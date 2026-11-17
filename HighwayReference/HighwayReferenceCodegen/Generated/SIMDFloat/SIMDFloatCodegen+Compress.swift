@@ -72,9 +72,11 @@ extension HighwayReferenceFloat {
     public static func compressed(_ a: SIMD, bitsUnchecked span: Span<UInt8>) -> SIMD {
         assert(span.count >= (laneCount + 7) / 8, "Span has fewer bytes than a mask has bits")
         return span.withUnsafeBufferPointer {
-            unsafe HighwayReference.Nothrow.compressedBitsF32(
-                a.raw,
-                $0.baseAddress.unsafelyUnwrapped
+            unsafe SIMD(
+                raw: HighwayReference.Nothrow.compressedBitsF32(
+                    a.raw,
+                    $0.baseAddress.unsafelyUnwrapped
+                )
             )
         }
     }
@@ -115,67 +117,76 @@ extension HighwayReferenceFloat {
 
 @inline(never)
 public func portCompressedF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mask) -> SIMD<Float> {
-    SIMDFloat.compressed(a, where: mask)
+    SIMD<Float>.compressed(a, where: mask)
 }
 
 @inline(never)
 public func highwayCompressedF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mask) -> SIMD<Float> {
-    HighwayReference.Nothrow.compressedF32(a.raw, mask.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.compressedF32(a.raw, mask.raw))
 }
 
 @inline(never)
 public func portCompressedF32ConstantA(where mask: SIMD<Float>.Mask) -> SIMD<Float> {
-    SIMDFloat.compressed(SIMDFloat.repeating(1.5), where: mask)
+    SIMD<Float>.compressed(SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
 public func highwayCompressedF32ConstantA(where mask: SIMD<Float>.Mask) -> SIMD<Float> {
-    HighwayReference.Nothrow.compressedF32(HighwayReference.Nothrow.repeatingF32(1.5).raw, mask.raw)
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.compressedF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            mask.raw
+        )
+    )
 }
 
 @inline(never)
 public func portCompressedNotF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mask) -> SIMD<Float> {
-    SIMDFloat.compressedNot(a, where: mask)
+    SIMD<Float>.compressedNot(a, where: mask)
 }
 
 @inline(never)
 public func highwayCompressedNotF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mask) -> SIMD<Float> {
-    HighwayReference.Nothrow.compressedNotF32(a.raw, mask.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.compressedNotF32(a.raw, mask.raw))
 }
 
 @inline(never)
 public func portCompressedNotF32ConstantA(where mask: SIMD<Float>.Mask) -> SIMD<Float> {
-    SIMDFloat.compressedNot(SIMDFloat.repeating(1.5), where: mask)
+    SIMD<Float>.compressedNot(SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
 public func highwayCompressedNotF32ConstantA(where mask: SIMD<Float>.Mask) -> SIMD<Float> {
-    HighwayReference.Nothrow.compressedNotF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        mask.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.compressedNotF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            mask.raw
+        )
     )
 }
 
 @inline(never)
 public func portPartitionedF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mask) -> SIMD<Float> {
-    SIMDFloat.partitioned(a, where: mask)
+    SIMD<Float>.partitioned(a, where: mask)
 }
 
 @inline(never)
 public func highwayPartitionedF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mask) -> SIMD<Float> {
-    HighwayReference.Nothrow.partitionedF32(a.raw, mask.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.partitionedF32(a.raw, mask.raw))
 }
 
 @inline(never)
 public func portPartitionedF32ConstantA(where mask: SIMD<Float>.Mask) -> SIMD<Float> {
-    SIMDFloat.partitioned(SIMDFloat.repeating(1.5), where: mask)
+    SIMD<Float>.partitioned(SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
 public func highwayPartitionedF32ConstantA(where mask: SIMD<Float>.Mask) -> SIMD<Float> {
-    HighwayReference.Nothrow.partitionedF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        mask.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.partitionedF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            mask.raw
+        )
     )
 }
 
@@ -185,7 +196,7 @@ public func portStoreCompressedF32(
     where mask: SIMD<Float>.Mask,
     to: UnsafeMutablePointer<Float>
 ) -> Int {
-    unsafe SIMDFloat.storeCompressed(a, where: mask, to: to)
+    unsafe SIMD<Float>.storeCompressed(a, where: mask, to: to)
 }
 
 @inline(never)
@@ -202,7 +213,7 @@ public func portStoreCompressedF32ConstantA(
     where mask: SIMD<Float>.Mask,
     to: UnsafeMutablePointer<Float>
 ) -> Int {
-    unsafe SIMDFloat.storeCompressed(SIMDFloat.repeating(1.5), where: mask, to: to)
+    unsafe SIMD<Float>.storeCompressed(SIMD<Float>.repeating(1.5), where: mask, to: to)
 }
 
 @inline(never)
@@ -211,7 +222,7 @@ public func highwayStoreCompressedF32ConstantA(
     to: UnsafeMutablePointer<Float>
 ) -> Int {
     unsafe HighwayReference.Nothrow.storeCompressedF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
         mask.raw,
         to
     )
@@ -223,7 +234,7 @@ public func portStoreCompressedBlendedF32(
     where mask: SIMD<Float>.Mask,
     to: UnsafeMutablePointer<Float>
 ) -> Int {
-    unsafe SIMDFloat.storeCompressedBlended(a, where: mask, to: to)
+    unsafe SIMD<Float>.storeCompressedBlended(a, where: mask, to: to)
 }
 
 @inline(never)
@@ -240,7 +251,7 @@ public func portStoreCompressedBlendedF32ConstantA(
     where mask: SIMD<Float>.Mask,
     to: UnsafeMutablePointer<Float>
 ) -> Int {
-    unsafe SIMDFloat.storeCompressedBlended(SIMDFloat.repeating(1.5), where: mask, to: to)
+    unsafe SIMD<Float>.storeCompressedBlended(SIMD<Float>.repeating(1.5), where: mask, to: to)
 }
 
 @inline(never)
@@ -249,7 +260,7 @@ public func highwayStoreCompressedBlendedF32ConstantA(
     to: UnsafeMutablePointer<Float>
 ) -> Int {
     unsafe HighwayReference.Nothrow.storeCompressedBlendedF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
         mask.raw,
         to
     )
@@ -257,24 +268,26 @@ public func highwayStoreCompressedBlendedF32ConstantA(
 
 @inline(never)
 public func portCompressedBitsF32(_ a: SIMD<Float>, bits: UnsafePointer<UInt8>) -> SIMD<Float> {
-    unsafe SIMDFloat.compressed(a, bits: bits)
+    unsafe SIMD<Float>.compressed(a, bits: bits)
 }
 
 @inline(never)
 public func highwayCompressedBitsF32(_ a: SIMD<Float>, bits: UnsafePointer<UInt8>) -> SIMD<Float> {
-    unsafe HighwayReference.Nothrow.compressedBitsF32(a.raw, bits)
+    unsafe SIMD<Float>(raw: HighwayReference.Nothrow.compressedBitsF32(a.raw, bits))
 }
 
 @inline(never)
 public func portCompressedBitsF32ConstantA(bits: UnsafePointer<UInt8>) -> SIMD<Float> {
-    unsafe SIMDFloat.compressed(SIMDFloat.repeating(1.5), bits: bits)
+    unsafe SIMD<Float>.compressed(SIMD<Float>.repeating(1.5), bits: bits)
 }
 
 @inline(never)
 public func highwayCompressedBitsF32ConstantA(bits: UnsafePointer<UInt8>) -> SIMD<Float> {
-    unsafe HighwayReference.Nothrow.compressedBitsF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        bits
+    unsafe SIMD<Float>(
+        raw: HighwayReference.Nothrow.compressedBitsF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            bits
+        )
     )
 }
 
@@ -284,7 +297,7 @@ public func portStoreCompressedBitsF32(
     bits: UnsafePointer<UInt8>,
     to: UnsafeMutablePointer<Float>
 ) -> Int {
-    unsafe SIMDFloat.storeCompressed(a, bits: bits, to: to)
+    unsafe SIMD<Float>.storeCompressed(a, bits: bits, to: to)
 }
 
 @inline(never)
@@ -301,7 +314,7 @@ public func portStoreCompressedBitsF32ConstantA(
     bits: UnsafePointer<UInt8>,
     to: UnsafeMutablePointer<Float>
 ) -> Int {
-    unsafe SIMDFloat.storeCompressed(SIMDFloat.repeating(1.5), bits: bits, to: to)
+    unsafe SIMD<Float>.storeCompressed(SIMD<Float>.repeating(1.5), bits: bits, to: to)
 }
 
 @inline(never)
@@ -310,7 +323,7 @@ public func highwayStoreCompressedBitsF32ConstantA(
     to: UnsafeMutablePointer<Float>
 ) -> Int {
     unsafe HighwayReference.Nothrow.storeCompressedBitsF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
         bits,
         to
     )

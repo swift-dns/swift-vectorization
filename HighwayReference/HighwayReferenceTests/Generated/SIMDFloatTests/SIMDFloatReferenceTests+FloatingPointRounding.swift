@@ -8,11 +8,11 @@ import Vectorization
 extension SIMDFloatReferenceTests {
     @Test func roundedToNearestOrEven() {
         let mismatches = Mismatches("roundedToNearestOrEven")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF505_C5C0_E215_BFAD)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF505_C5C0_E215_BFAD)
         for a in aInputs {
             mismatches.check(
                 H.roundedToNearestOrEven(a),
-                HighwayReference.roundedToNearestOrEvenF32(a.raw),
+                H(raw: HighwayReference.roundedToNearestOrEvenF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -21,11 +21,11 @@ extension SIMDFloatReferenceTests {
 
     @Test func roundedTowardZero() {
         let mismatches = Mismatches("roundedTowardZero")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAD05_1CCE_9943_A540)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAD05_1CCE_9943_A540)
         for a in aInputs {
             mismatches.check(
                 H.roundedTowardZero(a),
-                HighwayReference.roundedTowardZeroF32(a.raw),
+                H(raw: HighwayReference.roundedTowardZeroF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -34,11 +34,11 @@ extension SIMDFloatReferenceTests {
 
     @Test func roundedUp() {
         let mismatches = Mismatches("roundedUp")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD657_8134_8E59_1A8C)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD657_8134_8E59_1A8C)
         for a in aInputs {
             mismatches.check(
                 H.roundedUp(a),
-                HighwayReference.roundedUpF32(a.raw),
+                H(raw: HighwayReference.roundedUpF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -47,11 +47,11 @@ extension SIMDFloatReferenceTests {
 
     @Test func roundedDown() {
         let mismatches = Mismatches("roundedDown")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD975_5E1D_C882_9AC1)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD975_5E1D_C882_9AC1)
         for a in aInputs {
             mismatches.check(
                 H.roundedDown(a),
-                HighwayReference.roundedDownF32(a.raw),
+                H(raw: HighwayReference.roundedDownF32(a.raw)),
                 "a: \(describe(a))"
             )
         }

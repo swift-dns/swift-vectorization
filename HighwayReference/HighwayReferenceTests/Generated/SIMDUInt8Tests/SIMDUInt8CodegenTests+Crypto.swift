@@ -10,13 +10,11 @@ extension SIMDUInt8CodegenTests {
     @Test func aesRound() {
         let mismatches = Mismatches("portAesRoundU8")
         let aInputs =
-            Inputs.vectors(H.Vector.self, seed: 0x7EF8_9397_E4C3_6557)
+            Inputs.vectors(H.self, seed: 0x7EF8_9397_E4C3_6557)
             + (0..<256).map { start in
-                H.Vector(
-                    H.Vector.Simd((0..<H.laneCount).map { H.Lane(truncatingIfNeeded: start + $0) })
-                )
+                H(H.SIMDType((0..<H.laneCount).map { Lane(truncatingIfNeeded: start + $0) }))
             }
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7EF8_9297_E4C3_63A4)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7EF8_9297_E4C3_63A4)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portAesRoundU8(a, roundKey: b),
@@ -29,7 +27,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func aesRoundConstantA() {
         let mismatches = Mismatches("portAesRoundU8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB396_15B1_91F8_31E3)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB396_15B1_91F8_31E3)
         for b in bInputs {
             mismatches.check(
                 portAesRoundU8ConstantA(roundKey: b),
@@ -43,11 +41,9 @@ extension SIMDUInt8CodegenTests {
     @Test func aesRoundConstantB() {
         let mismatches = Mismatches("portAesRoundU8ConstantB")
         let aInputs =
-            Inputs.vectors(H.Vector.self, seed: 0xBC97_CBB1_972B_0AA5)
+            Inputs.vectors(H.self, seed: 0xBC97_CBB1_972B_0AA5)
             + (0..<256).map { start in
-                H.Vector(
-                    H.Vector.Simd((0..<H.laneCount).map { H.Lane(truncatingIfNeeded: start + $0) })
-                )
+                H(H.SIMDType((0..<H.laneCount).map { Lane(truncatingIfNeeded: start + $0) }))
             }
         for a in aInputs {
             mismatches.check(
@@ -62,13 +58,11 @@ extension SIMDUInt8CodegenTests {
     @Test func aesLastRound() {
         let mismatches = Mismatches("portAesLastRoundU8")
         let aInputs =
-            Inputs.vectors(H.Vector.self, seed: 0x98BA_E92E_8275_29F7)
+            Inputs.vectors(H.self, seed: 0x98BA_E92E_8275_29F7)
             + (0..<256).map { start in
-                H.Vector(
-                    H.Vector.Simd((0..<H.laneCount).map { H.Lane(truncatingIfNeeded: start + $0) })
-                )
+                H(H.SIMDType((0..<H.laneCount).map { Lane(truncatingIfNeeded: start + $0) }))
             }
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x98BA_E82E_8275_2844)
+        let bInputs = Inputs.vectors(H.self, seed: 0x98BA_E82E_8275_2844)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portAesLastRoundU8(a, roundKey: b),
@@ -81,7 +75,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func aesLastRoundConstantA() {
         let mismatches = Mismatches("portAesLastRoundU8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA614_3C74_8EAE_E903)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA614_3C74_8EAE_E903)
         for b in bInputs {
             mismatches.check(
                 portAesLastRoundU8ConstantA(roundKey: b),
@@ -95,11 +89,9 @@ extension SIMDUInt8CodegenTests {
     @Test func aesLastRoundConstantB() {
         let mismatches = Mismatches("portAesLastRoundU8ConstantB")
         let aInputs =
-            Inputs.vectors(H.Vector.self, seed: 0xAF15_F274_93E1_C1C5)
+            Inputs.vectors(H.self, seed: 0xAF15_F274_93E1_C1C5)
             + (0..<256).map { start in
-                H.Vector(
-                    H.Vector.Simd((0..<H.laneCount).map { H.Lane(truncatingIfNeeded: start + $0) })
-                )
+                H(H.SIMDType((0..<H.laneCount).map { Lane(truncatingIfNeeded: start + $0) }))
             }
         for a in aInputs {
             mismatches.check(
@@ -114,13 +106,11 @@ extension SIMDUInt8CodegenTests {
     @Test func aesRoundInverse() {
         let mismatches = Mismatches("portAesRoundInverseU8")
         let aInputs =
-            Inputs.vectors(H.Vector.self, seed: 0xB0A4_CA76_71A2_526B)
+            Inputs.vectors(H.self, seed: 0xB0A4_CA76_71A2_526B)
             + (0..<256).map { start in
-                H.Vector(
-                    H.Vector.Simd((0..<H.laneCount).map { H.Lane(truncatingIfNeeded: start + $0) })
-                )
+                H(H.SIMDType((0..<H.laneCount).map { Lane(truncatingIfNeeded: start + $0) }))
             }
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB0A4_C976_71A2_50B8)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB0A4_C976_71A2_50B8)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portAesRoundInverseU8(a, roundKey: b),
@@ -133,7 +123,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func aesRoundInverseConstantA() {
         let mismatches = Mismatches("portAesRoundInverseU8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8B3E_1EF9_EC35_B127)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8B3E_1EF9_EC35_B127)
         for b in bInputs {
             mismatches.check(
                 portAesRoundInverseU8ConstantA(roundKey: b),
@@ -147,11 +137,9 @@ extension SIMDUInt8CodegenTests {
     @Test func aesRoundInverseConstantB() {
         let mismatches = Mismatches("portAesRoundInverseU8ConstantB")
         let aInputs =
-            Inputs.vectors(H.Vector.self, seed: 0x94AC_B4F9_F1C5_2569)
+            Inputs.vectors(H.self, seed: 0x94AC_B4F9_F1C5_2569)
             + (0..<256).map { start in
-                H.Vector(
-                    H.Vector.Simd((0..<H.laneCount).map { H.Lane(truncatingIfNeeded: start + $0) })
-                )
+                H(H.SIMDType((0..<H.laneCount).map { Lane(truncatingIfNeeded: start + $0) }))
             }
         for a in aInputs {
             mismatches.check(
@@ -166,13 +154,11 @@ extension SIMDUInt8CodegenTests {
     @Test func aesLastRoundInverse() {
         let mismatches = Mismatches("portAesLastRoundInverseU8")
         let aInputs =
-            Inputs.vectors(H.Vector.self, seed: 0x799C_5422_5755_074B)
+            Inputs.vectors(H.self, seed: 0x799C_5422_5755_074B)
             + (0..<256).map { start in
-                H.Vector(
-                    H.Vector.Simd((0..<H.laneCount).map { H.Lane(truncatingIfNeeded: start + $0) })
-                )
+                H(H.SIMDType((0..<H.laneCount).map { Lane(truncatingIfNeeded: start + $0) }))
             }
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x799C_5322_5755_0598)
+        let bInputs = Inputs.vectors(H.self, seed: 0x799C_5322_5755_0598)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portAesLastRoundInverseU8(a, roundKey: b),
@@ -185,7 +171,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func aesLastRoundInverseConstantA() {
         let mismatches = Mismatches("portAesLastRoundInverseU8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2BEF_0D42_7851_4A07)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2BEF_0D42_7851_4A07)
         for b in bInputs {
             mismatches.check(
                 portAesLastRoundInverseU8ConstantA(roundKey: b),
@@ -199,11 +185,9 @@ extension SIMDUInt8CodegenTests {
     @Test func aesLastRoundInverseConstantB() {
         let mismatches = Mismatches("portAesLastRoundInverseU8ConstantB")
         let aInputs =
-            Inputs.vectors(H.Vector.self, seed: 0x33AA_A342_7C6F_29C9)
+            Inputs.vectors(H.self, seed: 0x33AA_A342_7C6F_29C9)
             + (0..<256).map { start in
-                H.Vector(
-                    H.Vector.Simd((0..<H.laneCount).map { H.Lane(truncatingIfNeeded: start + $0) })
-                )
+                H(H.SIMDType((0..<H.laneCount).map { Lane(truncatingIfNeeded: start + $0) }))
             }
         for a in aInputs {
             mismatches.check(
@@ -218,11 +202,9 @@ extension SIMDUInt8CodegenTests {
     @Test func aesInverseMixColumns() {
         let mismatches = Mismatches("portAesInverseMixColumnsU8")
         let aInputs =
-            Inputs.vectors(H.Vector.self, seed: 0x1444_CEB0_5E0A_A5FE)
+            Inputs.vectors(H.self, seed: 0x1444_CEB0_5E0A_A5FE)
             + (0..<256).map { start in
-                H.Vector(
-                    H.Vector.Simd((0..<H.laneCount).map { H.Lane(truncatingIfNeeded: start + $0) })
-                )
+                H(H.SIMDType((0..<H.laneCount).map { Lane(truncatingIfNeeded: start + $0) }))
             }
         for a in aInputs {
             mismatches.check(
@@ -247,11 +229,9 @@ extension SIMDUInt8CodegenTests {
     @Test func aesKeyGenerationAssist() {
         let mismatches = Mismatches("portAesKeyGenerationAssistU8")
         let aInputs =
-            Inputs.vectors(H.Vector.self, seed: 0x9871_BD87_DD5D_0361)
+            Inputs.vectors(H.self, seed: 0x9871_BD87_DD5D_0361)
             + (0..<256).map { start in
-                H.Vector(
-                    H.Vector.Simd((0..<H.laneCount).map { H.Lane(truncatingIfNeeded: start + $0) })
-                )
+                H(H.SIMDType((0..<H.laneCount).map { Lane(truncatingIfNeeded: start + $0) }))
             }
         let roundConstantInputs = [UInt8](0...255)
         for (a, roundConstant) in everyPair(aInputs, roundConstantInputs) {
@@ -280,11 +260,9 @@ extension SIMDUInt8CodegenTests {
     @Test func aesKeyGenerationAssistConstantRoundConstant() {
         let mismatches = Mismatches("portAesKeyGenerationAssistU8ConstantRoundConstant")
         let aInputs =
-            Inputs.vectors(H.Vector.self, seed: 0x5DED_B513_7FE5_2B29)
+            Inputs.vectors(H.self, seed: 0x5DED_B513_7FE5_2B29)
             + (0..<256).map { start in
-                H.Vector(
-                    H.Vector.Simd((0..<H.laneCount).map { H.Lane(truncatingIfNeeded: start + $0) })
-                )
+                H(H.SIMDType((0..<H.laneCount).map { Lane(truncatingIfNeeded: start + $0) }))
             }
         for a in aInputs {
             mismatches.check(

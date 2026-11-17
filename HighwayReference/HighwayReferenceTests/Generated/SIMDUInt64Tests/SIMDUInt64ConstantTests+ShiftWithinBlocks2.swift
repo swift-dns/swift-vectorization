@@ -9,12 +9,12 @@ extension SIMDUInt64ConstantTests {
     @inline(__always)
     private func checkCombinedShiftedRightLanesConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("combinedShiftedRightLanes with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE364_4D09_BEC5_5FE2)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE364_4E09_BEC5_6195)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE364_4D09_BEC5_5FE2)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE364_4E09_BEC5_6195)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.combinedShiftedRightLanes(a, b, by: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.combinedShiftedRightLanesU64(
                         a.raw,
                         b.raw,
@@ -34,12 +34,12 @@ extension SIMDUInt64ConstantTests {
     @inline(__always)
     private func checkCombinedShiftedRightLanesUncheckedConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("combinedShiftedRightLanes unchecked with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6AF7_F0D4_2A2B_B6E2)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6AF7_F1D4_2A2B_B895)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6AF7_F0D4_2A2B_B6E2)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6AF7_F1D4_2A2B_B895)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 unsafe H.combinedShiftedRightLanes(a, b, byUnchecked: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.combinedShiftedRightLanesU64(
                         a.raw,
                         b.raw,
@@ -57,19 +57,19 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkCombinedShiftedRightLanesConstantA(_ value: H.Lane) {
+    private func checkCombinedShiftedRightLanesConstantA(_ value: Lane) {
         let mismatches = Mismatches("combinedShiftedRightLanes with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x156A_90AF_A266_42F5)
+        let bInputs = Inputs.vectors(H.self, seed: 0x156A_90AF_A266_42F5)
         let lanesInputs = Array(1...1)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for (b, lanes) in everyPair(bInputs, lanesInputs) {
             mismatches.check(
                 H.combinedShiftedRightLanes(H.repeating(value), b, by: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.combinedShiftedRightLanesU64(
                         H.repeating(value).raw,
                         b.raw,
@@ -83,19 +83,19 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkCombinedShiftedRightLanesConstantB(_ value: H.Lane) {
+    private func checkCombinedShiftedRightLanesConstantB(_ value: Lane) {
         let mismatches = Mismatches("combinedShiftedRightLanes with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFAD1_8AAF_9329_0723)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFAD1_8AAF_9329_0723)
         let lanesInputs = Array(1...1)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.combinedShiftedRightLanes(a, H.repeating(value), by: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.combinedShiftedRightLanesU64(
                         a.raw,
                         H.repeating(value).raw,
@@ -169,7 +169,7 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func combinedShiftedRightLanesConstantSplatMax() {
-        checkCombinedShiftedRightLanesConstantA(H.Lane.max)
-        checkCombinedShiftedRightLanesConstantB(H.Lane.max)
+        checkCombinedShiftedRightLanesConstantA(Lane.max)
+        checkCombinedShiftedRightLanesConstantB(Lane.max)
     }
 }

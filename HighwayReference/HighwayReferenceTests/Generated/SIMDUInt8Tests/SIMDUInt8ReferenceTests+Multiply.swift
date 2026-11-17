@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDUInt8ReferenceTests {
     @Test func multiplying() {
         let mismatches = Mismatches("multiplying")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1A44_9D57_20E2_22D4)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1A44_9E57_20E2_2487)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1A44_9D57_20E2_22D4)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1A44_9E57_20E2_2487)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplying(a, b),
-                H.Vector(raw: HighwayReference.multiplyingU8(a.raw, b.raw)),
+                H(raw: HighwayReference.multiplyingU8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -22,12 +22,12 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func multiplyingHigh() {
         let mismatches = Mismatches("multiplyingHigh")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAE12_B79E_4745_1E18)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xAE12_B89E_4745_1FCB)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAE12_B79E_4745_1E18)
+        let bInputs = Inputs.vectors(H.self, seed: 0xAE12_B89E_4745_1FCB)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplyingHigh(a, b),
-                H.Vector(raw: HighwayReference.multiplyingHighU8(a.raw, b.raw)),
+                H(raw: HighwayReference.multiplyingHighU8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

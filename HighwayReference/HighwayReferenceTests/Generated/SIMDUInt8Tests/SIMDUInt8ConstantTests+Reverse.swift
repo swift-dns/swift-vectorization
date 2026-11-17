@@ -7,16 +7,16 @@ import Vectorization
 
 extension SIMDUInt8ConstantTests {
     @inline(__always)
-    private func checkReversedConstantA(_ value: H.Lane) {
+    private func checkReversedConstantA(_ value: Lane) {
         let mismatches = Mismatches("reversed with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         mismatches.check(
             H.reversed(H.repeating(value)),
-            H.Vector(raw: HighwayReference.reversedU8(H.repeating(value).raw)),
+            H(raw: HighwayReference.reversedU8(H.repeating(value).raw)),
             ""
         )
         mismatches.record()

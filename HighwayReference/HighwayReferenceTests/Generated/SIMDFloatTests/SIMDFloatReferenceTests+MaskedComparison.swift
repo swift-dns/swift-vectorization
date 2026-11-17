@@ -9,8 +9,8 @@ extension SIMDFloatReferenceTests {
     @Test func equalToWhere() {
         let mismatches = Mismatches("equalToWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE6D9_FFEE_32CA_52F2)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE6DA_00EE_32CA_54A5)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE6D9_FDEE_32CA_4F8C)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE6DA_00EE_32CA_54A5)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE6D9_FDEE_32CA_4F8C)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x3684_53DA_EC97_B736)
         {
             mismatches.check(
@@ -25,8 +25,8 @@ extension SIMDFloatReferenceTests {
     @Test func equalToWhereNonCanonical() {
         let mismatches = Mismatches("equalToWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x74BC_F606_85FB_9769)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x74BC_F506_85FB_95B6)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x74BC_F406_85FB_9403)
+        let aInputs = Inputs.vectors(H.self, seed: 0x74BC_F506_85FB_95B6)
+        let bInputs = Inputs.vectors(H.self, seed: 0x74BC_F406_85FB_9403)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x2F88_B82F_A813_6523)
         {
             mismatches.check(
@@ -41,8 +41,8 @@ extension SIMDFloatReferenceTests {
     @Test func notEqualToWhere() {
         let mismatches = Mismatches("notEqualToWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB469_06D9_873D_0001)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB469_05D9_873C_FE4E)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB469_04D9_873C_FC9B)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB469_05D9_873C_FE4E)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB469_04D9_873C_FC9B)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x31A6_E1FD_20DF_2CFB)
         {
             mismatches.check(
@@ -57,8 +57,8 @@ extension SIMDFloatReferenceTests {
     @Test func notEqualToWhereNonCanonical() {
         let mismatches = Mismatches("notEqualToWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x9A6B_833B_20EE_2986)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9A6B_843B_20EE_2B39)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9A6B_813B_20EE_2620)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9A6B_843B_20EE_2B39)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9A6B_813B_20EE_2620)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xC800_8289_CCE0_8602)
         {
             mismatches.check(
@@ -73,8 +73,8 @@ extension SIMDFloatReferenceTests {
     @Test func lessThanWhere() {
         let mismatches = Mismatches("lessThanWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8150_DFB2_24CD_8271)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8150_DEB2_24CD_80BE)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8150_DDB2_24CD_7F0B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8150_DEB2_24CD_80BE)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8150_DDB2_24CD_7F0B)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x1023_3BCB_17C7_452B)
         {
             mismatches.check(
@@ -89,8 +89,8 @@ extension SIMDFloatReferenceTests {
     @Test func lessThanWhereNonCanonical() {
         let mismatches = Mismatches("lessThanWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x866E_ADF4_FEA5_1236)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x866E_AEF4_FEA5_13E9)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x866E_ABF4_FEA5_0ED0)
+        let aInputs = Inputs.vectors(H.self, seed: 0x866E_AEF4_FEA5_13E9)
+        let bInputs = Inputs.vectors(H.self, seed: 0x866E_ABF4_FEA5_0ED0)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x2A95_E184_3126_2132)
         {
             mismatches.check(
@@ -105,8 +105,8 @@ extension SIMDFloatReferenceTests {
     @Test func greaterThanWhere() {
         let mismatches = Mismatches("greaterThanWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB9D2_DCBB_F793_3526)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB9D2_DDBB_F793_36D9)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB9D2_DABB_F793_31C0)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB9D2_DDBB_F793_36D9)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB9D2_DABB_F793_31C0)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x3081_DE66_0CA5_4022)
         {
             mismatches.check(
@@ -121,8 +121,8 @@ extension SIMDFloatReferenceTests {
     @Test func greaterThanWhereNonCanonical() {
         let mismatches = Mismatches("greaterThanWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xD1A2_6056_E774_DED5)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD1A2_5F56_E774_DD22)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD1A2_5E56_E774_DB6F)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD1A2_5F56_E774_DD22)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD1A2_5E56_E774_DB6F)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x1642_24CC_172B_AE07)
         {
             mismatches.check(
@@ -137,8 +137,8 @@ extension SIMDFloatReferenceTests {
     @Test func lessThanOrEqualToWhere() {
         let mismatches = Mismatches("lessThanOrEqualToWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1AD7_368B_B1FD_BEE1)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1AD7_358B_B1FD_BD2E)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1AD7_348B_B1FD_BB7B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1AD7_358B_B1FD_BD2E)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1AD7_348B_B1FD_BB7B)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xFF6F_A6E6_362C_F8DB)
         {
             mismatches.check(
@@ -153,8 +153,8 @@ extension SIMDFloatReferenceTests {
     @Test func lessThanOrEqualToWhereNonCanonical() {
         let mismatches = Mismatches("lessThanOrEqualToWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x1DA2_877B_15B2_34E6)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1DA2_887B_15B2_3699)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1DA2_857B_15B2_3180)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1DA2_887B_15B2_3699)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1DA2_857B_15B2_3180)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x3BF0_526C_C9A8_4962)
         {
             mismatches.check(
@@ -169,8 +169,8 @@ extension SIMDFloatReferenceTests {
     @Test func greaterThanOrEqualToWhere() {
         let mismatches = Mismatches("greaterThanOrEqualToWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x25B6_4A26_F683_2BD0)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x25B6_4B26_F683_2D83)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x25B6_4C26_F683_2F36)
+        let aInputs = Inputs.vectors(H.self, seed: 0x25B6_4B26_F683_2D83)
+        let bInputs = Inputs.vectors(H.self, seed: 0x25B6_4C26_F683_2F36)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x6DBD_E111_E89C_828C)
         {
             mismatches.check(
@@ -185,8 +185,8 @@ extension SIMDFloatReferenceTests {
     @Test func greaterThanOrEqualToWhereNonCanonical() {
         let mismatches = Mismatches("greaterThanOrEqualToWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x211A_72D6_E879_868F)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x211A_71D6_E879_84DC)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x211A_74D6_E879_89F5)
+        let aInputs = Inputs.vectors(H.self, seed: 0x211A_71D6_E879_84DC)
+        let bInputs = Inputs.vectors(H.self, seed: 0x211A_74D6_E879_89F5)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x991C_B6BD_EB66_9CE9)
         {
             mismatches.check(

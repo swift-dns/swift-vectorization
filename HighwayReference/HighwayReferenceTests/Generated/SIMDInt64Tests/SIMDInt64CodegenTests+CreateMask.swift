@@ -58,7 +58,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func maskFromVector() {
         let mismatches = Mismatches("portMaskFromVectorI64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB7D7_4AE9_CFCE_0887)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB7D7_4AE9_CFCE_0887)
         for a in aInputs {
             mismatches.check(
                 portMaskFromVectorI64(from: a),
@@ -101,7 +101,7 @@ extension SIMDInt64CodegenTests {
     @Test func repeatingBlockMask() {
         let mismatches = Mismatches("portRepeatingBlockMaskI64")
         let bitsInputs = Inputs.maskBits(
-            lanes: 16 / MemoryLayout<H.Lane>.size,
+            lanes: 16 / MemoryLayout<Lane>.size,
             seed: 0xD3DC_4067_302F_E396
         )
         for bits in bitsInputs {

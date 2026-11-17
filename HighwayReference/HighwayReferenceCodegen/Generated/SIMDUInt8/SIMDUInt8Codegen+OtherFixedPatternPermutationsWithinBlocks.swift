@@ -5,24 +5,24 @@ public import Vectorization
 
 @inline(never)
 public func portOddEvenU8(_ a: SIMD<UInt8>, _ b: SIMD<UInt8>) -> SIMD<UInt8> {
-    SIMDUInt8.oddEven(a, b)
+    SIMD<UInt8>.oddEven(a, b)
 }
 
 @inline(never)
 public func highwayOddEvenU8(_ a: SIMD<UInt8>, _ b: SIMD<UInt8>) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.oddEvenU8(a.raw, b.raw))
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.oddEvenU8(a.raw, b.raw))
 }
 
 @inline(never)
 public func portOddEvenU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8> {
-    SIMDUInt8.oddEven(SIMDUInt8.repeating(26), b)
+    SIMD<UInt8>.oddEven(SIMD<UInt8>.repeating(26), b)
 }
 
 @inline(never)
 public func highwayOddEvenU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.oddEvenU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             b.raw
         )
     )
@@ -30,63 +30,63 @@ public func highwayOddEvenU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8> {
 
 @inline(never)
 public func portOddEvenU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
-    SIMDUInt8.oddEven(a, SIMDUInt8.repeating(26))
+    SIMD<UInt8>.oddEven(a, SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
 public func highwayOddEvenU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.oddEvenU8(
             a.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portDuplicatingEvenU8(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
-    SIMDUInt8.duplicatingEven(a)
+    SIMD<UInt8>.duplicatingEven(a)
 }
 
 @inline(never)
 public func highwayDuplicatingEvenU8(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.duplicatingEvenU8(a.raw))
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.duplicatingEvenU8(a.raw))
 }
 
 @inline(never)
 public func portDuplicatingEvenU8ConstantA() -> SIMD<UInt8> {
-    SIMDUInt8.duplicatingEven(SIMDUInt8.repeating(26))
+    SIMD<UInt8>.duplicatingEven(SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
 public func highwayDuplicatingEvenU8ConstantA() -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.duplicatingEvenU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portDuplicatingOddU8(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
-    SIMDUInt8.duplicatingOdd(a)
+    SIMD<UInt8>.duplicatingOdd(a)
 }
 
 @inline(never)
 public func highwayDuplicatingOddU8(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.duplicatingOddU8(a.raw))
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.duplicatingOddU8(a.raw))
 }
 
 @inline(never)
 public func portDuplicatingOddU8ConstantA() -> SIMD<UInt8> {
-    SIMDUInt8.duplicatingOdd(SIMDUInt8.repeating(26))
+    SIMD<UInt8>.duplicatingOdd(SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
 public func highwayDuplicatingOddU8ConstantA() -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.duplicatingOddU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }

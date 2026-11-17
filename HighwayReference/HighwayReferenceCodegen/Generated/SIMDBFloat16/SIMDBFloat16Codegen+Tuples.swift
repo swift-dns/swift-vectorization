@@ -8,7 +8,7 @@ public func portCreate2BF16(
     _ a: SIMD<BFloat16>,
     _ b: SIMD<BFloat16>
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>) {
-    SIMDBFloat16.create2(a, b)
+    SIMD<BFloat16>.create2(a, b)
 }
 
 @inline(never)
@@ -16,21 +16,21 @@ public func highwayCreate2BF16(
     _ a: SIMD<BFloat16>,
     _ b: SIMD<BFloat16>
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>) {
-    { tuple in (SIMDBFloat16.Vector(raw: tuple.v0), SIMDBFloat16.Vector(raw: tuple.v1)) }(
+    { tuple in (SIMD<BFloat16>(raw: tuple.v0), SIMD<BFloat16>(raw: tuple.v1)) }(
         HighwayReference.Nothrow.create2BF16(a.raw, b.raw)
     )
 }
 
 @inline(never)
 public func portCreate2BF16ConstantA(_ b: SIMD<BFloat16>) -> (SIMD<BFloat16>, SIMD<BFloat16>) {
-    SIMDBFloat16.create2(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), b)
+    SIMD<BFloat16>.create2(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)), b)
 }
 
 @inline(never)
 public func highwayCreate2BF16ConstantA(_ b: SIMD<BFloat16>) -> (SIMD<BFloat16>, SIMD<BFloat16>) {
-    { tuple in (SIMDBFloat16.Vector(raw: tuple.v0), SIMDBFloat16.Vector(raw: tuple.v1)) }(
+    { tuple in (SIMD<BFloat16>(raw: tuple.v0), SIMD<BFloat16>(raw: tuple.v1)) }(
         HighwayReference.Nothrow.create2BF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             b.raw
@@ -40,15 +40,15 @@ public func highwayCreate2BF16ConstantA(_ b: SIMD<BFloat16>) -> (SIMD<BFloat16>,
 
 @inline(never)
 public func portCreate2BF16ConstantB(_ a: SIMD<BFloat16>) -> (SIMD<BFloat16>, SIMD<BFloat16>) {
-    SIMDBFloat16.create2(a, SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+    SIMD<BFloat16>.create2(a, SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayCreate2BF16ConstantB(_ a: SIMD<BFloat16>) -> (SIMD<BFloat16>, SIMD<BFloat16>) {
-    { tuple in (SIMDBFloat16.Vector(raw: tuple.v0), SIMDBFloat16.Vector(raw: tuple.v1)) }(
+    { tuple in (SIMD<BFloat16>(raw: tuple.v0), SIMD<BFloat16>(raw: tuple.v1)) }(
         HighwayReference.Nothrow.create2BF16(
             a.raw,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -60,7 +60,7 @@ public func portGet2BF16(
     _ tuple: (SIMD<BFloat16>, SIMD<BFloat16>),
     atUnchecked index: Int
 ) -> SIMD<BFloat16> {
-    unsafe SIMDBFloat16.get2(tuple, atUnchecked: index)
+    unsafe SIMD<BFloat16>.get2(tuple, atUnchecked: index)
 }
 
 @inline(never)
@@ -68,7 +68,7 @@ public func highwayGet2BF16(
     _ tuple: (SIMD<BFloat16>, SIMD<BFloat16>),
     atUnchecked index: Int
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.get2BF16(
             cvectorization_ops_tuple2_bf16(v0: tuple.0.raw, v1: tuple.1.raw),
             index
@@ -78,14 +78,14 @@ public func highwayGet2BF16(
 
 @inline(never)
 public func portGet2BF16ConstantIndex(_ tuple: (SIMD<BFloat16>, SIMD<BFloat16>)) -> SIMD<BFloat16> {
-    unsafe SIMDBFloat16.get2(tuple, atUnchecked: 1)
+    unsafe SIMD<BFloat16>.get2(tuple, atUnchecked: 1)
 }
 
 @inline(never)
 public func highwayGet2BF16ConstantIndex(
     _ tuple: (SIMD<BFloat16>, SIMD<BFloat16>)
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.get2BF16(
             cvectorization_ops_tuple2_bf16(v0: tuple.0.raw, v1: tuple.1.raw),
             1
@@ -99,7 +99,7 @@ public func portSet2BF16(
     atUnchecked index: Int,
     to a: SIMD<BFloat16>
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>) {
-    unsafe SIMDBFloat16.set2(tuple, atUnchecked: index, to: a)
+    unsafe SIMD<BFloat16>.set2(tuple, atUnchecked: index, to: a)
 }
 
 @inline(never)
@@ -108,7 +108,7 @@ public func highwaySet2BF16(
     atUnchecked index: Int,
     to a: SIMD<BFloat16>
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>) {
-    { tuple in (SIMDBFloat16.Vector(raw: tuple.v0), SIMDBFloat16.Vector(raw: tuple.v1)) }(
+    { tuple in (SIMD<BFloat16>(raw: tuple.v0), SIMD<BFloat16>(raw: tuple.v1)) }(
         HighwayReference.Nothrow.set2BF16(
             cvectorization_ops_tuple2_bf16(v0: tuple.0.raw, v1: tuple.1.raw),
             index,
@@ -122,7 +122,7 @@ public func portSet2BF16ConstantIndex(
     _ tuple: (SIMD<BFloat16>, SIMD<BFloat16>),
     to a: SIMD<BFloat16>
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>) {
-    unsafe SIMDBFloat16.set2(tuple, atUnchecked: 1, to: a)
+    unsafe SIMD<BFloat16>.set2(tuple, atUnchecked: 1, to: a)
 }
 
 @inline(never)
@@ -130,7 +130,7 @@ public func highwaySet2BF16ConstantIndex(
     _ tuple: (SIMD<BFloat16>, SIMD<BFloat16>),
     to a: SIMD<BFloat16>
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>) {
-    { tuple in (SIMDBFloat16.Vector(raw: tuple.v0), SIMDBFloat16.Vector(raw: tuple.v1)) }(
+    { tuple in (SIMD<BFloat16>(raw: tuple.v0), SIMD<BFloat16>(raw: tuple.v1)) }(
         HighwayReference.Nothrow.set2BF16(
             cvectorization_ops_tuple2_bf16(v0: tuple.0.raw, v1: tuple.1.raw),
             1,
@@ -144,10 +144,10 @@ public func portSet2BF16ConstantA(
     _ tuple: (SIMD<BFloat16>, SIMD<BFloat16>),
     atUnchecked index: Int
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>) {
-    unsafe SIMDBFloat16.set2(
+    unsafe SIMD<BFloat16>.set2(
         tuple,
         atUnchecked: index,
-        to: SIMDBFloat16.repeating(BFloat16(bitPattern: 26))
+        to: SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26))
     )
 }
 
@@ -156,11 +156,11 @@ public func highwaySet2BF16ConstantA(
     _ tuple: (SIMD<BFloat16>, SIMD<BFloat16>),
     atUnchecked index: Int
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>) {
-    { tuple in (SIMDBFloat16.Vector(raw: tuple.v0), SIMDBFloat16.Vector(raw: tuple.v1)) }(
+    { tuple in (SIMD<BFloat16>(raw: tuple.v0), SIMD<BFloat16>(raw: tuple.v1)) }(
         HighwayReference.Nothrow.set2BF16(
             cvectorization_ops_tuple2_bf16(v0: tuple.0.raw, v1: tuple.1.raw),
             index,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -173,7 +173,7 @@ public func portCreate3BF16(
     _ b: SIMD<BFloat16>,
     _ c: SIMD<BFloat16>
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
-    SIMDBFloat16.create3(a, b, c)
+    SIMD<BFloat16>.create3(a, b, c)
 }
 
 @inline(never)
@@ -184,8 +184,8 @@ public func highwayCreate3BF16(
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
     { tuple in
         (
-            SIMDBFloat16.Vector(raw: tuple.v0), SIMDBFloat16.Vector(raw: tuple.v1),
-            SIMDBFloat16.Vector(raw: tuple.v2)
+            SIMD<BFloat16>(raw: tuple.v0), SIMD<BFloat16>(raw: tuple.v1),
+            SIMD<BFloat16>(raw: tuple.v2)
         )
     }(HighwayReference.Nothrow.create3BF16(a.raw, b.raw, c.raw))
 }
@@ -195,7 +195,7 @@ public func portCreate3BF16ConstantA(
     _ b: SIMD<BFloat16>,
     _ c: SIMD<BFloat16>
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
-    SIMDBFloat16.create3(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), b, c)
+    SIMD<BFloat16>.create3(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)), b, c)
 }
 
 @inline(never)
@@ -205,12 +205,12 @@ public func highwayCreate3BF16ConstantA(
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
     { tuple in
         (
-            SIMDBFloat16.Vector(raw: tuple.v0), SIMDBFloat16.Vector(raw: tuple.v1),
-            SIMDBFloat16.Vector(raw: tuple.v2)
+            SIMD<BFloat16>(raw: tuple.v0), SIMD<BFloat16>(raw: tuple.v1),
+            SIMD<BFloat16>(raw: tuple.v2)
         )
     }(
         HighwayReference.Nothrow.create3BF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             b.raw,
@@ -224,7 +224,7 @@ public func portCreate3BF16ConstantB(
     _ a: SIMD<BFloat16>,
     _ c: SIMD<BFloat16>
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
-    SIMDBFloat16.create3(a, SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), c)
+    SIMD<BFloat16>.create3(a, SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)), c)
 }
 
 @inline(never)
@@ -234,13 +234,13 @@ public func highwayCreate3BF16ConstantB(
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
     { tuple in
         (
-            SIMDBFloat16.Vector(raw: tuple.v0), SIMDBFloat16.Vector(raw: tuple.v1),
-            SIMDBFloat16.Vector(raw: tuple.v2)
+            SIMD<BFloat16>(raw: tuple.v0), SIMD<BFloat16>(raw: tuple.v1),
+            SIMD<BFloat16>(raw: tuple.v2)
         )
     }(
         HighwayReference.Nothrow.create3BF16(
             a.raw,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             c.raw
@@ -253,7 +253,7 @@ public func portCreate3BF16ConstantC(
     _ a: SIMD<BFloat16>,
     _ b: SIMD<BFloat16>
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
-    SIMDBFloat16.create3(a, b, SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+    SIMD<BFloat16>.create3(a, b, SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
@@ -263,14 +263,14 @@ public func highwayCreate3BF16ConstantC(
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
     { tuple in
         (
-            SIMDBFloat16.Vector(raw: tuple.v0), SIMDBFloat16.Vector(raw: tuple.v1),
-            SIMDBFloat16.Vector(raw: tuple.v2)
+            SIMD<BFloat16>(raw: tuple.v0), SIMD<BFloat16>(raw: tuple.v1),
+            SIMD<BFloat16>(raw: tuple.v2)
         )
     }(
         HighwayReference.Nothrow.create3BF16(
             a.raw,
             b.raw,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -282,7 +282,7 @@ public func portGet3BF16(
     _ tuple: (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>),
     atUnchecked index: Int
 ) -> SIMD<BFloat16> {
-    unsafe SIMDBFloat16.get3(tuple, atUnchecked: index)
+    unsafe SIMD<BFloat16>.get3(tuple, atUnchecked: index)
 }
 
 @inline(never)
@@ -290,7 +290,7 @@ public func highwayGet3BF16(
     _ tuple: (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>),
     atUnchecked index: Int
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.get3BF16(
             cvectorization_ops_tuple3_bf16(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
             index
@@ -302,14 +302,14 @@ public func highwayGet3BF16(
 public func portGet3BF16ConstantIndex(
     _ tuple: (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>)
 ) -> SIMD<BFloat16> {
-    unsafe SIMDBFloat16.get3(tuple, atUnchecked: 1)
+    unsafe SIMD<BFloat16>.get3(tuple, atUnchecked: 1)
 }
 
 @inline(never)
 public func highwayGet3BF16ConstantIndex(
     _ tuple: (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>)
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.get3BF16(
             cvectorization_ops_tuple3_bf16(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
             1
@@ -323,7 +323,7 @@ public func portSet3BF16(
     atUnchecked index: Int,
     to a: SIMD<BFloat16>
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
-    unsafe SIMDBFloat16.set3(tuple, atUnchecked: index, to: a)
+    unsafe SIMD<BFloat16>.set3(tuple, atUnchecked: index, to: a)
 }
 
 @inline(never)
@@ -334,8 +334,8 @@ public func highwaySet3BF16(
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
     { tuple in
         (
-            SIMDBFloat16.Vector(raw: tuple.v0), SIMDBFloat16.Vector(raw: tuple.v1),
-            SIMDBFloat16.Vector(raw: tuple.v2)
+            SIMD<BFloat16>(raw: tuple.v0), SIMD<BFloat16>(raw: tuple.v1),
+            SIMD<BFloat16>(raw: tuple.v2)
         )
     }(
         HighwayReference.Nothrow.set3BF16(
@@ -351,7 +351,7 @@ public func portSet3BF16ConstantIndex(
     _ tuple: (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>),
     to a: SIMD<BFloat16>
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
-    unsafe SIMDBFloat16.set3(tuple, atUnchecked: 1, to: a)
+    unsafe SIMD<BFloat16>.set3(tuple, atUnchecked: 1, to: a)
 }
 
 @inline(never)
@@ -361,8 +361,8 @@ public func highwaySet3BF16ConstantIndex(
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
     { tuple in
         (
-            SIMDBFloat16.Vector(raw: tuple.v0), SIMDBFloat16.Vector(raw: tuple.v1),
-            SIMDBFloat16.Vector(raw: tuple.v2)
+            SIMD<BFloat16>(raw: tuple.v0), SIMD<BFloat16>(raw: tuple.v1),
+            SIMD<BFloat16>(raw: tuple.v2)
         )
     }(
         HighwayReference.Nothrow.set3BF16(
@@ -378,10 +378,10 @@ public func portSet3BF16ConstantA(
     _ tuple: (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>),
     atUnchecked index: Int
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
-    unsafe SIMDBFloat16.set3(
+    unsafe SIMD<BFloat16>.set3(
         tuple,
         atUnchecked: index,
-        to: SIMDBFloat16.repeating(BFloat16(bitPattern: 26))
+        to: SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26))
     )
 }
 
@@ -392,14 +392,14 @@ public func highwaySet3BF16ConstantA(
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
     { tuple in
         (
-            SIMDBFloat16.Vector(raw: tuple.v0), SIMDBFloat16.Vector(raw: tuple.v1),
-            SIMDBFloat16.Vector(raw: tuple.v2)
+            SIMD<BFloat16>(raw: tuple.v0), SIMD<BFloat16>(raw: tuple.v1),
+            SIMD<BFloat16>(raw: tuple.v2)
         )
     }(
         HighwayReference.Nothrow.set3BF16(
             cvectorization_ops_tuple3_bf16(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
             index,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -413,7 +413,7 @@ public func portCreate4BF16(
     _ c: SIMD<BFloat16>,
     _ d: SIMD<BFloat16>
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
-    SIMDBFloat16.create4(a, b, c, d)
+    SIMD<BFloat16>.create4(a, b, c, d)
 }
 
 @inline(never)
@@ -425,8 +425,8 @@ public func highwayCreate4BF16(
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
     { tuple in
         (
-            SIMDBFloat16.Vector(raw: tuple.v0), SIMDBFloat16.Vector(raw: tuple.v1),
-            SIMDBFloat16.Vector(raw: tuple.v2), SIMDBFloat16.Vector(raw: tuple.v3)
+            SIMD<BFloat16>(raw: tuple.v0), SIMD<BFloat16>(raw: tuple.v1),
+            SIMD<BFloat16>(raw: tuple.v2), SIMD<BFloat16>(raw: tuple.v3)
         )
     }(HighwayReference.Nothrow.create4BF16(a.raw, b.raw, c.raw, d.raw))
 }
@@ -437,7 +437,7 @@ public func portCreate4BF16ConstantA(
     _ c: SIMD<BFloat16>,
     _ d: SIMD<BFloat16>
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
-    SIMDBFloat16.create4(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), b, c, d)
+    SIMD<BFloat16>.create4(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)), b, c, d)
 }
 
 @inline(never)
@@ -448,12 +448,12 @@ public func highwayCreate4BF16ConstantA(
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
     { tuple in
         (
-            SIMDBFloat16.Vector(raw: tuple.v0), SIMDBFloat16.Vector(raw: tuple.v1),
-            SIMDBFloat16.Vector(raw: tuple.v2), SIMDBFloat16.Vector(raw: tuple.v3)
+            SIMD<BFloat16>(raw: tuple.v0), SIMD<BFloat16>(raw: tuple.v1),
+            SIMD<BFloat16>(raw: tuple.v2), SIMD<BFloat16>(raw: tuple.v3)
         )
     }(
         HighwayReference.Nothrow.create4BF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             b.raw,
@@ -469,7 +469,7 @@ public func portCreate4BF16ConstantB(
     _ c: SIMD<BFloat16>,
     _ d: SIMD<BFloat16>
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
-    SIMDBFloat16.create4(a, SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), c, d)
+    SIMD<BFloat16>.create4(a, SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)), c, d)
 }
 
 @inline(never)
@@ -480,13 +480,13 @@ public func highwayCreate4BF16ConstantB(
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
     { tuple in
         (
-            SIMDBFloat16.Vector(raw: tuple.v0), SIMDBFloat16.Vector(raw: tuple.v1),
-            SIMDBFloat16.Vector(raw: tuple.v2), SIMDBFloat16.Vector(raw: tuple.v3)
+            SIMD<BFloat16>(raw: tuple.v0), SIMD<BFloat16>(raw: tuple.v1),
+            SIMD<BFloat16>(raw: tuple.v2), SIMD<BFloat16>(raw: tuple.v3)
         )
     }(
         HighwayReference.Nothrow.create4BF16(
             a.raw,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             c.raw,
@@ -501,7 +501,7 @@ public func portCreate4BF16ConstantC(
     _ b: SIMD<BFloat16>,
     _ d: SIMD<BFloat16>
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
-    SIMDBFloat16.create4(a, b, SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), d)
+    SIMD<BFloat16>.create4(a, b, SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)), d)
 }
 
 @inline(never)
@@ -512,14 +512,14 @@ public func highwayCreate4BF16ConstantC(
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
     { tuple in
         (
-            SIMDBFloat16.Vector(raw: tuple.v0), SIMDBFloat16.Vector(raw: tuple.v1),
-            SIMDBFloat16.Vector(raw: tuple.v2), SIMDBFloat16.Vector(raw: tuple.v3)
+            SIMD<BFloat16>(raw: tuple.v0), SIMD<BFloat16>(raw: tuple.v1),
+            SIMD<BFloat16>(raw: tuple.v2), SIMD<BFloat16>(raw: tuple.v3)
         )
     }(
         HighwayReference.Nothrow.create4BF16(
             a.raw,
             b.raw,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             d.raw
@@ -533,7 +533,7 @@ public func portCreate4BF16ConstantD(
     _ b: SIMD<BFloat16>,
     _ c: SIMD<BFloat16>
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
-    SIMDBFloat16.create4(a, b, c, SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+    SIMD<BFloat16>.create4(a, b, c, SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
@@ -544,15 +544,15 @@ public func highwayCreate4BF16ConstantD(
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
     { tuple in
         (
-            SIMDBFloat16.Vector(raw: tuple.v0), SIMDBFloat16.Vector(raw: tuple.v1),
-            SIMDBFloat16.Vector(raw: tuple.v2), SIMDBFloat16.Vector(raw: tuple.v3)
+            SIMD<BFloat16>(raw: tuple.v0), SIMD<BFloat16>(raw: tuple.v1),
+            SIMD<BFloat16>(raw: tuple.v2), SIMD<BFloat16>(raw: tuple.v3)
         )
     }(
         HighwayReference.Nothrow.create4BF16(
             a.raw,
             b.raw,
             c.raw,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -564,7 +564,7 @@ public func portGet4BF16(
     _ tuple: (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>),
     atUnchecked index: Int
 ) -> SIMD<BFloat16> {
-    unsafe SIMDBFloat16.get4(tuple, atUnchecked: index)
+    unsafe SIMD<BFloat16>.get4(tuple, atUnchecked: index)
 }
 
 @inline(never)
@@ -572,7 +572,7 @@ public func highwayGet4BF16(
     _ tuple: (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>),
     atUnchecked index: Int
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.get4BF16(
             cvectorization_ops_tuple4_bf16(
                 v0: tuple.0.raw,
@@ -589,14 +589,14 @@ public func highwayGet4BF16(
 public func portGet4BF16ConstantIndex(
     _ tuple: (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>)
 ) -> SIMD<BFloat16> {
-    unsafe SIMDBFloat16.get4(tuple, atUnchecked: 1)
+    unsafe SIMD<BFloat16>.get4(tuple, atUnchecked: 1)
 }
 
 @inline(never)
 public func highwayGet4BF16ConstantIndex(
     _ tuple: (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>)
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.get4BF16(
             cvectorization_ops_tuple4_bf16(
                 v0: tuple.0.raw,
@@ -615,7 +615,7 @@ public func portSet4BF16(
     atUnchecked index: Int,
     to a: SIMD<BFloat16>
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
-    unsafe SIMDBFloat16.set4(tuple, atUnchecked: index, to: a)
+    unsafe SIMD<BFloat16>.set4(tuple, atUnchecked: index, to: a)
 }
 
 @inline(never)
@@ -626,8 +626,8 @@ public func highwaySet4BF16(
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
     { tuple in
         (
-            SIMDBFloat16.Vector(raw: tuple.v0), SIMDBFloat16.Vector(raw: tuple.v1),
-            SIMDBFloat16.Vector(raw: tuple.v2), SIMDBFloat16.Vector(raw: tuple.v3)
+            SIMD<BFloat16>(raw: tuple.v0), SIMD<BFloat16>(raw: tuple.v1),
+            SIMD<BFloat16>(raw: tuple.v2), SIMD<BFloat16>(raw: tuple.v3)
         )
     }(
         HighwayReference.Nothrow.set4BF16(
@@ -648,7 +648,7 @@ public func portSet4BF16ConstantIndex(
     _ tuple: (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>),
     to a: SIMD<BFloat16>
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
-    unsafe SIMDBFloat16.set4(tuple, atUnchecked: 1, to: a)
+    unsafe SIMD<BFloat16>.set4(tuple, atUnchecked: 1, to: a)
 }
 
 @inline(never)
@@ -658,8 +658,8 @@ public func highwaySet4BF16ConstantIndex(
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
     { tuple in
         (
-            SIMDBFloat16.Vector(raw: tuple.v0), SIMDBFloat16.Vector(raw: tuple.v1),
-            SIMDBFloat16.Vector(raw: tuple.v2), SIMDBFloat16.Vector(raw: tuple.v3)
+            SIMD<BFloat16>(raw: tuple.v0), SIMD<BFloat16>(raw: tuple.v1),
+            SIMD<BFloat16>(raw: tuple.v2), SIMD<BFloat16>(raw: tuple.v3)
         )
     }(
         HighwayReference.Nothrow.set4BF16(
@@ -680,10 +680,10 @@ public func portSet4BF16ConstantA(
     _ tuple: (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>),
     atUnchecked index: Int
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
-    unsafe SIMDBFloat16.set4(
+    unsafe SIMD<BFloat16>.set4(
         tuple,
         atUnchecked: index,
-        to: SIMDBFloat16.repeating(BFloat16(bitPattern: 26))
+        to: SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26))
     )
 }
 
@@ -694,8 +694,8 @@ public func highwaySet4BF16ConstantA(
 ) -> (SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>, SIMD<BFloat16>) {
     { tuple in
         (
-            SIMDBFloat16.Vector(raw: tuple.v0), SIMDBFloat16.Vector(raw: tuple.v1),
-            SIMDBFloat16.Vector(raw: tuple.v2), SIMDBFloat16.Vector(raw: tuple.v3)
+            SIMD<BFloat16>(raw: tuple.v0), SIMD<BFloat16>(raw: tuple.v1),
+            SIMD<BFloat16>(raw: tuple.v2), SIMD<BFloat16>(raw: tuple.v3)
         )
     }(
         HighwayReference.Nothrow.set4BF16(
@@ -706,7 +706,7 @@ public func highwaySet4BF16ConstantA(
                 v3: tuple.3.raw
             ),
             index,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )

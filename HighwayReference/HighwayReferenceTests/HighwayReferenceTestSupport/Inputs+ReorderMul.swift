@@ -11,7 +11,7 @@ extension Inputs {
 
     package static func accumulators<V: ReferenceVector>(_ type: V.Type, seed: UInt64) -> [V]
     where V.Simd.Scalar: FixedWidthInteger {
-        accumulators(V.Simd.self, seed: seed).map(V.init)
+        accumulators(V.Simd.self, seed: seed).map { V(referenceSimd: $0) }
     }
 
     private static func accumulatorEdges<Lane: FixedWidthInteger>(_ type: Lane.Type) -> [Lane] {

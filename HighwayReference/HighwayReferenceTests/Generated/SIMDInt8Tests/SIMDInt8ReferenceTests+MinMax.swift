@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDInt8ReferenceTests {
     @Test func minimum() {
         let mismatches = Mismatches("minimum")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA01E_F671_37DD_787C)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA01E_F771_37DD_7A2F)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA01E_F671_37DD_787C)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA01E_F771_37DD_7A2F)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.minimum(a, b),
-                H.Vector(raw: HighwayReference.minimumI8(a.raw, b.raw)),
+                H(raw: HighwayReference.minimumI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -22,12 +22,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func maximum() {
         let mismatches = Mismatches("maximum")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF953_801E_8698_6CFA)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF953_811E_8698_6EAD)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF953_801E_8698_6CFA)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF953_811E_8698_6EAD)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.maximum(a, b),
-                H.Vector(raw: HighwayReference.maximumI8(a.raw, b.raw)),
+                H(raw: HighwayReference.maximumI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -36,12 +36,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func minimumNumber() {
         let mismatches = Mismatches("minimumNumber")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x659E_FDC6_EEDD_66A5)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x659E_FCC6_EEDD_64F2)
+        let aInputs = Inputs.vectors(H.self, seed: 0x659E_FDC6_EEDD_66A5)
+        let bInputs = Inputs.vectors(H.self, seed: 0x659E_FCC6_EEDD_64F2)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.minimumNumber(a, b),
-                H.Vector(raw: HighwayReference.minimumNumberI8(a.raw, b.raw)),
+                H(raw: HighwayReference.minimumNumberI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -50,12 +50,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func maximumNumber() {
         let mismatches = Mismatches("maximumNumber")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x608A_FDE1_D235_3F27)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x608A_FCE1_D235_3D74)
+        let aInputs = Inputs.vectors(H.self, seed: 0x608A_FDE1_D235_3F27)
+        let bInputs = Inputs.vectors(H.self, seed: 0x608A_FCE1_D235_3D74)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.maximumNumber(a, b),
-                H.Vector(raw: HighwayReference.maximumNumberI8(a.raw, b.raw)),
+                H(raw: HighwayReference.maximumNumberI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -64,12 +64,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func minimumMagnitude() {
         let mismatches = Mismatches("minimumMagnitude")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6A86_9A7B_ED02_96A0)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6A86_9B7B_ED02_9853)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6A86_9A7B_ED02_96A0)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6A86_9B7B_ED02_9853)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.minimumMagnitude(a, b),
-                H.Vector(raw: HighwayReference.minimumMagnitudeI8(a.raw, b.raw)),
+                H(raw: HighwayReference.minimumMagnitudeI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -78,12 +78,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func maximumMagnitude() {
         let mismatches = Mismatches("maximumMagnitude")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x49E7_E7E5_6321_0CCA)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x49E7_E8E5_6321_0E7D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x49E7_E7E5_6321_0CCA)
+        let bInputs = Inputs.vectors(H.self, seed: 0x49E7_E8E5_6321_0E7D)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.maximumMagnitude(a, b),
-                H.Vector(raw: HighwayReference.maximumMagnitudeI8(a.raw, b.raw)),
+                H(raw: HighwayReference.maximumMagnitudeI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

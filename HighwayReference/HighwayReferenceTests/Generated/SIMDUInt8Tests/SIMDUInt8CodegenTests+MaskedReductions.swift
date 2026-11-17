@@ -10,7 +10,7 @@ extension SIMDUInt8CodegenTests {
     @Test func sumWhere() {
         let mismatches = Mismatches("portSumWhereU8")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x9057_FC1E_7146_69CC)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9057_FD1E_7146_6B7F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9057_FD1E_7146_6B7F)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portSumWhereU8(a, where: mask),
@@ -37,7 +37,7 @@ extension SIMDUInt8CodegenTests {
     @Test func smallestWhere() {
         let mismatches = Mismatches("portSmallestWhereU8")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3BC1_960D_FD31_E0F0)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3BC1_970D_FD31_E2A3)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3BC1_970D_FD31_E2A3)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portSmallestWhereU8(a, where: mask),
@@ -64,7 +64,7 @@ extension SIMDUInt8CodegenTests {
     @Test func largestWhere() {
         let mismatches = Mismatches("portLargestWhereU8")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xBEFD_D139_0ABD_32AD)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBEFD_D039_0ABD_30FA)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBEFD_D039_0ABD_30FA)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portLargestWhereU8(a, where: mask),

@@ -7,18 +7,18 @@ import Vectorization
 
 extension SIMDUInt64ConstantTests {
     @inline(__always)
-    private func checkExpandedConstantA(_ value: H.Lane) {
+    private func checkExpandedConstantA(_ value: Lane) {
         let mismatches = Mismatches("expanded with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7326_534B_43E3_3E7F)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for mask in maskInputs {
             mismatches.check(
                 H.expanded(H.repeating(value), where: mask),
-                H.Vector(raw: HighwayReference.expandedU64(H.repeating(value).raw, mask.raw)),
+                H(raw: HighwayReference.expandedU64(H.repeating(value).raw, mask.raw)),
                 "mask: \(describe(mask))"
             )
         }
@@ -74,6 +74,6 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func expandedConstantSplatMax() {
-        checkExpandedConstantA(H.Lane.max)
+        checkExpandedConstantA(Lane.max)
     }
 }

@@ -9,8 +9,8 @@ import Vectorization
 extension SIMDInt64CodegenTests {
     @Test func equalTo() {
         let mismatches = Mismatches("portEqualToI64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7840_A5EB_BEA3_2447)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7840_A4EB_BEA3_2294)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7840_A5EB_BEA3_2447)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7840_A4EB_BEA3_2294)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portEqualToI64(a, b),
@@ -23,7 +23,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func equalToConstantA() {
         let mismatches = Mismatches("portEqualToI64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2411_DDC3_3A55_4BD3)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2411_DDC3_3A55_4BD3)
         for b in bInputs {
             mismatches.check(
                 portEqualToI64ConstantA(b),
@@ -36,7 +36,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func equalToConstantB() {
         let mismatches = Mismatches("portEqualToI64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2D13_93C3_3F88_2495)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2D13_93C3_3F88_2495)
         for a in aInputs {
             mismatches.check(
                 portEqualToI64ConstantB(a),
@@ -49,8 +49,8 @@ extension SIMDInt64CodegenTests {
 
     @Test func notEqualTo() {
         let mismatches = Mismatches("portNotEqualToI64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5100_7C79_6CD2_D0A2)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5100_7D79_6CD2_D255)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5100_7C79_6CD2_D0A2)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5100_7D79_6CD2_D255)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portNotEqualToI64(a, b),
@@ -63,7 +63,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func notEqualToConstantA() {
         let mismatches = Mismatches("portNotEqualToI64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCB8A_78A4_F259_AEF0)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCB8A_78A4_F259_AEF0)
         for b in bInputs {
             mismatches.check(
                 portNotEqualToI64ConstantA(b),
@@ -76,7 +76,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func notEqualToConstantB() {
         let mismatches = Mismatches("portNotEqualToI64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE623_7EA5_0196_EAC2)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE623_7EA5_0196_EAC2)
         for a in aInputs {
             mismatches.check(
                 portNotEqualToI64ConstantB(a),
@@ -89,8 +89,8 @@ extension SIMDInt64CodegenTests {
 
     @Test func lessThan() {
         let mismatches = Mismatches("portLessThanI64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF7DD_FDDE_38AA_D8EA)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF7DD_FEDE_38AA_DA9D)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF7DD_FDDE_38AA_D8EA)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF7DD_FEDE_38AA_DA9D)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portLessThanI64(a, b),
@@ -103,7 +103,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func lessThanConstantA() {
         let mismatches = Mismatches("portLessThanI64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x33F5_2126_52A6_5AB8)
+        let bInputs = Inputs.vectors(H.self, seed: 0x33F5_2126_52A6_5AB8)
         for b in bInputs {
             mismatches.check(
                 portLessThanI64ConstantA(b),
@@ -116,7 +116,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func lessThanConstantB() {
         let mismatches = Mismatches("portLessThanI64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4EFA_A726_623F_8EEA)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4EFA_A726_623F_8EEA)
         for a in aInputs {
             mismatches.check(
                 portLessThanI64ConstantB(a),
@@ -129,8 +129,8 @@ extension SIMDInt64CodegenTests {
 
     @Test func greaterThan() {
         let mismatches = Mismatches("portGreaterThanI64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6216_0DD7_7DED_43D7)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6216_0CD7_7DED_4224)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6216_0DD7_7DED_43D7)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6216_0CD7_7DED_4224)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portGreaterThanI64(a, b),
@@ -143,7 +143,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func greaterThanConstantA() {
         let mismatches = Mismatches("portGreaterThanI64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5D23_F1EA_04E2_B563)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5D23_F1EA_04E2_B563)
         for b in bInputs {
             mismatches.check(
                 portGreaterThanI64ConstantA(b),
@@ -156,7 +156,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func greaterThanConstantB() {
         let mismatches = Mismatches("portGreaterThanI64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6625_A7EA_0A15_8E25)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6625_A7EA_0A15_8E25)
         for a in aInputs {
             mismatches.check(
                 portGreaterThanI64ConstantB(a),
@@ -169,8 +169,8 @@ extension SIMDInt64CodegenTests {
 
     @Test func lessThanOrEqualTo() {
         let mismatches = Mismatches("portLessThanOrEqualToI64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7FD8_5DE3_3C35_5A7A)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7FD8_5EE3_3C35_5C2D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7FD8_5DE3_3C35_5A7A)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7FD8_5EE3_3C35_5C2D)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portLessThanOrEqualToI64(a, b),
@@ -183,7 +183,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func lessThanOrEqualToConstantA() {
         let mismatches = Mismatches("portLessThanOrEqualToI64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x423F_E638_5198_0988)
+        let bInputs = Inputs.vectors(H.self, seed: 0x423F_E638_5198_0988)
         for b in bInputs {
             mismatches.check(
                 portLessThanOrEqualToI64ConstantA(b),
@@ -196,7 +196,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func lessThanOrEqualToConstantB() {
         let mismatches = Mismatches("portLessThanOrEqualToI64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5B92_6C38_5FBF_A93A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5B92_6C38_5FBF_A93A)
         for a in aInputs {
             mismatches.check(
                 portLessThanOrEqualToI64ConstantB(a),
@@ -209,8 +209,8 @@ extension SIMDInt64CodegenTests {
 
     @Test func greaterThanOrEqualTo() {
         let mismatches = Mismatches("portGreaterThanOrEqualToI64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD43C_D42D_CA55_E1D5)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD43C_D32D_CA55_E022)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD43C_D42D_CA55_E1D5)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD43C_D32D_CA55_E022)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portGreaterThanOrEqualToI64(a, b),
@@ -223,7 +223,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func greaterThanOrEqualToConstantA() {
         let mismatches = Mismatches("portGreaterThanOrEqualToI64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xEA78_084A_9AAE_99F9)
+        let bInputs = Inputs.vectors(H.self, seed: 0xEA78_084A_9AAE_99F9)
         for b in bInputs {
             mismatches.check(
                 portGreaterThanOrEqualToI64ConstantA(b),
@@ -236,7 +236,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func greaterThanOrEqualToConstantB() {
         let mismatches = Mismatches("portGreaterThanOrEqualToI64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCFDF_224A_8B71_9487)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCFDF_224A_8B71_9487)
         for a in aInputs {
             mismatches.check(
                 portGreaterThanOrEqualToI64ConstantB(a),
@@ -249,7 +249,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func isNegative() {
         let mismatches = Mismatches("portIsNegativeI64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0131_D6AD_690C_CD0F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0131_D6AD_690C_CD0F)
         for a in aInputs {
             mismatches.check(portIsNegativeI64(a), highwayIsNegativeI64(a), "a: \(describe(a))")
         }
@@ -264,8 +264,8 @@ extension SIMDInt64CodegenTests {
 
     @Test func testingBit() {
         let mismatches = Mismatches("portTestingBitI64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF8A1_6D79_A07B_A5D3)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF8A1_6C79_A07B_A420)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF8A1_6D79_A07B_A5D3)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF8A1_6C79_A07B_A420)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portTestingBitI64(a, b),
@@ -278,7 +278,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func testingBitConstantA() {
         let mismatches = Mismatches("portTestingBitI64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7F5F_2522_39AB_1C4F)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7F5F_2522_39AB_1C4F)
         for b in bInputs {
             mismatches.check(
                 portTestingBitI64ConstantA(b),
@@ -291,7 +291,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func testingBitConstantB() {
         let mismatches = Mismatches("portTestingBitI64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x871A_5B22_3DC8_58F1)
+        let aInputs = Inputs.vectors(H.self, seed: 0x871A_5B22_3DC8_58F1)
         for a in aInputs {
             mismatches.check(
                 portTestingBitI64ConstantB(a),

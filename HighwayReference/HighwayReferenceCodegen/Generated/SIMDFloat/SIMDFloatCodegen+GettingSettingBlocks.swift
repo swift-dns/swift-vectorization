@@ -5,14 +5,14 @@ public import Vectorization
 
 @inline(never)
 public func portExtractingBlockF32ConstantA() -> SIMD<Float>.BlockVector {
-    unsafe SIMDFloat.block(SIMDFloat.repeating(1.5), atUnchecked: 0)
+    unsafe SIMD<Float>.block(SIMD<Float>.repeating(1.5), atUnchecked: 0)
 }
 
 @inline(never)
 public func highwayExtractingBlockF32ConstantA() -> SIMD<Float>.BlockVector {
-    SIMDFloat.BlockVector(
+    SIMD<Float>.BlockVector(
         raw: HighwayReference.Nothrow.extractingBlockF32(
-            HighwayReference.Nothrow.repeatingF32(1.5).raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
             0
         )
     )
@@ -20,25 +20,27 @@ public func highwayExtractingBlockF32ConstantA() -> SIMD<Float>.BlockVector {
 
 @inline(never)
 public func portExtractingBlockF32ConstantIndex(_ a: SIMD<Float>) -> SIMD<Float>.BlockVector {
-    unsafe SIMDFloat.block(a, atUnchecked: 0)
+    unsafe SIMD<Float>.block(a, atUnchecked: 0)
 }
 
 @inline(never)
 public func highwayExtractingBlockF32ConstantIndex(_ a: SIMD<Float>) -> SIMD<Float>.BlockVector {
-    SIMDFloat.BlockVector(raw: HighwayReference.Nothrow.extractingBlockF32(a.raw, 0))
+    SIMD<Float>.BlockVector(raw: HighwayReference.Nothrow.extractingBlockF32(a.raw, 0))
 }
 
 @inline(never)
 public func portReplacingBlockF32ConstantA(with b: SIMD<Float>.BlockVector) -> SIMD<Float> {
-    unsafe SIMDFloat.replacingBlock(SIMDFloat.repeating(1.5), atUnchecked: 0, with: b)
+    unsafe SIMD<Float>.replacingBlock(SIMD<Float>.repeating(1.5), atUnchecked: 0, with: b)
 }
 
 @inline(never)
 public func highwayReplacingBlockF32ConstantA(with b: SIMD<Float>.BlockVector) -> SIMD<Float> {
-    HighwayReference.Nothrow.replacingBlockF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        0,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.replacingBlockF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            0,
+            b.raw
+        )
     )
 }
 
@@ -47,7 +49,7 @@ public func portReplacingBlockF32ConstantIndex(
     _ a: SIMD<Float>,
     with b: SIMD<Float>.BlockVector
 ) -> SIMD<Float> {
-    unsafe SIMDFloat.replacingBlock(a, atUnchecked: 0, with: b)
+    unsafe SIMD<Float>.replacingBlock(a, atUnchecked: 0, with: b)
 }
 
 @inline(never)
@@ -55,5 +57,5 @@ public func highwayReplacingBlockF32ConstantIndex(
     _ a: SIMD<Float>,
     with b: SIMD<Float>.BlockVector
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.replacingBlockF32(a.raw, 0, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.replacingBlockF32(a.raw, 0, b.raw))
 }

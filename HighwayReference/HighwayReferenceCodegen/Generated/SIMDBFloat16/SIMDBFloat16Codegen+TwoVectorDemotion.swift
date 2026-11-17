@@ -8,7 +8,7 @@ public func portVectorConvertingF32ToBF16(
     converting a: SIMD<Float>,
     _ b: SIMD<Float>
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.vector(converting: a, b)
+    SIMD<BFloat16>.vector(converting: a, b)
 }
 
 @inline(never)
@@ -16,19 +16,19 @@ public func highwayVectorConvertingF32ToBF16(
     converting a: SIMD<Float>,
     _ b: SIMD<Float>
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.vectorConvertingF32ToBF16(a.raw, b.raw))
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.vectorConvertingF32ToBF16(a.raw, b.raw))
 }
 
 @inline(never)
 public func portVectorConvertingF32ToBF16ConstantA(_ b: SIMD<Float>) -> SIMD<BFloat16> {
-    SIMDBFloat16.vector(converting: SIMDFloat.repeating(1.5), b)
+    SIMD<BFloat16>.vector(converting: SIMD<Float>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayVectorConvertingF32ToBF16ConstantA(_ b: SIMD<Float>) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.vectorConvertingF32ToBF16(
-            HighwayReference.Nothrow.repeatingF32(1.5).raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
             b.raw
         )
     )
@@ -36,15 +36,15 @@ public func highwayVectorConvertingF32ToBF16ConstantA(_ b: SIMD<Float>) -> SIMD<
 
 @inline(never)
 public func portVectorConvertingF32ToBF16ConstantB(converting a: SIMD<Float>) -> SIMD<BFloat16> {
-    SIMDBFloat16.vector(converting: a, SIMDFloat.repeating(1.5))
+    SIMD<BFloat16>.vector(converting: a, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayVectorConvertingF32ToBF16ConstantB(converting a: SIMD<Float>) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.vectorConvertingF32ToBF16(
             a.raw,
-            HighwayReference.Nothrow.repeatingF32(1.5).raw
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
         )
     )
 }
@@ -54,7 +54,7 @@ public func portVectorConvertingInAnyOrderF32ToBF16(
     convertingInAnyOrder a: SIMD<Float>,
     _ b: SIMD<Float>
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.vector(convertingInAnyOrder: a, b)
+    SIMD<BFloat16>.vector(convertingInAnyOrder: a, b)
 }
 
 @inline(never)
@@ -62,22 +62,20 @@ public func highwayVectorConvertingInAnyOrderF32ToBF16(
     convertingInAnyOrder a: SIMD<Float>,
     _ b: SIMD<Float>
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
-        raw: HighwayReference.Nothrow.vectorConvertingInAnyOrderF32ToBF16(a.raw, b.raw)
-    )
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.vectorConvertingInAnyOrderF32ToBF16(a.raw, b.raw))
 }
 
 @inline(never)
 public func portVectorConvertingInAnyOrderF32ToBF16ConstantA(_ b: SIMD<Float>) -> SIMD<BFloat16> {
-    SIMDBFloat16.vector(convertingInAnyOrder: SIMDFloat.repeating(1.5), b)
+    SIMD<BFloat16>.vector(convertingInAnyOrder: SIMD<Float>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayVectorConvertingInAnyOrderF32ToBF16ConstantA(_ b: SIMD<Float>) -> SIMD<BFloat16>
 {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.vectorConvertingInAnyOrderF32ToBF16(
-            HighwayReference.Nothrow.repeatingF32(1.5).raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
             b.raw
         )
     )
@@ -87,17 +85,17 @@ public func highwayVectorConvertingInAnyOrderF32ToBF16ConstantA(_ b: SIMD<Float>
 public func portVectorConvertingInAnyOrderF32ToBF16ConstantB(
     convertingInAnyOrder a: SIMD<Float>
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.vector(convertingInAnyOrder: a, SIMDFloat.repeating(1.5))
+    SIMD<BFloat16>.vector(convertingInAnyOrder: a, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayVectorConvertingInAnyOrderF32ToBF16ConstantB(
     convertingInAnyOrder a: SIMD<Float>
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.vectorConvertingInAnyOrderF32ToBF16(
             a.raw,
-            HighwayReference.Nothrow.repeatingF32(1.5).raw
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
         )
     )
 }

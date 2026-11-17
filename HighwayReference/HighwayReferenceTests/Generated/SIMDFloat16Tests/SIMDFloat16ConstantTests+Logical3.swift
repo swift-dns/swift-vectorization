@@ -8,19 +8,25 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
-    private func checkBitwiseXorWhereConstantA(_ value: H.Lane) {
+    private func checkBitwiseXorWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("bitwiseXorWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x37FD_5361_9006_E27C)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x37FD_5561_9006_E5E2)
+        let bInputs = Inputs.vectors(H.self, seed: 0x37FD_5561_9006_E5E2)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 H.bitwiseXor(H.repeating(value), b, where: mask),
-                HighwayReference.bitwiseXorWhereF16(mask.raw, H.repeating(value).raw, b.raw),
+                H(
+                    raw: HighwayReference.bitwiseXorWhereF16(
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw
+                    )
+                ),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -28,19 +34,25 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseXorWhereConstantB(_ value: H.Lane) {
+    private func checkBitwiseXorWhereConstantB(_ value: Lane) {
         let mismatches = Mismatches("bitwiseXorWhere with b repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x416C_0A61_9596_8ED1)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x416C_0961_9596_8D1E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x416C_0961_9596_8D1E)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.bitwiseXor(a, H.repeating(value), where: mask),
-                HighwayReference.bitwiseXorWhereF16(mask.raw, a.raw, H.repeating(value).raw),
+                H(
+                    raw: HighwayReference.bitwiseXorWhereF16(
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw
+                    )
+                ),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -118,8 +130,8 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func bitwiseXorWhereConstantSplatPayloadNaN() {
-        checkBitwiseXorWhereConstantA(H.Lane(nan: 1, signaling: false))
-        checkBitwiseXorWhereConstantB(H.Lane(nan: 1, signaling: false))
+        checkBitwiseXorWhereConstantA(Lane(nan: 1, signaling: false))
+        checkBitwiseXorWhereConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func bitwiseXorWhereConstantSplatSignalingNaN() {
@@ -143,27 +155,29 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseAndWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkBitwiseAndWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "bitwiseAndWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x43F1_1AFA_6FC3_36B4)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x43F1_1DFA_6FC3_3BCD)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x43F1_1CFA_6FC3_3A1A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x43F1_1DFA_6FC3_3BCD)
+        let bInputs = Inputs.vectors(H.self, seed: 0x43F1_1CFA_6FC3_3A1A)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x49B3_0870_E521_B8E1)
         {
             mismatches.check(
                 H.bitwiseAnd(a, b, where: mask, otherwise: H.repeating(value)),
-                HighwayReference.bitwiseAndWhereOtherwiseF16(
-                    H.repeating(value).raw,
-                    mask.raw,
-                    a.raw,
-                    b.raw
+                H(
+                    raw: HighwayReference.bitwiseAndWhereOtherwiseF16(
+                        H.repeating(value).raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
@@ -172,14 +186,14 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseAndWhereOtherwiseConstantA(_ value: H.Lane) {
+    private func checkBitwiseAndWhereOtherwiseConstantA(_ value: Lane) {
         let mismatches = Mismatches("bitwiseAndWhereOtherwise with a repeating \(hex(value))")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x0C9A_92B8_1CC2_5246)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x0C9A_92B8_1CC2_5246)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x0C9A_93B8_1CC2_53F9)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0C9A_91B8_1CC2_5093)
+        let bInputs = Inputs.vectors(H.self, seed: 0x0C9A_91B8_1CC2_5093)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (otherwise, mask, b) in mixedTriples(
@@ -190,11 +204,13 @@ extension SIMDFloat16ConstantTests {
         ) {
             mismatches.check(
                 H.bitwiseAnd(H.repeating(value), b, where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseAndWhereOtherwiseF16(
-                    otherwise.raw,
-                    mask.raw,
-                    H.repeating(value).raw,
-                    b.raw
+                H(
+                    raw: HighwayReference.bitwiseAndWhereOtherwiseF16(
+                        otherwise.raw,
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw
+                    )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b))"
             )
@@ -203,14 +219,14 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseAndWhereOtherwiseConstantB(_ value: H.Lane) {
+    private func checkBitwiseAndWhereOtherwiseConstantB(_ value: Lane) {
         let mismatches = Mismatches("bitwiseAndWhereOtherwise with b repeating \(hex(value))")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xF201_ADB8_0D85_4E87)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xF201_ADB8_0D85_4E87)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF201_ACB8_0D85_4CD4)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF201_AFB8_0D85_51ED)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF201_AFB8_0D85_51ED)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (otherwise, mask, a) in mixedTriples(
@@ -221,11 +237,13 @@ extension SIMDFloat16ConstantTests {
         ) {
             mismatches.check(
                 H.bitwiseAnd(a, H.repeating(value), where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseAndWhereOtherwiseF16(
-                    otherwise.raw,
-                    mask.raw,
-                    a.raw,
-                    H.repeating(value).raw
+                H(
+                    raw: HighwayReference.bitwiseAndWhereOtherwiseF16(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw
+                    )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
             )
@@ -318,9 +336,9 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func bitwiseAndWhereOtherwiseConstantSplatPayloadNaN() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(H.Lane(nan: 1, signaling: false))
-        checkBitwiseAndWhereOtherwiseConstantA(H.Lane(nan: 1, signaling: false))
-        checkBitwiseAndWhereOtherwiseConstantB(H.Lane(nan: 1, signaling: false))
+        checkBitwiseAndWhereOtherwiseConstantOtherwise(Lane(nan: 1, signaling: false))
+        checkBitwiseAndWhereOtherwiseConstantA(Lane(nan: 1, signaling: false))
+        checkBitwiseAndWhereOtherwiseConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func bitwiseAndWhereOtherwiseConstantSplatSignalingNaN() {
@@ -348,27 +366,29 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseOrWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkBitwiseOrWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "bitwiseOrWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7086_87EC_E891_4D38)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7086_8AEC_E891_5251)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7086_89EC_E891_509E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7086_8AEC_E891_5251)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7086_89EC_E891_509E)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x977D_AD24_2F2E_3D4D)
         {
             mismatches.check(
                 H.bitwiseOr(a, b, where: mask, otherwise: H.repeating(value)),
-                HighwayReference.bitwiseOrWhereOtherwiseF16(
-                    H.repeating(value).raw,
-                    mask.raw,
-                    a.raw,
-                    b.raw
+                H(
+                    raw: HighwayReference.bitwiseOrWhereOtherwiseF16(
+                        H.repeating(value).raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
@@ -377,14 +397,14 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseOrWhereOtherwiseConstantA(_ value: H.Lane) {
+    private func checkBitwiseOrWhereOtherwiseConstantA(_ value: Lane) {
         let mismatches = Mismatches("bitwiseOrWhereOtherwise with a repeating \(hex(value))")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xCFC3_C325_F128_8E22)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xCFC3_C325_F128_8E22)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xCFC3_C425_F128_8FD5)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCFC3_C225_F128_8C6F)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCFC3_C225_F128_8C6F)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (otherwise, mask, b) in mixedTriples(
@@ -395,11 +415,13 @@ extension SIMDFloat16ConstantTests {
         ) {
             mismatches.check(
                 H.bitwiseOr(H.repeating(value), b, where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseOrWhereOtherwiseF16(
-                    otherwise.raw,
-                    mask.raw,
-                    H.repeating(value).raw,
-                    b.raw
+                H(
+                    raw: HighwayReference.bitwiseOrWhereOtherwiseF16(
+                        otherwise.raw,
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw
+                    )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b))"
             )
@@ -408,14 +430,14 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseOrWhereOtherwiseConstantB(_ value: H.Lane) {
+    private func checkBitwiseOrWhereOtherwiseConstantB(_ value: Lane) {
         let mismatches = Mismatches("bitwiseOrWhereOtherwise with b repeating \(hex(value))")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xB6DE_3E25_E35D_C203)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xB6DE_3E25_E35D_C203)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB6DE_3D25_E35D_C050)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB6DE_4025_E35D_C569)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB6DE_4025_E35D_C569)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (otherwise, mask, a) in mixedTriples(
@@ -426,11 +448,13 @@ extension SIMDFloat16ConstantTests {
         ) {
             mismatches.check(
                 H.bitwiseOr(a, H.repeating(value), where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseOrWhereOtherwiseF16(
-                    otherwise.raw,
-                    mask.raw,
-                    a.raw,
-                    H.repeating(value).raw
+                H(
+                    raw: HighwayReference.bitwiseOrWhereOtherwiseF16(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw
+                    )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
             )
@@ -523,9 +547,9 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func bitwiseOrWhereOtherwiseConstantSplatPayloadNaN() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(H.Lane(nan: 1, signaling: false))
-        checkBitwiseOrWhereOtherwiseConstantA(H.Lane(nan: 1, signaling: false))
-        checkBitwiseOrWhereOtherwiseConstantB(H.Lane(nan: 1, signaling: false))
+        checkBitwiseOrWhereOtherwiseConstantOtherwise(Lane(nan: 1, signaling: false))
+        checkBitwiseOrWhereOtherwiseConstantA(Lane(nan: 1, signaling: false))
+        checkBitwiseOrWhereOtherwiseConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func bitwiseOrWhereOtherwiseConstantSplatSignalingNaN() {
@@ -553,27 +577,29 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseXorWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkBitwiseXorWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "bitwiseXorWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x698B_C940_5528_2A08)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x698B_CC40_5528_2F21)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x698B_CB40_5528_2D6E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x698B_CC40_5528_2F21)
+        let bInputs = Inputs.vectors(H.self, seed: 0x698B_CB40_5528_2D6E)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x0FC3_A9D7_0085_F05D)
         {
             mismatches.check(
                 H.bitwiseXor(a, b, where: mask, otherwise: H.repeating(value)),
-                HighwayReference.bitwiseXorWhereOtherwiseF16(
-                    H.repeating(value).raw,
-                    mask.raw,
-                    a.raw,
-                    b.raw
+                H(
+                    raw: HighwayReference.bitwiseXorWhereOtherwiseF16(
+                        H.repeating(value).raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
@@ -582,14 +608,14 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseXorWhereOtherwiseConstantA(_ value: H.Lane) {
+    private func checkBitwiseXorWhereOtherwiseConstantA(_ value: Lane) {
         let mismatches = Mismatches("bitwiseXorWhereOtherwise with a repeating \(hex(value))")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x3D11_159A_43F8_C672)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x3D11_159A_43F8_C672)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3D11_169A_43F8_C825)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3D11_149A_43F8_C4BF)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3D11_149A_43F8_C4BF)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (otherwise, mask, b) in mixedTriples(
@@ -600,11 +626,13 @@ extension SIMDFloat16ConstantTests {
         ) {
             mismatches.check(
                 H.bitwiseXor(H.repeating(value), b, where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseXorWhereOtherwiseF16(
-                    otherwise.raw,
-                    mask.raw,
-                    H.repeating(value).raw,
-                    b.raw
+                H(
+                    raw: HighwayReference.bitwiseXorWhereOtherwiseF16(
+                        otherwise.raw,
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw
+                    )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b))"
             )
@@ -613,14 +641,14 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseXorWhereOtherwiseConstantB(_ value: H.Lane) {
+    private func checkBitwiseXorWhereOtherwiseConstantB(_ value: Lane) {
         let mismatches = Mismatches("bitwiseXorWhereOtherwise with b repeating \(hex(value))")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x2352_109A_3575_3013)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x2352_109A_3575_3013)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x2352_0F9A_3575_2E60)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2352_129A_3575_3379)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2352_129A_3575_3379)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (otherwise, mask, a) in mixedTriples(
@@ -631,11 +659,13 @@ extension SIMDFloat16ConstantTests {
         ) {
             mismatches.check(
                 H.bitwiseXor(a, H.repeating(value), where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseXorWhereOtherwiseF16(
-                    otherwise.raw,
-                    mask.raw,
-                    a.raw,
-                    H.repeating(value).raw
+                H(
+                    raw: HighwayReference.bitwiseXorWhereOtherwiseF16(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw
+                    )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
             )
@@ -728,9 +758,9 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func bitwiseXorWhereOtherwiseConstantSplatPayloadNaN() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(H.Lane(nan: 1, signaling: false))
-        checkBitwiseXorWhereOtherwiseConstantA(H.Lane(nan: 1, signaling: false))
-        checkBitwiseXorWhereOtherwiseConstantB(H.Lane(nan: 1, signaling: false))
+        checkBitwiseXorWhereOtherwiseConstantOtherwise(Lane(nan: 1, signaling: false))
+        checkBitwiseXorWhereOtherwiseConstantA(Lane(nan: 1, signaling: false))
+        checkBitwiseXorWhereOtherwiseConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func bitwiseXorWhereOtherwiseConstantSplatSignalingNaN() {
@@ -758,11 +788,11 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkAllBitsSetConstantA(_ value: H.Lane) {
+    private func checkAllBitsSetConstantA(_ value: Lane) {
         let mismatches = Mismatches("allBitsSet with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
@@ -830,7 +860,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func allBitsSetConstantSplatPayloadNaN() {
-        checkAllBitsSetConstantA(H.Lane(nan: 1, signaling: false))
+        checkAllBitsSetConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func allBitsSetConstantSplatSignalingNaN() {
@@ -850,11 +880,11 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkAllBitsClearConstantA(_ value: H.Lane) {
+    private func checkAllBitsClearConstantA(_ value: Lane) {
         let mismatches = Mismatches("allBitsClear with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
@@ -922,7 +952,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func allBitsClearConstantSplatPayloadNaN() {
-        checkAllBitsClearConstantA(H.Lane(nan: 1, signaling: false))
+        checkAllBitsClearConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func allBitsClearConstantSplatSignalingNaN() {
@@ -942,16 +972,16 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkZeroingNegativeConstantA(_ value: H.Lane) {
+    private func checkZeroingNegativeConstantA(_ value: Lane) {
         let mismatches = Mismatches("zeroingNegative with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
             H.zeroingNegative(H.repeating(value)),
-            HighwayReference.zeroingNegativeF16(H.repeating(value).raw),
+            H(raw: HighwayReference.zeroingNegativeF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -1014,7 +1044,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func zeroingNegativeConstantSplatPayloadNaN() {
-        checkZeroingNegativeConstantA(H.Lane(nan: 1, signaling: false))
+        checkZeroingNegativeConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func zeroingNegativeConstantSplatSignalingNaN() {
@@ -1034,19 +1064,25 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkSelectingIfNegativeConstantA(_ value: H.Lane) {
+    private func checkSelectingIfNegativeConstantA(_ value: Lane) {
         let mismatches = Mismatches("selectingIfNegative with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x32EA_3E78_4635_AC92)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x32EA_3D78_4635_AADF)
+        let bInputs = Inputs.vectors(H.self, seed: 0x32EA_3E78_4635_AC92)
+        let cInputs = Inputs.vectors(H.self, seed: 0x32EA_3D78_4635_AADF)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 H.selectingIfNegative(H.repeating(value), b, c),
-                HighwayReference.selectingIfNegativeF16(H.repeating(value).raw, b.raw, c.raw),
+                H(
+                    raw: HighwayReference.selectingIfNegativeF16(
+                        H.repeating(value).raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -1054,19 +1090,25 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkSelectingIfNegativeConstantB(_ value: H.Lane) {
+    private func checkSelectingIfNegativeConstantB(_ value: Lane) {
         let mismatches = Mismatches("selectingIfNegative with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x29E8_8878_4102_D3D0)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x29E8_8A78_4102_D736)
+        let aInputs = Inputs.vectors(H.self, seed: 0x29E8_8878_4102_D3D0)
+        let cInputs = Inputs.vectors(H.self, seed: 0x29E8_8A78_4102_D736)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 H.selectingIfNegative(a, H.repeating(value), c),
-                HighwayReference.selectingIfNegativeF16(a.raw, H.repeating(value).raw, c.raw),
+                H(
+                    raw: HighwayReference.selectingIfNegativeF16(
+                        a.raw,
+                        H.repeating(value).raw,
+                        c.raw
+                    )
+                ),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -1074,19 +1116,25 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkSelectingIfNegativeConstantC(_ value: H.Lane) {
+    private func checkSelectingIfNegativeConstantC(_ value: Lane) {
         let mismatches = Mismatches("selectingIfNegative with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2153_7178_3C2C_281B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2153_7078_3C2C_2668)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2153_7178_3C2C_281B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2153_7078_3C2C_2668)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.selectingIfNegative(a, b, H.repeating(value)),
-                HighwayReference.selectingIfNegativeF16(a.raw, b.raw, H.repeating(value).raw),
+                H(
+                    raw: HighwayReference.selectingIfNegativeF16(
+                        a.raw,
+                        b.raw,
+                        H.repeating(value).raw
+                    )
+                ),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -1178,9 +1226,9 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func selectingIfNegativeConstantSplatPayloadNaN() {
-        checkSelectingIfNegativeConstantA(H.Lane(nan: 1, signaling: false))
-        checkSelectingIfNegativeConstantB(H.Lane(nan: 1, signaling: false))
-        checkSelectingIfNegativeConstantC(H.Lane(nan: 1, signaling: false))
+        checkSelectingIfNegativeConstantA(Lane(nan: 1, signaling: false))
+        checkSelectingIfNegativeConstantB(Lane(nan: 1, signaling: false))
+        checkSelectingIfNegativeConstantC(Lane(nan: 1, signaling: false))
     }
 
     @Test func selectingIfNegativeConstantSplatSignalingNaN() {

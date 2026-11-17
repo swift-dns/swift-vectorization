@@ -7,7 +7,8 @@ import Vectorization
 
 @Suite("SIMDUInt64 against Highway")
 struct SIMDUInt64ReferenceTests {
-    typealias H = SIMDUInt64
+    typealias H = SIMD<UInt64>
+    typealias Lane = UInt64
 
     @Test func laneCount() {
         let mismatches = Mismatches("laneCount")

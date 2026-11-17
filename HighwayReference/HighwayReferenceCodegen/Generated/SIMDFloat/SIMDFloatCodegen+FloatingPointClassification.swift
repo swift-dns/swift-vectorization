@@ -5,46 +5,48 @@ public import Vectorization
 
 @inline(never)
 public func portIsNaNF32(_ a: SIMD<Float>) -> SIMD<Float>.Mask {
-    SIMDFloat.isNaN(a)
+    SIMD<Float>.isNaN(a)
 }
 
 @inline(never)
 public func highwayIsNaNF32(_ a: SIMD<Float>) -> SIMD<Float>.Mask {
-    SIMDFloat.Mask(raw: HighwayReference.Nothrow.isNaNF32(a.raw))
+    SIMD<Float>.Mask(raw: HighwayReference.Nothrow.isNaNF32(a.raw))
 }
 
 @inline(never)
 public func portIsNaNF32ConstantA() -> SIMD<Float>.Mask {
-    SIMDFloat.isNaN(SIMDFloat.repeating(1.5))
+    SIMD<Float>.isNaN(SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayIsNaNF32ConstantA() -> SIMD<Float>.Mask {
-    SIMDFloat.Mask(
-        raw: HighwayReference.Nothrow.isNaNF32(HighwayReference.Nothrow.repeatingF32(1.5).raw)
+    SIMD<Float>.Mask(
+        raw: HighwayReference.Nothrow.isNaNF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portIsEitherNaNF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float>.Mask {
-    SIMDFloat.isEitherNaN(a, b)
+    SIMD<Float>.isEitherNaN(a, b)
 }
 
 @inline(never)
 public func highwayIsEitherNaNF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float>.Mask {
-    SIMDFloat.Mask(raw: HighwayReference.Nothrow.isEitherNaNF32(a.raw, b.raw))
+    SIMD<Float>.Mask(raw: HighwayReference.Nothrow.isEitherNaNF32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portIsEitherNaNF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float>.Mask {
-    SIMDFloat.isEitherNaN(SIMDFloat.repeating(1.5), b)
+    SIMD<Float>.isEitherNaN(SIMD<Float>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayIsEitherNaNF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float>.Mask {
-    SIMDFloat.Mask(
+    SIMD<Float>.Mask(
         raw: HighwayReference.Nothrow.isEitherNaNF32(
-            HighwayReference.Nothrow.repeatingF32(1.5).raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
             b.raw
         )
     )
@@ -52,59 +54,63 @@ public func highwayIsEitherNaNF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float>.Mask
 
 @inline(never)
 public func portIsEitherNaNF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float>.Mask {
-    SIMDFloat.isEitherNaN(a, SIMDFloat.repeating(1.5))
+    SIMD<Float>.isEitherNaN(a, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayIsEitherNaNF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float>.Mask {
-    SIMDFloat.Mask(
+    SIMD<Float>.Mask(
         raw: HighwayReference.Nothrow.isEitherNaNF32(
             a.raw,
-            HighwayReference.Nothrow.repeatingF32(1.5).raw
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
         )
     )
 }
 
 @inline(never)
 public func portIsInfiniteF32(_ a: SIMD<Float>) -> SIMD<Float>.Mask {
-    SIMDFloat.isInfinite(a)
+    SIMD<Float>.isInfinite(a)
 }
 
 @inline(never)
 public func highwayIsInfiniteF32(_ a: SIMD<Float>) -> SIMD<Float>.Mask {
-    SIMDFloat.Mask(raw: HighwayReference.Nothrow.isInfiniteF32(a.raw))
+    SIMD<Float>.Mask(raw: HighwayReference.Nothrow.isInfiniteF32(a.raw))
 }
 
 @inline(never)
 public func portIsInfiniteF32ConstantA() -> SIMD<Float>.Mask {
-    SIMDFloat.isInfinite(SIMDFloat.repeating(1.5))
+    SIMD<Float>.isInfinite(SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayIsInfiniteF32ConstantA() -> SIMD<Float>.Mask {
-    SIMDFloat.Mask(
-        raw: HighwayReference.Nothrow.isInfiniteF32(HighwayReference.Nothrow.repeatingF32(1.5).raw)
+    SIMD<Float>.Mask(
+        raw: HighwayReference.Nothrow.isInfiniteF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portIsFiniteF32(_ a: SIMD<Float>) -> SIMD<Float>.Mask {
-    SIMDFloat.isFinite(a)
+    SIMD<Float>.isFinite(a)
 }
 
 @inline(never)
 public func highwayIsFiniteF32(_ a: SIMD<Float>) -> SIMD<Float>.Mask {
-    SIMDFloat.Mask(raw: HighwayReference.Nothrow.isFiniteF32(a.raw))
+    SIMD<Float>.Mask(raw: HighwayReference.Nothrow.isFiniteF32(a.raw))
 }
 
 @inline(never)
 public func portIsFiniteF32ConstantA() -> SIMD<Float>.Mask {
-    SIMDFloat.isFinite(SIMDFloat.repeating(1.5))
+    SIMD<Float>.isFinite(SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayIsFiniteF32ConstantA() -> SIMD<Float>.Mask {
-    SIMDFloat.Mask(
-        raw: HighwayReference.Nothrow.isFiniteF32(HighwayReference.Nothrow.repeatingF32(1.5).raw)
+    SIMD<Float>.Mask(
+        raw: HighwayReference.Nothrow.isFiniteF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }

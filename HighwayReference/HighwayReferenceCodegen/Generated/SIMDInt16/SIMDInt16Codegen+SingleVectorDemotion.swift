@@ -5,62 +5,62 @@ public import Vectorization
 
 @inline(never)
 public func portHalfVectorClampingU32ToI16(clamping a: SIMD<UInt32>) -> SIMD<Int16>.HalfVector {
-    SIMDInt16.halfVector(clamping: a)
+    SIMD<Int16>.halfVector(clamping: a)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingU32ToI16(clamping a: SIMD<UInt32>) -> SIMD<Int16>.HalfVector {
-    SIMDInt16.HalfVector(raw: HighwayReference.Nothrow.halfVectorClampingU32ToI16(a.raw))
+    SIMD<Int16>.HalfVector(raw: HighwayReference.Nothrow.halfVectorClampingU32ToI16(a.raw))
 }
 
 @inline(never)
 public func portHalfVectorClampingU32ToI16ConstantA() -> SIMD<Int16>.HalfVector {
-    SIMDInt16.halfVector(clamping: SIMDUInt32.repeating(26))
+    SIMD<Int16>.halfVector(clamping: SIMD<UInt32>.repeating(26))
 }
 
 @inline(never)
 public func highwayHalfVectorClampingU32ToI16ConstantA() -> SIMD<Int16>.HalfVector {
-    SIMDInt16.HalfVector(
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingU32ToI16(
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portHalfVectorClampingI32ToI16(clamping a: SIMD<Int32>) -> SIMD<Int16>.HalfVector {
-    SIMDInt16.halfVector(clamping: a)
+    SIMD<Int16>.halfVector(clamping: a)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingI32ToI16(clamping a: SIMD<Int32>) -> SIMD<Int16>.HalfVector {
-    SIMDInt16.HalfVector(raw: HighwayReference.Nothrow.halfVectorClampingI32ToI16(a.raw))
+    SIMD<Int16>.HalfVector(raw: HighwayReference.Nothrow.halfVectorClampingI32ToI16(a.raw))
 }
 
 @inline(never)
 public func portHalfVectorClampingI32ToI16ConstantA() -> SIMD<Int16>.HalfVector {
-    SIMDInt16.halfVector(clamping: SIMDInt32.repeating(26))
+    SIMD<Int16>.halfVector(clamping: SIMD<Int32>.repeating(26))
 }
 
 @inline(never)
 public func highwayHalfVectorClampingI32ToI16ConstantA() -> SIMD<Int16>.HalfVector {
-    SIMDInt16.HalfVector(
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingI32ToI16(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portHalfVectorClampingShiftedRightByU32ToI16ConstantA() -> SIMD<Int16>.HalfVector {
-    unsafe SIMDInt16.halfVector(clamping: SIMDUInt32.repeating(26), shiftedRightByUnchecked: 1)
+    unsafe SIMD<Int16>.halfVector(clamping: SIMD<UInt32>.repeating(26), shiftedRightByUnchecked: 1)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingShiftedRightByU32ToI16ConstantA() -> SIMD<Int16>.HalfVector {
-    SIMDInt16.HalfVector(
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingShiftedRightByU32ToI16(
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
             1
         )
     )
@@ -70,14 +70,14 @@ public func highwayHalfVectorClampingShiftedRightByU32ToI16ConstantA() -> SIMD<I
 public func portHalfVectorClampingShiftedRightByU32ToI16ConstantBits(
     clamping a: SIMD<UInt32>
 ) -> SIMD<Int16>.HalfVector {
-    unsafe SIMDInt16.halfVector(clamping: a, shiftedRightByUnchecked: 1)
+    unsafe SIMD<Int16>.halfVector(clamping: a, shiftedRightByUnchecked: 1)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingShiftedRightByU32ToI16ConstantBits(
     clamping a: SIMD<UInt32>
 ) -> SIMD<Int16>.HalfVector {
-    SIMDInt16.HalfVector(
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingShiftedRightByU32ToI16(a.raw, 1)
     )
 }
@@ -86,28 +86,28 @@ public func highwayHalfVectorClampingShiftedRightByU32ToI16ConstantBits(
 public func portHalfVectorClampingShiftedRightByU32ToI16ConstantBitsWidthDifference(
     clamping a: SIMD<UInt32>
 ) -> SIMD<Int16>.HalfVector {
-    unsafe SIMDInt16.halfVector(clamping: a, shiftedRightByUnchecked: 16)
+    unsafe SIMD<Int16>.halfVector(clamping: a, shiftedRightByUnchecked: 16)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingShiftedRightByU32ToI16ConstantBitsWidthDifference(
     clamping a: SIMD<UInt32>
 ) -> SIMD<Int16>.HalfVector {
-    SIMDInt16.HalfVector(
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingShiftedRightByU32ToI16(a.raw, 16)
     )
 }
 
 @inline(never)
 public func portHalfVectorClampingShiftedRightByI32ToI16ConstantA() -> SIMD<Int16>.HalfVector {
-    unsafe SIMDInt16.halfVector(clamping: SIMDInt32.repeating(26), shiftedRightByUnchecked: 1)
+    unsafe SIMD<Int16>.halfVector(clamping: SIMD<Int32>.repeating(26), shiftedRightByUnchecked: 1)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingShiftedRightByI32ToI16ConstantA() -> SIMD<Int16>.HalfVector {
-    SIMDInt16.HalfVector(
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingShiftedRightByI32ToI16(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             1
         )
     )
@@ -117,14 +117,14 @@ public func highwayHalfVectorClampingShiftedRightByI32ToI16ConstantA() -> SIMD<I
 public func portHalfVectorClampingShiftedRightByI32ToI16ConstantBits(
     clamping a: SIMD<Int32>
 ) -> SIMD<Int16>.HalfVector {
-    unsafe SIMDInt16.halfVector(clamping: a, shiftedRightByUnchecked: 1)
+    unsafe SIMD<Int16>.halfVector(clamping: a, shiftedRightByUnchecked: 1)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingShiftedRightByI32ToI16ConstantBits(
     clamping a: SIMD<Int32>
 ) -> SIMD<Int16>.HalfVector {
-    SIMDInt16.HalfVector(
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingShiftedRightByI32ToI16(a.raw, 1)
     )
 }
@@ -133,14 +133,14 @@ public func highwayHalfVectorClampingShiftedRightByI32ToI16ConstantBits(
 public func portHalfVectorClampingShiftedRightByI32ToI16ConstantBitsWidthDifference(
     clamping a: SIMD<Int32>
 ) -> SIMD<Int16>.HalfVector {
-    unsafe SIMDInt16.halfVector(clamping: a, shiftedRightByUnchecked: 16)
+    unsafe SIMD<Int16>.halfVector(clamping: a, shiftedRightByUnchecked: 16)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingShiftedRightByI32ToI16ConstantBitsWidthDifference(
     clamping a: SIMD<Int32>
 ) -> SIMD<Int16>.HalfVector {
-    SIMDInt16.HalfVector(
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingShiftedRightByI32ToI16(a.raw, 16)
     )
 }
@@ -149,8 +149,8 @@ public func highwayHalfVectorClampingShiftedRightByI32ToI16ConstantBitsWidthDiff
 public func portHalfVectorClampingRoundingShiftedRightByU32ToI16ConstantA()
     -> SIMD<Int16>.HalfVector
 {
-    unsafe SIMDInt16.halfVector(
-        clamping: SIMDUInt32.repeating(26),
+    unsafe SIMD<Int16>.halfVector(
+        clamping: SIMD<UInt32>.repeating(26),
         roundingShiftedRightByUnchecked: 1
     )
 }
@@ -159,9 +159,9 @@ public func portHalfVectorClampingRoundingShiftedRightByU32ToI16ConstantA()
 public func highwayHalfVectorClampingRoundingShiftedRightByU32ToI16ConstantA()
     -> SIMD<Int16>.HalfVector
 {
-    SIMDInt16.HalfVector(
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingRoundingShiftedRightByU32ToI16(
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
             1
         )
     )
@@ -171,14 +171,14 @@ public func highwayHalfVectorClampingRoundingShiftedRightByU32ToI16ConstantA()
 public func portHalfVectorClampingRoundingShiftedRightByU32ToI16ConstantBits(
     clamping a: SIMD<UInt32>
 ) -> SIMD<Int16>.HalfVector {
-    unsafe SIMDInt16.halfVector(clamping: a, roundingShiftedRightByUnchecked: 1)
+    unsafe SIMD<Int16>.halfVector(clamping: a, roundingShiftedRightByUnchecked: 1)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingRoundingShiftedRightByU32ToI16ConstantBits(
     clamping a: SIMD<UInt32>
 ) -> SIMD<Int16>.HalfVector {
-    SIMDInt16.HalfVector(
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingRoundingShiftedRightByU32ToI16(a.raw, 1)
     )
 }
@@ -187,14 +187,14 @@ public func highwayHalfVectorClampingRoundingShiftedRightByU32ToI16ConstantBits(
 public func portHalfVectorClampingRoundingShiftedRightByU32ToI16ConstantBitsWidthDifference(
     clamping a: SIMD<UInt32>
 ) -> SIMD<Int16>.HalfVector {
-    unsafe SIMDInt16.halfVector(clamping: a, roundingShiftedRightByUnchecked: 16)
+    unsafe SIMD<Int16>.halfVector(clamping: a, roundingShiftedRightByUnchecked: 16)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingRoundingShiftedRightByU32ToI16ConstantBitsWidthDifference(
     clamping a: SIMD<UInt32>
 ) -> SIMD<Int16>.HalfVector {
-    SIMDInt16.HalfVector(
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingRoundingShiftedRightByU32ToI16(a.raw, 16)
     )
 }
@@ -203,8 +203,8 @@ public func highwayHalfVectorClampingRoundingShiftedRightByU32ToI16ConstantBitsW
 public func portHalfVectorClampingRoundingShiftedRightByI32ToI16ConstantA()
     -> SIMD<Int16>.HalfVector
 {
-    unsafe SIMDInt16.halfVector(
-        clamping: SIMDInt32.repeating(26),
+    unsafe SIMD<Int16>.halfVector(
+        clamping: SIMD<Int32>.repeating(26),
         roundingShiftedRightByUnchecked: 1
     )
 }
@@ -213,9 +213,9 @@ public func portHalfVectorClampingRoundingShiftedRightByI32ToI16ConstantA()
 public func highwayHalfVectorClampingRoundingShiftedRightByI32ToI16ConstantA()
     -> SIMD<Int16>.HalfVector
 {
-    SIMDInt16.HalfVector(
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingRoundingShiftedRightByI32ToI16(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             1
         )
     )
@@ -225,14 +225,14 @@ public func highwayHalfVectorClampingRoundingShiftedRightByI32ToI16ConstantA()
 public func portHalfVectorClampingRoundingShiftedRightByI32ToI16ConstantBits(
     clamping a: SIMD<Int32>
 ) -> SIMD<Int16>.HalfVector {
-    unsafe SIMDInt16.halfVector(clamping: a, roundingShiftedRightByUnchecked: 1)
+    unsafe SIMD<Int16>.halfVector(clamping: a, roundingShiftedRightByUnchecked: 1)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingRoundingShiftedRightByI32ToI16ConstantBits(
     clamping a: SIMD<Int32>
 ) -> SIMD<Int16>.HalfVector {
-    SIMDInt16.HalfVector(
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingRoundingShiftedRightByI32ToI16(a.raw, 1)
     )
 }
@@ -241,14 +241,14 @@ public func highwayHalfVectorClampingRoundingShiftedRightByI32ToI16ConstantBits(
 public func portHalfVectorClampingRoundingShiftedRightByI32ToI16ConstantBitsWidthDifference(
     clamping a: SIMD<Int32>
 ) -> SIMD<Int16>.HalfVector {
-    unsafe SIMDInt16.halfVector(clamping: a, roundingShiftedRightByUnchecked: 16)
+    unsafe SIMD<Int16>.halfVector(clamping: a, roundingShiftedRightByUnchecked: 16)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingRoundingShiftedRightByI32ToI16ConstantBitsWidthDifference(
     clamping a: SIMD<Int32>
 ) -> SIMD<Int16>.HalfVector {
-    SIMDInt16.HalfVector(
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingRoundingShiftedRightByI32ToI16(a.raw, 16)
     )
 }
@@ -256,26 +256,26 @@ public func highwayHalfVectorClampingRoundingShiftedRightByI32ToI16ConstantBitsW
 @inline(never)
 public func portQuarterVectorClampingU64ToI16(clamping a: SIMD<UInt64>) -> SIMD<Int16>.QuarterVector
 {
-    SIMDInt16.quarterVector(clamping: a)
+    SIMD<Int16>.quarterVector(clamping: a)
 }
 
 @inline(never)
 public func highwayQuarterVectorClampingU64ToI16(
     clamping a: SIMD<UInt64>
 ) -> SIMD<Int16>.QuarterVector {
-    SIMDInt16.QuarterVector(raw: HighwayReference.Nothrow.quarterVectorClampingU64ToI16(a.raw))
+    SIMD<Int16>.QuarterVector(raw: HighwayReference.Nothrow.quarterVectorClampingU64ToI16(a.raw))
 }
 
 @inline(never)
 public func portQuarterVectorClampingU64ToI16ConstantA() -> SIMD<Int16>.QuarterVector {
-    SIMDInt16.quarterVector(clamping: SIMDUInt64.repeating(26))
+    SIMD<Int16>.quarterVector(clamping: SIMD<UInt64>.repeating(26))
 }
 
 @inline(never)
 public func highwayQuarterVectorClampingU64ToI16ConstantA() -> SIMD<Int16>.QuarterVector {
-    SIMDInt16.QuarterVector(
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorClampingU64ToI16(
-            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
+            SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
         )
     )
 }
@@ -283,26 +283,26 @@ public func highwayQuarterVectorClampingU64ToI16ConstantA() -> SIMD<Int16>.Quart
 @inline(never)
 public func portQuarterVectorClampingI64ToI16(clamping a: SIMD<Int64>) -> SIMD<Int16>.QuarterVector
 {
-    SIMDInt16.quarterVector(clamping: a)
+    SIMD<Int16>.quarterVector(clamping: a)
 }
 
 @inline(never)
 public func highwayQuarterVectorClampingI64ToI16(
     clamping a: SIMD<Int64>
 ) -> SIMD<Int16>.QuarterVector {
-    SIMDInt16.QuarterVector(raw: HighwayReference.Nothrow.quarterVectorClampingI64ToI16(a.raw))
+    SIMD<Int16>.QuarterVector(raw: HighwayReference.Nothrow.quarterVectorClampingI64ToI16(a.raw))
 }
 
 @inline(never)
 public func portQuarterVectorClampingI64ToI16ConstantA() -> SIMD<Int16>.QuarterVector {
-    SIMDInt16.quarterVector(clamping: SIMDInt64.repeating(26))
+    SIMD<Int16>.quarterVector(clamping: SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
 public func highwayQuarterVectorClampingI64ToI16ConstantA() -> SIMD<Int16>.QuarterVector {
-    SIMDInt16.QuarterVector(
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorClampingI64ToI16(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
         )
     )
 }
@@ -310,16 +310,19 @@ public func highwayQuarterVectorClampingI64ToI16ConstantA() -> SIMD<Int16>.Quart
 @inline(never)
 public func portQuarterVectorClampingShiftedRightByU64ToI16ConstantA() -> SIMD<Int16>.QuarterVector
 {
-    unsafe SIMDInt16.quarterVector(clamping: SIMDUInt64.repeating(26), shiftedRightByUnchecked: 1)
+    unsafe SIMD<Int16>.quarterVector(
+        clamping: SIMD<UInt64>.repeating(26),
+        shiftedRightByUnchecked: 1
+    )
 }
 
 @inline(never)
 public func highwayQuarterVectorClampingShiftedRightByU64ToI16ConstantA()
     -> SIMD<Int16>.QuarterVector
 {
-    SIMDInt16.QuarterVector(
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorClampingShiftedRightByU64ToI16(
-            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
+            SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
             1
         )
     )
@@ -329,14 +332,14 @@ public func highwayQuarterVectorClampingShiftedRightByU64ToI16ConstantA()
 public func portQuarterVectorClampingShiftedRightByU64ToI16ConstantBits(
     clamping a: SIMD<UInt64>
 ) -> SIMD<Int16>.QuarterVector {
-    unsafe SIMDInt16.quarterVector(clamping: a, shiftedRightByUnchecked: 1)
+    unsafe SIMD<Int16>.quarterVector(clamping: a, shiftedRightByUnchecked: 1)
 }
 
 @inline(never)
 public func highwayQuarterVectorClampingShiftedRightByU64ToI16ConstantBits(
     clamping a: SIMD<UInt64>
 ) -> SIMD<Int16>.QuarterVector {
-    SIMDInt16.QuarterVector(
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorClampingShiftedRightByU64ToI16(a.raw, 1)
     )
 }
@@ -345,14 +348,14 @@ public func highwayQuarterVectorClampingShiftedRightByU64ToI16ConstantBits(
 public func portQuarterVectorClampingShiftedRightByU64ToI16ConstantBitsWidthDifference(
     clamping a: SIMD<UInt64>
 ) -> SIMD<Int16>.QuarterVector {
-    unsafe SIMDInt16.quarterVector(clamping: a, shiftedRightByUnchecked: 48)
+    unsafe SIMD<Int16>.quarterVector(clamping: a, shiftedRightByUnchecked: 48)
 }
 
 @inline(never)
 public func highwayQuarterVectorClampingShiftedRightByU64ToI16ConstantBitsWidthDifference(
     clamping a: SIMD<UInt64>
 ) -> SIMD<Int16>.QuarterVector {
-    SIMDInt16.QuarterVector(
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorClampingShiftedRightByU64ToI16(a.raw, 48)
     )
 }
@@ -360,16 +363,19 @@ public func highwayQuarterVectorClampingShiftedRightByU64ToI16ConstantBitsWidthD
 @inline(never)
 public func portQuarterVectorClampingShiftedRightByI64ToI16ConstantA() -> SIMD<Int16>.QuarterVector
 {
-    unsafe SIMDInt16.quarterVector(clamping: SIMDInt64.repeating(26), shiftedRightByUnchecked: 1)
+    unsafe SIMD<Int16>.quarterVector(
+        clamping: SIMD<Int64>.repeating(26),
+        shiftedRightByUnchecked: 1
+    )
 }
 
 @inline(never)
 public func highwayQuarterVectorClampingShiftedRightByI64ToI16ConstantA()
     -> SIMD<Int16>.QuarterVector
 {
-    SIMDInt16.QuarterVector(
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorClampingShiftedRightByI64ToI16(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             1
         )
     )
@@ -379,14 +385,14 @@ public func highwayQuarterVectorClampingShiftedRightByI64ToI16ConstantA()
 public func portQuarterVectorClampingShiftedRightByI64ToI16ConstantBits(
     clamping a: SIMD<Int64>
 ) -> SIMD<Int16>.QuarterVector {
-    unsafe SIMDInt16.quarterVector(clamping: a, shiftedRightByUnchecked: 1)
+    unsafe SIMD<Int16>.quarterVector(clamping: a, shiftedRightByUnchecked: 1)
 }
 
 @inline(never)
 public func highwayQuarterVectorClampingShiftedRightByI64ToI16ConstantBits(
     clamping a: SIMD<Int64>
 ) -> SIMD<Int16>.QuarterVector {
-    SIMDInt16.QuarterVector(
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorClampingShiftedRightByI64ToI16(a.raw, 1)
     )
 }
@@ -395,14 +401,14 @@ public func highwayQuarterVectorClampingShiftedRightByI64ToI16ConstantBits(
 public func portQuarterVectorClampingShiftedRightByI64ToI16ConstantBitsWidthDifference(
     clamping a: SIMD<Int64>
 ) -> SIMD<Int16>.QuarterVector {
-    unsafe SIMDInt16.quarterVector(clamping: a, shiftedRightByUnchecked: 48)
+    unsafe SIMD<Int16>.quarterVector(clamping: a, shiftedRightByUnchecked: 48)
 }
 
 @inline(never)
 public func highwayQuarterVectorClampingShiftedRightByI64ToI16ConstantBitsWidthDifference(
     clamping a: SIMD<Int64>
 ) -> SIMD<Int16>.QuarterVector {
-    SIMDInt16.QuarterVector(
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorClampingShiftedRightByI64ToI16(a.raw, 48)
     )
 }
@@ -411,8 +417,8 @@ public func highwayQuarterVectorClampingShiftedRightByI64ToI16ConstantBitsWidthD
 public func portQuarterVectorClampingRoundingShiftedRightByU64ToI16ConstantA()
     -> SIMD<Int16>.QuarterVector
 {
-    unsafe SIMDInt16.quarterVector(
-        clamping: SIMDUInt64.repeating(26),
+    unsafe SIMD<Int16>.quarterVector(
+        clamping: SIMD<UInt64>.repeating(26),
         roundingShiftedRightByUnchecked: 1
     )
 }
@@ -421,9 +427,9 @@ public func portQuarterVectorClampingRoundingShiftedRightByU64ToI16ConstantA()
 public func highwayQuarterVectorClampingRoundingShiftedRightByU64ToI16ConstantA()
     -> SIMD<Int16>.QuarterVector
 {
-    SIMDInt16.QuarterVector(
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorClampingRoundingShiftedRightByU64ToI16(
-            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
+            SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
             1
         )
     )
@@ -433,14 +439,14 @@ public func highwayQuarterVectorClampingRoundingShiftedRightByU64ToI16ConstantA(
 public func portQuarterVectorClampingRoundingShiftedRightByU64ToI16ConstantBits(
     clamping a: SIMD<UInt64>
 ) -> SIMD<Int16>.QuarterVector {
-    unsafe SIMDInt16.quarterVector(clamping: a, roundingShiftedRightByUnchecked: 1)
+    unsafe SIMD<Int16>.quarterVector(clamping: a, roundingShiftedRightByUnchecked: 1)
 }
 
 @inline(never)
 public func highwayQuarterVectorClampingRoundingShiftedRightByU64ToI16ConstantBits(
     clamping a: SIMD<UInt64>
 ) -> SIMD<Int16>.QuarterVector {
-    SIMDInt16.QuarterVector(
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorClampingRoundingShiftedRightByU64ToI16(a.raw, 1)
     )
 }
@@ -449,14 +455,14 @@ public func highwayQuarterVectorClampingRoundingShiftedRightByU64ToI16ConstantBi
 public func portQuarterVectorClampingRoundingShiftedRightByU64ToI16ConstantBitsWidthDifference(
     clamping a: SIMD<UInt64>
 ) -> SIMD<Int16>.QuarterVector {
-    unsafe SIMDInt16.quarterVector(clamping: a, roundingShiftedRightByUnchecked: 48)
+    unsafe SIMD<Int16>.quarterVector(clamping: a, roundingShiftedRightByUnchecked: 48)
 }
 
 @inline(never)
 public func highwayQuarterVectorClampingRoundingShiftedRightByU64ToI16ConstantBitsWidthDifference(
     clamping a: SIMD<UInt64>
 ) -> SIMD<Int16>.QuarterVector {
-    SIMDInt16.QuarterVector(
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorClampingRoundingShiftedRightByU64ToI16(a.raw, 48)
     )
 }
@@ -465,8 +471,8 @@ public func highwayQuarterVectorClampingRoundingShiftedRightByU64ToI16ConstantBi
 public func portQuarterVectorClampingRoundingShiftedRightByI64ToI16ConstantA()
     -> SIMD<Int16>.QuarterVector
 {
-    unsafe SIMDInt16.quarterVector(
-        clamping: SIMDInt64.repeating(26),
+    unsafe SIMD<Int16>.quarterVector(
+        clamping: SIMD<Int64>.repeating(26),
         roundingShiftedRightByUnchecked: 1
     )
 }
@@ -475,9 +481,9 @@ public func portQuarterVectorClampingRoundingShiftedRightByI64ToI16ConstantA()
 public func highwayQuarterVectorClampingRoundingShiftedRightByI64ToI16ConstantA()
     -> SIMD<Int16>.QuarterVector
 {
-    SIMDInt16.QuarterVector(
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorClampingRoundingShiftedRightByI64ToI16(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             1
         )
     )
@@ -487,14 +493,14 @@ public func highwayQuarterVectorClampingRoundingShiftedRightByI64ToI16ConstantA(
 public func portQuarterVectorClampingRoundingShiftedRightByI64ToI16ConstantBits(
     clamping a: SIMD<Int64>
 ) -> SIMD<Int16>.QuarterVector {
-    unsafe SIMDInt16.quarterVector(clamping: a, roundingShiftedRightByUnchecked: 1)
+    unsafe SIMD<Int16>.quarterVector(clamping: a, roundingShiftedRightByUnchecked: 1)
 }
 
 @inline(never)
 public func highwayQuarterVectorClampingRoundingShiftedRightByI64ToI16ConstantBits(
     clamping a: SIMD<Int64>
 ) -> SIMD<Int16>.QuarterVector {
-    SIMDInt16.QuarterVector(
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorClampingRoundingShiftedRightByI64ToI16(a.raw, 1)
     )
 }
@@ -503,14 +509,14 @@ public func highwayQuarterVectorClampingRoundingShiftedRightByI64ToI16ConstantBi
 public func portQuarterVectorClampingRoundingShiftedRightByI64ToI16ConstantBitsWidthDifference(
     clamping a: SIMD<Int64>
 ) -> SIMD<Int16>.QuarterVector {
-    unsafe SIMDInt16.quarterVector(clamping: a, roundingShiftedRightByUnchecked: 48)
+    unsafe SIMD<Int16>.quarterVector(clamping: a, roundingShiftedRightByUnchecked: 48)
 }
 
 @inline(never)
 public func highwayQuarterVectorClampingRoundingShiftedRightByI64ToI16ConstantBitsWidthDifference(
     clamping a: SIMD<Int64>
 ) -> SIMD<Int16>.QuarterVector {
-    SIMDInt16.QuarterVector(
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorClampingRoundingShiftedRightByI64ToI16(a.raw, 48)
     )
 }

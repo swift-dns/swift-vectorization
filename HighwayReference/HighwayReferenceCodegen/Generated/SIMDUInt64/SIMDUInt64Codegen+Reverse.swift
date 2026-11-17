@@ -5,168 +5,168 @@ public import Vectorization
 
 @inline(never)
 public func portReversedU64(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.reversed(a)
+    SIMD<UInt64>.reversed(a)
 }
 
 @inline(never)
 public func highwayReversedU64(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.Vector(raw: HighwayReference.Nothrow.reversedU64(a.raw))
+    SIMD<UInt64>(raw: HighwayReference.Nothrow.reversedU64(a.raw))
 }
 
 @inline(never)
 public func portReversedU64ConstantA() -> SIMD<UInt64> {
-    SIMDUInt64.reversed(SIMDUInt64.repeating(26))
+    SIMD<UInt64>.reversed(SIMD<UInt64>.repeating(26))
 }
 
 @inline(never)
 public func highwayReversedU64ConstantA() -> SIMD<UInt64> {
-    SIMDUInt64.Vector(
+    SIMD<UInt64>(
         raw: HighwayReference.Nothrow.reversedU64(
-            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
+            SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portByteSwappedU64(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.byteSwapped(a)
+    SIMD<UInt64>.byteSwapped(a)
 }
 
 @inline(never)
 public func highwayByteSwappedU64(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.Vector(raw: HighwayReference.Nothrow.byteSwappedU64(a.raw))
+    SIMD<UInt64>(raw: HighwayReference.Nothrow.byteSwappedU64(a.raw))
 }
 
 @inline(never)
 public func portByteSwappedU64ConstantA() -> SIMD<UInt64> {
-    SIMDUInt64.byteSwapped(SIMDUInt64.repeating(26))
+    SIMD<UInt64>.byteSwapped(SIMD<UInt64>.repeating(26))
 }
 
 @inline(never)
 public func highwayByteSwappedU64ConstantA() -> SIMD<UInt64> {
-    SIMDUInt64.Vector(
+    SIMD<UInt64>(
         raw: HighwayReference.Nothrow.byteSwappedU64(
-            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
+            SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portBitReversedU64(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.bitReversed(a)
+    SIMD<UInt64>.bitReversed(a)
 }
 
 @inline(never)
 public func highwayBitReversedU64(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.Vector(raw: HighwayReference.Nothrow.bitReversedU64(a.raw))
+    SIMD<UInt64>(raw: HighwayReference.Nothrow.bitReversedU64(a.raw))
 }
 
 @inline(never)
 public func portBitReversedU64ConstantA() -> SIMD<UInt64> {
-    SIMDUInt64.bitReversed(SIMDUInt64.repeating(26))
+    SIMD<UInt64>.bitReversed(SIMD<UInt64>.repeating(26))
 }
 
 @inline(never)
 public func highwayBitReversedU64ConstantA() -> SIMD<UInt64> {
-    SIMDUInt64.Vector(
+    SIMD<UInt64>(
         raw: HighwayReference.Nothrow.bitReversedU64(
-            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
+            SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portReversedBlocksU64(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.reversedBlocks(a)
+    SIMD<UInt64>.reversedBlocks(a)
 }
 
 @inline(never)
 public func highwayReversedBlocksU64(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.Vector(raw: HighwayReference.Nothrow.reversedBlocksU64(a.raw))
+    SIMD<UInt64>(raw: HighwayReference.Nothrow.reversedBlocksU64(a.raw))
 }
 
 @inline(never)
 public func portReversedBlocksU64ConstantA() -> SIMD<UInt64> {
-    SIMDUInt64.reversedBlocks(SIMDUInt64.repeating(26))
+    SIMD<UInt64>.reversedBlocks(SIMD<UInt64>.repeating(26))
 }
 
 @inline(never)
 public func highwayReversedBlocksU64ConstantA() -> SIMD<UInt64> {
-    SIMDUInt64.Vector(
+    SIMD<UInt64>(
         raw: HighwayReference.Nothrow.reversedBlocksU64(
-            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
+            SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portReversed2U64(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.reversed2(a)
+    SIMD<UInt64>.reversed2(a)
 }
 
 @inline(never)
 public func highwayReversed2U64(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.Vector(raw: HighwayReference.Nothrow.reversed2U64(a.raw))
+    SIMD<UInt64>(raw: HighwayReference.Nothrow.reversed2U64(a.raw))
 }
 
 @inline(never)
 public func portReversed2U64ConstantA() -> SIMD<UInt64> {
-    SIMDUInt64.reversed2(SIMDUInt64.repeating(26))
+    SIMD<UInt64>.reversed2(SIMD<UInt64>.repeating(26))
 }
 
 @inline(never)
 public func highwayReversed2U64ConstantA() -> SIMD<UInt64> {
-    SIMDUInt64.Vector(
+    SIMD<UInt64>(
         raw: HighwayReference.Nothrow.reversed2U64(
-            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
+            SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portReversed4U64(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.reversed4(a)
+    SIMD<UInt64>.reversed4(a)
 }
 
 @inline(never)
 public func highwayReversed4U64(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.Vector(raw: HighwayReference.Nothrow.reversed4U64(a.raw))
+    SIMD<UInt64>(raw: HighwayReference.Nothrow.reversed4U64(a.raw))
 }
 
 @inline(never)
 public func portReversed4U64ConstantA() -> SIMD<UInt64> {
-    SIMDUInt64.reversed4(SIMDUInt64.repeating(26))
+    SIMD<UInt64>.reversed4(SIMD<UInt64>.repeating(26))
 }
 
 @inline(never)
 public func highwayReversed4U64ConstantA() -> SIMD<UInt64> {
-    SIMDUInt64.Vector(
+    SIMD<UInt64>(
         raw: HighwayReference.Nothrow.reversed4U64(
-            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
+            SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portReversed8U64(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.reversed8(a)
+    SIMD<UInt64>.reversed8(a)
 }
 
 @inline(never)
 public func highwayReversed8U64(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.Vector(raw: HighwayReference.Nothrow.reversed8U64(a.raw))
+    SIMD<UInt64>(raw: HighwayReference.Nothrow.reversed8U64(a.raw))
 }
 
 @inline(never)
 public func portReversed8U64ConstantA() -> SIMD<UInt64> {
-    SIMDUInt64.reversed8(SIMDUInt64.repeating(26))
+    SIMD<UInt64>.reversed8(SIMD<UInt64>.repeating(26))
 }
 
 @inline(never)
 public func highwayReversed8U64ConstantA() -> SIMD<UInt64> {
-    SIMDUInt64.Vector(
+    SIMD<UInt64>(
         raw: HighwayReference.Nothrow.reversed8U64(
-            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
+            SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
         )
     )
 }

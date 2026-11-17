@@ -8,20 +8,20 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
-    private func checkClampedConstantA(_ value: H.Lane) {
+    private func checkClampedConstantA(_ value: Lane) {
         let mismatches = Mismatches("clamped with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5831_C07B_DAE7_5FFC)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x5831_C37B_DAE7_6515)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5831_C07B_DAE7_5FFC)
+        let cInputs = Inputs.vectors(H.self, seed: 0x5831_C37B_DAE7_6515)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
-        for (b, c) in everyPair(bInputs, cInputs) where !hasUnorderedNaNs(H.repeating(value), b, c)
-        {
+        for (b, c) in everyPair(bInputs, cInputs)
+        where !hasUnorderedNaNs(H.repeating(value).simd, b.simd, c.simd) {
             mismatches.check(
                 H.clamped(H.repeating(value), between: b, and: c),
-                HighwayReference.clampedF16(H.repeating(value).raw, b.raw, c.raw),
+                H(raw: HighwayReference.clampedF16(H.repeating(value).raw, b.raw, c.raw)),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -29,20 +29,20 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkClampedConstantB(_ value: H.Lane) {
+    private func checkClampedConstantB(_ value: Lane) {
         let mismatches = Mismatches("clamped with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7337_467B_EA80_942E)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x7337_447B_EA80_90C8)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7337_467B_EA80_942E)
+        let cInputs = Inputs.vectors(H.self, seed: 0x7337_447B_EA80_90C8)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
-        for (a, c) in everyPair(aInputs, cInputs) where !hasUnorderedNaNs(a, H.repeating(value), c)
-        {
+        for (a, c) in everyPair(aInputs, cInputs)
+        where !hasUnorderedNaNs(a.simd, H.repeating(value).simd, c.simd) {
             mismatches.check(
                 H.clamped(a, between: H.repeating(value), and: c),
-                HighwayReference.clampedF16(a.raw, H.repeating(value).raw, c.raw),
+                H(raw: HighwayReference.clampedF16(a.raw, H.repeating(value).raw, c.raw)),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -50,20 +50,20 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkClampedConstantC(_ value: H.Lane) {
+    private func checkClampedConstantC(_ value: Lane) {
         let mismatches = Mismatches("clamped with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6A35_8F7B_E54D_B9B9)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6A35_8E7B_E54D_B806)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6A35_8F7B_E54D_B9B9)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6A35_8E7B_E54D_B806)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a, b, H.repeating(value))
-        {
+        for (a, b) in everyPair(aInputs, bInputs)
+        where !hasUnorderedNaNs(a.simd, b.simd, H.repeating(value).simd) {
             mismatches.check(
                 H.clamped(a, between: b, and: H.repeating(value)),
-                HighwayReference.clampedF16(a.raw, b.raw, H.repeating(value).raw),
+                H(raw: HighwayReference.clampedF16(a.raw, b.raw, H.repeating(value).raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -167,9 +167,9 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func clampedConstantSplatPayloadNaN() {
-        checkClampedConstantA(H.Lane(nan: 1, signaling: false))
-        checkClampedConstantB(H.Lane(nan: 1, signaling: false))
-        checkClampedConstantC(H.Lane(nan: 1, signaling: false))
+        checkClampedConstantA(Lane(nan: 1, signaling: false))
+        checkClampedConstantB(Lane(nan: 1, signaling: false))
+        checkClampedConstantC(Lane(nan: 1, signaling: false))
     }
 
     @Test func clampedConstantSplatSignalingNaN() {
@@ -197,16 +197,16 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkApproximateReciprocalConstantA(_ value: H.Lane) {
+    private func checkApproximateReciprocalConstantA(_ value: Lane) {
         let mismatches = Mismatches("approximateReciprocal with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
             H.approximateReciprocal(H.repeating(value)),
-            HighwayReference.approximateReciprocalF16(H.repeating(value).raw),
+            H(raw: HighwayReference.approximateReciprocalF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -269,7 +269,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func approximateReciprocalConstantSplatPayloadNaN() {
-        checkApproximateReciprocalConstantA(H.Lane(nan: 1, signaling: false))
+        checkApproximateReciprocalConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func approximateReciprocalConstantSplatSignalingNaN() {
@@ -289,18 +289,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkApproximateReciprocalSquareRootConstantA(_ value: H.Lane) {
+    private func checkApproximateReciprocalSquareRootConstantA(_ value: Lane) {
         let mismatches = Mismatches(
             "approximateReciprocalSquareRoot with a repeating \(hex(value))"
         )
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
             H.approximateReciprocalSquareRoot(H.repeating(value)),
-            HighwayReference.approximateReciprocalSquareRootF16(H.repeating(value).raw),
+            H(raw: HighwayReference.approximateReciprocalSquareRootF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -363,7 +363,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func approximateReciprocalSquareRootConstantSplatPayloadNaN() {
-        checkApproximateReciprocalSquareRootConstantA(H.Lane(nan: 1, signaling: false))
+        checkApproximateReciprocalSquareRootConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func approximateReciprocalSquareRootConstantSplatSignalingNaN() {
@@ -383,18 +383,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkPairwiseAddingConstantA(_ value: H.Lane) {
+    private func checkPairwiseAddingConstantA(_ value: Lane) {
         let mismatches = Mismatches("pairwiseAdding with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC102_1671_4A67_55CF)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC102_1671_4A67_55CF)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
-        for b in bInputs where !hasUnorderedNaNs(adjacentLanesOf: H.repeating(value), b) {
+        for b in bInputs where !hasUnorderedNaNs(adjacentLanesOf: H.repeating(value).simd, b.simd) {
             mismatches.check(
                 H.pairwiseAdding(H.repeating(value), b),
-                HighwayReference.pairwiseAddingF16(H.repeating(value).raw, b.raw),
+                H(raw: HighwayReference.pairwiseAddingF16(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -402,18 +402,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkPairwiseAddingConstantB(_ value: H.Lane) {
+    private func checkPairwiseAddingConstantB(_ value: Lane) {
         let mismatches = Mismatches("pairwiseAdding with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC8BD_4C71_4E84_9271)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC8BD_4C71_4E84_9271)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
-        for a in aInputs where !hasUnorderedNaNs(adjacentLanesOf: a, H.repeating(value)) {
+        for a in aInputs where !hasUnorderedNaNs(adjacentLanesOf: a.simd, H.repeating(value).simd) {
             mismatches.check(
                 H.pairwiseAdding(a, H.repeating(value)),
-                HighwayReference.pairwiseAddingF16(a.raw, H.repeating(value).raw),
+                H(raw: HighwayReference.pairwiseAddingF16(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -491,8 +491,8 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func pairwiseAddingConstantSplatPayloadNaN() {
-        checkPairwiseAddingConstantA(H.Lane(nan: 1, signaling: false))
-        checkPairwiseAddingConstantB(H.Lane(nan: 1, signaling: false))
+        checkPairwiseAddingConstantA(Lane(nan: 1, signaling: false))
+        checkPairwiseAddingConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func pairwiseAddingConstantSplatSignalingNaN() {
@@ -516,18 +516,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkPairwiseSubtractingConstantA(_ value: H.Lane) {
+    private func checkPairwiseSubtractingConstantA(_ value: Lane) {
         let mismatches = Mismatches("pairwiseSubtracting with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB5AF_B732_547D_BBF6)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB5AF_B732_547D_BBF6)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.pairwiseSubtracting(H.repeating(value), b),
-                HighwayReference.pairwiseSubtractingF16(H.repeating(value).raw, b.raw),
+                H(raw: HighwayReference.pairwiseSubtractingF16(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -535,18 +535,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkPairwiseSubtractingConstantB(_ value: H.Lane) {
+    private func checkPairwiseSubtractingConstantB(_ value: Lane) {
         let mismatches = Mismatches("pairwiseSubtracting with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAC41_2132_4EEE_47B4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAC41_2132_4EEE_47B4)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.pairwiseSubtracting(a, H.repeating(value)),
-                HighwayReference.pairwiseSubtractingF16(a.raw, H.repeating(value).raw),
+                H(raw: HighwayReference.pairwiseSubtractingF16(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -624,8 +624,8 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func pairwiseSubtractingConstantSplatPayloadNaN() {
-        checkPairwiseSubtractingConstantA(H.Lane(nan: 1, signaling: false))
-        checkPairwiseSubtractingConstantB(H.Lane(nan: 1, signaling: false))
+        checkPairwiseSubtractingConstantA(Lane(nan: 1, signaling: false))
+        checkPairwiseSubtractingConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func pairwiseSubtractingConstantSplatSignalingNaN() {
@@ -649,16 +649,16 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkExponentConstantA(_ value: H.Lane) {
+    private func checkExponentConstantA(_ value: Lane) {
         let mismatches = Mismatches("exponent with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
             H.exponent(H.repeating(value)),
-            HighwayReference.exponentF16(H.repeating(value).raw),
+            H(raw: HighwayReference.exponentF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -721,7 +721,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func exponentConstantSplatPayloadNaN() {
-        checkExponentConstantA(H.Lane(nan: 1, signaling: false))
+        checkExponentConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func exponentConstantSplatSignalingNaN() {

@@ -5,10 +5,10 @@ public import Vectorization
 
 @inline(never)
 public func portLowerHalfOfMaskBF16(_ mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16>.HalfMask {
-    SIMDBFloat16.lowerHalf(mask)
+    SIMD<BFloat16>.lowerHalf(mask)
 }
 
 @inline(never)
 public func highwayLowerHalfOfMaskBF16(_ mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16>.HalfMask {
-    SIMDBFloat16.HalfMask(raw: HighwayReference.Nothrow.lowerHalfOfMaskBF16(mask.raw))
+    SIMD<BFloat16>.HalfMask(raw: HighwayReference.Nothrow.lowerHalfOfMaskBF16(mask.raw))
 }

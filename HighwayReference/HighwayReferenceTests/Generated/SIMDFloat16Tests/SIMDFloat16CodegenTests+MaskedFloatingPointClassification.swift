@@ -11,7 +11,7 @@ extension SIMDFloat16CodegenTests {
     @Test func isNaNWhere() {
         let mismatches = Mismatches("portIsNaNWhereF16")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x63B2_2EE8_89EB_90F0)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x63B2_2FE8_89EB_92A3)
+        let aInputs = Inputs.vectors(H.self, seed: 0x63B2_2FE8_89EB_92A3)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portIsNaNWhereF16(a, where: mask),

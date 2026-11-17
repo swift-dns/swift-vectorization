@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDInt8CodegenTests {
     @Test func slideUpLanes() {
         let mismatches = Mismatches("portSlideUpLanesI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC88C_1578_B5F2_B8C5)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC88C_1578_B5F2_B8C5)
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
@@ -36,7 +36,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func slideUpLanesConstantLanes() {
         let mismatches = Mismatches("portSlideUpLanesI8ConstantLanes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF83A_0AA4_15BC_6DFE)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF83A_0AA4_15BC_6DFE)
         for a in aInputs {
             mismatches.check(
                 portSlideUpLanesI8ConstantLanes(a),
@@ -49,8 +49,8 @@ extension SIMDInt8CodegenTests {
 
     @Test func slideUpLanesFillingWith() {
         let mismatches = Mismatches("portSlideUpLanesFillingWithI8")
-        let fillInputs = Inputs.vectors(H.Vector.self, seed: 0xD36C_7E9F_2354_A3A2)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD36C_7F9F_2354_A555)
+        let fillInputs = Inputs.vectors(H.self, seed: 0xD36C_7E9F_2354_A3A2)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD36C_7F9F_2354_A555)
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
         for (fill, a, lanes) in mixedTriples(
             fillInputs,
@@ -69,7 +69,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func slideUpLanesFillingWithConstantA() {
         let mismatches = Mismatches("portSlideUpLanesFillingWithI8ConstantA")
-        let fillInputs = Inputs.vectors(H.Vector.self, seed: 0x220A_5EE7_2CBE_59A3)
+        let fillInputs = Inputs.vectors(H.self, seed: 0x220A_5EE7_2CBE_59A3)
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
         for (fill, lanes) in everyPair(fillInputs, lanesInputs) {
             mismatches.check(
@@ -83,8 +83,8 @@ extension SIMDInt8CodegenTests {
 
     @Test func slideUpLanesFillingWithConstantLanes() {
         let mismatches = Mismatches("portSlideUpLanesFillingWithI8ConstantLanes")
-        let fillInputs = Inputs.vectors(H.Vector.self, seed: 0xA657_3479_D1C9_B1FB)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA657_3379_D1C9_B048)
+        let fillInputs = Inputs.vectors(H.self, seed: 0xA657_3479_D1C9_B1FB)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA657_3379_D1C9_B048)
         for (fill, a) in everyPair(fillInputs, aInputs) {
             mismatches.check(
                 portSlideUpLanesFillingWithI8ConstantLanes(a, fillingWith: fill),
@@ -97,7 +97,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func slideUpLanesFillingWithConstantFill() {
         let mismatches = Mismatches("portSlideUpLanesFillingWithI8ConstantFill")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA703_F474_1B19_20D4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA703_F474_1B19_20D4)
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
@@ -111,7 +111,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func slideDownLanes() {
         let mismatches = Mismatches("portSlideDownLanesI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x24BD_D7C6_59A6_FDB6)
+        let aInputs = Inputs.vectors(H.self, seed: 0x24BD_D7C6_59A6_FDB6)
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
@@ -138,7 +138,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func slideDownLanesConstantLanes() {
         let mismatches = Mismatches("portSlideDownLanesI8ConstantLanes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x79DE_F0B1_814D_D277)
+        let aInputs = Inputs.vectors(H.self, seed: 0x79DE_F0B1_814D_D277)
         for a in aInputs {
             mismatches.check(
                 portSlideDownLanesI8ConstantLanes(a),
@@ -151,8 +151,8 @@ extension SIMDInt8CodegenTests {
 
     @Test func slideDownLanesFillingWith() {
         let mismatches = Mismatches("portSlideDownLanesFillingWithI8")
-        let fillInputs = Inputs.vectors(H.Vector.self, seed: 0x6A3C_44B7_AA02_E4AB)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6A3C_43B7_AA02_E2F8)
+        let fillInputs = Inputs.vectors(H.self, seed: 0x6A3C_44B7_AA02_E4AB)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6A3C_43B7_AA02_E2F8)
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
         for (fill, a, lanes) in mixedTriples(
             fillInputs,
@@ -171,7 +171,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func slideDownLanesFillingWithConstantA() {
         let mismatches = Mismatches("portSlideDownLanesFillingWithI8ConstantA")
-        let fillInputs = Inputs.vectors(H.Vector.self, seed: 0x3AD4_731E_2456_C3B4)
+        let fillInputs = Inputs.vectors(H.self, seed: 0x3AD4_731E_2456_C3B4)
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
         for (fill, lanes) in everyPair(fillInputs, lanesInputs) {
             mismatches.check(
@@ -185,8 +185,8 @@ extension SIMDInt8CodegenTests {
 
     @Test func slideDownLanesFillingWithConstantLanes() {
         let mismatches = Mismatches("portSlideDownLanesFillingWithI8ConstantLanes")
-        let fillInputs = Inputs.vectors(H.Vector.self, seed: 0x2E59_3BD1_B8DC_DBB4)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2E59_3CD1_B8DC_DD67)
+        let fillInputs = Inputs.vectors(H.self, seed: 0x2E59_3BD1_B8DC_DBB4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2E59_3CD1_B8DC_DD67)
         for (fill, a) in everyPair(fillInputs, aInputs) {
             mismatches.check(
                 portSlideDownLanesFillingWithI8ConstantLanes(a, fillingWith: fill),
@@ -199,7 +199,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func slideDownLanesFillingWithConstantFill() {
         let mismatches = Mismatches("portSlideDownLanesFillingWithI8ConstantFill")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC44E_166D_0F39_5189)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC44E_166D_0F39_5189)
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
@@ -213,7 +213,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func slide1Up() {
         let mismatches = Mismatches("portSlide1UpI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1B86_0A91_0629_004B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1B86_0A91_0629_004B)
         for a in aInputs {
             mismatches.check(portSlide1UpI8(a), highwaySlide1UpI8(a), "a: \(describe(a))")
         }
@@ -228,8 +228,8 @@ extension SIMDInt8CodegenTests {
 
     @Test func slide1UpFillingWith() {
         let mismatches = Mismatches("portSlide1UpFillingWithI8")
-        let fillInputs = Inputs.lanes(H.Lane.self, seed: 0x0E73_5686_B0B1_066C)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0E73_5786_B0B1_081F)
+        let fillInputs = Inputs.lanes(Lane.self, seed: 0x0E73_5686_B0B1_066C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0E73_5786_B0B1_081F)
         for (fill, a) in everyPair(fillInputs, aInputs) {
             mismatches.check(
                 portSlide1UpFillingWithI8(a, fillingWith: fill),
@@ -242,7 +242,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func slide1UpFillingWithConstantA() {
         let mismatches = Mismatches("portSlide1UpFillingWithI8ConstantA")
-        let fillInputs = Inputs.lanes(H.Lane.self, seed: 0xBE93_4A3E_C309_EBE5)
+        let fillInputs = Inputs.lanes(Lane.self, seed: 0xBE93_4A3E_C309_EBE5)
         for fill in fillInputs {
             mismatches.check(
                 portSlide1UpFillingWithI8ConstantA(fillingWith: fill),
@@ -255,7 +255,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func slide1UpFillingWithConstantFill() {
         let mismatches = Mismatches("portSlide1UpFillingWithI8ConstantFill")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC544_1AEB_3574_D1E6)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC544_1AEB_3574_D1E6)
         for a in aInputs {
             mismatches.check(
                 portSlide1UpFillingWithI8ConstantFill(a),
@@ -268,7 +268,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func slide1Down() {
         let mismatches = Mismatches("portSlide1DownI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x23AE_4DD0_83D7_91D6)
+        let aInputs = Inputs.vectors(H.self, seed: 0x23AE_4DD0_83D7_91D6)
         for a in aInputs {
             mismatches.check(portSlide1DownI8(a), highwaySlide1DownI8(a), "a: \(describe(a))")
         }
@@ -283,8 +283,8 @@ extension SIMDInt8CodegenTests {
 
     @Test func slide1DownFillingWith() {
         let mismatches = Mismatches("portSlide1DownFillingWithI8")
-        let fillInputs = Inputs.lanes(H.Lane.self, seed: 0x998A_1641_BD67_6ECB)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x998A_1541_BD67_6D18)
+        let fillInputs = Inputs.lanes(Lane.self, seed: 0x998A_1641_BD67_6ECB)
+        let aInputs = Inputs.vectors(H.self, seed: 0x998A_1541_BD67_6D18)
         for (fill, a) in everyPair(fillInputs, aInputs) {
             mismatches.check(
                 portSlide1DownFillingWithI8(a, fillingWith: fill),
@@ -297,7 +297,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func slide1DownFillingWithConstantA() {
         let mismatches = Mismatches("portSlide1DownFillingWithI8ConstantA")
-        let fillInputs = Inputs.lanes(H.Lane.self, seed: 0x7D11_C514_FE23_F6D4)
+        let fillInputs = Inputs.lanes(Lane.self, seed: 0x7D11_C514_FE23_F6D4)
         for fill in fillInputs {
             mismatches.check(
                 portSlide1DownFillingWithI8ConstantA(fillingWith: fill),
@@ -310,7 +310,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func slide1DownFillingWithConstantFill() {
         let mismatches = Mismatches("portSlide1DownFillingWithI8ConstantFill")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8276_4A1F_E4E8_92A9)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8276_4A1F_E4E8_92A9)
         for a in aInputs {
             mismatches.check(
                 portSlide1DownFillingWithI8ConstantFill(a),
@@ -329,7 +329,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func slideUpBlocksConstantBlocks() {
         let mismatches = Mismatches("portSlideUpBlocksI8ConstantBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF323_8BCB_11B0_8400)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF323_8BCB_11B0_8400)
         for a in aInputs {
             mismatches.check(
                 portSlideUpBlocksI8ConstantBlocks(a),
@@ -348,7 +348,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func slideDownBlocksConstantBlocks() {
         let mismatches = Mismatches("portSlideDownBlocksI8ConstantBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x285E_1EEC_F314_1011)
+        let aInputs = Inputs.vectors(H.self, seed: 0x285E_1EEC_F314_1011)
         for a in aInputs {
             mismatches.check(
                 portSlideDownBlocksI8ConstantBlocks(a),
@@ -361,7 +361,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func combinedSlideDownLanesConstantA() {
         let mismatches = Mismatches("portCombinedSlideDownLanesI8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2965_EDCC_00A2_EE99)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2965_EDCC_00A2_EE99)
         for b in bInputs {
             mismatches.check(
                 portCombinedSlideDownLanesI8ConstantA(b),
@@ -374,7 +374,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func combinedSlideDownLanesConstantB() {
         let mismatches = Mismatches("portCombinedSlideDownLanesI8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1080_87CB_F2D8_5727)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1080_87CB_F2D8_5727)
         for a in aInputs {
             mismatches.check(
                 portCombinedSlideDownLanesI8ConstantB(a),
@@ -387,8 +387,8 @@ extension SIMDInt8CodegenTests {
 
     @Test func combinedSlideDownLanesConstantLanes() {
         let mismatches = Mismatches("portCombinedSlideDownLanesI8ConstantLanes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8D9D_7D08_C14B_A6CE)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8D9D_7E08_C14B_A881)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8D9D_7D08_C14B_A6CE)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8D9D_7E08_C14B_A881)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portCombinedSlideDownLanesI8ConstantLanes(a, b),

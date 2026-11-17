@@ -318,7 +318,7 @@ public func portLoadInterleaved2U16(
     _ v0: inout SIMD<UInt16>,
     _ v1: inout SIMD<UInt16>
 ) {
-    unsafe SIMDUInt16.loadInterleaved2(from: from, &v0, &v1)
+    unsafe SIMD<UInt16>.loadInterleaved2(from: from, &v0, &v1)
 }
 
 @inline(never)
@@ -337,7 +337,7 @@ public func portLoadInterleaved3U16(
     _ v1: inout SIMD<UInt16>,
     _ v2: inout SIMD<UInt16>
 ) {
-    unsafe SIMDUInt16.loadInterleaved3(from: from, &v0, &v1, &v2)
+    unsafe SIMD<UInt16>.loadInterleaved3(from: from, &v0, &v1, &v2)
 }
 
 @inline(never)
@@ -358,7 +358,7 @@ public func portLoadInterleaved4U16(
     _ v2: inout SIMD<UInt16>,
     _ v3: inout SIMD<UInt16>
 ) {
-    unsafe SIMDUInt16.loadInterleaved4(from: from, &v0, &v1, &v2, &v3)
+    unsafe SIMD<UInt16>.loadInterleaved4(from: from, &v0, &v1, &v2, &v3)
 }
 
 @inline(never)
@@ -378,7 +378,7 @@ public func portStoreInterleaved2U16(
     _ b: SIMD<UInt16>,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe SIMDUInt16.storeInterleaved2(a, b, to: to)
+    unsafe SIMD<UInt16>.storeInterleaved2(a, b, to: to)
 }
 
 @inline(never)
@@ -392,7 +392,7 @@ public func highwayStoreInterleaved2U16(
 
 @inline(never)
 public func portStoreInterleaved2U16ConstantA(_ b: SIMD<UInt16>, to: UnsafeMutablePointer<UInt16>) {
-    unsafe SIMDUInt16.storeInterleaved2(SIMDUInt16.repeating(26), b, to: to)
+    unsafe SIMD<UInt16>.storeInterleaved2(SIMD<UInt16>.repeating(26), b, to: to)
 }
 
 @inline(never)
@@ -401,7 +401,7 @@ public func highwayStoreInterleaved2U16ConstantA(
     to: UnsafeMutablePointer<UInt16>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved2U16(
-        SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+        SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
         b.raw,
         to
     )
@@ -409,7 +409,7 @@ public func highwayStoreInterleaved2U16ConstantA(
 
 @inline(never)
 public func portStoreInterleaved2U16ConstantB(_ a: SIMD<UInt16>, to: UnsafeMutablePointer<UInt16>) {
-    unsafe SIMDUInt16.storeInterleaved2(a, SIMDUInt16.repeating(26), to: to)
+    unsafe SIMD<UInt16>.storeInterleaved2(a, SIMD<UInt16>.repeating(26), to: to)
 }
 
 @inline(never)
@@ -419,7 +419,7 @@ public func highwayStoreInterleaved2U16ConstantB(
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved2U16(
         a.raw,
-        SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+        SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
         to
     )
 }
@@ -431,7 +431,7 @@ public func portStoreInterleaved3U16(
     _ c: SIMD<UInt16>,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe SIMDUInt16.storeInterleaved3(a, b, c, to: to)
+    unsafe SIMD<UInt16>.storeInterleaved3(a, b, c, to: to)
 }
 
 @inline(never)
@@ -450,7 +450,7 @@ public func portStoreInterleaved3U16ConstantA(
     _ c: SIMD<UInt16>,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe SIMDUInt16.storeInterleaved3(SIMDUInt16.repeating(26), b, c, to: to)
+    unsafe SIMD<UInt16>.storeInterleaved3(SIMD<UInt16>.repeating(26), b, c, to: to)
 }
 
 @inline(never)
@@ -460,7 +460,7 @@ public func highwayStoreInterleaved3U16ConstantA(
     to: UnsafeMutablePointer<UInt16>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved3U16(
-        SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+        SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
         b.raw,
         c.raw,
         to
@@ -473,7 +473,7 @@ public func portStoreInterleaved3U16ConstantB(
     _ c: SIMD<UInt16>,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe SIMDUInt16.storeInterleaved3(a, SIMDUInt16.repeating(26), c, to: to)
+    unsafe SIMD<UInt16>.storeInterleaved3(a, SIMD<UInt16>.repeating(26), c, to: to)
 }
 
 @inline(never)
@@ -484,7 +484,7 @@ public func highwayStoreInterleaved3U16ConstantB(
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved3U16(
         a.raw,
-        SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+        SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
         c.raw,
         to
     )
@@ -496,7 +496,7 @@ public func portStoreInterleaved3U16ConstantC(
     _ b: SIMD<UInt16>,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe SIMDUInt16.storeInterleaved3(a, b, SIMDUInt16.repeating(26), to: to)
+    unsafe SIMD<UInt16>.storeInterleaved3(a, b, SIMD<UInt16>.repeating(26), to: to)
 }
 
 @inline(never)
@@ -508,7 +508,7 @@ public func highwayStoreInterleaved3U16ConstantC(
     unsafe HighwayReference.Nothrow.storeInterleaved3U16(
         a.raw,
         b.raw,
-        SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+        SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
         to
     )
 }
@@ -521,7 +521,7 @@ public func portStoreInterleaved4U16(
     _ d: SIMD<UInt16>,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe SIMDUInt16.storeInterleaved4(a, b, c, d, to: to)
+    unsafe SIMD<UInt16>.storeInterleaved4(a, b, c, d, to: to)
 }
 
 @inline(never)
@@ -542,7 +542,7 @@ public func portStoreInterleaved4U16ConstantA(
     _ d: SIMD<UInt16>,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe SIMDUInt16.storeInterleaved4(SIMDUInt16.repeating(26), b, c, d, to: to)
+    unsafe SIMD<UInt16>.storeInterleaved4(SIMD<UInt16>.repeating(26), b, c, d, to: to)
 }
 
 @inline(never)
@@ -553,7 +553,7 @@ public func highwayStoreInterleaved4U16ConstantA(
     to: UnsafeMutablePointer<UInt16>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved4U16(
-        SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+        SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
         b.raw,
         c.raw,
         d.raw,
@@ -568,7 +568,7 @@ public func portStoreInterleaved4U16ConstantB(
     _ d: SIMD<UInt16>,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe SIMDUInt16.storeInterleaved4(a, SIMDUInt16.repeating(26), c, d, to: to)
+    unsafe SIMD<UInt16>.storeInterleaved4(a, SIMD<UInt16>.repeating(26), c, d, to: to)
 }
 
 @inline(never)
@@ -580,7 +580,7 @@ public func highwayStoreInterleaved4U16ConstantB(
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved4U16(
         a.raw,
-        SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+        SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
         c.raw,
         d.raw,
         to
@@ -594,7 +594,7 @@ public func portStoreInterleaved4U16ConstantC(
     _ d: SIMD<UInt16>,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe SIMDUInt16.storeInterleaved4(a, b, SIMDUInt16.repeating(26), d, to: to)
+    unsafe SIMD<UInt16>.storeInterleaved4(a, b, SIMD<UInt16>.repeating(26), d, to: to)
 }
 
 @inline(never)
@@ -607,7 +607,7 @@ public func highwayStoreInterleaved4U16ConstantC(
     unsafe HighwayReference.Nothrow.storeInterleaved4U16(
         a.raw,
         b.raw,
-        SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+        SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
         d.raw,
         to
     )
@@ -620,7 +620,7 @@ public func portStoreInterleaved4U16ConstantD(
     _ c: SIMD<UInt16>,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe SIMDUInt16.storeInterleaved4(a, b, c, SIMDUInt16.repeating(26), to: to)
+    unsafe SIMD<UInt16>.storeInterleaved4(a, b, c, SIMD<UInt16>.repeating(26), to: to)
 }
 
 @inline(never)
@@ -634,7 +634,7 @@ public func highwayStoreInterleaved4U16ConstantD(
         a.raw,
         b.raw,
         c.raw,
-        SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+        SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
         to
     )
 }

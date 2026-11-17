@@ -8,15 +8,15 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
-    private func checkSumWhereConstantA(_ value: H.Lane) {
+    private func checkSumWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("sumWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xBB03_7C9D_D66D_EF11)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
-        for mask in maskInputs where !hasUnorderedNaNs(lanesOf: H.repeating(value)) {
+        for mask in maskInputs where !hasUnorderedNaNs(lanesOf: H.repeating(value).simd) {
             mismatches.check(
                 H.sum(H.repeating(value), where: mask),
                 Float16(bitPattern: HighwayReference.sumWhereF16(mask.raw, H.repeating(value).raw)),
@@ -83,7 +83,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func sumWhereConstantSplatPayloadNaN() {
-        checkSumWhereConstantA(H.Lane(nan: 1, signaling: false))
+        checkSumWhereConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func sumWhereConstantSplatSignalingNaN() {
@@ -103,12 +103,12 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkSmallestWhereConstantA(_ value: H.Lane) {
+    private func checkSmallestWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("smallestWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x00C4_A2EC_850B_DDD5)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for mask in maskInputs {
@@ -180,7 +180,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func smallestWhereConstantSplatPayloadNaN() {
-        checkSmallestWhereConstantA(H.Lane(nan: 1, signaling: false))
+        checkSmallestWhereConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func smallestWhereConstantSplatSignalingNaN() {
@@ -200,12 +200,12 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkLargestWhereConstantA(_ value: H.Lane) {
+    private func checkLargestWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("largestWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC0C1_11F7_D485_785A)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for mask in maskInputs {
@@ -277,7 +277,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func largestWhereConstantSplatPayloadNaN() {
-        checkLargestWhereConstantA(H.Lane(nan: 1, signaling: false))
+        checkLargestWhereConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func largestWhereConstantSplatSignalingNaN() {

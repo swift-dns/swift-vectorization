@@ -10,7 +10,7 @@ import Vectorization
 extension SIMDFloat16CodegenTests {
     @Test func vectorBitPatternFromUInt8() {
         let mismatches = Mismatches("portVectorBitPatternU8ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt8.Vector.self, seed: 0xAD34_49AB_174D_655E)
+        let aInputs = Inputs.conversions(SIMD<UInt8>.self, seed: 0xAD34_49AB_174D_655E)
         for a in aInputs {
             mismatches.check(
                 portVectorBitPatternU8ToF16(bitPattern: a),
@@ -33,7 +33,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorBitPatternFromUInt16() {
         let mismatches = Mismatches("portVectorBitPatternU16ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt16.Vector.self, seed: 0xE3DB_986D_8241_7527)
+        let aInputs = Inputs.conversions(SIMD<UInt16>.self, seed: 0xE3DB_986D_8241_7527)
         for a in aInputs {
             mismatches.check(
                 portVectorBitPatternU16ToF16(bitPattern: a),
@@ -56,7 +56,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorBitPatternFromUInt32() {
         let mismatches = Mismatches("portVectorBitPatternU32ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0xBEAA_705B_C2F3_6A51)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0xBEAA_705B_C2F3_6A51)
         for a in aInputs {
             mismatches.check(
                 portVectorBitPatternU32ToF16(bitPattern: a),
@@ -79,7 +79,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorBitPatternFromUInt64() {
         let mismatches = Mismatches("portVectorBitPatternU64ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xBFE8_4685_F1AC_D61E)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xBFE8_4685_F1AC_D61E)
         for a in aInputs {
             mismatches.check(
                 portVectorBitPatternU64ToF16(bitPattern: a),
@@ -102,7 +102,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorBitPatternFromInt8() {
         let mismatches = Mismatches("portVectorBitPatternI8ToF16")
-        let aInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0xFE93_068F_DD1B_4873)
+        let aInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0xFE93_068F_DD1B_4873)
         for a in aInputs {
             mismatches.check(
                 portVectorBitPatternI8ToF16(bitPattern: a),
@@ -125,7 +125,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorBitPatternFromInt16() {
         let mismatches = Mismatches("portVectorBitPatternI16ToF16")
-        let aInputs = Inputs.conversions(SIMDInt16.Vector.self, seed: 0x5506_FC39_CC6E_C594)
+        let aInputs = Inputs.conversions(SIMD<Int16>.self, seed: 0x5506_FC39_CC6E_C594)
         for a in aInputs {
             mismatches.check(
                 portVectorBitPatternI16ToF16(bitPattern: a),
@@ -148,7 +148,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorBitPatternFromInt32() {
         let mismatches = Mismatches("portVectorBitPatternI32ToF16")
-        let aInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xEFA0_944B_3D3D_1C1A)
+        let aInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xEFA0_944B_3D3D_1C1A)
         for a in aInputs {
             mismatches.check(
                 portVectorBitPatternI32ToF16(bitPattern: a),
@@ -171,7 +171,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorBitPatternFromInt64() {
         let mismatches = Mismatches("portVectorBitPatternI64ToF16")
-        let aInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0x9BBB_6A21_70BA_7891)
+        let aInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0x9BBB_6A21_70BA_7891)
         for a in aInputs {
             mismatches.check(
                 portVectorBitPatternI64ToF16(bitPattern: a),
@@ -194,7 +194,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorBitPatternFromFloat() {
         let mismatches = Mismatches("portVectorBitPatternF32ToF16")
-        let aInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0x4C9A_39EE_6A8D_ACD0)
+        let aInputs = Inputs.conversions(SIMD<Float>.self, seed: 0x4C9A_39EE_6A8D_ACD0)
         for a in aInputs {
             mismatches.check(
                 portVectorBitPatternF32ToF16(bitPattern: a),
@@ -217,7 +217,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorBitPatternFromDouble() {
         let mismatches = Mismatches("portVectorBitPatternF64ToF16")
-        let aInputs = Inputs.conversions(SIMDDouble.Vector.self, seed: 0xFAD9_75AC_3362_9321)
+        let aInputs = Inputs.conversions(SIMD<Double>.self, seed: 0xFAD9_75AC_3362_9321)
         for a in aInputs {
             mismatches.check(
                 portVectorBitPatternF64ToF16(bitPattern: a),
@@ -240,7 +240,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorBitPatternFromBFloat16() {
         let mismatches = Mismatches("portVectorBitPatternBF16ToF16")
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x376A_8954_5191_6713)
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x376A_8954_5191_6713)
         for a in aInputs {
             mismatches.check(
                 portVectorBitPatternBF16ToF16(bitPattern: a),
@@ -263,12 +263,12 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorResizingFromUInt8() {
         let mismatches = Mismatches("portVectorResizingU8ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt8.Vector.self, seed: 0xAC1F_6457_AD1E_E77E)
+        let aInputs = Inputs.conversions(SIMD<UInt8>.self, seed: 0xAC1F_6457_AD1E_E77E)
         for a in aInputs {
             let port = portVectorResizingU8ToF16(resizing: a)
             let reference = highwayVectorResizingU8ToF16(resizing: a)
-            let definedBytes = SIMDUInt8.laneCount * MemoryLayout<SIMDUInt8.Lane>.stride
-            let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt8>.laneCount * MemoryLayout<UInt8>.stride
+            let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
@@ -292,8 +292,8 @@ extension SIMDFloat16CodegenTests {
         let mismatches = Mismatches("portVectorResizingU8ToF16ConstantA")
         let port = portVectorResizingU8ToF16ConstantA()
         let reference = highwayVectorResizingU8ToF16ConstantA()
-        let definedBytes = SIMDUInt8.laneCount * MemoryLayout<SIMDUInt8.Lane>.stride
-        let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<UInt8>.laneCount * MemoryLayout<UInt8>.stride
+        let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -310,12 +310,12 @@ extension SIMDFloat16CodegenTests {
 
     @Test func halfVectorResizingFromUInt8() {
         let mismatches = Mismatches("portHalfVectorResizingU8ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt8.Vector.self, seed: 0x493B_8F37_3721_F28D)
+        let aInputs = Inputs.conversions(SIMD<UInt8>.self, seed: 0x493B_8F37_3721_F28D)
         for a in aInputs {
             let port = portHalfVectorResizingU8ToF16(resizing: a)
             let reference = highwayHalfVectorResizingU8ToF16(resizing: a)
-            let definedBytes = SIMDUInt8.laneCount * MemoryLayout<SIMDUInt8.Lane>.stride
-            let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt8>.laneCount * MemoryLayout<UInt8>.stride
+            let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
@@ -339,8 +339,8 @@ extension SIMDFloat16CodegenTests {
         let mismatches = Mismatches("portHalfVectorResizingU8ToF16ConstantA")
         let port = portHalfVectorResizingU8ToF16ConstantA()
         let reference = highwayHalfVectorResizingU8ToF16ConstantA()
-        let definedBytes = SIMDUInt8.laneCount * MemoryLayout<SIMDUInt8.Lane>.stride
-        let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<UInt8>.laneCount * MemoryLayout<UInt8>.stride
+        let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -357,12 +357,12 @@ extension SIMDFloat16CodegenTests {
 
     @Test func quarterVectorResizingFromUInt8() {
         let mismatches = Mismatches("portQuarterVectorResizingU8ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt8.Vector.self, seed: 0x4D3F_A4CC_89F6_38E0)
+        let aInputs = Inputs.conversions(SIMD<UInt8>.self, seed: 0x4D3F_A4CC_89F6_38E0)
         for a in aInputs {
             let port = portQuarterVectorResizingU8ToF16(resizing: a)
             let reference = highwayQuarterVectorResizingU8ToF16(resizing: a)
-            let definedBytes = SIMDUInt8.laneCount * MemoryLayout<SIMDUInt8.Lane>.stride
-            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt8>.laneCount * MemoryLayout<UInt8>.stride
+            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
@@ -386,8 +386,8 @@ extension SIMDFloat16CodegenTests {
         let mismatches = Mismatches("portQuarterVectorResizingU8ToF16ConstantA")
         let port = portQuarterVectorResizingU8ToF16ConstantA()
         let reference = highwayQuarterVectorResizingU8ToF16ConstantA()
-        let definedBytes = SIMDUInt8.laneCount * MemoryLayout<SIMDUInt8.Lane>.stride
-        let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<UInt8>.laneCount * MemoryLayout<UInt8>.stride
+        let grownBytes = H.QuarterVector.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -404,17 +404,17 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorResizingFromHalfUInt8() {
         let mismatches = Mismatches("portVectorResizingHalfU8ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt8.HalfVector.self, seed: 0xADD4_8585_C4A8_6839)
+        let aInputs = Inputs.conversions(SIMD<UInt8>.HalfVector.self, seed: 0xADD4_8585_C4A8_6839)
             .map(poisoningUpperBytes)
         for a in aInputs {
             let port = portVectorResizingHalfU8ToF16(resizing: a)
             let reference = highwayVectorResizingHalfU8ToF16(resizing: a)
-            let definedBytes = SIMDUInt8.HalfVector.laneCount * MemoryLayout<SIMDUInt8.Lane>.stride
-            let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt8>.HalfVector.laneCount * MemoryLayout<UInt8>.stride
+            let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDUInt8.HalfVector.Raw>.size
+                MemoryLayout<SIMD<UInt8>.HalfVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -432,17 +432,17 @@ extension SIMDFloat16CodegenTests {
 
     @Test func halfVectorResizingFromHalfUInt8() {
         let mismatches = Mismatches("portHalfVectorResizingHalfU8ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt8.HalfVector.self, seed: 0xDB6B_FCBF_A002_9232)
+        let aInputs = Inputs.conversions(SIMD<UInt8>.HalfVector.self, seed: 0xDB6B_FCBF_A002_9232)
             .map(poisoningUpperBytes)
         for a in aInputs {
             let port = portHalfVectorResizingHalfU8ToF16(resizing: a)
             let reference = highwayHalfVectorResizingHalfU8ToF16(resizing: a)
-            let definedBytes = SIMDUInt8.HalfVector.laneCount * MemoryLayout<SIMDUInt8.Lane>.stride
-            let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt8>.HalfVector.laneCount * MemoryLayout<UInt8>.stride
+            let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDUInt8.HalfVector.Raw>.size
+                MemoryLayout<SIMD<UInt8>.HalfVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -460,17 +460,17 @@ extension SIMDFloat16CodegenTests {
 
     @Test func quarterVectorResizingFromHalfUInt8() {
         let mismatches = Mismatches("portQuarterVectorResizingHalfU8ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt8.HalfVector.self, seed: 0xF07A_659A_0A50_AEC7)
+        let aInputs = Inputs.conversions(SIMD<UInt8>.HalfVector.self, seed: 0xF07A_659A_0A50_AEC7)
             .map(poisoningUpperBytes)
         for a in aInputs {
             let port = portQuarterVectorResizingHalfU8ToF16(resizing: a)
             let reference = highwayQuarterVectorResizingHalfU8ToF16(resizing: a)
-            let definedBytes = SIMDUInt8.HalfVector.laneCount * MemoryLayout<SIMDUInt8.Lane>.stride
-            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt8>.HalfVector.laneCount * MemoryLayout<UInt8>.stride
+            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDUInt8.HalfVector.Raw>.size
+                MemoryLayout<SIMD<UInt8>.HalfVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -488,18 +488,19 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorResizingFromQuarterUInt8() {
         let mismatches = Mismatches("portVectorResizingQuarterU8ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt8.QuarterVector.self, seed: 0x4776_44FC_8607_41D8)
-            .map(poisoningUpperBytes)
+        let aInputs = Inputs.conversions(
+            SIMD<UInt8>.QuarterVector.self,
+            seed: 0x4776_44FC_8607_41D8
+        ).map(poisoningUpperBytes)
         for a in aInputs {
             let port = portVectorResizingQuarterU8ToF16(resizing: a)
             let reference = highwayVectorResizingQuarterU8ToF16(resizing: a)
-            let definedBytes =
-                SIMDUInt8.QuarterVector.laneCount * MemoryLayout<SIMDUInt8.Lane>.stride
-            let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt8>.QuarterVector.laneCount * MemoryLayout<UInt8>.stride
+            let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDUInt8.QuarterVector.Raw>.size
+                MemoryLayout<SIMD<UInt8>.QuarterVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -517,18 +518,19 @@ extension SIMDFloat16CodegenTests {
 
     @Test func halfVectorResizingFromQuarterUInt8() {
         let mismatches = Mismatches("portHalfVectorResizingQuarterU8ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt8.QuarterVector.self, seed: 0xBD12_5689_647C_355D)
-            .map(poisoningUpperBytes)
+        let aInputs = Inputs.conversions(
+            SIMD<UInt8>.QuarterVector.self,
+            seed: 0xBD12_5689_647C_355D
+        ).map(poisoningUpperBytes)
         for a in aInputs {
             let port = portHalfVectorResizingQuarterU8ToF16(resizing: a)
             let reference = highwayHalfVectorResizingQuarterU8ToF16(resizing: a)
-            let definedBytes =
-                SIMDUInt8.QuarterVector.laneCount * MemoryLayout<SIMDUInt8.Lane>.stride
-            let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt8>.QuarterVector.laneCount * MemoryLayout<UInt8>.stride
+            let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDUInt8.QuarterVector.Raw>.size
+                MemoryLayout<SIMD<UInt8>.QuarterVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -546,18 +548,19 @@ extension SIMDFloat16CodegenTests {
 
     @Test func quarterVectorResizingFromQuarterUInt8() {
         let mismatches = Mismatches("portQuarterVectorResizingQuarterU8ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt8.QuarterVector.self, seed: 0x9828_EBC4_06B6_7B7E)
-            .map(poisoningUpperBytes)
+        let aInputs = Inputs.conversions(
+            SIMD<UInt8>.QuarterVector.self,
+            seed: 0x9828_EBC4_06B6_7B7E
+        ).map(poisoningUpperBytes)
         for a in aInputs {
             let port = portQuarterVectorResizingQuarterU8ToF16(resizing: a)
             let reference = highwayQuarterVectorResizingQuarterU8ToF16(resizing: a)
-            let definedBytes =
-                SIMDUInt8.QuarterVector.laneCount * MemoryLayout<SIMDUInt8.Lane>.stride
-            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt8>.QuarterVector.laneCount * MemoryLayout<UInt8>.stride
+            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDUInt8.QuarterVector.Raw>.size
+                MemoryLayout<SIMD<UInt8>.QuarterVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -575,18 +578,17 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorResizingFromEighthUInt8() {
         let mismatches = Mismatches("portVectorResizingEighthU8ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt8.EighthVector.self, seed: 0xB6CE_4496_3809_562D)
+        let aInputs = Inputs.conversions(SIMD<UInt8>.EighthVector.self, seed: 0xB6CE_4496_3809_562D)
             .map(poisoningUpperBytes)
         for a in aInputs {
             let port = portVectorResizingEighthU8ToF16(resizing: a)
             let reference = highwayVectorResizingEighthU8ToF16(resizing: a)
-            let definedBytes =
-                SIMDUInt8.EighthVector.laneCount * MemoryLayout<SIMDUInt8.Lane>.stride
-            let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt8>.EighthVector.laneCount * MemoryLayout<UInt8>.stride
+            let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDUInt8.EighthVector.Raw>.size
+                MemoryLayout<SIMD<UInt8>.EighthVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -604,18 +606,17 @@ extension SIMDFloat16CodegenTests {
 
     @Test func halfVectorResizingFromEighthUInt8() {
         let mismatches = Mismatches("portHalfVectorResizingEighthU8ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt8.EighthVector.self, seed: 0x6350_E651_4736_A1CA)
+        let aInputs = Inputs.conversions(SIMD<UInt8>.EighthVector.self, seed: 0x6350_E651_4736_A1CA)
             .map(poisoningUpperBytes)
         for a in aInputs {
             let port = portHalfVectorResizingEighthU8ToF16(resizing: a)
             let reference = highwayHalfVectorResizingEighthU8ToF16(resizing: a)
-            let definedBytes =
-                SIMDUInt8.EighthVector.laneCount * MemoryLayout<SIMDUInt8.Lane>.stride
-            let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt8>.EighthVector.laneCount * MemoryLayout<UInt8>.stride
+            let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDUInt8.EighthVector.Raw>.size
+                MemoryLayout<SIMD<UInt8>.EighthVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -633,18 +634,17 @@ extension SIMDFloat16CodegenTests {
 
     @Test func quarterVectorResizingFromEighthUInt8() {
         let mismatches = Mismatches("portQuarterVectorResizingEighthU8ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt8.EighthVector.self, seed: 0xB006_FDA3_FA92_B79B)
+        let aInputs = Inputs.conversions(SIMD<UInt8>.EighthVector.self, seed: 0xB006_FDA3_FA92_B79B)
             .map(poisoningUpperBytes)
         for a in aInputs {
             let port = portQuarterVectorResizingEighthU8ToF16(resizing: a)
             let reference = highwayQuarterVectorResizingEighthU8ToF16(resizing: a)
-            let definedBytes =
-                SIMDUInt8.EighthVector.laneCount * MemoryLayout<SIMDUInt8.Lane>.stride
-            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt8>.EighthVector.laneCount * MemoryLayout<UInt8>.stride
+            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDUInt8.EighthVector.Raw>.size
+                MemoryLayout<SIMD<UInt8>.EighthVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -662,12 +662,12 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorResizingFromUInt16() {
         let mismatches = Mismatches("portVectorResizingU16ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt16.Vector.self, seed: 0xDEDB_CBB0_1541_24C7)
+        let aInputs = Inputs.conversions(SIMD<UInt16>.self, seed: 0xDEDB_CBB0_1541_24C7)
         for a in aInputs {
             let port = portVectorResizingU16ToF16(resizing: a)
             let reference = highwayVectorResizingU16ToF16(resizing: a)
-            let definedBytes = SIMDUInt16.laneCount * MemoryLayout<SIMDUInt16.Lane>.stride
-            let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt16>.laneCount * MemoryLayout<UInt16>.stride
+            let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
@@ -691,8 +691,8 @@ extension SIMDFloat16CodegenTests {
         let mismatches = Mismatches("portVectorResizingU16ToF16ConstantA")
         let port = portVectorResizingU16ToF16ConstantA()
         let reference = highwayVectorResizingU16ToF16ConstantA()
-        let definedBytes = SIMDUInt16.laneCount * MemoryLayout<SIMDUInt16.Lane>.stride
-        let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<UInt16>.laneCount * MemoryLayout<UInt16>.stride
+        let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -709,12 +709,12 @@ extension SIMDFloat16CodegenTests {
 
     @Test func halfVectorResizingFromUInt16() {
         let mismatches = Mismatches("portHalfVectorResizingU16ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt16.Vector.self, seed: 0x9711_D296_D938_D9B6)
+        let aInputs = Inputs.conversions(SIMD<UInt16>.self, seed: 0x9711_D296_D938_D9B6)
         for a in aInputs {
             let port = portHalfVectorResizingU16ToF16(resizing: a)
             let reference = highwayHalfVectorResizingU16ToF16(resizing: a)
-            let definedBytes = SIMDUInt16.laneCount * MemoryLayout<SIMDUInt16.Lane>.stride
-            let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt16>.laneCount * MemoryLayout<UInt16>.stride
+            let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
@@ -738,8 +738,8 @@ extension SIMDFloat16CodegenTests {
         let mismatches = Mismatches("portHalfVectorResizingU16ToF16ConstantA")
         let port = portHalfVectorResizingU16ToF16ConstantA()
         let reference = highwayHalfVectorResizingU16ToF16ConstantA()
-        let definedBytes = SIMDUInt16.laneCount * MemoryLayout<SIMDUInt16.Lane>.stride
-        let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<UInt16>.laneCount * MemoryLayout<UInt16>.stride
+        let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -756,12 +756,12 @@ extension SIMDFloat16CodegenTests {
 
     @Test func quarterVectorResizingFromUInt16() {
         let mismatches = Mismatches("portQuarterVectorResizingU16ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt16.Vector.self, seed: 0x93D2_6CC9_56A0_6631)
+        let aInputs = Inputs.conversions(SIMD<UInt16>.self, seed: 0x93D2_6CC9_56A0_6631)
         for a in aInputs {
             let port = portQuarterVectorResizingU16ToF16(resizing: a)
             let reference = highwayQuarterVectorResizingU16ToF16(resizing: a)
-            let definedBytes = SIMDUInt16.laneCount * MemoryLayout<SIMDUInt16.Lane>.stride
-            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt16>.laneCount * MemoryLayout<UInt16>.stride
+            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
@@ -785,8 +785,8 @@ extension SIMDFloat16CodegenTests {
         let mismatches = Mismatches("portQuarterVectorResizingU16ToF16ConstantA")
         let port = portQuarterVectorResizingU16ToF16ConstantA()
         let reference = highwayQuarterVectorResizingU16ToF16ConstantA()
-        let definedBytes = SIMDUInt16.laneCount * MemoryLayout<SIMDUInt16.Lane>.stride
-        let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<UInt16>.laneCount * MemoryLayout<UInt16>.stride
+        let grownBytes = H.QuarterVector.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -803,18 +803,17 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorResizingFromHalfUInt16() {
         let mismatches = Mismatches("portVectorResizingHalfU16ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt16.HalfVector.self, seed: 0xACB0_E612_3FBE_A1E2)
+        let aInputs = Inputs.conversions(SIMD<UInt16>.HalfVector.self, seed: 0xACB0_E612_3FBE_A1E2)
             .map(poisoningUpperBytes)
         for a in aInputs {
             let port = portVectorResizingHalfU16ToF16(resizing: a)
             let reference = highwayVectorResizingHalfU16ToF16(resizing: a)
-            let definedBytes =
-                SIMDUInt16.HalfVector.laneCount * MemoryLayout<SIMDUInt16.Lane>.stride
-            let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt16>.HalfVector.laneCount * MemoryLayout<UInt16>.stride
+            let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDUInt16.HalfVector.Raw>.size
+                MemoryLayout<SIMD<UInt16>.HalfVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -832,18 +831,17 @@ extension SIMDFloat16CodegenTests {
 
     @Test func halfVectorResizingFromHalfUInt16() {
         let mismatches = Mismatches("portHalfVectorResizingHalfU16ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt16.HalfVector.self, seed: 0x215C_0851_CDD7_1F2B)
+        let aInputs = Inputs.conversions(SIMD<UInt16>.HalfVector.self, seed: 0x215C_0851_CDD7_1F2B)
             .map(poisoningUpperBytes)
         for a in aInputs {
             let port = portHalfVectorResizingHalfU16ToF16(resizing: a)
             let reference = highwayHalfVectorResizingHalfU16ToF16(resizing: a)
-            let definedBytes =
-                SIMDUInt16.HalfVector.laneCount * MemoryLayout<SIMDUInt16.Lane>.stride
-            let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt16>.HalfVector.laneCount * MemoryLayout<UInt16>.stride
+            let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDUInt16.HalfVector.Raw>.size
+                MemoryLayout<SIMD<UInt16>.HalfVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -861,18 +859,17 @@ extension SIMDFloat16CodegenTests {
 
     @Test func quarterVectorResizingFromHalfUInt16() {
         let mismatches = Mismatches("portQuarterVectorResizingHalfU16ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt16.HalfVector.self, seed: 0x95EC_FF0A_0142_2388)
+        let aInputs = Inputs.conversions(SIMD<UInt16>.HalfVector.self, seed: 0x95EC_FF0A_0142_2388)
             .map(poisoningUpperBytes)
         for a in aInputs {
             let port = portQuarterVectorResizingHalfU16ToF16(resizing: a)
             let reference = highwayQuarterVectorResizingHalfU16ToF16(resizing: a)
-            let definedBytes =
-                SIMDUInt16.HalfVector.laneCount * MemoryLayout<SIMDUInt16.Lane>.stride
-            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt16>.HalfVector.laneCount * MemoryLayout<UInt16>.stride
+            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDUInt16.HalfVector.Raw>.size
+                MemoryLayout<SIMD<UInt16>.HalfVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -890,18 +887,19 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorResizingFromQuarterUInt16() {
         let mismatches = Mismatches("portVectorResizingQuarterU16ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt16.QuarterVector.self, seed: 0x0680_45CB_1F42_3DC9)
-            .map(poisoningUpperBytes)
+        let aInputs = Inputs.conversions(
+            SIMD<UInt16>.QuarterVector.self,
+            seed: 0x0680_45CB_1F42_3DC9
+        ).map(poisoningUpperBytes)
         for a in aInputs {
             let port = portVectorResizingQuarterU16ToF16(resizing: a)
             let reference = highwayVectorResizingQuarterU16ToF16(resizing: a)
-            let definedBytes =
-                SIMDUInt16.QuarterVector.laneCount * MemoryLayout<SIMDUInt16.Lane>.stride
-            let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt16>.QuarterVector.laneCount * MemoryLayout<UInt16>.stride
+            let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDUInt16.QuarterVector.Raw>.size
+                MemoryLayout<SIMD<UInt16>.QuarterVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -919,18 +917,19 @@ extension SIMDFloat16CodegenTests {
 
     @Test func halfVectorResizingFromQuarterUInt16() {
         let mismatches = Mismatches("portHalfVectorResizingQuarterU16ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt16.QuarterVector.self, seed: 0xDCE5_533A_86F4_6546)
-            .map(poisoningUpperBytes)
+        let aInputs = Inputs.conversions(
+            SIMD<UInt16>.QuarterVector.self,
+            seed: 0xDCE5_533A_86F4_6546
+        ).map(poisoningUpperBytes)
         for a in aInputs {
             let port = portHalfVectorResizingQuarterU16ToF16(resizing: a)
             let reference = highwayHalfVectorResizingQuarterU16ToF16(resizing: a)
-            let definedBytes =
-                SIMDUInt16.QuarterVector.laneCount * MemoryLayout<SIMDUInt16.Lane>.stride
-            let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt16>.QuarterVector.laneCount * MemoryLayout<UInt16>.stride
+            let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDUInt16.QuarterVector.Raw>.size
+                MemoryLayout<SIMD<UInt16>.QuarterVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -948,18 +947,19 @@ extension SIMDFloat16CodegenTests {
 
     @Test func quarterVectorResizingFromQuarterUInt16() {
         let mismatches = Mismatches("portQuarterVectorResizingQuarterU16ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt16.QuarterVector.self, seed: 0x8AA0_E8CC_51D1_A0C7)
-            .map(poisoningUpperBytes)
+        let aInputs = Inputs.conversions(
+            SIMD<UInt16>.QuarterVector.self,
+            seed: 0x8AA0_E8CC_51D1_A0C7
+        ).map(poisoningUpperBytes)
         for a in aInputs {
             let port = portQuarterVectorResizingQuarterU16ToF16(resizing: a)
             let reference = highwayQuarterVectorResizingQuarterU16ToF16(resizing: a)
-            let definedBytes =
-                SIMDUInt16.QuarterVector.laneCount * MemoryLayout<SIMDUInt16.Lane>.stride
-            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt16>.QuarterVector.laneCount * MemoryLayout<UInt16>.stride
+            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDUInt16.QuarterVector.Raw>.size
+                MemoryLayout<SIMD<UInt16>.QuarterVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -977,12 +977,12 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorResizingFromUInt32() {
         let mismatches = Mismatches("portVectorResizingU32ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0x0E68_23A0_C9F2_6F71)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0x0E68_23A0_C9F2_6F71)
         for a in aInputs {
             let port = portVectorResizingU32ToF16(resizing: a)
             let reference = highwayVectorResizingU32ToF16(resizing: a)
-            let definedBytes = SIMDUInt32.laneCount * MemoryLayout<SIMDUInt32.Lane>.stride
-            let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt32>.laneCount * MemoryLayout<UInt32>.stride
+            let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
@@ -1006,8 +1006,8 @@ extension SIMDFloat16CodegenTests {
         let mismatches = Mismatches("portVectorResizingU32ToF16ConstantA")
         let port = portVectorResizingU32ToF16ConstantA()
         let reference = highwayVectorResizingU32ToF16ConstantA()
-        let definedBytes = SIMDUInt32.laneCount * MemoryLayout<SIMDUInt32.Lane>.stride
-        let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<UInt32>.laneCount * MemoryLayout<UInt32>.stride
+        let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -1024,12 +1024,12 @@ extension SIMDFloat16CodegenTests {
 
     @Test func halfVectorResizingFromUInt32() {
         let mismatches = Mismatches("portHalfVectorResizingU32ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0x95DE_9288_031F_6CB8)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0x95DE_9288_031F_6CB8)
         for a in aInputs {
             let port = portHalfVectorResizingU32ToF16(resizing: a)
             let reference = highwayHalfVectorResizingU32ToF16(resizing: a)
-            let definedBytes = SIMDUInt32.laneCount * MemoryLayout<SIMDUInt32.Lane>.stride
-            let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt32>.laneCount * MemoryLayout<UInt32>.stride
+            let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
@@ -1053,8 +1053,8 @@ extension SIMDFloat16CodegenTests {
         let mismatches = Mismatches("portHalfVectorResizingU32ToF16ConstantA")
         let port = portHalfVectorResizingU32ToF16ConstantA()
         let reference = highwayHalfVectorResizingU32ToF16ConstantA()
-        let definedBytes = SIMDUInt32.laneCount * MemoryLayout<SIMDUInt32.Lane>.stride
-        let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<UInt32>.laneCount * MemoryLayout<UInt32>.stride
+        let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -1071,12 +1071,12 @@ extension SIMDFloat16CodegenTests {
 
     @Test func quarterVectorResizingFromUInt32() {
         let mismatches = Mismatches("portQuarterVectorResizingU32ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0xAA35_4CD8_C9BA_154F)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0xAA35_4CD8_C9BA_154F)
         for a in aInputs {
             let port = portQuarterVectorResizingU32ToF16(resizing: a)
             let reference = highwayQuarterVectorResizingU32ToF16(resizing: a)
-            let definedBytes = SIMDUInt32.laneCount * MemoryLayout<SIMDUInt32.Lane>.stride
-            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt32>.laneCount * MemoryLayout<UInt32>.stride
+            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
@@ -1100,8 +1100,8 @@ extension SIMDFloat16CodegenTests {
         let mismatches = Mismatches("portQuarterVectorResizingU32ToF16ConstantA")
         let port = portQuarterVectorResizingU32ToF16ConstantA()
         let reference = highwayQuarterVectorResizingU32ToF16ConstantA()
-        let definedBytes = SIMDUInt32.laneCount * MemoryLayout<SIMDUInt32.Lane>.stride
-        let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<UInt32>.laneCount * MemoryLayout<UInt32>.stride
+        let grownBytes = H.QuarterVector.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -1118,18 +1118,17 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorResizingFromHalfUInt32() {
         let mismatches = Mismatches("portVectorResizingHalfU32ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt32.HalfVector.self, seed: 0x52EC_2E02_A705_D45C)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.HalfVector.self, seed: 0x52EC_2E02_A705_D45C)
             .map(poisoningUpperBytes)
         for a in aInputs {
             let port = portVectorResizingHalfU32ToF16(resizing: a)
             let reference = highwayVectorResizingHalfU32ToF16(resizing: a)
-            let definedBytes =
-                SIMDUInt32.HalfVector.laneCount * MemoryLayout<SIMDUInt32.Lane>.stride
-            let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt32>.HalfVector.laneCount * MemoryLayout<UInt32>.stride
+            let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDUInt32.HalfVector.Raw>.size
+                MemoryLayout<SIMD<UInt32>.HalfVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -1147,18 +1146,17 @@ extension SIMDFloat16CodegenTests {
 
     @Test func halfVectorResizingFromHalfUInt32() {
         let mismatches = Mismatches("portHalfVectorResizingHalfU32ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt32.HalfVector.self, seed: 0xCC44_C840_8477_26ED)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.HalfVector.self, seed: 0xCC44_C840_8477_26ED)
             .map(poisoningUpperBytes)
         for a in aInputs {
             let port = portHalfVectorResizingHalfU32ToF16(resizing: a)
             let reference = highwayHalfVectorResizingHalfU32ToF16(resizing: a)
-            let definedBytes =
-                SIMDUInt32.HalfVector.laneCount * MemoryLayout<SIMDUInt32.Lane>.stride
-            let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt32>.HalfVector.laneCount * MemoryLayout<UInt32>.stride
+            let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDUInt32.HalfVector.Raw>.size
+                MemoryLayout<SIMD<UInt32>.HalfVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -1176,18 +1174,17 @@ extension SIMDFloat16CodegenTests {
 
     @Test func quarterVectorResizingFromHalfUInt32() {
         let mismatches = Mismatches("portQuarterVectorResizingHalfU32ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt32.HalfVector.self, seed: 0xEB04_3F1B_4AA2_1BC6)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.HalfVector.self, seed: 0xEB04_3F1B_4AA2_1BC6)
             .map(poisoningUpperBytes)
         for a in aInputs {
             let port = portQuarterVectorResizingHalfU32ToF16(resizing: a)
             let reference = highwayQuarterVectorResizingHalfU32ToF16(resizing: a)
-            let definedBytes =
-                SIMDUInt32.HalfVector.laneCount * MemoryLayout<SIMDUInt32.Lane>.stride
-            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt32>.HalfVector.laneCount * MemoryLayout<UInt32>.stride
+            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDUInt32.HalfVector.Raw>.size
+                MemoryLayout<SIMD<UInt32>.HalfVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -1205,12 +1202,12 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorResizingFromUInt64() {
         let mismatches = Mismatches("portVectorResizingU64ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xBAE8_79C8_84AC_85BE)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xBAE8_79C8_84AC_85BE)
         for a in aInputs {
             let port = portVectorResizingU64ToF16(resizing: a)
             let reference = highwayVectorResizingU64ToF16(resizing: a)
-            let definedBytes = SIMDUInt64.laneCount * MemoryLayout<SIMDUInt64.Lane>.stride
-            let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt64>.laneCount * MemoryLayout<UInt64>.stride
+            let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
@@ -1234,8 +1231,8 @@ extension SIMDFloat16CodegenTests {
         let mismatches = Mismatches("portVectorResizingU64ToF16ConstantA")
         let port = portVectorResizingU64ToF16ConstantA()
         let reference = highwayVectorResizingU64ToF16ConstantA()
-        let definedBytes = SIMDUInt64.laneCount * MemoryLayout<SIMDUInt64.Lane>.stride
-        let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<UInt64>.laneCount * MemoryLayout<UInt64>.stride
+        let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -1252,12 +1249,12 @@ extension SIMDFloat16CodegenTests {
 
     @Test func halfVectorResizingFromUInt64() {
         let mismatches = Mismatches("portHalfVectorResizingU64ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0x94A0_BC5D_D466_00EB)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0x94A0_BC5D_D466_00EB)
         for a in aInputs {
             let port = portHalfVectorResizingU64ToF16(resizing: a)
             let reference = highwayHalfVectorResizingU64ToF16(resizing: a)
-            let definedBytes = SIMDUInt64.laneCount * MemoryLayout<SIMDUInt64.Lane>.stride
-            let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt64>.laneCount * MemoryLayout<UInt64>.stride
+            let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
@@ -1281,8 +1278,8 @@ extension SIMDFloat16CodegenTests {
         let mismatches = Mismatches("portHalfVectorResizingU64ToF16ConstantA")
         let port = portHalfVectorResizingU64ToF16ConstantA()
         let reference = highwayHalfVectorResizingU64ToF16ConstantA()
-        let definedBytes = SIMDUInt64.laneCount * MemoryLayout<SIMDUInt64.Lane>.stride
-        let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<UInt64>.laneCount * MemoryLayout<UInt64>.stride
+        let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -1299,12 +1296,12 @@ extension SIMDFloat16CodegenTests {
 
     @Test func quarterVectorResizingFromUInt64() {
         let mismatches = Mismatches("portQuarterVectorResizingU64ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0x133D_D6C0_8160_0A60)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0x133D_D6C0_8160_0A60)
         for a in aInputs {
             let port = portQuarterVectorResizingU64ToF16(resizing: a)
             let reference = highwayQuarterVectorResizingU64ToF16(resizing: a)
-            let definedBytes = SIMDUInt64.laneCount * MemoryLayout<SIMDUInt64.Lane>.stride
-            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt64>.laneCount * MemoryLayout<UInt64>.stride
+            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
@@ -1328,8 +1325,8 @@ extension SIMDFloat16CodegenTests {
         let mismatches = Mismatches("portQuarterVectorResizingU64ToF16ConstantA")
         let port = portQuarterVectorResizingU64ToF16ConstantA()
         let reference = highwayQuarterVectorResizingU64ToF16ConstantA()
-        let definedBytes = SIMDUInt64.laneCount * MemoryLayout<SIMDUInt64.Lane>.stride
-        let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<UInt64>.laneCount * MemoryLayout<UInt64>.stride
+        let grownBytes = H.QuarterVector.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -1346,18 +1343,17 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorResizingFromHalfUInt64() {
         let mismatches = Mismatches("portVectorResizingHalfU64ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt64.HalfVector.self, seed: 0x0B5E_401B_0201_571F)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.HalfVector.self, seed: 0x0B5E_401B_0201_571F)
             .map(poisoningUpperBytes)
         for a in aInputs {
             let port = portVectorResizingHalfU64ToF16(resizing: a)
             let reference = highwayVectorResizingHalfU64ToF16(resizing: a)
-            let definedBytes =
-                SIMDUInt64.HalfVector.laneCount * MemoryLayout<SIMDUInt64.Lane>.stride
-            let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt64>.HalfVector.laneCount * MemoryLayout<UInt64>.stride
+            let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDUInt64.HalfVector.Raw>.size
+                MemoryLayout<SIMD<UInt64>.HalfVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -1375,18 +1371,17 @@ extension SIMDFloat16CodegenTests {
 
     @Test func halfVectorResizingFromHalfUInt64() {
         let mismatches = Mismatches("portHalfVectorResizingHalfU64ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt64.HalfVector.self, seed: 0x13D2_B628_297B_A42A)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.HalfVector.self, seed: 0x13D2_B628_297B_A42A)
             .map(poisoningUpperBytes)
         for a in aInputs {
             let port = portHalfVectorResizingHalfU64ToF16(resizing: a)
             let reference = highwayHalfVectorResizingHalfU64ToF16(resizing: a)
-            let definedBytes =
-                SIMDUInt64.HalfVector.laneCount * MemoryLayout<SIMDUInt64.Lane>.stride
-            let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt64>.HalfVector.laneCount * MemoryLayout<UInt64>.stride
+            let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDUInt64.HalfVector.Raw>.size
+                MemoryLayout<SIMD<UInt64>.HalfVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -1404,18 +1399,17 @@ extension SIMDFloat16CodegenTests {
 
     @Test func quarterVectorResizingFromHalfUInt64() {
         let mismatches = Mismatches("portQuarterVectorResizingHalfU64ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt64.HalfVector.self, seed: 0xC711_0D33_BA0D_B31D)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.HalfVector.self, seed: 0xC711_0D33_BA0D_B31D)
             .map(poisoningUpperBytes)
         for a in aInputs {
             let port = portQuarterVectorResizingHalfU64ToF16(resizing: a)
             let reference = highwayQuarterVectorResizingHalfU64ToF16(resizing: a)
-            let definedBytes =
-                SIMDUInt64.HalfVector.laneCount * MemoryLayout<SIMDUInt64.Lane>.stride
-            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<UInt64>.HalfVector.laneCount * MemoryLayout<UInt64>.stride
+            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDUInt64.HalfVector.Raw>.size
+                MemoryLayout<SIMD<UInt64>.HalfVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -1433,12 +1427,12 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorResizingFromInt8() {
         let mismatches = Mismatches("portVectorResizingI8ToF16")
-        let aInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0xD816_70F6_2CF2_F0D3)
+        let aInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0xD816_70F6_2CF2_F0D3)
         for a in aInputs {
             let port = portVectorResizingI8ToF16(resizing: a)
             let reference = highwayVectorResizingI8ToF16(resizing: a)
-            let definedBytes = SIMDInt8.laneCount * MemoryLayout<SIMDInt8.Lane>.stride
-            let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<Int8>.laneCount * MemoryLayout<Int8>.stride
+            let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
@@ -1462,8 +1456,8 @@ extension SIMDFloat16CodegenTests {
         let mismatches = Mismatches("portVectorResizingI8ToF16ConstantA")
         let port = portVectorResizingI8ToF16ConstantA()
         let reference = highwayVectorResizingI8ToF16ConstantA()
-        let definedBytes = SIMDInt8.laneCount * MemoryLayout<SIMDInt8.Lane>.stride
-        let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<Int8>.laneCount * MemoryLayout<Int8>.stride
+        let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -1480,12 +1474,12 @@ extension SIMDFloat16CodegenTests {
 
     @Test func halfVectorResizingFromInt8() {
         let mismatches = Mismatches("portHalfVectorResizingI8ToF16")
-        let aInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x40D6_87EA_AE11_664E)
+        let aInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x40D6_87EA_AE11_664E)
         for a in aInputs {
             let port = portHalfVectorResizingI8ToF16(resizing: a)
             let reference = highwayHalfVectorResizingI8ToF16(resizing: a)
-            let definedBytes = SIMDInt8.laneCount * MemoryLayout<SIMDInt8.Lane>.stride
-            let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<Int8>.laneCount * MemoryLayout<Int8>.stride
+            let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
@@ -1509,8 +1503,8 @@ extension SIMDFloat16CodegenTests {
         let mismatches = Mismatches("portHalfVectorResizingI8ToF16ConstantA")
         let port = portHalfVectorResizingI8ToF16ConstantA()
         let reference = highwayHalfVectorResizingI8ToF16ConstantA()
-        let definedBytes = SIMDInt8.laneCount * MemoryLayout<SIMDInt8.Lane>.stride
-        let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<Int8>.laneCount * MemoryLayout<Int8>.stride
+        let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -1527,12 +1521,12 @@ extension SIMDFloat16CodegenTests {
 
     @Test func quarterVectorResizingFromInt8() {
         let mismatches = Mismatches("portQuarterVectorResizingI8ToF16")
-        let aInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x9D21_376B_37B1_8451)
+        let aInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x9D21_376B_37B1_8451)
         for a in aInputs {
             let port = portQuarterVectorResizingI8ToF16(resizing: a)
             let reference = highwayQuarterVectorResizingI8ToF16(resizing: a)
-            let definedBytes = SIMDInt8.laneCount * MemoryLayout<SIMDInt8.Lane>.stride
-            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<Int8>.laneCount * MemoryLayout<Int8>.stride
+            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
@@ -1556,8 +1550,8 @@ extension SIMDFloat16CodegenTests {
         let mismatches = Mismatches("portQuarterVectorResizingI8ToF16ConstantA")
         let port = portQuarterVectorResizingI8ToF16ConstantA()
         let reference = highwayQuarterVectorResizingI8ToF16ConstantA()
-        let definedBytes = SIMDInt8.laneCount * MemoryLayout<SIMDInt8.Lane>.stride
-        let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<Int8>.laneCount * MemoryLayout<Int8>.stride
+        let grownBytes = H.QuarterVector.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -1574,18 +1568,17 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorResizingFromHalfInt8() {
         let mismatches = Mismatches("portVectorResizingHalfI8ToF16")
-        let aInputs = Inputs.conversions(SIMDInt8.HalfVector.self, seed: 0x16A0_5405_38E3_4C6A).map(
-            poisoningUpperBytes
-        )
+        let aInputs = Inputs.conversions(SIMD<Int8>.HalfVector.self, seed: 0x16A0_5405_38E3_4C6A)
+            .map(poisoningUpperBytes)
         for a in aInputs {
             let port = portVectorResizingHalfI8ToF16(resizing: a)
             let reference = highwayVectorResizingHalfI8ToF16(resizing: a)
-            let definedBytes = SIMDInt8.HalfVector.laneCount * MemoryLayout<SIMDInt8.Lane>.stride
-            let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<Int8>.HalfVector.laneCount * MemoryLayout<Int8>.stride
+            let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDInt8.HalfVector.Raw>.size
+                MemoryLayout<SIMD<Int8>.HalfVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -1603,18 +1596,17 @@ extension SIMDFloat16CodegenTests {
 
     @Test func halfVectorResizingFromHalfInt8() {
         let mismatches = Mismatches("portHalfVectorResizingHalfI8ToF16")
-        let aInputs = Inputs.conversions(SIMDInt8.HalfVector.self, seed: 0xB213_9A7B_AD95_A9C7).map(
-            poisoningUpperBytes
-        )
+        let aInputs = Inputs.conversions(SIMD<Int8>.HalfVector.self, seed: 0xB213_9A7B_AD95_A9C7)
+            .map(poisoningUpperBytes)
         for a in aInputs {
             let port = portHalfVectorResizingHalfI8ToF16(resizing: a)
             let reference = highwayHalfVectorResizingHalfI8ToF16(resizing: a)
-            let definedBytes = SIMDInt8.HalfVector.laneCount * MemoryLayout<SIMDInt8.Lane>.stride
-            let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<Int8>.HalfVector.laneCount * MemoryLayout<Int8>.stride
+            let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDInt8.HalfVector.Raw>.size
+                MemoryLayout<SIMD<Int8>.HalfVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -1632,18 +1624,17 @@ extension SIMDFloat16CodegenTests {
 
     @Test func quarterVectorResizingFromHalfInt8() {
         let mismatches = Mismatches("portQuarterVectorResizingHalfI8ToF16")
-        let aInputs = Inputs.conversions(SIMDInt8.HalfVector.self, seed: 0xDD54_4C7B_3904_B81C).map(
-            poisoningUpperBytes
-        )
+        let aInputs = Inputs.conversions(SIMD<Int8>.HalfVector.self, seed: 0xDD54_4C7B_3904_B81C)
+            .map(poisoningUpperBytes)
         for a in aInputs {
             let port = portQuarterVectorResizingHalfI8ToF16(resizing: a)
             let reference = highwayQuarterVectorResizingHalfI8ToF16(resizing: a)
-            let definedBytes = SIMDInt8.HalfVector.laneCount * MemoryLayout<SIMDInt8.Lane>.stride
-            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<Int8>.HalfVector.laneCount * MemoryLayout<Int8>.stride
+            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDInt8.HalfVector.Raw>.size
+                MemoryLayout<SIMD<Int8>.HalfVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -1661,17 +1652,17 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorResizingFromQuarterInt8() {
         let mismatches = Mismatches("portVectorResizingQuarterI8ToF16")
-        let aInputs = Inputs.conversions(SIMDInt8.QuarterVector.self, seed: 0x4208_EACE_7022_B6D9)
+        let aInputs = Inputs.conversions(SIMD<Int8>.QuarterVector.self, seed: 0x4208_EACE_7022_B6D9)
             .map(poisoningUpperBytes)
         for a in aInputs {
             let port = portVectorResizingQuarterI8ToF16(resizing: a)
             let reference = highwayVectorResizingQuarterI8ToF16(resizing: a)
-            let definedBytes = SIMDInt8.QuarterVector.laneCount * MemoryLayout<SIMDInt8.Lane>.stride
-            let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<Int8>.QuarterVector.laneCount * MemoryLayout<Int8>.stride
+            let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDInt8.QuarterVector.Raw>.size
+                MemoryLayout<SIMD<Int8>.QuarterVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -1689,17 +1680,17 @@ extension SIMDFloat16CodegenTests {
 
     @Test func halfVectorResizingFromQuarterInt8() {
         let mismatches = Mismatches("portHalfVectorResizingQuarterI8ToF16")
-        let aInputs = Inputs.conversions(SIMDInt8.QuarterVector.self, seed: 0xDE07_3AA4_88EE_ED5E)
+        let aInputs = Inputs.conversions(SIMD<Int8>.QuarterVector.self, seed: 0xDE07_3AA4_88EE_ED5E)
             .map(poisoningUpperBytes)
         for a in aInputs {
             let port = portHalfVectorResizingQuarterI8ToF16(resizing: a)
             let reference = highwayHalfVectorResizingQuarterI8ToF16(resizing: a)
-            let definedBytes = SIMDInt8.QuarterVector.laneCount * MemoryLayout<SIMDInt8.Lane>.stride
-            let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<Int8>.QuarterVector.laneCount * MemoryLayout<Int8>.stride
+            let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDInt8.QuarterVector.Raw>.size
+                MemoryLayout<SIMD<Int8>.QuarterVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -1717,17 +1708,17 @@ extension SIMDFloat16CodegenTests {
 
     @Test func quarterVectorResizingFromQuarterInt8() {
         let mismatches = Mismatches("portQuarterVectorResizingQuarterI8ToF16")
-        let aInputs = Inputs.conversions(SIMDInt8.QuarterVector.self, seed: 0x889C_93FE_A9EB_0CD3)
+        let aInputs = Inputs.conversions(SIMD<Int8>.QuarterVector.self, seed: 0x889C_93FE_A9EB_0CD3)
             .map(poisoningUpperBytes)
         for a in aInputs {
             let port = portQuarterVectorResizingQuarterI8ToF16(resizing: a)
             let reference = highwayQuarterVectorResizingQuarterI8ToF16(resizing: a)
-            let definedBytes = SIMDInt8.QuarterVector.laneCount * MemoryLayout<SIMDInt8.Lane>.stride
-            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<Int8>.QuarterVector.laneCount * MemoryLayout<Int8>.stride
+            let grownBytes = H.QuarterVector.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDInt8.QuarterVector.Raw>.size
+                MemoryLayout<SIMD<Int8>.QuarterVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),
@@ -1745,17 +1736,17 @@ extension SIMDFloat16CodegenTests {
 
     @Test func vectorResizingFromEighthInt8() {
         let mismatches = Mismatches("portVectorResizingEighthI8ToF16")
-        let aInputs = Inputs.conversions(SIMDInt8.EighthVector.self, seed: 0x1942_C2F6_71D9_612E)
+        let aInputs = Inputs.conversions(SIMD<Int8>.EighthVector.self, seed: 0x1942_C2F6_71D9_612E)
             .map(poisoningUpperBytes)
         for a in aInputs {
             let port = portVectorResizingEighthI8ToF16(resizing: a)
             let reference = highwayVectorResizingEighthI8ToF16(resizing: a)
-            let definedBytes = SIMDInt8.EighthVector.laneCount * MemoryLayout<SIMDInt8.Lane>.stride
-            let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = SIMD<Int8>.EighthVector.laneCount * MemoryLayout<Int8>.stride
+            let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,
-                MemoryLayout<SIMDInt8.EighthVector.Raw>.size
+                MemoryLayout<SIMD<Int8>.EighthVector.Raw>.size
             )
             mismatches.check(
                 Array(bytes(of: port).prefix(definedBytes)),

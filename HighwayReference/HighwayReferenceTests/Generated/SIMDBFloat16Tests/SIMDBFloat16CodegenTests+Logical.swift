@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDBFloat16CodegenTests {
     @Test func allBitsSet() {
         let mismatches = Mismatches("portAllBitsSetBF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFA7C_2918_3D2F_EDC5)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFA7C_2918_3D2F_EDC5)
         for a in aInputs {
             mismatches.check(portAllBitsSetBF16(a), highwayAllBitsSetBF16(a), "a: \(describe(a))")
         }
@@ -24,7 +24,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func zeroingNegative() {
         let mismatches = Mismatches("portZeroingNegativeBF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEA99_FF9C_F6B1_92FF)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEA99_FF9C_F6B1_92FF)
         for a in aInputs {
             mismatches.check(
                 portZeroingNegativeBF16(a),
@@ -47,9 +47,9 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func selectingIfNegative() {
         let mismatches = Mismatches("portSelectingIfNegativeBF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x14CB_C0D8_42FF_98FA)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x14CB_C1D8_42FF_9AAD)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x14CB_BED8_42FF_9594)
+        let aInputs = Inputs.vectors(H.self, seed: 0x14CB_C0D8_42FF_98FA)
+        let bInputs = Inputs.vectors(H.self, seed: 0x14CB_C1D8_42FF_9AAD)
+        let cInputs = Inputs.vectors(H.self, seed: 0x14CB_BED8_42FF_9594)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x7E98_5E1A_38DC_5B3E) {
             mismatches.check(
                 portSelectingIfNegativeBF16(a, b, c),
@@ -62,8 +62,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func selectingIfNegativeConstantA() {
         let mismatches = Mismatches("portSelectingIfNegativeBF16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5FF3_E939_C3A9_AD08)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x5FF3_EC39_C3A9_B221)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5FF3_E939_C3A9_AD08)
+        let cInputs = Inputs.vectors(H.self, seed: 0x5FF3_EC39_C3A9_B221)
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 portSelectingIfNegativeBF16ConstantA(b, c),
@@ -76,8 +76,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func selectingIfNegativeConstantB() {
         let mismatches = Mismatches("portSelectingIfNegativeBF16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7946_6F39_D1D1_4CBA)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x7946_6D39_D1D1_4954)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7946_6F39_D1D1_4CBA)
+        let cInputs = Inputs.vectors(H.self, seed: 0x7946_6D39_D1D1_4954)
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 portSelectingIfNegativeBF16ConstantB(a, c),
@@ -90,8 +90,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func selectingIfNegativeConstantC() {
         let mismatches = Mismatches("portSelectingIfNegativeBF16ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x718A_B839_CDB3_34E5)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x718A_B739_CDB3_3332)
+        let aInputs = Inputs.vectors(H.self, seed: 0x718A_B839_CDB3_34E5)
+        let bInputs = Inputs.vectors(H.self, seed: 0x718A_B739_CDB3_3332)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portSelectingIfNegativeBF16ConstantC(a, b),
@@ -104,8 +104,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func selectingIfNegativeOrZero() {
         let mismatches = Mismatches("portSelectingIfNegativeOrZeroBF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEFD7_BD28_0A3B_0F11)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xEFD7_BC28_0A3B_0D5E)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEFD7_BD28_0A3B_0F11)
+        let bInputs = Inputs.vectors(H.self, seed: 0xEFD7_BC28_0A3B_0D5E)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portSelectingIfNegativeOrZeroBF16(a, b),
@@ -118,7 +118,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func selectingIfNegativeOrZeroConstantA() {
         let mismatches = Mismatches("portSelectingIfNegativeOrZeroBF16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF570_488E_28C8_9B05)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF570_488E_28C8_9B05)
         for b in bInputs {
             mismatches.check(
                 portSelectingIfNegativeOrZeroBF16ConstantA(b),
@@ -131,7 +131,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func selectingIfNegativeOrZeroConstantB() {
         let mismatches = Mismatches("portSelectingIfNegativeOrZeroBF16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDBB0_C28E_1A44_2973)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDBB0_C28E_1A44_2973)
         for a in aInputs {
             mismatches.check(
                 portSelectingIfNegativeOrZeroBF16ConstantB(a),
@@ -144,8 +144,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func zeroingIfNegative() {
         let mismatches = Mismatches("portZeroingIfNegativeBF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4843_B2A0_148C_EC94)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4843_B3A0_148C_EE47)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4843_B2A0_148C_EC94)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4843_B3A0_148C_EE47)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portZeroingIfNegativeBF16(a, b),
@@ -158,7 +158,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func zeroingIfNegativeConstantA() {
         let mismatches = Mismatches("portZeroingIfNegativeBF16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF6C1_B3C3_76B4_7ABA)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF6C1_B3C3_76B4_7ABA)
         for b in bInputs {
             mismatches.check(
                 portZeroingIfNegativeBF16ConstantA(b),
@@ -171,7 +171,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func zeroingIfNegativeConstantB() {
         let mismatches = Mismatches("portZeroingIfNegativeBF16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEF05_FDC3_7296_6498)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEF05_FDC3_7296_6498)
         for a in aInputs {
             mismatches.check(
                 portZeroingIfNegativeBF16ConstantB(a),

@@ -7,12 +7,16 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
-    private func checkComplexConjugateConstantA(_ value: H.Lane) {
+    private func checkComplexConjugateConstantA(_ value: Lane) {
         let mismatches = Mismatches("complexConjugate with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         mismatches.check(
             H.complexConjugate(H.repeating(value)),
-            HighwayReference.complexConjugateF64(H.repeating(value).raw),
+            H(raw: HighwayReference.complexConjugateF64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -75,7 +79,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func complexConjugateConstantSplatPayloadNaN() {
-        checkComplexConjugateConstantA(H.Lane(nan: 1, signaling: false))
+        checkComplexConjugateConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func complexConjugateConstantSplatSignalingNaN() {
@@ -95,14 +99,18 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingComplexConstantA(_ value: H.Lane) {
+    private func checkMultiplyingComplexConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyingComplex with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC598_8ED7_BEBC_2DA3)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
-        for b in bInputs where !hasUnorderedNaNs(complexLanesOf: H.repeating(value), b) {
+        let bInputs = Inputs.vectors(H.self, seed: 0xC598_8ED7_BEBC_2DA3)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        for b in bInputs where !hasUnorderedNaNs(complexLanesOf: H.repeating(value).simd, b.simd) {
             mismatches.check(
                 H.multiplyingComplex(H.repeating(value), b),
-                HighwayReference.multiplyingComplexF64(H.repeating(value).raw, b.raw),
+                H(raw: HighwayReference.multiplyingComplexF64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -110,14 +118,18 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingComplexConstantB(_ value: H.Lane) {
+    private func checkMultiplyingComplexConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplyingComplex with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCE9A_44D7_C3EF_0665)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
-        for a in aInputs where !hasUnorderedNaNs(complexLanesOf: a, H.repeating(value)) {
+        let aInputs = Inputs.vectors(H.self, seed: 0xCE9A_44D7_C3EF_0665)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        for a in aInputs where !hasUnorderedNaNs(complexLanesOf: a.simd, H.repeating(value).simd) {
             mismatches.check(
                 H.multiplyingComplex(a, H.repeating(value)),
-                HighwayReference.multiplyingComplexF64(a.raw, H.repeating(value).raw),
+                H(raw: HighwayReference.multiplyingComplexF64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -195,8 +207,8 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func multiplyingComplexConstantSplatPayloadNaN() {
-        checkMultiplyingComplexConstantA(H.Lane(nan: 1, signaling: false))
-        checkMultiplyingComplexConstantB(H.Lane(nan: 1, signaling: false))
+        checkMultiplyingComplexConstantA(Lane(nan: 1, signaling: false))
+        checkMultiplyingComplexConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyingComplexConstantSplatSignalingNaN() {
@@ -220,14 +232,23 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingComplexConjugateConstantA(_ value: H.Lane) {
+    private func checkMultiplyingComplexConjugateConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyingComplexConjugate with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCE43_A3FF_CE51_6B51)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
-        for b in bInputs where !hasUnorderedNaNs(complexLanesOf: H.repeating(value), b) {
+        let bInputs = Inputs.vectors(H.self, seed: 0xCE43_A3FF_CE51_6B51)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        for b in bInputs where !hasUnorderedNaNs(complexLanesOf: H.repeating(value).simd, b.simd) {
             mismatches.check(
                 H.multiplyingComplexConjugate(H.repeating(value), b),
-                HighwayReference.multiplyingComplexConjugateF64(H.repeating(value).raw, b.raw),
+                H(
+                    raw: HighwayReference.multiplyingComplexConjugateF64(
+                        H.repeating(value).raw,
+                        b.raw
+                    )
+                ),
                 "b: \(describe(b))"
             )
         }
@@ -235,14 +256,23 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingComplexConjugateConstantB(_ value: H.Lane) {
+    private func checkMultiplyingComplexConjugateConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplyingComplexConjugate with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB33E_1DFF_BEB8_371F)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
-        for a in aInputs where !hasUnorderedNaNs(complexLanesOf: a, H.repeating(value)) {
+        let aInputs = Inputs.vectors(H.self, seed: 0xB33E_1DFF_BEB8_371F)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        for a in aInputs where !hasUnorderedNaNs(complexLanesOf: a.simd, H.repeating(value).simd) {
             mismatches.check(
                 H.multiplyingComplexConjugate(a, H.repeating(value)),
-                HighwayReference.multiplyingComplexConjugateF64(a.raw, H.repeating(value).raw),
+                H(
+                    raw: HighwayReference.multiplyingComplexConjugateF64(
+                        a.raw,
+                        H.repeating(value).raw
+                    )
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -320,8 +350,8 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func multiplyingComplexConjugateConstantSplatPayloadNaN() {
-        checkMultiplyingComplexConjugateConstantA(H.Lane(nan: 1, signaling: false))
-        checkMultiplyingComplexConjugateConstantB(H.Lane(nan: 1, signaling: false))
+        checkMultiplyingComplexConjugateConstantA(Lane(nan: 1, signaling: false))
+        checkMultiplyingComplexConjugateConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyingComplexConjugateConstantSplatSignalingNaN() {
@@ -345,16 +375,26 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAddingComplexConstantA(_ value: H.Lane) {
+    private func checkMultiplyAddingComplexConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyAddingComplex with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5640_0253_3716_3AFA)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x5640_0153_3716_3947)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x5640_0253_3716_3AFA)
+        let cInputs = Inputs.vectors(H.self, seed: 0x5640_0153_3716_3947)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (b, c) in everyPair(bInputs, cInputs)
-        where !hasUnorderedNaNs(complexLanesOf: H.repeating(value), b, c) {
+        where !hasUnorderedNaNs(complexLanesOf: H.repeating(value).simd, b.simd, c.simd) {
             mismatches.check(
                 H.multiplyAddingComplex(H.repeating(value), b, c),
-                HighwayReference.multiplyAddingComplexF64(H.repeating(value).raw, b.raw, c.raw),
+                H(
+                    raw: HighwayReference.multiplyAddingComplexF64(
+                        H.repeating(value).raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -362,16 +402,26 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAddingComplexConstantB(_ value: H.Lane) {
+    private func checkMultiplyAddingComplexConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplyAddingComplex with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4E84_4C53_32F8_24D8)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x4E84_4E53_32F8_283E)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x4E84_4C53_32F8_24D8)
+        let cInputs = Inputs.vectors(H.self, seed: 0x4E84_4E53_32F8_283E)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (a, c) in everyPair(aInputs, cInputs)
-        where !hasUnorderedNaNs(complexLanesOf: a, H.repeating(value), c) {
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, H.repeating(value).simd, c.simd) {
             mismatches.check(
                 H.multiplyAddingComplex(a, H.repeating(value), c),
-                HighwayReference.multiplyAddingComplexF64(a.raw, H.repeating(value).raw, c.raw),
+                H(
+                    raw: HighwayReference.multiplyAddingComplexF64(
+                        a.raw,
+                        H.repeating(value).raw,
+                        c.raw
+                    )
+                ),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -379,16 +429,26 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAddingComplexConstantC(_ value: H.Lane) {
+    private func checkMultiplyAddingComplexConstantC(_ value: Lane) {
         let mismatches = Mismatches("multiplyAddingComplex with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x45EF_9553_2E22_1C43)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x45EF_9453_2E22_1A90)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x45EF_9553_2E22_1C43)
+        let bInputs = Inputs.vectors(H.self, seed: 0x45EF_9453_2E22_1A90)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (a, b) in everyPair(aInputs, bInputs)
-        where !hasUnorderedNaNs(complexLanesOf: a, b, H.repeating(value)) {
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd, H.repeating(value).simd) {
             mismatches.check(
                 H.multiplyAddingComplex(a, b, H.repeating(value)),
-                HighwayReference.multiplyAddingComplexF64(a.raw, b.raw, H.repeating(value).raw),
+                H(
+                    raw: HighwayReference.multiplyAddingComplexF64(
+                        a.raw,
+                        b.raw,
+                        H.repeating(value).raw
+                    )
+                ),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -480,9 +540,9 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func multiplyAddingComplexConstantSplatPayloadNaN() {
-        checkMultiplyAddingComplexConstantA(H.Lane(nan: 1, signaling: false))
-        checkMultiplyAddingComplexConstantB(H.Lane(nan: 1, signaling: false))
-        checkMultiplyAddingComplexConstantC(H.Lane(nan: 1, signaling: false))
+        checkMultiplyAddingComplexConstantA(Lane(nan: 1, signaling: false))
+        checkMultiplyAddingComplexConstantB(Lane(nan: 1, signaling: false))
+        checkMultiplyAddingComplexConstantC(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyAddingComplexConstantSplatSignalingNaN() {
@@ -510,19 +570,25 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAddingComplexConjugateConstantA(_ value: H.Lane) {
+    private func checkMultiplyAddingComplexConjugateConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyAddingComplexConjugate with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x283D_1D6E_31CE_253A)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x283D_1C6E_31CE_2387)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x283D_1D6E_31CE_253A)
+        let cInputs = Inputs.vectors(H.self, seed: 0x283D_1C6E_31CE_2387)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (b, c) in everyPair(bInputs, cInputs)
-        where !hasUnorderedNaNs(complexLanesOf: H.repeating(value), b, c) {
+        where !hasUnorderedNaNs(complexLanesOf: H.repeating(value).simd, b.simd, c.simd) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(H.repeating(value), b, c),
-                HighwayReference.multiplyAddingComplexConjugateF64(
-                    H.repeating(value).raw,
-                    b.raw,
-                    c.raw
+                H(
+                    raw: HighwayReference.multiplyAddingComplexConjugateF64(
+                        H.repeating(value).raw,
+                        b.raw,
+                        c.raw
+                    )
                 ),
                 "b: \(describe(b)), c: \(describe(c))"
             )
@@ -531,19 +597,25 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAddingComplexConjugateConstantB(_ value: H.Lane) {
+    private func checkMultiplyAddingComplexConjugateConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplyAddingComplexConjugate with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2081_676E_2DB0_0F18)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x2081_696E_2DB0_127E)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x2081_676E_2DB0_0F18)
+        let cInputs = Inputs.vectors(H.self, seed: 0x2081_696E_2DB0_127E)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (a, c) in everyPair(aInputs, cInputs)
-        where !hasUnorderedNaNs(complexLanesOf: a, H.repeating(value), c) {
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, H.repeating(value).simd, c.simd) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, H.repeating(value), c),
-                HighwayReference.multiplyAddingComplexConjugateF64(
-                    a.raw,
-                    H.repeating(value).raw,
-                    c.raw
+                H(
+                    raw: HighwayReference.multiplyAddingComplexConjugateF64(
+                        a.raw,
+                        H.repeating(value).raw,
+                        c.raw
+                    )
                 ),
                 "a: \(describe(a)), c: \(describe(c))"
             )
@@ -552,19 +624,25 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAddingComplexConjugateConstantC(_ value: H.Lane) {
+    private func checkMultiplyAddingComplexConjugateConstantC(_ value: Lane) {
         let mismatches = Mismatches("multiplyAddingComplexConjugate with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x17EC_B06E_28DA_0683)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x17EC_AF6E_28DA_04D0)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x17EC_B06E_28DA_0683)
+        let bInputs = Inputs.vectors(H.self, seed: 0x17EC_AF6E_28DA_04D0)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (a, b) in everyPair(aInputs, bInputs)
-        where !hasUnorderedNaNs(complexLanesOf: a, b, H.repeating(value)) {
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd, H.repeating(value).simd) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, b, H.repeating(value)),
-                HighwayReference.multiplyAddingComplexConjugateF64(
-                    a.raw,
-                    b.raw,
-                    H.repeating(value).raw
+                H(
+                    raw: HighwayReference.multiplyAddingComplexConjugateF64(
+                        a.raw,
+                        b.raw,
+                        H.repeating(value).raw
+                    )
                 ),
                 "a: \(describe(a)), b: \(describe(b))"
             )
@@ -657,9 +735,9 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func multiplyAddingComplexConjugateConstantSplatPayloadNaN() {
-        checkMultiplyAddingComplexConjugateConstantA(H.Lane(nan: 1, signaling: false))
-        checkMultiplyAddingComplexConjugateConstantB(H.Lane(nan: 1, signaling: false))
-        checkMultiplyAddingComplexConjugateConstantC(H.Lane(nan: 1, signaling: false))
+        checkMultiplyAddingComplexConjugateConstantA(Lane(nan: 1, signaling: false))
+        checkMultiplyAddingComplexConjugateConstantB(Lane(nan: 1, signaling: false))
+        checkMultiplyAddingComplexConjugateConstantC(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyAddingComplexConjugateConstantSplatSignalingNaN() {
@@ -687,23 +765,29 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingComplexWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkMultiplyingComplexWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "multiplyingComplexWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x0B0F_FFB6_AA1A_50A3)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0B10_00B6_AA1A_5256)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0B10_01B6_AA1A_5409)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x0B10_00B6_AA1A_5256)
+        let bInputs = Inputs.vectors(H.self, seed: 0x0B10_01B6_AA1A_5409)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x37D5_0D80_8131_A62C)
-        where !hasUnorderedNaNs(complexLanesOf: a, b) {
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd) {
             mismatches.check(
                 H.multiplyingComplex(a, b, where: mask, otherwise: H.repeating(value)),
-                HighwayReference.multiplyingComplexWhereOtherwiseF64(
-                    H.repeating(value).raw,
-                    mask.raw,
-                    a.raw,
-                    b.raw
+                H(
+                    raw: HighwayReference.multiplyingComplexWhereOtherwiseF64(
+                        H.repeating(value).raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
@@ -712,27 +796,33 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingComplexWhereOtherwiseConstantA(_ value: H.Lane) {
+    private func checkMultiplyingComplexWhereOtherwiseConstantA(_ value: Lane) {
         let mismatches = Mismatches(
             "multiplyingComplexWhereOtherwise with a repeating \(hex(value))"
         )
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x892B_D12D_0C20_8A81)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x892B_D12D_0C20_8A81)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x892B_D02D_0C20_88CE)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x892B_CE2D_0C20_8568)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x892B_CE2D_0C20_8568)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (otherwise, mask, b) in mixedTriples(
             otherwiseInputs,
             maskInputs,
             bInputs,
             seed: 0x8E6C_EA05_B95B_207B
-        ) where !hasUnorderedNaNs(complexLanesOf: H.repeating(value), b) {
+        ) where !hasUnorderedNaNs(complexLanesOf: H.repeating(value).simd, b.simd) {
             mismatches.check(
                 H.multiplyingComplex(H.repeating(value), b, where: mask, otherwise: otherwise),
-                HighwayReference.multiplyingComplexWhereOtherwiseF64(
-                    otherwise.raw,
-                    mask.raw,
-                    H.repeating(value).raw,
-                    b.raw
+                H(
+                    raw: HighwayReference.multiplyingComplexWhereOtherwiseF64(
+                        otherwise.raw,
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw
+                    )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b))"
             )
@@ -741,27 +831,33 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingComplexWhereOtherwiseConstantB(_ value: H.Lane) {
+    private func checkMultiplyingComplexWhereOtherwiseConstantB(_ value: Lane) {
         let mismatches = Mismatches(
             "multiplyingComplexWhereOtherwise with b repeating \(hex(value))"
         )
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x8096_9A2D_0749_A86C)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x8096_9A2D_0749_A86C)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8096_9B2D_0749_AA1F)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8096_9C2D_0749_ABD2)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x8096_9C2D_0749_ABD2)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (otherwise, mask, a) in mixedTriples(
             otherwiseInputs,
             maskInputs,
             aInputs,
             seed: 0xB732_C6A5_88BE_1240
-        ) where !hasUnorderedNaNs(complexLanesOf: a, H.repeating(value)) {
+        ) where !hasUnorderedNaNs(complexLanesOf: a.simd, H.repeating(value).simd) {
             mismatches.check(
                 H.multiplyingComplex(a, H.repeating(value), where: mask, otherwise: otherwise),
-                HighwayReference.multiplyingComplexWhereOtherwiseF64(
-                    otherwise.raw,
-                    mask.raw,
-                    a.raw,
-                    H.repeating(value).raw
+                H(
+                    raw: HighwayReference.multiplyingComplexWhereOtherwiseF64(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw
+                    )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
             )
@@ -854,9 +950,9 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func multiplyingComplexWhereOtherwiseConstantSplatPayloadNaN() {
-        checkMultiplyingComplexWhereOtherwiseConstantOtherwise(H.Lane(nan: 1, signaling: false))
-        checkMultiplyingComplexWhereOtherwiseConstantA(H.Lane(nan: 1, signaling: false))
-        checkMultiplyingComplexWhereOtherwiseConstantB(H.Lane(nan: 1, signaling: false))
+        checkMultiplyingComplexWhereOtherwiseConstantOtherwise(Lane(nan: 1, signaling: false))
+        checkMultiplyingComplexWhereOtherwiseConstantA(Lane(nan: 1, signaling: false))
+        checkMultiplyingComplexWhereOtherwiseConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyingComplexWhereOtherwiseConstantSplatSignalingNaN() {
@@ -884,21 +980,27 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingComplexConjugateWhereConstantA(_ value: H.Lane) {
+    private func checkMultiplyingComplexConjugateWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches(
             "multiplyingComplexConjugateWhere with a repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x06CD_FF52_70C6_E22F)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x06CE_0152_70C6_E595)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x06CE_0152_70C6_E595)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (mask, b) in everyPair(maskInputs, bInputs)
-        where !hasUnorderedNaNs(complexLanesOf: H.repeating(value), b) {
+        where !hasUnorderedNaNs(complexLanesOf: H.repeating(value).simd, b.simd) {
             mismatches.check(
                 H.multiplyingComplexConjugate(H.repeating(value), b, where: mask),
-                HighwayReference.multiplyingComplexConjugateWhereF64(
-                    mask.raw,
-                    H.repeating(value).raw,
-                    b.raw
+                H(
+                    raw: HighwayReference.multiplyingComplexConjugateWhereF64(
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw
+                    )
                 ),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
@@ -907,21 +1009,27 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingComplexConjugateWhereConstantB(_ value: H.Lane) {
+    private func checkMultiplyingComplexConjugateWhereConstantB(_ value: Lane) {
         let mismatches = Mismatches(
             "multiplyingComplexConjugateWhere with b repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x21D3_8452_8060_14AE)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x21D3_8552_8060_1661)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x21D3_8552_8060_1661)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (mask, a) in everyPair(maskInputs, aInputs)
-        where !hasUnorderedNaNs(complexLanesOf: a, H.repeating(value)) {
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, H.repeating(value).simd) {
             mismatches.check(
                 H.multiplyingComplexConjugate(a, H.repeating(value), where: mask),
-                HighwayReference.multiplyingComplexConjugateWhereF64(
-                    mask.raw,
-                    a.raw,
-                    H.repeating(value).raw
+                H(
+                    raw: HighwayReference.multiplyingComplexConjugateWhereF64(
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw
+                    )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
@@ -1000,8 +1108,8 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func multiplyingComplexConjugateWhereConstantSplatPayloadNaN() {
-        checkMultiplyingComplexConjugateWhereConstantA(H.Lane(nan: 1, signaling: false))
-        checkMultiplyingComplexConjugateWhereConstantB(H.Lane(nan: 1, signaling: false))
+        checkMultiplyingComplexConjugateWhereConstantA(Lane(nan: 1, signaling: false))
+        checkMultiplyingComplexConjugateWhereConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyingComplexConjugateWhereConstantSplatSignalingNaN() {

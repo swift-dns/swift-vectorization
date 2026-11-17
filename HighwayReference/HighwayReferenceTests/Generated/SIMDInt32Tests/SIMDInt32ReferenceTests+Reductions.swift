@@ -8,7 +8,7 @@ import Vectorization
 extension SIMDInt32ReferenceTests {
     @Test func sum() {
         let mismatches = Mismatches("sum")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEC7D_B773_9E60_2DDE)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEC7D_B773_9E60_2DDE)
         for a in aInputs {
             mismatches.check(H.sum(a), HighwayReference.sumI32(a.raw), "a: \(describe(a))")
         }
@@ -17,7 +17,7 @@ extension SIMDInt32ReferenceTests {
 
     @Test func smallest() {
         let mismatches = Mismatches("smallest")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x723B_402C_1104_DBD0)
+        let aInputs = Inputs.vectors(H.self, seed: 0x723B_402C_1104_DBD0)
         for a in aInputs {
             mismatches.check(
                 H.smallest(a),
@@ -30,7 +30,7 @@ extension SIMDInt32ReferenceTests {
 
     @Test func largest() {
         let mismatches = Mismatches("largest")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA1DC_AF40_642E_AAA9)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA1DC_AF40_642E_AAA9)
         for a in aInputs {
             mismatches.check(H.largest(a), HighwayReference.largestI32(a.raw), "a: \(describe(a))")
         }
@@ -39,11 +39,11 @@ extension SIMDInt32ReferenceTests {
 
     @Test func repeatingSum() {
         let mismatches = Mismatches("repeatingSum")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7454_6B33_D50C_515D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7454_6B33_D50C_515D)
         for a in aInputs {
             mismatches.check(
                 H.repeatingSum(a),
-                H.Vector(raw: HighwayReference.repeatingSumI32(a.raw)),
+                H(raw: HighwayReference.repeatingSumI32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -52,11 +52,11 @@ extension SIMDInt32ReferenceTests {
 
     @Test func repeatingSmallest() {
         let mismatches = Mismatches("repeatingSmallest")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFFB4_824D_B723_2051)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFFB4_824D_B723_2051)
         for a in aInputs {
             mismatches.check(
                 H.repeatingSmallest(a),
-                H.Vector(raw: HighwayReference.repeatingSmallestI32(a.raw)),
+                H(raw: HighwayReference.repeatingSmallestI32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -65,11 +65,11 @@ extension SIMDInt32ReferenceTests {
 
     @Test func repeatingLargest() {
         let mismatches = Mismatches("repeatingLargest")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBD93_3B2F_6736_5E82)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBD93_3B2F_6736_5E82)
         for a in aInputs {
             mismatches.check(
                 H.repeatingLargest(a),
-                H.Vector(raw: HighwayReference.repeatingLargestI32(a.raw)),
+                H(raw: HighwayReference.repeatingLargestI32(a.raw)),
                 "a: \(describe(a))"
             )
         }

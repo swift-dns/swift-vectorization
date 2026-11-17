@@ -7,13 +7,17 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
-    private func checkCreate2ConstantA(_ value: H.Lane) {
+    private func checkCreate2ConstantA(_ value: Lane) {
         let mismatches = Mismatches("create2 with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCDF0_65C4_ECFC_1575)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0xCDF0_65C4_ECFC_1575)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for b in bInputs {
             let port = H.create2(H.repeating(value), b)
-            let reference = { tuple in (tuple.v0, tuple.v1) }(
+            let reference = { tuple in (H(raw: tuple.v0), H(raw: tuple.v1)) }(
                 HighwayReference.create2F64(H.repeating(value).raw, b.raw)
             )
             mismatches.check(port.0, reference.0, "b: \(describe(b))")
@@ -23,13 +27,17 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkCreate2ConstantB(_ value: H.Lane) {
+    private func checkCreate2ConstantB(_ value: Lane) {
         let mismatches = Mismatches("create2 with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB357_5FC4_DDBE_D9A3)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0xB357_5FC4_DDBE_D9A3)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for a in aInputs {
             let port = H.create2(a, H.repeating(value))
-            let reference = { tuple in (tuple.v0, tuple.v1) }(
+            let reference = { tuple in (H(raw: tuple.v0), H(raw: tuple.v1)) }(
                 HighwayReference.create2F64(a.raw, H.repeating(value).raw)
             )
             mismatches.check(port.0, reference.0, "a: \(describe(a))")
@@ -109,8 +117,8 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func create2ConstantSplatPayloadNaN() {
-        checkCreate2ConstantA(H.Lane(nan: 1, signaling: false))
-        checkCreate2ConstantB(H.Lane(nan: 1, signaling: false))
+        checkCreate2ConstantA(Lane(nan: 1, signaling: false))
+        checkCreate2ConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func create2ConstantSplatSignalingNaN() {
@@ -134,16 +142,18 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkSet2ConstantA(_ value: H.Lane) {
+    private func checkSet2ConstantA(_ value: Lane) {
         let mismatches = Mismatches("set2 with a repeating \(hex(value))")
-        let tupleInputs = Inputs.tuples2(
-            of: Inputs.vectors(H.Vector.self, seed: 0x5BF9_6008_B651_A53E)
-        )
+        let tupleInputs = Inputs.tuples2(of: Inputs.vectors(H.self, seed: 0x5BF9_6008_B651_A53E))
         let indexInputs = Inputs.tupleIndices(count: 2)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (tuple, index) in everyPair(tupleInputs, indexInputs) {
             let port = H.set2(tuple, at: index, to: H.repeating(value))
-            let reference = { tuple in (tuple.v0, tuple.v1) }(
+            let reference = { tuple in (H(raw: tuple.v0), H(raw: tuple.v1)) }(
                 HighwayReference.set2F64(
                     cvectorization_ops_tuple2_f64(v0: tuple.0.raw, v1: tuple.1.raw),
                     index,
@@ -221,7 +231,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func set2ConstantSplatPayloadNaN() {
-        checkSet2ConstantA(H.Lane(nan: 1, signaling: false))
+        checkSet2ConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func set2ConstantSplatSignalingNaN() {
@@ -241,14 +251,18 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkCreate3ConstantA(_ value: H.Lane) {
+    private func checkCreate3ConstantA(_ value: Lane) {
         let mismatches = Mismatches("create3 with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE7DF_4E25_E044_36E4)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xE7DF_5125_E044_3BFD)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0xE7DF_4E25_E044_36E4)
+        let cInputs = Inputs.vectors(H.self, seed: 0xE7DF_5125_E044_3BFD)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (b, c) in everyPair(bInputs, cInputs) {
             let port = H.create3(H.repeating(value), b, c)
-            let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
+            let reference = { tuple in (H(raw: tuple.v0), H(raw: tuple.v1), H(raw: tuple.v2)) }(
                 HighwayReference.create3F64(H.repeating(value).raw, b.raw, c.raw)
             )
             mismatches.check(port.0, reference.0, "b: \(describe(b)), c: \(describe(c))")
@@ -259,14 +273,18 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkCreate3ConstantB(_ value: H.Lane) {
+    private func checkCreate3ConstantB(_ value: Lane) {
         let mismatches = Mismatches("create3 with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x019E_B425_EEC8_7216)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x019E_B225_EEC8_6EB0)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x019E_B425_EEC8_7216)
+        let cInputs = Inputs.vectors(H.self, seed: 0x019E_B225_EEC8_6EB0)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (a, c) in everyPair(aInputs, cInputs) {
             let port = H.create3(a, H.repeating(value), c)
-            let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
+            let reference = { tuple in (H(raw: tuple.v0), H(raw: tuple.v1), H(raw: tuple.v2)) }(
                 HighwayReference.create3F64(a.raw, H.repeating(value).raw, c.raw)
             )
             mismatches.check(port.0, reference.0, "a: \(describe(a)), c: \(describe(c))")
@@ -277,14 +295,18 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkCreate3ConstantC(_ value: H.Lane) {
+    private func checkCreate3ConstantC(_ value: Lane) {
         let mismatches = Mismatches("create3 with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF9E3_1D25_EAAA_90A1)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF9E3_1C25_EAAA_8EEE)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0xF9E3_1D25_EAAA_90A1)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF9E3_1C25_EAAA_8EEE)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (a, b) in everyPair(aInputs, bInputs) {
             let port = H.create3(a, b, H.repeating(value))
-            let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
+            let reference = { tuple in (H(raw: tuple.v0), H(raw: tuple.v1), H(raw: tuple.v2)) }(
                 HighwayReference.create3F64(a.raw, b.raw, H.repeating(value).raw)
             )
             mismatches.check(port.0, reference.0, "a: \(describe(a)), b: \(describe(b))")
@@ -379,9 +401,9 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func create3ConstantSplatPayloadNaN() {
-        checkCreate3ConstantA(H.Lane(nan: 1, signaling: false))
-        checkCreate3ConstantB(H.Lane(nan: 1, signaling: false))
-        checkCreate3ConstantC(H.Lane(nan: 1, signaling: false))
+        checkCreate3ConstantA(Lane(nan: 1, signaling: false))
+        checkCreate3ConstantB(Lane(nan: 1, signaling: false))
+        checkCreate3ConstantC(Lane(nan: 1, signaling: false))
     }
 
     @Test func create3ConstantSplatSignalingNaN() {
@@ -409,16 +431,18 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkSet3ConstantA(_ value: H.Lane) {
+    private func checkSet3ConstantA(_ value: Lane) {
         let mismatches = Mismatches("set3 with a repeating \(hex(value))")
-        let tupleInputs = Inputs.tuples3(
-            of: Inputs.vectors(H.Vector.self, seed: 0x4309_FB0F_07E4_44A3)
-        )
+        let tupleInputs = Inputs.tuples3(of: Inputs.vectors(H.self, seed: 0x4309_FB0F_07E4_44A3))
         let indexInputs = Inputs.tupleIndices(count: 3)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (tuple, index) in everyPair(tupleInputs, indexInputs) {
             let port = H.set3(tuple, at: index, to: H.repeating(value))
-            let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
+            let reference = { tuple in (H(raw: tuple.v0), H(raw: tuple.v1), H(raw: tuple.v2)) }(
                 HighwayReference.set3F64(
                     cvectorization_ops_tuple3_f64(
                         v0: tuple.0.raw,
@@ -505,7 +529,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func set3ConstantSplatPayloadNaN() {
-        checkSet3ConstantA(H.Lane(nan: 1, signaling: false))
+        checkSet3ConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func set3ConstantSplatSignalingNaN() {
@@ -525,17 +549,21 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkCreate4ConstantA(_ value: H.Lane) {
+    private func checkCreate4ConstantA(_ value: Lane) {
         let mismatches = Mismatches("create4 with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2BB1_67AC_6B6B_8107)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x2BB1_68AC_6B6B_82BA)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0x2BB1_69AC_6B6B_846D)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x2BB1_67AC_6B6B_8107)
+        let cInputs = Inputs.vectors(H.self, seed: 0x2BB1_68AC_6B6B_82BA)
+        let dInputs = Inputs.vectors(H.self, seed: 0x2BB1_69AC_6B6B_846D)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (b, c, d) in mixedTriples(bInputs, cInputs, dInputs, seed: 0xB69C_3687_F449_3D08) {
             let port = H.create4(H.repeating(value), b, c, d)
-            let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
-                HighwayReference.create4F64(H.repeating(value).raw, b.raw, c.raw, d.raw)
-            )
+            let reference = { tuple in
+                (H(raw: tuple.v0), H(raw: tuple.v1), H(raw: tuple.v2), H(raw: tuple.v3))
+            }(HighwayReference.create4F64(H.repeating(value).raw, b.raw, c.raw, d.raw))
             mismatches.check(
                 port.0,
                 reference.0,
@@ -561,17 +589,21 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkCreate4ConstantB(_ value: H.Lane) {
+    private func checkCreate4ConstantB(_ value: Lane) {
         let mismatches = Mismatches("create4 with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x336C_FDAC_6F89_60C9)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x336C_FBAC_6F89_5D63)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0x336C_FAAC_6F89_5BB0)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x336C_FDAC_6F89_60C9)
+        let cInputs = Inputs.vectors(H.self, seed: 0x336C_FBAC_6F89_5D63)
+        let dInputs = Inputs.vectors(H.self, seed: 0x336C_FAAC_6F89_5BB0)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (a, c, d) in mixedTriples(aInputs, cInputs, dInputs, seed: 0xA012_0FB0_1348_4183) {
             let port = H.create4(a, H.repeating(value), c, d)
-            let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
-                HighwayReference.create4F64(a.raw, H.repeating(value).raw, c.raw, d.raw)
-            )
+            let reference = { tuple in
+                (H(raw: tuple.v0), H(raw: tuple.v1), H(raw: tuple.v2), H(raw: tuple.v3))
+            }(HighwayReference.create4F64(a.raw, H.repeating(value).raw, c.raw, d.raw))
             mismatches.check(
                 port.0,
                 reference.0,
@@ -597,17 +629,21 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkCreate4ConstantC(_ value: H.Lane) {
+    private func checkCreate4ConstantC(_ value: Lane) {
         let mismatches = Mismatches("create4 with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3C6E_B4AC_74BC_3B3E)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3C6E_B5AC_74BC_3CF1)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0x3C6E_B3AC_74BC_398B)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x3C6E_B4AC_74BC_3B3E)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3C6E_B5AC_74BC_3CF1)
+        let dInputs = Inputs.vectors(H.self, seed: 0x3C6E_B3AC_74BC_398B)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (a, b, d) in mixedTriples(aInputs, bInputs, dInputs, seed: 0x7229_8D63_FDFA_505A) {
             let port = H.create4(a, b, H.repeating(value), d)
-            let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
-                HighwayReference.create4F64(a.raw, b.raw, H.repeating(value).raw, d.raw)
-            )
+            let reference = { tuple in
+                (H(raw: tuple.v0), H(raw: tuple.v1), H(raw: tuple.v2), H(raw: tuple.v3))
+            }(HighwayReference.create4F64(a.raw, b.raw, H.repeating(value).raw, d.raw))
             mismatches.check(
                 port.0,
                 reference.0,
@@ -633,17 +669,21 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkCreate4ConstantD(_ value: H.Lane) {
+    private func checkCreate4ConstantD(_ value: Lane) {
         let mismatches = Mismatches("create4 with d repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4503_CBAC_7992_E6F3)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4503_CAAC_7992_E540)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x4503_CDAC_7992_EA59)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x4503_CBAC_7992_E6F3)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4503_CAAC_7992_E540)
+        let cInputs = Inputs.vectors(H.self, seed: 0x4503_CDAC_7992_EA59)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x5494_E3BA_BF04_2F35) {
             let port = H.create4(a, b, c, H.repeating(value))
-            let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
-                HighwayReference.create4F64(a.raw, b.raw, c.raw, H.repeating(value).raw)
-            )
+            let reference = { tuple in
+                (H(raw: tuple.v0), H(raw: tuple.v1), H(raw: tuple.v2), H(raw: tuple.v3))
+            }(HighwayReference.create4F64(a.raw, b.raw, c.raw, H.repeating(value).raw))
             mismatches.check(
                 port.0,
                 reference.0,
@@ -767,10 +807,10 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func create4ConstantSplatPayloadNaN() {
-        checkCreate4ConstantA(H.Lane(nan: 1, signaling: false))
-        checkCreate4ConstantB(H.Lane(nan: 1, signaling: false))
-        checkCreate4ConstantC(H.Lane(nan: 1, signaling: false))
-        checkCreate4ConstantD(H.Lane(nan: 1, signaling: false))
+        checkCreate4ConstantA(Lane(nan: 1, signaling: false))
+        checkCreate4ConstantB(Lane(nan: 1, signaling: false))
+        checkCreate4ConstantC(Lane(nan: 1, signaling: false))
+        checkCreate4ConstantD(Lane(nan: 1, signaling: false))
     }
 
     @Test func create4ConstantSplatSignalingNaN() {
@@ -802,16 +842,20 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkSet4ConstantA(_ value: H.Lane) {
+    private func checkSet4ConstantA(_ value: Lane) {
         let mismatches = Mismatches("set4 with a repeating \(hex(value))")
-        let tupleInputs = Inputs.tuples4(
-            of: Inputs.vectors(H.Vector.self, seed: 0xD926_6807_FB83_C968)
-        )
+        let tupleInputs = Inputs.tuples4(of: Inputs.vectors(H.self, seed: 0xD926_6807_FB83_C968))
         let indexInputs = Inputs.tupleIndices(count: 4)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (tuple, index) in everyPair(tupleInputs, indexInputs) {
             let port = H.set4(tuple, at: index, to: H.repeating(value))
-            let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
+            let reference = { tuple in
+                (H(raw: tuple.v0), H(raw: tuple.v1), H(raw: tuple.v2), H(raw: tuple.v3))
+            }(
                 HighwayReference.set4F64(
                     cvectorization_ops_tuple4_f64(
                         v0: tuple.0.raw,
@@ -904,7 +948,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func set4ConstantSplatPayloadNaN() {
-        checkSet4ConstantA(H.Lane(nan: 1, signaling: false))
+        checkSet4ConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func set4ConstantSplatSignalingNaN() {

@@ -7,20 +7,20 @@ import Vectorization
 
 extension SIMDUInt32ConstantTests {
     @inline(__always)
-    private func checkZippingLowerFromUInt16ConstantA(_ value: SIMDUInt16.Lane) {
+    private func checkZippingLowerFromUInt16ConstantA(_ value: UInt16) {
         let mismatches = Mismatches("zippingLowerFromUInt16 with a repeating \(hex(value))")
-        let bInputs = Inputs.conversions(SIMDUInt16.Vector.self, seed: 0x2F0F_C767_15BF_7D40)
+        let bInputs = Inputs.conversions(SIMD<UInt16>.self, seed: 0x2F0F_C767_15BF_7D40)
         mismatches.check(
-            SIMDUInt16.repeating(value),
-            SIMDUInt16.Vector(raw: HighwayReference.repeatingU16(value)),
+            SIMD<UInt16>.repeating(value),
+            SIMD<UInt16>(raw: HighwayReference.repeatingU16(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
-                H.zippingLower(SIMDUInt16.repeating(value), b),
-                H.Vector(
+                H.zippingLower(SIMD<UInt16>.repeating(value), b),
+                H(
                     raw: HighwayReference.zippingLowerU16ToU32(
-                        SIMDUInt16.repeating(value).raw,
+                        SIMD<UInt16>.repeating(value).raw,
                         b.raw
                     )
                 ),
@@ -31,21 +31,21 @@ extension SIMDUInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkZippingLowerFromUInt16ConstantB(_ value: SIMDUInt16.Lane) {
+    private func checkZippingLowerFromUInt16ConstantB(_ value: UInt16) {
         let mismatches = Mismatches("zippingLowerFromUInt16 with b repeating \(hex(value))")
-        let aInputs = Inputs.conversions(SIMDUInt16.Vector.self, seed: 0x48CF_4D67_2443_EED2)
+        let aInputs = Inputs.conversions(SIMD<UInt16>.self, seed: 0x48CF_4D67_2443_EED2)
         mismatches.check(
-            SIMDUInt16.repeating(value),
-            SIMDUInt16.Vector(raw: HighwayReference.repeatingU16(value)),
+            SIMD<UInt16>.repeating(value),
+            SIMD<UInt16>(raw: HighwayReference.repeatingU16(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
-                H.zippingLower(a, SIMDUInt16.repeating(value)),
-                H.Vector(
+                H.zippingLower(a, SIMD<UInt16>.repeating(value)),
+                H(
                     raw: HighwayReference.zippingLowerU16ToU32(
                         a.raw,
-                        SIMDUInt16.repeating(value).raw
+                        SIMD<UInt16>.repeating(value).raw
                     )
                 ),
                 "a: \(describe(a))"
@@ -115,25 +115,25 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func zippingLowerFromUInt16ConstantSplatMax() {
-        checkZippingLowerFromUInt16ConstantA(SIMDUInt16.Lane.max)
-        checkZippingLowerFromUInt16ConstantB(SIMDUInt16.Lane.max)
+        checkZippingLowerFromUInt16ConstantA(UInt16.max)
+        checkZippingLowerFromUInt16ConstantB(UInt16.max)
     }
 
     @inline(__always)
-    private func checkZippingUpperFromUInt16ConstantA(_ value: SIMDUInt16.Lane) {
+    private func checkZippingUpperFromUInt16ConstantA(_ value: UInt16) {
         let mismatches = Mismatches("zippingUpperFromUInt16 with a repeating \(hex(value))")
-        let bInputs = Inputs.conversions(SIMDUInt16.Vector.self, seed: 0x7776_CD96_DC06_8393)
+        let bInputs = Inputs.conversions(SIMD<UInt16>.self, seed: 0x7776_CD96_DC06_8393)
         mismatches.check(
-            SIMDUInt16.repeating(value),
-            SIMDUInt16.Vector(raw: HighwayReference.repeatingU16(value)),
+            SIMD<UInt16>.repeating(value),
+            SIMD<UInt16>(raw: HighwayReference.repeatingU16(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
-                H.zippingUpper(SIMDUInt16.repeating(value), b),
-                H.Vector(
+                H.zippingUpper(SIMD<UInt16>.repeating(value), b),
+                H(
                     raw: HighwayReference.zippingUpperU16ToU32(
-                        SIMDUInt16.repeating(value).raw,
+                        SIMD<UInt16>.repeating(value).raw,
                         b.raw
                     )
                 ),
@@ -144,21 +144,21 @@ extension SIMDUInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkZippingUpperFromUInt16ConstantB(_ value: SIMDUInt16.Lane) {
+    private func checkZippingUpperFromUInt16ConstantB(_ value: UInt16) {
         let mismatches = Mismatches("zippingUpperFromUInt16 with b repeating \(hex(value))")
-        let aInputs = Inputs.conversions(SIMDUInt16.Vector.self, seed: 0x8078_8396_E139_5C55)
+        let aInputs = Inputs.conversions(SIMD<UInt16>.self, seed: 0x8078_8396_E139_5C55)
         mismatches.check(
-            SIMDUInt16.repeating(value),
-            SIMDUInt16.Vector(raw: HighwayReference.repeatingU16(value)),
+            SIMD<UInt16>.repeating(value),
+            SIMD<UInt16>(raw: HighwayReference.repeatingU16(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
-                H.zippingUpper(a, SIMDUInt16.repeating(value)),
-                H.Vector(
+                H.zippingUpper(a, SIMD<UInt16>.repeating(value)),
+                H(
                     raw: HighwayReference.zippingUpperU16ToU32(
                         a.raw,
-                        SIMDUInt16.repeating(value).raw
+                        SIMD<UInt16>.repeating(value).raw
                     )
                 ),
                 "a: \(describe(a))"
@@ -228,7 +228,7 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func zippingUpperFromUInt16ConstantSplatMax() {
-        checkZippingUpperFromUInt16ConstantA(SIMDUInt16.Lane.max)
-        checkZippingUpperFromUInt16ConstantB(SIMDUInt16.Lane.max)
+        checkZippingUpperFromUInt16ConstantA(UInt16.max)
+        checkZippingUpperFromUInt16ConstantB(UInt16.max)
     }
 }

@@ -7,9 +7,14 @@
 public protocol SIMDElement {
     associatedtype _RawVector: Sendable
     associatedtype _RawMask: Sendable
+    associatedtype _SIMDVector
+    associatedtype _SIMDMask
     associatedtype _RawHalfVector: Sendable
     associatedtype _RawHalfMask: Sendable
+    associatedtype _SIMDHalfVector
+    associatedtype _SIMDHalfMask
     associatedtype _RawBlockVector: Sendable
+    associatedtype _SIMDBlockVector
     associatedtype IndexLane: SIMDElement where IndexLane.IndexLane == IndexLane
 
     static var _laneCount: Int { get }
@@ -1085,10 +1090,14 @@ public protocol SIMDFloatElement: SIMDNumericElement {
 public protocol SIMDQuarterVectorElement: SIMDElement {
     associatedtype _RawQuarterVector: Sendable
     associatedtype _RawQuarterMask: Sendable
+    associatedtype _SIMDQuarterVector
+    associatedtype _SIMDQuarterMask
 }
 
 /// The lane types that have eighth vectors.
 public protocol SIMDEighthVectorElement: SIMDQuarterVectorElement {
     associatedtype _RawEighthVector: Sendable
     associatedtype _RawEighthMask: Sendable
+    associatedtype _SIMDEighthVector
+    associatedtype _SIMDEighthMask
 }

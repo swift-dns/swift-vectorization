@@ -7,14 +7,23 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
-    private func checkSelectingIfNegativeOrZeroConstantA(_ value: H.Lane) {
+    private func checkSelectingIfNegativeOrZeroConstantA(_ value: Lane) {
         let mismatches = Mismatches("selectingIfNegativeOrZero with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE1FD_3D0A_56AC_11DE)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0xE1FD_3D0A_56AC_11DE)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for b in bInputs {
             mismatches.check(
                 H.selectingIfNegativeOrZero(H.repeating(value), b),
-                HighwayReference.selectingIfNegativeOrZeroF64(H.repeating(value).raw, b.raw),
+                H(
+                    raw: HighwayReference.selectingIfNegativeOrZeroF64(
+                        H.repeating(value).raw,
+                        b.raw
+                    )
+                ),
                 "b: \(describe(b))"
             )
         }
@@ -22,14 +31,23 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkSelectingIfNegativeOrZeroConstantB(_ value: H.Lane) {
+    private func checkSelectingIfNegativeOrZeroConstantB(_ value: Lane) {
         let mismatches = Mismatches("selectingIfNegativeOrZero with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD88E_870A_511C_673C)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0xD88E_870A_511C_673C)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for a in aInputs {
             mismatches.check(
                 H.selectingIfNegativeOrZero(a, H.repeating(value)),
-                HighwayReference.selectingIfNegativeOrZeroF64(a.raw, H.repeating(value).raw),
+                H(
+                    raw: HighwayReference.selectingIfNegativeOrZeroF64(
+                        a.raw,
+                        H.repeating(value).raw
+                    )
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -107,8 +125,8 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatPayloadNaN() {
-        checkSelectingIfNegativeOrZeroConstantA(H.Lane(nan: 1, signaling: false))
-        checkSelectingIfNegativeOrZeroConstantB(H.Lane(nan: 1, signaling: false))
+        checkSelectingIfNegativeOrZeroConstantA(Lane(nan: 1, signaling: false))
+        checkSelectingIfNegativeOrZeroConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatSignalingNaN() {
@@ -132,14 +150,18 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkZeroingIfNegativeConstantA(_ value: H.Lane) {
+    private func checkZeroingIfNegativeConstantA(_ value: Lane) {
         let mismatches = Mismatches("zeroingIfNegative with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF53D_A14B_329E_A5E9)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0xF53D_A14B_329E_A5E9)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for b in bInputs {
             mismatches.check(
                 H.zeroingIfNegative(H.repeating(value), b),
-                HighwayReference.zeroingIfNegativeF64(H.repeating(value).raw, b.raw),
+                H(raw: HighwayReference.zeroingIfNegativeF64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -147,14 +169,18 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkZeroingIfNegativeConstantB(_ value: H.Lane) {
+    private func checkZeroingIfNegativeConstantB(_ value: Lane) {
         let mismatches = Mismatches("zeroingIfNegative with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDB7E_3B4B_241A_6AB7)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0xDB7E_3B4B_241A_6AB7)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for a in aInputs {
             mismatches.check(
                 H.zeroingIfNegative(a, H.repeating(value)),
-                HighwayReference.zeroingIfNegativeF64(a.raw, H.repeating(value).raw),
+                H(raw: HighwayReference.zeroingIfNegativeF64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -232,8 +258,8 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func zeroingIfNegativeConstantSplatPayloadNaN() {
-        checkZeroingIfNegativeConstantA(H.Lane(nan: 1, signaling: false))
-        checkZeroingIfNegativeConstantB(H.Lane(nan: 1, signaling: false))
+        checkZeroingIfNegativeConstantA(Lane(nan: 1, signaling: false))
+        checkZeroingIfNegativeConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func zeroingIfNegativeConstantSplatSignalingNaN() {
@@ -257,14 +283,18 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkNegatingIfNegativeConstantA(_ value: H.Lane) {
+    private func checkNegatingIfNegativeConstantA(_ value: Lane) {
         let mismatches = Mismatches("negatingIfNegative with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x715D_CC53_C543_C690)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x715D_CC53_C543_C690)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for b in bInputs {
             mismatches.check(
                 H.negatingIfNegative(H.repeating(value), b),
-                HighwayReference.negatingIfNegativeF64(H.repeating(value).raw, b.raw),
+                H(raw: HighwayReference.negatingIfNegativeF64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -272,14 +302,18 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkNegatingIfNegativeConstantB(_ value: H.Lane) {
+    private func checkNegatingIfNegativeConstantB(_ value: Lane) {
         let mismatches = Mismatches("negatingIfNegative with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8A43_5253_D30E_9462)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x8A43_5253_D30E_9462)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for a in aInputs {
             mismatches.check(
                 H.negatingIfNegative(a, H.repeating(value)),
-                HighwayReference.negatingIfNegativeF64(a.raw, H.repeating(value).raw),
+                H(raw: HighwayReference.negatingIfNegativeF64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -357,8 +391,8 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func negatingIfNegativeConstantSplatPayloadNaN() {
-        checkNegatingIfNegativeConstantA(H.Lane(nan: 1, signaling: false))
-        checkNegatingIfNegativeConstantB(H.Lane(nan: 1, signaling: false))
+        checkNegatingIfNegativeConstantA(Lane(nan: 1, signaling: false))
+        checkNegatingIfNegativeConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func negatingIfNegativeConstantSplatSignalingNaN() {

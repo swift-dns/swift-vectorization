@@ -7,7 +7,7 @@ import Vectorization
 
 extension SIMDFloatConstantTests {
     @inline(__always)
-    private func checkTableLookupLanesConstantA(_ value: H.Lane) {
+    private func checkTableLookupLanesConstantA(_ value: Lane) {
         let mismatches = Mismatches("tableLookupLanes with a repeating \(hex(value))")
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
@@ -15,11 +15,15 @@ extension SIMDFloatConstantTests {
             seed: 0x4395_E82B_D27B_9A6D,
             inContract: true
         )
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for indices in indicesInputs {
             mismatches.check(
                 H.tableLookupLanes(H.repeating(value), at: indices),
-                HighwayReference.tableLookupLanesF32(H.repeating(value).raw, indices.raw),
+                H(raw: HighwayReference.tableLookupLanesF32(H.repeating(value).raw, indices.raw)),
                 "indices: \(describe(indices))"
             )
         }
@@ -83,7 +87,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func tableLookupLanesConstantSplatPayloadNaN() {
-        checkTableLookupLanesConstantA(H.Lane(nan: 1, signaling: false))
+        checkTableLookupLanesConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func tableLookupLanesConstantSplatSignalingNaN() {
@@ -103,23 +107,29 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkTwoTablesLookupLanesConstantA(_ value: H.Lane) {
+    private func checkTwoTablesLookupLanesConstantA(_ value: Lane) {
         let mismatches = Mismatches("twoTablesLookupLanes with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3DB4_AF6B_68DA_E3E6)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3DB4_AF6B_68DA_E3E6)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 2 * H.laneCount,
             seed: 0x3DB4_AE6B_68DA_E233,
             inContract: true
         )
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (b, indices) in everyPair(bInputs, indicesInputs) {
             mismatches.check(
                 H.twoTablesLookupLanes(H.repeating(value), b, at: indices),
-                HighwayReference.twoTablesLookupLanesF32(
-                    H.repeating(value).raw,
-                    b.raw,
-                    indices.raw
+                H(
+                    raw: HighwayReference.twoTablesLookupLanesF32(
+                        H.repeating(value).raw,
+                        b.raw,
+                        indices.raw
+                    )
                 ),
                 "b: \(describe(b)), indices: \(describe(indices))"
             )
@@ -128,23 +138,29 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkTwoTablesLookupLanesConstantB(_ value: H.Lane) {
+    private func checkTwoTablesLookupLanesConstantB(_ value: Lane) {
         let mismatches = Mismatches("twoTablesLookupLanes with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x351F_996B_6404_39E4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x351F_996B_6404_39E4)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 2 * H.laneCount,
             seed: 0x351F_9B6B_6404_3D4A,
             inContract: true
         )
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 H.twoTablesLookupLanes(a, H.repeating(value), at: indices),
-                HighwayReference.twoTablesLookupLanesF32(
-                    a.raw,
-                    H.repeating(value).raw,
-                    indices.raw
+                H(
+                    raw: HighwayReference.twoTablesLookupLanesF32(
+                        a.raw,
+                        H.repeating(value).raw,
+                        indices.raw
+                    )
                 ),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
@@ -223,8 +239,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func twoTablesLookupLanesConstantSplatPayloadNaN() {
-        checkTwoTablesLookupLanesConstantA(H.Lane(nan: 1, signaling: false))
-        checkTwoTablesLookupLanesConstantB(H.Lane(nan: 1, signaling: false))
+        checkTwoTablesLookupLanesConstantA(Lane(nan: 1, signaling: false))
+        checkTwoTablesLookupLanesConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func twoTablesLookupLanesConstantSplatSignalingNaN() {

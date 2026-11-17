@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDDoubleReferenceTests {
     @Test func multiplying() {
         let mismatches = Mismatches("multiplying")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x11B3_489B_B17E_71F3)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x11B3_479B_B17E_7040)
+        let aInputs = Inputs.vectors(H.self, seed: 0x11B3_489B_B17E_71F3)
+        let bInputs = Inputs.vectors(H.self, seed: 0x11B3_479B_B17E_7040)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplying(a, b),
-                HighwayReference.multiplyingF64(a.raw, b.raw),
+                H(raw: HighwayReference.multiplyingF64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -22,12 +22,12 @@ extension SIMDDoubleReferenceTests {
 
     @Test func multiplyingRounded() {
         let mismatches = Mismatches("multiplyingRounded")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8928_9FF5_F84B_C00A)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8928_A0F5_F84B_C1BD)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x8928_9FF5_F84B_C00A)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8928_A0F5_F84B_C1BD)
+        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a.simd, b.simd) {
             mismatches.check(
                 H.multiplyingRounded(a, b),
-                HighwayReference.multiplyingRoundedF64(a.raw, b.raw),
+                H(raw: HighwayReference.multiplyingRoundedF64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -36,12 +36,12 @@ extension SIMDDoubleReferenceTests {
 
     @Test func multiplyingByFloorPowerOf2() {
         let mismatches = Mismatches("multiplyingByFloorPowerOf2")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x07C4_7966_7E70_647C)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x07C4_7A66_7E70_662F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x07C4_7966_7E70_647C)
+        let bInputs = Inputs.vectors(H.self, seed: 0x07C4_7A66_7E70_662F)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplyingByFloorPowerOf2(a, b),
-                HighwayReference.multiplyingByFloorPowerOf2F64(a.raw, b.raw),
+                H(raw: HighwayReference.multiplyingByFloorPowerOf2F64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -50,12 +50,12 @@ extension SIMDDoubleReferenceTests {
 
     @Test func multiplyingByPowerOf2FromInt64() {
         let mismatches = Mismatches("multiplyingByPowerOf2FromInt64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE751_1323_C444_E5A5)
-        let bInputs = Inputs.exponents(SIMDInt64.Vector.self, seed: 0xE751_1223_C444_E3F2)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE751_1323_C444_E5A5)
+        let bInputs = Inputs.exponents(SIMD<Int64>.self, seed: 0xE751_1223_C444_E3F2)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplyingByPowerOf2(a, b),
-                HighwayReference.multiplyingByPowerOf2I64ToF64(a.raw, b.raw),
+                H(raw: HighwayReference.multiplyingByPowerOf2I64ToF64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

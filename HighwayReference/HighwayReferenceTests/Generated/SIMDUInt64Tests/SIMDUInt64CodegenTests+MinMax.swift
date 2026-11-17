@@ -9,8 +9,8 @@ import Vectorization
 extension SIMDUInt64CodegenTests {
     @Test func minimum() {
         let mismatches = Mismatches("portMinimumU64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1108_0039_271B_76F6)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1108_0139_271B_78A9)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1108_0039_271B_76F6)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1108_0139_271B_78A9)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMinimumU64(a, b),
@@ -23,7 +23,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func minimumConstantA() {
         let mismatches = Mismatches("portMinimumU64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7ACA_EC51_B900_5424)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7ACA_EC51_B900_5424)
         for b in bInputs {
             mismatches.check(
                 portMinimumU64ConstantA(b),
@@ -36,7 +36,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func minimumConstantB() {
         let mismatches = Mismatches("portMinimumU64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x948A_5251_C784_8F56)
+        let aInputs = Inputs.vectors(H.self, seed: 0x948A_5251_C784_8F56)
         for a in aInputs {
             mismatches.check(
                 portMinimumU64ConstantB(a),
@@ -49,8 +49,8 @@ extension SIMDUInt64CodegenTests {
 
     @Test func maximum() {
         let mismatches = Mismatches("portMaximumU64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEA65_4647_1AEB_BD20)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xEA65_4747_1AEB_BED3)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEA65_4647_1AEB_BD20)
+        let bInputs = Inputs.vectors(H.self, seed: 0xEA65_4747_1AEB_BED3)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMaximumU64(a, b),
@@ -63,7 +63,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func maximumConstantA() {
         let mismatches = Mismatches("portMaximumU64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2CDE_4869_D057_9316)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2CDE_4869_D057_9316)
         for b in bInputs {
             mismatches.check(
                 portMaximumU64ConstantA(b),
@@ -76,7 +76,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func maximumConstantB() {
         let mismatches = Mismatches("portMaximumU64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2522_B269_CC39_B354)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2522_B269_CC39_B354)
         for a in aInputs {
             mismatches.check(
                 portMaximumU64ConstantB(a),
@@ -89,8 +89,8 @@ extension SIMDUInt64CodegenTests {
 
     @Test func minimumNumber() {
         let mismatches = Mismatches("portMinimumNumberU64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7E0B_AA84_946E_8893)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7E0B_A984_946E_86E0)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7E0B_AA84_946E_8893)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7E0B_A984_946E_86E0)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMinimumNumberU64(a, b),
@@ -103,7 +103,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func minimumNumberConstantA() {
         let mismatches = Mismatches("portMinimumNumberU64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCE12_1E6F_667F_420F)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCE12_1E6F_667F_420F)
         for b in bInputs {
             mismatches.check(
                 portMinimumNumberU64ConstantA(b),
@@ -116,7 +116,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func minimumNumberConstantB() {
         let mismatches = Mismatches("portMinimumNumberU64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD5CD_546F_6A9C_7EB1)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD5CD_546F_6A9C_7EB1)
         for a in aInputs {
             mismatches.check(
                 portMinimumNumberU64ConstantB(a),
@@ -129,8 +129,8 @@ extension SIMDUInt64CodegenTests {
 
     @Test func maximumNumber() {
         let mismatches = Mismatches("portMaximumNumberU64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x20AB_D413_42C9_B9A9)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x20AB_D313_42C9_B7F6)
+        let aInputs = Inputs.vectors(H.self, seed: 0x20AB_D413_42C9_B9A9)
+        let bInputs = Inputs.vectors(H.self, seed: 0x20AB_D313_42C9_B7F6)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMaximumNumberU64(a, b),
@@ -143,7 +143,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func maximumNumberConstantA() {
         let mismatches = Mismatches("portMaximumNumberU64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD327_8B01_D4C5_6B1D)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD327_8B01_D4C5_6B1D)
         for b in bInputs {
             mismatches.check(
                 portMaximumNumberU64ConstantA(b),
@@ -156,7 +156,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func maximumNumberConstantB() {
         let mismatches = Mismatches("portMaximumNumberU64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB822_0501_C52C_36EB)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB822_0501_C52C_36EB)
         for a in aInputs {
             mismatches.check(
                 portMaximumNumberU64ConstantB(a),
@@ -169,8 +169,8 @@ extension SIMDUInt64CodegenTests {
 
     @Test func minimumMagnitude() {
         let mismatches = Mismatches("portMinimumMagnitudeU64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x66D0_7E46_8356_17D6)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x66D0_7F46_8356_1989)
+        let aInputs = Inputs.vectors(H.self, seed: 0x66D0_7E46_8356_17D6)
+        let bInputs = Inputs.vectors(H.self, seed: 0x66D0_7F46_8356_1989)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMinimumMagnitudeU64(a, b),
@@ -183,7 +183,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func minimumMagnitudeConstantA() {
         let mismatches = Mismatches("portMinimumMagnitudeU64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xED7E_EEFF_C203_8E84)
+        let bInputs = Inputs.vectors(H.self, seed: 0xED7E_EEFF_C203_8E84)
         for b in bInputs {
             mismatches.check(
                 portMinimumMagnitudeU64ConstantA(b),
@@ -196,7 +196,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func minimumMagnitudeConstantB() {
         let mismatches = Mismatches("portMinimumMagnitudeU64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x073E_54FF_D087_C9B6)
+        let aInputs = Inputs.vectors(H.self, seed: 0x073E_54FF_D087_C9B6)
         for a in aInputs {
             mismatches.check(
                 portMinimumMagnitudeU64ConstantB(a),
@@ -209,8 +209,8 @@ extension SIMDUInt64CodegenTests {
 
     @Test func maximumMagnitude() {
         let mismatches = Mismatches("portMaximumMagnitudeU64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4960_F08D_668C_A824)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4960_F18D_668C_A9D7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4960_F08D_668C_A824)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4960_F18D_668C_A9D7)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMaximumMagnitudeU64(a, b),
@@ -223,7 +223,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func maximumMagnitudeConstantA() {
         let mismatches = Mismatches("portMaximumMagnitudeU64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3AE3_6E16_D82E_174A)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3AE3_6E16_D82E_174A)
         for b in bInputs {
             mismatches.check(
                 portMaximumMagnitudeU64ConstantA(b),
@@ -236,7 +236,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func maximumMagnitudeConstantB() {
         let mismatches = Mismatches("portMaximumMagnitudeU64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x324E_B816_D358_1068)
+        let aInputs = Inputs.vectors(H.self, seed: 0x324E_B816_D358_1068)
         for a in aInputs {
             mismatches.check(
                 portMaximumMagnitudeU64ConstantB(a),
@@ -249,8 +249,8 @@ extension SIMDUInt64CodegenTests {
 
     @Test func minimum128() {
         let mismatches = Mismatches("portMinimum128U64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7E58_173A_FA4B_7575)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7E58_163A_FA4B_73C2)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7E58_173A_FA4B_7575)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7E58_163A_FA4B_73C2)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMinimum128U64(a, b),
@@ -263,7 +263,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func minimum128ConstantA() {
         let mismatches = Mismatches("portMinimum128U64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xBE55_A171_DBDF_1619)
+        let bInputs = Inputs.vectors(H.self, seed: 0xBE55_A171_DBDF_1619)
         for b in bInputs {
             mismatches.check(
                 portMinimum128U64ConstantA(b),
@@ -276,7 +276,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func minimum128ConstantB() {
         let mismatches = Mismatches("portMinimum128U64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA570_3B71_CE14_7EA7)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA570_3B71_CE14_7EA7)
         for a in aInputs {
             mismatches.check(
                 portMinimum128U64ConstantB(a),
@@ -289,8 +289,8 @@ extension SIMDUInt64CodegenTests {
 
     @Test func maximum128() {
         let mismatches = Mismatches("portMaximum128U64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB466_5A71_6003_0527)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB466_5971_6003_0374)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB466_5A71_6003_0527)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB466_5971_6003_0374)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMaximum128U64(a, b),
@@ -303,7 +303,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func maximum128ConstantA() {
         let mismatches = Mismatches("portMaximum128U64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1729_3634_6E8D_7EB3)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1729_3634_6E8D_7EB3)
         for b in bInputs {
             mismatches.check(
                 portMaximum128U64ConstantA(b),
@@ -316,7 +316,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func maximum128ConstantB() {
         let mismatches = Mismatches("portMaximum128U64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x202B_6C34_73C1_30F5)
+        let aInputs = Inputs.vectors(H.self, seed: 0x202B_6C34_73C1_30F5)
         for a in aInputs {
             mismatches.check(
                 portMaximum128U64ConstantB(a),
@@ -329,8 +329,8 @@ extension SIMDUInt64CodegenTests {
 
     @Test func minimum128Upper() {
         let mismatches = Mismatches("portMinimum128UpperU64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8705_12BE_EB94_A949)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8705_11BE_EB94_A796)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8705_12BE_EB94_A949)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8705_11BE_EB94_A796)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMinimum128UpperU64(a, b),
@@ -343,7 +343,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func minimum128UpperConstantA() {
         let mismatches = Mismatches("portMinimum128UpperU64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x630C_E7BA_6A50_D73D)
+        let bInputs = Inputs.vectors(H.self, seed: 0x630C_E7BA_6A50_D73D)
         for b in bInputs {
             mismatches.check(
                 portMinimum128UpperU64ConstantA(b),
@@ -356,7 +356,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func minimum128UpperConstantB() {
         let mismatches = Mismatches("portMinimum128UpperU64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x49BA_61BA_5C29_378B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x49BA_61BA_5C29_378B)
         for a in aInputs {
             mismatches.check(
                 portMinimum128UpperU64ConstantB(a),
@@ -369,8 +369,8 @@ extension SIMDUInt64CodegenTests {
 
     @Test func maximum128Upper() {
         let mismatches = Mismatches("portMaximum128UpperU64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0A23_5BC3_6039_624B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0A23_5AC3_6039_6098)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0A23_5BC3_6039_624B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x0A23_5AC3_6039_6098)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMaximum128UpperU64(a, b),
@@ -383,7 +383,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func maximum128UpperConstantA() {
         let mismatches = Mismatches("portMaximum128UpperU64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1278_C9BC_4EB6_0B07)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1278_C9BC_4EB6_0B07)
         for b in bInputs {
             mismatches.check(
                 portMaximum128UpperU64ConstantA(b),
@@ -396,7 +396,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func maximum128UpperConstantB() {
         let mismatches = Mismatches("portMaximum128UpperU64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1A34_5FBC_52D3_EAC9)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1A34_5FBC_52D3_EAC9)
         for a in aInputs {
             mismatches.check(
                 portMaximum128UpperU64ConstantB(a),

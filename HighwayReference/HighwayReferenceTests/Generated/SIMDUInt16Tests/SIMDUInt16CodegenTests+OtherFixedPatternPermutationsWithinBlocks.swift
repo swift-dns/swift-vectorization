@@ -9,8 +9,8 @@ import Vectorization
 extension SIMDUInt16CodegenTests {
     @Test func oddEven() {
         let mismatches = Mismatches("portOddEvenU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5E2B_6807_A740_30F6)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5E2B_6907_A740_32A9)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5E2B_6807_A740_30F6)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5E2B_6907_A740_32A9)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portOddEvenU16(a, b),
@@ -23,7 +23,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func oddEvenConstantA() {
         let mismatches = Mismatches("portOddEvenU16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD193_F368_6A76_2224)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD193_F368_6A76_2224)
         for b in bInputs {
             mismatches.check(
                 portOddEvenU16ConstantA(b),
@@ -36,7 +36,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func oddEvenConstantB() {
         let mismatches = Mismatches("portOddEvenU16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEB53_5968_78FA_5D56)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEB53_5968_78FA_5D56)
         for a in aInputs {
             mismatches.check(
                 portOddEvenU16ConstantB(a),
@@ -49,7 +49,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func duplicatingEven() {
         let mismatches = Mismatches("portDuplicatingEvenU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFAED_46BD_F180_5AA9)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFAED_46BD_F180_5AA9)
         for a in aInputs {
             mismatches.check(
                 portDuplicatingEvenU16(a),
@@ -72,7 +72,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func duplicatingOdd() {
         let mismatches = Mismatches("portDuplicatingOddU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB051_543A_B6CB_07C8)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB051_543A_B6CB_07C8)
         for a in aInputs {
             mismatches.check(
                 portDuplicatingOddU16(a),

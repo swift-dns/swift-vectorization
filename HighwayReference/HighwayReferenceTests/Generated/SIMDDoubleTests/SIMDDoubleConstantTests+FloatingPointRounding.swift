@@ -7,12 +7,16 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
-    private func checkRoundedToNearestOrEvenConstantA(_ value: H.Lane) {
+    private func checkRoundedToNearestOrEvenConstantA(_ value: Lane) {
         let mismatches = Mismatches("roundedToNearestOrEven with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         mismatches.check(
             H.roundedToNearestOrEven(H.repeating(value)),
-            HighwayReference.roundedToNearestOrEvenF64(H.repeating(value).raw),
+            H(raw: HighwayReference.roundedToNearestOrEvenF64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -75,7 +79,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func roundedToNearestOrEvenConstantSplatPayloadNaN() {
-        checkRoundedToNearestOrEvenConstantA(H.Lane(nan: 1, signaling: false))
+        checkRoundedToNearestOrEvenConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func roundedToNearestOrEvenConstantSplatSignalingNaN() {
@@ -95,12 +99,16 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkRoundedTowardZeroConstantA(_ value: H.Lane) {
+    private func checkRoundedTowardZeroConstantA(_ value: Lane) {
         let mismatches = Mismatches("roundedTowardZero with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         mismatches.check(
             H.roundedTowardZero(H.repeating(value)),
-            HighwayReference.roundedTowardZeroF64(H.repeating(value).raw),
+            H(raw: HighwayReference.roundedTowardZeroF64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -163,7 +171,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func roundedTowardZeroConstantSplatPayloadNaN() {
-        checkRoundedTowardZeroConstantA(H.Lane(nan: 1, signaling: false))
+        checkRoundedTowardZeroConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func roundedTowardZeroConstantSplatSignalingNaN() {
@@ -183,12 +191,16 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkRoundedUpConstantA(_ value: H.Lane) {
+    private func checkRoundedUpConstantA(_ value: Lane) {
         let mismatches = Mismatches("roundedUp with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         mismatches.check(
             H.roundedUp(H.repeating(value)),
-            HighwayReference.roundedUpF64(H.repeating(value).raw),
+            H(raw: HighwayReference.roundedUpF64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -251,7 +263,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func roundedUpConstantSplatPayloadNaN() {
-        checkRoundedUpConstantA(H.Lane(nan: 1, signaling: false))
+        checkRoundedUpConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func roundedUpConstantSplatSignalingNaN() {
@@ -271,12 +283,16 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkRoundedDownConstantA(_ value: H.Lane) {
+    private func checkRoundedDownConstantA(_ value: Lane) {
         let mismatches = Mismatches("roundedDown with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         mismatches.check(
             H.roundedDown(H.repeating(value)),
-            HighwayReference.roundedDownF64(H.repeating(value).raw),
+            H(raw: HighwayReference.roundedDownF64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -339,7 +355,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func roundedDownConstantSplatPayloadNaN() {
-        checkRoundedDownConstantA(H.Lane(nan: 1, signaling: false))
+        checkRoundedDownConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func roundedDownConstantSplatSignalingNaN() {

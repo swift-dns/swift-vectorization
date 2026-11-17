@@ -5,10 +5,17 @@ public import CVectorizationOps
 extension UInt16: SIMDIntegerElement, SIMDQuarterVectorElement {
     public typealias _RawVector = cvectorization_ops_raw_vector_u16
     public typealias _RawMask = cvectorization_ops_raw_mask_u16
+    public typealias _SIMDVector = cvectorization_ops_vector_u16
+    public typealias _SIMDMask = SIMDMask<cvectorization_ops_mask_u16>
     public typealias _RawHalfVector = cvectorization_ops_raw_half_vector_u16
     public typealias _RawHalfMask = cvectorization_ops_raw_half_mask_u16
+    public typealias _SIMDHalfVector = cvectorization_ops_half_vector_u16
+    public typealias _SIMDHalfMask = cvectorization_ops_half_mask_u16
     public typealias _RawBlockVector = cvectorization_ops_raw_block_u16
+    public typealias _SIMDBlockVector = cvectorization_ops_block_u16
     public typealias IndexLane = UInt16
     public typealias _RawQuarterVector = cvectorization_ops_raw_quarter_vector_u16
     public typealias _RawQuarterMask = cvectorization_ops_raw_quarter_mask_u16
+    public typealias _SIMDQuarterVector = cvectorization_ops_quarter_vector_u16
+    public typealias _SIMDQuarterMask = cvectorization_ops_quarter_mask_u16
 }

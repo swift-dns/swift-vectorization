@@ -8,8 +8,8 @@ import Vectorization
 extension SIMDFloatReferenceTests {
     @Test func store() {
         let mismatches = Mismatches("store")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC2EE_15A5_D0A3_859D)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC2EE_15A5_D0A3_859D)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -26,8 +26,8 @@ extension SIMDFloatReferenceTests {
 
     @Test func storeBeforeGuardPage() {
         let mismatches = Mismatches("store before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x50B0_D6CD_444D_148A)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0x50B0_D6CD_444D_148A)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.store(a, to: destination)
@@ -42,8 +42,8 @@ extension SIMDFloatReferenceTests {
 
     @Test func storeUncheckedSpan() {
         let mismatches = Mismatches("store unchecked span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x27BD_C37C_CCA9_E2ED)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x27BD_C37C_CCA9_E2ED)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -66,7 +66,7 @@ extension SIMDFloatReferenceTests {
 
     @Test func storeUncheckedOutputSpan() {
         let mismatches = Mismatches("store unchecked output span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEBD1_6DD4_92F3_5090)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEBD1_6DD4_92F3_5090)
         for a in aInputs {
             let (_, portLanes) = withOutputSpan(capacity: H.laneCount) { output in
                 unsafe H.append(a, toUnchecked: &output)
@@ -81,8 +81,8 @@ extension SIMDFloatReferenceTests {
 
     @Test func storeAligned() {
         let mismatches = Mismatches("storeAligned")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2202_A492_C454_C3CD)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2202_A492_C454_C3CD)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             let (_, portLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
                 destination in unsafe H.storeAligned(a, to: destination)
@@ -97,8 +97,8 @@ extension SIMDFloatReferenceTests {
 
     @Test func storeAlignedBeforeGuardPage() {
         let mismatches = Mismatches("storeAligned before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1ABA_6A0C_2152_18DA)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1ABA_6A0C_2152_18DA)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.storeAligned(a, to: destination)
@@ -113,8 +113,8 @@ extension SIMDFloatReferenceTests {
 
     @Test func storeAlignedUncheckedSpan() {
         let mismatches = Mismatches("storeAligned unchecked span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC94B_F3DB_76BC_079D)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC94B_F3DB_76BC_079D)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             let (_, portLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
                 destination in
@@ -147,17 +147,17 @@ extension SIMDFloatReferenceTests {
 
     @Test func storeAlignedUncheckedOutputSpan() {
         let mismatches = Mismatches("storeAligned unchecked output span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD672_1A76_808B_61E0)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD672_1A76_808B_61E0)
         for a in aInputs {
             let (_, portLanes) = withOutputSpan(
                 capacity: H.laneCount,
-                alignment: H.laneCount * MemoryLayout<H.Lane>.stride
+                alignment: H.laneCount * MemoryLayout<Lane>.stride
             ) { output in
                 unsafe H.appendAligned(a, toUnchecked: &output)
             }
             let (_, referenceLanes) = withOutputSpan(
                 capacity: H.laneCount,
-                alignment: H.laneCount * MemoryLayout<H.Lane>.stride
+                alignment: H.laneCount * MemoryLayout<Lane>.stride
             ) { output in
                 H.appendAligned(a, to: &output)
             }
@@ -168,9 +168,9 @@ extension SIMDFloatReferenceTests {
 
     @Test func storeFirst() {
         let mismatches = Mismatches("storeFirst")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x97A2_AA0E_F514_F127)
+        let aInputs = Inputs.vectors(H.self, seed: 0x97A2_AA0E_F514_F127)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, count) in everyPair(aInputs, countInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -187,9 +187,9 @@ extension SIMDFloatReferenceTests {
 
     @Test func storeFirstBeforeGuardPage() {
         let mismatches = Mismatches("storeFirst before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBD96_5766_B400_062C)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBD96_5766_B400_062C)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, count) in everyPair(aInputs, countInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(count))) {
                 destination in unsafe H.storeFirst(a, to: destination, count: count)
@@ -204,7 +204,7 @@ extension SIMDFloatReferenceTests {
 
     @Test func storeFirstUncheckedOutputSpan() {
         let mismatches = Mismatches("storeFirst unchecked output span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x58DB_C2DF_902E_328A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x58DB_C2DF_902E_328A)
         let countInputs = Inputs.counts(through: H.laneCount)
         for (a, count) in everyPair(aInputs, countInputs) {
             let (_, portLanes) = withOutputSpan(capacity: count) { output in
@@ -220,9 +220,9 @@ extension SIMDFloatReferenceTests {
 
     @Test func storeWhere() {
         let mismatches = Mismatches("storeWhere")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBF92_5F4D_CF60_F9FE)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBF92_5F4D_CF60_F9FE)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xBF92_604D_CF60_FBB1)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -243,9 +243,9 @@ extension SIMDFloatReferenceTests {
 
     @Test func storeWhereBeforeGuardPage() {
         let mismatches = Mismatches("storeWhere before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDF50_C406_9000_804F)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDF50_C406_9000_804F)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xDF50_C306_9000_7E9C)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.store(a, to: destination, where: mask)
@@ -272,9 +272,9 @@ extension SIMDFloatReferenceTests {
         let mismatches = Mismatches(
             "storeWhere with the lanes the mask leaves out past a guard page"
         )
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8DC5_EBAD_2BBC_6966)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8DC5_EBAD_2BBC_6966)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8DC5_ECAD_2BBC_6B19)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(
                 Array(sentinel.prefix(lanesThroughLastTrue(of: mask)))
@@ -293,9 +293,9 @@ extension SIMDFloatReferenceTests {
 
     @Test func storeWhereNonCanonical() {
         let mismatches = Mismatches("storeWhere with masks from arbitrary vectors")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB29B_3845_E7A1_FD2D)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB29B_3845_E7A1_FD2D)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xB29B_3745_E7A1_FB7A)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -316,9 +316,9 @@ extension SIMDFloatReferenceTests {
 
     @Test func storeWhereUncheckedSpan() {
         let mismatches = Mismatches("storeWhere unchecked span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD3EF_236C_9F79_485C)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD3EF_236C_9F79_485C)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xD3EF_246C_9F79_4A0F)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -346,8 +346,8 @@ extension SIMDFloatReferenceTests {
     @Test func storeRepeating() {
         let mismatches = Mismatches("storeRepeating")
         let countInputs = Inputs.counts(through: 2 * H.laneCount)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x7BA6_133B_16B7_CA37)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x7BA6_133B_16B7_CA37)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for (count, value) in everyPair(countInputs, valueInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -365,8 +365,8 @@ extension SIMDFloatReferenceTests {
     @Test func storeRepeatingBeforeGuardPage() {
         let mismatches = Mismatches("storeRepeating before a guard page")
         let countInputs = Inputs.counts(through: H.laneCount)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x835A_F5E6_D4A9_AEEA)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x835A_F5E6_D4A9_AEEA)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (count, value) in everyPair(countInputs, valueInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(count))) {
                 destination in unsafe H.storeRepeating(value, count: count, to: destination)
@@ -383,11 +383,11 @@ extension SIMDFloatReferenceTests {
         let mismatches = Mismatches("copy")
         let countInputs = Inputs.counts(through: 2 * H.laneCount)
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 2 * H.laneCount,
             seed: 0xF0FE_0D63_8010_802C
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for (count, from) in everyPair(countInputs, fromInputs) {
             var portLanes = sentinel
             var referenceLanes = sentinel
@@ -415,12 +415,8 @@ extension SIMDFloatReferenceTests {
     @Test func copyBeforeGuardPage() {
         let mismatches = Mismatches("copy before a guard page")
         let countInputs = Inputs.counts(through: H.laneCount)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x50CE_D18F_88A2_C897
-        )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x50CE_D18F_88A2_C897)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (count, from) in everyPair(countInputs, fromInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(count))) {
                 destination in
@@ -444,7 +440,7 @@ extension SIMDFloatReferenceTests {
         let aInputs = Inputs.vectors(H.HalfVector.self, seed: 0x75BD_5E8D_F0ED_5068).map(
             poisoningUpperBytes
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount / 2 + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount / 2 + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -464,7 +460,7 @@ extension SIMDFloatReferenceTests {
         let aInputs = Inputs.vectors(H.HalfVector.self, seed: 0x26AF_BB26_45CF_EE61).map(
             poisoningUpperBytes
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount / 2)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount / 2)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.store(a, to: destination)
@@ -482,7 +478,7 @@ extension SIMDFloatReferenceTests {
         let aInputs = Inputs.vectors(H.HalfVector.self, seed: 0xA39F_FF1A_F841_7BEA).map(
             poisoningUpperBytes
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount / 2 + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount / 2 + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -525,7 +521,7 @@ extension SIMDFloatReferenceTests {
         let aInputs = Inputs.vectors(H.BlockVector.self, seed: 0x8CBB_3CCF_9F62_0150).map(
             poisoningUpperBytes
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 16 / MemoryLayout<H.Lane>.size + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 16 / MemoryLayout<Lane>.size + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -545,7 +541,7 @@ extension SIMDFloatReferenceTests {
         let aInputs = Inputs.vectors(H.BlockVector.self, seed: 0x6A19_16FC_671F_6F69).map(
             poisoningUpperBytes
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 16 / MemoryLayout<H.Lane>.size)
+        let sentinel = Inputs.sentinel(Lane.self, count: 16 / MemoryLayout<Lane>.size)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.store(a, to: destination)
@@ -563,7 +559,7 @@ extension SIMDFloatReferenceTests {
         let aInputs = Inputs.vectors(H.BlockVector.self, seed: 0x16E8_10D1_F482_91E2).map(
             poisoningUpperBytes
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 16 / MemoryLayout<H.Lane>.size + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 16 / MemoryLayout<Lane>.size + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -590,11 +586,10 @@ extension SIMDFloatReferenceTests {
             poisoningUpperBytes
         )
         for a in aInputs {
-            let (_, portLanes) = withOutputSpan(capacity: 16 / MemoryLayout<H.Lane>.size) {
-                output in
+            let (_, portLanes) = withOutputSpan(capacity: 16 / MemoryLayout<Lane>.size) { output in
                 unsafe H.append(a, toUnchecked: &output)
             }
-            let (_, referenceLanes) = withOutputSpan(capacity: 16 / MemoryLayout<H.Lane>.size) {
+            let (_, referenceLanes) = withOutputSpan(capacity: 16 / MemoryLayout<Lane>.size) {
                 output in
                 H.append(a, to: &output)
             }

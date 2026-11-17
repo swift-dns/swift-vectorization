@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDDoubleReferenceTests {
     @Test func zippingLowerFromFloat() {
         let mismatches = Mismatches("zippingLowerFromFloat")
-        let aInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0x9313_3775_1B49_98E1)
-        let bInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0x9313_3675_1B49_972E)
+        let aInputs = Inputs.conversions(SIMD<Float>.self, seed: 0x9313_3775_1B49_98E1)
+        let bInputs = Inputs.conversions(SIMD<Float>.self, seed: 0x9313_3675_1B49_972E)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.zippingLower(a, b),
-                HighwayReference.zippingLowerF32ToF64(a.raw, b.raw),
+                H(raw: HighwayReference.zippingLowerF32ToF64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -22,12 +22,12 @@ extension SIMDDoubleReferenceTests {
 
     @Test func zippingUpperFromFloat() {
         let mismatches = Mismatches("zippingUpperFromFloat")
-        let aInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0x17B0_90D3_4259_C8DE)
-        let bInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0x17B0_91D3_4259_CA91)
+        let aInputs = Inputs.conversions(SIMD<Float>.self, seed: 0x17B0_90D3_4259_C8DE)
+        let bInputs = Inputs.conversions(SIMD<Float>.self, seed: 0x17B0_91D3_4259_CA91)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.zippingUpper(a, b),
-                HighwayReference.zippingUpperF32ToF64(a.raw, b.raw),
+                H(raw: HighwayReference.zippingUpperF32ToF64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

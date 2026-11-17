@@ -39,7 +39,7 @@ extension HighwayReferenceFloat {
 
 @inline(never)
 public func portStoreStreamingF32(_ a: SIMD<Float>, to: UnsafeMutablePointer<Float>) {
-    unsafe SIMDFloat.storeStreaming(a, to: to)
+    unsafe SIMD<Float>.storeStreaming(a, to: to)
 }
 
 @inline(never)
@@ -49,13 +49,13 @@ public func highwayStoreStreamingF32(_ a: SIMD<Float>, to: UnsafeMutablePointer<
 
 @inline(never)
 public func portStoreStreamingF32ConstantA(to: UnsafeMutablePointer<Float>) {
-    unsafe SIMDFloat.storeStreaming(SIMDFloat.repeating(1.5), to: to)
+    unsafe SIMD<Float>.storeStreaming(SIMD<Float>.repeating(1.5), to: to)
 }
 
 @inline(never)
 public func highwayStoreStreamingF32ConstantA(to: UnsafeMutablePointer<Float>) {
     unsafe HighwayReference.Nothrow.storeStreamingF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
         to
     )
 }

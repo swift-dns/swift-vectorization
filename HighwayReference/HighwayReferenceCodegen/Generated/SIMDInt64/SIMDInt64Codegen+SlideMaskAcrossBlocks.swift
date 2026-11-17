@@ -8,7 +8,7 @@ public func portSlideMaskUpLanesI64(
     _ mask: SIMD<Int64>.Mask,
     byUnchecked lanes: Int
 ) -> SIMD<Int64>.Mask {
-    unsafe SIMDInt64.slideUpLanes(mask, byUnchecked: lanes)
+    unsafe SIMD<Int64>.slideUpLanes(mask, byUnchecked: lanes)
 }
 
 @inline(never)
@@ -16,17 +16,17 @@ public func highwaySlideMaskUpLanesI64(
     _ mask: SIMD<Int64>.Mask,
     byUnchecked lanes: Int
 ) -> SIMD<Int64>.Mask {
-    SIMDInt64.Mask(raw: HighwayReference.Nothrow.slideMaskUpLanesI64(mask.raw, lanes))
+    SIMD<Int64>.Mask(raw: HighwayReference.Nothrow.slideMaskUpLanesI64(mask.raw, lanes))
 }
 
 @inline(never)
 public func portSlideMaskUpLanesI64ConstantLanes(_ mask: SIMD<Int64>.Mask) -> SIMD<Int64>.Mask {
-    unsafe SIMDInt64.slideUpLanes(mask, byUnchecked: 1)
+    unsafe SIMD<Int64>.slideUpLanes(mask, byUnchecked: 1)
 }
 
 @inline(never)
 public func highwaySlideMaskUpLanesI64ConstantLanes(_ mask: SIMD<Int64>.Mask) -> SIMD<Int64>.Mask {
-    SIMDInt64.Mask(raw: HighwayReference.Nothrow.slideMaskUpLanesI64(mask.raw, 1))
+    SIMD<Int64>.Mask(raw: HighwayReference.Nothrow.slideMaskUpLanesI64(mask.raw, 1))
 }
 
 @inline(never)
@@ -34,7 +34,7 @@ public func portSlideMaskDownLanesI64(
     _ mask: SIMD<Int64>.Mask,
     byUnchecked lanes: Int
 ) -> SIMD<Int64>.Mask {
-    unsafe SIMDInt64.slideDownLanes(mask, byUnchecked: lanes)
+    unsafe SIMD<Int64>.slideDownLanes(mask, byUnchecked: lanes)
 }
 
 @inline(never)
@@ -42,36 +42,36 @@ public func highwaySlideMaskDownLanesI64(
     _ mask: SIMD<Int64>.Mask,
     byUnchecked lanes: Int
 ) -> SIMD<Int64>.Mask {
-    SIMDInt64.Mask(raw: HighwayReference.Nothrow.slideMaskDownLanesI64(mask.raw, lanes))
+    SIMD<Int64>.Mask(raw: HighwayReference.Nothrow.slideMaskDownLanesI64(mask.raw, lanes))
 }
 
 @inline(never)
 public func portSlideMaskDownLanesI64ConstantLanes(_ mask: SIMD<Int64>.Mask) -> SIMD<Int64>.Mask {
-    unsafe SIMDInt64.slideDownLanes(mask, byUnchecked: 1)
+    unsafe SIMD<Int64>.slideDownLanes(mask, byUnchecked: 1)
 }
 
 @inline(never)
 public func highwaySlideMaskDownLanesI64ConstantLanes(_ mask: SIMD<Int64>.Mask) -> SIMD<Int64>.Mask
 {
-    SIMDInt64.Mask(raw: HighwayReference.Nothrow.slideMaskDownLanesI64(mask.raw, 1))
+    SIMD<Int64>.Mask(raw: HighwayReference.Nothrow.slideMaskDownLanesI64(mask.raw, 1))
 }
 
 @inline(never)
 public func portSlideMask1UpI64(_ mask: SIMD<Int64>.Mask) -> SIMD<Int64>.Mask {
-    SIMDInt64.slide1Up(mask)
+    SIMD<Int64>.slide1Up(mask)
 }
 
 @inline(never)
 public func highwaySlideMask1UpI64(_ mask: SIMD<Int64>.Mask) -> SIMD<Int64>.Mask {
-    SIMDInt64.Mask(raw: HighwayReference.Nothrow.slideMask1UpI64(mask.raw))
+    SIMD<Int64>.Mask(raw: HighwayReference.Nothrow.slideMask1UpI64(mask.raw))
 }
 
 @inline(never)
 public func portSlideMask1DownI64(_ mask: SIMD<Int64>.Mask) -> SIMD<Int64>.Mask {
-    SIMDInt64.slide1Down(mask)
+    SIMD<Int64>.slide1Down(mask)
 }
 
 @inline(never)
 public func highwaySlideMask1DownI64(_ mask: SIMD<Int64>.Mask) -> SIMD<Int64>.Mask {
-    SIMDInt64.Mask(raw: HighwayReference.Nothrow.slideMask1DownI64(mask.raw))
+    SIMD<Int64>.Mask(raw: HighwayReference.Nothrow.slideMask1DownI64(mask.raw))
 }

@@ -5,128 +5,162 @@ public import Vectorization
 
 @inline(never)
 public func portAddingF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.adding(a, b)
+    SIMD<Double>.adding(a, b)
 }
 
 @inline(never)
 public func highwayAddingF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.addingF64(a.raw, b.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.addingF64(a.raw, b.raw))
 }
 
 @inline(never)
 public func portAddingF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.adding(SIMDDouble.repeating(1.5), b)
+    SIMD<Double>.adding(SIMD<Double>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayAddingF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.addingF64(HighwayReference.Nothrow.repeatingF64(1.5).raw, b.raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.addingF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
 public func portAddingF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.adding(a, SIMDDouble.repeating(1.5))
+    SIMD<Double>.adding(a, SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayAddingF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.addingF64(a.raw, HighwayReference.Nothrow.repeatingF64(1.5).raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.addingF64(
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
 public func portSubtractingF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.subtracting(a, b)
+    SIMD<Double>.subtracting(a, b)
 }
 
 @inline(never)
 public func highwaySubtractingF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.subtractingF64(a.raw, b.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.subtractingF64(a.raw, b.raw))
 }
 
 @inline(never)
 public func portSubtractingF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.subtracting(SIMDDouble.repeating(1.5), b)
+    SIMD<Double>.subtracting(SIMD<Double>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwaySubtractingF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.subtractingF64(HighwayReference.Nothrow.repeatingF64(1.5).raw, b.raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.subtractingF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
 public func portSubtractingF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.subtracting(a, SIMDDouble.repeating(1.5))
+    SIMD<Double>.subtracting(a, SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwaySubtractingF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.subtractingF64(a.raw, HighwayReference.Nothrow.repeatingF64(1.5).raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.subtractingF64(
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
 public func portAddingSubtractingF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.addingSubtracting(a, b)
+    SIMD<Double>.addingSubtracting(a, b)
 }
 
 @inline(never)
 public func highwayAddingSubtractingF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.addingSubtractingF64(a.raw, b.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.addingSubtractingF64(a.raw, b.raw))
 }
 
 @inline(never)
 public func portAddingSubtractingF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.addingSubtracting(SIMDDouble.repeating(1.5), b)
+    SIMD<Double>.addingSubtracting(SIMD<Double>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayAddingSubtractingF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.addingSubtractingF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        b.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.addingSubtractingF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portAddingSubtractingF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.addingSubtracting(a, SIMDDouble.repeating(1.5))
+    SIMD<Double>.addingSubtracting(a, SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayAddingSubtractingF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.addingSubtractingF64(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.addingSubtractingF64(
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portDividingF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.dividing(a, b)
+    SIMD<Double>.dividing(a, b)
 }
 
 @inline(never)
 public func highwayDividingF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.dividingF64(a.raw, b.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.dividingF64(a.raw, b.raw))
 }
 
 @inline(never)
 public func portDividingF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.dividing(SIMDDouble.repeating(1.5), b)
+    SIMD<Double>.dividing(SIMD<Double>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayDividingF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.dividingF64(HighwayReference.Nothrow.repeatingF64(1.5).raw, b.raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.dividingF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
 public func portDividingF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.dividing(a, SIMDDouble.repeating(1.5))
+    SIMD<Double>.dividing(a, SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayDividingF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.dividingF64(a.raw, HighwayReference.Nothrow.repeatingF64(1.5).raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.dividingF64(
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -135,7 +169,7 @@ public func portClampedF64(
     between b: SIMD<Double>,
     and c: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.clamped(a, between: b, and: c)
+    SIMD<Double>.clamped(a, between: b, and: c)
 }
 
 @inline(never)
@@ -144,372 +178,424 @@ public func highwayClampedF64(
     between b: SIMD<Double>,
     and c: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.clampedF64(a.raw, b.raw, c.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.clampedF64(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
 public func portClampedF64ConstantA(between b: SIMD<Double>, and c: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.clamped(SIMDDouble.repeating(1.5), between: b, and: c)
+    SIMD<Double>.clamped(SIMD<Double>.repeating(1.5), between: b, and: c)
 }
 
 @inline(never)
 public func highwayClampedF64ConstantA(between b: SIMD<Double>, and c: SIMD<Double>) -> SIMD<Double>
 {
-    HighwayReference.Nothrow.clampedF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        b.raw,
-        c.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.clampedF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portClampedF64ConstantB(_ a: SIMD<Double>, and c: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.clamped(a, between: SIMDDouble.repeating(1.5), and: c)
+    SIMD<Double>.clamped(a, between: SIMD<Double>.repeating(1.5), and: c)
 }
 
 @inline(never)
 public func highwayClampedF64ConstantB(_ a: SIMD<Double>, and c: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.clampedF64(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        c.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.clampedF64(
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portClampedF64ConstantC(_ a: SIMD<Double>, between b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.clamped(a, between: b, and: SIMDDouble.repeating(1.5))
+    SIMD<Double>.clamped(a, between: b, and: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayClampedF64ConstantC(_ a: SIMD<Double>, between b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.clampedF64(
-        a.raw,
-        b.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.clampedF64(
+            a.raw,
+            b.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portAbsoluteDifferenceF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.absoluteDifference(a, b)
+    SIMD<Double>.absoluteDifference(a, b)
 }
 
 @inline(never)
 public func highwayAbsoluteDifferenceF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.absoluteDifferenceF64(a.raw, b.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.absoluteDifferenceF64(a.raw, b.raw))
 }
 
 @inline(never)
 public func portAbsoluteDifferenceF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.absoluteDifference(SIMDDouble.repeating(1.5), b)
+    SIMD<Double>.absoluteDifference(SIMD<Double>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayAbsoluteDifferenceF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.absoluteDifferenceF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        b.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.absoluteDifferenceF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portAbsoluteDifferenceF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.absoluteDifference(a, SIMDDouble.repeating(1.5))
+    SIMD<Double>.absoluteDifference(a, SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayAbsoluteDifferenceF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.absoluteDifferenceF64(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.absoluteDifferenceF64(
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portNegatedF64(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.negated(a)
+    SIMD<Double>.negated(a)
 }
 
 @inline(never)
 public func highwayNegatedF64(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.negatedF64(a.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.negatedF64(a.raw))
 }
 
 @inline(never)
 public func portNegatedF64ConstantA() -> SIMD<Double> {
-    SIMDDouble.negated(SIMDDouble.repeating(1.5))
+    SIMD<Double>.negated(SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayNegatedF64ConstantA() -> SIMD<Double> {
-    HighwayReference.Nothrow.negatedF64(HighwayReference.Nothrow.repeatingF64(1.5).raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.negatedF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
 public func portMagnitudeF64(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.magnitude(a)
+    SIMD<Double>.magnitude(a)
 }
 
 @inline(never)
 public func highwayMagnitudeF64(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.magnitudeF64(a.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.magnitudeF64(a.raw))
 }
 
 @inline(never)
 public func portMagnitudeF64ConstantA() -> SIMD<Double> {
-    SIMDDouble.magnitude(SIMDDouble.repeating(1.5))
+    SIMD<Double>.magnitude(SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMagnitudeF64ConstantA() -> SIMD<Double> {
-    HighwayReference.Nothrow.magnitudeF64(HighwayReference.Nothrow.repeatingF64(1.5).raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.magnitudeF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
 public func portSquareRootF64(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.squareRoot(a)
+    SIMD<Double>.squareRoot(a)
 }
 
 @inline(never)
 public func highwaySquareRootF64(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.squareRootF64(a.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.squareRootF64(a.raw))
 }
 
 @inline(never)
 public func portSquareRootF64ConstantA() -> SIMD<Double> {
-    SIMDDouble.squareRoot(SIMDDouble.repeating(1.5))
+    SIMD<Double>.squareRoot(SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwaySquareRootF64ConstantA() -> SIMD<Double> {
-    HighwayReference.Nothrow.squareRootF64(HighwayReference.Nothrow.repeatingF64(1.5).raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.squareRootF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
 public func portApproximateReciprocalSquareRootF64(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.approximateReciprocalSquareRoot(a)
+    SIMD<Double>.approximateReciprocalSquareRoot(a)
 }
 
 @inline(never)
 public func highwayApproximateReciprocalSquareRootF64(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.approximateReciprocalSquareRootF64(a.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.approximateReciprocalSquareRootF64(a.raw))
 }
 
 @inline(never)
 public func portApproximateReciprocalSquareRootF64ConstantA() -> SIMD<Double> {
-    SIMDDouble.approximateReciprocalSquareRoot(SIMDDouble.repeating(1.5))
+    SIMD<Double>.approximateReciprocalSquareRoot(SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayApproximateReciprocalSquareRootF64ConstantA() -> SIMD<Double> {
-    HighwayReference.Nothrow.approximateReciprocalSquareRootF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.approximateReciprocalSquareRootF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portApproximateReciprocalF64(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.approximateReciprocal(a)
+    SIMD<Double>.approximateReciprocal(a)
 }
 
 @inline(never)
 public func highwayApproximateReciprocalF64(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.approximateReciprocalF64(a.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.approximateReciprocalF64(a.raw))
 }
 
 @inline(never)
 public func portApproximateReciprocalF64ConstantA() -> SIMD<Double> {
-    SIMDDouble.approximateReciprocal(SIMDDouble.repeating(1.5))
+    SIMD<Double>.approximateReciprocal(SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayApproximateReciprocalF64ConstantA() -> SIMD<Double> {
-    HighwayReference.Nothrow.approximateReciprocalF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.approximateReciprocalF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portExponentF64(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.exponent(a)
+    SIMD<Double>.exponent(a)
 }
 
 @inline(never)
 public func highwayExponentF64(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.exponentF64(a.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.exponentF64(a.raw))
 }
 
 @inline(never)
 public func portExponentF64ConstantA() -> SIMD<Double> {
-    SIMDDouble.exponent(SIMDDouble.repeating(1.5))
+    SIMD<Double>.exponent(SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayExponentF64ConstantA() -> SIMD<Double> {
-    HighwayReference.Nothrow.exponentF64(HighwayReference.Nothrow.repeatingF64(1.5).raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.exponentF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
 public func portMantissaF64(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.mantissa(a)
+    SIMD<Double>.mantissa(a)
 }
 
 @inline(never)
 public func highwayMantissaF64(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.mantissaF64(a.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.mantissaF64(a.raw))
 }
 
 @inline(never)
 public func portMantissaF64ConstantA() -> SIMD<Double> {
-    SIMDDouble.mantissa(SIMDDouble.repeating(1.5))
+    SIMD<Double>.mantissa(SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMantissaF64ConstantA() -> SIMD<Double> {
-    HighwayReference.Nothrow.mantissaF64(HighwayReference.Nothrow.repeatingF64(1.5).raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.mantissaF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
 public func portPairwiseAddingF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.pairwiseAdding(a, b)
+    SIMD<Double>.pairwiseAdding(a, b)
 }
 
 @inline(never)
 public func highwayPairwiseAddingF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.pairwiseAddingF64(a.raw, b.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.pairwiseAddingF64(a.raw, b.raw))
 }
 
 @inline(never)
 public func portPairwiseAddingF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.pairwiseAdding(SIMDDouble.repeating(1.5), b)
+    SIMD<Double>.pairwiseAdding(SIMD<Double>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayPairwiseAddingF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.pairwiseAddingF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        b.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.pairwiseAddingF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portPairwiseAddingF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.pairwiseAdding(a, SIMDDouble.repeating(1.5))
+    SIMD<Double>.pairwiseAdding(a, SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayPairwiseAddingF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.pairwiseAddingF64(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.pairwiseAddingF64(
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portPairwiseSubtractingF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.pairwiseSubtracting(a, b)
+    SIMD<Double>.pairwiseSubtracting(a, b)
 }
 
 @inline(never)
 public func highwayPairwiseSubtractingF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.pairwiseSubtractingF64(a.raw, b.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.pairwiseSubtractingF64(a.raw, b.raw))
 }
 
 @inline(never)
 public func portPairwiseSubtractingF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.pairwiseSubtracting(SIMDDouble.repeating(1.5), b)
+    SIMD<Double>.pairwiseSubtracting(SIMD<Double>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayPairwiseSubtractingF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.pairwiseSubtractingF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        b.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.pairwiseSubtractingF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portPairwiseSubtractingF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.pairwiseSubtracting(a, SIMDDouble.repeating(1.5))
+    SIMD<Double>.pairwiseSubtracting(a, SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayPairwiseSubtractingF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.pairwiseSubtractingF64(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.pairwiseSubtractingF64(
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portSumsOf2F32ToF64(_ a: SIMD<Float>) -> SIMD<Double> {
-    SIMDDouble.sumsOf2(a)
+    SIMD<Double>.sumsOf2(a)
 }
 
 @inline(never)
 public func highwaySumsOf2F32ToF64(_ a: SIMD<Float>) -> SIMD<Double> {
-    HighwayReference.Nothrow.sumsOf2F32ToF64(a.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.sumsOf2F32ToF64(a.raw))
 }
 
 @inline(never)
 public func portSumsOf2F32ToF64ConstantA() -> SIMD<Double> {
-    SIMDDouble.sumsOf2(SIMDFloat.repeating(1.5))
+    SIMD<Double>.sumsOf2(SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwaySumsOf2F32ToF64ConstantA() -> SIMD<Double> {
-    HighwayReference.Nothrow.sumsOf2F32ToF64(HighwayReference.Nothrow.repeatingF32(1.5).raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.sumsOf2F32ToF64(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
+    )
 }
 
 #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func portSumsOf4F16ToF64(_ a: SIMD<Float16>) -> SIMD<Double> {
-    SIMDDouble.sumsOf4(a)
+    SIMD<Double>.sumsOf4(a)
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func highwaySumsOf4F16ToF64(_ a: SIMD<Float16>) -> SIMD<Double> {
-    HighwayReference.Nothrow.sumsOf4F16ToF64(a.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.sumsOf4F16ToF64(a.raw))
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func portSumsOf4F16ToF64ConstantA() -> SIMD<Double> {
-    SIMDDouble.sumsOf4(SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    SIMD<Double>.sumsOf4(SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func highwaySumsOf4F16ToF64ConstantA() -> SIMD<Double> {
-    HighwayReference.Nothrow.sumsOf4F16ToF64(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.sumsOf4F16ToF64(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 #endif
 
 @inline(never)
 public func portSumsOf4BF16ToF64(_ a: SIMD<BFloat16>) -> SIMD<Double> {
-    SIMDDouble.sumsOf4(a)
+    SIMD<Double>.sumsOf4(a)
 }
 
 @inline(never)
 public func highwaySumsOf4BF16ToF64(_ a: SIMD<BFloat16>) -> SIMD<Double> {
-    HighwayReference.Nothrow.sumsOf4BF16ToF64(a.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.sumsOf4BF16ToF64(a.raw))
 }
 
 @inline(never)
 public func portSumsOf4BF16ToF64ConstantA() -> SIMD<Double> {
-    SIMDDouble.sumsOf4(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+    SIMD<Double>.sumsOf4(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwaySumsOf4BF16ToF64ConstantA() -> SIMD<Double> {
-    HighwayReference.Nothrow.sumsOf4BF16ToF64(
-        SIMDBFloat16.Vector(
-            raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
-        ).raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.sumsOf4BF16ToF64(
+            SIMD<BFloat16>(
+                raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }

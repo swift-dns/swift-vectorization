@@ -9,11 +9,11 @@ import Vectorization
 extension SIMDFloat16ReferenceTests {
     @Test func reversed() {
         let mismatches = Mismatches("reversed")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC6AA_D4F9_1EB0_7312)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC6AA_D4F9_1EB0_7312)
         for a in aInputs {
             mismatches.check(
                 H.reversed(a),
-                HighwayReference.reversedF16(a.raw),
+                H(raw: HighwayReference.reversedF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -22,11 +22,11 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func byteSwapped() {
         let mismatches = Mismatches("byteSwapped")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9F29_1D47_B5E7_014C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9F29_1D47_B5E7_014C)
         for a in aInputs {
             mismatches.check(
                 H.byteSwapped(a),
-                HighwayReference.byteSwappedF16(a.raw),
+                H(raw: HighwayReference.byteSwappedF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -35,11 +35,11 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func reversedBlocks() {
         let mismatches = Mismatches("reversedBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6B36_71BC_D0D2_8F34)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6B36_71BC_D0D2_8F34)
         for a in aInputs {
             mismatches.check(
                 H.reversedBlocks(a),
-                HighwayReference.reversedBlocksF16(a.raw),
+                H(raw: HighwayReference.reversedBlocksF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -48,11 +48,11 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func reversed2() {
         let mismatches = Mismatches("reversed2")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x29F6_124F_1671_4C52)
+        let aInputs = Inputs.vectors(H.self, seed: 0x29F6_124F_1671_4C52)
         for a in aInputs {
             mismatches.check(
                 H.reversed2(a),
-                HighwayReference.reversed2F16(a.raw),
+                H(raw: HighwayReference.reversed2F16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -61,11 +61,11 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func reversed4() {
         let mismatches = Mismatches("reversed4")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF6E4_284E_F9C5_74D4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF6E4_284E_F9C5_74D4)
         for a in aInputs {
             mismatches.check(
                 H.reversed4(a),
-                HighwayReference.reversed4F16(a.raw),
+                H(raw: HighwayReference.reversed4F16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -74,11 +74,11 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func reversed8() {
         let mismatches = Mismatches("reversed8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD349_6C4E_E555_6040)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD349_6C4E_E555_6040)
         for a in aInputs {
             mismatches.check(
                 H.reversed8(a),
-                HighwayReference.reversed8F16(a.raw),
+                H(raw: HighwayReference.reversed8F16(a.raw)),
                 "a: \(describe(a))"
             )
         }

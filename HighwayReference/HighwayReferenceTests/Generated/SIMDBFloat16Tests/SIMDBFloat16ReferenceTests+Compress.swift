@@ -8,11 +8,11 @@ import Vectorization
 extension SIMDBFloat16ReferenceTests {
     @Test func compressed() {
         let mismatches = Mismatches("compressed")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x92AE_44FB_607F_916D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x92AE_44FB_607F_916D)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x92AE_43FB_607F_8FBA)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let port = H.compressed(a, where: mask)
-            let reference = H.Vector(raw: HighwayReference.compressedBF16(a.raw, mask.raw))
+            let reference = H(raw: HighwayReference.compressedBF16(a.raw, mask.raw))
             let checkedLanes =
                 HighwayReference.compressTailIsDeterministicBF16()
                 ? H.laneCount : H.bits(of: mask).nonzeroBitCount
@@ -27,11 +27,11 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func compressedNonCanonical() {
         let mismatches = Mismatches("compressed with masks from arbitrary vectors")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9AD4_F1B3_416C_0A8A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9AD4_F1B3_416C_0A8A)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x9AD4_F2B3_416C_0C3D)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let port = H.compressed(a, where: mask)
-            let reference = H.Vector(raw: HighwayReference.compressedBF16(a.raw, mask.raw))
+            let reference = H(raw: HighwayReference.compressedBF16(a.raw, mask.raw))
             let checkedLanes =
                 HighwayReference.compressTailIsDeterministicBF16()
                 ? H.laneCount : H.bits(of: mask).nonzeroBitCount
@@ -46,11 +46,11 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func compressedNot() {
         let mismatches = Mismatches("compressedNot")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x43DA_CAC0_61DD_DA58)
+        let aInputs = Inputs.vectors(H.self, seed: 0x43DA_CAC0_61DD_DA58)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x43DA_CBC0_61DD_DC0B)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let port = H.compressedNot(a, where: mask)
-            let reference = H.Vector(raw: HighwayReference.compressedNotBF16(a.raw, mask.raw))
+            let reference = H(raw: HighwayReference.compressedNotBF16(a.raw, mask.raw))
             let checkedLanes =
                 HighwayReference.compressTailIsDeterministicBF16()
                 ? H.laneCount : H.laneCount - H.bits(of: mask).nonzeroBitCount
@@ -65,11 +65,11 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func compressedNotNonCanonical() {
         let mismatches = Mismatches("compressedNot with masks from arbitrary vectors")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9105_628C_EB7A_E857)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9105_628C_EB7A_E857)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x9105_618C_EB7A_E6A4)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let port = H.compressedNot(a, where: mask)
-            let reference = H.Vector(raw: HighwayReference.compressedNotBF16(a.raw, mask.raw))
+            let reference = H(raw: HighwayReference.compressedNotBF16(a.raw, mask.raw))
             let checkedLanes =
                 HighwayReference.compressTailIsDeterministicBF16()
                 ? H.laneCount : H.laneCount - H.bits(of: mask).nonzeroBitCount
@@ -84,7 +84,7 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func compressedBits() {
         let mismatches = Mismatches("compressedBits")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1B9B_7B6E_4B73_5505)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1B9B_7B6E_4B73_5505)
         let bitsInputs = Inputs.buffers(
             UInt8.self,
             count: (H.laneCount + 7) / 8,
@@ -95,7 +95,7 @@ extension SIMDBFloat16ReferenceTests {
                 (
                     unsafe H.compressed(a, bits: source.baseAddress!),
                     (bits + [UInt8](repeating: 0, count: 8)).withUnsafeBufferPointer { padded in
-                        unsafe H.Vector(
+                        unsafe H(
                             raw: HighwayReference.compressedBitsBF16(a.raw, padded.baseAddress!)
                         )
                     }
@@ -117,7 +117,7 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func compressedBitsBeforeGuardPage() {
         let mismatches = Mismatches("compressedBits before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC643_5A73_7787_2192)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC643_5A73_7787_2192)
         let bitsInputs = Inputs.buffers(
             UInt8.self,
             count: (H.laneCount + 7) / 8,
@@ -128,7 +128,7 @@ extension SIMDBFloat16ReferenceTests {
                 (
                     unsafe H.compressed(a, bits: source),
                     (bits + [UInt8](repeating: 0, count: 8)).withUnsafeBufferPointer { padded in
-                        unsafe H.Vector(
+                        unsafe H(
                             raw: HighwayReference.compressedBitsBF16(a.raw, padded.baseAddress!)
                         )
                     }
@@ -150,7 +150,7 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func compressedBitsUncheckedSpan() {
         let mismatches = Mismatches("compressedBits unchecked span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAA21_FAE6_A0C7_9745)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAA21_FAE6_A0C7_9745)
         let bitsInputs = Inputs.buffers(
             UInt8.self,
             count: (H.laneCount + 7) / 8,

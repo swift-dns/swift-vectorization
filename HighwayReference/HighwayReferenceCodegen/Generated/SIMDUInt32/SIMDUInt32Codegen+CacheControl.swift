@@ -39,7 +39,7 @@ extension HighwayReferenceUInt32 {
 
 @inline(never)
 public func portStoreStreamingU32(_ a: SIMD<UInt32>, to: UnsafeMutablePointer<UInt32>) {
-    unsafe SIMDUInt32.storeStreaming(a, to: to)
+    unsafe SIMD<UInt32>.storeStreaming(a, to: to)
 }
 
 @inline(never)
@@ -49,13 +49,13 @@ public func highwayStoreStreamingU32(_ a: SIMD<UInt32>, to: UnsafeMutablePointer
 
 @inline(never)
 public func portStoreStreamingU32ConstantA(to: UnsafeMutablePointer<UInt32>) {
-    unsafe SIMDUInt32.storeStreaming(SIMDUInt32.repeating(26), to: to)
+    unsafe SIMD<UInt32>.storeStreaming(SIMD<UInt32>.repeating(26), to: to)
 }
 
 @inline(never)
 public func highwayStoreStreamingU32ConstantA(to: UnsafeMutablePointer<UInt32>) {
     unsafe HighwayReference.Nothrow.storeStreamingU32(
-        SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
+        SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
         to
     )
 }

@@ -9,8 +9,8 @@ import Vectorization
 extension SIMDInt32CodegenTests {
     @Test func oddEven() {
         let mismatches = Mismatches("portOddEvenI32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7ABE_05B0_D094_B7B0)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7ABE_06B0_D094_B963)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7ABE_05B0_D094_B7B0)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7ABE_06B0_D094_B963)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portOddEvenI32(a, b),
@@ -23,7 +23,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func oddEvenConstantA() {
         let mismatches = Mismatches("portOddEvenI32ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5523_DFD6_2A94_C1E6)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5523_DFD6_2A94_C1E6)
         for b in bInputs {
             mismatches.check(
                 portOddEvenI32ConstantA(b),
@@ -36,7 +36,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func oddEvenConstantB() {
         let mismatches = Mismatches("portOddEvenI32ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4C8E_C9D6_25BE_17E4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4C8E_C9D6_25BE_17E4)
         for a in aInputs {
             mismatches.check(
                 portOddEvenI32ConstantB(a),
@@ -49,7 +49,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func duplicatingEven() {
         let mismatches = Mismatches("portDuplicatingEvenI32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC86A_B4BF_D685_9263)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC86A_B4BF_D685_9263)
         for a in aInputs {
             mismatches.check(
                 portDuplicatingEvenI32(a),
@@ -72,7 +72,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func duplicatingOdd() {
         let mismatches = Mismatches("portDuplicatingOddI32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFB2B_8977_F86B_272A)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFB2B_8977_F86B_272A)
         for a in aInputs {
             mismatches.check(
                 portDuplicatingOddI32(a),
@@ -91,7 +91,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func shuffled1032() {
         let mismatches = Mismatches("portShuffled1032I32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x593F_5093_F029_F576)
+        let aInputs = Inputs.vectors(H.self, seed: 0x593F_5093_F029_F576)
         for a in aInputs {
             mismatches.check(portShuffled1032I32(a), highwayShuffled1032I32(a), "a: \(describe(a))")
         }
@@ -106,7 +106,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func shuffled0321() {
         let mismatches = Mismatches("portShuffled0321I32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1091_3A9A_17E4_24E2)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1091_3A9A_17E4_24E2)
         for a in aInputs {
             mismatches.check(portShuffled0321I32(a), highwayShuffled0321I32(a), "a: \(describe(a))")
         }
@@ -121,7 +121,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func shuffled2103() {
         let mismatches = Mismatches("portShuffled2103I32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x06D9_C96B_7889_3816)
+        let aInputs = Inputs.vectors(H.self, seed: 0x06D9_C96B_7889_3816)
         for a in aInputs {
             mismatches.check(portShuffled2103I32(a), highwayShuffled2103I32(a), "a: \(describe(a))")
         }
@@ -136,7 +136,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func shuffled2301() {
         let mismatches = Mismatches("portShuffled2301I32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFBE3_D7AA_3FA2_1686)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFBE3_D7AA_3FA2_1686)
         for a in aInputs {
             mismatches.check(portShuffled2301I32(a), highwayShuffled2301I32(a), "a: \(describe(a))")
         }
@@ -151,7 +151,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func shuffled0123() {
         let mismatches = Mismatches("portShuffled0123I32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA509_28E2_B419_4FCA)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA509_28E2_B419_4FCA)
         for a in aInputs {
             mismatches.check(portShuffled0123I32(a), highwayShuffled0123I32(a), "a: \(describe(a))")
         }

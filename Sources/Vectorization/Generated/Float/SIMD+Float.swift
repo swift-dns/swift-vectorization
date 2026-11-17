@@ -7,6 +7,14 @@ extension SIMD where Lane == Float {
     public init(raw: cvectorization_ops_vector_f32) {
         self.raw = raw
     }
+
+    @export(implementation) @inline(always)
+    public init(_ simd: SIMDType) {
+        raw = simd
+    }
+
+    @export(implementation) @inline(always)
+    public var simd: SIMDType { raw }
 }
 
 extension SIMD.Mask where Lane == Float {
@@ -16,14 +24,12 @@ extension SIMD.Mask where Lane == Float {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: SIMDMask<cvectorization_ops_mask_f32>) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_mask_f32(simd._storage)
     }
 
     @export(implementation) @inline(always)
-    public var simd: SIMDMask<cvectorization_ops_mask_f32> {
-        SIMDMask<cvectorization_ops_mask_f32>(cvectorization_ops_from_raw_mask_f32(raw))
-    }
+    public var simd: SIMDType { SIMDType(cvectorization_ops_from_raw_mask_f32(raw)) }
 }
 
 extension SIMD.HalfVector where Lane == Float {
@@ -33,14 +39,12 @@ extension SIMD.HalfVector where Lane == Float {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_half_vector_f32) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_half_vector_f32(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_half_vector_f32 {
-        cvectorization_ops_from_raw_half_vector_f32(raw)
-    }
+    public var simd: SIMDType { cvectorization_ops_from_raw_half_vector_f32(raw) }
 }
 
 extension SIMD.HalfMask where Lane == Float {
@@ -50,14 +54,12 @@ extension SIMD.HalfMask where Lane == Float {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_half_mask_f32) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_half_mask_f32(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_half_mask_f32 {
-        cvectorization_ops_from_raw_half_mask_f32(raw)
-    }
+    public var simd: SIMDType { cvectorization_ops_from_raw_half_mask_f32(raw) }
 }
 
 extension SIMD.BlockVector where Lane == Float {
@@ -67,12 +69,12 @@ extension SIMD.BlockVector where Lane == Float {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_block_f32) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_block_f32(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_block_f32 { cvectorization_ops_from_raw_block_f32(raw) }
+    public var simd: SIMDType { cvectorization_ops_from_raw_block_f32(raw) }
 }
 
 extension SIMD where Lane == Float {

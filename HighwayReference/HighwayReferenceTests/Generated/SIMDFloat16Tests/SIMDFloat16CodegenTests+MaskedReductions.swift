@@ -11,8 +11,8 @@ extension SIMDFloat16CodegenTests {
     @Test func sumWhere() {
         let mismatches = Mismatches("portSumWhereF16")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xEE9F_1826_2CE1_753E)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEE9F_1926_2CE1_76F1)
-        for (mask, a) in everyPair(maskInputs, aInputs) where !hasUnorderedNaNs(lanesOf: a) {
+        let aInputs = Inputs.vectors(H.self, seed: 0xEE9F_1926_2CE1_76F1)
+        for (mask, a) in everyPair(maskInputs, aInputs) where !hasUnorderedNaNs(lanesOf: a.simd) {
             mismatches.check(
                 portSumWhereF16(a, where: mask),
                 highwaySumWhereF16(a, where: mask),
@@ -38,7 +38,7 @@ extension SIMDFloat16CodegenTests {
     @Test func smallestWhere() {
         let mismatches = Mismatches("portSmallestWhereF16")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xD7D7_89A2_6156_5482)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD7D7_8AA2_6156_5635)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD7D7_8AA2_6156_5635)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portSmallestWhereF16(a, where: mask),
@@ -65,7 +65,7 @@ extension SIMDFloat16CodegenTests {
     @Test func largestWhere() {
         let mismatches = Mismatches("portLargestWhereF16")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF68D_F816_5190_D717)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF68D_F716_5190_D564)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF68D_F716_5190_D564)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portLargestWhereF16(a, where: mask),

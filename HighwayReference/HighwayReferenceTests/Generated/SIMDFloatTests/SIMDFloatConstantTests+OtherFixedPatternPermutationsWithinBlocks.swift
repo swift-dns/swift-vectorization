@@ -7,14 +7,18 @@ import Vectorization
 
 extension SIMDFloatConstantTests {
     @inline(__always)
-    private func checkOddEvenConstantA(_ value: H.Lane) {
+    private func checkOddEvenConstantA(_ value: Lane) {
         let mismatches = Mismatches("oddEven with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1AD8_0D95_1BD2_DCBB)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x1AD8_0D95_1BD2_DCBB)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for b in bInputs {
             mismatches.check(
                 H.oddEven(H.repeating(value), b),
-                HighwayReference.oddEvenF32(H.repeating(value).raw, b.raw),
+                H(raw: HighwayReference.oddEvenF32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -22,14 +26,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkOddEvenConstantB(_ value: H.Lane) {
+    private func checkOddEvenConstantB(_ value: Lane) {
         let mismatches = Mismatches("oddEven with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x236D_4395_20A9_BD1D)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x236D_4395_20A9_BD1D)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for a in aInputs {
             mismatches.check(
                 H.oddEven(a, H.repeating(value)),
-                HighwayReference.oddEvenF32(a.raw, H.repeating(value).raw),
+                H(raw: HighwayReference.oddEvenF32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -107,8 +115,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func oddEvenConstantSplatPayloadNaN() {
-        checkOddEvenConstantA(H.Lane(nan: 1, signaling: false))
-        checkOddEvenConstantB(H.Lane(nan: 1, signaling: false))
+        checkOddEvenConstantA(Lane(nan: 1, signaling: false))
+        checkOddEvenConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func oddEvenConstantSplatSignalingNaN() {
@@ -132,12 +140,16 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkDuplicatingEvenConstantA(_ value: H.Lane) {
+    private func checkDuplicatingEvenConstantA(_ value: Lane) {
         let mismatches = Mismatches("duplicatingEven with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         mismatches.check(
             H.duplicatingEven(H.repeating(value)),
-            HighwayReference.duplicatingEvenF32(H.repeating(value).raw),
+            H(raw: HighwayReference.duplicatingEvenF32(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -200,7 +212,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func duplicatingEvenConstantSplatPayloadNaN() {
-        checkDuplicatingEvenConstantA(H.Lane(nan: 1, signaling: false))
+        checkDuplicatingEvenConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func duplicatingEvenConstantSplatSignalingNaN() {
@@ -220,12 +232,16 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkDuplicatingOddConstantA(_ value: H.Lane) {
+    private func checkDuplicatingOddConstantA(_ value: Lane) {
         let mismatches = Mismatches("duplicatingOdd with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         mismatches.check(
             H.duplicatingOdd(H.repeating(value)),
-            HighwayReference.duplicatingOddF32(H.repeating(value).raw),
+            H(raw: HighwayReference.duplicatingOddF32(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -288,7 +304,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func duplicatingOddConstantSplatPayloadNaN() {
-        checkDuplicatingOddConstantA(H.Lane(nan: 1, signaling: false))
+        checkDuplicatingOddConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func duplicatingOddConstantSplatSignalingNaN() {
@@ -308,12 +324,16 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkShuffled1032ConstantA(_ value: H.Lane) {
+    private func checkShuffled1032ConstantA(_ value: Lane) {
         let mismatches = Mismatches("shuffled1032 with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         mismatches.check(
             H.shuffled1032(H.repeating(value)),
-            HighwayReference.shuffled1032F32(H.repeating(value).raw),
+            H(raw: HighwayReference.shuffled1032F32(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -376,7 +396,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func shuffled1032ConstantSplatPayloadNaN() {
-        checkShuffled1032ConstantA(H.Lane(nan: 1, signaling: false))
+        checkShuffled1032ConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func shuffled1032ConstantSplatSignalingNaN() {
@@ -396,12 +416,16 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkShuffled0321ConstantA(_ value: H.Lane) {
+    private func checkShuffled0321ConstantA(_ value: Lane) {
         let mismatches = Mismatches("shuffled0321 with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         mismatches.check(
             H.shuffled0321(H.repeating(value)),
-            HighwayReference.shuffled0321F32(H.repeating(value).raw),
+            H(raw: HighwayReference.shuffled0321F32(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -464,7 +488,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func shuffled0321ConstantSplatPayloadNaN() {
-        checkShuffled0321ConstantA(H.Lane(nan: 1, signaling: false))
+        checkShuffled0321ConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func shuffled0321ConstantSplatSignalingNaN() {
@@ -484,12 +508,16 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkShuffled2103ConstantA(_ value: H.Lane) {
+    private func checkShuffled2103ConstantA(_ value: Lane) {
         let mismatches = Mismatches("shuffled2103 with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         mismatches.check(
             H.shuffled2103(H.repeating(value)),
-            HighwayReference.shuffled2103F32(H.repeating(value).raw),
+            H(raw: HighwayReference.shuffled2103F32(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -552,7 +580,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func shuffled2103ConstantSplatPayloadNaN() {
-        checkShuffled2103ConstantA(H.Lane(nan: 1, signaling: false))
+        checkShuffled2103ConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func shuffled2103ConstantSplatSignalingNaN() {
@@ -572,12 +600,16 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkShuffled2301ConstantA(_ value: H.Lane) {
+    private func checkShuffled2301ConstantA(_ value: Lane) {
         let mismatches = Mismatches("shuffled2301 with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         mismatches.check(
             H.shuffled2301(H.repeating(value)),
-            HighwayReference.shuffled2301F32(H.repeating(value).raw),
+            H(raw: HighwayReference.shuffled2301F32(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -640,7 +672,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func shuffled2301ConstantSplatPayloadNaN() {
-        checkShuffled2301ConstantA(H.Lane(nan: 1, signaling: false))
+        checkShuffled2301ConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func shuffled2301ConstantSplatSignalingNaN() {
@@ -660,12 +692,16 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkShuffled0123ConstantA(_ value: H.Lane) {
+    private func checkShuffled0123ConstantA(_ value: Lane) {
         let mismatches = Mismatches("shuffled0123 with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         mismatches.check(
             H.shuffled0123(H.repeating(value)),
-            HighwayReference.shuffled0123F32(H.repeating(value).raw),
+            H(raw: HighwayReference.shuffled0123F32(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -728,7 +764,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func shuffled0123ConstantSplatPayloadNaN() {
-        checkShuffled0123ConstantA(H.Lane(nan: 1, signaling: false))
+        checkShuffled0123ConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func shuffled0123ConstantSplatSignalingNaN() {

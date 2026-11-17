@@ -5,77 +5,77 @@ public import Vectorization
 
 @inline(never)
 public func portHalfVectorConvertingU64ToF32(converting a: SIMD<UInt64>) -> SIMD<Float>.HalfVector {
-    SIMDFloat.halfVector(converting: a)
+    SIMD<Float>.halfVector(converting: a)
 }
 
 @inline(never)
 public func highwayHalfVectorConvertingU64ToF32(
     converting a: SIMD<UInt64>
 ) -> SIMD<Float>.HalfVector {
-    SIMDFloat.HalfVector(raw: HighwayReference.Nothrow.halfVectorConvertingU64ToF32(a.raw))
+    SIMD<Float>.HalfVector(raw: HighwayReference.Nothrow.halfVectorConvertingU64ToF32(a.raw))
 }
 
 @inline(never)
 public func portHalfVectorConvertingU64ToF32ConstantA() -> SIMD<Float>.HalfVector {
-    SIMDFloat.halfVector(converting: SIMDUInt64.repeating(26))
+    SIMD<Float>.halfVector(converting: SIMD<UInt64>.repeating(26))
 }
 
 @inline(never)
 public func highwayHalfVectorConvertingU64ToF32ConstantA() -> SIMD<Float>.HalfVector {
-    SIMDFloat.HalfVector(
+    SIMD<Float>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorConvertingU64ToF32(
-            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
+            SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portHalfVectorConvertingI64ToF32(converting a: SIMD<Int64>) -> SIMD<Float>.HalfVector {
-    SIMDFloat.halfVector(converting: a)
+    SIMD<Float>.halfVector(converting: a)
 }
 
 @inline(never)
 public func highwayHalfVectorConvertingI64ToF32(converting a: SIMD<Int64>) -> SIMD<Float>.HalfVector
 {
-    SIMDFloat.HalfVector(raw: HighwayReference.Nothrow.halfVectorConvertingI64ToF32(a.raw))
+    SIMD<Float>.HalfVector(raw: HighwayReference.Nothrow.halfVectorConvertingI64ToF32(a.raw))
 }
 
 @inline(never)
 public func portHalfVectorConvertingI64ToF32ConstantA() -> SIMD<Float>.HalfVector {
-    SIMDFloat.halfVector(converting: SIMDInt64.repeating(26))
+    SIMD<Float>.halfVector(converting: SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
 public func highwayHalfVectorConvertingI64ToF32ConstantA() -> SIMD<Float>.HalfVector {
-    SIMDFloat.HalfVector(
+    SIMD<Float>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorConvertingI64ToF32(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portHalfVectorConvertingF64ToF32(converting a: SIMD<Double>) -> SIMD<Float>.HalfVector {
-    SIMDFloat.halfVector(converting: a)
+    SIMD<Float>.halfVector(converting: a)
 }
 
 @inline(never)
 public func highwayHalfVectorConvertingF64ToF32(
     converting a: SIMD<Double>
 ) -> SIMD<Float>.HalfVector {
-    SIMDFloat.HalfVector(raw: HighwayReference.Nothrow.halfVectorConvertingF64ToF32(a.raw))
+    SIMD<Float>.HalfVector(raw: HighwayReference.Nothrow.halfVectorConvertingF64ToF32(a.raw))
 }
 
 @inline(never)
 public func portHalfVectorConvertingF64ToF32ConstantA() -> SIMD<Float>.HalfVector {
-    SIMDFloat.halfVector(converting: SIMDDouble.repeating(1.5))
+    SIMD<Float>.halfVector(converting: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayHalfVectorConvertingF64ToF32ConstantA() -> SIMD<Float>.HalfVector {
-    SIMDFloat.HalfVector(
+    SIMD<Float>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorConvertingF64ToF32(
-            HighwayReference.Nothrow.repeatingF64(1.5).raw
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
         )
     )
 }

@@ -5,24 +5,24 @@ public import Vectorization
 
 @inline(never)
 public func portSlideUpLanesI64(_ a: SIMD<Int64>, byUnchecked lanes: Int) -> SIMD<Int64> {
-    unsafe SIMDInt64.slideUpLanes(a, byUnchecked: lanes)
+    unsafe SIMD<Int64>.slideUpLanes(a, byUnchecked: lanes)
 }
 
 @inline(never)
 public func highwaySlideUpLanesI64(_ a: SIMD<Int64>, byUnchecked lanes: Int) -> SIMD<Int64> {
-    SIMDInt64.Vector(raw: HighwayReference.Nothrow.slideUpLanesI64(a.raw, lanes))
+    SIMD<Int64>(raw: HighwayReference.Nothrow.slideUpLanesI64(a.raw, lanes))
 }
 
 @inline(never)
 public func portSlideUpLanesI64ConstantA(byUnchecked lanes: Int) -> SIMD<Int64> {
-    unsafe SIMDInt64.slideUpLanes(SIMDInt64.repeating(26), byUnchecked: lanes)
+    unsafe SIMD<Int64>.slideUpLanes(SIMD<Int64>.repeating(26), byUnchecked: lanes)
 }
 
 @inline(never)
 public func highwaySlideUpLanesI64ConstantA(byUnchecked lanes: Int) -> SIMD<Int64> {
-    SIMDInt64.Vector(
+    SIMD<Int64>(
         raw: HighwayReference.Nothrow.slideUpLanesI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             lanes
         )
     )
@@ -30,12 +30,12 @@ public func highwaySlideUpLanesI64ConstantA(byUnchecked lanes: Int) -> SIMD<Int6
 
 @inline(never)
 public func portSlideUpLanesI64ConstantLanes(_ a: SIMD<Int64>) -> SIMD<Int64> {
-    unsafe SIMDInt64.slideUpLanes(a, byUnchecked: 1)
+    unsafe SIMD<Int64>.slideUpLanes(a, byUnchecked: 1)
 }
 
 @inline(never)
 public func highwaySlideUpLanesI64ConstantLanes(_ a: SIMD<Int64>) -> SIMD<Int64> {
-    SIMDInt64.Vector(raw: HighwayReference.Nothrow.slideUpLanesI64(a.raw, 1))
+    SIMD<Int64>(raw: HighwayReference.Nothrow.slideUpLanesI64(a.raw, 1))
 }
 
 @inline(never)
@@ -44,7 +44,7 @@ public func portSlideUpLanesFillingWithI64(
     byUnchecked lanes: Int,
     fillingWith fill: SIMD<Int64>
 ) -> SIMD<Int64> {
-    unsafe SIMDInt64.slideUpLanes(a, byUnchecked: lanes, fillingWith: fill)
+    unsafe SIMD<Int64>.slideUpLanes(a, byUnchecked: lanes, fillingWith: fill)
 }
 
 @inline(never)
@@ -53,9 +53,7 @@ public func highwaySlideUpLanesFillingWithI64(
     byUnchecked lanes: Int,
     fillingWith fill: SIMD<Int64>
 ) -> SIMD<Int64> {
-    SIMDInt64.Vector(
-        raw: HighwayReference.Nothrow.slideUpLanesFillingWithI64(fill.raw, a.raw, lanes)
-    )
+    SIMD<Int64>(raw: HighwayReference.Nothrow.slideUpLanesFillingWithI64(fill.raw, a.raw, lanes))
 }
 
 @inline(never)
@@ -63,7 +61,11 @@ public func portSlideUpLanesFillingWithI64ConstantA(
     byUnchecked lanes: Int,
     fillingWith fill: SIMD<Int64>
 ) -> SIMD<Int64> {
-    unsafe SIMDInt64.slideUpLanes(SIMDInt64.repeating(26), byUnchecked: lanes, fillingWith: fill)
+    unsafe SIMD<Int64>.slideUpLanes(
+        SIMD<Int64>.repeating(26),
+        byUnchecked: lanes,
+        fillingWith: fill
+    )
 }
 
 @inline(never)
@@ -71,10 +73,10 @@ public func highwaySlideUpLanesFillingWithI64ConstantA(
     byUnchecked lanes: Int,
     fillingWith fill: SIMD<Int64>
 ) -> SIMD<Int64> {
-    SIMDInt64.Vector(
+    SIMD<Int64>(
         raw: HighwayReference.Nothrow.slideUpLanesFillingWithI64(
             fill.raw,
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             lanes
         )
     )
@@ -85,7 +87,7 @@ public func portSlideUpLanesFillingWithI64ConstantLanes(
     _ a: SIMD<Int64>,
     fillingWith fill: SIMD<Int64>
 ) -> SIMD<Int64> {
-    unsafe SIMDInt64.slideUpLanes(a, byUnchecked: 1, fillingWith: fill)
+    unsafe SIMD<Int64>.slideUpLanes(a, byUnchecked: 1, fillingWith: fill)
 }
 
 @inline(never)
@@ -93,7 +95,7 @@ public func highwaySlideUpLanesFillingWithI64ConstantLanes(
     _ a: SIMD<Int64>,
     fillingWith fill: SIMD<Int64>
 ) -> SIMD<Int64> {
-    SIMDInt64.Vector(raw: HighwayReference.Nothrow.slideUpLanesFillingWithI64(fill.raw, a.raw, 1))
+    SIMD<Int64>(raw: HighwayReference.Nothrow.slideUpLanesFillingWithI64(fill.raw, a.raw, 1))
 }
 
 @inline(never)
@@ -101,7 +103,7 @@ public func portSlideUpLanesFillingWithI64ConstantFill(
     _ a: SIMD<Int64>,
     byUnchecked lanes: Int
 ) -> SIMD<Int64> {
-    unsafe SIMDInt64.slideUpLanes(a, byUnchecked: lanes, fillingWith: SIMDInt64.repeating(26))
+    unsafe SIMD<Int64>.slideUpLanes(a, byUnchecked: lanes, fillingWith: SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
@@ -109,9 +111,9 @@ public func highwaySlideUpLanesFillingWithI64ConstantFill(
     _ a: SIMD<Int64>,
     byUnchecked lanes: Int
 ) -> SIMD<Int64> {
-    SIMDInt64.Vector(
+    SIMD<Int64>(
         raw: HighwayReference.Nothrow.slideUpLanesFillingWithI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             a.raw,
             lanes
         )
@@ -120,24 +122,24 @@ public func highwaySlideUpLanesFillingWithI64ConstantFill(
 
 @inline(never)
 public func portSlideDownLanesI64(_ a: SIMD<Int64>, byUnchecked lanes: Int) -> SIMD<Int64> {
-    unsafe SIMDInt64.slideDownLanes(a, byUnchecked: lanes)
+    unsafe SIMD<Int64>.slideDownLanes(a, byUnchecked: lanes)
 }
 
 @inline(never)
 public func highwaySlideDownLanesI64(_ a: SIMD<Int64>, byUnchecked lanes: Int) -> SIMD<Int64> {
-    SIMDInt64.Vector(raw: HighwayReference.Nothrow.slideDownLanesI64(a.raw, lanes))
+    SIMD<Int64>(raw: HighwayReference.Nothrow.slideDownLanesI64(a.raw, lanes))
 }
 
 @inline(never)
 public func portSlideDownLanesI64ConstantA(byUnchecked lanes: Int) -> SIMD<Int64> {
-    unsafe SIMDInt64.slideDownLanes(SIMDInt64.repeating(26), byUnchecked: lanes)
+    unsafe SIMD<Int64>.slideDownLanes(SIMD<Int64>.repeating(26), byUnchecked: lanes)
 }
 
 @inline(never)
 public func highwaySlideDownLanesI64ConstantA(byUnchecked lanes: Int) -> SIMD<Int64> {
-    SIMDInt64.Vector(
+    SIMD<Int64>(
         raw: HighwayReference.Nothrow.slideDownLanesI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             lanes
         )
     )
@@ -145,12 +147,12 @@ public func highwaySlideDownLanesI64ConstantA(byUnchecked lanes: Int) -> SIMD<In
 
 @inline(never)
 public func portSlideDownLanesI64ConstantLanes(_ a: SIMD<Int64>) -> SIMD<Int64> {
-    unsafe SIMDInt64.slideDownLanes(a, byUnchecked: 1)
+    unsafe SIMD<Int64>.slideDownLanes(a, byUnchecked: 1)
 }
 
 @inline(never)
 public func highwaySlideDownLanesI64ConstantLanes(_ a: SIMD<Int64>) -> SIMD<Int64> {
-    SIMDInt64.Vector(raw: HighwayReference.Nothrow.slideDownLanesI64(a.raw, 1))
+    SIMD<Int64>(raw: HighwayReference.Nothrow.slideDownLanesI64(a.raw, 1))
 }
 
 @inline(never)
@@ -159,7 +161,7 @@ public func portSlideDownLanesFillingWithI64(
     byUnchecked lanes: Int,
     fillingWith fill: SIMD<Int64>
 ) -> SIMD<Int64> {
-    unsafe SIMDInt64.slideDownLanes(a, byUnchecked: lanes, fillingWith: fill)
+    unsafe SIMD<Int64>.slideDownLanes(a, byUnchecked: lanes, fillingWith: fill)
 }
 
 @inline(never)
@@ -168,9 +170,7 @@ public func highwaySlideDownLanesFillingWithI64(
     byUnchecked lanes: Int,
     fillingWith fill: SIMD<Int64>
 ) -> SIMD<Int64> {
-    SIMDInt64.Vector(
-        raw: HighwayReference.Nothrow.slideDownLanesFillingWithI64(fill.raw, a.raw, lanes)
-    )
+    SIMD<Int64>(raw: HighwayReference.Nothrow.slideDownLanesFillingWithI64(fill.raw, a.raw, lanes))
 }
 
 @inline(never)
@@ -178,7 +178,11 @@ public func portSlideDownLanesFillingWithI64ConstantA(
     byUnchecked lanes: Int,
     fillingWith fill: SIMD<Int64>
 ) -> SIMD<Int64> {
-    unsafe SIMDInt64.slideDownLanes(SIMDInt64.repeating(26), byUnchecked: lanes, fillingWith: fill)
+    unsafe SIMD<Int64>.slideDownLanes(
+        SIMD<Int64>.repeating(26),
+        byUnchecked: lanes,
+        fillingWith: fill
+    )
 }
 
 @inline(never)
@@ -186,10 +190,10 @@ public func highwaySlideDownLanesFillingWithI64ConstantA(
     byUnchecked lanes: Int,
     fillingWith fill: SIMD<Int64>
 ) -> SIMD<Int64> {
-    SIMDInt64.Vector(
+    SIMD<Int64>(
         raw: HighwayReference.Nothrow.slideDownLanesFillingWithI64(
             fill.raw,
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             lanes
         )
     )
@@ -200,7 +204,7 @@ public func portSlideDownLanesFillingWithI64ConstantLanes(
     _ a: SIMD<Int64>,
     fillingWith fill: SIMD<Int64>
 ) -> SIMD<Int64> {
-    unsafe SIMDInt64.slideDownLanes(a, byUnchecked: 1, fillingWith: fill)
+    unsafe SIMD<Int64>.slideDownLanes(a, byUnchecked: 1, fillingWith: fill)
 }
 
 @inline(never)
@@ -208,7 +212,7 @@ public func highwaySlideDownLanesFillingWithI64ConstantLanes(
     _ a: SIMD<Int64>,
     fillingWith fill: SIMD<Int64>
 ) -> SIMD<Int64> {
-    SIMDInt64.Vector(raw: HighwayReference.Nothrow.slideDownLanesFillingWithI64(fill.raw, a.raw, 1))
+    SIMD<Int64>(raw: HighwayReference.Nothrow.slideDownLanesFillingWithI64(fill.raw, a.raw, 1))
 }
 
 @inline(never)
@@ -216,7 +220,7 @@ public func portSlideDownLanesFillingWithI64ConstantFill(
     _ a: SIMD<Int64>,
     byUnchecked lanes: Int
 ) -> SIMD<Int64> {
-    unsafe SIMDInt64.slideDownLanes(a, byUnchecked: lanes, fillingWith: SIMDInt64.repeating(26))
+    unsafe SIMD<Int64>.slideDownLanes(a, byUnchecked: lanes, fillingWith: SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
@@ -224,9 +228,9 @@ public func highwaySlideDownLanesFillingWithI64ConstantFill(
     _ a: SIMD<Int64>,
     byUnchecked lanes: Int
 ) -> SIMD<Int64> {
-    SIMDInt64.Vector(
+    SIMD<Int64>(
         raw: HighwayReference.Nothrow.slideDownLanesFillingWithI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             a.raw,
             lanes
         )
@@ -235,91 +239,91 @@ public func highwaySlideDownLanesFillingWithI64ConstantFill(
 
 @inline(never)
 public func portSlide1UpI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
-    SIMDInt64.slide1Up(a)
+    SIMD<Int64>.slide1Up(a)
 }
 
 @inline(never)
 public func highwaySlide1UpI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
-    SIMDInt64.Vector(raw: HighwayReference.Nothrow.slide1UpI64(a.raw))
+    SIMD<Int64>(raw: HighwayReference.Nothrow.slide1UpI64(a.raw))
 }
 
 @inline(never)
 public func portSlide1UpI64ConstantA() -> SIMD<Int64> {
-    SIMDInt64.slide1Up(SIMDInt64.repeating(26))
+    SIMD<Int64>.slide1Up(SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
 public func highwaySlide1UpI64ConstantA() -> SIMD<Int64> {
-    SIMDInt64.Vector(
+    SIMD<Int64>(
         raw: HighwayReference.Nothrow.slide1UpI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portSlide1UpFillingWithI64(_ a: SIMD<Int64>, fillingWith fill: Int64) -> SIMD<Int64> {
-    SIMDInt64.slide1Up(a, fillingWith: fill)
+    SIMD<Int64>.slide1Up(a, fillingWith: fill)
 }
 
 @inline(never)
 public func highwaySlide1UpFillingWithI64(_ a: SIMD<Int64>, fillingWith fill: Int64) -> SIMD<Int64>
 {
-    SIMDInt64.Vector(raw: HighwayReference.Nothrow.slide1UpFillingWithI64(fill, a.raw))
+    SIMD<Int64>(raw: HighwayReference.Nothrow.slide1UpFillingWithI64(fill, a.raw))
 }
 
 @inline(never)
 public func portSlide1UpFillingWithI64ConstantA(fillingWith fill: Int64) -> SIMD<Int64> {
-    SIMDInt64.slide1Up(SIMDInt64.repeating(26), fillingWith: fill)
+    SIMD<Int64>.slide1Up(SIMD<Int64>.repeating(26), fillingWith: fill)
 }
 
 @inline(never)
 public func highwaySlide1UpFillingWithI64ConstantA(fillingWith fill: Int64) -> SIMD<Int64> {
-    SIMDInt64.Vector(
+    SIMD<Int64>(
         raw: HighwayReference.Nothrow.slide1UpFillingWithI64(
             fill,
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portSlide1UpFillingWithI64ConstantFill(_ a: SIMD<Int64>) -> SIMD<Int64> {
-    SIMDInt64.slide1Up(a, fillingWith: 26)
+    SIMD<Int64>.slide1Up(a, fillingWith: 26)
 }
 
 @inline(never)
 public func highwaySlide1UpFillingWithI64ConstantFill(_ a: SIMD<Int64>) -> SIMD<Int64> {
-    SIMDInt64.Vector(raw: HighwayReference.Nothrow.slide1UpFillingWithI64(26, a.raw))
+    SIMD<Int64>(raw: HighwayReference.Nothrow.slide1UpFillingWithI64(26, a.raw))
 }
 
 @inline(never)
 public func portSlide1DownI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
-    SIMDInt64.slide1Down(a)
+    SIMD<Int64>.slide1Down(a)
 }
 
 @inline(never)
 public func highwaySlide1DownI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
-    SIMDInt64.Vector(raw: HighwayReference.Nothrow.slide1DownI64(a.raw))
+    SIMD<Int64>(raw: HighwayReference.Nothrow.slide1DownI64(a.raw))
 }
 
 @inline(never)
 public func portSlide1DownI64ConstantA() -> SIMD<Int64> {
-    SIMDInt64.slide1Down(SIMDInt64.repeating(26))
+    SIMD<Int64>.slide1Down(SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
 public func highwaySlide1DownI64ConstantA() -> SIMD<Int64> {
-    SIMDInt64.Vector(
+    SIMD<Int64>(
         raw: HighwayReference.Nothrow.slide1DownI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portSlide1DownFillingWithI64(_ a: SIMD<Int64>, fillingWith fill: Int64) -> SIMD<Int64> {
-    SIMDInt64.slide1Down(a, fillingWith: fill)
+    SIMD<Int64>.slide1Down(a, fillingWith: fill)
 }
 
 @inline(never)
@@ -327,44 +331,44 @@ public func highwaySlide1DownFillingWithI64(
     _ a: SIMD<Int64>,
     fillingWith fill: Int64
 ) -> SIMD<Int64> {
-    SIMDInt64.Vector(raw: HighwayReference.Nothrow.slide1DownFillingWithI64(fill, a.raw))
+    SIMD<Int64>(raw: HighwayReference.Nothrow.slide1DownFillingWithI64(fill, a.raw))
 }
 
 @inline(never)
 public func portSlide1DownFillingWithI64ConstantA(fillingWith fill: Int64) -> SIMD<Int64> {
-    SIMDInt64.slide1Down(SIMDInt64.repeating(26), fillingWith: fill)
+    SIMD<Int64>.slide1Down(SIMD<Int64>.repeating(26), fillingWith: fill)
 }
 
 @inline(never)
 public func highwaySlide1DownFillingWithI64ConstantA(fillingWith fill: Int64) -> SIMD<Int64> {
-    SIMDInt64.Vector(
+    SIMD<Int64>(
         raw: HighwayReference.Nothrow.slide1DownFillingWithI64(
             fill,
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portSlide1DownFillingWithI64ConstantFill(_ a: SIMD<Int64>) -> SIMD<Int64> {
-    SIMDInt64.slide1Down(a, fillingWith: 26)
+    SIMD<Int64>.slide1Down(a, fillingWith: 26)
 }
 
 @inline(never)
 public func highwaySlide1DownFillingWithI64ConstantFill(_ a: SIMD<Int64>) -> SIMD<Int64> {
-    SIMDInt64.Vector(raw: HighwayReference.Nothrow.slide1DownFillingWithI64(26, a.raw))
+    SIMD<Int64>(raw: HighwayReference.Nothrow.slide1DownFillingWithI64(26, a.raw))
 }
 
 @inline(never)
 public func portSlideUpBlocksI64ConstantA() -> SIMD<Int64> {
-    unsafe SIMDInt64.slideUpBlocks(SIMDInt64.repeating(26), byUnchecked: 0)
+    unsafe SIMD<Int64>.slideUpBlocks(SIMD<Int64>.repeating(26), byUnchecked: 0)
 }
 
 @inline(never)
 public func highwaySlideUpBlocksI64ConstantA() -> SIMD<Int64> {
-    SIMDInt64.Vector(
+    SIMD<Int64>(
         raw: HighwayReference.Nothrow.slideUpBlocksI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             0
         )
     )
@@ -372,24 +376,24 @@ public func highwaySlideUpBlocksI64ConstantA() -> SIMD<Int64> {
 
 @inline(never)
 public func portSlideUpBlocksI64ConstantBlocks(_ a: SIMD<Int64>) -> SIMD<Int64> {
-    unsafe SIMDInt64.slideUpBlocks(a, byUnchecked: 0)
+    unsafe SIMD<Int64>.slideUpBlocks(a, byUnchecked: 0)
 }
 
 @inline(never)
 public func highwaySlideUpBlocksI64ConstantBlocks(_ a: SIMD<Int64>) -> SIMD<Int64> {
-    SIMDInt64.Vector(raw: HighwayReference.Nothrow.slideUpBlocksI64(a.raw, 0))
+    SIMD<Int64>(raw: HighwayReference.Nothrow.slideUpBlocksI64(a.raw, 0))
 }
 
 @inline(never)
 public func portSlideDownBlocksI64ConstantA() -> SIMD<Int64> {
-    unsafe SIMDInt64.slideDownBlocks(SIMDInt64.repeating(26), byUnchecked: 0)
+    unsafe SIMD<Int64>.slideDownBlocks(SIMD<Int64>.repeating(26), byUnchecked: 0)
 }
 
 @inline(never)
 public func highwaySlideDownBlocksI64ConstantA() -> SIMD<Int64> {
-    SIMDInt64.Vector(
+    SIMD<Int64>(
         raw: HighwayReference.Nothrow.slideDownBlocksI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             0
         )
     )
@@ -397,24 +401,24 @@ public func highwaySlideDownBlocksI64ConstantA() -> SIMD<Int64> {
 
 @inline(never)
 public func portSlideDownBlocksI64ConstantBlocks(_ a: SIMD<Int64>) -> SIMD<Int64> {
-    unsafe SIMDInt64.slideDownBlocks(a, byUnchecked: 0)
+    unsafe SIMD<Int64>.slideDownBlocks(a, byUnchecked: 0)
 }
 
 @inline(never)
 public func highwaySlideDownBlocksI64ConstantBlocks(_ a: SIMD<Int64>) -> SIMD<Int64> {
-    SIMDInt64.Vector(raw: HighwayReference.Nothrow.slideDownBlocksI64(a.raw, 0))
+    SIMD<Int64>(raw: HighwayReference.Nothrow.slideDownBlocksI64(a.raw, 0))
 }
 
 @inline(never)
 public func portCombinedSlideDownLanesI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64> {
-    unsafe SIMDInt64.combinedSlideDownLanes(SIMDInt64.repeating(26), b, byUnchecked: 1)
+    unsafe SIMD<Int64>.combinedSlideDownLanes(SIMD<Int64>.repeating(26), b, byUnchecked: 1)
 }
 
 @inline(never)
 public func highwayCombinedSlideDownLanesI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64> {
-    SIMDInt64.Vector(
+    SIMD<Int64>(
         raw: HighwayReference.Nothrow.combinedSlideDownLanesI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             b.raw,
             1
         )
@@ -423,15 +427,15 @@ public func highwayCombinedSlideDownLanesI64ConstantA(_ b: SIMD<Int64>) -> SIMD<
 
 @inline(never)
 public func portCombinedSlideDownLanesI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64> {
-    unsafe SIMDInt64.combinedSlideDownLanes(a, SIMDInt64.repeating(26), byUnchecked: 1)
+    unsafe SIMD<Int64>.combinedSlideDownLanes(a, SIMD<Int64>.repeating(26), byUnchecked: 1)
 }
 
 @inline(never)
 public func highwayCombinedSlideDownLanesI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64> {
-    SIMDInt64.Vector(
+    SIMD<Int64>(
         raw: HighwayReference.Nothrow.combinedSlideDownLanesI64(
             a.raw,
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             1
         )
     )
@@ -442,7 +446,7 @@ public func portCombinedSlideDownLanesI64ConstantLanes(
     _ a: SIMD<Int64>,
     _ b: SIMD<Int64>
 ) -> SIMD<Int64> {
-    unsafe SIMDInt64.combinedSlideDownLanes(a, b, byUnchecked: 1)
+    unsafe SIMD<Int64>.combinedSlideDownLanes(a, b, byUnchecked: 1)
 }
 
 @inline(never)
@@ -450,5 +454,5 @@ public func highwayCombinedSlideDownLanesI64ConstantLanes(
     _ a: SIMD<Int64>,
     _ b: SIMD<Int64>
 ) -> SIMD<Int64> {
-    SIMDInt64.Vector(raw: HighwayReference.Nothrow.combinedSlideDownLanesI64(a.raw, b.raw, 1))
+    SIMD<Int64>(raw: HighwayReference.Nothrow.combinedSlideDownLanesI64(a.raw, b.raw, 1))
 }

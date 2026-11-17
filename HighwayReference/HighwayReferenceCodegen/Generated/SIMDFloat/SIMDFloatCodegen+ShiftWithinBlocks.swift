@@ -5,109 +5,133 @@ public import Vectorization
 
 @inline(never)
 public func portShiftedLeftBytesF32ConstantA() -> SIMD<Float> {
-    unsafe SIMDFloat.shiftedLeftBytes(SIMDFloat.repeating(1.5), byUnchecked: 1)
+    unsafe SIMD<Float>.shiftedLeftBytes(SIMD<Float>.repeating(1.5), byUnchecked: 1)
 }
 
 @inline(never)
 public func highwayShiftedLeftBytesF32ConstantA() -> SIMD<Float> {
-    HighwayReference.Nothrow.shiftedLeftBytesF32(HighwayReference.Nothrow.repeatingF32(1.5).raw, 1)
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.shiftedLeftBytesF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            1
+        )
+    )
 }
 
 @inline(never)
 public func portShiftedLeftBytesF32ConstantBytes(_ a: SIMD<Float>) -> SIMD<Float> {
-    unsafe SIMDFloat.shiftedLeftBytes(a, byUnchecked: 1)
+    unsafe SIMD<Float>.shiftedLeftBytes(a, byUnchecked: 1)
 }
 
 @inline(never)
 public func highwayShiftedLeftBytesF32ConstantBytes(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.shiftedLeftBytesF32(a.raw, 1)
+    SIMD<Float>(raw: HighwayReference.Nothrow.shiftedLeftBytesF32(a.raw, 1))
 }
 
 @inline(never)
 public func portShiftedRightBytesF32ConstantA() -> SIMD<Float> {
-    unsafe SIMDFloat.shiftedRightBytes(SIMDFloat.repeating(1.5), byUnchecked: 1)
+    unsafe SIMD<Float>.shiftedRightBytes(SIMD<Float>.repeating(1.5), byUnchecked: 1)
 }
 
 @inline(never)
 public func highwayShiftedRightBytesF32ConstantA() -> SIMD<Float> {
-    HighwayReference.Nothrow.shiftedRightBytesF32(HighwayReference.Nothrow.repeatingF32(1.5).raw, 1)
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.shiftedRightBytesF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            1
+        )
+    )
 }
 
 @inline(never)
 public func portShiftedRightBytesF32ConstantBytes(_ a: SIMD<Float>) -> SIMD<Float> {
-    unsafe SIMDFloat.shiftedRightBytes(a, byUnchecked: 1)
+    unsafe SIMD<Float>.shiftedRightBytes(a, byUnchecked: 1)
 }
 
 @inline(never)
 public func highwayShiftedRightBytesF32ConstantBytes(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.shiftedRightBytesF32(a.raw, 1)
+    SIMD<Float>(raw: HighwayReference.Nothrow.shiftedRightBytesF32(a.raw, 1))
 }
 
 @inline(never)
 public func portShiftedLeftLanesF32ConstantA() -> SIMD<Float> {
-    unsafe SIMDFloat.shiftedLeftLanes(SIMDFloat.repeating(1.5), byUnchecked: 1)
+    unsafe SIMD<Float>.shiftedLeftLanes(SIMD<Float>.repeating(1.5), byUnchecked: 1)
 }
 
 @inline(never)
 public func highwayShiftedLeftLanesF32ConstantA() -> SIMD<Float> {
-    HighwayReference.Nothrow.shiftedLeftLanesF32(HighwayReference.Nothrow.repeatingF32(1.5).raw, 1)
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.shiftedLeftLanesF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            1
+        )
+    )
 }
 
 @inline(never)
 public func portShiftedLeftLanesF32ConstantLanes(_ a: SIMD<Float>) -> SIMD<Float> {
-    unsafe SIMDFloat.shiftedLeftLanes(a, byUnchecked: 1)
+    unsafe SIMD<Float>.shiftedLeftLanes(a, byUnchecked: 1)
 }
 
 @inline(never)
 public func highwayShiftedLeftLanesF32ConstantLanes(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.shiftedLeftLanesF32(a.raw, 1)
+    SIMD<Float>(raw: HighwayReference.Nothrow.shiftedLeftLanesF32(a.raw, 1))
 }
 
 @inline(never)
 public func portShiftedRightLanesF32ConstantA() -> SIMD<Float> {
-    unsafe SIMDFloat.shiftedRightLanes(SIMDFloat.repeating(1.5), byUnchecked: 1)
+    unsafe SIMD<Float>.shiftedRightLanes(SIMD<Float>.repeating(1.5), byUnchecked: 1)
 }
 
 @inline(never)
 public func highwayShiftedRightLanesF32ConstantA() -> SIMD<Float> {
-    HighwayReference.Nothrow.shiftedRightLanesF32(HighwayReference.Nothrow.repeatingF32(1.5).raw, 1)
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.shiftedRightLanesF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            1
+        )
+    )
 }
 
 @inline(never)
 public func portShiftedRightLanesF32ConstantLanes(_ a: SIMD<Float>) -> SIMD<Float> {
-    unsafe SIMDFloat.shiftedRightLanes(a, byUnchecked: 1)
+    unsafe SIMD<Float>.shiftedRightLanes(a, byUnchecked: 1)
 }
 
 @inline(never)
 public func highwayShiftedRightLanesF32ConstantLanes(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.shiftedRightLanesF32(a.raw, 1)
+    SIMD<Float>(raw: HighwayReference.Nothrow.shiftedRightLanesF32(a.raw, 1))
 }
 
 @inline(never)
 public func portCombinedShiftedRightBytesF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    unsafe SIMDFloat.combinedShiftedRightBytes(SIMDFloat.repeating(1.5), b, byUnchecked: 1)
+    unsafe SIMD<Float>.combinedShiftedRightBytes(SIMD<Float>.repeating(1.5), b, byUnchecked: 1)
 }
 
 @inline(never)
 public func highwayCombinedShiftedRightBytesF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.combinedShiftedRightBytesF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw,
-        1
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.combinedShiftedRightBytesF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw,
+            1
+        )
     )
 }
 
 @inline(never)
 public func portCombinedShiftedRightBytesF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    unsafe SIMDFloat.combinedShiftedRightBytes(a, SIMDFloat.repeating(1.5), byUnchecked: 1)
+    unsafe SIMD<Float>.combinedShiftedRightBytes(a, SIMD<Float>.repeating(1.5), byUnchecked: 1)
 }
 
 @inline(never)
 public func highwayCombinedShiftedRightBytesF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.combinedShiftedRightBytesF32(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        1
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.combinedShiftedRightBytesF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            1
+        )
     )
 }
 
@@ -116,7 +140,7 @@ public func portCombinedShiftedRightBytesF32ConstantBytes(
     _ a: SIMD<Float>,
     _ b: SIMD<Float>
 ) -> SIMD<Float> {
-    unsafe SIMDFloat.combinedShiftedRightBytes(a, b, byUnchecked: 1)
+    unsafe SIMD<Float>.combinedShiftedRightBytes(a, b, byUnchecked: 1)
 }
 
 @inline(never)
@@ -124,34 +148,38 @@ public func highwayCombinedShiftedRightBytesF32ConstantBytes(
     _ a: SIMD<Float>,
     _ b: SIMD<Float>
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.combinedShiftedRightBytesF32(a.raw, b.raw, 1)
+    SIMD<Float>(raw: HighwayReference.Nothrow.combinedShiftedRightBytesF32(a.raw, b.raw, 1))
 }
 
 @inline(never)
 public func portCombinedShiftedRightLanesF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    unsafe SIMDFloat.combinedShiftedRightLanes(SIMDFloat.repeating(1.5), b, byUnchecked: 1)
+    unsafe SIMD<Float>.combinedShiftedRightLanes(SIMD<Float>.repeating(1.5), b, byUnchecked: 1)
 }
 
 @inline(never)
 public func highwayCombinedShiftedRightLanesF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.combinedShiftedRightLanesF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw,
-        1
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.combinedShiftedRightLanesF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw,
+            1
+        )
     )
 }
 
 @inline(never)
 public func portCombinedShiftedRightLanesF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    unsafe SIMDFloat.combinedShiftedRightLanes(a, SIMDFloat.repeating(1.5), byUnchecked: 1)
+    unsafe SIMD<Float>.combinedShiftedRightLanes(a, SIMD<Float>.repeating(1.5), byUnchecked: 1)
 }
 
 @inline(never)
 public func highwayCombinedShiftedRightLanesF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.combinedShiftedRightLanesF32(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        1
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.combinedShiftedRightLanesF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            1
+        )
     )
 }
 
@@ -160,7 +188,7 @@ public func portCombinedShiftedRightLanesF32ConstantLanes(
     _ a: SIMD<Float>,
     _ b: SIMD<Float>
 ) -> SIMD<Float> {
-    unsafe SIMDFloat.combinedShiftedRightLanes(a, b, byUnchecked: 1)
+    unsafe SIMD<Float>.combinedShiftedRightLanes(a, b, byUnchecked: 1)
 }
 
 @inline(never)
@@ -168,5 +196,5 @@ public func highwayCombinedShiftedRightLanesF32ConstantLanes(
     _ a: SIMD<Float>,
     _ b: SIMD<Float>
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.combinedShiftedRightLanesF32(a.raw, b.raw, 1)
+    SIMD<Float>(raw: HighwayReference.Nothrow.combinedShiftedRightLanesF32(a.raw, b.raw, 1))
 }

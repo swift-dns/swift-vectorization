@@ -10,15 +10,15 @@ extension SIMDInt16CodegenTests {
     @Test func loadInterleaved2() {
         let mismatches = Mismatches("portLoadInterleaved2I16")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 2 * H.laneCount,
             seed: 0x94BF_3DD8_1257_B108
         )
         for from in fromInputs {
             var p0 = H.zero()
             var p1 = H.zero()
-            var r0 = H.Vector(raw: HighwayReference.zeroI16())
-            var r1 = H.Vector(raw: HighwayReference.zeroI16())
+            var r0 = H(raw: HighwayReference.zeroI16())
+            var r1 = H(raw: HighwayReference.zeroI16())
             from.withUnsafeBufferPointer { source in
                 unsafe portLoadInterleaved2I16(from: source.baseAddress!, &p0, &p1)
                 unsafe highwayLoadInterleaved2I16(from: source.baseAddress!, &r0, &r1)
@@ -32,15 +32,15 @@ extension SIMDInt16CodegenTests {
     @Test func loadInterleaved2BeforeGuardPage() {
         let mismatches = Mismatches("portLoadInterleaved2I16 before a guard page")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 2 * H.laneCount,
             seed: 0x0BB1_C9F7_4236_3141
         )
         for from in fromInputs {
             var p0 = H.zero()
             var p1 = H.zero()
-            var r0 = H.Vector(raw: HighwayReference.zeroI16())
-            var r1 = H.Vector(raw: HighwayReference.zeroI16())
+            var r0 = H(raw: HighwayReference.zeroI16())
+            var r1 = H(raw: HighwayReference.zeroI16())
             _ = unsafe withGuardedLanes(from) { source in
                 unsafe portLoadInterleaved2I16(from: source, &p0, &p1)
                 unsafe highwayLoadInterleaved2I16(from: source, &r0, &r1)
@@ -54,7 +54,7 @@ extension SIMDInt16CodegenTests {
     @Test func loadInterleaved3() {
         let mismatches = Mismatches("portLoadInterleaved3I16")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 3 * H.laneCount,
             seed: 0x8B50_86D8_0CC8_04B3
         )
@@ -62,9 +62,9 @@ extension SIMDInt16CodegenTests {
             var p0 = H.zero()
             var p1 = H.zero()
             var p2 = H.zero()
-            var r0 = H.Vector(raw: HighwayReference.zeroI16())
-            var r1 = H.Vector(raw: HighwayReference.zeroI16())
-            var r2 = H.Vector(raw: HighwayReference.zeroI16())
+            var r0 = H(raw: HighwayReference.zeroI16())
+            var r1 = H(raw: HighwayReference.zeroI16())
+            var r2 = H(raw: HighwayReference.zeroI16())
             from.withUnsafeBufferPointer { source in
                 unsafe portLoadInterleaved3I16(from: source.baseAddress!, &p0, &p1, &p2)
                 unsafe highwayLoadInterleaved3I16(from: source.baseAddress!, &r0, &r1, &r2)
@@ -79,7 +79,7 @@ extension SIMDInt16CodegenTests {
     @Test func loadInterleaved3BeforeGuardPage() {
         let mismatches = Mismatches("portLoadInterleaved3I16 before a guard page")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 3 * H.laneCount,
             seed: 0x34A7_13FD_44F2_27D8
         )
@@ -87,9 +87,9 @@ extension SIMDInt16CodegenTests {
             var p0 = H.zero()
             var p1 = H.zero()
             var p2 = H.zero()
-            var r0 = H.Vector(raw: HighwayReference.zeroI16())
-            var r1 = H.Vector(raw: HighwayReference.zeroI16())
-            var r2 = H.Vector(raw: HighwayReference.zeroI16())
+            var r0 = H(raw: HighwayReference.zeroI16())
+            var r1 = H(raw: HighwayReference.zeroI16())
+            var r2 = H(raw: HighwayReference.zeroI16())
             _ = unsafe withGuardedLanes(from) { source in
                 unsafe portLoadInterleaved3I16(from: source, &p0, &p1, &p2)
                 unsafe highwayLoadInterleaved3I16(from: source, &r0, &r1, &r2)
@@ -104,7 +104,7 @@ extension SIMDInt16CodegenTests {
     @Test func loadInterleaved4() {
         let mismatches = Mismatches("portLoadInterleaved4I16")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 4 * H.laneCount,
             seed: 0x82BB_6FD8_07F1_58FE
         )
@@ -113,10 +113,10 @@ extension SIMDInt16CodegenTests {
             var p1 = H.zero()
             var p2 = H.zero()
             var p3 = H.zero()
-            var r0 = H.Vector(raw: HighwayReference.zeroI16())
-            var r1 = H.Vector(raw: HighwayReference.zeroI16())
-            var r2 = H.Vector(raw: HighwayReference.zeroI16())
-            var r3 = H.Vector(raw: HighwayReference.zeroI16())
+            var r0 = H(raw: HighwayReference.zeroI16())
+            var r1 = H(raw: HighwayReference.zeroI16())
+            var r2 = H(raw: HighwayReference.zeroI16())
+            var r3 = H(raw: HighwayReference.zeroI16())
             from.withUnsafeBufferPointer { source in
                 unsafe portLoadInterleaved4I16(from: source.baseAddress!, &p0, &p1, &p2, &p3)
                 unsafe highwayLoadInterleaved4I16(from: source.baseAddress!, &r0, &r1, &r2, &r3)
@@ -132,7 +132,7 @@ extension SIMDInt16CodegenTests {
     @Test func loadInterleaved4BeforeGuardPage() {
         let mismatches = Mismatches("portLoadInterleaved4I16 before a guard page")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 4 * H.laneCount,
             seed: 0x8257_F25C_114A_654F
         )
@@ -141,10 +141,10 @@ extension SIMDInt16CodegenTests {
             var p1 = H.zero()
             var p2 = H.zero()
             var p3 = H.zero()
-            var r0 = H.Vector(raw: HighwayReference.zeroI16())
-            var r1 = H.Vector(raw: HighwayReference.zeroI16())
-            var r2 = H.Vector(raw: HighwayReference.zeroI16())
-            var r3 = H.Vector(raw: HighwayReference.zeroI16())
+            var r0 = H(raw: HighwayReference.zeroI16())
+            var r1 = H(raw: HighwayReference.zeroI16())
+            var r2 = H(raw: HighwayReference.zeroI16())
+            var r3 = H(raw: HighwayReference.zeroI16())
             _ = unsafe withGuardedLanes(from) { source in
                 unsafe portLoadInterleaved4I16(from: source, &p0, &p1, &p2, &p3)
                 unsafe highwayLoadInterleaved4I16(from: source, &r0, &r1, &r2, &r3)
@@ -159,9 +159,9 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved2() {
         let mismatches = Mismatches("portStoreInterleaved2I16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD99E_74FB_91A1_AF81)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD99E_73FB_91A1_ADCE)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD99E_74FB_91A1_AF81)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD99E_73FB_91A1_ADCE)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for (a, b) in everyPair(aInputs, bInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -178,9 +178,9 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved2BeforeGuardPage() {
         let mismatches = Mismatches("portStoreInterleaved2I16 before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD04D_757D_69BC_4CBE)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD04D_767D_69BC_4E71)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD04D_757D_69BC_4CBE)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD04D_767D_69BC_4E71)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount)
         for (a, b) in everyPair(aInputs, bInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portStoreInterleaved2I16(a, b, to: destination)
@@ -195,8 +195,8 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved2ConstantA() {
         let mismatches = Mismatches("portStoreInterleaved2I16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5FD4_0F98_C65C_D035)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5FD4_0F98_C65C_D035)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for b in bInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -213,8 +213,8 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved2ConstantABeforeGuardPage() {
         let mismatches = Mismatches("portStoreInterleaved2I16ConstantA before a guard page")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF5B5_7157_4DD2_C5D0)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF5B5_7157_4DD2_C5D0)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount)
         for b in bInputs {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portStoreInterleaved2I16ConstantA(b, to: destination)
@@ -229,8 +229,8 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved2ConstantB() {
         let mismatches = Mismatches("portStoreInterleaved2I16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x453B_0998_B71F_9463)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x453B_0998_B71F_9463)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -247,8 +247,8 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved2ConstantBBeforeGuardPage() {
         let mismatches = Mismatches("portStoreInterleaved2I16ConstantB before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x71FA_2E45_E212_0FA8)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0x71FA_2E45_E212_0FA8)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portStoreInterleaved2I16ConstantB(a, to: destination)
@@ -263,10 +263,10 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved3() {
         let mismatches = Mismatches("portStoreInterleaved3I16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE30D_0BFB_9731_2576)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE30D_0CFB_9731_2729)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xE30D_09FB_9731_2210)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 3 * H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE30D_0BFB_9731_2576)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE30D_0CFB_9731_2729)
+        let cInputs = Inputs.vectors(H.self, seed: 0xE30D_09FB_9731_2210)
+        let sentinel = Inputs.sentinel(Lane.self, count: 3 * H.laneCount + 4)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x7576_D43E_9B0E_09F2) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -287,10 +287,10 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved3BeforeGuardPage() {
         let mismatches = Mismatches("portStoreInterleaved3I16 before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEED8_B400_47A2_CA07)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xEED8_B300_47A2_C854)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xEED8_B600_47A2_CD6D)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 3 * H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEED8_B400_47A2_CA07)
+        let bInputs = Inputs.vectors(H.self, seed: 0xEED8_B300_47A2_C854)
+        let cInputs = Inputs.vectors(H.self, seed: 0xEED8_B600_47A2_CD6D)
+        let sentinel = Inputs.sentinel(Lane.self, count: 3 * H.laneCount)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xAE53_200D_B21D_8701) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portStoreInterleaved3I16(a, b, c, to: destination)
@@ -309,9 +309,9 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved3ConstantA() {
         let mismatches = Mismatches("portStoreInterleaved3I16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x120C_7DE1_D94B_47A4)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x120C_80E1_D94B_4CBD)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 3 * H.laneCount + 4)
+        let bInputs = Inputs.vectors(H.self, seed: 0x120C_7DE1_D94B_47A4)
+        let cInputs = Inputs.vectors(H.self, seed: 0x120C_80E1_D94B_4CBD)
+        let sentinel = Inputs.sentinel(Lane.self, count: 3 * H.laneCount + 4)
         for (b, c) in everyPair(bInputs, cInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -328,9 +328,9 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved3ConstantABeforeGuardPage() {
         let mismatches = Mismatches("portStoreInterleaved3I16ConstantA before a guard page")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x49A3_2F5F_62B4_3BEF)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x49A3_305F_62B4_3DA2)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 3 * H.laneCount)
+        let bInputs = Inputs.vectors(H.self, seed: 0x49A3_2F5F_62B4_3BEF)
+        let cInputs = Inputs.vectors(H.self, seed: 0x49A3_305F_62B4_3DA2)
+        let sentinel = Inputs.sentinel(Lane.self, count: 3 * H.laneCount)
         for (b, c) in everyPair(bInputs, cInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portStoreInterleaved3I16ConstantA(b, c, to: destination)
@@ -345,9 +345,9 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved3ConstantB() {
         let mismatches = Mismatches("portStoreInterleaved3I16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2BCB_E3E1_E7CF_82D6)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x2BCB_E1E1_E7CF_7F70)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 3 * H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2BCB_E3E1_E7CF_82D6)
+        let cInputs = Inputs.vectors(H.self, seed: 0x2BCB_E1E1_E7CF_7F70)
+        let sentinel = Inputs.sentinel(Lane.self, count: 3 * H.laneCount + 4)
         for (a, c) in everyPair(aInputs, cInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -364,9 +364,9 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved3ConstantBBeforeGuardPage() {
         let mismatches = Mismatches("portStoreInterleaved3I16ConstantB before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9DB8_7F9C_7496_C9A7)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x9DB8_819C_7496_CD0D)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 3 * H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9DB8_7F9C_7496_C9A7)
+        let cInputs = Inputs.vectors(H.self, seed: 0x9DB8_819C_7496_CD0D)
+        let sentinel = Inputs.sentinel(Lane.self, count: 3 * H.laneCount)
         for (a, c) in everyPair(aInputs, cInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portStoreInterleaved3I16ConstantB(a, c, to: destination)
@@ -381,9 +381,9 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved3ConstantC() {
         let mismatches = Mismatches("portStoreInterleaved3I16ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2410_4CE1_E3B1_A161)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2410_4BE1_E3B1_9FAE)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 3 * H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2410_4CE1_E3B1_A161)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2410_4BE1_E3B1_9FAE)
+        let sentinel = Inputs.sentinel(Lane.self, count: 3 * H.laneCount + 4)
         for (a, b) in everyPair(aInputs, bInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -400,9 +400,9 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved3ConstantCBeforeGuardPage() {
         let mismatches = Mismatches("portStoreInterleaved3I16ConstantC before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x149C_C798_2F3D_FF5E)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x149C_C898_2F3E_0111)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 3 * H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0x149C_C798_2F3D_FF5E)
+        let bInputs = Inputs.vectors(H.self, seed: 0x149C_C898_2F3E_0111)
+        let sentinel = Inputs.sentinel(Lane.self, count: 3 * H.laneCount)
         for (a, b) in everyPair(aInputs, bInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portStoreInterleaved3I16ConstantC(a, b, to: destination)
@@ -417,11 +417,11 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved4() {
         let mismatches = Mismatches("portStoreInterleaved4I16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEBA1_C2FB_9C07_2E0B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xEBA1_C1FB_9C07_2C58)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xEBA1_C4FB_9C07_3171)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0xEBA1_C3FB_9C07_2FBE)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 * H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEBA1_C2FB_9C07_2E0B)
+        let bInputs = Inputs.vectors(H.self, seed: 0xEBA1_C1FB_9C07_2C58)
+        let cInputs = Inputs.vectors(H.self, seed: 0xEBA1_C4FB_9C07_3171)
+        let dInputs = Inputs.vectors(H.self, seed: 0xEBA1_C3FB_9C07_2FBE)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount + 4)
         for (a, b, c, d) in mixedQuadruples(
             aInputs,
             bInputs,
@@ -448,11 +448,11 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved4BeforeGuardPage() {
         let mismatches = Mismatches("portStoreInterleaved4I16 before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x699D_C41B_2DF7_29D0)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x699D_C51B_2DF7_2B83)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x699D_C61B_2DF7_2D36)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0x699D_C71B_2DF7_2EE9)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 * H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0x699D_C41B_2DF7_29D0)
+        let bInputs = Inputs.vectors(H.self, seed: 0x699D_C51B_2DF7_2B83)
+        let cInputs = Inputs.vectors(H.self, seed: 0x699D_C61B_2DF7_2D36)
+        let dInputs = Inputs.vectors(H.self, seed: 0x699D_C71B_2DF7_2EE9)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount)
         for (a, b, c, d) in mixedQuadruples(
             aInputs,
             bInputs,
@@ -477,10 +477,10 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved4ConstantA() {
         let mismatches = Mismatches("portStoreInterleaved4I16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5C83_22E6_51D1_98C7)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x5C83_23E6_51D1_9A7A)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0x5C83_24E6_51D1_9C2D)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 * H.laneCount + 4)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5C83_22E6_51D1_98C7)
+        let cInputs = Inputs.vectors(H.self, seed: 0x5C83_23E6_51D1_9A7A)
+        let dInputs = Inputs.vectors(H.self, seed: 0x5C83_24E6_51D1_9C2D)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount + 4)
         for (b, c, d) in mixedTriples(bInputs, cInputs, dInputs, seed: 0x3A0D_6E1D_466B_6548) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -501,10 +501,10 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved4ConstantABeforeGuardPage() {
         let mismatches = Mismatches("portStoreInterleaved4I16ConstantA before a guard page")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x49E7_66D8_2281_D1DA)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x49E7_65D8_2281_D027)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0x49E7_64D8_2281_CE74)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 * H.laneCount)
+        let bInputs = Inputs.vectors(H.self, seed: 0x49E7_66D8_2281_D1DA)
+        let cInputs = Inputs.vectors(H.self, seed: 0x49E7_65D8_2281_D027)
+        let dInputs = Inputs.vectors(H.self, seed: 0x49E7_64D8_2281_CE74)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount)
         for (b, c, d) in mixedTriples(bInputs, cInputs, dInputs, seed: 0xE386_A398_CD9C_C1DF) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portStoreInterleaved4I16ConstantA(b, c, d, to: destination)
@@ -523,10 +523,10 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved4ConstantB() {
         let mismatches = Mismatches("portStoreInterleaved4I16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x643E_B8E6_55EF_7889)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x643E_B6E6_55EF_7523)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0x643E_B5E6_55EF_7370)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 * H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x643E_B8E6_55EF_7889)
+        let cInputs = Inputs.vectors(H.self, seed: 0x643E_B6E6_55EF_7523)
+        let dInputs = Inputs.vectors(H.self, seed: 0x643E_B5E6_55EF_7370)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount + 4)
         for (a, c, d) in mixedTriples(aInputs, cInputs, dInputs, seed: 0xEB56_777F_F2AA_9FC3) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -547,10 +547,10 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved4ConstantBBeforeGuardPage() {
         let mismatches = Mismatches("portStoreInterleaved4I16ConstantB before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFFD5_FADF_98EB_8A26)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xFFD5_F8DF_98EB_86C0)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0xFFD5_F9DF_98EB_8873)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 * H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFFD5_FADF_98EB_8A26)
+        let cInputs = Inputs.vectors(H.self, seed: 0xFFD5_F8DF_98EB_86C0)
+        let dInputs = Inputs.vectors(H.self, seed: 0xFFD5_F9DF_98EB_8873)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount)
         for (a, c, d) in mixedTriples(aInputs, cInputs, dInputs, seed: 0xBCD5_8CF9_B35A_E722) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portStoreInterleaved4I16ConstantB(a, c, d, to: destination)
@@ -569,10 +569,10 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved4ConstantC() {
         let mismatches = Mismatches("portStoreInterleaved4I16ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6D40_6FE6_5B22_52FE)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6D40_70E6_5B22_54B1)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0x6D40_6EE6_5B22_514B)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 * H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6D40_6FE6_5B22_52FE)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6D40_70E6_5B22_54B1)
+        let dInputs = Inputs.vectors(H.self, seed: 0x6D40_6EE6_5B22_514B)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount + 4)
         for (a, b, d) in mixedTriples(aInputs, bInputs, dInputs, seed: 0x65F3_FB79_7C49_B69A) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -593,10 +593,10 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved4ConstantCBeforeGuardPage() {
         let mismatches = Mismatches("portStoreInterleaved4I16ConstantC before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x00BA_FAAC_B2AC_034F)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x00BA_F9AC_B2AC_019C)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0x00BA_FBAC_B2AC_0502)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 * H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0x00BA_FAAC_B2AC_034F)
+        let bInputs = Inputs.vectors(H.self, seed: 0x00BA_F9AC_B2AC_019C)
+        let dInputs = Inputs.vectors(H.self, seed: 0x00BA_FBAC_B2AC_0502)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount)
         for (a, b, d) in mixedTriples(aInputs, bInputs, dInputs, seed: 0x2D6D_FB3C_6F6A_6A29) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portStoreInterleaved4I16ConstantC(a, b, d, to: destination)
@@ -615,10 +615,10 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved4ConstantD() {
         let mismatches = Mismatches("portStoreInterleaved4I16ConstantD")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x75D5_86E6_5FF8_FEB3)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x75D5_85E6_5FF8_FD00)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x75D5_88E6_5FF9_0219)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 * H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x75D5_86E6_5FF8_FEB3)
+        let bInputs = Inputs.vectors(H.self, seed: 0x75D5_85E6_5FF8_FD00)
+        let cInputs = Inputs.vectors(H.self, seed: 0x75D5_88E6_5FF9_0219)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount + 4)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xD4AC_43C3_1CBB_9275) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -639,10 +639,10 @@ extension SIMDInt16CodegenTests {
 
     @Test func storeInterleaved4ConstantDBeforeGuardPage() {
         let mismatches = Mismatches("portStoreInterleaved4I16ConstantD before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB30A_1C4D_E653_C5D8)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB30A_1D4D_E653_C78B)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xB30A_1E4D_E653_C93E)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 * H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB30A_1C4D_E653_C5D8)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB30A_1D4D_E653_C78B)
+        let cInputs = Inputs.vectors(H.self, seed: 0xB30A_1E4D_E653_C93E)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xE6D0_01CE_5B97_EE94) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portStoreInterleaved4I16ConstantD(a, b, c, to: destination)

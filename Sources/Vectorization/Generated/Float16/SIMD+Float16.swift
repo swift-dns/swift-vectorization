@@ -9,6 +9,14 @@ extension SIMD where Lane == Float16 {
     public init(raw: cvectorization_ops_vector_f16) {
         self.raw = raw
     }
+
+    @export(implementation) @inline(always)
+    public init(_ simd: SIMDType) {
+        raw = simd
+    }
+
+    @export(implementation) @inline(always)
+    public var simd: SIMDType { raw }
 }
 
 @available(SwiftStdlib 5.3, *)
@@ -19,14 +27,12 @@ extension SIMD.Mask where Lane == Float16 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: SIMDMask<cvectorization_ops_mask_f16>) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_mask_f16(simd._storage)
     }
 
     @export(implementation) @inline(always)
-    public var simd: SIMDMask<cvectorization_ops_mask_f16> {
-        SIMDMask<cvectorization_ops_mask_f16>(cvectorization_ops_from_raw_mask_f16(raw))
-    }
+    public var simd: SIMDType { SIMDType(cvectorization_ops_from_raw_mask_f16(raw)) }
 }
 
 @available(SwiftStdlib 5.3, *)
@@ -37,14 +43,12 @@ extension SIMD.HalfVector where Lane == Float16 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_half_vector_f16) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_half_vector_f16(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_half_vector_f16 {
-        cvectorization_ops_from_raw_half_vector_f16(raw)
-    }
+    public var simd: SIMDType { cvectorization_ops_from_raw_half_vector_f16(raw) }
 }
 
 @available(SwiftStdlib 5.3, *)
@@ -55,14 +59,12 @@ extension SIMD.HalfMask where Lane == Float16 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_half_mask_f16) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_half_mask_f16(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_half_mask_f16 {
-        cvectorization_ops_from_raw_half_mask_f16(raw)
-    }
+    public var simd: SIMDType { cvectorization_ops_from_raw_half_mask_f16(raw) }
 }
 
 @available(SwiftStdlib 5.3, *)
@@ -73,14 +75,12 @@ extension SIMD.QuarterVector where Lane == Float16 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_quarter_vector_f16) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_quarter_vector_f16(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_quarter_vector_f16 {
-        cvectorization_ops_from_raw_quarter_vector_f16(raw)
-    }
+    public var simd: SIMDType { cvectorization_ops_from_raw_quarter_vector_f16(raw) }
 }
 
 @available(SwiftStdlib 5.3, *)
@@ -91,14 +91,12 @@ extension SIMD.QuarterMask where Lane == Float16 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_quarter_mask_f16) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_quarter_mask_f16(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_quarter_mask_f16 {
-        cvectorization_ops_from_raw_quarter_mask_f16(raw)
-    }
+    public var simd: SIMDType { cvectorization_ops_from_raw_quarter_mask_f16(raw) }
 }
 
 @available(SwiftStdlib 5.3, *)
@@ -109,12 +107,12 @@ extension SIMD.BlockVector where Lane == Float16 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_block_f16) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_block_f16(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_block_f16 { cvectorization_ops_from_raw_block_f16(raw) }
+    public var simd: SIMDType { cvectorization_ops_from_raw_block_f16(raw) }
 }
 
 @available(SwiftStdlib 5.3, *)

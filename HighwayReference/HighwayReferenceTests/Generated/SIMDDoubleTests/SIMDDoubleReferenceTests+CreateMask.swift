@@ -21,7 +21,7 @@ extension SIMDDoubleReferenceTests {
 
     @Test func maskFromVector() {
         let mismatches = Mismatches("maskFromVector")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB469_9FAB_E5C7_7EBC)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB469_9FAB_E5C7_7EBC)
         for a in aInputs {
             mismatches.check(
                 H.mask(from: a),
@@ -48,7 +48,7 @@ extension SIMDDoubleReferenceTests {
     @Test func repeatingBlockMask() {
         let mismatches = Mismatches("repeatingBlockMask")
         let bitsInputs = Inputs.maskBits(
-            lanes: 16 / MemoryLayout<H.Lane>.size,
+            lanes: 16 / MemoryLayout<Lane>.size,
             seed: 0x8709_C0A6_376D_3CED
         )
         for bits in bitsInputs {

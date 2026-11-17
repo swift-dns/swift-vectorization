@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDBFloat16CodegenTests {
     @Test func reversed() {
         let mismatches = Mismatches("portReversedBF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC1A2_EAA5_C488_89B2)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC1A2_EAA5_C488_89B2)
         for a in aInputs {
             mismatches.check(portReversedBF16(a), highwayReversedBF16(a), "a: \(describe(a))")
         }
@@ -24,7 +24,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func byteSwapped() {
         let mismatches = Mismatches("portByteSwappedBF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4624_EB99_07B4_90AC)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4624_EB99_07B4_90AC)
         for a in aInputs {
             mismatches.check(portByteSwappedBF16(a), highwayByteSwappedBF16(a), "a: \(describe(a))")
         }
@@ -39,7 +39,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func reversedBlocks() {
         let mismatches = Mismatches("portReversedBlocksBF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4B0C_0AF6_A92E_4814)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4B0C_0AF6_A92E_4814)
         for a in aInputs {
             mismatches.check(
                 portReversedBlocksBF16(a),
@@ -62,7 +62,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func reversed2() {
         let mismatches = Mismatches("portReversed2BF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x774C_46AC_E610_E5F2)
+        let aInputs = Inputs.vectors(H.self, seed: 0x774C_46AC_E610_E5F2)
         for a in aInputs {
             mismatches.check(portReversed2BF16(a), highwayReversed2BF16(a), "a: \(describe(a))")
         }
@@ -77,7 +77,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func reversed4() {
         let mismatches = Mismatches("portReversed4BF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4287_DCAC_C7F4_5374)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4287_DCAC_C7F4_5374)
         for a in aInputs {
             mismatches.check(portReversed4BF16(a), highwayReversed4BF16(a), "a: \(describe(a))")
         }
@@ -92,7 +92,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func reversed8() {
         let mismatches = Mismatches("portReversed8BF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x20A0_20AC_B4F5_D360)
+        let aInputs = Inputs.vectors(H.self, seed: 0x20A0_20AC_B4F5_D360)
         for a in aInputs {
             mismatches.check(portReversed8BF16(a), highwayReversed8BF16(a), "a: \(describe(a))")
         }

@@ -5,46 +5,48 @@ public import Vectorization
 
 @inline(never)
 public func portIsNaNF64(_ a: SIMD<Double>) -> SIMD<Double>.Mask {
-    SIMDDouble.isNaN(a)
+    SIMD<Double>.isNaN(a)
 }
 
 @inline(never)
 public func highwayIsNaNF64(_ a: SIMD<Double>) -> SIMD<Double>.Mask {
-    SIMDDouble.Mask(raw: HighwayReference.Nothrow.isNaNF64(a.raw))
+    SIMD<Double>.Mask(raw: HighwayReference.Nothrow.isNaNF64(a.raw))
 }
 
 @inline(never)
 public func portIsNaNF64ConstantA() -> SIMD<Double>.Mask {
-    SIMDDouble.isNaN(SIMDDouble.repeating(1.5))
+    SIMD<Double>.isNaN(SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayIsNaNF64ConstantA() -> SIMD<Double>.Mask {
-    SIMDDouble.Mask(
-        raw: HighwayReference.Nothrow.isNaNF64(HighwayReference.Nothrow.repeatingF64(1.5).raw)
+    SIMD<Double>.Mask(
+        raw: HighwayReference.Nothrow.isNaNF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portIsEitherNaNF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double>.Mask {
-    SIMDDouble.isEitherNaN(a, b)
+    SIMD<Double>.isEitherNaN(a, b)
 }
 
 @inline(never)
 public func highwayIsEitherNaNF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double>.Mask {
-    SIMDDouble.Mask(raw: HighwayReference.Nothrow.isEitherNaNF64(a.raw, b.raw))
+    SIMD<Double>.Mask(raw: HighwayReference.Nothrow.isEitherNaNF64(a.raw, b.raw))
 }
 
 @inline(never)
 public func portIsEitherNaNF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double>.Mask {
-    SIMDDouble.isEitherNaN(SIMDDouble.repeating(1.5), b)
+    SIMD<Double>.isEitherNaN(SIMD<Double>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayIsEitherNaNF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double>.Mask {
-    SIMDDouble.Mask(
+    SIMD<Double>.Mask(
         raw: HighwayReference.Nothrow.isEitherNaNF64(
-            HighwayReference.Nothrow.repeatingF64(1.5).raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
             b.raw
         )
     )
@@ -52,59 +54,63 @@ public func highwayIsEitherNaNF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double>.Ma
 
 @inline(never)
 public func portIsEitherNaNF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double>.Mask {
-    SIMDDouble.isEitherNaN(a, SIMDDouble.repeating(1.5))
+    SIMD<Double>.isEitherNaN(a, SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayIsEitherNaNF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double>.Mask {
-    SIMDDouble.Mask(
+    SIMD<Double>.Mask(
         raw: HighwayReference.Nothrow.isEitherNaNF64(
             a.raw,
-            HighwayReference.Nothrow.repeatingF64(1.5).raw
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
         )
     )
 }
 
 @inline(never)
 public func portIsInfiniteF64(_ a: SIMD<Double>) -> SIMD<Double>.Mask {
-    SIMDDouble.isInfinite(a)
+    SIMD<Double>.isInfinite(a)
 }
 
 @inline(never)
 public func highwayIsInfiniteF64(_ a: SIMD<Double>) -> SIMD<Double>.Mask {
-    SIMDDouble.Mask(raw: HighwayReference.Nothrow.isInfiniteF64(a.raw))
+    SIMD<Double>.Mask(raw: HighwayReference.Nothrow.isInfiniteF64(a.raw))
 }
 
 @inline(never)
 public func portIsInfiniteF64ConstantA() -> SIMD<Double>.Mask {
-    SIMDDouble.isInfinite(SIMDDouble.repeating(1.5))
+    SIMD<Double>.isInfinite(SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayIsInfiniteF64ConstantA() -> SIMD<Double>.Mask {
-    SIMDDouble.Mask(
-        raw: HighwayReference.Nothrow.isInfiniteF64(HighwayReference.Nothrow.repeatingF64(1.5).raw)
+    SIMD<Double>.Mask(
+        raw: HighwayReference.Nothrow.isInfiniteF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portIsFiniteF64(_ a: SIMD<Double>) -> SIMD<Double>.Mask {
-    SIMDDouble.isFinite(a)
+    SIMD<Double>.isFinite(a)
 }
 
 @inline(never)
 public func highwayIsFiniteF64(_ a: SIMD<Double>) -> SIMD<Double>.Mask {
-    SIMDDouble.Mask(raw: HighwayReference.Nothrow.isFiniteF64(a.raw))
+    SIMD<Double>.Mask(raw: HighwayReference.Nothrow.isFiniteF64(a.raw))
 }
 
 @inline(never)
 public func portIsFiniteF64ConstantA() -> SIMD<Double>.Mask {
-    SIMDDouble.isFinite(SIMDDouble.repeating(1.5))
+    SIMD<Double>.isFinite(SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayIsFiniteF64ConstantA() -> SIMD<Double>.Mask {
-    SIMDDouble.Mask(
-        raw: HighwayReference.Nothrow.isFiniteF64(HighwayReference.Nothrow.repeatingF64(1.5).raw)
+    SIMD<Double>.Mask(
+        raw: HighwayReference.Nothrow.isFiniteF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }

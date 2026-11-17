@@ -8,17 +8,17 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
-    private func checkHalfVectorConvertingFromFloatConstantA(_ value: SIMDFloat.Lane) {
+    private func checkHalfVectorConvertingFromFloatConstantA(_ value: Float) {
         let mismatches = Mismatches("halfVectorConvertingFromFloat with a repeating \(hex(value))")
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         mismatches.check(
-            H.halfVector(converting: SIMDFloat.repeating(value)),
+            H.halfVector(converting: SIMD<Float>.repeating(value)),
             H.HalfVector(
-                raw: HighwayReference.halfVectorConvertingF32ToF16(SIMDFloat.repeating(value).raw)
+                raw: HighwayReference.halfVectorConvertingF32ToF16(SIMD<Float>.repeating(value).raw)
             ),
             ""
         )
@@ -82,7 +82,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func halfVectorConvertingFromFloatConstantSplatPayloadNaN() {
-        checkHalfVectorConvertingFromFloatConstantA(SIMDFloat.Lane(nan: 1, signaling: false))
+        checkHalfVectorConvertingFromFloatConstantA(Float(nan: 1, signaling: false))
     }
 
     @Test func halfVectorConvertingFromFloatConstantSplatSignalingNaN() {
@@ -102,20 +102,20 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkQuarterVectorConvertingFromDoubleConstantA(_ value: SIMDDouble.Lane) {
+    private func checkQuarterVectorConvertingFromDoubleConstantA(_ value: Double) {
         let mismatches = Mismatches(
             "quarterVectorConvertingFromDouble with a repeating \(hex(value))"
         )
         mismatches.check(
-            SIMDDouble.repeating(value),
-            HighwayReference.repeatingF64(value),
+            SIMD<Double>.repeating(value),
+            SIMD<Double>(raw: HighwayReference.repeatingF64(value)),
             "repeating"
         )
         mismatches.check(
-            H.quarterVector(converting: SIMDDouble.repeating(value)),
+            H.quarterVector(converting: SIMD<Double>.repeating(value)),
             H.QuarterVector(
                 raw: HighwayReference.quarterVectorConvertingF64ToF16(
-                    SIMDDouble.repeating(value).raw
+                    SIMD<Double>.repeating(value).raw
                 )
             ),
             ""
@@ -180,7 +180,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func quarterVectorConvertingFromDoubleConstantSplatPayloadNaN() {
-        checkQuarterVectorConvertingFromDoubleConstantA(SIMDDouble.Lane(nan: 1, signaling: false))
+        checkQuarterVectorConvertingFromDoubleConstantA(Double(nan: 1, signaling: false))
     }
 
     @Test func quarterVectorConvertingFromDoubleConstantSplatSignalingNaN() {

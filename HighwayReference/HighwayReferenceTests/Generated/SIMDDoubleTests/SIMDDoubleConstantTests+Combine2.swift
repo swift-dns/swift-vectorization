@@ -7,9 +7,13 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
-    private func checkLowerHalfConstantA(_ value: H.Lane) {
+    private func checkLowerHalfConstantA(_ value: Lane) {
         let mismatches = Mismatches("lowerHalf with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         mismatches.check(
             H.lowerHalf(H.repeating(value)),
             H.HalfVector(raw: HighwayReference.lowerHalfF64(H.repeating(value).raw)),
@@ -75,7 +79,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func lowerHalfConstantSplatPayloadNaN() {
-        checkLowerHalfConstantA(H.Lane(nan: 1, signaling: false))
+        checkLowerHalfConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func lowerHalfConstantSplatSignalingNaN() {
@@ -95,9 +99,13 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkUpperHalfConstantA(_ value: H.Lane) {
+    private func checkUpperHalfConstantA(_ value: Lane) {
         let mismatches = Mismatches("upperHalf with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         mismatches.check(
             H.upperHalf(H.repeating(value)),
             H.HalfVector(raw: HighwayReference.upperHalfF64(H.repeating(value).raw)),
@@ -163,7 +171,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func upperHalfConstantSplatPayloadNaN() {
-        checkUpperHalfConstantA(H.Lane(nan: 1, signaling: false))
+        checkUpperHalfConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func upperHalfConstantSplatSignalingNaN() {

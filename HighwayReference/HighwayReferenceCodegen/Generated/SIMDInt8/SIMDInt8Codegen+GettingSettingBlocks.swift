@@ -5,14 +5,14 @@ public import Vectorization
 
 @inline(never)
 public func portExtractingBlockI8ConstantA() -> SIMD<Int8>.BlockVector {
-    unsafe SIMDInt8.block(SIMDInt8.repeating(26), atUnchecked: 0)
+    unsafe SIMD<Int8>.block(SIMD<Int8>.repeating(26), atUnchecked: 0)
 }
 
 @inline(never)
 public func highwayExtractingBlockI8ConstantA() -> SIMD<Int8>.BlockVector {
-    SIMDInt8.BlockVector(
+    SIMD<Int8>.BlockVector(
         raw: HighwayReference.Nothrow.extractingBlockI8(
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             0
         )
     )
@@ -20,24 +20,24 @@ public func highwayExtractingBlockI8ConstantA() -> SIMD<Int8>.BlockVector {
 
 @inline(never)
 public func portExtractingBlockI8ConstantIndex(_ a: SIMD<Int8>) -> SIMD<Int8>.BlockVector {
-    unsafe SIMDInt8.block(a, atUnchecked: 0)
+    unsafe SIMD<Int8>.block(a, atUnchecked: 0)
 }
 
 @inline(never)
 public func highwayExtractingBlockI8ConstantIndex(_ a: SIMD<Int8>) -> SIMD<Int8>.BlockVector {
-    SIMDInt8.BlockVector(raw: HighwayReference.Nothrow.extractingBlockI8(a.raw, 0))
+    SIMD<Int8>.BlockVector(raw: HighwayReference.Nothrow.extractingBlockI8(a.raw, 0))
 }
 
 @inline(never)
 public func portReplacingBlockI8ConstantA(with b: SIMD<Int8>.BlockVector) -> SIMD<Int8> {
-    unsafe SIMDInt8.replacingBlock(SIMDInt8.repeating(26), atUnchecked: 0, with: b)
+    unsafe SIMD<Int8>.replacingBlock(SIMD<Int8>.repeating(26), atUnchecked: 0, with: b)
 }
 
 @inline(never)
 public func highwayReplacingBlockI8ConstantA(with b: SIMD<Int8>.BlockVector) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.replacingBlockI8(
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             0,
             b.raw
         )
@@ -49,7 +49,7 @@ public func portReplacingBlockI8ConstantIndex(
     _ a: SIMD<Int8>,
     with b: SIMD<Int8>.BlockVector
 ) -> SIMD<Int8> {
-    unsafe SIMDInt8.replacingBlock(a, atUnchecked: 0, with: b)
+    unsafe SIMD<Int8>.replacingBlock(a, atUnchecked: 0, with: b)
 }
 
 @inline(never)
@@ -57,5 +57,5 @@ public func highwayReplacingBlockI8ConstantIndex(
     _ a: SIMD<Int8>,
     with b: SIMD<Int8>.BlockVector
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.replacingBlockI8(a.raw, 0, b.raw))
+    SIMD<Int8>(raw: HighwayReference.Nothrow.replacingBlockI8(a.raw, 0, b.raw))
 }

@@ -6,7 +6,7 @@ public import Vectorization
 
 @inline(never)
 public func portSumWhereF16(_ a: SIMD<Float16>, where mask: SIMD<Float16>.Mask) -> Float16 {
-    SIMDFloat16.sum(a, where: mask)
+    SIMD<Float16>.sum(a, where: mask)
 }
 
 @inline(never)
@@ -16,7 +16,7 @@ public func highwaySumWhereF16(_ a: SIMD<Float16>, where mask: SIMD<Float16>.Mas
 
 @inline(never)
 public func portSumWhereF16ConstantA(where mask: SIMD<Float16>.Mask) -> Float16 {
-    SIMDFloat16.sum(SIMDFloat16.repeating(Float16(bitPattern: 26)), where: mask)
+    SIMD<Float16>.sum(SIMD<Float16>.repeating(Float16(bitPattern: 26)), where: mask)
 }
 
 @inline(never)
@@ -24,14 +24,16 @@ public func highwaySumWhereF16ConstantA(where mask: SIMD<Float16>.Mask) -> Float
     Float16(
         bitPattern: HighwayReference.Nothrow.sumWhereF16(
             mask.raw,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
         )
     )
 }
 
 @inline(never)
 public func portSmallestWhereF16(_ a: SIMD<Float16>, where mask: SIMD<Float16>.Mask) -> Float16 {
-    SIMDFloat16.smallest(a, where: mask)
+    SIMD<Float16>.smallest(a, where: mask)
 }
 
 @inline(never)
@@ -41,7 +43,7 @@ public func highwaySmallestWhereF16(_ a: SIMD<Float16>, where mask: SIMD<Float16
 
 @inline(never)
 public func portSmallestWhereF16ConstantA(where mask: SIMD<Float16>.Mask) -> Float16 {
-    SIMDFloat16.smallest(SIMDFloat16.repeating(Float16(bitPattern: 26)), where: mask)
+    SIMD<Float16>.smallest(SIMD<Float16>.repeating(Float16(bitPattern: 26)), where: mask)
 }
 
 @inline(never)
@@ -49,14 +51,16 @@ public func highwaySmallestWhereF16ConstantA(where mask: SIMD<Float16>.Mask) -> 
     Float16(
         bitPattern: HighwayReference.Nothrow.smallestWhereF16(
             mask.raw,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
         )
     )
 }
 
 @inline(never)
 public func portLargestWhereF16(_ a: SIMD<Float16>, where mask: SIMD<Float16>.Mask) -> Float16 {
-    SIMDFloat16.largest(a, where: mask)
+    SIMD<Float16>.largest(a, where: mask)
 }
 
 @inline(never)
@@ -66,7 +70,7 @@ public func highwayLargestWhereF16(_ a: SIMD<Float16>, where mask: SIMD<Float16>
 
 @inline(never)
 public func portLargestWhereF16ConstantA(where mask: SIMD<Float16>.Mask) -> Float16 {
-    SIMDFloat16.largest(SIMDFloat16.repeating(Float16(bitPattern: 26)), where: mask)
+    SIMD<Float16>.largest(SIMD<Float16>.repeating(Float16(bitPattern: 26)), where: mask)
 }
 
 @inline(never)
@@ -74,7 +78,9 @@ public func highwayLargestWhereF16ConstantA(where mask: SIMD<Float16>.Mask) -> F
     Float16(
         bitPattern: HighwayReference.Nothrow.largestWhereF16(
             mask.raw,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
         )
     )
 }

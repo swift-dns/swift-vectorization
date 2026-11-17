@@ -9,7 +9,7 @@ public func portSelectingU32(
     _ a: SIMD<UInt32>,
     _ b: SIMD<UInt32>
 ) -> SIMD<UInt32> {
-    SIMDUInt32.selecting(mask, a, b)
+    SIMD<UInt32>.selecting(mask, a, b)
 }
 
 @inline(never)
@@ -18,13 +18,13 @@ public func highwaySelectingU32(
     _ a: SIMD<UInt32>,
     _ b: SIMD<UInt32>
 ) -> SIMD<UInt32> {
-    SIMDUInt32.Vector(raw: HighwayReference.Nothrow.selectingU32(mask.raw, a.raw, b.raw))
+    SIMD<UInt32>(raw: HighwayReference.Nothrow.selectingU32(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portSelectingU32ConstantA(_ mask: SIMD<UInt32>.Mask, _ b: SIMD<UInt32>) -> SIMD<UInt32>
 {
-    SIMDUInt32.selecting(mask, SIMDUInt32.repeating(26), b)
+    SIMD<UInt32>.selecting(mask, SIMD<UInt32>.repeating(26), b)
 }
 
 @inline(never)
@@ -32,10 +32,10 @@ public func highwaySelectingU32ConstantA(
     _ mask: SIMD<UInt32>.Mask,
     _ b: SIMD<UInt32>
 ) -> SIMD<UInt32> {
-    SIMDUInt32.Vector(
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.selectingU32(
             mask.raw,
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
             b.raw
         )
     )
@@ -44,7 +44,7 @@ public func highwaySelectingU32ConstantA(
 @inline(never)
 public func portSelectingU32ConstantB(_ mask: SIMD<UInt32>.Mask, _ a: SIMD<UInt32>) -> SIMD<UInt32>
 {
-    SIMDUInt32.selecting(mask, a, SIMDUInt32.repeating(26))
+    SIMD<UInt32>.selecting(mask, a, SIMD<UInt32>.repeating(26))
 }
 
 @inline(never)
@@ -52,63 +52,63 @@ public func highwaySelectingU32ConstantB(
     _ mask: SIMD<UInt32>.Mask,
     _ a: SIMD<UInt32>
 ) -> SIMD<UInt32> {
-    SIMDUInt32.Vector(
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.selectingU32(
             mask.raw,
             a.raw,
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portSelectingOrZeroU32(_ mask: SIMD<UInt32>.Mask, _ a: SIMD<UInt32>) -> SIMD<UInt32> {
-    SIMDUInt32.selectingOrZero(mask, a)
+    SIMD<UInt32>.selectingOrZero(mask, a)
 }
 
 @inline(never)
 public func highwaySelectingOrZeroU32(_ mask: SIMD<UInt32>.Mask, _ a: SIMD<UInt32>) -> SIMD<UInt32>
 {
-    SIMDUInt32.Vector(raw: HighwayReference.Nothrow.selectingOrZeroU32(mask.raw, a.raw))
+    SIMD<UInt32>(raw: HighwayReference.Nothrow.selectingOrZeroU32(mask.raw, a.raw))
 }
 
 @inline(never)
 public func portSelectingOrZeroU32ConstantA(_ mask: SIMD<UInt32>.Mask) -> SIMD<UInt32> {
-    SIMDUInt32.selectingOrZero(mask, SIMDUInt32.repeating(26))
+    SIMD<UInt32>.selectingOrZero(mask, SIMD<UInt32>.repeating(26))
 }
 
 @inline(never)
 public func highwaySelectingOrZeroU32ConstantA(_ mask: SIMD<UInt32>.Mask) -> SIMD<UInt32> {
-    SIMDUInt32.Vector(
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.selectingOrZeroU32(
             mask.raw,
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portZeroingSelectedU32(_ mask: SIMD<UInt32>.Mask, _ a: SIMD<UInt32>) -> SIMD<UInt32> {
-    SIMDUInt32.zeroingSelected(mask, a)
+    SIMD<UInt32>.zeroingSelected(mask, a)
 }
 
 @inline(never)
 public func highwayZeroingSelectedU32(_ mask: SIMD<UInt32>.Mask, _ a: SIMD<UInt32>) -> SIMD<UInt32>
 {
-    SIMDUInt32.Vector(raw: HighwayReference.Nothrow.zeroingSelectedU32(mask.raw, a.raw))
+    SIMD<UInt32>(raw: HighwayReference.Nothrow.zeroingSelectedU32(mask.raw, a.raw))
 }
 
 @inline(never)
 public func portZeroingSelectedU32ConstantA(_ mask: SIMD<UInt32>.Mask) -> SIMD<UInt32> {
-    SIMDUInt32.zeroingSelected(mask, SIMDUInt32.repeating(26))
+    SIMD<UInt32>.zeroingSelected(mask, SIMD<UInt32>.repeating(26))
 }
 
 @inline(never)
 public func highwayZeroingSelectedU32ConstantA(_ mask: SIMD<UInt32>.Mask) -> SIMD<UInt32> {
-    SIMDUInt32.Vector(
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.zeroingSelectedU32(
             mask.raw,
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
         )
     )
 }
@@ -119,7 +119,7 @@ public func portSelectingByVectorU32(
     _ b: SIMD<UInt32>,
     _ c: SIMD<UInt32>
 ) -> SIMD<UInt32> {
-    SIMDUInt32.selecting(a, b, c)
+    SIMD<UInt32>.selecting(a, b, c)
 }
 
 @inline(never)
@@ -128,13 +128,13 @@ public func highwaySelectingByVectorU32(
     _ b: SIMD<UInt32>,
     _ c: SIMD<UInt32>
 ) -> SIMD<UInt32> {
-    SIMDUInt32.Vector(raw: HighwayReference.Nothrow.selectingByVectorU32(a.raw, b.raw, c.raw))
+    SIMD<UInt32>(raw: HighwayReference.Nothrow.selectingByVectorU32(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
 public func portSelectingByVectorU32ConstantA(_ b: SIMD<UInt32>, _ c: SIMD<UInt32>) -> SIMD<UInt32>
 {
-    SIMDUInt32.selecting(SIMDUInt32.repeating(26), b, c)
+    SIMD<UInt32>.selecting(SIMD<UInt32>.repeating(26), b, c)
 }
 
 @inline(never)
@@ -142,9 +142,9 @@ public func highwaySelectingByVectorU32ConstantA(
     _ b: SIMD<UInt32>,
     _ c: SIMD<UInt32>
 ) -> SIMD<UInt32> {
-    SIMDUInt32.Vector(
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.selectingByVectorU32(
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
             b.raw,
             c.raw
         )
@@ -154,7 +154,7 @@ public func highwaySelectingByVectorU32ConstantA(
 @inline(never)
 public func portSelectingByVectorU32ConstantB(_ a: SIMD<UInt32>, _ c: SIMD<UInt32>) -> SIMD<UInt32>
 {
-    SIMDUInt32.selecting(a, SIMDUInt32.repeating(26), c)
+    SIMD<UInt32>.selecting(a, SIMD<UInt32>.repeating(26), c)
 }
 
 @inline(never)
@@ -162,10 +162,10 @@ public func highwaySelectingByVectorU32ConstantB(
     _ a: SIMD<UInt32>,
     _ c: SIMD<UInt32>
 ) -> SIMD<UInt32> {
-    SIMDUInt32.Vector(
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.selectingByVectorU32(
             a.raw,
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
             c.raw
         )
     )
@@ -174,7 +174,7 @@ public func highwaySelectingByVectorU32ConstantB(
 @inline(never)
 public func portSelectingByVectorU32ConstantC(_ a: SIMD<UInt32>, _ b: SIMD<UInt32>) -> SIMD<UInt32>
 {
-    SIMDUInt32.selecting(a, b, SIMDUInt32.repeating(26))
+    SIMD<UInt32>.selecting(a, b, SIMD<UInt32>.repeating(26))
 }
 
 @inline(never)
@@ -182,11 +182,11 @@ public func highwaySelectingByVectorU32ConstantC(
     _ a: SIMD<UInt32>,
     _ b: SIMD<UInt32>
 ) -> SIMD<UInt32> {
-    SIMDUInt32.Vector(
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.selectingByVectorU32(
             a.raw,
             b.raw,
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
         )
     )
 }

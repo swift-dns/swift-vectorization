@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDBFloat16ReferenceTests {
     @Test func shiftedLeftLanes() {
         let mismatches = Mismatches("shiftedLeftLanes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0C12_513C_F511_87AB)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0C12_513C_F511_87AB)
         let lanesInputs = Array(0...8)
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.shiftedLeftLanes(a, by: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedLeftLanesBF16(
                         a.raw,
                         Int32(truncatingIfNeeded: lanes)
@@ -27,12 +27,12 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func shiftedLeftLanesUnchecked() {
         let mismatches = Mismatches("shiftedLeftLanes unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4AB0_9A07_278D_497F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4AB0_9A07_278D_497F)
         let lanesInputs = Array(0...8)
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 unsafe H.shiftedLeftLanes(a, byUnchecked: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedLeftLanesBF16(
                         a.raw,
                         Int32(truncatingIfNeeded: lanes)
@@ -46,8 +46,8 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func combinedShiftedRightBytes() {
         let mismatches = Mismatches("combinedShiftedRightBytes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x28E7_05D5_2AC6_4437)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x28E7_04D5_2AC6_4284)
+        let aInputs = Inputs.vectors(H.self, seed: 0x28E7_05D5_2AC6_4437)
+        let bInputs = Inputs.vectors(H.self, seed: 0x28E7_04D5_2AC6_4284)
         let bytesInputs = Array(1...15)
         for (a, b, bytes) in mixedTriples(
             aInputs,
@@ -57,7 +57,7 @@ extension SIMDBFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.combinedShiftedRightBytes(a, b, by: bytes),
-                H.Vector(
+                H(
                     raw: HighwayReference.combinedShiftedRightBytesBF16(
                         a.raw,
                         b.raw,
@@ -72,8 +72,8 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func combinedShiftedRightBytesUnchecked() {
         let mismatches = Mismatches("combinedShiftedRightBytes unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEE43_9D1E_EB4B_D8BB)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xEE43_9C1E_EB4B_D708)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEE43_9D1E_EB4B_D8BB)
+        let bInputs = Inputs.vectors(H.self, seed: 0xEE43_9C1E_EB4B_D708)
         let bytesInputs = Array(1...15)
         for (a, b, bytes) in mixedTriples(
             aInputs,
@@ -83,7 +83,7 @@ extension SIMDBFloat16ReferenceTests {
         ) {
             mismatches.check(
                 unsafe H.combinedShiftedRightBytes(a, b, byUnchecked: bytes),
-                H.Vector(
+                H(
                     raw: HighwayReference.combinedShiftedRightBytesBF16(
                         a.raw,
                         b.raw,
@@ -98,8 +98,8 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func combinedShiftedRightLanes() {
         let mismatches = Mismatches("combinedShiftedRightLanes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6D7D_8F02_FE25_D79F)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6D7D_8E02_FE25_D5EC)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6D7D_8F02_FE25_D79F)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6D7D_8E02_FE25_D5EC)
         let lanesInputs = Array(1...7)
         for (a, b, lanes) in mixedTriples(
             aInputs,
@@ -109,7 +109,7 @@ extension SIMDBFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.combinedShiftedRightLanes(a, b, by: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.combinedShiftedRightLanesBF16(
                         a.raw,
                         b.raw,
@@ -124,8 +124,8 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func combinedShiftedRightLanesUnchecked() {
         let mismatches = Mismatches("combinedShiftedRightLanes unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x33F9_F37C_DDAC_7D03)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x33F9_F27C_DDAC_7B50)
+        let aInputs = Inputs.vectors(H.self, seed: 0x33F9_F37C_DDAC_7D03)
+        let bInputs = Inputs.vectors(H.self, seed: 0x33F9_F27C_DDAC_7B50)
         let lanesInputs = Array(1...7)
         for (a, b, lanes) in mixedTriples(
             aInputs,
@@ -135,7 +135,7 @@ extension SIMDBFloat16ReferenceTests {
         ) {
             mismatches.check(
                 unsafe H.combinedShiftedRightLanes(a, b, byUnchecked: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.combinedShiftedRightLanesBF16(
                         a.raw,
                         b.raw,

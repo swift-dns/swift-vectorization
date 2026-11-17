@@ -45,7 +45,7 @@ extension Inputs {
 
     package static func exponents<V: ReferenceVector>(_ type: V.Type, seed: UInt64) -> [V]
     where V.Simd.Scalar: FixedWidthInteger & SignedInteger {
-        exponents(V.Simd.self, seed: seed).map(V.init)
+        exponents(V.Simd.self, seed: seed).map { V(referenceSimd: $0) }
     }
 
     package static func byteIndices<V: Swift.SIMD>(_ type: V.Type, seed: UInt64) -> [V]
@@ -59,6 +59,6 @@ extension Inputs {
 
     package static func byteIndices<V: ReferenceVector>(_ type: V.Type, seed: UInt64) -> [V]
     where V.Simd.Scalar: FixedWidthInteger {
-        byteIndices(V.Simd.self, seed: seed).map(V.init)
+        byteIndices(V.Simd.self, seed: seed).map { V(referenceSimd: $0) }
     }
 }

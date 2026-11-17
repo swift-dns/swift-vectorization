@@ -10,11 +10,11 @@ extension SIMDInt64ConstantTests {
     private func checkShiftedRightWhereConstantBits(_ bits: Int) {
         let mismatches = Mismatches("shiftedRightWhere with bits \(bits)")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3CC4_37C2_790E_F7F0)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3CC4_38C2_790E_F9A3)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3CC4_38C2_790E_F9A3)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.shiftedRight(a, by: bits, where: mask),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedRightWhereTemplateI64(
                         mask.raw,
                         a.raw,
@@ -286,9 +286,9 @@ extension SIMDInt64ConstantTests {
     @inline(__always)
     private func checkShiftedRightWhereOtherwiseConstantBits(_ bits: Int) {
         let mismatches = Mismatches("shiftedRightWhereOtherwise with bits \(bits)")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x8C57_BD36_D1FB_3704)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x8C57_BD36_D1FB_3704)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8C57_BE36_D1FB_38B7)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8C57_BF36_D1FB_3A6A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8C57_BF36_D1FB_3A6A)
         for (otherwise, mask, a) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -297,7 +297,7 @@ extension SIMDInt64ConstantTests {
         ) {
             mismatches.check(
                 H.shiftedRight(a, by: bits, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedRightWhereOtherwiseTemplateI64(
                         otherwise.raw,
                         mask.raw,
@@ -568,16 +568,16 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkShiftedRightWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkShiftedRightWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "shiftedRightWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1AD4_300C_2887_9B37)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1AD4_310C_2887_9CEA)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1AD4_310C_2887_9CEA)
         let bitsInputs = Inputs.shiftAmounts(bits: 64, inContract: true)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (mask, a, bits) in mixedTriples(
@@ -588,7 +588,7 @@ extension SIMDInt64ConstantTests {
         ) {
             mismatches.check(
                 H.shiftedRight(a, by: bits, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedRightWhereOtherwiseI64(
                         H.repeating(value).raw,
                         mask.raw,
@@ -671,10 +671,10 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func shiftedRightWhereOtherwiseConstantSplatMax() {
-        checkShiftedRightWhereOtherwiseConstantOtherwise(H.Lane.max)
+        checkShiftedRightWhereOtherwiseConstantOtherwise(Lane.max)
     }
 
     @Test func shiftedRightWhereOtherwiseConstantSplatMin() {
-        checkShiftedRightWhereOtherwiseConstantOtherwise(H.Lane.min)
+        checkShiftedRightWhereOtherwiseConstantOtherwise(Lane.min)
     }
 }

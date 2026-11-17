@@ -5,24 +5,24 @@ public import Vectorization
 
 @inline(never)
 public func portSlideUpLanesI16(_ a: SIMD<Int16>, byUnchecked lanes: Int) -> SIMD<Int16> {
-    unsafe SIMDInt16.slideUpLanes(a, byUnchecked: lanes)
+    unsafe SIMD<Int16>.slideUpLanes(a, byUnchecked: lanes)
 }
 
 @inline(never)
 public func highwaySlideUpLanesI16(_ a: SIMD<Int16>, byUnchecked lanes: Int) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slideUpLanesI16(a.raw, lanes))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.slideUpLanesI16(a.raw, lanes))
 }
 
 @inline(never)
 public func portSlideUpLanesI16ConstantA(byUnchecked lanes: Int) -> SIMD<Int16> {
-    unsafe SIMDInt16.slideUpLanes(SIMDInt16.repeating(26), byUnchecked: lanes)
+    unsafe SIMD<Int16>.slideUpLanes(SIMD<Int16>.repeating(26), byUnchecked: lanes)
 }
 
 @inline(never)
 public func highwaySlideUpLanesI16ConstantA(byUnchecked lanes: Int) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.slideUpLanesI16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             lanes
         )
     )
@@ -30,12 +30,12 @@ public func highwaySlideUpLanesI16ConstantA(byUnchecked lanes: Int) -> SIMD<Int1
 
 @inline(never)
 public func portSlideUpLanesI16ConstantLanes(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    unsafe SIMDInt16.slideUpLanes(a, byUnchecked: 1)
+    unsafe SIMD<Int16>.slideUpLanes(a, byUnchecked: 1)
 }
 
 @inline(never)
 public func highwaySlideUpLanesI16ConstantLanes(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slideUpLanesI16(a.raw, 1))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.slideUpLanesI16(a.raw, 1))
 }
 
 @inline(never)
@@ -44,7 +44,7 @@ public func portSlideUpLanesFillingWithI16(
     byUnchecked lanes: Int,
     fillingWith fill: SIMD<Int16>
 ) -> SIMD<Int16> {
-    unsafe SIMDInt16.slideUpLanes(a, byUnchecked: lanes, fillingWith: fill)
+    unsafe SIMD<Int16>.slideUpLanes(a, byUnchecked: lanes, fillingWith: fill)
 }
 
 @inline(never)
@@ -53,9 +53,7 @@ public func highwaySlideUpLanesFillingWithI16(
     byUnchecked lanes: Int,
     fillingWith fill: SIMD<Int16>
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
-        raw: HighwayReference.Nothrow.slideUpLanesFillingWithI16(fill.raw, a.raw, lanes)
-    )
+    SIMD<Int16>(raw: HighwayReference.Nothrow.slideUpLanesFillingWithI16(fill.raw, a.raw, lanes))
 }
 
 @inline(never)
@@ -63,7 +61,11 @@ public func portSlideUpLanesFillingWithI16ConstantA(
     byUnchecked lanes: Int,
     fillingWith fill: SIMD<Int16>
 ) -> SIMD<Int16> {
-    unsafe SIMDInt16.slideUpLanes(SIMDInt16.repeating(26), byUnchecked: lanes, fillingWith: fill)
+    unsafe SIMD<Int16>.slideUpLanes(
+        SIMD<Int16>.repeating(26),
+        byUnchecked: lanes,
+        fillingWith: fill
+    )
 }
 
 @inline(never)
@@ -71,10 +73,10 @@ public func highwaySlideUpLanesFillingWithI16ConstantA(
     byUnchecked lanes: Int,
     fillingWith fill: SIMD<Int16>
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.slideUpLanesFillingWithI16(
             fill.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             lanes
         )
     )
@@ -85,7 +87,7 @@ public func portSlideUpLanesFillingWithI16ConstantLanes(
     _ a: SIMD<Int16>,
     fillingWith fill: SIMD<Int16>
 ) -> SIMD<Int16> {
-    unsafe SIMDInt16.slideUpLanes(a, byUnchecked: 1, fillingWith: fill)
+    unsafe SIMD<Int16>.slideUpLanes(a, byUnchecked: 1, fillingWith: fill)
 }
 
 @inline(never)
@@ -93,7 +95,7 @@ public func highwaySlideUpLanesFillingWithI16ConstantLanes(
     _ a: SIMD<Int16>,
     fillingWith fill: SIMD<Int16>
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slideUpLanesFillingWithI16(fill.raw, a.raw, 1))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.slideUpLanesFillingWithI16(fill.raw, a.raw, 1))
 }
 
 @inline(never)
@@ -101,7 +103,7 @@ public func portSlideUpLanesFillingWithI16ConstantFill(
     _ a: SIMD<Int16>,
     byUnchecked lanes: Int
 ) -> SIMD<Int16> {
-    unsafe SIMDInt16.slideUpLanes(a, byUnchecked: lanes, fillingWith: SIMDInt16.repeating(26))
+    unsafe SIMD<Int16>.slideUpLanes(a, byUnchecked: lanes, fillingWith: SIMD<Int16>.repeating(26))
 }
 
 @inline(never)
@@ -109,9 +111,9 @@ public func highwaySlideUpLanesFillingWithI16ConstantFill(
     _ a: SIMD<Int16>,
     byUnchecked lanes: Int
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.slideUpLanesFillingWithI16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             a.raw,
             lanes
         )
@@ -120,24 +122,24 @@ public func highwaySlideUpLanesFillingWithI16ConstantFill(
 
 @inline(never)
 public func portSlideDownLanesI16(_ a: SIMD<Int16>, byUnchecked lanes: Int) -> SIMD<Int16> {
-    unsafe SIMDInt16.slideDownLanes(a, byUnchecked: lanes)
+    unsafe SIMD<Int16>.slideDownLanes(a, byUnchecked: lanes)
 }
 
 @inline(never)
 public func highwaySlideDownLanesI16(_ a: SIMD<Int16>, byUnchecked lanes: Int) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slideDownLanesI16(a.raw, lanes))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.slideDownLanesI16(a.raw, lanes))
 }
 
 @inline(never)
 public func portSlideDownLanesI16ConstantA(byUnchecked lanes: Int) -> SIMD<Int16> {
-    unsafe SIMDInt16.slideDownLanes(SIMDInt16.repeating(26), byUnchecked: lanes)
+    unsafe SIMD<Int16>.slideDownLanes(SIMD<Int16>.repeating(26), byUnchecked: lanes)
 }
 
 @inline(never)
 public func highwaySlideDownLanesI16ConstantA(byUnchecked lanes: Int) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.slideDownLanesI16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             lanes
         )
     )
@@ -145,12 +147,12 @@ public func highwaySlideDownLanesI16ConstantA(byUnchecked lanes: Int) -> SIMD<In
 
 @inline(never)
 public func portSlideDownLanesI16ConstantLanes(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    unsafe SIMDInt16.slideDownLanes(a, byUnchecked: 1)
+    unsafe SIMD<Int16>.slideDownLanes(a, byUnchecked: 1)
 }
 
 @inline(never)
 public func highwaySlideDownLanesI16ConstantLanes(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slideDownLanesI16(a.raw, 1))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.slideDownLanesI16(a.raw, 1))
 }
 
 @inline(never)
@@ -159,7 +161,7 @@ public func portSlideDownLanesFillingWithI16(
     byUnchecked lanes: Int,
     fillingWith fill: SIMD<Int16>
 ) -> SIMD<Int16> {
-    unsafe SIMDInt16.slideDownLanes(a, byUnchecked: lanes, fillingWith: fill)
+    unsafe SIMD<Int16>.slideDownLanes(a, byUnchecked: lanes, fillingWith: fill)
 }
 
 @inline(never)
@@ -168,9 +170,7 @@ public func highwaySlideDownLanesFillingWithI16(
     byUnchecked lanes: Int,
     fillingWith fill: SIMD<Int16>
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
-        raw: HighwayReference.Nothrow.slideDownLanesFillingWithI16(fill.raw, a.raw, lanes)
-    )
+    SIMD<Int16>(raw: HighwayReference.Nothrow.slideDownLanesFillingWithI16(fill.raw, a.raw, lanes))
 }
 
 @inline(never)
@@ -178,7 +178,11 @@ public func portSlideDownLanesFillingWithI16ConstantA(
     byUnchecked lanes: Int,
     fillingWith fill: SIMD<Int16>
 ) -> SIMD<Int16> {
-    unsafe SIMDInt16.slideDownLanes(SIMDInt16.repeating(26), byUnchecked: lanes, fillingWith: fill)
+    unsafe SIMD<Int16>.slideDownLanes(
+        SIMD<Int16>.repeating(26),
+        byUnchecked: lanes,
+        fillingWith: fill
+    )
 }
 
 @inline(never)
@@ -186,10 +190,10 @@ public func highwaySlideDownLanesFillingWithI16ConstantA(
     byUnchecked lanes: Int,
     fillingWith fill: SIMD<Int16>
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.slideDownLanesFillingWithI16(
             fill.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             lanes
         )
     )
@@ -200,7 +204,7 @@ public func portSlideDownLanesFillingWithI16ConstantLanes(
     _ a: SIMD<Int16>,
     fillingWith fill: SIMD<Int16>
 ) -> SIMD<Int16> {
-    unsafe SIMDInt16.slideDownLanes(a, byUnchecked: 1, fillingWith: fill)
+    unsafe SIMD<Int16>.slideDownLanes(a, byUnchecked: 1, fillingWith: fill)
 }
 
 @inline(never)
@@ -208,7 +212,7 @@ public func highwaySlideDownLanesFillingWithI16ConstantLanes(
     _ a: SIMD<Int16>,
     fillingWith fill: SIMD<Int16>
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slideDownLanesFillingWithI16(fill.raw, a.raw, 1))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.slideDownLanesFillingWithI16(fill.raw, a.raw, 1))
 }
 
 @inline(never)
@@ -216,7 +220,7 @@ public func portSlideDownLanesFillingWithI16ConstantFill(
     _ a: SIMD<Int16>,
     byUnchecked lanes: Int
 ) -> SIMD<Int16> {
-    unsafe SIMDInt16.slideDownLanes(a, byUnchecked: lanes, fillingWith: SIMDInt16.repeating(26))
+    unsafe SIMD<Int16>.slideDownLanes(a, byUnchecked: lanes, fillingWith: SIMD<Int16>.repeating(26))
 }
 
 @inline(never)
@@ -224,9 +228,9 @@ public func highwaySlideDownLanesFillingWithI16ConstantFill(
     _ a: SIMD<Int16>,
     byUnchecked lanes: Int
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.slideDownLanesFillingWithI16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             a.raw,
             lanes
         )
@@ -235,91 +239,91 @@ public func highwaySlideDownLanesFillingWithI16ConstantFill(
 
 @inline(never)
 public func portSlide1UpI16(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.slide1Up(a)
+    SIMD<Int16>.slide1Up(a)
 }
 
 @inline(never)
 public func highwaySlide1UpI16(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slide1UpI16(a.raw))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.slide1UpI16(a.raw))
 }
 
 @inline(never)
 public func portSlide1UpI16ConstantA() -> SIMD<Int16> {
-    SIMDInt16.slide1Up(SIMDInt16.repeating(26))
+    SIMD<Int16>.slide1Up(SIMD<Int16>.repeating(26))
 }
 
 @inline(never)
 public func highwaySlide1UpI16ConstantA() -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.slide1UpI16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portSlide1UpFillingWithI16(_ a: SIMD<Int16>, fillingWith fill: Int16) -> SIMD<Int16> {
-    SIMDInt16.slide1Up(a, fillingWith: fill)
+    SIMD<Int16>.slide1Up(a, fillingWith: fill)
 }
 
 @inline(never)
 public func highwaySlide1UpFillingWithI16(_ a: SIMD<Int16>, fillingWith fill: Int16) -> SIMD<Int16>
 {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slide1UpFillingWithI16(fill, a.raw))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.slide1UpFillingWithI16(fill, a.raw))
 }
 
 @inline(never)
 public func portSlide1UpFillingWithI16ConstantA(fillingWith fill: Int16) -> SIMD<Int16> {
-    SIMDInt16.slide1Up(SIMDInt16.repeating(26), fillingWith: fill)
+    SIMD<Int16>.slide1Up(SIMD<Int16>.repeating(26), fillingWith: fill)
 }
 
 @inline(never)
 public func highwaySlide1UpFillingWithI16ConstantA(fillingWith fill: Int16) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.slide1UpFillingWithI16(
             fill,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portSlide1UpFillingWithI16ConstantFill(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.slide1Up(a, fillingWith: 26)
+    SIMD<Int16>.slide1Up(a, fillingWith: 26)
 }
 
 @inline(never)
 public func highwaySlide1UpFillingWithI16ConstantFill(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slide1UpFillingWithI16(26, a.raw))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.slide1UpFillingWithI16(26, a.raw))
 }
 
 @inline(never)
 public func portSlide1DownI16(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.slide1Down(a)
+    SIMD<Int16>.slide1Down(a)
 }
 
 @inline(never)
 public func highwaySlide1DownI16(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slide1DownI16(a.raw))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.slide1DownI16(a.raw))
 }
 
 @inline(never)
 public func portSlide1DownI16ConstantA() -> SIMD<Int16> {
-    SIMDInt16.slide1Down(SIMDInt16.repeating(26))
+    SIMD<Int16>.slide1Down(SIMD<Int16>.repeating(26))
 }
 
 @inline(never)
 public func highwaySlide1DownI16ConstantA() -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.slide1DownI16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portSlide1DownFillingWithI16(_ a: SIMD<Int16>, fillingWith fill: Int16) -> SIMD<Int16> {
-    SIMDInt16.slide1Down(a, fillingWith: fill)
+    SIMD<Int16>.slide1Down(a, fillingWith: fill)
 }
 
 @inline(never)
@@ -327,44 +331,44 @@ public func highwaySlide1DownFillingWithI16(
     _ a: SIMD<Int16>,
     fillingWith fill: Int16
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slide1DownFillingWithI16(fill, a.raw))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.slide1DownFillingWithI16(fill, a.raw))
 }
 
 @inline(never)
 public func portSlide1DownFillingWithI16ConstantA(fillingWith fill: Int16) -> SIMD<Int16> {
-    SIMDInt16.slide1Down(SIMDInt16.repeating(26), fillingWith: fill)
+    SIMD<Int16>.slide1Down(SIMD<Int16>.repeating(26), fillingWith: fill)
 }
 
 @inline(never)
 public func highwaySlide1DownFillingWithI16ConstantA(fillingWith fill: Int16) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.slide1DownFillingWithI16(
             fill,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portSlide1DownFillingWithI16ConstantFill(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.slide1Down(a, fillingWith: 26)
+    SIMD<Int16>.slide1Down(a, fillingWith: 26)
 }
 
 @inline(never)
 public func highwaySlide1DownFillingWithI16ConstantFill(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slide1DownFillingWithI16(26, a.raw))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.slide1DownFillingWithI16(26, a.raw))
 }
 
 @inline(never)
 public func portSlideUpBlocksI16ConstantA() -> SIMD<Int16> {
-    unsafe SIMDInt16.slideUpBlocks(SIMDInt16.repeating(26), byUnchecked: 0)
+    unsafe SIMD<Int16>.slideUpBlocks(SIMD<Int16>.repeating(26), byUnchecked: 0)
 }
 
 @inline(never)
 public func highwaySlideUpBlocksI16ConstantA() -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.slideUpBlocksI16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             0
         )
     )
@@ -372,24 +376,24 @@ public func highwaySlideUpBlocksI16ConstantA() -> SIMD<Int16> {
 
 @inline(never)
 public func portSlideUpBlocksI16ConstantBlocks(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    unsafe SIMDInt16.slideUpBlocks(a, byUnchecked: 0)
+    unsafe SIMD<Int16>.slideUpBlocks(a, byUnchecked: 0)
 }
 
 @inline(never)
 public func highwaySlideUpBlocksI16ConstantBlocks(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slideUpBlocksI16(a.raw, 0))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.slideUpBlocksI16(a.raw, 0))
 }
 
 @inline(never)
 public func portSlideDownBlocksI16ConstantA() -> SIMD<Int16> {
-    unsafe SIMDInt16.slideDownBlocks(SIMDInt16.repeating(26), byUnchecked: 0)
+    unsafe SIMD<Int16>.slideDownBlocks(SIMD<Int16>.repeating(26), byUnchecked: 0)
 }
 
 @inline(never)
 public func highwaySlideDownBlocksI16ConstantA() -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.slideDownBlocksI16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             0
         )
     )
@@ -397,24 +401,24 @@ public func highwaySlideDownBlocksI16ConstantA() -> SIMD<Int16> {
 
 @inline(never)
 public func portSlideDownBlocksI16ConstantBlocks(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    unsafe SIMDInt16.slideDownBlocks(a, byUnchecked: 0)
+    unsafe SIMD<Int16>.slideDownBlocks(a, byUnchecked: 0)
 }
 
 @inline(never)
 public func highwaySlideDownBlocksI16ConstantBlocks(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slideDownBlocksI16(a.raw, 0))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.slideDownBlocksI16(a.raw, 0))
 }
 
 @inline(never)
 public func portCombinedSlideDownLanesI16ConstantA(_ b: SIMD<Int16>) -> SIMD<Int16> {
-    unsafe SIMDInt16.combinedSlideDownLanes(SIMDInt16.repeating(26), b, byUnchecked: 1)
+    unsafe SIMD<Int16>.combinedSlideDownLanes(SIMD<Int16>.repeating(26), b, byUnchecked: 1)
 }
 
 @inline(never)
 public func highwayCombinedSlideDownLanesI16ConstantA(_ b: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.combinedSlideDownLanesI16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw,
             1
         )
@@ -423,15 +427,15 @@ public func highwayCombinedSlideDownLanesI16ConstantA(_ b: SIMD<Int16>) -> SIMD<
 
 @inline(never)
 public func portCombinedSlideDownLanesI16ConstantB(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    unsafe SIMDInt16.combinedSlideDownLanes(a, SIMDInt16.repeating(26), byUnchecked: 1)
+    unsafe SIMD<Int16>.combinedSlideDownLanes(a, SIMD<Int16>.repeating(26), byUnchecked: 1)
 }
 
 @inline(never)
 public func highwayCombinedSlideDownLanesI16ConstantB(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.combinedSlideDownLanesI16(
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             1
         )
     )
@@ -442,7 +446,7 @@ public func portCombinedSlideDownLanesI16ConstantLanes(
     _ a: SIMD<Int16>,
     _ b: SIMD<Int16>
 ) -> SIMD<Int16> {
-    unsafe SIMDInt16.combinedSlideDownLanes(a, b, byUnchecked: 1)
+    unsafe SIMD<Int16>.combinedSlideDownLanes(a, b, byUnchecked: 1)
 }
 
 @inline(never)
@@ -450,5 +454,5 @@ public func highwayCombinedSlideDownLanesI16ConstantLanes(
     _ a: SIMD<Int16>,
     _ b: SIMD<Int16>
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.combinedSlideDownLanesI16(a.raw, b.raw, 1))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.combinedSlideDownLanesI16(a.raw, b.raw, 1))
 }

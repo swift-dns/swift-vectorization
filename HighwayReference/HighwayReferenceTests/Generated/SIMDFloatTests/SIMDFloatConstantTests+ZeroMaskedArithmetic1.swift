@@ -7,14 +7,18 @@ import Vectorization
 
 extension SIMDFloatConstantTests {
     @inline(__always)
-    private func checkSquareRootWhereConstantA(_ value: H.Lane) {
+    private func checkSquareRootWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("squareRootWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x036A_DA28_DFEC_FDD1)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for mask in maskInputs {
             mismatches.check(
                 H.squareRoot(H.repeating(value), where: mask),
-                HighwayReference.squareRootWhereF32(mask.raw, H.repeating(value).raw),
+                H(raw: HighwayReference.squareRootWhereF32(mask.raw, H.repeating(value).raw)),
                 "mask: \(describe(mask))"
             )
         }
@@ -78,7 +82,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func squareRootWhereConstantSplatPayloadNaN() {
-        checkSquareRootWhereConstantA(H.Lane(nan: 1, signaling: false))
+        checkSquareRootWhereConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func squareRootWhereConstantSplatSignalingNaN() {
@@ -98,16 +102,20 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMaximumWhereConstantA(_ value: H.Lane) {
+    private func checkMaximumWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("maximumWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC255_69B5_E00C_706E)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC255_67B5_E00C_6D08)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0xC255_67B5_E00C_6D08)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (mask, b) in everyPair(maskInputs, bInputs)
-        where !hasUnorderedNaNs(H.repeating(value), b) {
+        where !hasUnorderedNaNs(H.repeating(value).simd, b.simd) {
             mismatches.check(
                 H.maximum(H.repeating(value), b, where: mask),
-                HighwayReference.maximumWhereF32(mask.raw, H.repeating(value).raw, b.raw),
+                H(raw: HighwayReference.maximumWhereF32(mask.raw, H.repeating(value).raw, b.raw)),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -115,16 +123,20 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMaximumWhereConstantB(_ value: H.Lane) {
+    private func checkMaximumWhereConstantB(_ value: Lane) {
         let mismatches = Mismatches("maximumWhere with b repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA74F_E4B5_D073_3DEF)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA74F_E3B5_D073_3C3C)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0xA74F_E3B5_D073_3C3C)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (mask, a) in everyPair(maskInputs, aInputs)
-        where !hasUnorderedNaNs(a, H.repeating(value)) {
+        where !hasUnorderedNaNs(a.simd, H.repeating(value).simd) {
             mismatches.check(
                 H.maximum(a, H.repeating(value), where: mask),
-                HighwayReference.maximumWhereF32(mask.raw, a.raw, H.repeating(value).raw),
+                H(raw: HighwayReference.maximumWhereF32(mask.raw, a.raw, H.repeating(value).raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -202,8 +214,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func maximumWhereConstantSplatPayloadNaN() {
-        checkMaximumWhereConstantA(H.Lane(nan: 1, signaling: false))
-        checkMaximumWhereConstantB(H.Lane(nan: 1, signaling: false))
+        checkMaximumWhereConstantA(Lane(nan: 1, signaling: false))
+        checkMaximumWhereConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func maximumWhereConstantSplatSignalingNaN() {
@@ -227,16 +239,20 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkAddingWhereConstantA(_ value: H.Lane) {
+    private func checkAddingWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("addingWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB2DA_B171_85BB_6EAF)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB2DA_B371_85BB_7215)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0xB2DA_B371_85BB_7215)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (mask, b) in everyPair(maskInputs, bInputs)
-        where !hasUnorderedNaNs(H.repeating(value), b) {
+        where !hasUnorderedNaNs(H.repeating(value).simd, b.simd) {
             mismatches.check(
                 H.adding(H.repeating(value), b, where: mask),
-                HighwayReference.addingWhereF32(mask.raw, H.repeating(value).raw, b.raw),
+                H(raw: HighwayReference.addingWhereF32(mask.raw, H.repeating(value).raw, b.raw)),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -244,16 +260,20 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkAddingWhereConstantB(_ value: H.Lane) {
+    private func checkAddingWhereConstantB(_ value: Lane) {
         let mismatches = Mismatches("addingWhere with b repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xCDE0_3671_9554_A12E)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCDE0_3771_9554_A2E1)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0xCDE0_3771_9554_A2E1)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (mask, a) in everyPair(maskInputs, aInputs)
-        where !hasUnorderedNaNs(a, H.repeating(value)) {
+        where !hasUnorderedNaNs(a.simd, H.repeating(value).simd) {
             mismatches.check(
                 H.adding(a, H.repeating(value), where: mask),
-                HighwayReference.addingWhereF32(mask.raw, a.raw, H.repeating(value).raw),
+                H(raw: HighwayReference.addingWhereF32(mask.raw, a.raw, H.repeating(value).raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -331,8 +351,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func addingWhereConstantSplatPayloadNaN() {
-        checkAddingWhereConstantA(H.Lane(nan: 1, signaling: false))
-        checkAddingWhereConstantB(H.Lane(nan: 1, signaling: false))
+        checkAddingWhereConstantA(Lane(nan: 1, signaling: false))
+        checkAddingWhereConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func addingWhereConstantSplatSignalingNaN() {
@@ -356,15 +376,25 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkSubtractingWhereConstantA(_ value: H.Lane) {
+    private func checkSubtractingWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("subtractingWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7CE9_90D8_5437_0A4C)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7CE9_92D8_5437_0DB2)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x7CE9_92D8_5437_0DB2)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 H.subtracting(H.repeating(value), b, where: mask),
-                HighwayReference.subtractingWhereF32(mask.raw, H.repeating(value).raw, b.raw),
+                H(
+                    raw: HighwayReference.subtractingWhereF32(
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw
+                    )
+                ),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -372,15 +402,25 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkSubtractingWhereConstantB(_ value: H.Lane) {
+    private func checkSubtractingWhereConstantB(_ value: Lane) {
         let mismatches = Mismatches("subtractingWhere with b repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x857E_C7D8_590D_EC61)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x857E_C6D8_590D_EAAE)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x857E_C6D8_590D_EAAE)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.subtracting(a, H.repeating(value), where: mask),
-                HighwayReference.subtractingWhereF32(mask.raw, a.raw, H.repeating(value).raw),
+                H(
+                    raw: HighwayReference.subtractingWhereF32(
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw
+                    )
+                ),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -458,8 +498,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func subtractingWhereConstantSplatPayloadNaN() {
-        checkSubtractingWhereConstantA(H.Lane(nan: 1, signaling: false))
-        checkSubtractingWhereConstantB(H.Lane(nan: 1, signaling: false))
+        checkSubtractingWhereConstantA(Lane(nan: 1, signaling: false))
+        checkSubtractingWhereConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func subtractingWhereConstantSplatSignalingNaN() {
@@ -483,16 +523,26 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingWhereConstantA(_ value: H.Lane) {
+    private func checkMultiplyingWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyingWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1A24_B5BB_BAEE_E8C0)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1A24_B7BB_BAEE_EC26)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x1A24_B7BB_BAEE_EC26)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (mask, b) in everyPair(maskInputs, bInputs)
-        where !hasUnorderedNaNs(H.repeating(value), b) {
+        where !hasUnorderedNaNs(H.repeating(value).simd, b.simd) {
             mismatches.check(
                 H.multiplying(H.repeating(value), b, where: mask),
-                HighwayReference.multiplyingWhereF32(mask.raw, H.repeating(value).raw, b.raw),
+                H(
+                    raw: HighwayReference.multiplyingWhereF32(
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw
+                    )
+                ),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -500,16 +550,26 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingWhereConstantB(_ value: H.Lane) {
+    private func checkMultiplyingWhereConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplyingWhere with b repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x2326_ECBB_C022_9CB5)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2326_EBBB_C022_9B02)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x2326_EBBB_C022_9B02)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (mask, a) in everyPair(maskInputs, aInputs)
-        where !hasUnorderedNaNs(a, H.repeating(value)) {
+        where !hasUnorderedNaNs(a.simd, H.repeating(value).simd) {
             mismatches.check(
                 H.multiplying(a, H.repeating(value), where: mask),
-                HighwayReference.multiplyingWhereF32(mask.raw, a.raw, H.repeating(value).raw),
+                H(
+                    raw: HighwayReference.multiplyingWhereF32(
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw
+                    )
+                ),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -587,8 +647,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func multiplyingWhereConstantSplatPayloadNaN() {
-        checkMultiplyingWhereConstantA(H.Lane(nan: 1, signaling: false))
-        checkMultiplyingWhereConstantB(H.Lane(nan: 1, signaling: false))
+        checkMultiplyingWhereConstantA(Lane(nan: 1, signaling: false))
+        checkMultiplyingWhereConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyingWhereConstantSplatSignalingNaN() {
@@ -612,15 +672,19 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkDividingWhereConstantA(_ value: H.Lane) {
+    private func checkDividingWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("dividingWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB5D7_5B8A_00FD_A3C0)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB5D7_5D8A_00FD_A726)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0xB5D7_5D8A_00FD_A726)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 H.dividing(H.repeating(value), b, where: mask),
-                HighwayReference.dividingWhereF32(mask.raw, H.repeating(value).raw, b.raw),
+                H(raw: HighwayReference.dividingWhereF32(mask.raw, H.repeating(value).raw, b.raw)),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -628,15 +692,19 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkDividingWhereConstantB(_ value: H.Lane) {
+    private func checkDividingWhereConstantB(_ value: Lane) {
         let mismatches = Mismatches("dividingWhere with b repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xBED9_928A_0631_57B5)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBED9_918A_0631_5602)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0xBED9_918A_0631_5602)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.dividing(a, H.repeating(value), where: mask),
-                HighwayReference.dividingWhereF32(mask.raw, a.raw, H.repeating(value).raw),
+                H(raw: HighwayReference.dividingWhereF32(mask.raw, a.raw, H.repeating(value).raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -714,8 +782,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func dividingWhereConstantSplatPayloadNaN() {
-        checkDividingWhereConstantA(H.Lane(nan: 1, signaling: false))
-        checkDividingWhereConstantB(H.Lane(nan: 1, signaling: false))
+        checkDividingWhereConstantA(Lane(nan: 1, signaling: false))
+        checkDividingWhereConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func dividingWhereConstantSplatSignalingNaN() {
@@ -739,21 +807,27 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAddingWhereConstantA(_ value: H.Lane) {
+    private func checkMultiplyAddingWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyAddingWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x518D_E8FD_51D6_E3C7)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x518D_EAFD_51D6_E72D)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x518D_E9FD_51D6_E57A)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x518D_EAFD_51D6_E72D)
+        let cInputs = Inputs.vectors(H.self, seed: 0x518D_E9FD_51D6_E57A)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (mask, b, c) in mixedTriples(maskInputs, bInputs, cInputs, seed: 0xA9E1_F59D_CAE1_3041)
-        where !hasUnorderedNaNs(multiplying: H.repeating(value), b, adding: c) {
+        where !hasUnorderedNaNs(multiplying: H.repeating(value).simd, b.simd, adding: c.simd) {
             mismatches.check(
                 H.multiplyAdding(H.repeating(value), b, c, where: mask),
-                HighwayReference.multiplyAddingWhereF32(
-                    mask.raw,
-                    H.repeating(value).raw,
-                    b.raw,
-                    c.raw
+                H(
+                    raw: HighwayReference.multiplyAddingWhereF32(
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw,
+                        c.raw
+                    )
                 ),
                 "mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
             )
@@ -762,21 +836,27 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAddingWhereConstantB(_ value: H.Lane) {
+    private func checkMultiplyAddingWhereConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplyAddingWhere with b repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6C26_CDFD_6113_E786)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6C26_CEFD_6113_E939)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x6C26_CCFD_6113_E5D3)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x6C26_CEFD_6113_E939)
+        let cInputs = Inputs.vectors(H.self, seed: 0x6C26_CCFD_6113_E5D3)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (mask, a, c) in mixedTriples(maskInputs, aInputs, cInputs, seed: 0x2204_411B_757B_B002)
-        where !hasUnorderedNaNs(multiplying: a, H.repeating(value), adding: c) {
+        where !hasUnorderedNaNs(multiplying: a.simd, H.repeating(value).simd, adding: c.simd) {
             mismatches.check(
                 H.multiplyAdding(a, H.repeating(value), c, where: mask),
-                HighwayReference.multiplyAddingWhereF32(
-                    mask.raw,
-                    a.raw,
-                    H.repeating(value).raw,
-                    c.raw
+                H(
+                    raw: HighwayReference.multiplyAddingWhereF32(
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw,
+                        c.raw
+                    )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
             )
@@ -785,21 +865,27 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAddingWhereConstantC(_ value: H.Lane) {
+    private func checkMultiplyAddingWhereConstantC(_ value: Lane) {
         let mismatches = Mismatches("multiplyAddingWhere with c repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6391_B6FD_5C3D_3BD1)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6391_B5FD_5C3D_3A1E)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6391_B4FD_5C3D_386B)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x6391_B5FD_5C3D_3A1E)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6391_B4FD_5C3D_386B)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xA158_60C7_01F5_C60B)
-        where !hasUnorderedNaNs(multiplying: a, b, adding: H.repeating(value)) {
+        where !hasUnorderedNaNs(multiplying: a.simd, b.simd, adding: H.repeating(value).simd) {
             mismatches.check(
                 H.multiplyAdding(a, b, H.repeating(value), where: mask),
-                HighwayReference.multiplyAddingWhereF32(
-                    mask.raw,
-                    a.raw,
-                    b.raw,
-                    H.repeating(value).raw
+                H(
+                    raw: HighwayReference.multiplyAddingWhereF32(
+                        mask.raw,
+                        a.raw,
+                        b.raw,
+                        H.repeating(value).raw
+                    )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
@@ -892,9 +978,9 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func multiplyAddingWhereConstantSplatPayloadNaN() {
-        checkMultiplyAddingWhereConstantA(H.Lane(nan: 1, signaling: false))
-        checkMultiplyAddingWhereConstantB(H.Lane(nan: 1, signaling: false))
-        checkMultiplyAddingWhereConstantC(H.Lane(nan: 1, signaling: false))
+        checkMultiplyAddingWhereConstantA(Lane(nan: 1, signaling: false))
+        checkMultiplyAddingWhereConstantB(Lane(nan: 1, signaling: false))
+        checkMultiplyAddingWhereConstantC(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyAddingWhereConstantSplatSignalingNaN() {
@@ -922,21 +1008,27 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplySubtractingWhereConstantA(_ value: H.Lane) {
+    private func checkMultiplySubtractingWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplySubtractingWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x605B_1260_9040_5734)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x605B_1460_9040_5A9A)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x605B_1560_9040_5C4D)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x605B_1460_9040_5A9A)
+        let cInputs = Inputs.vectors(H.self, seed: 0x605B_1560_9040_5C4D)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (mask, b, c) in mixedTriples(maskInputs, bInputs, cInputs, seed: 0x229B_3802_D74F_ED68)
-        where !hasUnorderedNaNs(multiplying: H.repeating(value), b, adding: c) {
+        where !hasUnorderedNaNs(multiplying: H.repeating(value).simd, b.simd, adding: c.simd) {
             mismatches.check(
                 H.multiplySubtracting(H.repeating(value), b, c, where: mask),
-                HighwayReference.multiplySubtractingWhereF32(
-                    mask.raw,
-                    H.repeating(value).raw,
-                    b.raw,
-                    c.raw
+                H(
+                    raw: HighwayReference.multiplySubtractingWhereF32(
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw,
+                        c.raw
+                    )
                 ),
                 "mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
             )
@@ -945,21 +1037,27 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplySubtractingWhereConstantB(_ value: H.Lane) {
+    private func checkMultiplySubtractingWhereConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplySubtractingWhere with b repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x69C9_A960_95CF_CD29)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x69C9_A860_95CF_CB76)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x69C9_A660_95CF_C810)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x69C9_A860_95CF_CB76)
+        let cInputs = Inputs.vectors(H.self, seed: 0x69C9_A660_95CF_C810)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (mask, a, c) in mixedTriples(maskInputs, aInputs, cInputs, seed: 0x1568_1690_5133_F663)
-        where !hasUnorderedNaNs(multiplying: a, H.repeating(value), adding: c) {
+        where !hasUnorderedNaNs(multiplying: a.simd, H.repeating(value).simd, adding: c.simd) {
             mismatches.check(
                 H.multiplySubtracting(a, H.repeating(value), c, where: mask),
-                HighwayReference.multiplySubtractingWhereF32(
-                    mask.raw,
-                    a.raw,
-                    H.repeating(value).raw,
-                    c.raw
+                H(
+                    raw: HighwayReference.multiplySubtractingWhereF32(
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw,
+                        c.raw
+                    )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
             )
@@ -968,21 +1066,27 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplySubtractingWhereConstantC(_ value: H.Lane) {
+    private func checkMultiplySubtractingWhereConstantC(_ value: Lane) {
         let mismatches = Mismatches("multiplySubtractingWhere with c repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x72CB_6060_9B02_A79E)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x72CB_6160_9B02_A951)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x72CB_5E60_9B02_A438)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x72CB_6160_9B02_A951)
+        let bInputs = Inputs.vectors(H.self, seed: 0x72CB_5E60_9B02_A438)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x4C81_FA2F_0C9A_5C3A)
-        where !hasUnorderedNaNs(multiplying: a, b, adding: H.repeating(value)) {
+        where !hasUnorderedNaNs(multiplying: a.simd, b.simd, adding: H.repeating(value).simd) {
             mismatches.check(
                 H.multiplySubtracting(a, b, H.repeating(value), where: mask),
-                HighwayReference.multiplySubtractingWhereF32(
-                    mask.raw,
-                    a.raw,
-                    b.raw,
-                    H.repeating(value).raw
+                H(
+                    raw: HighwayReference.multiplySubtractingWhereF32(
+                        mask.raw,
+                        a.raw,
+                        b.raw,
+                        H.repeating(value).raw
+                    )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
@@ -1075,9 +1179,9 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func multiplySubtractingWhereConstantSplatPayloadNaN() {
-        checkMultiplySubtractingWhereConstantA(H.Lane(nan: 1, signaling: false))
-        checkMultiplySubtractingWhereConstantB(H.Lane(nan: 1, signaling: false))
-        checkMultiplySubtractingWhereConstantC(H.Lane(nan: 1, signaling: false))
+        checkMultiplySubtractingWhereConstantA(Lane(nan: 1, signaling: false))
+        checkMultiplySubtractingWhereConstantB(Lane(nan: 1, signaling: false))
+        checkMultiplySubtractingWhereConstantC(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplySubtractingWhereConstantSplatSignalingNaN() {

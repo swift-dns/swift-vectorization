@@ -5,8 +5,13 @@ public import CVectorizationOps
 extension UInt32: SIMDIntegerElement {
     public typealias _RawVector = cvectorization_ops_raw_vector_u32
     public typealias _RawMask = cvectorization_ops_raw_mask_u32
+    public typealias _SIMDVector = cvectorization_ops_vector_u32
+    public typealias _SIMDMask = SIMDMask<cvectorization_ops_mask_u32>
     public typealias _RawHalfVector = cvectorization_ops_raw_half_vector_u32
     public typealias _RawHalfMask = cvectorization_ops_raw_half_mask_u32
+    public typealias _SIMDHalfVector = cvectorization_ops_half_vector_u32
+    public typealias _SIMDHalfMask = cvectorization_ops_half_mask_u32
     public typealias _RawBlockVector = cvectorization_ops_raw_block_u32
+    public typealias _SIMDBlockVector = cvectorization_ops_block_u32
     public typealias IndexLane = UInt32
 }

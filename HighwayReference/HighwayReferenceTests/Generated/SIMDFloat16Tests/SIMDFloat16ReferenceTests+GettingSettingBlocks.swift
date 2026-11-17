@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDFloat16ReferenceTests {
     @Test func extractingBlock() {
         let mismatches = Mismatches("extractingBlock")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAABC_81DF_4257_243A)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAABC_81DF_4257_243A)
         let indexInputs = Array(0...H.laneCount / 8 - 1)
         for (a, index) in everyPair(aInputs, indexInputs) {
             mismatches.check(
@@ -28,7 +28,7 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func extractingBlockUnchecked() {
         let mismatches = Mismatches("extractingBlock unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x78AD_D4F5_7E46_E234)
+        let aInputs = Inputs.vectors(H.self, seed: 0x78AD_D4F5_7E46_E234)
         let indexInputs = Array(0...H.laneCount / 8 - 1)
         for (a, index) in everyPair(aInputs, indexInputs) {
             mismatches.check(
@@ -47,7 +47,7 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func replacingBlock() {
         let mismatches = Mismatches("replacingBlock")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6C1F_E28C_E472_5030)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6C1F_E28C_E472_5030)
         let indexInputs = Array(0...H.laneCount / 8 - 1)
         let bInputs = Inputs.vectors(H.BlockVector.self, seed: 0x6C1F_E48C_E472_5396).map(
             poisoningUpperBytes
@@ -60,7 +60,13 @@ extension SIMDFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.replacingBlock(a, at: index, with: b),
-                HighwayReference.replacingBlockF16(a.raw, Int32(truncatingIfNeeded: index), b.raw),
+                H(
+                    raw: HighwayReference.replacingBlockF16(
+                        a.raw,
+                        Int32(truncatingIfNeeded: index),
+                        b.raw
+                    )
+                ),
                 "a: \(describe(a)), index: \(index), b: \(describe(b))"
             )
         }
@@ -69,7 +75,7 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func replacingBlockUnchecked() {
         let mismatches = Mismatches("replacingBlock unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB73E_FD11_8793_60F6)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB73E_FD11_8793_60F6)
         let indexInputs = Array(0...H.laneCount / 8 - 1)
         let bInputs = Inputs.vectors(H.BlockVector.self, seed: 0xB73E_FB11_8793_5D90).map(
             poisoningUpperBytes
@@ -82,7 +88,13 @@ extension SIMDFloat16ReferenceTests {
         ) {
             mismatches.check(
                 unsafe H.replacingBlock(a, atUnchecked: index, with: b),
-                HighwayReference.replacingBlockF16(a.raw, Int32(truncatingIfNeeded: index), b.raw),
+                H(
+                    raw: HighwayReference.replacingBlockF16(
+                        a.raw,
+                        Int32(truncatingIfNeeded: index),
+                        b.raw
+                    )
+                ),
                 "a: \(describe(a)), index: \(index), b: \(describe(b))"
             )
         }

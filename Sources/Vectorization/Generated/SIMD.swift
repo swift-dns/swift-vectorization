@@ -2,6 +2,9 @@
 
 /// A vector of `Lane` values as wide as the target's vectors, and the ops over such vectors.
 public struct SIMD<Lane: SIMDElement>: Sendable {
+    /// The SIMD type a `SIMD` converts to and from, whose width is the target's.
+    public typealias SIMDType = Lane._SIMDVector
+
     public var raw: Lane._RawVector
 
     @export(implementation) @inline(always)
@@ -10,6 +13,9 @@ public struct SIMD<Lane: SIMDElement>: Sendable {
     }
 
     public struct Mask: Sendable {
+        /// The SIMD mask type a `Mask` converts to and from, whose width is the target's.
+        public typealias SIMDType = Lane._SIMDMask
+
         public var raw: Lane._RawMask
 
         @export(implementation) @inline(always)
@@ -21,6 +27,9 @@ public struct SIMD<Lane: SIMDElement>: Sendable {
     public typealias Indices = SIMD<Lane.IndexLane>
 
     public struct HalfVector: Sendable {
+        /// The SIMD type that `HalfVector` converts to and from, half the target's width.
+        public typealias SIMDType = Lane._SIMDHalfVector
+
         public var raw: Lane._RawHalfVector
 
         @export(implementation) @inline(always)
@@ -30,6 +39,9 @@ public struct SIMD<Lane: SIMDElement>: Sendable {
     }
 
     public struct HalfMask: Sendable {
+        /// The SIMD type that `HalfMask` converts to and from, half the target's width.
+        public typealias SIMDType = Lane._SIMDHalfMask
+
         public var raw: Lane._RawHalfMask
 
         @export(implementation) @inline(always)
@@ -39,6 +51,9 @@ public struct SIMD<Lane: SIMDElement>: Sendable {
     }
 
     public struct BlockVector: Sendable {
+        /// The SIMD type that `BlockVector` converts to and from, 128 bits wide.
+        public typealias SIMDType = Lane._SIMDBlockVector
+
         public var raw: Lane._RawBlockVector
 
         @export(implementation) @inline(always)
@@ -50,6 +65,9 @@ public struct SIMD<Lane: SIMDElement>: Sendable {
 
 extension SIMD where Lane: SIMDQuarterVectorElement {
     public struct QuarterVector: Sendable {
+        /// The SIMD type that `QuarterVector` converts to and from, a quarter of the target's width.
+        public typealias SIMDType = Lane._SIMDQuarterVector
+
         public var raw: Lane._RawQuarterVector
 
         @export(implementation) @inline(always)
@@ -59,6 +77,9 @@ extension SIMD where Lane: SIMDQuarterVectorElement {
     }
 
     public struct QuarterMask: Sendable {
+        /// The SIMD type that `QuarterMask` converts to and from, a quarter of the target's width.
+        public typealias SIMDType = Lane._SIMDQuarterMask
+
         public var raw: Lane._RawQuarterMask
 
         @export(implementation) @inline(always)
@@ -70,6 +91,9 @@ extension SIMD where Lane: SIMDQuarterVectorElement {
 
 extension SIMD where Lane: SIMDEighthVectorElement {
     public struct EighthVector: Sendable {
+        /// The SIMD type that `EighthVector` converts to and from, an eighth of the target's width.
+        public typealias SIMDType = Lane._SIMDEighthVector
+
         public var raw: Lane._RawEighthVector
 
         @export(implementation) @inline(always)
@@ -79,6 +103,9 @@ extension SIMD where Lane: SIMDEighthVectorElement {
     }
 
     public struct EighthMask: Sendable {
+        /// The SIMD type that `EighthMask` converts to and from, an eighth of the target's width.
+        public typealias SIMDType = Lane._SIMDEighthMask
+
         public var raw: Lane._RawEighthMask
 
         @export(implementation) @inline(always)

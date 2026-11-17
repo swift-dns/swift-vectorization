@@ -8,11 +8,11 @@ import Vectorization
 extension SIMDUInt16ReferenceTests {
     @Test func reversed() {
         let mismatches = Mismatches("reversed")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2502_50D3_004D_E701)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2502_50D3_004D_E701)
         for a in aInputs {
             mismatches.check(
                 H.reversed(a),
-                H.Vector(raw: HighwayReference.reversedU16(a.raw)),
+                H(raw: HighwayReference.reversedU16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -21,11 +21,11 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func byteSwapped() {
         let mismatches = Mismatches("byteSwapped")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x745B_8564_744A_6EF1)
+        let aInputs = Inputs.vectors(H.self, seed: 0x745B_8564_744A_6EF1)
         for a in aInputs {
             mismatches.check(
                 H.byteSwapped(a),
-                H.Vector(raw: HighwayReference.byteSwappedU16(a.raw)),
+                H(raw: HighwayReference.byteSwappedU16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -34,11 +34,11 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func bitReversed() {
         let mismatches = Mismatches("bitReversed")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE08E_1426_B37F_C1FE)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE08E_1426_B37F_C1FE)
         for a in aInputs {
             mismatches.check(
                 H.bitReversed(a),
-                H.Vector(raw: HighwayReference.bitReversedU16(a.raw)),
+                H(raw: HighwayReference.bitReversedU16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -47,11 +47,11 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func reversedBlocks() {
         let mismatches = Mismatches("reversedBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7150_D88E_C76D_DDE7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7150_D88E_C76D_DDE7)
         for a in aInputs {
             mismatches.check(
                 H.reversedBlocks(a),
-                H.Vector(raw: HighwayReference.reversedBlocksU16(a.raw)),
+                H(raw: HighwayReference.reversedBlocksU16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -60,11 +60,11 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func reversed2() {
         let mismatches = Mismatches("reversed2")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8EF0_5A89_B956_D05B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8EF0_5A89_B956_D05B)
         for a in aInputs {
             mismatches.check(
                 H.reversed2(a),
-                H.Vector(raw: HighwayReference.reversed2U16(a.raw)),
+                H(raw: HighwayReference.reversed2U16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -73,11 +73,11 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func reversed4() {
         let mismatches = Mismatches("reversed4")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7E9F_8C89_B062_0CD1)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7E9F_8C89_B062_0CD1)
         for a in aInputs {
             mismatches.check(
                 H.reversed4(a),
-                H.Vector(raw: HighwayReference.reversed4U16(a.raw)),
+                H(raw: HighwayReference.reversed4U16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -86,11 +86,11 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func reversed8() {
         let mismatches = Mismatches("reversed8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE59C_8089_EA71_E2ED)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE59C_8089_EA71_E2ED)
         for a in aInputs {
             mismatches.check(
                 H.reversed8(a),
-                H.Vector(raw: HighwayReference.reversed8U16(a.raw)),
+                H(raw: HighwayReference.reversed8U16(a.raw)),
                 "a: \(describe(a))"
             )
         }

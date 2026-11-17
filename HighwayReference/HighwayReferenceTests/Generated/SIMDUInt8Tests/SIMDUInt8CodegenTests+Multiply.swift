@@ -9,8 +9,8 @@ import Vectorization
 extension SIMDUInt8CodegenTests {
     @Test func multiplying() {
         let mismatches = Mismatches("portMultiplyingU8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1A44_9D57_20E2_22D4)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1A44_9E57_20E2_2487)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1A44_9D57_20E2_22D4)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1A44_9E57_20E2_2487)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMultiplyingU8(a, b),
@@ -23,7 +23,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func multiplyingConstantA() {
         let mismatches = Mismatches("portMultiplyingU8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9EB5_7262_C215_1CFA)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9EB5_7262_C215_1CFA)
         for b in bInputs {
             mismatches.check(
                 portMultiplyingU8ConstantA(b),
@@ -36,7 +36,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func multiplyingConstantB() {
         let mismatches = Mismatches("portMultiplyingU8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x96F9_BC62_BDF7_06D8)
+        let aInputs = Inputs.vectors(H.self, seed: 0x96F9_BC62_BDF7_06D8)
         for a in aInputs {
             mismatches.check(
                 portMultiplyingU8ConstantB(a),
@@ -49,8 +49,8 @@ extension SIMDUInt8CodegenTests {
 
     @Test func multiplyingHigh() {
         let mismatches = Mismatches("portMultiplyingHighU8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAE12_B79E_4745_1E18)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xAE12_B89E_4745_1FCB)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAE12_B79E_4745_1E18)
+        let bInputs = Inputs.vectors(H.self, seed: 0xAE12_B89E_4745_1FCB)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMultiplyingHighU8(a, b),
@@ -63,7 +63,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func multiplyingHighConstantA() {
         let mismatches = Mismatches("portMultiplyingHighU8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1512_5BA7_7C38_3D6E)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1512_5BA7_7C38_3D6E)
         for b in bInputs {
             mismatches.check(
                 portMultiplyingHighU8ConstantA(b),
@@ -76,7 +76,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func multiplyingHighConstantB() {
         let mismatches = Mismatches("portMultiplyingHighU8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0C7D_25A7_7761_5D0C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0C7D_25A7_7761_5D0C)
         for a in aInputs {
             mismatches.check(
                 portMultiplyingHighU8ConstantB(a),

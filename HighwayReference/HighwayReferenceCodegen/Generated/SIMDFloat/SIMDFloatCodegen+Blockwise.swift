@@ -8,7 +8,7 @@ public func portTableLookupBytesF32(
     _ a: SIMD<Float>,
     atUnchecked indices: SIMD<Float>
 ) -> SIMD<Float> {
-    unsafe SIMDFloat.tableLookupBytes(a, atUnchecked: indices)
+    unsafe SIMD<Float>.tableLookupBytes(a, atUnchecked: indices)
 }
 
 @inline(never)
@@ -16,32 +16,36 @@ public func highwayTableLookupBytesF32(
     _ a: SIMD<Float>,
     atUnchecked indices: SIMD<Float>
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.tableLookupBytesF32(a.raw, indices.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.tableLookupBytesF32(a.raw, indices.raw))
 }
 
 @inline(never)
 public func portTableLookupBytesF32ConstantA(atUnchecked indices: SIMD<Float>) -> SIMD<Float> {
-    unsafe SIMDFloat.tableLookupBytes(SIMDFloat.repeating(1.5), atUnchecked: indices)
+    unsafe SIMD<Float>.tableLookupBytes(SIMD<Float>.repeating(1.5), atUnchecked: indices)
 }
 
 @inline(never)
 public func highwayTableLookupBytesF32ConstantA(atUnchecked indices: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.tableLookupBytesF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        indices.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.tableLookupBytesF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            indices.raw
+        )
     )
 }
 
 @inline(never)
 public func portTableLookupBytesF32ConstantIndices(_ a: SIMD<Float>) -> SIMD<Float> {
-    unsafe SIMDFloat.tableLookupBytes(a, atUnchecked: SIMDFloat.repeating(Float(bitPattern: 3)))
+    unsafe SIMD<Float>.tableLookupBytes(a, atUnchecked: SIMD<Float>.repeating(Float(bitPattern: 3)))
 }
 
 @inline(never)
 public func highwayTableLookupBytesF32ConstantIndices(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.tableLookupBytesF32(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(Float(bitPattern: 3)).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.tableLookupBytesF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(Float(bitPattern: 3))).raw
+        )
     )
 }
 
@@ -50,7 +54,7 @@ public func portTableLookupBytesOrZeroF32(
     _ a: SIMD<Float>,
     atUnchecked indices: SIMD<Float>
 ) -> SIMD<Float> {
-    unsafe SIMDFloat.tableLookupBytesOrZero(a, atUnchecked: indices)
+    unsafe SIMD<Float>.tableLookupBytesOrZero(a, atUnchecked: indices)
 }
 
 @inline(never)
@@ -58,132 +62,146 @@ public func highwayTableLookupBytesOrZeroF32(
     _ a: SIMD<Float>,
     atUnchecked indices: SIMD<Float>
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.tableLookupBytesOrZeroF32(a.raw, indices.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.tableLookupBytesOrZeroF32(a.raw, indices.raw))
 }
 
 @inline(never)
 public func portTableLookupBytesOrZeroF32ConstantA(atUnchecked indices: SIMD<Float>) -> SIMD<Float>
 {
-    unsafe SIMDFloat.tableLookupBytesOrZero(SIMDFloat.repeating(1.5), atUnchecked: indices)
+    unsafe SIMD<Float>.tableLookupBytesOrZero(SIMD<Float>.repeating(1.5), atUnchecked: indices)
 }
 
 @inline(never)
 public func highwayTableLookupBytesOrZeroF32ConstantA(
     atUnchecked indices: SIMD<Float>
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.tableLookupBytesOrZeroF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        indices.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.tableLookupBytesOrZeroF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            indices.raw
+        )
     )
 }
 
 @inline(never)
 public func portTableLookupBytesOrZeroF32ConstantIndices(_ a: SIMD<Float>) -> SIMD<Float> {
-    unsafe SIMDFloat.tableLookupBytesOrZero(
+    unsafe SIMD<Float>.tableLookupBytesOrZero(
         a,
-        atUnchecked: SIMDFloat.repeating(Float(bitPattern: 3))
+        atUnchecked: SIMD<Float>.repeating(Float(bitPattern: 3))
     )
 }
 
 @inline(never)
 public func highwayTableLookupBytesOrZeroF32ConstantIndices(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.tableLookupBytesOrZeroF32(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(Float(bitPattern: 3)).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.tableLookupBytesOrZeroF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(Float(bitPattern: 3))).raw
+        )
     )
 }
 
 @inline(never)
 public func portPairwiseAddingBlocksF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.pairwiseAddingBlocks(a, b)
+    SIMD<Float>.pairwiseAddingBlocks(a, b)
 }
 
 @inline(never)
 public func highwayPairwiseAddingBlocksF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.pairwiseAddingBlocksF32(a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.pairwiseAddingBlocksF32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portPairwiseAddingBlocksF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.pairwiseAddingBlocks(SIMDFloat.repeating(1.5), b)
+    SIMD<Float>.pairwiseAddingBlocks(SIMD<Float>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayPairwiseAddingBlocksF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.pairwiseAddingBlocksF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.pairwiseAddingBlocksF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portPairwiseAddingBlocksF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.pairwiseAddingBlocks(a, SIMDFloat.repeating(1.5))
+    SIMD<Float>.pairwiseAddingBlocks(a, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayPairwiseAddingBlocksF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.pairwiseAddingBlocksF32(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.pairwiseAddingBlocksF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portPairwiseSubtractingBlocksF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.pairwiseSubtractingBlocks(a, b)
+    SIMD<Float>.pairwiseSubtractingBlocks(a, b)
 }
 
 @inline(never)
 public func highwayPairwiseSubtractingBlocksF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.pairwiseSubtractingBlocksF32(a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.pairwiseSubtractingBlocksF32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portPairwiseSubtractingBlocksF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.pairwiseSubtractingBlocks(SIMDFloat.repeating(1.5), b)
+    SIMD<Float>.pairwiseSubtractingBlocks(SIMD<Float>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayPairwiseSubtractingBlocksF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.pairwiseSubtractingBlocksF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.pairwiseSubtractingBlocksF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portPairwiseSubtractingBlocksF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.pairwiseSubtractingBlocks(a, SIMDFloat.repeating(1.5))
+    SIMD<Float>.pairwiseSubtractingBlocks(a, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayPairwiseSubtractingBlocksF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.pairwiseSubtractingBlocksF32(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.pairwiseSubtractingBlocksF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portBroadcastingInBlocksF32ConstantA() -> SIMD<Float> {
-    unsafe SIMDFloat.broadcastingInBlocks(SIMDFloat.repeating(1.5), laneUnchecked: 1)
+    unsafe SIMD<Float>.broadcastingInBlocks(SIMD<Float>.repeating(1.5), laneUnchecked: 1)
 }
 
 @inline(never)
 public func highwayBroadcastingInBlocksF32ConstantA() -> SIMD<Float> {
-    HighwayReference.Nothrow.broadcastingInBlocksF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        1
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.broadcastingInBlocksF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            1
+        )
     )
 }
 
 @inline(never)
 public func portBroadcastingInBlocksF32ConstantLane(_ a: SIMD<Float>) -> SIMD<Float> {
-    unsafe SIMDFloat.broadcastingInBlocks(a, laneUnchecked: 1)
+    unsafe SIMD<Float>.broadcastingInBlocks(a, laneUnchecked: 1)
 }
 
 @inline(never)
 public func highwayBroadcastingInBlocksF32ConstantLane(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.broadcastingInBlocksF32(a.raw, 1)
+    SIMD<Float>(raw: HighwayReference.Nothrow.broadcastingInBlocksF32(a.raw, 1))
 }

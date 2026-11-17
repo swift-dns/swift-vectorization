@@ -7,19 +7,19 @@ import Vectorization
 
 extension SIMDBFloat16ConstantTests {
     @inline(__always)
-    private func checkReplacingLaneConstantA(_ value: H.Lane) {
+    private func checkReplacingLaneConstantA(_ value: Lane) {
         let mismatches = Mismatches("replacingLane with a repeating \(hex(value))")
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xE643_E070_EC10_49E8)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xE643_E070_EC10_49E8)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for (index, value) in everyPair(indexInputs, valueInputs) {
             mismatches.check(
                 H.replacingLane(H.repeating(value), at: index, with: value),
-                H.Vector(
+                H(
                     raw: HighwayReference.replacingLaneBF16(
                         H.repeating(value).raw,
                         index,
@@ -33,78 +33,78 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func replacingLaneConstantSplatZero() {
-        checkReplacingLaneConstantA(H.Lane(bitPattern: 0x0000))
+        checkReplacingLaneConstantA(Lane(bitPattern: 0x0000))
     }
 
     @Test func replacingLaneConstantSplatNegativeZero() {
-        checkReplacingLaneConstantA(H.Lane(bitPattern: 0x8000))
+        checkReplacingLaneConstantA(Lane(bitPattern: 0x8000))
     }
 
     @Test func replacingLaneConstantSplatOne() {
-        checkReplacingLaneConstantA(H.Lane(bitPattern: 0x3F80))
+        checkReplacingLaneConstantA(Lane(bitPattern: 0x3F80))
     }
 
     @Test func replacingLaneConstantSplatMinusOne() {
-        checkReplacingLaneConstantA(H.Lane(bitPattern: 0xBF80))
+        checkReplacingLaneConstantA(Lane(bitPattern: 0xBF80))
     }
 
     @Test func replacingLaneConstantSplatTwo() {
-        checkReplacingLaneConstantA(H.Lane(bitPattern: 0x4000))
+        checkReplacingLaneConstantA(Lane(bitPattern: 0x4000))
     }
 
     @Test func replacingLaneConstantSplatHalf() {
-        checkReplacingLaneConstantA(H.Lane(bitPattern: 0x3F00))
+        checkReplacingLaneConstantA(Lane(bitPattern: 0x3F00))
     }
 
     @Test func replacingLaneConstantSplatFour() {
-        checkReplacingLaneConstantA(H.Lane(bitPattern: 0x4080))
+        checkReplacingLaneConstantA(Lane(bitPattern: 0x4080))
     }
 
     @Test func replacingLaneConstantSplatQuarter() {
-        checkReplacingLaneConstantA(H.Lane(bitPattern: 0x3E80))
+        checkReplacingLaneConstantA(Lane(bitPattern: 0x3E80))
     }
 
     @Test func replacingLaneConstantSplatOnePointFive() {
-        checkReplacingLaneConstantA(H.Lane(bitPattern: 0x3FC0))
+        checkReplacingLaneConstantA(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func replacingLaneConstantSplatMinusTwoPointFive() {
-        checkReplacingLaneConstantA(H.Lane(bitPattern: 0xC020))
+        checkReplacingLaneConstantA(Lane(bitPattern: 0xC020))
     }
 
     @Test func replacingLaneConstantSplatInfinity() {
-        checkReplacingLaneConstantA(H.Lane(bitPattern: 0x7F80))
+        checkReplacingLaneConstantA(Lane(bitPattern: 0x7F80))
     }
 
     @Test func replacingLaneConstantSplatMinusInfinity() {
-        checkReplacingLaneConstantA(H.Lane(bitPattern: 0xFF80))
+        checkReplacingLaneConstantA(Lane(bitPattern: 0xFF80))
     }
 
     @Test func replacingLaneConstantSplatNaN() {
-        checkReplacingLaneConstantA(H.Lane(bitPattern: 0x7FC0))
+        checkReplacingLaneConstantA(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func replacingLaneConstantSplatMinusNaN() {
-        checkReplacingLaneConstantA(H.Lane(bitPattern: 0xFFC0))
+        checkReplacingLaneConstantA(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func replacingLaneConstantSplatPayloadNaN() {
-        checkReplacingLaneConstantA(H.Lane(bitPattern: 0x7FC1))
+        checkReplacingLaneConstantA(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func replacingLaneConstantSplatSignalingNaN() {
-        checkReplacingLaneConstantA(H.Lane(bitPattern: 0x7F81))
+        checkReplacingLaneConstantA(Lane(bitPattern: 0x7F81))
     }
 
     @Test func replacingLaneConstantSplatMinusSignalingNaN() {
-        checkReplacingLaneConstantA(H.Lane(bitPattern: 0xFF81))
+        checkReplacingLaneConstantA(Lane(bitPattern: 0xFF81))
     }
 
     @Test func replacingLaneConstantSplatLeastNonzero() {
-        checkReplacingLaneConstantA(H.Lane(bitPattern: 0x0001))
+        checkReplacingLaneConstantA(Lane(bitPattern: 0x0001))
     }
 
     @Test func replacingLaneConstantSplatGreatest() {
-        checkReplacingLaneConstantA(H.Lane(bitPattern: 0x7F7F))
+        checkReplacingLaneConstantA(Lane(bitPattern: 0x7F7F))
     }
 }

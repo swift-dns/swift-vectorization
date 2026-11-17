@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDBFloat16ReferenceTests {
     @Test func oddEvenBlocks() {
         let mismatches = Mismatches("oddEvenBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6D11_E651_EF30_763D)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6D11_E551_EF30_748A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6D11_E651_EF30_763D)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6D11_E551_EF30_748A)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.oddEvenBlocks(a, b),
-                H.Vector(raw: HighwayReference.oddEvenBlocksBF16(a.raw, b.raw)),
+                H(raw: HighwayReference.oddEvenBlocksBF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -22,11 +22,11 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func swappingAdjacentBlocks() {
         let mismatches = Mismatches("swappingAdjacentBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFDA3_5CE6_EAAD_66A3)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFDA3_5CE6_EAAD_66A3)
         for a in aInputs {
             mismatches.check(
                 H.swappingAdjacentBlocks(a),
-                H.Vector(raw: HighwayReference.swappingAdjacentBlocksBF16(a.raw)),
+                H(raw: HighwayReference.swappingAdjacentBlocksBF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -35,12 +35,12 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func interleavingEvenBlocks() {
         let mismatches = Mismatches("interleavingEvenBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x88DA_CF0F_4A8B_9FE0)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x88DA_D00F_4A8B_A193)
+        let aInputs = Inputs.vectors(H.self, seed: 0x88DA_CF0F_4A8B_9FE0)
+        let bInputs = Inputs.vectors(H.self, seed: 0x88DA_D00F_4A8B_A193)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingEvenBlocks(a, b),
-                H.Vector(raw: HighwayReference.interleavingEvenBlocksBF16(a.raw, b.raw)),
+                H(raw: HighwayReference.interleavingEvenBlocksBF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -49,12 +49,12 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func interleavingOddBlocks() {
         let mismatches = Mismatches("interleavingOddBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB147_95E9_C2D1_38AF)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB147_94E9_C2D1_36FC)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB147_95E9_C2D1_38AF)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB147_94E9_C2D1_36FC)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingOddBlocks(a, b),
-                H.Vector(raw: HighwayReference.interleavingOddBlocksBF16(a.raw, b.raw)),
+                H(raw: HighwayReference.interleavingOddBlocksBF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -63,12 +63,12 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func interleavingLowerBlocks() {
         let mismatches = Mismatches("interleavingLowerBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x74BF_E0CE_B63E_35A3)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x74BF_DFCE_B63E_33F0)
+        let aInputs = Inputs.vectors(H.self, seed: 0x74BF_E0CE_B63E_35A3)
+        let bInputs = Inputs.vectors(H.self, seed: 0x74BF_DFCE_B63E_33F0)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingLowerBlocks(a, b),
-                H.Vector(raw: HighwayReference.interleavingLowerBlocksBF16(a.raw, b.raw)),
+                H(raw: HighwayReference.interleavingLowerBlocksBF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -77,12 +77,12 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func interleavingUpperBlocks() {
         let mismatches = Mismatches("interleavingUpperBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x56E5_80EE_68FC_DBEE)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x56E5_81EE_68FC_DDA1)
+        let aInputs = Inputs.vectors(H.self, seed: 0x56E5_80EE_68FC_DBEE)
+        let bInputs = Inputs.vectors(H.self, seed: 0x56E5_81EE_68FC_DDA1)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingUpperBlocks(a, b),
-                H.Vector(raw: HighwayReference.interleavingUpperBlocksBF16(a.raw, b.raw)),
+                H(raw: HighwayReference.interleavingUpperBlocksBF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -91,12 +91,12 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func broadcastingBlock() {
         let mismatches = Mismatches("broadcastingBlock")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDE33_BB49_1885_30C8)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDE33_BB49_1885_30C8)
         let blockInputs = Array(0...H.laneCount / 8 - 1)
         for (a, block) in everyPair(aInputs, blockInputs) {
             mismatches.check(
                 H.broadcasting(a, block: block),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingBlockBF16(
                         a.raw,
                         Int32(truncatingIfNeeded: block)
@@ -110,12 +110,12 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func broadcastingBlockUnchecked() {
         let mismatches = Mismatches("broadcastingBlock unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2DAE_083E_BFF4_EBAE)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2DAE_083E_BFF4_EBAE)
         let blockInputs = Array(0...H.laneCount / 8 - 1)
         for (a, block) in everyPair(aInputs, blockInputs) {
             mismatches.check(
                 unsafe H.broadcasting(a, blockUnchecked: block),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingBlockBF16(
                         a.raw,
                         Int32(truncatingIfNeeded: block)

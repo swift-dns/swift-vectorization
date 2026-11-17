@@ -8,7 +8,7 @@ public func portTableLookupBytesBF16(
     _ a: SIMD<BFloat16>,
     atUnchecked indices: SIMD<BFloat16>
 ) -> SIMD<BFloat16> {
-    unsafe SIMDBFloat16.tableLookupBytes(a, atUnchecked: indices)
+    unsafe SIMD<BFloat16>.tableLookupBytes(a, atUnchecked: indices)
 }
 
 @inline(never)
@@ -16,14 +16,14 @@ public func highwayTableLookupBytesBF16(
     _ a: SIMD<BFloat16>,
     atUnchecked indices: SIMD<BFloat16>
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.tableLookupBytesBF16(a.raw, indices.raw))
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.tableLookupBytesBF16(a.raw, indices.raw))
 }
 
 @inline(never)
 public func portTableLookupBytesBF16ConstantA(atUnchecked indices: SIMD<BFloat16>) -> SIMD<BFloat16>
 {
-    unsafe SIMDBFloat16.tableLookupBytes(
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+    unsafe SIMD<BFloat16>.tableLookupBytes(
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         atUnchecked: indices
     )
 }
@@ -32,9 +32,9 @@ public func portTableLookupBytesBF16ConstantA(atUnchecked indices: SIMD<BFloat16
 public func highwayTableLookupBytesBF16ConstantA(
     atUnchecked indices: SIMD<BFloat16>
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.tableLookupBytesBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             indices.raw
@@ -44,18 +44,18 @@ public func highwayTableLookupBytesBF16ConstantA(
 
 @inline(never)
 public func portTableLookupBytesBF16ConstantIndices(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    unsafe SIMDBFloat16.tableLookupBytes(
+    unsafe SIMD<BFloat16>.tableLookupBytes(
         a,
-        atUnchecked: SIMDBFloat16.repeating(BFloat16(bitPattern: 3))
+        atUnchecked: SIMD<BFloat16>.repeating(BFloat16(bitPattern: 3))
     )
 }
 
 @inline(never)
 public func highwayTableLookupBytesBF16ConstantIndices(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.tableLookupBytesBF16(
             a.raw,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 3).bitPattern)
             ).raw
         )
@@ -67,7 +67,7 @@ public func portTableLookupBytesOrZeroBF16(
     _ a: SIMD<BFloat16>,
     atUnchecked indices: SIMD<BFloat16>
 ) -> SIMD<BFloat16> {
-    unsafe SIMDBFloat16.tableLookupBytesOrZero(a, atUnchecked: indices)
+    unsafe SIMD<BFloat16>.tableLookupBytesOrZero(a, atUnchecked: indices)
 }
 
 @inline(never)
@@ -75,17 +75,15 @@ public func highwayTableLookupBytesOrZeroBF16(
     _ a: SIMD<BFloat16>,
     atUnchecked indices: SIMD<BFloat16>
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
-        raw: HighwayReference.Nothrow.tableLookupBytesOrZeroBF16(a.raw, indices.raw)
-    )
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.tableLookupBytesOrZeroBF16(a.raw, indices.raw))
 }
 
 @inline(never)
 public func portTableLookupBytesOrZeroBF16ConstantA(
     atUnchecked indices: SIMD<BFloat16>
 ) -> SIMD<BFloat16> {
-    unsafe SIMDBFloat16.tableLookupBytesOrZero(
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+    unsafe SIMD<BFloat16>.tableLookupBytesOrZero(
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         atUnchecked: indices
     )
 }
@@ -94,9 +92,9 @@ public func portTableLookupBytesOrZeroBF16ConstantA(
 public func highwayTableLookupBytesOrZeroBF16ConstantA(
     atUnchecked indices: SIMD<BFloat16>
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.tableLookupBytesOrZeroBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             indices.raw
@@ -106,19 +104,19 @@ public func highwayTableLookupBytesOrZeroBF16ConstantA(
 
 @inline(never)
 public func portTableLookupBytesOrZeroBF16ConstantIndices(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    unsafe SIMDBFloat16.tableLookupBytesOrZero(
+    unsafe SIMD<BFloat16>.tableLookupBytesOrZero(
         a,
-        atUnchecked: SIMDBFloat16.repeating(BFloat16(bitPattern: 3))
+        atUnchecked: SIMD<BFloat16>.repeating(BFloat16(bitPattern: 3))
     )
 }
 
 @inline(never)
 public func highwayTableLookupBytesOrZeroBF16ConstantIndices(_ a: SIMD<BFloat16>) -> SIMD<BFloat16>
 {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.tableLookupBytesOrZeroBF16(
             a.raw,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 3).bitPattern)
             ).raw
         )

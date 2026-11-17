@@ -16,7 +16,7 @@ extension HighwayReferenceBFloat16 {
     public static func loadExpanded(fromUnchecked span: Span<Lane>, where mask: Mask) -> SIMD {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return span.withUnsafeBufferPointer {
-            unsafe SIMDBFloat16.Vector(
+            unsafe SIMD(
                 raw: HighwayReference.Nothrow.loadExpandedWhereBF16(
                     mask.raw,
                     $0.baseAddress.unsafelyUnwrapped
@@ -45,7 +45,7 @@ extension HighwayReferenceBFloat16 {
     ) -> SIMD {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return span.withUnsafeBufferPointer {
-            unsafe SIMDBFloat16.Vector(
+            unsafe SIMD(
                 raw: HighwayReference.Nothrow.loadExpandedWhereOtherwiseBF16(
                     otherwise.raw,
                     mask.raw,
@@ -60,7 +60,7 @@ extension HighwayReferenceBFloat16 {
 @inline(never)
 public func portExpandedBF16(_ a: SIMD<BFloat16>, where mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16>
 {
-    SIMDBFloat16.expanded(a, where: mask)
+    SIMD<BFloat16>.expanded(a, where: mask)
 }
 
 @inline(never)
@@ -68,19 +68,19 @@ public func highwayExpandedBF16(
     _ a: SIMD<BFloat16>,
     where mask: SIMD<BFloat16>.Mask
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.expandedBF16(a.raw, mask.raw))
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.expandedBF16(a.raw, mask.raw))
 }
 
 @inline(never)
 public func portExpandedBF16ConstantA(where mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16> {
-    SIMDBFloat16.expanded(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), where: mask)
+    SIMD<BFloat16>.expanded(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)), where: mask)
 }
 
 @inline(never)
 public func highwayExpandedBF16ConstantA(where mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.expandedBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             mask.raw
@@ -93,7 +93,7 @@ public func portLoadExpandedWhereBF16(
     from: UnsafePointer<BFloat16>,
     where mask: SIMD<BFloat16>.Mask
 ) -> SIMD<BFloat16> {
-    unsafe SIMDBFloat16.loadExpanded(from: from, where: mask)
+    unsafe SIMD<BFloat16>.loadExpanded(from: from, where: mask)
 }
 
 @inline(never)
@@ -101,7 +101,7 @@ public func highwayLoadExpandedWhereBF16(
     from: UnsafePointer<BFloat16>,
     where mask: SIMD<BFloat16>.Mask
 ) -> SIMD<BFloat16> {
-    unsafe SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.loadExpandedWhereBF16(mask.raw, from))
+    unsafe SIMD<BFloat16>(raw: HighwayReference.Nothrow.loadExpandedWhereBF16(mask.raw, from))
 }
 
 @inline(never)
@@ -110,7 +110,7 @@ public func portLoadExpandedWhereOtherwiseBF16(
     where mask: SIMD<BFloat16>.Mask,
     otherwise: SIMD<BFloat16>
 ) -> SIMD<BFloat16> {
-    unsafe SIMDBFloat16.loadExpanded(from: from, where: mask, otherwise: otherwise)
+    unsafe SIMD<BFloat16>.loadExpanded(from: from, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -119,7 +119,7 @@ public func highwayLoadExpandedWhereOtherwiseBF16(
     where mask: SIMD<BFloat16>.Mask,
     otherwise: SIMD<BFloat16>
 ) -> SIMD<BFloat16> {
-    unsafe SIMDBFloat16.Vector(
+    unsafe SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.loadExpandedWhereOtherwiseBF16(otherwise.raw, mask.raw, from)
     )
 }
@@ -129,10 +129,10 @@ public func portLoadExpandedWhereOtherwiseBF16ConstantOtherwise(
     from: UnsafePointer<BFloat16>,
     where mask: SIMD<BFloat16>.Mask
 ) -> SIMD<BFloat16> {
-    unsafe SIMDBFloat16.loadExpanded(
+    unsafe SIMD<BFloat16>.loadExpanded(
         from: from,
         where: mask,
-        otherwise: SIMDBFloat16.repeating(BFloat16(bitPattern: 26))
+        otherwise: SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26))
     )
 }
 
@@ -141,9 +141,9 @@ public func highwayLoadExpandedWhereOtherwiseBF16ConstantOtherwise(
     from: UnsafePointer<BFloat16>,
     where mask: SIMD<BFloat16>.Mask
 ) -> SIMD<BFloat16> {
-    unsafe SIMDBFloat16.Vector(
+    unsafe SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.loadExpandedWhereOtherwiseBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             mask.raw,

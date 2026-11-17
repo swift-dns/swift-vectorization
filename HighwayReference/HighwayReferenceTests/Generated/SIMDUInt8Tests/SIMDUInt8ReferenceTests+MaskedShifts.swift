@@ -9,17 +9,13 @@ extension SIMDUInt8ReferenceTests {
     @Test func shiftedLeftByWhere() {
         let mismatches = Mismatches("shiftedLeftByWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE221_5690_77F0_A58A)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE221_5790_77F0_A73D)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0xE221_5490_77F0_A224,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0xE221_5790_77F0_A73D)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0xE221_5490_77F0_A224, inContract: true)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x066E_E310_16E8_464E)
         {
             mismatches.check(
                 H.shiftedLeft(a, by: b, where: mask),
-                H.Vector(raw: HighwayReference.shiftedLeftByWhereU8(mask.raw, a.raw, b.raw)),
+                H(raw: HighwayReference.shiftedLeftByWhereU8(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -35,17 +31,13 @@ extension SIMDUInt8ReferenceTests {
     func shiftedLeftByWhereOutOfContract() {
         let mismatches = Mismatches("shiftedLeftByWhere out of contract")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x45E7_6A68_9350_F6A7)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x45E7_6968_9350_F4F4)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x45E7_6C68_9350_FA0D,
-            inContract: false
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x45E7_6968_9350_F4F4)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x45E7_6C68_9350_FA0D, inContract: false)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x01A3_E883_A0EB_71A1)
         {
             mismatches.check(
                 H.shiftedLeft(a, by: b, where: mask),
-                H.Vector(raw: HighwayReference.shiftedLeftByWhereU8(mask.raw, a.raw, b.raw)),
+                H(raw: HighwayReference.shiftedLeftByWhereU8(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -55,17 +47,13 @@ extension SIMDUInt8ReferenceTests {
     @Test func shiftedLeftByWhereNonCanonical() {
         let mismatches = Mismatches("shiftedLeftByWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x023E_880E_F8E8_C8E1)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x023E_870E_F8E8_C72E)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x023E_860E_F8E8_C57B,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x023E_870E_F8E8_C72E)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x023E_860E_F8E8_C57B, inContract: true)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xDC0D_9EAC_7EDA_66DB)
         {
             mismatches.check(
                 H.shiftedLeft(a, by: b, where: mask),
-                H.Vector(raw: HighwayReference.shiftedLeftByWhereU8(mask.raw, a.raw, b.raw)),
+                H(raw: HighwayReference.shiftedLeftByWhereU8(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -74,14 +62,10 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func shiftedLeftByWhereOtherwise() {
         let mismatches = Mismatches("shiftedLeftByWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xEC97_B29C_33F1_6A72)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xEC97_B29C_33F1_6A72)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xEC97_B39C_33F1_6C25)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEC97_B09C_33F1_670C)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0xEC97_B19C_33F1_68BF,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0xEC97_B09C_33F1_670C)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0xEC97_B19C_33F1_68BF, inContract: true)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -91,7 +75,7 @@ extension SIMDUInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.shiftedLeft(a, by: b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedLeftByWhereOtherwiseU8(
                         otherwise.raw,
                         mask.raw,
@@ -113,14 +97,10 @@ extension SIMDUInt8ReferenceTests {
     )
     func shiftedLeftByWhereOtherwiseOutOfContract() {
         let mismatches = Mismatches("shiftedLeftByWhereOtherwise out of contract")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x354C_3E95_034A_B37F)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x354C_3E95_034A_B37F)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x354C_3D95_034A_B1CC)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x354C_4095_034A_B6E5)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x354C_3F95_034A_B532,
-            inContract: false
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x354C_4095_034A_B6E5)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x354C_3F95_034A_B532, inContract: false)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -130,7 +110,7 @@ extension SIMDUInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.shiftedLeft(a, by: b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedLeftByWhereOtherwiseU8(
                         otherwise.raw,
                         mask.raw,
@@ -146,14 +126,10 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func shiftedLeftByWhereOtherwiseNonCanonical() {
         let mismatches = Mismatches("shiftedLeftByWhereOtherwise with masks from arbitrary vectors")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x405D_6C4D_C826_D6E9)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x405D_6C4D_C826_D6E9)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x405D_6B4D_C826_D536)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x405D_6A4D_C826_D383)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x405D_694D_C826_D1D0,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x405D_6A4D_C826_D383)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x405D_694D_C826_D1D0, inContract: true)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -163,7 +139,7 @@ extension SIMDUInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.shiftedLeft(a, by: b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedLeftByWhereOtherwiseU8(
                         otherwise.raw,
                         mask.raw,
@@ -180,17 +156,13 @@ extension SIMDUInt8ReferenceTests {
     @Test func shiftedRightByWhere() {
         let mismatches = Mismatches("shiftedRightByWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3082_7935_914E_3E9B)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3082_7835_914E_3CE8)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x3082_7B35_914E_4201,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x3082_7835_914E_3CE8)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x3082_7B35_914E_4201, inContract: true)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x5D27_0665_F76B_58BD)
         {
             mismatches.check(
                 H.shiftedRight(a, by: b, where: mask),
-                H.Vector(raw: HighwayReference.shiftedRightByWhereU8(mask.raw, a.raw, b.raw)),
+                H(raw: HighwayReference.shiftedRightByWhereU8(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -206,17 +178,13 @@ extension SIMDUInt8ReferenceTests {
     func shiftedRightByWhereOutOfContract() {
         let mismatches = Mismatches("shiftedRightByWhere out of contract")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x9B0D_546E_ACBC_ECE0)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9B0D_556E_ACBC_EE93)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x9B0D_566E_ACBC_F046,
-            inContract: false
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x9B0D_556E_ACBC_EE93)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x9B0D_566E_ACBC_F046, inContract: false)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xFD0E_4185_0DAF_BADC)
         {
             mismatches.check(
                 H.shiftedRight(a, by: b, where: mask),
-                H.Vector(raw: HighwayReference.shiftedRightByWhereU8(mask.raw, a.raw, b.raw)),
+                H(raw: HighwayReference.shiftedRightByWhereU8(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -226,17 +194,13 @@ extension SIMDUInt8ReferenceTests {
     @Test func shiftedRightByWhereNonCanonical() {
         let mismatches = Mismatches("shiftedRightByWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x8CE9_1438_A558_7DB0)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8CE9_1538_A558_7F63)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x8CE9_1638_A558_8116,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x8CE9_1538_A558_7F63)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x8CE9_1638_A558_8116, inContract: true)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xE430_7320_F9AF_496C)
         {
             mismatches.check(
                 H.shiftedRight(a, by: b, where: mask),
-                H.Vector(raw: HighwayReference.shiftedRightByWhereU8(mask.raw, a.raw, b.raw)),
+                H(raw: HighwayReference.shiftedRightByWhereU8(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -245,14 +209,10 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func shiftedRightByWhereOtherwise() {
         let mismatches = Mismatches("shiftedRightByWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x2265_6EB3_7DEA_61B9)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x2265_6EB3_7DEA_61B9)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x2265_6DB3_7DEA_6006)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2265_6CB3_7DEA_5E53)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x2265_6BB3_7DEA_5CA0,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x2265_6CB3_7DEA_5E53)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x2265_6BB3_7DEA_5CA0, inContract: true)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -262,7 +222,7 @@ extension SIMDUInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.shiftedRight(a, by: b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedRightByWhereOtherwiseU8(
                         otherwise.raw,
                         mask.raw,
@@ -284,14 +244,10 @@ extension SIMDUInt8ReferenceTests {
     )
     func shiftedRightByWhereOtherwiseOutOfContract() {
         let mismatches = Mismatches("shiftedRightByWhereOtherwise out of contract")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x72DC_523C_E83E_3032)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x72DC_523C_E83E_3032)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x72DC_533C_E83E_31E5)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x72DC_503C_E83E_2CCC)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x72DC_513C_E83E_2E7F,
-            inContract: false
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x72DC_503C_E83E_2CCC)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x72DC_513C_E83E_2E7F, inContract: false)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -301,7 +257,7 @@ extension SIMDUInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.shiftedRight(a, by: b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedRightByWhereOtherwiseU8(
                         otherwise.raw,
                         mask.raw,
@@ -319,14 +275,10 @@ extension SIMDUInt8ReferenceTests {
         let mismatches = Mismatches(
             "shiftedRightByWhereOtherwise with masks from arbitrary vectors"
         )
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x8BA5_56BC_83AC_00FE)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x8BA5_56BC_83AC_00FE)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x8BA5_57BC_83AC_02B1)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8BA5_54BC_83AB_FD98)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x8BA5_55BC_83AB_FF4B,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x8BA5_54BC_83AB_FD98)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x8BA5_55BC_83AB_FF4B, inContract: true)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -336,7 +288,7 @@ extension SIMDUInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.shiftedRight(a, by: b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedRightByWhereOtherwiseU8(
                         otherwise.raw,
                         mask.raw,
@@ -353,7 +305,7 @@ extension SIMDUInt8ReferenceTests {
     @Test func shiftedLeftWhere() {
         let mismatches = Mismatches("shiftedLeftWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x355F_5953_29D9_B9CD)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x355F_5853_29D9_B81A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x355F_5853_29D9_B81A)
         let bitsInputs = Inputs.shiftAmounts(bits: 8, inContract: true)
         for (mask, a, bits) in mixedTriples(
             maskInputs,
@@ -363,9 +315,7 @@ extension SIMDUInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.shiftedLeft(a, by: bits, where: mask),
-                H.Vector(
-                    raw: HighwayReference.shiftedLeftWhereU8(mask.raw, a.raw, Int32(clamping: bits))
-                ),
+                H(raw: HighwayReference.shiftedLeftWhereU8(mask.raw, a.raw, Int32(clamping: bits))),
                 "mask: \(describe(mask)), a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -381,7 +331,7 @@ extension SIMDUInt8ReferenceTests {
     func shiftedLeftWhereOutOfContract() {
         let mismatches = Mismatches("shiftedLeftWhere out of contract")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x5489_DC6E_8167_8806)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5489_DD6E_8167_89B9)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5489_DD6E_8167_89B9)
         let bitsInputs = Inputs.shiftAmounts(bits: 8, inContract: false)
         for (mask, a, bits) in mixedTriples(
             maskInputs,
@@ -391,9 +341,7 @@ extension SIMDUInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.shiftedLeft(a, by: bits, where: mask),
-                H.Vector(
-                    raw: HighwayReference.shiftedLeftWhereU8(mask.raw, a.raw, Int32(clamping: bits))
-                ),
+                H(raw: HighwayReference.shiftedLeftWhereU8(mask.raw, a.raw, Int32(clamping: bits))),
                 "mask: \(describe(mask)), a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -403,7 +351,7 @@ extension SIMDUInt8ReferenceTests {
     @Test func shiftedLeftWhereNonCanonical() {
         let mismatches = Mismatches("shiftedLeftWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x0B0B_8C7A_897D_0E6A)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0B0B_8D7A_897D_101D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0B0B_8D7A_897D_101D)
         let bitsInputs = Inputs.shiftAmounts(bits: 8, inContract: true)
         for (mask, a, bits) in mixedTriples(
             maskInputs,
@@ -413,9 +361,7 @@ extension SIMDUInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.shiftedLeft(a, by: bits, where: mask),
-                H.Vector(
-                    raw: HighwayReference.shiftedLeftWhereU8(mask.raw, a.raw, Int32(clamping: bits))
-                ),
+                H(raw: HighwayReference.shiftedLeftWhereU8(mask.raw, a.raw, Int32(clamping: bits))),
                 "mask: \(describe(mask)), a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -424,9 +370,9 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func shiftedLeftWhereOtherwise() {
         let mismatches = Mismatches("shiftedLeftWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x0BEA_B61B_2BF7_92FF)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x0BEA_B61B_2BF7_92FF)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x0BEA_B51B_2BF7_914C)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0BEA_B81B_2BF7_9665)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0BEA_B81B_2BF7_9665)
         let bitsInputs = Inputs.shiftAmounts(bits: 8, inContract: true)
         for (otherwise, mask, a, bits) in mixedQuadruples(
             otherwiseInputs,
@@ -437,7 +383,7 @@ extension SIMDUInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.shiftedLeft(a, by: bits, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedLeftWhereOtherwiseU8(
                         otherwise.raw,
                         mask.raw,
@@ -459,9 +405,9 @@ extension SIMDUInt8ReferenceTests {
     )
     func shiftedLeftWhereOtherwiseOutOfContract() {
         let mismatches = Mismatches("shiftedLeftWhereOtherwise out of contract")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x4CB1_BE99_8E5A_7524)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x4CB1_BE99_8E5A_7524)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x4CB1_BF99_8E5A_76D7)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4CB1_C099_8E5A_788A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4CB1_C099_8E5A_788A)
         let bitsInputs = Inputs.shiftAmounts(bits: 8, inContract: false)
         for (otherwise, mask, a, bits) in mixedQuadruples(
             otherwiseInputs,
@@ -472,7 +418,7 @@ extension SIMDUInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.shiftedLeft(a, by: bits, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedLeftWhereOtherwiseU8(
                         otherwise.raw,
                         mask.raw,
@@ -488,9 +434,9 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func shiftedLeftWhereOtherwiseNonCanonical() {
         let mismatches = Mismatches("shiftedLeftWhereOtherwise with masks from arbitrary vectors")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x9BE4_ECF7_0ECE_EB8C)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x9BE4_ECF7_0ECE_EB8C)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x9BE4_EDF7_0ECE_ED3F)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9BE4_EEF7_0ECE_EEF2)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9BE4_EEF7_0ECE_EEF2)
         let bitsInputs = Inputs.shiftAmounts(bits: 8, inContract: true)
         for (otherwise, mask, a, bits) in mixedQuadruples(
             otherwiseInputs,
@@ -501,7 +447,7 @@ extension SIMDUInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.shiftedLeft(a, by: bits, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedLeftWhereOtherwiseU8(
                         otherwise.raw,
                         mask.raw,
@@ -518,7 +464,7 @@ extension SIMDUInt8ReferenceTests {
     @Test func shiftedRightWhere() {
         let mismatches = Mismatches("shiftedRightWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xDCBD_88A2_B2EA_2EB8)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDCBD_89A2_B2EA_306B)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDCBD_89A2_B2EA_306B)
         let bitsInputs = Inputs.shiftAmounts(bits: 8, inContract: true)
         for (mask, a, bits) in mixedTriples(
             maskInputs,
@@ -528,7 +474,7 @@ extension SIMDUInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.shiftedRight(a, by: bits, where: mask),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedRightWhereU8(
                         mask.raw,
                         a.raw,
@@ -550,7 +496,7 @@ extension SIMDUInt8ReferenceTests {
     func shiftedRightWhereOutOfContract() {
         let mismatches = Mismatches("shiftedRightWhere out of contract")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3EC4_318C_F93D_05E9)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3EC4_308C_F93D_0436)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3EC4_308C_F93D_0436)
         let bitsInputs = Inputs.shiftAmounts(bits: 8, inContract: false)
         for (mask, a, bits) in mixedTriples(
             maskInputs,
@@ -560,7 +506,7 @@ extension SIMDUInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.shiftedRight(a, by: bits, where: mask),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedRightWhereU8(
                         mask.raw,
                         a.raw,
@@ -576,7 +522,7 @@ extension SIMDUInt8ReferenceTests {
     @Test func shiftedRightWhereNonCanonical() {
         let mismatches = Mismatches("shiftedRightWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x0B20_7119_77D8_6937)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0B20_7019_77D8_6784)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0B20_7019_77D8_6784)
         let bitsInputs = Inputs.shiftAmounts(bits: 8, inContract: true)
         for (mask, a, bits) in mixedTriples(
             maskInputs,
@@ -586,7 +532,7 @@ extension SIMDUInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.shiftedRight(a, by: bits, where: mask),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedRightWhereU8(
                         mask.raw,
                         a.raw,
@@ -601,9 +547,9 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func shiftedRightWhereOtherwise() {
         let mismatches = Mismatches("shiftedRightWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xFFD9_C6B1_19C0_378C)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xFFD9_C6B1_19C0_378C)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xFFD9_C7B1_19C0_393F)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFFD9_C8B1_19C0_3AF2)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFFD9_C8B1_19C0_3AF2)
         let bitsInputs = Inputs.shiftAmounts(bits: 8, inContract: true)
         for (otherwise, mask, a, bits) in mixedQuadruples(
             otherwiseInputs,
@@ -614,7 +560,7 @@ extension SIMDUInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.shiftedRight(a, by: bits, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedRightWhereOtherwiseU8(
                         otherwise.raw,
                         mask.raw,
@@ -636,9 +582,9 @@ extension SIMDUInt8ReferenceTests {
     )
     func shiftedRightWhereOtherwiseOutOfContract() {
         let mismatches = Mismatches("shiftedRightWhereOtherwise out of contract")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xC9FD_F39E_9849_5D2D)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xC9FD_F39E_9849_5D2D)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC9FD_F29E_9849_5B7A)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC9FD_F19E_9849_59C7)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC9FD_F19E_9849_59C7)
         let bitsInputs = Inputs.shiftAmounts(bits: 8, inContract: false)
         for (otherwise, mask, a, bits) in mixedQuadruples(
             otherwiseInputs,
@@ -649,7 +595,7 @@ extension SIMDUInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.shiftedRight(a, by: bits, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedRightWhereOtherwiseU8(
                         otherwise.raw,
                         mask.raw,
@@ -665,9 +611,9 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func shiftedRightWhereOtherwiseNonCanonical() {
         let mismatches = Mismatches("shiftedRightWhereOtherwise with masks from arbitrary vectors")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x71DF_57BB_9D98_7083)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x71DF_57BB_9D98_7083)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x71DF_56BB_9D98_6ED0)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x71DF_59BB_9D98_73E9)
+        let aInputs = Inputs.vectors(H.self, seed: 0x71DF_59BB_9D98_73E9)
         let bitsInputs = Inputs.shiftAmounts(bits: 8, inContract: true)
         for (otherwise, mask, a, bits) in mixedQuadruples(
             otherwiseInputs,
@@ -678,7 +624,7 @@ extension SIMDUInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.shiftedRight(a, by: bits, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedRightWhereOtherwiseU8(
                         otherwise.raw,
                         mask.raw,

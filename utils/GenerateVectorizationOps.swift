@@ -753,12 +753,12 @@ let codegenCountAlternatives = [
     CodegenAlternative(name: "two", value: { _ in "2" }),
     CodegenAlternative(
         name: "laneCount",
-        value: { "\($0.namespace).laneCount" },
+        value: { "\($0.vectorType).laneCount" },
         highwayValue: highwayLaneCount
     ),
     CodegenAlternative(
         name: "twiceLaneCount",
-        value: { "2 * \($0.namespace).laneCount" },
+        value: { "2 * \($0.vectorType).laneCount" },
         highwayValue: { "2 * \(highwayLaneCount(of: $0))" },
         fitsOneVector: false
     ),
@@ -31468,9 +31468,9 @@ let mulBitsPowerOf2Ops = sourcedOps(accepting: mulBitsPowerOf2Accepts) { source,
 
 func mulBitsSourceInputs(of op: Op, operand: Element, seed: String) -> String? {
     switch op.highwayName {
-    case "MulByPow2": return "Inputs.exponents(\(operand.namespace).Vector.self, \(seed))"
+    case "MulByPow2": return "Inputs.exponents(\(operand.vectorType).self, \(seed))"
     case "MultiRotateRight", "BitShuffle":
-        return "Inputs.byteIndices(\(operand.namespace).Vector.self, \(seed))"
+        return "Inputs.byteIndices(\(operand.vectorType).self, \(seed))"
     default: return nil
     }
 }
@@ -32966,14 +32966,14 @@ func widenMulCornerTests(of op: Op, for element: Element) -> [String] {
         let operand = operandElement(of: parameter, for: element, source: op.source)
         let (inputsName, type) =
             parameter.isSourced
-            ? ("widenMulOperands", "\(operand.namespace).Vector")
-            : ("widenMulAccumulators", "H.Vector")
+            ? ("widenMulOperands", operand.vectorType)
+            : ("widenMulAccumulators", "H")
         let values = "Inputs.\(inputsName)(\(type).self)"
         return ReferenceInput(
             parameter: input.parameter,
             name: input.name,
             values: parameter.shape == .full
-                ? values : "\(values).map { \(operand.namespace).lowerHalf($0) }"
+                ? values : "\(values).map { \(operand.vectorType).lowerHalf($0) }"
         )
     }
     guard let accumulator = inputs.last else { return [] }
@@ -33347,7 +33347,7 @@ func reorderMulPairingTest(of reorder: Op, from source: Element, to element: Ele
     let test = "\(reorder.swiftName)\(uppercasedFirst(rearrange.swiftName))From\(source.swiftType)"
     let seeds = ["0", "1"].map { "seed: \(referenceTestSeed(element, test, $0))" }
     let operands = (0..<2).map {
-        "Inputs.conversions(\(source.namespace).Vector.self, \(seeds[$0]))"
+        "Inputs.conversions(\(source.vectorType).self, \(seeds[$0]))"
     }
     let reorderReference = referenceCall(
         referenceFunctionName(of: reorder, for: element),
@@ -33370,23 +33370,23 @@ func reorderMulPairingTest(of reorder: Op, from source: Element, to element: Ele
         var portSum1 = H.zero()
         var referenceSum0 = H.zero()
         var referenceSum1 = H.zero()
-        var products = [H.Lane](repeating: 0, count: H.laneCount)
+        var products = [Lane](repeating: 0, count: H.laneCount)
         for (a, b) in steps {
         portSum0 = H.\(reorder.swiftName)(a, b, portSum0, &portSum1)
-        referenceSum0 = H.Vector(raw: \(reorderReference))
+        referenceSum0 = H(raw: \(reorderReference))
         for lane in products.indices {
-        let even = H.Lane(truncatingIfNeeded: a.simd[2 * lane]) &* H.Lane(truncatingIfNeeded: b.simd[2 * lane])
-        let odd = H.Lane(truncatingIfNeeded: a.simd[2 * lane + 1]) &* H.Lane(truncatingIfNeeded: b.simd[2 * lane + 1])
+        let even = Lane(truncatingIfNeeded: a.simd[2 * lane]) &* Lane(truncatingIfNeeded: b.simd[2 * lane])
+        let odd = Lane(truncatingIfNeeded: a.simd[2 * lane + 1]) &* Lane(truncatingIfNeeded: b.simd[2 * lane + 1])
         products[lane] = products[lane] &+ even &+ odd
         }
         }
         let described = { steps.map { "\\(describe($0.0)) * \\(describe($0.1))" }.joined(separator: ", ") }
         let rearranged = H.\(rearrange.swiftName)(portSum0, portSum1)
-        let referenceRearranged = H.Vector(raw: \(rearrangeReference))
+        let referenceRearranged = H(raw: \(rearrangeReference))
         mismatches.check(portSum0, referenceSum0, "steps: \\(described()), sum0")
         mismatches.check(portSum1, referenceSum1, "steps: \\(described()), sum1")
         mismatches.check(rearranged, referenceRearranged, "steps: \\(described()), rearranged")
-        mismatches.check(rearranged, H.Vector(H.Vector.Simd(products)), "steps: \\(described()), products")
+        mismatches.check(rearranged, H(H.SIMDType(products)), "steps: \\(described()), products")
         }
         """
     return referenceTestFunction(
@@ -34628,7 +34628,7 @@ func integerDemotionSourceInputs(
     guard op.section == .singleVectorDemotion, operand.category != .float,
         result.category != .float
     else { return nil }
-    return "Inputs.integerDemotions(\(operand.namespace).Vector.self, to: H.Lane.self, \(seed))"
+    return "Inputs.integerDemotions(\(operand.vectorType).self, to: Lane.self, \(seed))"
 }
 
 func demoteSingleOps(_ shape: Shape, _ highwayName: String, shift: DemoteShift? = nil) -> [Op] {
@@ -34676,7 +34676,7 @@ func float16DemotionSourceInputs(
 ) -> String? {
     guard op.highwayName == "DemoteTo", operand.category == .float, element.category == .float16
     else { return nil }
-    return "Inputs.float16Demotions(\(operand.namespace).Vector.self, \(seed))"
+    return "Inputs.float16Demotions(\(operand.vectorType).self, \(seed))"
 }
 
 func floatDemotionSourceInputs(
@@ -34689,7 +34689,7 @@ func floatDemotionSourceInputs(
     guard demotions.contains(op.highwayName), demoteFloatConverts(operand, element) else {
         return nil
     }
-    return "Inputs.floatDemotions(\(operand.namespace).Vector.self, \(seed))"
+    return "Inputs.floatDemotions(\(operand.vectorType).self, \(seed))"
 }
 
 func narrowedResult(
@@ -37875,7 +37875,7 @@ func bfloat16DemotionSourceInputs(
     seed: String
 ) -> String? {
     guard bfloat16DemotesFromFloat(operand, element) else { return nil }
-    return "Inputs.bfloat16Demotions(\(operand.namespace).Vector.self, \(seed))"
+    return "Inputs.bfloat16Demotions(\(operand.vectorType).self, \(seed))"
 }
 
 enum Bfloat16Rounding {
@@ -44806,6 +44806,23 @@ func rawTypeName(of shape: Shape, isMask: Bool = false) -> String {
     "_Raw\(isMask ? shape.swiftMask : shape.swiftVector)"
 }
 
+func simdTypeName(of shape: Shape, isMask: Bool = false) -> String {
+    "_SIMD\(isMask ? shape.swiftMask : shape.swiftVector)"
+}
+
+func simdTypeDocumentation(of name: String, shape: Shape, isMask: Bool = false) -> String {
+    let width =
+        switch shape {
+        case .full: "whose width is the target's"
+        case .half: "half the target's width"
+        case .quarter: "a quarter of the target's width"
+        case .eighth: "an eighth of the target's width"
+        case .block: "128 bits wide"
+        }
+    let subject = shape != .full ? "SIMD type that" : isMask ? "SIMD mask type a" : "SIMD type a"
+    return "/// The \(subject) `\(name)` converts to and from, \(width)."
+}
+
 struct StaticRequirement {
     let name: String
     let type: String
@@ -44962,6 +44979,10 @@ func protocolDeclaration(_ elementProtocol: ElementProtocol) -> String {
         if shape.hasMask {
             members += "    associatedtype \(rawTypeName(of: shape, isMask: true)): Sendable\n"
         }
+        members += "    associatedtype \(simdTypeName(of: shape))\n"
+        if shape.hasMask {
+            members += "    associatedtype \(simdTypeName(of: shape, isMask: true))\n"
+        }
     }
     if elementProtocol.parent == nil {
         members +=
@@ -44992,13 +45013,16 @@ func generateProtocols() -> String {
     return "\(generationNotice)\n\n\(declarations)\n"
 }
 
-func genericTypeDeclaration(named name: String, raw: String) -> String {
+func genericTypeDeclaration(named name: String, shape: Shape, isMask: Bool) -> String {
     """
     public struct \(name): Sendable {
-        public var raw: Lane.\(raw)
+        \(simdTypeDocumentation(of: name, shape: shape, isMask: isMask))
+        public typealias SIMDType = Lane.\(simdTypeName(of: shape, isMask: isMask))
+
+        public var raw: Lane.\(rawTypeName(of: shape, isMask: isMask))
 
         @export(implementation) @inline(always)
-        public init(raw: Lane.\(raw)) {
+        public init(raw: Lane.\(rawTypeName(of: shape, isMask: isMask))) {
             self.raw = raw
         }
     }
@@ -45010,15 +45034,12 @@ func nestedTypeDeclarations(of elementProtocol: ElementProtocol) -> [String] {
         var declarations: [String] = []
         if shape != .full {
             declarations.append(
-                genericTypeDeclaration(named: shape.swiftVector, raw: rawTypeName(of: shape))
+                genericTypeDeclaration(named: shape.swiftVector, shape: shape, isMask: false)
             )
         }
         if shape.hasMask {
             declarations.append(
-                genericTypeDeclaration(
-                    named: shape.swiftMask,
-                    raw: rawTypeName(of: shape, isMask: true)
-                )
+                genericTypeDeclaration(named: shape.swiftMask, shape: shape, isMask: true)
             )
         }
         if shape == .full {
@@ -45041,6 +45062,9 @@ func generateSIMD() -> String {
 
         /// A vector of `Lane` values as wide as the target's vectors, and the ops over such vectors.
         public struct SIMD<Lane: SIMDElement>: Sendable {
+            \(simdTypeDocumentation(of: "SIMD", shape: .full))
+            public typealias SIMDType = Lane._SIMDVector
+
             public var raw: Lane._RawVector
 
             @export(implementation) @inline(always)
@@ -45150,6 +45174,10 @@ func generateElementWitnesses(_ element: Element) -> [SectionMember] {
     return members
 }
 
+func simdMaskType(of element: Element, shape: Shape) -> String {
+    shape == .full ? "SIMDMask<\(element.cMask)>" : element.cMask(of: shape)
+}
+
 func generateElementConformance(_ element: Element) -> String {
     var aliases = ""
     for elementProtocol in elementProtocols where elementProtocol.isConformed(by: element) {
@@ -45159,6 +45187,12 @@ func generateElementConformance(_ element: Element) -> String {
             if shape.hasMask {
                 aliases +=
                     "    public typealias \(rawTypeName(of: shape, isMask: true)) = \(element.cRawMask(of: shape))\n"
+            }
+            aliases +=
+                "    public typealias \(simdTypeName(of: shape)) = \(element.cVector(of: shape))\n"
+            if shape.hasMask {
+                aliases +=
+                    "    public typealias \(simdTypeName(of: shape, isMask: true)) = \(simdMaskType(of: element, shape: shape))\n"
             }
         }
         if elementProtocol.parent == nil {
@@ -45180,31 +45214,27 @@ func generateElementConformance(_ element: Element) -> String {
 
 func concreteTypeMembers(
     raw: String,
-    simd: String?,
-    toRaw: String,
-    fromRaw: String,
+    toRaw: String?,
+    fromRaw: String?,
     isMask: Bool = false
 ) -> String {
-    var output = """
+    let conversion = toRaw.map { "\($0)(simd\(isMask ? "._storage" : ""))" } ?? "simd"
+    let reading = fromRaw.map { isMask ? "SIMDType(\($0)(raw))" : "\($0)(raw)" } ?? "raw"
+    return """
             @export(implementation) @inline(always)
             public init(raw: \(raw)) {
                 self.raw = raw
             }
 
-        """
-    guard let simd else { return output }
-    output += """
-
             @export(implementation) @inline(always)
-            public init(_ simd: \(simd)) {
-                raw = \(toRaw)(simd\(isMask ? "._storage" : ""))
+            public init(_ simd: SIMDType) {
+                raw = \(conversion)
             }
 
             @export(implementation) @inline(always)
-            public var simd: \(simd) { \(isMask ? "\(simd)(" : "")\(fromRaw)(raw)\(isMask ? ")" : "") }
+            public var simd: SIMDType { \(reading) }
 
         """
-    return output
 }
 
 func concreteExtension(
@@ -45223,7 +45253,6 @@ func narrowConcreteExtensions(of element: Element, shape: Shape) -> [String] {
             of: element,
             members: concreteTypeMembers(
                 raw: element.cRawVector(of: shape),
-                simd: element.cVector(of: shape),
                 toRaw: element.cToRawVector(of: shape),
                 fromRaw: element.cFromRawVector(of: shape)
             )
@@ -45236,7 +45265,6 @@ func narrowConcreteExtensions(of element: Element, shape: Shape) -> [String] {
                 of: element,
                 members: concreteTypeMembers(
                     raw: element.cRawMask(of: shape),
-                    simd: element.cMask(of: shape),
                     toRaw: element.cToRawMask(of: shape),
                     fromRaw: element.cFromRawMask(of: shape)
                 )
@@ -45253,9 +45281,8 @@ func generateElement(_ element: Element) -> String {
             of: element,
             members: concreteTypeMembers(
                 raw: element.rawVectorType(of: .full),
-                simd: element.hasOpaqueVector ? element.cVector : nil,
-                toRaw: element.cToRawVector,
-                fromRaw: element.cFromRawVector
+                toRaw: element.hasOpaqueVector ? element.cToRawVector : nil,
+                fromRaw: element.hasOpaqueVector ? element.cFromRawVector : nil
             )
         ),
         concreteExtension(
@@ -45263,7 +45290,6 @@ func generateElement(_ element: Element) -> String {
             of: element,
             members: concreteTypeMembers(
                 raw: element.cRawMask,
-                simd: "SIMDMask<\(element.cMask)>",
                 toRaw: element.cToRawMask,
                 fromRaw: element.cFromRawMask,
                 isMask: true
@@ -45510,7 +45536,7 @@ func pointerLanes(
         return op.clampsSpanCount && !guarded ? "2 * H.laneCount" : alternativeLanes(alternative)
     case .table(let lanes)?: return String(lanes)
     case .maskBytes?: return "(H.laneCount + 7) / 8"
-    case .block?: return "16 / MemoryLayout<H.Lane>.size"
+    case .block?: return "16 / MemoryLayout<Lane>.size"
     case .halfVector?, .quarterVector?, .eighthVector?:
         return partialExtentLanes(op.span, prefix: "H.")
     case .gathered?: return "H.laneCount"
@@ -45522,7 +45548,7 @@ func pointeeType(of op: Op, for element: Element) -> String {
     if let narrow = op.narrowElement { return narrow.swiftType }
     if op.parameters.contains(.constIndexPointer) { return laneIndexElement(of: element).swiftType }
     if case .maskBytes? = op.span { return "UInt8" }
-    return "H.Lane"
+    return "Lane"
 }
 
 func pointerExpression(_ closureParameter: String, aligned: Bool) -> String {
@@ -45545,7 +45571,7 @@ func indexInputs(
     guard let contract = op.indexContract else {
         fatalError("\(op.swiftName) takes indices but has no index contract")
     }
-    let type = parameter.isLaneIndices ? "H.Indices" : "H.Vector"
+    let type = parameter.isLaneIndices ? "H.Indices" : "H"
     let offset = contract.offset == 0 ? "" : "offset: \(contract.offset), "
     let perByte = contract.isPerByte ? "perByte: true, " : ""
     let count = contract.count.expression(laneCount: "H.laneCount")
@@ -45556,17 +45582,17 @@ func indexInputs(
 
 func divisorInputs(_ vectors: String, spreadSeed: String, for element: Element) -> String {
     let negatives =
-        element.category == .signedInteger ? " + [H.Vector(H.Vector.Simd(repeating: -1))]" : ""
+        element.category == .signedInteger ? " + [H(H.SIMDType(repeating: -1))]" : ""
     let shifted =
-        "H.Vector(vector.simd &>> H.Vector.Simd(repeating: H.Lane(truncatingIfNeeded: index)))"
+        "H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))"
     let spread =
-        "Inputs.vectors(H.Vector.self, \(spreadSeed)).enumerated().map { index, vector in \(shifted) }"
+        "Inputs.vectors(H.self, \(spreadSeed)).enumerated().map { index, vector in \(shifted) }"
     return "\(vectors)\(negatives) + \(spread)"
 }
 
 func byteSweepInputs(_ vectors: String) -> String {
-    let lanes = "(0..<H.laneCount).map { H.Lane(truncatingIfNeeded: start + $0) }"
-    return "\(vectors) + (0..<256).map { start in H.Vector(H.Vector.Simd(\(lanes))) }"
+    let lanes = "(0..<H.laneCount).map { Lane(truncatingIfNeeded: start + $0) }"
+    return "\(vectors) + (0..<256).map { start in H(H.SIMDType(\(lanes))) }"
 }
 
 func immediate(named name: String, of op: Op) -> ImmediateArgument {
@@ -45612,25 +45638,29 @@ func referenceInputs(
                 ?? floatDemotionSourceInputs(of: op, operand: operand, for: element, seed: seed)
                 ?? float16DemotionSourceInputs(of: op, operand: operand, for: element, seed: seed)
                 ?? bfloat16DemotionSourceInputs(operand: operand, for: element, seed: seed)
-                ?? "Inputs.conversions(\(operand.namespace).Vector.self, \(seed))"
+                ?? "Inputs.conversions(\(operand.vectorType).self, \(seed))"
         case .narrowVector(let shape):
             values = "Inputs.vectors(H.\(shape.swiftVector).self, \(seed)).map(poisoningUpperBytes)"
         case .sourceNarrowVector(let shape):
-            values = "Inputs.conversions(\(operand.namespace).\(shape.swiftVector).self, \(seed))"
+            values = "Inputs.conversions(\(operand.vectorType).\(shape.swiftVector).self, \(seed))"
             values += ".map(poisoningUpperBytes)"
         case .sourceMask:
-            values = maskInputs("\(operand.namespace).Mask", seed: seed, nonCanonical: nonCanonical)
+            values = maskInputs(
+                "\(operand.vectorType).Mask",
+                seed: seed,
+                nonCanonical: nonCanonical
+            )
         case .narrowMask(let shape):
             values = maskInputs("H.\(shape.swiftMask)", seed: seed, nonCanonical: nonCanonical)
         case .sourceNarrowMask(let shape):
             values = maskInputs(
-                "\(operand.namespace).\(shape.swiftMask)",
+                "\(operand.vectorType).\(shape.swiftMask)",
                 seed: seed,
                 nonCanonical: nonCanonical
             )
         case .vector, .fillVector, .otherwiseVector, .outVector:
             let generator = op.accumulates ? "accumulators" : "vectors"
-            values = "Inputs.\(generator)(H.Vector.self, \(seed))"
+            values = "Inputs.\(generator)(H.self, \(seed))"
             if op.divides && element.category != .float && parameter == .vector
                 && inputs.contains(where: { $0.parameter == .vector })
             {
@@ -45655,15 +45685,15 @@ func referenceInputs(
                 values += ".filter { (0...H.laneCount).contains(\(count)) }"
             }
         case .lane, .fillLane, .insertedLane:
-            values = "Inputs.lanes(H.Lane.self, \(seed))"
+            values = "Inputs.lanes(Lane.self, \(seed))"
         case .flag:
             values = "[false, true]"
         case .maskBits:
-            values = "Inputs.maskBits(lanes: 16 / MemoryLayout<H.Lane>.size, \(seed))"
+            values = "Inputs.maskBits(lanes: 16 / MemoryLayout<Lane>.size, \(seed))"
         case .laneIndex:
             values = "Inputs.laneIndices(lanes: H.laneCount)"
         case .tuple(let count):
-            values = "Inputs.tuples\(count)(of: Inputs.vectors(H.Vector.self, \(seed)))"
+            values = "Inputs.tuples\(count)(of: Inputs.vectors(H.self, \(seed)))"
         case .tupleIndex:
             values = "Inputs.tupleIndices(count: \(tupleCount(of: op)))"
         case .count where op.clampsSpanCount:
@@ -45675,7 +45705,7 @@ func referenceInputs(
         case .shiftAmount:
             values = "Inputs.shiftAmounts(bits: \(element.bits), inContract: \(inContract))"
         case .shiftCounts:
-            values = "Inputs.shiftCounts(H.Vector.self, \(seed), inContract: \(inContract))"
+            values = "Inputs.shiftCounts(H.self, \(seed), inContract: \(inContract))"
         case .laneAmount:
             values = "Inputs.laneAmounts(lanes: H.laneCount, inContract: \(inContract))"
         case .roundConstant:
@@ -45697,11 +45727,11 @@ func referenceInputs(
             let pointee = isBytes ? "UInt8" : pointeeType(of: op, for: element)
             values = "Inputs.buffers(\(pointee).self, count: \(lanes), \(seed))"
         case .pointerIndices, .pointerOffsets:
-            let vector = "\(signedElement(of: element).namespace).Vector"
+            let vector = signedElement(of: element).vectorType
             let lanes = pointerLanes(of: op)
             let count =
                 parameter == .pointerOffsets
-                ? "(\(lanes) - 1) * MemoryLayout<H.Lane>.stride + 1" : lanes
+                ? "(\(lanes) - 1) * MemoryLayout<Lane>.stride + 1" : lanes
             values =
                 "Inputs.tableIndices(\(vector).self, count: \(count), \(seed), inContract: true)"
         }
@@ -45774,14 +45804,14 @@ func referenceResult(
     on type: String = "H"
 ) -> String {
     switch returns {
-    case .vector: return opaqueVector(call, of: element, on: type)
+    case .vector: return opaqueVector(call, on: type)
     case .narrowVector(let shape): return "\(type).\(shape.swiftVector)(raw: \(call))"
     case .narrowMask(let shape): return "\(type).\(shape.swiftMask)(raw: \(call))"
     case .laneIndices: return "\(type).Indices(raw: \(call))"
     case .mask: return "\(type).Mask(raw: \(call))"
     case .indices: return "\(type).Indices(raw: \(call))"
     case .tuple(let count):
-        let members = (0..<count).map { opaqueVector("tuple.v\($0)", of: element, on: type) }
+        let members = (0..<count).map { opaqueVector("tuple.v\($0)", on: type) }
         return "{ tuple in (\(members.joined(separator: ", "))) }(\(call))"
     case .lane:
         return element.isHalfPrecision ? "\(element.swiftType)(bitPattern: \(call))" : call
@@ -45968,7 +45998,7 @@ func compressedPrefixComparison(
         []
     )
     let lanes = ["portResult", "referenceResult"].map { result in
-        "(0..<checkedLanes).map { \(simdVector(result, of: element))[$0] }"
+        "(0..<checkedLanes).map { \(simdVector(result))[$0] }"
     }
     return """
         let checkedLanes = compressedLaneCount(bits: \(source), lanes: H.laneCount, tailIsDeterministic: \(isDeterministic))
@@ -46110,7 +46140,7 @@ func poisonedIndexStatements(of op: Op, inputs: [ReferenceInput]) -> String {
     guard let operand = inputs.first(where: { $0.parameter.isPointerIndices }) else { return "" }
     let pastEnd =
         operand.parameter == .pointerOffsets
-        ? "H.laneCount * MemoryLayout<H.Lane>.stride" : "H.laneCount"
+        ? "H.laneCount * MemoryLayout<Lane>.stride" : "H.laneCount"
     let unused: String
     if inputs.contains(where: { $0.parameter == .whereMask }) {
         unused = "where: mask"
@@ -46230,7 +46260,7 @@ func referenceStatements(
             : "\(portCall("bits", ["of: mask"])).nonzeroBitCount"
         let lanes = defined == .trueLanes ? trueCount : "H.laneCount - \(trueCount)"
         let results = ["port", "reference"].map { result in
-            let simd = simdVector(result, of: element)
+            let simd = simdVector(result)
             return "(0..<checkedLanes).map { \(simd)[$0] }"
         }
         statements = """
@@ -46242,7 +46272,7 @@ func referenceStatements(
     } else if op.growth == .unspecified {
         let source = op.source ?? element
         let shape = op.sourceShape
-        let type = "\(source.namespace)\(shape == .full ? "" : ".\(shape.swiftVector)")"
+        let type = "\(source.vectorType)\(shape == .full ? "" : ".\(shape.swiftVector)")"
         let results = ["port", "reference"].map { "Array(bytes(of: \($0)).prefix(definedBytes))" }
         let resultType: String
         switch op.returns {
@@ -46256,8 +46286,8 @@ func referenceStatements(
         statements = """
             let port = \(calls.port)
             let reference = \(calls.reference)
-            let definedBytes = \(type).laneCount * MemoryLayout<\(source.namespace).Lane>.stride
-            let grownBytes = \(resultType).laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = \(type).laneCount * MemoryLayout<\(source.swiftType)>.stride
+            let grownBytes = \(resultType).laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, \(register))
             mismatches.check(\(results[0]), \(results[1]), \(description))
             mismatches.check(\(grown[0]), \(grown[1]), \(description))
@@ -46420,7 +46450,7 @@ func rebindingReferenceTest(
         ReferenceInput(
             parameter: .mask,
             name: "mask",
-            values: maskInputs("\(source.namespace).Mask", seed: seed, nonCanonical: nonCanonical)
+            values: maskInputs("\(source.vectorType).Mask", seed: seed, nonCanonical: nonCanonical)
         )
     ]
     let port = portCall(op.swiftName, ["\(op.label): mask"])
@@ -46445,10 +46475,10 @@ func repeatingBlockReferenceTest(for element: Element) -> String {
     let vectors = ReferenceInput(
         parameter: .vector,
         name: "vector",
-        values: "Inputs.vectors(H.Vector.self, \(seed))"
+        values: "Inputs.vectors(H.self, \(seed))"
     )
     let lanes = repeatingBlockLanes(of: element).indices.map {
-        element.swiftLane(fromSimd: "\(simdVector("vector", of: element))[\($0)]")
+        element.swiftLane(fromSimd: "\(simdVector("vector"))[\($0)]")
     }
     let function = referenceFunctionName(repeatingBlockName, element)
     let port = portCall(repeatingBlockName, lanes)
@@ -46501,71 +46531,77 @@ func laneCountReferenceTest(for element: Element) -> String {
     )
 }
 
-func simdVector(_ expression: String, of element: Element) -> String {
-    element.hasOpaqueVector ? "\(expression).simd" : expression
+func simdVector(_ expression: String) -> String {
+    "\(expression).simd"
 }
 
-func opaqueVector(_ expression: String, of element: Element, on type: String = "H") -> String {
-    element.hasOpaqueVector ? "\(type).Vector(raw: \(expression))" : expression
+func opaqueVector(_ expression: String, on type: String = "H") -> String {
+    "\(type)(raw: \(expression))"
 }
 
 func narrowReferenceConformance(of element: Element, shape: Shape) -> String {
-    let lanes =
-        shape == .block
-        ? "16 / MemoryLayout<\(element.swiftType)>.stride"
-        : "\(element.namespace).laneCount / \(shape.fraction ?? 1)"
+    let vector = "\(element.vectorType).\(shape.swiftVector)"
     return """
-        extension \(element.namespace).\(shape.swiftVector): ReferenceNarrowVector {
-            package static var laneCount: Int { \(lanes) }
-
-            package init(lanes: [\(element.swiftType)]) {
-                self = lanes.withUnsafeBufferPointer { buffer in
-                    unsafe \(element.namespace).load\(shape.prefix)(from: buffer.baseAddress!)
-                }
+        package static func \(lowercasedFirstWord(shape.swiftVector))(lanes: [\(element.swiftType)]) -> \(vector) {
+            lanes.withUnsafeBufferPointer { buffer in
+                unsafe \(element.vectorType).load\(shape.prefix)(from: buffer.baseAddress!)
             }
+        }
 
-            package var lanes: [\(element.swiftType)] {
-                var lanes = [\(element.swiftType)](repeating: \(element.swiftZeroLane), count: Self.laneCount)
-                lanes.withUnsafeMutableBufferPointer { buffer in
-                    unsafe \(element.namespace).store(self, to: buffer.baseAddress!)
-                }
-                return lanes
+        package static func lanes(of vector: \(vector)) -> [\(element.swiftType)] {
+            var lanes = [\(element.swiftType)](repeating: \(element.swiftZeroLane), count: \(vector).laneCount)
+            lanes.withUnsafeMutableBufferPointer { buffer in
+                unsafe \(element.vectorType).store(vector, to: buffer.baseAddress!)
             }
+            return lanes
         }
         """
 }
 
-func narrowMaskReferenceConformance(of element: Element, shape: Shape) -> String {
-    """
-    extension \(element.namespace).\(shape.swiftMask): ReferenceNarrowMask {
-        package typealias Lane = \(element.swiftMaskLane)
-
-        package static var laneCount: Int { \(element.namespace).laneCount / \(shape.fraction ?? 1) }
-    }
-    """
-}
-
 func referenceConformances(of element: Element) -> String {
-    var blocks: [String] = []
-    if element.hasOpaqueVector {
-        let body =
-            element.isHalfPrecision
-            ? "{\n    package typealias InputLane = \(element.swiftType)\n\n"
-                + "    package static func simdLane(_ lane: InputLane) -> UInt16 { lane.bitPattern }\n}"
-            : "{}"
-        blocks.append("extension \(element.namespace).Vector: ReferenceVector \(body)")
-    }
-    blocks.append("extension \(element.namespace).Mask: ReferenceMask {}")
-    for shape in narrowShapes(of: element) {
-        blocks.append(narrowReferenceConformance(of: element, shape: shape))
-        if shape.hasMask {
-            blocks.append(narrowMaskReferenceConformance(of: element, shape: shape))
+    let vector = element.vectorType
+    let mask = "\(vector).Mask"
+    var members = [
+        """
+        package static func vector(_ simd: \(vector).SIMDType) -> \(vector) {
+            \(vector)(simd)
         }
+        """,
+        """
+        package static func simd(of vector: \(vector)) -> \(vector).SIMDType {
+            vector.simd
+        }
+        """,
+        """
+        package static func mask(_ simd: \(mask).SIMDType) -> \(mask) {
+            \(mask)(simd)
+        }
+        """,
+        """
+        package static func simd(of mask: \(mask)) -> \(mask).SIMDType {
+            mask.simd
+        }
+        """,
+    ]
+    if element.category == .bfloat16 {
+        members.insert(
+            "package static func simdLane(_ lane: \(element.swiftType)) -> UInt16 { lane.bitPattern }",
+            at: 0
+        )
     }
+    members += narrowShapes(of: element).map { narrowReferenceConformance(of: element, shape: $0) }
+    let protocolName =
+        element.supports(.eighth)
+        ? "ReferenceEighthElement"
+        : element.supports(.quarter) ? "ReferenceQuarterElement" : "ReferenceElement"
     let attribute = element.swiftAvailability.map { "\($0)\n" } ?? ""
-    let conformances = blocks.map { "\(attribute)\($0)" }.joined(separator: "\n\n")
-    guard let condition = element.compilationCondition else { return conformances }
-    return "#if \(condition)\n\(conformances)\n#endif"
+    let conformance = """
+        \(attribute)extension \(element.swiftType): \(protocolName) {
+        \(swiftIndented(members.joined(separator: "\n\n")))
+        }
+        """
+    guard let condition = element.compilationCondition else { return conformance }
+    return "#if \(condition)\n\(conformance)\n#endif"
 }
 
 func referenceTests(of op: Op, for element: Element) -> [String] {
@@ -46880,7 +46916,8 @@ func generateReferenceTests(_ element: Element) -> String {
 
         @Suite("\(element.namespace) against Highway")
         struct \(element.namespace)ReferenceTests {
-            typealias H = \(element.namespace)
+            typealias H = \(element.vectorType)
+            typealias Lane = \(element.swiftType)
 
         \(tests.joined(separator: "\n\n"))
         }
@@ -46888,11 +46925,11 @@ func generateReferenceTests(_ element: Element) -> String {
         """
 }
 
-func generateReferenceConformances(of conformingElements: [Element], importing: String) -> String {
+func generateReferenceConformances(of conformingElements: [Element]) -> String {
     """
     \(generationNotice)
 
-    \(importing)
+    package import Vectorization
 
     \(conformingElements.map(referenceConformances(of:)).joined(separator: "\n\n"))
 
@@ -47002,7 +47039,7 @@ func codegenFunctions(
             codegenFunctionName("port", referenceName, constantParameter: constantParameter),
             parameters: port.parameters,
             returnClause: hasReturn ? " -> \(portReturn)" : "",
-            call: portKeyword + portCall(swiftName, port.arguments, on: element.namespace)
+            call: portKeyword + portCall(swiftName, port.arguments, on: element.vectorType)
         ),
         codegenFunction(
             codegenFunctionName("highway", referenceName, constantParameter: constantParameter),
@@ -47017,7 +47054,7 @@ func codegenFunctions(
                     ),
                     returning: returns,
                     for: element,
-                    on: element.namespace
+                    on: element.vectorType
                 )
         ),
     ]
@@ -47059,7 +47096,7 @@ struct CodegenSide {
 
     var namespace: String {
         switch kind {
-        case .port: return element.namespace
+        case .port: return element.vectorType
         case .highway: return referenceNamespace(of: element)
         }
     }
@@ -47091,7 +47128,7 @@ struct CodegenSide {
                 swiftCallArgument($0, passing: $1)
             }
             let portKeyword = isUnsafe(op) || takesIndices(op) ? "unsafe " : ""
-            return portKeyword + portCall(op.swiftName, labelled, on: element.namespace)
+            return portKeyword + portCall(op.swiftName, labelled, on: element.vectorType)
         case .highway:
             let converted = zip(op.swiftOrdered(op.operands), arguments).map {
                 rawArgument($1, $0, for: element)
@@ -47103,7 +47140,7 @@ struct CodegenSide {
                 in: referenceNothrowNamespace
             )
             return keyword
-                + referenceResult(call, returning: op.returns, for: element, on: element.namespace)
+                + referenceResult(call, returning: op.returns, for: element, on: element.vectorType)
         }
     }
 
@@ -47114,14 +47151,14 @@ struct CodegenSide {
     func repeatingBlock(_ lanes: [String]) -> String {
         switch kind {
         case .port:
-            return portCall(repeatingBlockName, lanes, on: element.namespace)
+            return portCall(repeatingBlockName, lanes, on: element.vectorType)
         case .highway:
             let call = referenceCall(
                 referenceFunctionName(repeatingBlockName, element),
                 lanes,
                 in: referenceNothrowNamespace
             )
-            return referenceResult(call, returning: .vector, for: element, on: element.namespace)
+            return referenceResult(call, returning: .vector, for: element, on: element.vectorType)
         }
     }
 }
@@ -47448,7 +47485,7 @@ func repeatingBlockCodegenFunctions(for element: Element) -> String {
         for: element,
         returns: .vector,
         isUnsafe: (port: false, reference: false),
-        port: (lanes.map { "_ \($0): \(element.namespace).Lane" }, lanes),
+        port: (lanes.map { "_ \($0): \(element.swiftType)" }, lanes),
         reference: (
             lanes.map { "_ \($0): \(element.swiftType)" },
             lanes.map(element.swiftScalarArgument)
@@ -47495,7 +47532,7 @@ func referenceSpanForms(of op: Op, for element: Element) -> SpanForms? {
             call,
             returning: op.returns,
             for: element,
-            on: element.namespace
+            on: "SIMD"
         )
         return "unsafe \(result)"
     }
@@ -47512,7 +47549,7 @@ func referenceSpanForms(of op: WideningOp, from narrow: Element, to wide: Elemen
             op.takesCount ? [pointers[0], count] : [pointers[0]],
             in: referenceNothrowNamespace
         )
-        return "unsafe \(referenceResult(call, returning: .vector, for: wide, on: wide.namespace))"
+        return "unsafe \(referenceResult(call, returning: .vector, for: wide, on: "SIMD"))"
     }
     return forms
 }
@@ -47523,8 +47560,8 @@ func referenceSpanNamespace(of element: Element) -> String {
     """
     \(element.swiftAvailability.map { "\($0)\n" } ?? "")public enum \(referenceNamespace(of: element)) {
         public typealias Lane = \(element.swiftType)
-        public typealias Vector = \(element.namespace).Vector
-        public typealias Mask = \(element.namespace).Mask
+        public typealias SIMD = Vectorization.SIMD<\(element.swiftType)>
+        public typealias Mask = SIMD.Mask
 
         @export(implementation) @inline(always)
         public static var laneCount: Int {
@@ -48503,49 +48540,55 @@ func unorderedNaNsCondition(
     guard element.category == .float || element.category == .float16,
         let unorderedNaNs = op.unorderedNaNs
     else { return nil }
-    let multiplicands = vectors.filter { $0 != "c" }.joined(separator: ", ")
+    func simd(_ vector: String) -> String {
+        sources.contains(vector) && op.source?.category == .bfloat16 ? vector : "\(vector).simd"
+    }
+    let multiplicands = vectors.filter { $0 != "c" }.map(simd).joined(separator: ", ")
     let hasAddend = vectors.contains("c")
     let accumulators = vectors.filter { !sources.contains($0) }
     switch (unorderedNaNs, vectors.count) {
     case (.perLane, 2), (.perLane, 3), (.multiplyAdd, 2):
-        return "!hasUnorderedNaNs(\(vectors.joined(separator: ", ")))"
+        return "!hasUnorderedNaNs(\(vectors.map(simd).joined(separator: ", ")))"
     case (.negatedAddend, 2) where hasAddend:
-        return "!hasUnorderedNaNs(\(multiplicands), negatedLanes(of: c))"
+        return "!hasUnorderedNaNs(\(multiplicands), negatedLanes(of: c.simd))"
     case (.alternatingAddend, 2) where hasAddend:
-        return "!hasUnorderedNaNs(alternatingNegation: \(multiplicands), c)"
+        return "!hasUnorderedNaNs(alternatingNegation: \(multiplicands), c.simd)"
     case (.alternatingNegatedAddend, 2) where hasAddend:
-        return "!hasUnorderedNaNs(alternatingNegation: \(multiplicands), negatedLanes(of: c))"
+        return "!hasUnorderedNaNs(alternatingNegation: \(multiplicands), negatedLanes(of: c.simd))"
     case (.negatedAddend, 2), (.alternatingAddend, 2), (.alternatingNegatedAddend, 2):
-        return "!hasUnorderedNaNs(\(vectors.joined(separator: ", ")))"
+        return "!hasUnorderedNaNs(\(vectors.map(simd).joined(separator: ", ")))"
     case (.adjacentLanes, _):
-        return "!hasUnorderedNaNs(adjacentLanesOf: \(vectors.joined(separator: ", ")))"
+        return "!hasUnorderedNaNs(adjacentLanesOf: \(vectors.map(simd).joined(separator: ", ")))"
     case (.adjacentQuads, _):
-        return "!hasUnorderedNaNs(adjacentQuadsOf: \(vectors.joined(separator: ", ")))"
+        return "!hasUnorderedNaNs(adjacentQuadsOf: \(vectors.map(simd).joined(separator: ", ")))"
     case (.alternatingNegation, 2):
-        return "!hasUnorderedNaNs(alternatingNegation: \(vectors.joined(separator: ", ")))"
+        return
+            "!hasUnorderedNaNs(alternatingNegation: \(vectors.map(simd).joined(separator: ", ")))"
     case (.alternatingNegation, 1):
         return nil
     case (.multiplyAdd, 3), (.negatedAddend, 3), (.alternatingAddend, 3),
         (.alternatingNegatedAddend, 3):
-        return "!hasUnorderedNaNs(multiplying: \(vectors[0]), \(vectors[1]), adding: \(vectors[2]))"
+        return
+            "!hasUnorderedNaNs(multiplying: \(simd(vectors[0])), \(simd(vectors[1])), adding: \(simd(vectors[2])))"
     case (.negatedMultiplicand, 3):
-        return "!hasUnorderedNaNs(negating: \(vectors[0]), \(vectors[1]), adding: \(vectors[2]))"
+        return
+            "!hasUnorderedNaNs(negating: \(simd(vectors[0])), \(simd(vectors[1])), adding: \(simd(vectors[2])))"
     case (.negatedMultiplicand, 2):
-        return "!hasNaNs(negating: \(vectors.filter { $0 != "c" }.joined(separator: ", ")))"
+        return "!hasNaNs(negating: \(multiplicands))"
     case (.acrossLanes, 1):
-        return "!hasUnorderedNaNs(lanesOf: \(vectors[0]))"
+        return "!hasUnorderedNaNs(lanesOf: \(simd(vectors[0])))"
     case (.complexLanes, _):
-        return "!hasUnorderedNaNs(complexLanesOf: \(vectors.joined(separator: ", ")))"
+        return "!hasUnorderedNaNs(complexLanesOf: \(vectors.map(simd).joined(separator: ", ")))"
     case (.widenedPairs, _) where sources.count == 2:
         return "!hasUnorderedNaNs(widening: \(sources[0]), \(sources[1]))"
     case (.widenedEven, _) where sources.count == 2 && accumulators.count == 1,
         (.widenedOdd, _) where sources.count == 2 && accumulators.count == 1:
         let parity = unorderedNaNs == .widenedEven ? 0 : 1
         return
-            "!hasUnorderedNaNs(widening: \(sources[0]), \(sources[1]), parity: \(parity), adding: \(accumulators[0]))"
+            "!hasUnorderedNaNs(widening: \(sources[0]), \(sources[1]), parity: \(parity), adding: \(simd(accumulators[0])))"
     case (.widenedAccumulating, _) where sources.count == 2 && accumulators.count == 2:
         return
-            "!hasUnorderedNaNs(widening: \(sources[0]), \(sources[1]), accumulating: \(accumulators[0]), \(accumulators[1]))"
+            "!hasUnorderedNaNs(widening: \(sources[0]), \(sources[1]), accumulating: \(simd(accumulators[0])), \(simd(accumulators[1])))"
     default:
         return nil
     }
@@ -48705,7 +48748,7 @@ func codegenRebindingTest(
         ReferenceInput(
             parameter: .mask,
             name: "mask",
-            values: "Inputs.masks(\(source.namespace).Mask.self, \(seed))"
+            values: "Inputs.masks(\(source.vectorType).Mask.self, \(seed))"
         )
     ]
     let calls = codegenCalls(
@@ -48731,10 +48774,10 @@ func codegenRepeatingBlockTest(for element: Element) -> String {
     let vectors = ReferenceInput(
         parameter: .vector,
         name: "vector",
-        values: "Inputs.vectors(H.Vector.self, \(seed))"
+        values: "Inputs.vectors(H.self, \(seed))"
     )
     let lanes = repeatingBlockLanes(of: element).indices
-        .map { element.swiftLane(fromSimd: "\(simdVector("vector", of: element))[\($0)]") }
+        .map { element.swiftLane(fromSimd: "\(simdVector("vector"))[\($0)]") }
         .joined(separator: ", ")
     let referenceName = referenceFunctionName(repeatingBlockName, element)
     let function = codegenFunctionName("port", referenceName)
@@ -48770,10 +48813,10 @@ func codegenKernelInputs(
         let seed = "seed: \(referenceTestSeed(element, test, String(inputs.count)))"
         switch parameter.kind {
         case .vector:
-            let values = "Inputs.vectors(H.Vector.self, \(seed))"
+            let values = "Inputs.vectors(H.self, \(seed))"
             inputs.append(ReferenceInput(parameter: .vector, name: parameter.name, values: values))
         case .lane:
-            let values = "Inputs.lanes(H.Lane.self, \(seed))"
+            let values = "Inputs.lanes(Lane.self, \(seed))"
             inputs.append(ReferenceInput(parameter: .lane, name: parameter.name, values: values))
         case .pointer, .span, .byteSpan, .mutableSpan:
             let isBytes =
@@ -48782,7 +48825,7 @@ func codegenKernelInputs(
             let values =
                 isBytes
                 ? "Inputs.byteBuffers(count: \(codegenKernelLength), \(seed))"
-                : "Inputs.buffers(H.Lane.self, count: \(codegenKernelLength), \(seed))"
+                : "Inputs.buffers(Lane.self, count: \(codegenKernelLength), \(seed))"
             inputs.append(
                 ReferenceInput(parameter: .constLanePointer, name: parameter.name, values: values)
             )
@@ -48993,7 +49036,8 @@ func generateCodegenTests(_ element: Element) -> String {
 
     @Suite("\(element.namespace) codegen against Highway")
     struct \(element.namespace)CodegenTests {
-        typealias H = \(element.namespace)
+        typealias H = \(element.vectorType)
+        typealias Lane = \(element.swiftType)
     }
 
     """
@@ -49134,7 +49178,7 @@ func integerSplats(for element: Element) -> [ConstantValue] {
         [0, 1, 15, 16, 26, 127, 128, 255, 256, 257, 65280, 65281]
         + (signed ? [-1, -16, -17, -128, -129] : [])
     let fitting = candidates.filter { (lower...upper).contains($0) }
-    let extremes = [("Max", "H.Lane.max", upper), ("Min", "H.Lane.min", lower)]
+    let extremes = [("Max", "Lane.max", upper), ("Min", "Lane.min", lower)]
         .filter { _, _, value in signed || value == upper }
         .filter { _, _, value in !fitting.contains(value) }
     return integerConstants(fitting)
@@ -49156,7 +49200,7 @@ let floatSplats = [
     ConstantValue(name: "MinusInfinity", literal: "-.infinity"),
     ConstantValue(name: "NaN", literal: ".nan"),
     ConstantValue(name: "MinusNaN", literal: "-.nan"),
-    ConstantValue(name: "PayloadNaN", literal: "H.Lane(nan: 1, signaling: false)"),
+    ConstantValue(name: "PayloadNaN", literal: "Lane(nan: 1, signaling: false)"),
     ConstantValue(name: "SignalingNaN", literal: ".signalingNaN"),
     ConstantValue(name: "MinusSignalingNaN", literal: "-.signalingNaN"),
     ConstantValue(name: "LeastNonzero", literal: ".leastNonzeroMagnitude"),
@@ -49173,7 +49217,7 @@ let bfloatSplats = [
 ].map { name, bits in
     ConstantValue(
         name: name,
-        literal: "H.Lane(bitPattern: 0x\(String(format: "%04X", bits)))"
+        literal: "Lane(bitPattern: 0x\(String(format: "%04X", bits)))"
     )
 }
 
@@ -49545,17 +49589,17 @@ func isConstantVector(_ parameter: Parameter) -> Bool {
 }
 
 func constantNamespace(of operand: Element, for element: Element) -> String {
-    operand.suffix == element.suffix ? "H" : operand.namespace
+    operand.suffix == element.suffix ? "H" : operand.vectorType
 }
 
 func constantLane(of operand: Element, for element: Element) -> String {
-    "\(constantNamespace(of: operand, for: element)).Lane"
+    operand.suffix == element.suffix ? "Lane" : operand.swiftType
 }
 
 func constantType(
     of parameter: Parameter,
     for element: Element,
-    lane: String = "H.Lane"
+    lane: String = "Lane"
 )
     -> String
 {
@@ -49589,7 +49633,7 @@ func constantHelper(
     let blockLanes = (0..<operand.blockLaneCount).map { values[$0 % values.count] }
     let splat =
         op.parameters[index].isPointerIndices
-        ? portCall("repeating", [value], on: operand.namespace)
+        ? portCall("repeating", [value], on: operand.vectorType)
         : alternating
             ? portCall(repeatingBlockName, blockLanes)
             : portCall("repeating", [value], on: constantNamespace(of: operand, for: element))
@@ -49860,7 +49904,7 @@ func constantTests(of op: Op, for element: Element) -> [String] {
         let lane = constantLane(of: operand, for: element)
         let infix = position == 0 ? "" : operand.namespace
         for value in constantSplats(for: operand) {
-            let literal = value.literal.replacingOccurrences(of: "H.Lane", with: lane)
+            let literal = value.literal.replacingOccurrences(of: "Lane", with: lane)
             members.append(
                 constantTest(
                     "\(op.testIdentifier)Constant\(infix)Splat\(value.name)",
@@ -49974,7 +50018,8 @@ func generateConstantTests(_ element: Element) -> String {
 
     @Suite("\(element.namespace) constants against Highway")
     struct \(element.namespace)ConstantTests {
-        typealias H = \(element.namespace)
+        typealias H = \(element.vectorType)
+        typealias Lane = \(element.swiftType)
     }
 
     """
@@ -50141,6 +50186,10 @@ func entirelyGuardedCondition(of members: [SectionMember]) -> String? {
     return condition
 }
 
+func exposesVectorization(_ source: String) -> Bool {
+    source.range(of: #"public [^{]*\b(SIMD\w*|BFloat16)\b"#, options: .regularExpression) != nil
+}
+
 func sectionFile(
     _ members: [SectionMember],
     imports: String,
@@ -50166,6 +50215,12 @@ func sectionFile(
     let outside = members.flatMap(\.outside)
     if !outside.isEmpty {
         output += "\n\(outside.joined(separator: "\n\n"))\n"
+    }
+    if !exposesVectorization(output) {
+        output = output.replacingOccurrences(
+            of: "public import Vectorization",
+            with: "import Vectorization"
+        )
     }
     return conditioned(
         output,
@@ -50340,14 +50395,11 @@ let generatedFunctions = headerFunctions(of: generatedHeader)
 try write(generatedHeader, to: headerPath)
 try write(generateReferenceHeader(), to: referenceHeaderPath)
 try write(
-    generateReferenceConformances(of: classicElements, importing: "import Vectorization"),
+    generateReferenceConformances(of: classicElements),
     to: "\(generatedReferenceSupportRoot)/ReferenceConformances.swift"
 )
 try write(
-    generateReferenceConformances(
-        of: halfPrecisionElements,
-        importing: "package import Vectorization"
-    ),
+    generateReferenceConformances(of: halfPrecisionElements),
     to: "\(generatedReferenceSupportRoot)/HalfPrecisionConformances.swift"
 )
 try write(

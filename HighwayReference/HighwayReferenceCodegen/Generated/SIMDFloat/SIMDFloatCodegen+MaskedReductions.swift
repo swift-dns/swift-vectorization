@@ -5,7 +5,7 @@ public import Vectorization
 
 @inline(never)
 public func portSumWhereF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mask) -> Float {
-    SIMDFloat.sum(a, where: mask)
+    SIMD<Float>.sum(a, where: mask)
 }
 
 @inline(never)
@@ -15,17 +15,20 @@ public func highwaySumWhereF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mask) -
 
 @inline(never)
 public func portSumWhereF32ConstantA(where mask: SIMD<Float>.Mask) -> Float {
-    SIMDFloat.sum(SIMDFloat.repeating(1.5), where: mask)
+    SIMD<Float>.sum(SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
 public func highwaySumWhereF32ConstantA(where mask: SIMD<Float>.Mask) -> Float {
-    HighwayReference.Nothrow.sumWhereF32(mask.raw, HighwayReference.Nothrow.repeatingF32(1.5).raw)
+    HighwayReference.Nothrow.sumWhereF32(
+        mask.raw,
+        SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+    )
 }
 
 @inline(never)
 public func portSmallestWhereF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mask) -> Float {
-    SIMDFloat.smallest(a, where: mask)
+    SIMD<Float>.smallest(a, where: mask)
 }
 
 @inline(never)
@@ -35,20 +38,20 @@ public func highwaySmallestWhereF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Ma
 
 @inline(never)
 public func portSmallestWhereF32ConstantA(where mask: SIMD<Float>.Mask) -> Float {
-    SIMDFloat.smallest(SIMDFloat.repeating(1.5), where: mask)
+    SIMD<Float>.smallest(SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
 public func highwaySmallestWhereF32ConstantA(where mask: SIMD<Float>.Mask) -> Float {
     HighwayReference.Nothrow.smallestWhereF32(
         mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+        SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
     )
 }
 
 @inline(never)
 public func portLargestWhereF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mask) -> Float {
-    SIMDFloat.largest(a, where: mask)
+    SIMD<Float>.largest(a, where: mask)
 }
 
 @inline(never)
@@ -58,13 +61,13 @@ public func highwayLargestWhereF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mas
 
 @inline(never)
 public func portLargestWhereF32ConstantA(where mask: SIMD<Float>.Mask) -> Float {
-    SIMDFloat.largest(SIMDFloat.repeating(1.5), where: mask)
+    SIMD<Float>.largest(SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
 public func highwayLargestWhereF32ConstantA(where mask: SIMD<Float>.Mask) -> Float {
     HighwayReference.Nothrow.largestWhereF32(
         mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+        SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
     )
 }

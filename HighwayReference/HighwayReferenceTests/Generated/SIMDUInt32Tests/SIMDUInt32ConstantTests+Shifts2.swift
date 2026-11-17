@@ -9,13 +9,11 @@ extension SIMDUInt32ConstantTests {
     @inline(__always)
     private func checkRotatedRightConstantBits(_ bits: Int) {
         let mismatches = Mismatches("rotatedRight with bits \(bits)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA855_9155_0975_BAEC)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA855_9155_0975_BAEC)
         for a in aInputs {
             mismatches.check(
                 H.rotatedRight(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.rotatedRightTemplateU32(a.raw, Int32(clamping: bits))
-                ),
+                H(raw: HighwayReference.rotatedRightTemplateU32(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a))"
             )
         }

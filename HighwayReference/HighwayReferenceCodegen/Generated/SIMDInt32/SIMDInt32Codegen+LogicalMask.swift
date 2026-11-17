@@ -5,18 +5,18 @@ public import Vectorization
 
 @inline(never)
 public func portBitwiseNotMaskI32(_ mask: SIMD<Int32>.Mask) -> SIMD<Int32>.Mask {
-    SIMDInt32.bitwiseNot(mask)
+    SIMD<Int32>.bitwiseNot(mask)
 }
 
 @inline(never)
 public func highwayBitwiseNotMaskI32(_ mask: SIMD<Int32>.Mask) -> SIMD<Int32>.Mask {
-    SIMDInt32.Mask(raw: HighwayReference.Nothrow.bitwiseNotMaskI32(mask.raw))
+    SIMD<Int32>.Mask(raw: HighwayReference.Nothrow.bitwiseNotMaskI32(mask.raw))
 }
 
 @inline(never)
 public func portBitwiseAndMaskI32(_ a: SIMD<Int32>.Mask, _ b: SIMD<Int32>.Mask) -> SIMD<Int32>.Mask
 {
-    SIMDInt32.bitwiseAnd(a, b)
+    SIMD<Int32>.bitwiseAnd(a, b)
 }
 
 @inline(never)
@@ -24,7 +24,7 @@ public func highwayBitwiseAndMaskI32(
     _ a: SIMD<Int32>.Mask,
     _ b: SIMD<Int32>.Mask
 ) -> SIMD<Int32>.Mask {
-    SIMDInt32.Mask(raw: HighwayReference.Nothrow.bitwiseAndMaskI32(a.raw, b.raw))
+    SIMD<Int32>.Mask(raw: HighwayReference.Nothrow.bitwiseAndMaskI32(a.raw, b.raw))
 }
 
 @inline(never)
@@ -32,7 +32,7 @@ public func portBitwiseAndNotMaskI32(
     _ a: SIMD<Int32>.Mask,
     _ b: SIMD<Int32>.Mask
 ) -> SIMD<Int32>.Mask {
-    SIMDInt32.bitwiseAndNot(a, b)
+    SIMD<Int32>.bitwiseAndNot(a, b)
 }
 
 @inline(never)
@@ -40,12 +40,12 @@ public func highwayBitwiseAndNotMaskI32(
     _ a: SIMD<Int32>.Mask,
     _ b: SIMD<Int32>.Mask
 ) -> SIMD<Int32>.Mask {
-    SIMDInt32.Mask(raw: HighwayReference.Nothrow.bitwiseAndNotMaskI32(a.raw, b.raw))
+    SIMD<Int32>.Mask(raw: HighwayReference.Nothrow.bitwiseAndNotMaskI32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portBitwiseOrMaskI32(_ a: SIMD<Int32>.Mask, _ b: SIMD<Int32>.Mask) -> SIMD<Int32>.Mask {
-    SIMDInt32.bitwiseOr(a, b)
+    SIMD<Int32>.bitwiseOr(a, b)
 }
 
 @inline(never)
@@ -53,13 +53,13 @@ public func highwayBitwiseOrMaskI32(
     _ a: SIMD<Int32>.Mask,
     _ b: SIMD<Int32>.Mask
 ) -> SIMD<Int32>.Mask {
-    SIMDInt32.Mask(raw: HighwayReference.Nothrow.bitwiseOrMaskI32(a.raw, b.raw))
+    SIMD<Int32>.Mask(raw: HighwayReference.Nothrow.bitwiseOrMaskI32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portBitwiseXorMaskI32(_ a: SIMD<Int32>.Mask, _ b: SIMD<Int32>.Mask) -> SIMD<Int32>.Mask
 {
-    SIMDInt32.bitwiseXor(a, b)
+    SIMD<Int32>.bitwiseXor(a, b)
 }
 
 @inline(never)
@@ -67,56 +67,56 @@ public func highwayBitwiseXorMaskI32(
     _ a: SIMD<Int32>.Mask,
     _ b: SIMD<Int32>.Mask
 ) -> SIMD<Int32>.Mask {
-    SIMDInt32.Mask(raw: HighwayReference.Nothrow.bitwiseXorMaskI32(a.raw, b.raw))
+    SIMD<Int32>.Mask(raw: HighwayReference.Nothrow.bitwiseXorMaskI32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portNeitherTrueI32(_ a: SIMD<Int32>.Mask, _ b: SIMD<Int32>.Mask) -> SIMD<Int32>.Mask {
-    SIMDInt32.neitherTrue(a, b)
+    SIMD<Int32>.neitherTrue(a, b)
 }
 
 @inline(never)
 public func highwayNeitherTrueI32(_ a: SIMD<Int32>.Mask, _ b: SIMD<Int32>.Mask) -> SIMD<Int32>.Mask
 {
-    SIMDInt32.Mask(raw: HighwayReference.Nothrow.neitherTrueI32(a.raw, b.raw))
+    SIMD<Int32>.Mask(raw: HighwayReference.Nothrow.neitherTrueI32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portOnlyFirstTrueI32(_ mask: SIMD<Int32>.Mask) -> SIMD<Int32>.Mask {
-    SIMDInt32.onlyFirstTrue(mask)
+    SIMD<Int32>.onlyFirstTrue(mask)
 }
 
 @inline(never)
 public func highwayOnlyFirstTrueI32(_ mask: SIMD<Int32>.Mask) -> SIMD<Int32>.Mask {
-    SIMDInt32.Mask(raw: HighwayReference.Nothrow.onlyFirstTrueI32(mask.raw))
+    SIMD<Int32>.Mask(raw: HighwayReference.Nothrow.onlyFirstTrueI32(mask.raw))
 }
 
 @inline(never)
 public func portBeforeFirstTrueI32(_ mask: SIMD<Int32>.Mask) -> SIMD<Int32>.Mask {
-    SIMDInt32.beforeFirstTrue(mask)
+    SIMD<Int32>.beforeFirstTrue(mask)
 }
 
 @inline(never)
 public func highwayBeforeFirstTrueI32(_ mask: SIMD<Int32>.Mask) -> SIMD<Int32>.Mask {
-    SIMDInt32.Mask(raw: HighwayReference.Nothrow.beforeFirstTrueI32(mask.raw))
+    SIMD<Int32>.Mask(raw: HighwayReference.Nothrow.beforeFirstTrueI32(mask.raw))
 }
 
 @inline(never)
 public func portAtOrBeforeFirstTrueI32(_ mask: SIMD<Int32>.Mask) -> SIMD<Int32>.Mask {
-    SIMDInt32.atOrBeforeFirstTrue(mask)
+    SIMD<Int32>.atOrBeforeFirstTrue(mask)
 }
 
 @inline(never)
 public func highwayAtOrBeforeFirstTrueI32(_ mask: SIMD<Int32>.Mask) -> SIMD<Int32>.Mask {
-    SIMDInt32.Mask(raw: HighwayReference.Nothrow.atOrBeforeFirstTrueI32(mask.raw))
+    SIMD<Int32>.Mask(raw: HighwayReference.Nothrow.atOrBeforeFirstTrueI32(mask.raw))
 }
 
 @inline(never)
 public func portAtOrAfterFirstTrueI32(_ mask: SIMD<Int32>.Mask) -> SIMD<Int32>.Mask {
-    SIMDInt32.atOrAfterFirstTrue(mask)
+    SIMD<Int32>.atOrAfterFirstTrue(mask)
 }
 
 @inline(never)
 public func highwayAtOrAfterFirstTrueI32(_ mask: SIMD<Int32>.Mask) -> SIMD<Int32>.Mask {
-    SIMDInt32.Mask(raw: HighwayReference.Nothrow.atOrAfterFirstTrueI32(mask.raw))
+    SIMD<Int32>.Mask(raw: HighwayReference.Nothrow.atOrAfterFirstTrueI32(mask.raw))
 }

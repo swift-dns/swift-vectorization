@@ -6,217 +6,265 @@ public import Vectorization
 
 @inline(never)
 public func portMinimumF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.minimum(a, b)
+    SIMD<Float16>.minimum(a, b)
 }
 
 @inline(never)
 public func highwayMinimumF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.minimumF16(a.raw, b.raw)
+    SIMD<Float16>(raw: HighwayReference.Nothrow.minimumF16(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMinimumF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.minimum(SIMDFloat16.repeating(Float16(bitPattern: 26)), b)
+    SIMD<Float16>.minimum(SIMD<Float16>.repeating(Float16(bitPattern: 26)), b)
 }
 
 @inline(never)
 public func highwayMinimumF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.minimumF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
-        b.raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.minimumF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMinimumF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.minimum(a, SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    SIMD<Float16>.minimum(a, SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayMinimumF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.minimumF16(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.minimumF16(
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portMaximumF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.maximum(a, b)
+    SIMD<Float16>.maximum(a, b)
 }
 
 @inline(never)
 public func highwayMaximumF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.maximumF16(a.raw, b.raw)
+    SIMD<Float16>(raw: HighwayReference.Nothrow.maximumF16(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMaximumF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.maximum(SIMDFloat16.repeating(Float16(bitPattern: 26)), b)
+    SIMD<Float16>.maximum(SIMD<Float16>.repeating(Float16(bitPattern: 26)), b)
 }
 
 @inline(never)
 public func highwayMaximumF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.maximumF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
-        b.raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.maximumF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMaximumF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.maximum(a, SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    SIMD<Float16>.maximum(a, SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayMaximumF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.maximumF16(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.maximumF16(
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portMinimumNumberF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.minimumNumber(a, b)
+    SIMD<Float16>.minimumNumber(a, b)
 }
 
 @inline(never)
 public func highwayMinimumNumberF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.minimumNumberF16(a.raw, b.raw)
+    SIMD<Float16>(raw: HighwayReference.Nothrow.minimumNumberF16(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMinimumNumberF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.minimumNumber(SIMDFloat16.repeating(Float16(bitPattern: 26)), b)
+    SIMD<Float16>.minimumNumber(SIMD<Float16>.repeating(Float16(bitPattern: 26)), b)
 }
 
 @inline(never)
 public func highwayMinimumNumberF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.minimumNumberF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
-        b.raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.minimumNumberF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMinimumNumberF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.minimumNumber(a, SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    SIMD<Float16>.minimumNumber(a, SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayMinimumNumberF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.minimumNumberF16(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.minimumNumberF16(
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portMaximumNumberF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.maximumNumber(a, b)
+    SIMD<Float16>.maximumNumber(a, b)
 }
 
 @inline(never)
 public func highwayMaximumNumberF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.maximumNumberF16(a.raw, b.raw)
+    SIMD<Float16>(raw: HighwayReference.Nothrow.maximumNumberF16(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMaximumNumberF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.maximumNumber(SIMDFloat16.repeating(Float16(bitPattern: 26)), b)
+    SIMD<Float16>.maximumNumber(SIMD<Float16>.repeating(Float16(bitPattern: 26)), b)
 }
 
 @inline(never)
 public func highwayMaximumNumberF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.maximumNumberF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
-        b.raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.maximumNumberF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMaximumNumberF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.maximumNumber(a, SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    SIMD<Float16>.maximumNumber(a, SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayMaximumNumberF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.maximumNumberF16(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.maximumNumberF16(
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portMinimumMagnitudeF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.minimumMagnitude(a, b)
+    SIMD<Float16>.minimumMagnitude(a, b)
 }
 
 @inline(never)
 public func highwayMinimumMagnitudeF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.minimumMagnitudeF16(a.raw, b.raw)
+    SIMD<Float16>(raw: HighwayReference.Nothrow.minimumMagnitudeF16(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMinimumMagnitudeF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.minimumMagnitude(SIMDFloat16.repeating(Float16(bitPattern: 26)), b)
+    SIMD<Float16>.minimumMagnitude(SIMD<Float16>.repeating(Float16(bitPattern: 26)), b)
 }
 
 @inline(never)
 public func highwayMinimumMagnitudeF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.minimumMagnitudeF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
-        b.raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.minimumMagnitudeF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMinimumMagnitudeF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.minimumMagnitude(a, SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    SIMD<Float16>.minimumMagnitude(a, SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayMinimumMagnitudeF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.minimumMagnitudeF16(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.minimumMagnitudeF16(
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portMaximumMagnitudeF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.maximumMagnitude(a, b)
+    SIMD<Float16>.maximumMagnitude(a, b)
 }
 
 @inline(never)
 public func highwayMaximumMagnitudeF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.maximumMagnitudeF16(a.raw, b.raw)
+    SIMD<Float16>(raw: HighwayReference.Nothrow.maximumMagnitudeF16(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMaximumMagnitudeF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.maximumMagnitude(SIMDFloat16.repeating(Float16(bitPattern: 26)), b)
+    SIMD<Float16>.maximumMagnitude(SIMD<Float16>.repeating(Float16(bitPattern: 26)), b)
 }
 
 @inline(never)
 public func highwayMaximumMagnitudeF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.maximumMagnitudeF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
-        b.raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.maximumMagnitudeF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMaximumMagnitudeF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.maximumMagnitude(a, SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    SIMD<Float16>.maximumMagnitude(a, SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayMaximumMagnitudeF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.maximumMagnitudeF16(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.maximumMagnitudeF16(
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 #endif

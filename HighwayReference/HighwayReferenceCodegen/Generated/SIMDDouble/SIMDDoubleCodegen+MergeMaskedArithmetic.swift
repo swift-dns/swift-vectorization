@@ -9,7 +9,7 @@ public func portSquareRootWhereOtherwiseF64(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.squareRoot(a, where: mask, otherwise: otherwise)
+    SIMD<Double>.squareRoot(a, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -18,7 +18,9 @@ public func highwaySquareRootWhereOtherwiseF64(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.squareRootWhereOtherwiseF64(otherwise.raw, mask.raw, a.raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.squareRootWhereOtherwiseF64(otherwise.raw, mask.raw, a.raw)
+    )
 }
 
 @inline(never)
@@ -26,7 +28,7 @@ public func portSquareRootWhereOtherwiseF64ConstantA(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.squareRoot(SIMDDouble.repeating(1.5), where: mask, otherwise: otherwise)
+    SIMD<Double>.squareRoot(SIMD<Double>.repeating(1.5), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -34,10 +36,12 @@ public func highwaySquareRootWhereOtherwiseF64ConstantA(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.squareRootWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.squareRootWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
@@ -46,7 +50,7 @@ public func portSquareRootWhereOtherwiseF64ConstantOtherwise(
     _ a: SIMD<Double>,
     where mask: SIMD<Double>.Mask
 ) -> SIMD<Double> {
-    SIMDDouble.squareRoot(a, where: mask, otherwise: SIMDDouble.repeating(1.5))
+    SIMD<Double>.squareRoot(a, where: mask, otherwise: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
@@ -54,10 +58,12 @@ public func highwaySquareRootWhereOtherwiseF64ConstantOtherwise(
     _ a: SIMD<Double>,
     where mask: SIMD<Double>.Mask
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.squareRootWhereOtherwiseF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        mask.raw,
-        a.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.squareRootWhereOtherwiseF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            mask.raw,
+            a.raw
+        )
     )
 }
 
@@ -68,7 +74,7 @@ public func portMinimumWhereOtherwiseF64(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.minimum(a, b, where: mask, otherwise: otherwise)
+    SIMD<Double>.minimum(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -78,7 +84,14 @@ public func highwayMinimumWhereOtherwiseF64(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.minimumWhereOtherwiseF64(otherwise.raw, mask.raw, a.raw, b.raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.minimumWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -87,7 +100,7 @@ public func portMinimumWhereOtherwiseF64ConstantA(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.minimum(SIMDDouble.repeating(1.5), b, where: mask, otherwise: otherwise)
+    SIMD<Double>.minimum(SIMD<Double>.repeating(1.5), b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -96,11 +109,13 @@ public func highwayMinimumWhereOtherwiseF64ConstantA(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.minimumWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        b.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.minimumWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
     )
 }
 
@@ -110,7 +125,7 @@ public func portMinimumWhereOtherwiseF64ConstantB(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.minimum(a, SIMDDouble.repeating(1.5), where: mask, otherwise: otherwise)
+    SIMD<Double>.minimum(a, SIMD<Double>.repeating(1.5), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -119,11 +134,13 @@ public func highwayMinimumWhereOtherwiseF64ConstantB(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.minimumWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.minimumWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
@@ -133,7 +150,7 @@ public func portMinimumWhereOtherwiseF64ConstantOtherwise(
     _ b: SIMD<Double>,
     where mask: SIMD<Double>.Mask
 ) -> SIMD<Double> {
-    SIMDDouble.minimum(a, b, where: mask, otherwise: SIMDDouble.repeating(1.5))
+    SIMD<Double>.minimum(a, b, where: mask, otherwise: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
@@ -142,11 +159,13 @@ public func highwayMinimumWhereOtherwiseF64ConstantOtherwise(
     _ b: SIMD<Double>,
     where mask: SIMD<Double>.Mask
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.minimumWhereOtherwiseF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        mask.raw,
-        a.raw,
-        b.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.minimumWhereOtherwiseF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
     )
 }
 
@@ -157,7 +176,7 @@ public func portMaximumWhereOtherwiseF64(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.maximum(a, b, where: mask, otherwise: otherwise)
+    SIMD<Double>.maximum(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -167,7 +186,14 @@ public func highwayMaximumWhereOtherwiseF64(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.maximumWhereOtherwiseF64(otherwise.raw, mask.raw, a.raw, b.raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.maximumWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -176,7 +202,7 @@ public func portMaximumWhereOtherwiseF64ConstantA(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.maximum(SIMDDouble.repeating(1.5), b, where: mask, otherwise: otherwise)
+    SIMD<Double>.maximum(SIMD<Double>.repeating(1.5), b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -185,11 +211,13 @@ public func highwayMaximumWhereOtherwiseF64ConstantA(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.maximumWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        b.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.maximumWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
     )
 }
 
@@ -199,7 +227,7 @@ public func portMaximumWhereOtherwiseF64ConstantB(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.maximum(a, SIMDDouble.repeating(1.5), where: mask, otherwise: otherwise)
+    SIMD<Double>.maximum(a, SIMD<Double>.repeating(1.5), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -208,11 +236,13 @@ public func highwayMaximumWhereOtherwiseF64ConstantB(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.maximumWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.maximumWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
@@ -222,7 +252,7 @@ public func portMaximumWhereOtherwiseF64ConstantOtherwise(
     _ b: SIMD<Double>,
     where mask: SIMD<Double>.Mask
 ) -> SIMD<Double> {
-    SIMDDouble.maximum(a, b, where: mask, otherwise: SIMDDouble.repeating(1.5))
+    SIMD<Double>.maximum(a, b, where: mask, otherwise: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
@@ -231,11 +261,13 @@ public func highwayMaximumWhereOtherwiseF64ConstantOtherwise(
     _ b: SIMD<Double>,
     where mask: SIMD<Double>.Mask
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.maximumWhereOtherwiseF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        mask.raw,
-        a.raw,
-        b.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.maximumWhereOtherwiseF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
     )
 }
 
@@ -246,7 +278,7 @@ public func portAddingWhereOtherwiseF64(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.adding(a, b, where: mask, otherwise: otherwise)
+    SIMD<Double>.adding(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -256,7 +288,9 @@ public func highwayAddingWhereOtherwiseF64(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.addingWhereOtherwiseF64(otherwise.raw, mask.raw, a.raw, b.raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.addingWhereOtherwiseF64(otherwise.raw, mask.raw, a.raw, b.raw)
+    )
 }
 
 @inline(never)
@@ -265,7 +299,7 @@ public func portAddingWhereOtherwiseF64ConstantA(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.adding(SIMDDouble.repeating(1.5), b, where: mask, otherwise: otherwise)
+    SIMD<Double>.adding(SIMD<Double>.repeating(1.5), b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -274,11 +308,13 @@ public func highwayAddingWhereOtherwiseF64ConstantA(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.addingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        b.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.addingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
     )
 }
 
@@ -288,7 +324,7 @@ public func portAddingWhereOtherwiseF64ConstantB(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.adding(a, SIMDDouble.repeating(1.5), where: mask, otherwise: otherwise)
+    SIMD<Double>.adding(a, SIMD<Double>.repeating(1.5), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -297,11 +333,13 @@ public func highwayAddingWhereOtherwiseF64ConstantB(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.addingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.addingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
@@ -311,7 +349,7 @@ public func portAddingWhereOtherwiseF64ConstantOtherwise(
     _ b: SIMD<Double>,
     where mask: SIMD<Double>.Mask
 ) -> SIMD<Double> {
-    SIMDDouble.adding(a, b, where: mask, otherwise: SIMDDouble.repeating(1.5))
+    SIMD<Double>.adding(a, b, where: mask, otherwise: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
@@ -320,11 +358,13 @@ public func highwayAddingWhereOtherwiseF64ConstantOtherwise(
     _ b: SIMD<Double>,
     where mask: SIMD<Double>.Mask
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.addingWhereOtherwiseF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        mask.raw,
-        a.raw,
-        b.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.addingWhereOtherwiseF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
     )
 }
 
@@ -335,7 +375,7 @@ public func portSubtractingWhereOtherwiseF64(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.subtracting(a, b, where: mask, otherwise: otherwise)
+    SIMD<Double>.subtracting(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -345,7 +385,14 @@ public func highwaySubtractingWhereOtherwiseF64(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.subtractingWhereOtherwiseF64(otherwise.raw, mask.raw, a.raw, b.raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.subtractingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -354,7 +401,7 @@ public func portSubtractingWhereOtherwiseF64ConstantA(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.subtracting(SIMDDouble.repeating(1.5), b, where: mask, otherwise: otherwise)
+    SIMD<Double>.subtracting(SIMD<Double>.repeating(1.5), b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -363,11 +410,13 @@ public func highwaySubtractingWhereOtherwiseF64ConstantA(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.subtractingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        b.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.subtractingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
     )
 }
 
@@ -377,7 +426,7 @@ public func portSubtractingWhereOtherwiseF64ConstantB(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.subtracting(a, SIMDDouble.repeating(1.5), where: mask, otherwise: otherwise)
+    SIMD<Double>.subtracting(a, SIMD<Double>.repeating(1.5), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -386,11 +435,13 @@ public func highwaySubtractingWhereOtherwiseF64ConstantB(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.subtractingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.subtractingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
@@ -400,7 +451,7 @@ public func portSubtractingWhereOtherwiseF64ConstantOtherwise(
     _ b: SIMD<Double>,
     where mask: SIMD<Double>.Mask
 ) -> SIMD<Double> {
-    SIMDDouble.subtracting(a, b, where: mask, otherwise: SIMDDouble.repeating(1.5))
+    SIMD<Double>.subtracting(a, b, where: mask, otherwise: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
@@ -409,11 +460,13 @@ public func highwaySubtractingWhereOtherwiseF64ConstantOtherwise(
     _ b: SIMD<Double>,
     where mask: SIMD<Double>.Mask
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.subtractingWhereOtherwiseF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        mask.raw,
-        a.raw,
-        b.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.subtractingWhereOtherwiseF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
     )
 }
 
@@ -424,7 +477,7 @@ public func portMultiplyingWhereOtherwiseF64(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.multiplying(a, b, where: mask, otherwise: otherwise)
+    SIMD<Double>.multiplying(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -434,7 +487,14 @@ public func highwayMultiplyingWhereOtherwiseF64(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.multiplyingWhereOtherwiseF64(otherwise.raw, mask.raw, a.raw, b.raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.multiplyingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -443,7 +503,7 @@ public func portMultiplyingWhereOtherwiseF64ConstantA(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.multiplying(SIMDDouble.repeating(1.5), b, where: mask, otherwise: otherwise)
+    SIMD<Double>.multiplying(SIMD<Double>.repeating(1.5), b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -452,11 +512,13 @@ public func highwayMultiplyingWhereOtherwiseF64ConstantA(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.multiplyingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        b.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.multiplyingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
     )
 }
 
@@ -466,7 +528,7 @@ public func portMultiplyingWhereOtherwiseF64ConstantB(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.multiplying(a, SIMDDouble.repeating(1.5), where: mask, otherwise: otherwise)
+    SIMD<Double>.multiplying(a, SIMD<Double>.repeating(1.5), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -475,11 +537,13 @@ public func highwayMultiplyingWhereOtherwiseF64ConstantB(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.multiplyingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.multiplyingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
@@ -489,7 +553,7 @@ public func portMultiplyingWhereOtherwiseF64ConstantOtherwise(
     _ b: SIMD<Double>,
     where mask: SIMD<Double>.Mask
 ) -> SIMD<Double> {
-    SIMDDouble.multiplying(a, b, where: mask, otherwise: SIMDDouble.repeating(1.5))
+    SIMD<Double>.multiplying(a, b, where: mask, otherwise: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
@@ -498,11 +562,13 @@ public func highwayMultiplyingWhereOtherwiseF64ConstantOtherwise(
     _ b: SIMD<Double>,
     where mask: SIMD<Double>.Mask
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.multiplyingWhereOtherwiseF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        mask.raw,
-        a.raw,
-        b.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.multiplyingWhereOtherwiseF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
     )
 }
 
@@ -513,7 +579,7 @@ public func portDividingWhereOtherwiseF64(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.dividing(a, b, where: mask, otherwise: otherwise)
+    SIMD<Double>.dividing(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -523,7 +589,14 @@ public func highwayDividingWhereOtherwiseF64(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.dividingWhereOtherwiseF64(otherwise.raw, mask.raw, a.raw, b.raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.dividingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -532,7 +605,7 @@ public func portDividingWhereOtherwiseF64ConstantA(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.dividing(SIMDDouble.repeating(1.5), b, where: mask, otherwise: otherwise)
+    SIMD<Double>.dividing(SIMD<Double>.repeating(1.5), b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -541,11 +614,13 @@ public func highwayDividingWhereOtherwiseF64ConstantA(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.dividingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        b.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.dividingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
     )
 }
 
@@ -555,7 +630,7 @@ public func portDividingWhereOtherwiseF64ConstantB(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.dividing(a, SIMDDouble.repeating(1.5), where: mask, otherwise: otherwise)
+    SIMD<Double>.dividing(a, SIMD<Double>.repeating(1.5), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -564,11 +639,13 @@ public func highwayDividingWhereOtherwiseF64ConstantB(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.dividingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.dividingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
@@ -578,7 +655,7 @@ public func portDividingWhereOtherwiseF64ConstantOtherwise(
     _ b: SIMD<Double>,
     where mask: SIMD<Double>.Mask
 ) -> SIMD<Double> {
-    SIMDDouble.dividing(a, b, where: mask, otherwise: SIMDDouble.repeating(1.5))
+    SIMD<Double>.dividing(a, b, where: mask, otherwise: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
@@ -587,11 +664,13 @@ public func highwayDividingWhereOtherwiseF64ConstantOtherwise(
     _ b: SIMD<Double>,
     where mask: SIMD<Double>.Mask
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.dividingWhereOtherwiseF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        mask.raw,
-        a.raw,
-        b.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.dividingWhereOtherwiseF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
     )
 }
 
@@ -603,7 +682,7 @@ public func portMultiplyAddingWhereOtherwiseF64(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.multiplyAdding(a, b, c, where: mask, otherwise: otherwise)
+    SIMD<Double>.multiplyAdding(a, b, c, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -614,12 +693,14 @@ public func highwayMultiplyAddingWhereOtherwiseF64(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.multiplyAddingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        a.raw,
-        b.raw,
-        c.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.multiplyAddingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
@@ -630,7 +711,13 @@ public func portMultiplyAddingWhereOtherwiseF64ConstantA(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.multiplyAdding(SIMDDouble.repeating(1.5), b, c, where: mask, otherwise: otherwise)
+    SIMD<Double>.multiplyAdding(
+        SIMD<Double>.repeating(1.5),
+        b,
+        c,
+        where: mask,
+        otherwise: otherwise
+    )
 }
 
 @inline(never)
@@ -640,12 +727,14 @@ public func highwayMultiplyAddingWhereOtherwiseF64ConstantA(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.multiplyAddingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        b.raw,
-        c.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.multiplyAddingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
@@ -656,7 +745,13 @@ public func portMultiplyAddingWhereOtherwiseF64ConstantB(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.multiplyAdding(a, SIMDDouble.repeating(1.5), c, where: mask, otherwise: otherwise)
+    SIMD<Double>.multiplyAdding(
+        a,
+        SIMD<Double>.repeating(1.5),
+        c,
+        where: mask,
+        otherwise: otherwise
+    )
 }
 
 @inline(never)
@@ -666,12 +761,14 @@ public func highwayMultiplyAddingWhereOtherwiseF64ConstantB(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.multiplyAddingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        c.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.multiplyAddingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            c.raw
+        )
     )
 }
 
@@ -682,7 +779,13 @@ public func portMultiplyAddingWhereOtherwiseF64ConstantC(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.multiplyAdding(a, b, SIMDDouble.repeating(1.5), where: mask, otherwise: otherwise)
+    SIMD<Double>.multiplyAdding(
+        a,
+        b,
+        SIMD<Double>.repeating(1.5),
+        where: mask,
+        otherwise: otherwise
+    )
 }
 
 @inline(never)
@@ -692,12 +795,14 @@ public func highwayMultiplyAddingWhereOtherwiseF64ConstantC(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.multiplyAddingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        a.raw,
-        b.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.multiplyAddingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
@@ -708,7 +813,7 @@ public func portMultiplyAddingWhereOtherwiseF64ConstantOtherwise(
     _ c: SIMD<Double>,
     where mask: SIMD<Double>.Mask
 ) -> SIMD<Double> {
-    SIMDDouble.multiplyAdding(a, b, c, where: mask, otherwise: SIMDDouble.repeating(1.5))
+    SIMD<Double>.multiplyAdding(a, b, c, where: mask, otherwise: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
@@ -718,12 +823,14 @@ public func highwayMultiplyAddingWhereOtherwiseF64ConstantOtherwise(
     _ c: SIMD<Double>,
     where mask: SIMD<Double>.Mask
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.multiplyAddingWhereOtherwiseF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        mask.raw,
-        a.raw,
-        b.raw,
-        c.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.multiplyAddingWhereOtherwiseF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
@@ -735,7 +842,7 @@ public func portMultiplySubtractingWhereOtherwiseF64(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.multiplySubtracting(a, b, c, where: mask, otherwise: otherwise)
+    SIMD<Double>.multiplySubtracting(a, b, c, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -746,12 +853,14 @@ public func highwayMultiplySubtractingWhereOtherwiseF64(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.multiplySubtractingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        a.raw,
-        b.raw,
-        c.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.multiplySubtractingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
@@ -762,8 +871,8 @@ public func portMultiplySubtractingWhereOtherwiseF64ConstantA(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.multiplySubtracting(
-        SIMDDouble.repeating(1.5),
+    SIMD<Double>.multiplySubtracting(
+        SIMD<Double>.repeating(1.5),
         b,
         c,
         where: mask,
@@ -778,12 +887,14 @@ public func highwayMultiplySubtractingWhereOtherwiseF64ConstantA(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.multiplySubtractingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        b.raw,
-        c.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.multiplySubtractingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
@@ -794,9 +905,9 @@ public func portMultiplySubtractingWhereOtherwiseF64ConstantB(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.multiplySubtracting(
+    SIMD<Double>.multiplySubtracting(
         a,
-        SIMDDouble.repeating(1.5),
+        SIMD<Double>.repeating(1.5),
         c,
         where: mask,
         otherwise: otherwise
@@ -810,12 +921,14 @@ public func highwayMultiplySubtractingWhereOtherwiseF64ConstantB(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.multiplySubtractingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        c.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.multiplySubtractingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            c.raw
+        )
     )
 }
 
@@ -826,10 +939,10 @@ public func portMultiplySubtractingWhereOtherwiseF64ConstantC(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.multiplySubtracting(
+    SIMD<Double>.multiplySubtracting(
         a,
         b,
-        SIMDDouble.repeating(1.5),
+        SIMD<Double>.repeating(1.5),
         where: mask,
         otherwise: otherwise
     )
@@ -842,12 +955,14 @@ public func highwayMultiplySubtractingWhereOtherwiseF64ConstantC(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.multiplySubtractingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        a.raw,
-        b.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.multiplySubtractingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
@@ -858,7 +973,7 @@ public func portMultiplySubtractingWhereOtherwiseF64ConstantOtherwise(
     _ c: SIMD<Double>,
     where mask: SIMD<Double>.Mask
 ) -> SIMD<Double> {
-    SIMDDouble.multiplySubtracting(a, b, c, where: mask, otherwise: SIMDDouble.repeating(1.5))
+    SIMD<Double>.multiplySubtracting(a, b, c, where: mask, otherwise: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
@@ -868,12 +983,14 @@ public func highwayMultiplySubtractingWhereOtherwiseF64ConstantOtherwise(
     _ c: SIMD<Double>,
     where mask: SIMD<Double>.Mask
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.multiplySubtractingWhereOtherwiseF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        mask.raw,
-        a.raw,
-        b.raw,
-        c.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.multiplySubtractingWhereOtherwiseF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
@@ -885,7 +1002,7 @@ public func portNegatedMultiplyAddingWhereOtherwiseF64(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.negatedMultiplyAdding(a, b, c, where: mask, otherwise: otherwise)
+    SIMD<Double>.negatedMultiplyAdding(a, b, c, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -896,12 +1013,14 @@ public func highwayNegatedMultiplyAddingWhereOtherwiseF64(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.negatedMultiplyAddingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        a.raw,
-        b.raw,
-        c.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
@@ -912,8 +1031,8 @@ public func portNegatedMultiplyAddingWhereOtherwiseF64ConstantA(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.negatedMultiplyAdding(
-        SIMDDouble.repeating(1.5),
+    SIMD<Double>.negatedMultiplyAdding(
+        SIMD<Double>.repeating(1.5),
         b,
         c,
         where: mask,
@@ -928,12 +1047,14 @@ public func highwayNegatedMultiplyAddingWhereOtherwiseF64ConstantA(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.negatedMultiplyAddingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        b.raw,
-        c.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
@@ -944,9 +1065,9 @@ public func portNegatedMultiplyAddingWhereOtherwiseF64ConstantB(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.negatedMultiplyAdding(
+    SIMD<Double>.negatedMultiplyAdding(
         a,
-        SIMDDouble.repeating(1.5),
+        SIMD<Double>.repeating(1.5),
         c,
         where: mask,
         otherwise: otherwise
@@ -960,12 +1081,14 @@ public func highwayNegatedMultiplyAddingWhereOtherwiseF64ConstantB(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.negatedMultiplyAddingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        c.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            c.raw
+        )
     )
 }
 
@@ -976,10 +1099,10 @@ public func portNegatedMultiplyAddingWhereOtherwiseF64ConstantC(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.negatedMultiplyAdding(
+    SIMD<Double>.negatedMultiplyAdding(
         a,
         b,
-        SIMDDouble.repeating(1.5),
+        SIMD<Double>.repeating(1.5),
         where: mask,
         otherwise: otherwise
     )
@@ -992,12 +1115,14 @@ public func highwayNegatedMultiplyAddingWhereOtherwiseF64ConstantC(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.negatedMultiplyAddingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        a.raw,
-        b.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
@@ -1008,7 +1133,7 @@ public func portNegatedMultiplyAddingWhereOtherwiseF64ConstantOtherwise(
     _ c: SIMD<Double>,
     where mask: SIMD<Double>.Mask
 ) -> SIMD<Double> {
-    SIMDDouble.negatedMultiplyAdding(a, b, c, where: mask, otherwise: SIMDDouble.repeating(1.5))
+    SIMD<Double>.negatedMultiplyAdding(a, b, c, where: mask, otherwise: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
@@ -1018,12 +1143,14 @@ public func highwayNegatedMultiplyAddingWhereOtherwiseF64ConstantOtherwise(
     _ c: SIMD<Double>,
     where mask: SIMD<Double>.Mask
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.negatedMultiplyAddingWhereOtherwiseF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        mask.raw,
-        a.raw,
-        b.raw,
-        c.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereOtherwiseF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
@@ -1035,7 +1162,7 @@ public func portNegatedMultiplySubtractingWhereOtherwiseF64(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.negatedMultiplySubtracting(a, b, c, where: mask, otherwise: otherwise)
+    SIMD<Double>.negatedMultiplySubtracting(a, b, c, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -1046,12 +1173,14 @@ public func highwayNegatedMultiplySubtractingWhereOtherwiseF64(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.negatedMultiplySubtractingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        a.raw,
-        b.raw,
-        c.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
@@ -1062,8 +1191,8 @@ public func portNegatedMultiplySubtractingWhereOtherwiseF64ConstantA(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.negatedMultiplySubtracting(
-        SIMDDouble.repeating(1.5),
+    SIMD<Double>.negatedMultiplySubtracting(
+        SIMD<Double>.repeating(1.5),
         b,
         c,
         where: mask,
@@ -1078,12 +1207,14 @@ public func highwayNegatedMultiplySubtractingWhereOtherwiseF64ConstantA(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.negatedMultiplySubtractingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        b.raw,
-        c.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
@@ -1094,9 +1225,9 @@ public func portNegatedMultiplySubtractingWhereOtherwiseF64ConstantB(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.negatedMultiplySubtracting(
+    SIMD<Double>.negatedMultiplySubtracting(
         a,
-        SIMDDouble.repeating(1.5),
+        SIMD<Double>.repeating(1.5),
         c,
         where: mask,
         otherwise: otherwise
@@ -1110,12 +1241,14 @@ public func highwayNegatedMultiplySubtractingWhereOtherwiseF64ConstantB(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.negatedMultiplySubtractingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        c.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            c.raw
+        )
     )
 }
 
@@ -1126,10 +1259,10 @@ public func portNegatedMultiplySubtractingWhereOtherwiseF64ConstantC(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    SIMDDouble.negatedMultiplySubtracting(
+    SIMD<Double>.negatedMultiplySubtracting(
         a,
         b,
-        SIMDDouble.repeating(1.5),
+        SIMD<Double>.repeating(1.5),
         where: mask,
         otherwise: otherwise
     )
@@ -1142,12 +1275,14 @@ public func highwayNegatedMultiplySubtractingWhereOtherwiseF64ConstantC(
     where mask: SIMD<Double>.Mask,
     otherwise: SIMD<Double>
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.negatedMultiplySubtractingWhereOtherwiseF64(
-        otherwise.raw,
-        mask.raw,
-        a.raw,
-        b.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereOtherwiseF64(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
@@ -1158,12 +1293,12 @@ public func portNegatedMultiplySubtractingWhereOtherwiseF64ConstantOtherwise(
     _ c: SIMD<Double>,
     where mask: SIMD<Double>.Mask
 ) -> SIMD<Double> {
-    SIMDDouble.negatedMultiplySubtracting(
+    SIMD<Double>.negatedMultiplySubtracting(
         a,
         b,
         c,
         where: mask,
-        otherwise: SIMDDouble.repeating(1.5)
+        otherwise: SIMD<Double>.repeating(1.5)
     )
 }
 
@@ -1174,11 +1309,13 @@ public func highwayNegatedMultiplySubtractingWhereOtherwiseF64ConstantOtherwise(
     _ c: SIMD<Double>,
     where mask: SIMD<Double>.Mask
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.negatedMultiplySubtractingWhereOtherwiseF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        mask.raw,
-        a.raw,
-        b.raw,
-        c.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereOtherwiseF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            c.raw
+        )
     )
 }

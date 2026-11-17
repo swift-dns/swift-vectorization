@@ -9,12 +9,12 @@ extension SIMD where Lane == BFloat16 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_vector_bf16) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_vector_bf16(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_vector_bf16 { cvectorization_ops_from_raw_vector_bf16(raw) }
+    public var simd: SIMDType { cvectorization_ops_from_raw_vector_bf16(raw) }
 }
 
 extension SIMD.Mask where Lane == BFloat16 {
@@ -24,14 +24,12 @@ extension SIMD.Mask where Lane == BFloat16 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: SIMDMask<cvectorization_ops_mask_bf16>) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_mask_bf16(simd._storage)
     }
 
     @export(implementation) @inline(always)
-    public var simd: SIMDMask<cvectorization_ops_mask_bf16> {
-        SIMDMask<cvectorization_ops_mask_bf16>(cvectorization_ops_from_raw_mask_bf16(raw))
-    }
+    public var simd: SIMDType { SIMDType(cvectorization_ops_from_raw_mask_bf16(raw)) }
 }
 
 extension SIMD.HalfVector where Lane == BFloat16 {
@@ -41,14 +39,12 @@ extension SIMD.HalfVector where Lane == BFloat16 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_half_vector_bf16) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_half_vector_bf16(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_half_vector_bf16 {
-        cvectorization_ops_from_raw_half_vector_bf16(raw)
-    }
+    public var simd: SIMDType { cvectorization_ops_from_raw_half_vector_bf16(raw) }
 }
 
 extension SIMD.HalfMask where Lane == BFloat16 {
@@ -58,14 +54,12 @@ extension SIMD.HalfMask where Lane == BFloat16 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_half_mask_bf16) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_half_mask_bf16(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_half_mask_bf16 {
-        cvectorization_ops_from_raw_half_mask_bf16(raw)
-    }
+    public var simd: SIMDType { cvectorization_ops_from_raw_half_mask_bf16(raw) }
 }
 
 extension SIMD.QuarterVector where Lane == BFloat16 {
@@ -75,14 +69,12 @@ extension SIMD.QuarterVector where Lane == BFloat16 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_quarter_vector_bf16) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_quarter_vector_bf16(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_quarter_vector_bf16 {
-        cvectorization_ops_from_raw_quarter_vector_bf16(raw)
-    }
+    public var simd: SIMDType { cvectorization_ops_from_raw_quarter_vector_bf16(raw) }
 }
 
 extension SIMD.QuarterMask where Lane == BFloat16 {
@@ -92,14 +84,12 @@ extension SIMD.QuarterMask where Lane == BFloat16 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_quarter_mask_bf16) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_quarter_mask_bf16(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_quarter_mask_bf16 {
-        cvectorization_ops_from_raw_quarter_mask_bf16(raw)
-    }
+    public var simd: SIMDType { cvectorization_ops_from_raw_quarter_mask_bf16(raw) }
 }
 
 extension SIMD.BlockVector where Lane == BFloat16 {
@@ -109,12 +99,12 @@ extension SIMD.BlockVector where Lane == BFloat16 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_block_bf16) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_block_bf16(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_block_bf16 { cvectorization_ops_from_raw_block_bf16(raw) }
+    public var simd: SIMDType { cvectorization_ops_from_raw_block_bf16(raw) }
 }
 
 extension SIMD where Lane == BFloat16 {

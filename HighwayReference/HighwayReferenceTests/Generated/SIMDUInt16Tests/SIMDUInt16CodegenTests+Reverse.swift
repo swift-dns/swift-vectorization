@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDUInt16CodegenTests {
     @Test func reversed() {
         let mismatches = Mismatches("portReversedU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2502_50D3_004D_E701)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2502_50D3_004D_E701)
         for a in aInputs {
             mismatches.check(portReversedU16(a), highwayReversedU16(a), "a: \(describe(a))")
         }
@@ -24,7 +24,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func byteSwapped() {
         let mismatches = Mismatches("portByteSwappedU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x745B_8564_744A_6EF1)
+        let aInputs = Inputs.vectors(H.self, seed: 0x745B_8564_744A_6EF1)
         for a in aInputs {
             mismatches.check(portByteSwappedU16(a), highwayByteSwappedU16(a), "a: \(describe(a))")
         }
@@ -39,7 +39,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func bitReversed() {
         let mismatches = Mismatches("portBitReversedU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE08E_1426_B37F_C1FE)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE08E_1426_B37F_C1FE)
         for a in aInputs {
             mismatches.check(portBitReversedU16(a), highwayBitReversedU16(a), "a: \(describe(a))")
         }
@@ -54,7 +54,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func reversedBlocks() {
         let mismatches = Mismatches("portReversedBlocksU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7150_D88E_C76D_DDE7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7150_D88E_C76D_DDE7)
         for a in aInputs {
             mismatches.check(
                 portReversedBlocksU16(a),
@@ -73,7 +73,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func reversed2() {
         let mismatches = Mismatches("portReversed2U16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8EF0_5A89_B956_D05B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8EF0_5A89_B956_D05B)
         for a in aInputs {
             mismatches.check(portReversed2U16(a), highwayReversed2U16(a), "a: \(describe(a))")
         }
@@ -88,7 +88,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func reversed4() {
         let mismatches = Mismatches("portReversed4U16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7E9F_8C89_B062_0CD1)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7E9F_8C89_B062_0CD1)
         for a in aInputs {
             mismatches.check(portReversed4U16(a), highwayReversed4U16(a), "a: \(describe(a))")
         }
@@ -103,7 +103,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func reversed8() {
         let mismatches = Mismatches("portReversed8U16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE59C_8089_EA71_E2ED)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE59C_8089_EA71_E2ED)
         for a in aInputs {
             mismatches.check(portReversed8U16(a), highwayReversed8U16(a), "a: \(describe(a))")
         }

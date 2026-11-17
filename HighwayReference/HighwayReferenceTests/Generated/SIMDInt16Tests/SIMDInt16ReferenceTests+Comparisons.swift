@@ -8,8 +8,8 @@ import Vectorization
 extension SIMDInt16ReferenceTests {
     @Test func equalTo() {
         let mismatches = Mismatches("equalTo")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x37D6_4479_1B1B_9712)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x37D6_4579_1B1B_98C5)
+        let aInputs = Inputs.vectors(H.self, seed: 0x37D6_4479_1B1B_9712)
+        let bInputs = Inputs.vectors(H.self, seed: 0x37D6_4579_1B1B_98C5)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.equalTo(a, b),
@@ -22,8 +22,8 @@ extension SIMDInt16ReferenceTests {
 
     @Test func notEqualTo() {
         let mismatches = Mismatches("notEqualTo")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB928_9FEC_3E10_4CF5)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB928_9EEC_3E10_4B42)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB928_9FEC_3E10_4CF5)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB928_9EEC_3E10_4B42)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.notEqualTo(a, b),
@@ -36,8 +36,8 @@ extension SIMDInt16ReferenceTests {
 
     @Test func lessThan() {
         let mismatches = Mismatches("lessThan")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9E3C_ED23_8537_370D)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9E3C_EC23_8537_355A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9E3C_ED23_8537_370D)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9E3C_EC23_8537_355A)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.lessThan(a, b),
@@ -50,8 +50,8 @@ extension SIMDInt16ReferenceTests {
 
     @Test func greaterThan() {
         let mismatches = Mismatches("greaterThan")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3E77_BA7D_3BFE_FC8E)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3E77_BB7D_3BFE_FE41)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3E77_BA7D_3BFE_FC8E)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3E77_BB7D_3BFE_FE41)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.greaterThan(a, b),
@@ -64,8 +64,8 @@ extension SIMDInt16ReferenceTests {
 
     @Test func lessThanOrEqualTo() {
         let mismatches = Mismatches("lessThanOrEqualTo")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5694_AA42_70D4_75FB)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5694_A942_70D4_7448)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5694_AA42_70D4_75FB)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5694_A942_70D4_7448)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.lessThanOrEqualTo(a, b),
@@ -78,8 +78,8 @@ extension SIMDInt16ReferenceTests {
 
     @Test func greaterThanOrEqualTo() {
         let mismatches = Mismatches("greaterThanOrEqualTo")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA9DF_7A04_9F72_1746)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA9DF_7B04_9F72_18F9)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA9DF_7A04_9F72_1746)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA9DF_7B04_9F72_18F9)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.greaterThanOrEqualTo(a, b),
@@ -92,7 +92,7 @@ extension SIMDInt16ReferenceTests {
 
     @Test func isNegative() {
         let mismatches = Mismatches("isNegative")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1D7A_6705_876D_9ECC)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1D7A_6705_876D_9ECC)
         for a in aInputs {
             mismatches.check(
                 H.isNegative(a),
@@ -105,8 +105,8 @@ extension SIMDInt16ReferenceTests {
 
     @Test func testingBit() {
         let mismatches = Mismatches("testingBit")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xADE2_5EAE_7841_4184)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xADE2_5FAE_7841_4337)
+        let aInputs = Inputs.vectors(H.self, seed: 0xADE2_5EAE_7841_4184)
+        let bInputs = Inputs.vectors(H.self, seed: 0xADE2_5FAE_7841_4337)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.testingBit(a, b),

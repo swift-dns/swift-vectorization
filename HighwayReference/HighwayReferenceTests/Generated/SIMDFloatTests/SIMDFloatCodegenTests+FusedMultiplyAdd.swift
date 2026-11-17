@@ -9,11 +9,11 @@ import Vectorization
 extension SIMDFloatCodegenTests {
     @Test func multiplyAdding() {
         let mismatches = Mismatches("portMultiplyAddingF32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8CBC_55A2_356E_A1EF)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8CBC_54A2_356E_A03C)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x8CBC_57A2_356E_A555)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8CBC_55A2_356E_A1EF)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8CBC_54A2_356E_A03C)
+        let cInputs = Inputs.vectors(H.self, seed: 0x8CBC_57A2_356E_A555)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x7407_DBB7_7944_5749)
-        where !hasUnorderedNaNs(multiplying: a, b, adding: c) {
+        where !hasUnorderedNaNs(multiplying: a.simd, b.simd, adding: c.simd) {
             mismatches.check(
                 portMultiplyAddingF32(a, b, c),
                 highwayMultiplyAddingF32(a, b, c),
@@ -25,9 +25,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func multiplyAddingConstantA() {
         let mismatches = Mismatches("portMultiplyAddingF32ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x76FF_FE51_B98A_227B)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x76FF_FF51_B98A_242E)
-        for (b, c) in everyPair(bInputs, cInputs) where !hasUnorderedNaNs(b, c) {
+        let bInputs = Inputs.vectors(H.self, seed: 0x76FF_FE51_B98A_227B)
+        let cInputs = Inputs.vectors(H.self, seed: 0x76FF_FF51_B98A_242E)
+        for (b, c) in everyPair(bInputs, cInputs) where !hasUnorderedNaNs(b.simd, c.simd) {
             mismatches.check(
                 portMultiplyAddingF32ConstantA(b, c),
                 highwayMultiplyAddingF32ConstantA(b, c),
@@ -39,9 +39,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func multiplyAddingConstantB() {
         let mismatches = Mismatches("portMultiplyAddingF32ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7F95_3451_BE61_02DD)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x7F95_3251_BE60_FF77)
-        for (a, c) in everyPair(aInputs, cInputs) where !hasUnorderedNaNs(a, c) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x7F95_3451_BE61_02DD)
+        let cInputs = Inputs.vectors(H.self, seed: 0x7F95_3251_BE60_FF77)
+        for (a, c) in everyPair(aInputs, cInputs) where !hasUnorderedNaNs(a.simd, c.simd) {
             mismatches.check(
                 portMultiplyAddingF32ConstantB(a, c),
                 highwayMultiplyAddingF32ConstantB(a, c),
@@ -53,9 +53,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func multiplyAddingConstantC() {
         let mismatches = Mismatches("portMultiplyAddingF32ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8750_CB51_C27E_E452)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8750_CC51_C27E_E605)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x8750_CB51_C27E_E452)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8750_CC51_C27E_E605)
+        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a.simd, b.simd) {
             mismatches.check(
                 portMultiplyAddingF32ConstantC(a, b),
                 highwayMultiplyAddingF32ConstantC(a, b),
@@ -67,11 +67,11 @@ extension SIMDFloatCodegenTests {
 
     @Test func negatedMultiplyAdding() {
         let mismatches = Mismatches("portNegatedMultiplyAddingF32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF479_927D_D3AE_6A6F)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF479_917D_D3AE_68BC)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xF479_947D_D3AE_6DD5)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF479_927D_D3AE_6A6F)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF479_917D_D3AE_68BC)
+        let cInputs = Inputs.vectors(H.self, seed: 0xF479_947D_D3AE_6DD5)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x5B8B_0343_1CB2_F4C9)
-        where !hasUnorderedNaNs(negating: a, b, adding: c) {
+        where !hasUnorderedNaNs(negating: a.simd, b.simd, adding: c.simd) {
             mismatches.check(
                 portNegatedMultiplyAddingF32(a, b, c),
                 highwayNegatedMultiplyAddingF32(a, b, c),
@@ -83,9 +83,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func negatedMultiplyAddingConstantA() {
         let mismatches = Mismatches("portNegatedMultiplyAddingF32ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC5DE_F578_5FF1_03FB)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xC5DE_F678_5FF1_05AE)
-        for (b, c) in everyPair(bInputs, cInputs) where !hasNaNs(negating: b) {
+        let bInputs = Inputs.vectors(H.self, seed: 0xC5DE_F578_5FF1_03FB)
+        let cInputs = Inputs.vectors(H.self, seed: 0xC5DE_F678_5FF1_05AE)
+        for (b, c) in everyPair(bInputs, cInputs) where !hasNaNs(negating: b.simd) {
             mismatches.check(
                 portNegatedMultiplyAddingF32ConstantA(b, c),
                 highwayNegatedMultiplyAddingF32ConstantA(b, c),
@@ -97,9 +97,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func negatedMultiplyAddingConstantB() {
         let mismatches = Mismatches("portNegatedMultiplyAddingF32ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCE74_2B78_64C7_E45D)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xCE74_2978_64C7_E0F7)
-        for (a, c) in everyPair(aInputs, cInputs) where !hasNaNs(negating: a) {
+        let aInputs = Inputs.vectors(H.self, seed: 0xCE74_2B78_64C7_E45D)
+        let cInputs = Inputs.vectors(H.self, seed: 0xCE74_2978_64C7_E0F7)
+        for (a, c) in everyPair(aInputs, cInputs) where !hasNaNs(negating: a.simd) {
             mismatches.check(
                 portNegatedMultiplyAddingF32ConstantB(a, c),
                 highwayNegatedMultiplyAddingF32ConstantB(a, c),
@@ -111,9 +111,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func negatedMultiplyAddingConstantC() {
         let mismatches = Mismatches("portNegatedMultiplyAddingF32ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD62F_C278_68E5_C5D2)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD62F_C378_68E5_C785)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasNaNs(negating: a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0xD62F_C278_68E5_C5D2)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD62F_C378_68E5_C785)
+        for (a, b) in everyPair(aInputs, bInputs) where !hasNaNs(negating: a.simd, b.simd) {
             mismatches.check(
                 portNegatedMultiplyAddingF32ConstantC(a, b),
                 highwayNegatedMultiplyAddingF32ConstantC(a, b),
@@ -129,11 +129,11 @@ extension SIMDFloatCodegenTests {
             isIntermittent: SIMDTarget.targetName != "AVX2"
         ) {
             let mismatches = Mismatches("portMultiplySubtractingF32")
-            let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDF1C_ADF5_DBF2_5DCC)
-            let bInputs = Inputs.vectors(H.Vector.self, seed: 0xDF1C_AEF5_DBF2_5F7F)
-            let cInputs = Inputs.vectors(H.Vector.self, seed: 0xDF1C_AFF5_DBF2_6132)
+            let aInputs = Inputs.vectors(H.self, seed: 0xDF1C_ADF5_DBF2_5DCC)
+            let bInputs = Inputs.vectors(H.self, seed: 0xDF1C_AEF5_DBF2_5F7F)
+            let cInputs = Inputs.vectors(H.self, seed: 0xDF1C_AFF5_DBF2_6132)
             for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x308F_D970_72C4_98A0)
-            where !hasUnorderedNaNs(multiplying: a, b, adding: c) {
+            where !hasUnorderedNaNs(multiplying: a.simd, b.simd, adding: c.simd) {
                 mismatches.check(
                     portMultiplySubtractingF32(a, b, c),
                     highwayMultiplySubtractingF32(a, b, c),
@@ -154,10 +154,10 @@ extension SIMDFloatCodegenTests {
             isIntermittent: SIMDTarget.targetName != "AVX2"
         ) {
             let mismatches = Mismatches("portMultiplySubtractingF32ConstantA")
-            let bInputs = Inputs.vectors(H.Vector.self, seed: 0x54DA_B659_FAF3_4192)
-            let cInputs = Inputs.vectors(H.Vector.self, seed: 0x54DA_B559_FAF3_3FDF)
+            let bInputs = Inputs.vectors(H.self, seed: 0x54DA_B659_FAF3_4192)
+            let cInputs = Inputs.vectors(H.self, seed: 0x54DA_B559_FAF3_3FDF)
             for (b, c) in everyPair(bInputs, cInputs)
-            where !hasUnorderedNaNs(b, negatedLanes(of: c)) {
+            where !hasUnorderedNaNs(b.simd, negatedLanes(of: c.simd)) {
                 mismatches.check(
                     portMultiplySubtractingF32ConstantA(b, c),
                     highwayMultiplySubtractingF32ConstantA(b, c),
@@ -178,10 +178,10 @@ extension SIMDFloatCodegenTests {
             isIntermittent: SIMDTarget.targetName != "AVX2"
         ) {
             let mismatches = Mismatches("portMultiplySubtractingF32ConstantB")
-            let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4BD9_0059_F5C0_68D0)
-            let cInputs = Inputs.vectors(H.Vector.self, seed: 0x4BD9_0259_F5C0_6C36)
+            let aInputs = Inputs.vectors(H.self, seed: 0x4BD9_0059_F5C0_68D0)
+            let cInputs = Inputs.vectors(H.self, seed: 0x4BD9_0259_F5C0_6C36)
             for (a, c) in everyPair(aInputs, cInputs)
-            where !hasUnorderedNaNs(a, negatedLanes(of: c)) {
+            where !hasUnorderedNaNs(a.simd, negatedLanes(of: c.simd)) {
                 mismatches.check(
                     portMultiplySubtractingF32ConstantB(a, c),
                     highwayMultiplySubtractingF32ConstantB(a, c),
@@ -198,9 +198,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func multiplySubtractingConstantC() {
         let mismatches = Mismatches("portMultiplySubtractingF32ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4343_E959_F0E9_BD1B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4343_E859_F0E9_BB68)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x4343_E959_F0E9_BD1B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4343_E859_F0E9_BB68)
+        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a.simd, b.simd) {
             mismatches.check(
                 portMultiplySubtractingF32ConstantC(a, b),
                 highwayMultiplySubtractingF32ConstantC(a, b),
@@ -216,11 +216,11 @@ extension SIMDFloatCodegenTests {
             isIntermittent: SIMDTarget.targetName != "AVX2"
         ) {
             let mismatches = Mismatches("portNegatedMultiplySubtractingF32")
-            let aInputs = Inputs.vectors(H.Vector.self, seed: 0x28C9_85FF_D721_E74C)
-            let bInputs = Inputs.vectors(H.Vector.self, seed: 0x28C9_86FF_D721_E8FF)
-            let cInputs = Inputs.vectors(H.Vector.self, seed: 0x28C9_87FF_D721_EAB2)
+            let aInputs = Inputs.vectors(H.self, seed: 0x28C9_85FF_D721_E74C)
+            let bInputs = Inputs.vectors(H.self, seed: 0x28C9_86FF_D721_E8FF)
+            let cInputs = Inputs.vectors(H.self, seed: 0x28C9_87FF_D721_EAB2)
             for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x5C5A_BF26_8E42_8120)
-            where !hasUnorderedNaNs(negating: a, b, adding: c) {
+            where !hasUnorderedNaNs(negating: a.simd, b.simd, adding: c.simd) {
                 mismatches.check(
                     portNegatedMultiplySubtractingF32(a, b, c),
                     highwayNegatedMultiplySubtractingF32(a, b, c),
@@ -241,9 +241,9 @@ extension SIMDFloatCodegenTests {
             isIntermittent: SIMDTarget.targetName != "AVX2"
         ) {
             let mismatches = Mismatches("portNegatedMultiplySubtractingF32ConstantA")
-            let bInputs = Inputs.vectors(H.Vector.self, seed: 0x176D_600E_049B_7612)
-            let cInputs = Inputs.vectors(H.Vector.self, seed: 0x176D_5F0E_049B_745F)
-            for (b, c) in everyPair(bInputs, cInputs) where !hasNaNs(negating: b) {
+            let bInputs = Inputs.vectors(H.self, seed: 0x176D_600E_049B_7612)
+            let cInputs = Inputs.vectors(H.self, seed: 0x176D_5F0E_049B_745F)
+            for (b, c) in everyPair(bInputs, cInputs) where !hasNaNs(negating: b.simd) {
                 mismatches.check(
                     portNegatedMultiplySubtractingF32ConstantA(b, c),
                     highwayNegatedMultiplySubtractingF32ConstantA(b, c),
@@ -264,9 +264,9 @@ extension SIMDFloatCodegenTests {
             isIntermittent: SIMDTarget.targetName != "AVX2"
         ) {
             let mismatches = Mismatches("portNegatedMultiplySubtractingF32ConstantB")
-            let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0E6B_AA0D_FF68_9D50)
-            let cInputs = Inputs.vectors(H.Vector.self, seed: 0x0E6B_AC0D_FF68_A0B6)
-            for (a, c) in everyPair(aInputs, cInputs) where !hasNaNs(negating: a) {
+            let aInputs = Inputs.vectors(H.self, seed: 0x0E6B_AA0D_FF68_9D50)
+            let cInputs = Inputs.vectors(H.self, seed: 0x0E6B_AC0D_FF68_A0B6)
+            for (a, c) in everyPair(aInputs, cInputs) where !hasNaNs(negating: a.simd) {
                 mismatches.check(
                     portNegatedMultiplySubtractingF32ConstantB(a, c),
                     highwayNegatedMultiplySubtractingF32ConstantB(a, c),
@@ -283,9 +283,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func negatedMultiplySubtractingConstantC() {
         let mismatches = Mismatches("portNegatedMultiplySubtractingF32ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x05D6_930D_FA91_F19B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x05D6_920D_FA91_EFE8)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasNaNs(negating: a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x05D6_930D_FA91_F19B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x05D6_920D_FA91_EFE8)
+        for (a, b) in everyPair(aInputs, bInputs) where !hasNaNs(negating: a.simd, b.simd) {
             mismatches.check(
                 portNegatedMultiplySubtractingF32ConstantC(a, b),
                 highwayNegatedMultiplySubtractingF32ConstantC(a, b),
@@ -297,11 +297,11 @@ extension SIMDFloatCodegenTests {
 
     @Test func multiplyAddingSubtracting() {
         let mismatches = Mismatches("portMultiplyAddingSubtractingF32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEBEA_7ADF_C934_2A83)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xEBEA_79DF_C934_28D0)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xEBEA_7CDF_C934_2DE9)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEBEA_7ADF_C934_2A83)
+        let bInputs = Inputs.vectors(H.self, seed: 0xEBEA_79DF_C934_28D0)
+        let cInputs = Inputs.vectors(H.self, seed: 0xEBEA_7CDF_C934_2DE9)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xF3D2_3553_9607_9805)
-        where !hasUnorderedNaNs(multiplying: a, b, adding: c) {
+        where !hasUnorderedNaNs(multiplying: a.simd, b.simd, adding: c.simd) {
             mismatches.check(
                 portMultiplyAddingSubtractingF32(a, b, c),
                 highwayMultiplyAddingSubtractingF32(a, b, c),
@@ -313,10 +313,10 @@ extension SIMDFloatCodegenTests {
 
     @Test func multiplyAddingSubtractingConstantA() {
         let mismatches = Mismatches("portMultiplyAddingSubtractingF32ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x25A5_8F0A_10D5_CA3F)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x25A5_900A_10D5_CBF2)
-        for (b, c) in everyPair(bInputs, cInputs) where !hasUnorderedNaNs(alternatingNegation: b, c)
-        {
+        let bInputs = Inputs.vectors(H.self, seed: 0x25A5_8F0A_10D5_CA3F)
+        let cInputs = Inputs.vectors(H.self, seed: 0x25A5_900A_10D5_CBF2)
+        for (b, c) in everyPair(bInputs, cInputs)
+        where !hasUnorderedNaNs(alternatingNegation: b.simd, c.simd) {
             mismatches.check(
                 portMultiplyAddingSubtractingF32ConstantA(b, c),
                 highwayMultiplyAddingSubtractingF32ConstantA(b, c),
@@ -328,10 +328,10 @@ extension SIMDFloatCodegenTests {
 
     @Test func multiplyAddingSubtractingConstantB() {
         let mismatches = Mismatches("portMultiplyAddingSubtractingF32ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2E3A_C50A_15AC_AAA1)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x2E3A_C30A_15AC_A73B)
-        for (a, c) in everyPair(aInputs, cInputs) where !hasUnorderedNaNs(alternatingNegation: a, c)
-        {
+        let aInputs = Inputs.vectors(H.self, seed: 0x2E3A_C50A_15AC_AAA1)
+        let cInputs = Inputs.vectors(H.self, seed: 0x2E3A_C30A_15AC_A73B)
+        for (a, c) in everyPair(aInputs, cInputs)
+        where !hasUnorderedNaNs(alternatingNegation: a.simd, c.simd) {
             mismatches.check(
                 portMultiplyAddingSubtractingF32ConstantB(a, c),
                 highwayMultiplyAddingSubtractingF32ConstantB(a, c),
@@ -343,9 +343,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func multiplyAddingSubtractingConstantC() {
         let mismatches = Mismatches("portMultiplyAddingSubtractingF32ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x35F6_5C0A_19CA_8C16)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x35F6_5D0A_19CA_8DC9)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x35F6_5C0A_19CA_8C16)
+        let bInputs = Inputs.vectors(H.self, seed: 0x35F6_5D0A_19CA_8DC9)
+        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a.simd, b.simd) {
             mismatches.check(
                 portMultiplyAddingSubtractingF32ConstantC(a, b),
                 highwayMultiplyAddingSubtractingF32ConstantC(a, b),
@@ -357,11 +357,11 @@ extension SIMDFloatCodegenTests {
 
     @Test func multiplySubtractingAdding() {
         let mismatches = Mismatches("portMultiplySubtractingAddingF32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x34BC_CC28_3ECA_9F2D)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x34BC_CB28_3ECA_9D7A)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x34BC_CA28_3ECA_9BC7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x34BC_CC28_3ECA_9F2D)
+        let bInputs = Inputs.vectors(H.self, seed: 0x34BC_CB28_3ECA_9D7A)
+        let cInputs = Inputs.vectors(H.self, seed: 0x34BC_CA28_3ECA_9BC7)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xD34D_32F9_8E5B_8BFF)
-        where !hasUnorderedNaNs(multiplying: a, b, adding: c) {
+        where !hasUnorderedNaNs(multiplying: a.simd, b.simd, adding: c.simd) {
             mismatches.check(
                 portMultiplySubtractingAddingF32(a, b, c),
                 highwayMultiplySubtractingAddingF32(a, b, c),
@@ -373,10 +373,10 @@ extension SIMDFloatCodegenTests {
 
     @Test func multiplySubtractingAddingConstantA() {
         let mismatches = Mismatches("portMultiplySubtractingAddingF32ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6007_3765_AFFF_0A31)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x6007_3465_AFFF_0518)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6007_3765_AFFF_0A31)
+        let cInputs = Inputs.vectors(H.self, seed: 0x6007_3465_AFFF_0518)
         for (b, c) in everyPair(bInputs, cInputs)
-        where !hasUnorderedNaNs(alternatingNegation: b, negatedLanes(of: c)) {
+        where !hasUnorderedNaNs(alternatingNegation: b.simd, negatedLanes(of: c.simd)) {
             mismatches.check(
                 portMultiplySubtractingAddingF32ConstantA(b, c),
                 highwayMultiplySubtractingAddingF32ConstantA(b, c),
@@ -388,10 +388,10 @@ extension SIMDFloatCodegenTests {
 
     @Test func multiplySubtractingAddingConstantB() {
         let mismatches = Mismatches("portMultiplySubtractingAddingF32ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x46B4_B165_A1D7_6A7F)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x46B4_B365_A1D7_6DE5)
+        let aInputs = Inputs.vectors(H.self, seed: 0x46B4_B165_A1D7_6A7F)
+        let cInputs = Inputs.vectors(H.self, seed: 0x46B4_B365_A1D7_6DE5)
         for (a, c) in everyPair(aInputs, cInputs)
-        where !hasUnorderedNaNs(alternatingNegation: a, negatedLanes(of: c)) {
+        where !hasUnorderedNaNs(alternatingNegation: a.simd, negatedLanes(of: c.simd)) {
             mismatches.check(
                 portMultiplySubtractingAddingF32ConstantB(a, c),
                 highwayMultiplySubtractingAddingF32ConstantB(a, c),
@@ -403,9 +403,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func multiplySubtractingAddingConstantC() {
         let mismatches = Mismatches("portMultiplySubtractingAddingF32ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4F49_E865_A6AE_4C94)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4F49_E965_A6AE_4E47)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x4F49_E865_A6AE_4C94)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4F49_E965_A6AE_4E47)
+        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a.simd, b.simd) {
             mismatches.check(
                 portMultiplySubtractingAddingF32ConstantC(a, b),
                 highwayMultiplySubtractingAddingF32ConstantC(a, b),
@@ -417,11 +417,11 @@ extension SIMDFloatCodegenTests {
 
     @Test func multiplyAddingEvenFromBFloat16() {
         let mismatches = Mismatches("portMultiplyAddingEvenBF16ToF32")
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x06CF_9A48_6C9E_7698)
-        let bInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x06CF_9B48_6C9E_784B)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x06CF_9C48_6C9E_79FE)
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x06CF_9A48_6C9E_7698)
+        let bInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x06CF_9B48_6C9E_784B)
+        let cInputs = Inputs.vectors(H.self, seed: 0x06CF_9C48_6C9E_79FE)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x4E0E_6BBE_3616_A2D4)
-        where !hasUnorderedNaNs(widening: a, b, parity: 0, adding: c) {
+        where !hasUnorderedNaNs(widening: a, b, parity: 0, adding: c.simd) {
             mismatches.check(
                 portMultiplyAddingEvenBF16ToF32(a, b, c),
                 highwayMultiplyAddingEvenBF16ToF32(a, b, c),
@@ -433,14 +433,14 @@ extension SIMDFloatCodegenTests {
 
     @Test func multiplyAddingEvenFromBFloat16ConstantA() {
         let mismatches = Mismatches("portMultiplyAddingEvenBF16ToF32ConstantA")
-        let bInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x45B0_7395_59E4_CEEE)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x45B0_7295_59E4_CD3B)
+        let bInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x45B0_7395_59E4_CEEE)
+        let cInputs = Inputs.vectors(H.self, seed: 0x45B0_7295_59E4_CD3B)
         for (b, c) in everyPair(bInputs, cInputs)
         where !hasUnorderedNaNs(
-            widening: SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+            widening: SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
             b,
             parity: 0,
-            adding: c
+            adding: c.simd
         ) {
             mismatches.check(
                 portMultiplyAddingEvenBF16ToF32ConstantA(b, c),
@@ -453,14 +453,14 @@ extension SIMDFloatCodegenTests {
 
     @Test func multiplyAddingEvenFromBFloat16ConstantB() {
         let mismatches = Mismatches("portMultiplyAddingEvenBF16ToF32ConstantB")
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x3D1B_3D95_550D_EE8C)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x3D1B_3F95_550D_F1F2)
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x3D1B_3D95_550D_EE8C)
+        let cInputs = Inputs.vectors(H.self, seed: 0x3D1B_3F95_550D_F1F2)
         for (a, c) in everyPair(aInputs, cInputs)
         where !hasUnorderedNaNs(
             widening: a,
-            SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+            SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
             parity: 0,
-            adding: c
+            adding: c.simd
         ) {
             mismatches.check(
                 portMultiplyAddingEvenBF16ToF32ConstantB(a, c),
@@ -473,10 +473,11 @@ extension SIMDFloatCodegenTests {
 
     @Test func multiplyAddingEvenFromBFloat16ConstantC() {
         let mismatches = Mismatches("portMultiplyAddingEvenBF16ToF32ConstantC")
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x33AC_A695_4F7E_7897)
-        let bInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x33AC_A595_4F7E_76E4)
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x33AC_A695_4F7E_7897)
+        let bInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x33AC_A595_4F7E_76E4)
         for (a, b) in everyPair(aInputs, bInputs)
-        where !hasUnorderedNaNs(widening: a, b, parity: 0, adding: SIMDFloat.repeating(1.5)) {
+        where !hasUnorderedNaNs(widening: a, b, parity: 0, adding: SIMD<Float>.repeating(1.5).simd)
+        {
             mismatches.check(
                 portMultiplyAddingEvenBF16ToF32ConstantC(a, b),
                 highwayMultiplyAddingEvenBF16ToF32ConstantC(a, b),
@@ -488,11 +489,11 @@ extension SIMDFloatCodegenTests {
 
     @Test func multiplyAddingOddFromBFloat16() {
         let mismatches = Mismatches("portMultiplyAddingOddBF16ToF32")
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x5056_1A05_E79D_6EA9)
-        let bInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x5056_1905_E79D_6CF6)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x5056_1805_E79D_6B43)
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x5056_1A05_E79D_6EA9)
+        let bInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x5056_1905_E79D_6CF6)
+        let cInputs = Inputs.vectors(H.self, seed: 0x5056_1805_E79D_6B43)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xDC0C_6E4F_D7AC_E6E3)
-        where !hasUnorderedNaNs(widening: a, b, parity: 1, adding: c) {
+        where !hasUnorderedNaNs(widening: a, b, parity: 1, adding: c.simd) {
             mismatches.check(
                 portMultiplyAddingOddBF16ToF32(a, b, c),
                 highwayMultiplyAddingOddBF16ToF32(a, b, c),
@@ -504,14 +505,14 @@ extension SIMDFloatCodegenTests {
 
     @Test func multiplyAddingOddFromBFloat16ConstantA() {
         let mismatches = Mismatches("portMultiplyAddingOddBF16ToF32ConstantA")
-        let bInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x7545_3366_6269_DA1D)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x7545_3066_6269_D504)
+        let bInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x7545_3366_6269_DA1D)
+        let cInputs = Inputs.vectors(H.self, seed: 0x7545_3066_6269_D504)
         for (b, c) in everyPair(bInputs, cInputs)
         where !hasUnorderedNaNs(
-            widening: SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+            widening: SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
             b,
             parity: 1,
-            adding: c
+            adding: c.simd
         ) {
             mismatches.check(
                 portMultiplyAddingOddBF16ToF32ConstantA(b, c),
@@ -524,14 +525,14 @@ extension SIMDFloatCodegenTests {
 
     @Test func multiplyAddingOddFromBFloat16ConstantB() {
         let mismatches = Mismatches("portMultiplyAddingOddBF16ToF32ConstantB")
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x5A3F_AD66_52D0_A5EB)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x5A3F_AF66_52D0_A951)
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x5A3F_AD66_52D0_A5EB)
+        let cInputs = Inputs.vectors(H.self, seed: 0x5A3F_AF66_52D0_A951)
         for (a, c) in everyPair(aInputs, cInputs)
         where !hasUnorderedNaNs(
             widening: a,
-            SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+            SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
             parity: 1,
-            adding: c
+            adding: c.simd
         ) {
             mismatches.check(
                 portMultiplyAddingOddBF16ToF32ConstantB(a, c),
@@ -544,10 +545,11 @@ extension SIMDFloatCodegenTests {
 
     @Test func multiplyAddingOddFromBFloat16ConstantC() {
         let mismatches = Mismatches("portMultiplyAddingOddBF16ToF32ConstantC")
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x63AE_4466_5860_1BE0)
-        let bInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x63AE_4566_5860_1D93)
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x63AE_4466_5860_1BE0)
+        let bInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x63AE_4566_5860_1D93)
         for (a, b) in everyPair(aInputs, bInputs)
-        where !hasUnorderedNaNs(widening: a, b, parity: 1, adding: SIMDFloat.repeating(1.5)) {
+        where !hasUnorderedNaNs(widening: a, b, parity: 1, adding: SIMD<Float>.repeating(1.5).simd)
+        {
             mismatches.check(
                 portMultiplyAddingOddBF16ToF32ConstantC(a, b),
                 highwayMultiplyAddingOddBF16ToF32ConstantC(a, b),

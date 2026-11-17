@@ -5,333 +5,369 @@ public import Vectorization
 
 @inline(never)
 public func portConcatenatingLowerLowerF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.concatenatingLowerLower(a, b)
+    SIMD<Float>.concatenatingLowerLower(a, b)
 }
 
 @inline(never)
 public func highwayConcatenatingLowerLowerF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.concatenatingLowerLowerF32(a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.concatenatingLowerLowerF32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portConcatenatingLowerLowerF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.concatenatingLowerLower(SIMDFloat.repeating(1.5), b)
+    SIMD<Float>.concatenatingLowerLower(SIMD<Float>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayConcatenatingLowerLowerF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.concatenatingLowerLowerF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.concatenatingLowerLowerF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portConcatenatingLowerLowerF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.concatenatingLowerLower(a, SIMDFloat.repeating(1.5))
+    SIMD<Float>.concatenatingLowerLower(a, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayConcatenatingLowerLowerF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.concatenatingLowerLowerF32(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.concatenatingLowerLowerF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portConcatenatingUpperUpperF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.concatenatingUpperUpper(a, b)
+    SIMD<Float>.concatenatingUpperUpper(a, b)
 }
 
 @inline(never)
 public func highwayConcatenatingUpperUpperF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.concatenatingUpperUpperF32(a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.concatenatingUpperUpperF32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portConcatenatingUpperUpperF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.concatenatingUpperUpper(SIMDFloat.repeating(1.5), b)
+    SIMD<Float>.concatenatingUpperUpper(SIMD<Float>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayConcatenatingUpperUpperF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.concatenatingUpperUpperF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.concatenatingUpperUpperF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portConcatenatingUpperUpperF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.concatenatingUpperUpper(a, SIMDFloat.repeating(1.5))
+    SIMD<Float>.concatenatingUpperUpper(a, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayConcatenatingUpperUpperF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.concatenatingUpperUpperF32(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.concatenatingUpperUpperF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portConcatenatingLowerUpperF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.concatenatingLowerUpper(a, b)
+    SIMD<Float>.concatenatingLowerUpper(a, b)
 }
 
 @inline(never)
 public func highwayConcatenatingLowerUpperF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.concatenatingLowerUpperF32(a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.concatenatingLowerUpperF32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portConcatenatingLowerUpperF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.concatenatingLowerUpper(SIMDFloat.repeating(1.5), b)
+    SIMD<Float>.concatenatingLowerUpper(SIMD<Float>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayConcatenatingLowerUpperF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.concatenatingLowerUpperF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.concatenatingLowerUpperF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portConcatenatingLowerUpperF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.concatenatingLowerUpper(a, SIMDFloat.repeating(1.5))
+    SIMD<Float>.concatenatingLowerUpper(a, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayConcatenatingLowerUpperF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.concatenatingLowerUpperF32(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.concatenatingLowerUpperF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portConcatenatingUpperLowerF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.concatenatingUpperLower(a, b)
+    SIMD<Float>.concatenatingUpperLower(a, b)
 }
 
 @inline(never)
 public func highwayConcatenatingUpperLowerF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.concatenatingUpperLowerF32(a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.concatenatingUpperLowerF32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portConcatenatingUpperLowerF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.concatenatingUpperLower(SIMDFloat.repeating(1.5), b)
+    SIMD<Float>.concatenatingUpperLower(SIMD<Float>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayConcatenatingUpperLowerF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.concatenatingUpperLowerF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.concatenatingUpperLowerF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portConcatenatingUpperLowerF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.concatenatingUpperLower(a, SIMDFloat.repeating(1.5))
+    SIMD<Float>.concatenatingUpperLower(a, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayConcatenatingUpperLowerF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.concatenatingUpperLowerF32(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.concatenatingUpperLowerF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portConcatenatingOddF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.concatenatingOdd(a, b)
+    SIMD<Float>.concatenatingOdd(a, b)
 }
 
 @inline(never)
 public func highwayConcatenatingOddF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.concatenatingOddF32(a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.concatenatingOddF32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portConcatenatingOddF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.concatenatingOdd(SIMDFloat.repeating(1.5), b)
+    SIMD<Float>.concatenatingOdd(SIMD<Float>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayConcatenatingOddF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.concatenatingOddF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.concatenatingOddF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portConcatenatingOddF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.concatenatingOdd(a, SIMDFloat.repeating(1.5))
+    SIMD<Float>.concatenatingOdd(a, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayConcatenatingOddF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.concatenatingOddF32(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.concatenatingOddF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portConcatenatingEvenF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.concatenatingEven(a, b)
+    SIMD<Float>.concatenatingEven(a, b)
 }
 
 @inline(never)
 public func highwayConcatenatingEvenF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.concatenatingEvenF32(a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.concatenatingEvenF32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portConcatenatingEvenF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.concatenatingEven(SIMDFloat.repeating(1.5), b)
+    SIMD<Float>.concatenatingEven(SIMD<Float>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayConcatenatingEvenF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.concatenatingEvenF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.concatenatingEvenF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portConcatenatingEvenF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.concatenatingEven(a, SIMDFloat.repeating(1.5))
+    SIMD<Float>.concatenatingEven(a, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayConcatenatingEvenF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.concatenatingEvenF32(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.concatenatingEvenF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portInterleavingWholeLowerF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.interleavingWholeLower(a, b)
+    SIMD<Float>.interleavingWholeLower(a, b)
 }
 
 @inline(never)
 public func highwayInterleavingWholeLowerF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.interleavingWholeLowerF32(a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.interleavingWholeLowerF32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portInterleavingWholeLowerF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.interleavingWholeLower(SIMDFloat.repeating(1.5), b)
+    SIMD<Float>.interleavingWholeLower(SIMD<Float>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayInterleavingWholeLowerF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.interleavingWholeLowerF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.interleavingWholeLowerF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portInterleavingWholeLowerF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.interleavingWholeLower(a, SIMDFloat.repeating(1.5))
+    SIMD<Float>.interleavingWholeLower(a, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayInterleavingWholeLowerF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.interleavingWholeLowerF32(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.interleavingWholeLowerF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portInterleavingWholeUpperF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.interleavingWholeUpper(a, b)
+    SIMD<Float>.interleavingWholeUpper(a, b)
 }
 
 @inline(never)
 public func highwayInterleavingWholeUpperF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.interleavingWholeUpperF32(a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.interleavingWholeUpperF32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portInterleavingWholeUpperF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.interleavingWholeUpper(SIMDFloat.repeating(1.5), b)
+    SIMD<Float>.interleavingWholeUpper(SIMD<Float>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayInterleavingWholeUpperF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.interleavingWholeUpperF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.interleavingWholeUpperF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portInterleavingWholeUpperF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.interleavingWholeUpper(a, SIMDFloat.repeating(1.5))
+    SIMD<Float>.interleavingWholeUpper(a, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayInterleavingWholeUpperF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.interleavingWholeUpperF32(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.interleavingWholeUpperF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portLowerHalfF32(_ a: SIMD<Float>) -> SIMD<Float>.HalfVector {
-    SIMDFloat.lowerHalf(a)
+    SIMD<Float>.lowerHalf(a)
 }
 
 @inline(never)
 public func highwayLowerHalfF32(_ a: SIMD<Float>) -> SIMD<Float>.HalfVector {
-    SIMDFloat.HalfVector(raw: HighwayReference.Nothrow.lowerHalfF32(a.raw))
+    SIMD<Float>.HalfVector(raw: HighwayReference.Nothrow.lowerHalfF32(a.raw))
 }
 
 @inline(never)
 public func portLowerHalfF32ConstantA() -> SIMD<Float>.HalfVector {
-    SIMDFloat.lowerHalf(SIMDFloat.repeating(1.5))
+    SIMD<Float>.lowerHalf(SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayLowerHalfF32ConstantA() -> SIMD<Float>.HalfVector {
-    SIMDFloat.HalfVector(
-        raw: HighwayReference.Nothrow.lowerHalfF32(HighwayReference.Nothrow.repeatingF32(1.5).raw)
+    SIMD<Float>.HalfVector(
+        raw: HighwayReference.Nothrow.lowerHalfF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portUpperHalfF32(_ a: SIMD<Float>) -> SIMD<Float>.HalfVector {
-    SIMDFloat.upperHalf(a)
+    SIMD<Float>.upperHalf(a)
 }
 
 @inline(never)
 public func highwayUpperHalfF32(_ a: SIMD<Float>) -> SIMD<Float>.HalfVector {
-    SIMDFloat.HalfVector(raw: HighwayReference.Nothrow.upperHalfF32(a.raw))
+    SIMD<Float>.HalfVector(raw: HighwayReference.Nothrow.upperHalfF32(a.raw))
 }
 
 @inline(never)
 public func portUpperHalfF32ConstantA() -> SIMD<Float>.HalfVector {
-    SIMDFloat.upperHalf(SIMDFloat.repeating(1.5))
+    SIMD<Float>.upperHalf(SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayUpperHalfF32ConstantA() -> SIMD<Float>.HalfVector {
-    SIMDFloat.HalfVector(
-        raw: HighwayReference.Nothrow.upperHalfF32(HighwayReference.Nothrow.repeatingF32(1.5).raw)
+    SIMD<Float>.HalfVector(
+        raw: HighwayReference.Nothrow.upperHalfF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
@@ -340,7 +376,7 @@ public func portCombiningF32(
     _ a: SIMD<Float>.HalfVector,
     _ b: SIMD<Float>.HalfVector
 ) -> SIMD<Float> {
-    SIMDFloat.combining(a, b)
+    SIMD<Float>.combining(a, b)
 }
 
 @inline(never)
@@ -348,15 +384,15 @@ public func highwayCombiningF32(
     _ a: SIMD<Float>.HalfVector,
     _ b: SIMD<Float>.HalfVector
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.combiningF32(a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.combiningF32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portZeroExtendingF32(_ a: SIMD<Float>.HalfVector) -> SIMD<Float> {
-    SIMDFloat.zeroExtending(a)
+    SIMD<Float>.zeroExtending(a)
 }
 
 @inline(never)
 public func highwayZeroExtendingF32(_ a: SIMD<Float>.HalfVector) -> SIMD<Float> {
-    HighwayReference.Nothrow.zeroExtendingF32(a.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.zeroExtendingF32(a.raw))
 }

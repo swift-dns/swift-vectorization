@@ -7,17 +7,17 @@ import Vectorization
 
 extension SIMDUInt32ConstantTests {
     @inline(__always)
-    private func checkHalfVectorClampingFromUInt64ConstantA(_ value: SIMDUInt64.Lane) {
+    private func checkHalfVectorClampingFromUInt64ConstantA(_ value: UInt64) {
         let mismatches = Mismatches("halfVectorClampingFromUInt64 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt64.repeating(value),
-            SIMDUInt64.Vector(raw: HighwayReference.repeatingU64(value)),
+            SIMD<UInt64>.repeating(value),
+            SIMD<UInt64>(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         mismatches.check(
-            H.halfVector(clamping: SIMDUInt64.repeating(value)),
+            H.halfVector(clamping: SIMD<UInt64>.repeating(value)),
             H.HalfVector(
-                raw: HighwayReference.halfVectorClampingU64ToU32(SIMDUInt64.repeating(value).raw)
+                raw: HighwayReference.halfVectorClampingU64ToU32(SIMD<UInt64>.repeating(value).raw)
             ),
             ""
         )
@@ -73,21 +73,21 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func halfVectorClampingFromUInt64ConstantSplatMax() {
-        checkHalfVectorClampingFromUInt64ConstantA(SIMDUInt64.Lane.max)
+        checkHalfVectorClampingFromUInt64ConstantA(UInt64.max)
     }
 
     @inline(__always)
-    private func checkHalfVectorClampingFromInt64ConstantA(_ value: SIMDInt64.Lane) {
+    private func checkHalfVectorClampingFromInt64ConstantA(_ value: Int64) {
         let mismatches = Mismatches("halfVectorClampingFromInt64 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDInt64.repeating(value),
-            SIMDInt64.Vector(raw: HighwayReference.repeatingI64(value)),
+            SIMD<Int64>.repeating(value),
+            SIMD<Int64>(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         mismatches.check(
-            H.halfVector(clamping: SIMDInt64.repeating(value)),
+            H.halfVector(clamping: SIMD<Int64>.repeating(value)),
             H.HalfVector(
-                raw: HighwayReference.halfVectorClampingI64ToU32(SIMDInt64.repeating(value).raw)
+                raw: HighwayReference.halfVectorClampingI64ToU32(SIMD<Int64>.repeating(value).raw)
             ),
             ""
         )
@@ -163,19 +163,19 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func halfVectorClampingFromInt64ConstantSplatMax() {
-        checkHalfVectorClampingFromInt64ConstantA(SIMDInt64.Lane.max)
+        checkHalfVectorClampingFromInt64ConstantA(Int64.max)
     }
 
     @Test func halfVectorClampingFromInt64ConstantSplatMin() {
-        checkHalfVectorClampingFromInt64ConstantA(SIMDInt64.Lane.min)
+        checkHalfVectorClampingFromInt64ConstantA(Int64.min)
     }
 
     @inline(__always)
     private func checkHalfVectorClampingShiftedRightByFromUInt64ConstantBits(_ bits: Int) {
         let mismatches = Mismatches("halfVectorClampingShiftedRightByFromUInt64 with bits \(bits)")
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt64>.self,
+            to: Lane.self,
             seed: 0xAA1A_8D5C_08E0_97B0
         )
         for a in aInputs {
@@ -455,8 +455,8 @@ extension SIMDUInt32ConstantTests {
             "halfVectorClampingShiftedRightByFromUInt64 unchecked with bits \(bits)"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt64>.self,
+            to: Lane.self,
             seed: 0x94A9_B2BD_CFF3_DF82
         )
         for a in aInputs {
@@ -731,23 +731,22 @@ extension SIMDUInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkHalfVectorClampingShiftedRightByFromUInt64ConstantA(_ value: SIMDUInt64.Lane)
-    {
+    private func checkHalfVectorClampingShiftedRightByFromUInt64ConstantA(_ value: UInt64) {
         let mismatches = Mismatches(
             "halfVectorClampingShiftedRightByFromUInt64 with a repeating \(hex(value))"
         )
         let bitsInputs = Array(0...63)
         mismatches.check(
-            SIMDUInt64.repeating(value),
-            SIMDUInt64.Vector(raw: HighwayReference.repeatingU64(value)),
+            SIMD<UInt64>.repeating(value),
+            SIMD<UInt64>(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for bits in bitsInputs {
             mismatches.check(
-                H.halfVector(clamping: SIMDUInt64.repeating(value), shiftedRightBy: bits),
+                H.halfVector(clamping: SIMD<UInt64>.repeating(value), shiftedRightBy: bits),
                 H.HalfVector(
                     raw: HighwayReference.halfVectorClampingShiftedRightByU64ToU32(
-                        SIMDUInt64.repeating(value).raw,
+                        SIMD<UInt64>.repeating(value).raw,
                         Int32(truncatingIfNeeded: bits)
                     )
                 ),
@@ -806,6 +805,6 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func halfVectorClampingShiftedRightByFromUInt64ConstantSplatMax() {
-        checkHalfVectorClampingShiftedRightByFromUInt64ConstantA(SIMDUInt64.Lane.max)
+        checkHalfVectorClampingShiftedRightByFromUInt64ConstantA(UInt64.max)
     }
 }

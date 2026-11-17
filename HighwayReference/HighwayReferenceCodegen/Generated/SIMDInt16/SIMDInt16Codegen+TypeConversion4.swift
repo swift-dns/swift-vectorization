@@ -8,27 +8,29 @@ public import Vectorization
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func portVectorRoundingDownF16ToI16(roundingDown a: SIMD<Float16>) -> SIMD<Int16> {
-    SIMDInt16.vector(roundingDown: a)
+    SIMD<Int16>.vector(roundingDown: a)
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func highwayVectorRoundingDownF16ToI16(roundingDown a: SIMD<Float16>) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorRoundingDownF16ToI16(a.raw))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorRoundingDownF16ToI16(a.raw))
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func portVectorRoundingDownF16ToI16ConstantA() -> SIMD<Int16> {
-    SIMDInt16.vector(roundingDown: SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    SIMD<Int16>.vector(roundingDown: SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func highwayVectorRoundingDownF16ToI16ConstantA() -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.vectorRoundingDownF16ToI16(
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
         )
     )
 }
@@ -41,7 +43,7 @@ public func portVectorConvertingWhereF16ToI16(
     converting a: SIMD<Float16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.vector(converting: a, where: mask)
+    SIMD<Int16>.vector(converting: a, where: mask)
 }
 
 @available(SwiftStdlib 5.3, *)
@@ -50,14 +52,14 @@ public func highwayVectorConvertingWhereF16ToI16(
     converting a: SIMD<Float16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorConvertingWhereF16ToI16(mask.raw, a.raw))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorConvertingWhereF16ToI16(mask.raw, a.raw))
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func portVectorConvertingWhereF16ToI16ConstantA(where mask: SIMD<Int16>.Mask) -> SIMD<Int16>
 {
-    SIMDInt16.vector(converting: SIMDFloat16.repeating(Float16(bitPattern: 26)), where: mask)
+    SIMD<Int16>.vector(converting: SIMD<Float16>.repeating(Float16(bitPattern: 26)), where: mask)
 }
 
 @available(SwiftStdlib 5.3, *)
@@ -65,10 +67,12 @@ public func portVectorConvertingWhereF16ToI16ConstantA(where mask: SIMD<Int16>.M
 public func highwayVectorConvertingWhereF16ToI16ConstantA(
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.vectorConvertingWhereF16ToI16(
             mask.raw,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
         )
     )
 }

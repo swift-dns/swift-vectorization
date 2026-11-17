@@ -7,18 +7,18 @@ import Vectorization
 
 extension SIMDInt8ConstantTests {
     @inline(__always)
-    private func checkBitwiseAndConstantA(_ value: H.Lane) {
+    private func checkBitwiseAndConstantA(_ value: Lane) {
         let mismatches = Mismatches("bitwiseAnd with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9AC6_3280_3CF6_863E)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9AC6_3280_3CF6_863E)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.bitwiseAnd(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.bitwiseAndI8(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.bitwiseAndI8(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -26,18 +26,18 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseAndConstantB(_ value: H.Lane) {
+    private func checkBitwiseAndConstantB(_ value: Lane) {
         let mismatches = Mismatches("bitwiseAnd with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x930A_FC80_38D9_499C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x930A_FC80_38D9_499C)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.bitwiseAnd(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.bitwiseAndI8(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.bitwiseAndI8(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -95,18 +95,18 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseOrConstantA(_ value: H.Lane) {
+    private func checkBitwiseOrConstantA(_ value: Lane) {
         let mismatches = Mismatches("bitwiseOr with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x78BC_A40F_0B02_B432)
+        let bInputs = Inputs.vectors(H.self, seed: 0x78BC_A40F_0B02_B432)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.bitwiseOr(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.bitwiseOrI8(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.bitwiseOrI8(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -114,18 +114,18 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseOrConstantB(_ value: H.Lane) {
+    private func checkBitwiseOrConstantB(_ value: Lane) {
         let mismatches = Mismatches("bitwiseOr with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6FBA_EE0F_05CF_DB70)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6FBA_EE0F_05CF_DB70)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.bitwiseOr(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.bitwiseOrI8(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.bitwiseOrI8(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -183,18 +183,18 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseXorConstantA(_ value: H.Lane) {
+    private func checkBitwiseXorConstantA(_ value: Lane) {
         let mismatches = Mismatches("bitwiseXor with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9A70_CD68_1EAF_EC56)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9A70_CD68_1EAF_EC56)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.bitwiseXor(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.bitwiseXorI8(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.bitwiseXorI8(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -202,18 +202,18 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseXorConstantB(_ value: H.Lane) {
+    private func checkBitwiseXorConstantB(_ value: Lane) {
         let mismatches = Mismatches("bitwiseXor with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x92B5_3768_1A92_0C94)
+        let aInputs = Inputs.vectors(H.self, seed: 0x92B5_3768_1A92_0C94)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.bitwiseXor(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.bitwiseXorI8(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.bitwiseXorI8(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -271,18 +271,18 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseAndNotConstantA(_ value: H.Lane) {
+    private func checkBitwiseAndNotConstantA(_ value: Lane) {
         let mismatches = Mismatches("bitwiseAndNot with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x858D_01F1_D798_E3EB)
+        let bInputs = Inputs.vectors(H.self, seed: 0x858D_01F1_D798_E3EB)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.bitwiseAndNot(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.bitwiseAndNotI8(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.bitwiseAndNotI8(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -290,18 +290,18 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseAndNotConstantB(_ value: H.Lane) {
+    private func checkBitwiseAndNotConstantB(_ value: Lane) {
         let mismatches = Mismatches("bitwiseAndNot with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8EFB_B7F1_DD28_8E8D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8EFB_B7F1_DD28_8E8D)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.bitwiseAndNot(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.bitwiseAndNotI8(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.bitwiseAndNotI8(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -359,16 +359,16 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkBroadcastingSignBitConstantA(_ value: H.Lane) {
+    private func checkBroadcastingSignBitConstantA(_ value: Lane) {
         let mismatches = Mismatches("broadcastingSignBit with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         mismatches.check(
             H.broadcastingSignBit(H.repeating(value)),
-            H.Vector(raw: HighwayReference.broadcastingSignBitI8(H.repeating(value).raw)),
+            H(raw: HighwayReference.broadcastingSignBitI8(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -415,23 +415,23 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseAndWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkBitwiseAndWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "bitwiseAndWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x943A_7E88_3C07_80DA)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x943A_7D88_3C07_7F27)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x943A_7C88_3C07_7D74)
+        let aInputs = Inputs.vectors(H.self, seed: 0x943A_7D88_3C07_7F27)
+        let bInputs = Inputs.vectors(H.self, seed: 0x943A_7C88_3C07_7D74)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xEF33_023C_1379_46DF)
         {
             mismatches.check(
                 H.bitwiseAnd(a, b, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.bitwiseAndWhereOtherwiseI8(
                         H.repeating(value).raw,
                         mask.raw,
@@ -486,23 +486,23 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseOrWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkBitwiseOrWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "bitwiseOrWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x5095_7C9F_C5A6_BC46)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5095_7B9F_C5A6_BA93)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5095_7A9F_C5A6_B8E0)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5095_7B9F_C5A6_BA93)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5095_7A9F_C5A6_B8E0)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x485B_9D18_4113_EAB3)
         {
             mismatches.check(
                 H.bitwiseOr(a, b, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.bitwiseOrWhereOtherwiseI8(
                         H.repeating(value).raw,
                         mask.raw,
@@ -557,23 +557,23 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseXorWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkBitwiseXorWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "bitwiseXorWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x4E7D_E69F_4B87_7662)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4E7D_E59F_4B87_74AF)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4E7D_E49F_4B87_72FC)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4E7D_E59F_4B87_74AF)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4E7D_E49F_4B87_72FC)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xCA57_EC0B_9312_80C7)
         {
             mismatches.check(
                 H.bitwiseXor(a, b, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.bitwiseXorWhereOtherwiseI8(
                         H.repeating(value).raw,
                         mask.raw,
@@ -628,18 +628,18 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkNegatingIfNegativeConstantB(_ value: H.Lane) {
+    private func checkNegatingIfNegativeConstantB(_ value: Lane) {
         let mismatches = Mismatches("negatingIfNegative with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1E88_E59B_D980_32E7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1E88_E59B_D980_32E7)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.negatingIfNegative(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.negatingIfNegativeI8(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.negatingIfNegativeI8(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }

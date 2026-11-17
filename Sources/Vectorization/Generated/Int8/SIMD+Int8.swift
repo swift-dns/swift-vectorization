@@ -9,12 +9,12 @@ extension SIMD where Lane == Int8 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_vector_i8) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_vector_i8(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_vector_i8 { cvectorization_ops_from_raw_vector_i8(raw) }
+    public var simd: SIMDType { cvectorization_ops_from_raw_vector_i8(raw) }
 }
 
 extension SIMD.Mask where Lane == Int8 {
@@ -24,14 +24,12 @@ extension SIMD.Mask where Lane == Int8 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: SIMDMask<cvectorization_ops_mask_i8>) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_mask_i8(simd._storage)
     }
 
     @export(implementation) @inline(always)
-    public var simd: SIMDMask<cvectorization_ops_mask_i8> {
-        SIMDMask<cvectorization_ops_mask_i8>(cvectorization_ops_from_raw_mask_i8(raw))
-    }
+    public var simd: SIMDType { SIMDType(cvectorization_ops_from_raw_mask_i8(raw)) }
 }
 
 extension SIMD.HalfVector where Lane == Int8 {
@@ -41,14 +39,12 @@ extension SIMD.HalfVector where Lane == Int8 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_half_vector_i8) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_half_vector_i8(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_half_vector_i8 {
-        cvectorization_ops_from_raw_half_vector_i8(raw)
-    }
+    public var simd: SIMDType { cvectorization_ops_from_raw_half_vector_i8(raw) }
 }
 
 extension SIMD.HalfMask where Lane == Int8 {
@@ -58,14 +54,12 @@ extension SIMD.HalfMask where Lane == Int8 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_half_mask_i8) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_half_mask_i8(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_half_mask_i8 {
-        cvectorization_ops_from_raw_half_mask_i8(raw)
-    }
+    public var simd: SIMDType { cvectorization_ops_from_raw_half_mask_i8(raw) }
 }
 
 extension SIMD.QuarterVector where Lane == Int8 {
@@ -75,14 +69,12 @@ extension SIMD.QuarterVector where Lane == Int8 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_quarter_vector_i8) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_quarter_vector_i8(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_quarter_vector_i8 {
-        cvectorization_ops_from_raw_quarter_vector_i8(raw)
-    }
+    public var simd: SIMDType { cvectorization_ops_from_raw_quarter_vector_i8(raw) }
 }
 
 extension SIMD.QuarterMask where Lane == Int8 {
@@ -92,14 +84,12 @@ extension SIMD.QuarterMask where Lane == Int8 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_quarter_mask_i8) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_quarter_mask_i8(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_quarter_mask_i8 {
-        cvectorization_ops_from_raw_quarter_mask_i8(raw)
-    }
+    public var simd: SIMDType { cvectorization_ops_from_raw_quarter_mask_i8(raw) }
 }
 
 extension SIMD.EighthVector where Lane == Int8 {
@@ -109,14 +99,12 @@ extension SIMD.EighthVector where Lane == Int8 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_eighth_vector_i8) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_eighth_vector_i8(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_eighth_vector_i8 {
-        cvectorization_ops_from_raw_eighth_vector_i8(raw)
-    }
+    public var simd: SIMDType { cvectorization_ops_from_raw_eighth_vector_i8(raw) }
 }
 
 extension SIMD.EighthMask where Lane == Int8 {
@@ -126,14 +114,12 @@ extension SIMD.EighthMask where Lane == Int8 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_eighth_mask_i8) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_eighth_mask_i8(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_eighth_mask_i8 {
-        cvectorization_ops_from_raw_eighth_mask_i8(raw)
-    }
+    public var simd: SIMDType { cvectorization_ops_from_raw_eighth_mask_i8(raw) }
 }
 
 extension SIMD.BlockVector where Lane == Int8 {
@@ -143,12 +129,12 @@ extension SIMD.BlockVector where Lane == Int8 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_block_i8) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_block_i8(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_block_i8 { cvectorization_ops_from_raw_block_i8(raw) }
+    public var simd: SIMDType { cvectorization_ops_from_raw_block_i8(raw) }
 }
 
 extension SIMD where Lane == Int8 {

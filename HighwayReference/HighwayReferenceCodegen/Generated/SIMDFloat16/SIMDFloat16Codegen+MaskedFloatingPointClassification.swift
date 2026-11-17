@@ -9,7 +9,7 @@ public func portIsNaNWhereF16(
     _ a: SIMD<Float16>,
     where mask: SIMD<Float16>.Mask
 ) -> SIMD<Float16>.Mask {
-    SIMDFloat16.isNaN(a, where: mask)
+    SIMD<Float16>.isNaN(a, where: mask)
 }
 
 @inline(never)
@@ -17,20 +17,22 @@ public func highwayIsNaNWhereF16(
     _ a: SIMD<Float16>,
     where mask: SIMD<Float16>.Mask
 ) -> SIMD<Float16>.Mask {
-    SIMDFloat16.Mask(raw: HighwayReference.Nothrow.isNaNWhereF16(mask.raw, a.raw))
+    SIMD<Float16>.Mask(raw: HighwayReference.Nothrow.isNaNWhereF16(mask.raw, a.raw))
 }
 
 @inline(never)
 public func portIsNaNWhereF16ConstantA(where mask: SIMD<Float16>.Mask) -> SIMD<Float16>.Mask {
-    SIMDFloat16.isNaN(SIMDFloat16.repeating(Float16(bitPattern: 26)), where: mask)
+    SIMD<Float16>.isNaN(SIMD<Float16>.repeating(Float16(bitPattern: 26)), where: mask)
 }
 
 @inline(never)
 public func highwayIsNaNWhereF16ConstantA(where mask: SIMD<Float16>.Mask) -> SIMD<Float16>.Mask {
-    SIMDFloat16.Mask(
+    SIMD<Float16>.Mask(
         raw: HighwayReference.Nothrow.isNaNWhereF16(
             mask.raw,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
         )
     )
 }

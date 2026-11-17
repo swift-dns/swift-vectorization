@@ -9,8 +9,8 @@ import Vectorization
 extension SIMDInt16CodegenTests {
     @Test func zippingLowerFromInt8() {
         let mismatches = Mismatches("portZippingLowerI8ToI16")
-        let aInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0xF9E3_0AA2_FAA2_3F80)
-        let bInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0xF9E3_0BA2_FAA2_4133)
+        let aInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0xF9E3_0AA2_FAA2_3F80)
+        let bInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0xF9E3_0BA2_FAA2_4133)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portZippingLowerI8ToI16(a, b),
@@ -23,7 +23,7 @@ extension SIMDInt16CodegenTests {
 
     @Test func zippingLowerFromInt8ConstantA() {
         let mismatches = Mismatches("portZippingLowerI8ToI16ConstantA")
-        let bInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x4544_CCBE_2FD6_3876)
+        let bInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x4544_CCBE_2FD6_3876)
         for b in bInputs {
             mismatches.check(
                 portZippingLowerI8ToI16ConstantA(b),
@@ -36,7 +36,7 @@ extension SIMDInt16CodegenTests {
 
     @Test func zippingLowerFromInt8ConstantB() {
         let mismatches = Mismatches("portZippingLowerI8ToI16ConstantB")
-        let aInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x3BD6_36BE_2A46_C434)
+        let aInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x3BD6_36BE_2A46_C434)
         for a in aInputs {
             mismatches.check(
                 portZippingLowerI8ToI16ConstantB(a),
@@ -49,8 +49,8 @@ extension SIMDInt16CodegenTests {
 
     @Test func zippingUpperFromInt8() {
         let mismatches = Mismatches("portZippingUpperI8ToI16")
-        let aInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x84EC_A0A7_83EB_2531)
-        let bInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x84EC_9FA7_83EB_237E)
+        let aInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x84EC_A0A7_83EB_2531)
+        let bInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x84EC_9FA7_83EB_237E)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portZippingUpperI8ToI16(a, b),
@@ -63,7 +63,7 @@ extension SIMDInt16CodegenTests {
 
     @Test func zippingUpperFromInt8ConstantA() {
         let mismatches = Mismatches("portZippingUpperI8ToI16ConstantA")
-        let bInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0xF4E9_E16E_1C39_D7A5)
+        let bInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0xF4E9_E16E_1C39_D7A5)
         for b in bInputs {
             mismatches.check(
                 portZippingUpperI8ToI16ConstantA(b),
@@ -76,7 +76,7 @@ extension SIMDInt16CodegenTests {
 
     @Test func zippingUpperFromInt8ConstantB() {
         let mismatches = Mismatches("portZippingUpperI8ToI16ConstantB")
-        let aInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0xDB2A_DB6E_0DB6_3F93)
+        let aInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0xDB2A_DB6E_0DB6_3F93)
         for a in aInputs {
             mismatches.check(
                 portZippingUpperI8ToI16ConstantB(a),

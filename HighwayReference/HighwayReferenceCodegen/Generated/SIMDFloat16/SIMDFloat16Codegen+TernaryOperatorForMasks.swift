@@ -10,7 +10,7 @@ public func portSelectingF16(
     _ a: SIMD<Float16>,
     _ b: SIMD<Float16>
 ) -> SIMD<Float16> {
-    SIMDFloat16.selecting(mask, a, b)
+    SIMD<Float16>.selecting(mask, a, b)
 }
 
 @inline(never)
@@ -19,7 +19,7 @@ public func highwaySelectingF16(
     _ a: SIMD<Float16>,
     _ b: SIMD<Float16>
 ) -> SIMD<Float16> {
-    HighwayReference.Nothrow.selectingF16(mask.raw, a.raw, b.raw)
+    SIMD<Float16>(raw: HighwayReference.Nothrow.selectingF16(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -27,7 +27,7 @@ public func portSelectingF16ConstantA(
     _ mask: SIMD<Float16>.Mask,
     _ b: SIMD<Float16>
 ) -> SIMD<Float16> {
-    SIMDFloat16.selecting(mask, SIMDFloat16.repeating(Float16(bitPattern: 26)), b)
+    SIMD<Float16>.selecting(mask, SIMD<Float16>.repeating(Float16(bitPattern: 26)), b)
 }
 
 @inline(never)
@@ -35,10 +35,14 @@ public func highwaySelectingF16ConstantA(
     _ mask: SIMD<Float16>.Mask,
     _ b: SIMD<Float16>
 ) -> SIMD<Float16> {
-    HighwayReference.Nothrow.selectingF16(
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
-        b.raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.selectingF16(
+            mask.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
+        )
     )
 }
 
@@ -47,7 +51,7 @@ public func portSelectingF16ConstantB(
     _ mask: SIMD<Float16>.Mask,
     _ a: SIMD<Float16>
 ) -> SIMD<Float16> {
-    SIMDFloat16.selecting(mask, a, SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    SIMD<Float16>.selecting(mask, a, SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
@@ -55,17 +59,21 @@ public func highwaySelectingF16ConstantB(
     _ mask: SIMD<Float16>.Mask,
     _ a: SIMD<Float16>
 ) -> SIMD<Float16> {
-    HighwayReference.Nothrow.selectingF16(
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.selectingF16(
+            mask.raw,
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portSelectingOrZeroF16(_ mask: SIMD<Float16>.Mask, _ a: SIMD<Float16>) -> SIMD<Float16>
 {
-    SIMDFloat16.selectingOrZero(mask, a)
+    SIMD<Float16>.selectingOrZero(mask, a)
 }
 
 @inline(never)
@@ -73,26 +81,30 @@ public func highwaySelectingOrZeroF16(
     _ mask: SIMD<Float16>.Mask,
     _ a: SIMD<Float16>
 ) -> SIMD<Float16> {
-    HighwayReference.Nothrow.selectingOrZeroF16(mask.raw, a.raw)
+    SIMD<Float16>(raw: HighwayReference.Nothrow.selectingOrZeroF16(mask.raw, a.raw))
 }
 
 @inline(never)
 public func portSelectingOrZeroF16ConstantA(_ mask: SIMD<Float16>.Mask) -> SIMD<Float16> {
-    SIMDFloat16.selectingOrZero(mask, SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    SIMD<Float16>.selectingOrZero(mask, SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwaySelectingOrZeroF16ConstantA(_ mask: SIMD<Float16>.Mask) -> SIMD<Float16> {
-    HighwayReference.Nothrow.selectingOrZeroF16(
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.selectingOrZeroF16(
+            mask.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portZeroingSelectedF16(_ mask: SIMD<Float16>.Mask, _ a: SIMD<Float16>) -> SIMD<Float16>
 {
-    SIMDFloat16.zeroingSelected(mask, a)
+    SIMD<Float16>.zeroingSelected(mask, a)
 }
 
 @inline(never)
@@ -100,19 +112,23 @@ public func highwayZeroingSelectedF16(
     _ mask: SIMD<Float16>.Mask,
     _ a: SIMD<Float16>
 ) -> SIMD<Float16> {
-    HighwayReference.Nothrow.zeroingSelectedF16(mask.raw, a.raw)
+    SIMD<Float16>(raw: HighwayReference.Nothrow.zeroingSelectedF16(mask.raw, a.raw))
 }
 
 @inline(never)
 public func portZeroingSelectedF16ConstantA(_ mask: SIMD<Float16>.Mask) -> SIMD<Float16> {
-    SIMDFloat16.zeroingSelected(mask, SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    SIMD<Float16>.zeroingSelected(mask, SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayZeroingSelectedF16ConstantA(_ mask: SIMD<Float16>.Mask) -> SIMD<Float16> {
-    HighwayReference.Nothrow.zeroingSelectedF16(
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.zeroingSelectedF16(
+            mask.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
@@ -122,7 +138,7 @@ public func portSelectingByVectorF16(
     _ b: SIMD<Float16>,
     _ c: SIMD<Float16>
 ) -> SIMD<Float16> {
-    SIMDFloat16.selecting(a, b, c)
+    SIMD<Float16>.selecting(a, b, c)
 }
 
 @inline(never)
@@ -131,7 +147,7 @@ public func highwaySelectingByVectorF16(
     _ b: SIMD<Float16>,
     _ c: SIMD<Float16>
 ) -> SIMD<Float16> {
-    HighwayReference.Nothrow.selectingByVectorF16(a.raw, b.raw, c.raw)
+    SIMD<Float16>(raw: HighwayReference.Nothrow.selectingByVectorF16(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
@@ -139,7 +155,7 @@ public func portSelectingByVectorF16ConstantA(
     _ b: SIMD<Float16>,
     _ c: SIMD<Float16>
 ) -> SIMD<Float16> {
-    SIMDFloat16.selecting(SIMDFloat16.repeating(Float16(bitPattern: 26)), b, c)
+    SIMD<Float16>.selecting(SIMD<Float16>.repeating(Float16(bitPattern: 26)), b, c)
 }
 
 @inline(never)
@@ -147,10 +163,14 @@ public func highwaySelectingByVectorF16ConstantA(
     _ b: SIMD<Float16>,
     _ c: SIMD<Float16>
 ) -> SIMD<Float16> {
-    HighwayReference.Nothrow.selectingByVectorF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
-        b.raw,
-        c.raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.selectingByVectorF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
@@ -159,7 +179,7 @@ public func portSelectingByVectorF16ConstantB(
     _ a: SIMD<Float16>,
     _ c: SIMD<Float16>
 ) -> SIMD<Float16> {
-    SIMDFloat16.selecting(a, SIMDFloat16.repeating(Float16(bitPattern: 26)), c)
+    SIMD<Float16>.selecting(a, SIMD<Float16>.repeating(Float16(bitPattern: 26)), c)
 }
 
 @inline(never)
@@ -167,10 +187,14 @@ public func highwaySelectingByVectorF16ConstantB(
     _ a: SIMD<Float16>,
     _ c: SIMD<Float16>
 ) -> SIMD<Float16> {
-    HighwayReference.Nothrow.selectingByVectorF16(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
-        c.raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.selectingByVectorF16(
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            c.raw
+        )
     )
 }
 
@@ -179,7 +203,7 @@ public func portSelectingByVectorF16ConstantC(
     _ a: SIMD<Float16>,
     _ b: SIMD<Float16>
 ) -> SIMD<Float16> {
-    SIMDFloat16.selecting(a, b, SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    SIMD<Float16>.selecting(a, b, SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
@@ -187,10 +211,14 @@ public func highwaySelectingByVectorF16ConstantC(
     _ a: SIMD<Float16>,
     _ b: SIMD<Float16>
 ) -> SIMD<Float16> {
-    HighwayReference.Nothrow.selectingByVectorF16(
-        a.raw,
-        b.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.selectingByVectorF16(
+            a.raw,
+            b.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 #endif

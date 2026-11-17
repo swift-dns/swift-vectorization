@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDUInt16ReferenceTests {
     @Test func shiftedLeft() {
         let mismatches = Mismatches("shiftedLeft")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x55C7_17E1_AD13_4DA7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x55C7_17E1_AD13_4DA7)
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: true)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.shiftedLeft(a, by: bits),
-                H.Vector(raw: HighwayReference.shiftedLeftU16(a.raw, Int32(clamping: bits))),
+                H(raw: HighwayReference.shiftedLeftU16(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -28,12 +28,12 @@ extension SIMDUInt16ReferenceTests {
     )
     func shiftedLeftOutOfContract() {
         let mismatches = Mismatches("shiftedLeft out of contract")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAE67_596A_B9C9_DA7C)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAE67_596A_B9C9_DA7C)
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: false)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.shiftedLeft(a, by: bits),
-                H.Vector(raw: HighwayReference.shiftedLeftU16(a.raw, Int32(clamping: bits))),
+                H(raw: HighwayReference.shiftedLeftU16(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -42,12 +42,12 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func shiftedRight() {
         let mismatches = Mismatches("shiftedRight")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7616_0438_A20A_C9CA)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7616_0438_A20A_C9CA)
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: true)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.shiftedRight(a, by: bits),
-                H.Vector(raw: HighwayReference.shiftedRightU16(a.raw, Int32(clamping: bits))),
+                H(raw: HighwayReference.shiftedRightU16(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -62,12 +62,12 @@ extension SIMDUInt16ReferenceTests {
     )
     func shiftedRightOutOfContract() {
         let mismatches = Mismatches("shiftedRight out of contract")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x46CC_5EF1_23B4_8EE7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x46CC_5EF1_23B4_8EE7)
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: false)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.shiftedRight(a, by: bits),
-                H.Vector(raw: HighwayReference.shiftedRightU16(a.raw, Int32(clamping: bits))),
+                H(raw: HighwayReference.shiftedRightU16(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -76,16 +76,12 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func shiftedLeftBy() {
         let mismatches = Mismatches("shiftedLeftBy")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFF01_F960_2CA2_4832)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0xFF01_FA60_2CA2_49E5,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0xFF01_F960_2CA2_4832)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0xFF01_FA60_2CA2_49E5, inContract: true)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.shiftedLeft(a, by: b),
-                H.Vector(raw: HighwayReference.shiftedLeftByU16(a.raw, b.raw)),
+                H(raw: HighwayReference.shiftedLeftByU16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -100,16 +96,12 @@ extension SIMDUInt16ReferenceTests {
     )
     func shiftedLeftByOutOfContract() {
         let mismatches = Mismatches("shiftedLeftBy out of contract")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8CDC_34A8_CA8A_E03F)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x8CDC_33A8_CA8A_DE8C,
-            inContract: false
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x8CDC_34A8_CA8A_E03F)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x8CDC_33A8_CA8A_DE8C, inContract: false)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.shiftedLeft(a, by: b),
-                H.Vector(raw: HighwayReference.shiftedLeftByU16(a.raw, b.raw)),
+                H(raw: HighwayReference.shiftedLeftByU16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -118,16 +110,12 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func shiftedRightBy() {
         let mismatches = Mismatches("shiftedRightBy")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x93B1_D6B4_0DF3_2963)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x93B1_D5B4_0DF3_27B0,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x93B1_D6B4_0DF3_2963)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x93B1_D5B4_0DF3_27B0, inContract: true)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.shiftedRight(a, by: b),
-                H.Vector(raw: HighwayReference.shiftedRightByU16(a.raw, b.raw)),
+                H(raw: HighwayReference.shiftedRightByU16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -142,16 +130,12 @@ extension SIMDUInt16ReferenceTests {
     )
     func shiftedRightByOutOfContract() {
         let mismatches = Mismatches("shiftedRightBy out of contract")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1013_5411_87B6_8F38)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x1013_5511_87B6_90EB,
-            inContract: false
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x1013_5411_87B6_8F38)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x1013_5511_87B6_90EB, inContract: false)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.shiftedRight(a, by: b),
-                H.Vector(raw: HighwayReference.shiftedRightByU16(a.raw, b.raw)),
+                H(raw: HighwayReference.shiftedRightByU16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -160,16 +144,12 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func roundingShiftedRightBy() {
         let mismatches = Mismatches("roundingShiftedRightBy")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCDF9_6E2B_F098_4073)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0xCDF9_6D2B_F098_3EC0,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0xCDF9_6E2B_F098_4073)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0xCDF9_6D2B_F098_3EC0, inContract: true)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.roundingShiftedRight(a, by: b),
-                H.Vector(raw: HighwayReference.roundingShiftedRightByU16(a.raw, b.raw)),
+                H(raw: HighwayReference.roundingShiftedRightByU16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -184,16 +164,12 @@ extension SIMDUInt16ReferenceTests {
     )
     func roundingShiftedRightByOutOfContract() {
         let mismatches = Mismatches("roundingShiftedRightBy out of contract")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x307D_C2C4_440F_E788)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x307D_C3C4_440F_E93B,
-            inContract: false
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x307D_C2C4_440F_E788)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x307D_C3C4_440F_E93B, inContract: false)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.roundingShiftedRight(a, by: b),
-                H.Vector(raw: HighwayReference.roundingShiftedRightByU16(a.raw, b.raw)),
+                H(raw: HighwayReference.roundingShiftedRightByU16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -202,14 +178,12 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func roundingShiftedRight() {
         let mismatches = Mismatches("roundingShiftedRight")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCDC9_F090_8833_233A)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCDC9_F090_8833_233A)
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: true)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.roundingShiftedRight(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.roundingShiftedRightU16(a.raw, Int32(clamping: bits))
-                ),
+                H(raw: HighwayReference.roundingShiftedRightU16(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -224,14 +198,12 @@ extension SIMDUInt16ReferenceTests {
     )
     func roundingShiftedRightOutOfContract() {
         let mismatches = Mismatches("roundingShiftedRight out of contract")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x813A_3879_DFB7_BDD7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x813A_3879_DFB7_BDD7)
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: false)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.roundingShiftedRight(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.roundingShiftedRightU16(a.raw, Int32(clamping: bits))
-                ),
+                H(raw: HighwayReference.roundingShiftedRightU16(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -240,16 +212,12 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func rotatedLeftBy() {
         let mismatches = Mismatches("rotatedLeftBy")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7AAE_73D1_F319_4A36)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x7AAE_74D1_F319_4BE9,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x7AAE_73D1_F319_4A36)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x7AAE_74D1_F319_4BE9, inContract: true)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.rotatedLeft(a, by: b),
-                H.Vector(raw: HighwayReference.rotatedLeftByU16(a.raw, b.raw)),
+                H(raw: HighwayReference.rotatedLeftByU16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -264,16 +232,12 @@ extension SIMDUInt16ReferenceTests {
     )
     func rotatedLeftByOutOfContract() {
         let mismatches = Mismatches("rotatedLeftBy out of contract")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7ED2_F187_C145_B123)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x7ED2_F087_C145_AF70,
-            inContract: false
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x7ED2_F187_C145_B123)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x7ED2_F087_C145_AF70, inContract: false)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.rotatedLeft(a, by: b),
-                H.Vector(raw: HighwayReference.rotatedLeftByU16(a.raw, b.raw)),
+                H(raw: HighwayReference.rotatedLeftByU16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -282,16 +246,12 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func rotatedRightBy() {
         let mismatches = Mismatches("rotatedRightBy")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9F61_54D3_F75C_EA3F)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x9F61_53D3_F75C_E88C,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x9F61_54D3_F75C_EA3F)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x9F61_53D3_F75C_E88C, inContract: true)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.rotatedRight(a, by: b),
-                H.Vector(raw: HighwayReference.rotatedRightByU16(a.raw, b.raw)),
+                H(raw: HighwayReference.rotatedRightByU16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -306,16 +266,12 @@ extension SIMDUInt16ReferenceTests {
     )
     func rotatedRightByOutOfContract() {
         let mismatches = Mismatches("rotatedRightBy out of contract")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0E2F_EBED_0A09_7364)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x0E2F_ECED_0A09_7517,
-            inContract: false
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x0E2F_EBED_0A09_7364)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x0E2F_ECED_0A09_7517, inContract: false)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.rotatedRight(a, by: b),
-                H.Vector(raw: HighwayReference.rotatedRightByU16(a.raw, b.raw)),
+                H(raw: HighwayReference.rotatedRightByU16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -324,12 +280,12 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func rotatedLeft() {
         let mismatches = Mismatches("rotatedLeft")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE1D1_F2F9_61EA_79BB)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE1D1_F2F9_61EA_79BB)
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: true)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.rotatedLeft(a, by: bits),
-                H.Vector(raw: HighwayReference.rotatedLeftU16(a.raw, Int32(clamping: bits))),
+                H(raw: HighwayReference.rotatedLeftU16(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -344,12 +300,12 @@ extension SIMDUInt16ReferenceTests {
     )
     func rotatedLeftOutOfContract() {
         let mismatches = Mismatches("rotatedLeft out of contract")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC60E_331B_09A5_BD40)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC60E_331B_09A5_BD40)
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: false)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.rotatedLeft(a, by: bits),
-                H.Vector(raw: HighwayReference.rotatedLeftU16(a.raw, Int32(clamping: bits))),
+                H(raw: HighwayReference.rotatedLeftU16(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -358,12 +314,12 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func rotatedRight() {
         let mismatches = Mismatches("rotatedRight")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB5EE_F037_1B4C_B6C6)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB5EE_F037_1B4C_B6C6)
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: true)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.rotatedRight(a, by: bits),
-                H.Vector(raw: HighwayReference.rotatedRightU16(a.raw, Int32(clamping: bits))),
+                H(raw: HighwayReference.rotatedRightU16(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -378,12 +334,12 @@ extension SIMDUInt16ReferenceTests {
     )
     func rotatedRightOutOfContract() {
         let mismatches = Mismatches("rotatedRight out of contract")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF4D9_777F_C2B3_CA73)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF4D9_777F_C2B3_CA73)
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: false)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.rotatedRight(a, by: bits),
-                H.Vector(raw: HighwayReference.rotatedRightU16(a.raw, Int32(clamping: bits))),
+                H(raw: HighwayReference.rotatedRightU16(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }

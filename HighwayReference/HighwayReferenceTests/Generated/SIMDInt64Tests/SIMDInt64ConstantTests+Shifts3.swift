@@ -9,13 +9,11 @@ extension SIMDInt64ConstantTests {
     @inline(__always)
     private func checkRotatedLeftConstantBits(_ bits: Int) {
         let mismatches = Mismatches("rotatedLeft with bits \(bits)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE8B6_D639_1C7F_6B10)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE8B6_D639_1C7F_6B10)
         for a in aInputs {
             mismatches.check(
                 H.rotatedLeft(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.rotatedLeftTemplateI64(a.raw, Int32(clamping: bits))
-                ),
+                H(raw: HighwayReference.rotatedLeftTemplateI64(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a))"
             )
         }
@@ -279,18 +277,18 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkRotatedLeftConstantA(_ value: H.Lane) {
+    private func checkRotatedLeftConstantA(_ value: Lane) {
         let mismatches = Mismatches("rotatedLeft with a repeating \(hex(value))")
         let bitsInputs = Inputs.shiftAmounts(bits: 64, inContract: true)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for bits in bitsInputs {
             mismatches.check(
                 H.rotatedLeft(H.repeating(value), by: bits),
-                H.Vector(
+                H(
                     raw: HighwayReference.rotatedLeftI64(
                         H.repeating(value).raw,
                         Int32(clamping: bits)
@@ -371,23 +369,21 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func rotatedLeftConstantSplatMax() {
-        checkRotatedLeftConstantA(H.Lane.max)
+        checkRotatedLeftConstantA(Lane.max)
     }
 
     @Test func rotatedLeftConstantSplatMin() {
-        checkRotatedLeftConstantA(H.Lane.min)
+        checkRotatedLeftConstantA(Lane.min)
     }
 
     @inline(__always)
     private func checkRotatedRightConstantBits(_ bits: Int) {
         let mismatches = Mismatches("rotatedRight with bits \(bits)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB77C_7902_7230_7353)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB77C_7902_7230_7353)
         for a in aInputs {
             mismatches.check(
                 H.rotatedRight(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.rotatedRightTemplateI64(a.raw, Int32(clamping: bits))
-                ),
+                H(raw: HighwayReference.rotatedRightTemplateI64(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a))"
             )
         }
@@ -651,18 +647,18 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkRotatedRightConstantA(_ value: H.Lane) {
+    private func checkRotatedRightConstantA(_ value: Lane) {
         let mismatches = Mismatches("rotatedRight with a repeating \(hex(value))")
         let bitsInputs = Inputs.shiftAmounts(bits: 64, inContract: true)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for bits in bitsInputs {
             mismatches.check(
                 H.rotatedRight(H.repeating(value), by: bits),
-                H.Vector(
+                H(
                     raw: HighwayReference.rotatedRightI64(
                         H.repeating(value).raw,
                         Int32(clamping: bits)
@@ -743,10 +739,10 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func rotatedRightConstantSplatMax() {
-        checkRotatedRightConstantA(H.Lane.max)
+        checkRotatedRightConstantA(Lane.max)
     }
 
     @Test func rotatedRightConstantSplatMin() {
-        checkRotatedRightConstantA(H.Lane.min)
+        checkRotatedRightConstantA(Lane.min)
     }
 }

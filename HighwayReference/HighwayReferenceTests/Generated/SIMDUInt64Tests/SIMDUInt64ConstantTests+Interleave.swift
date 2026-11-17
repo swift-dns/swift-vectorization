@@ -7,18 +7,18 @@ import Vectorization
 
 extension SIMDUInt64ConstantTests {
     @inline(__always)
-    private func checkInterleavingLowerConstantA(_ value: H.Lane) {
+    private func checkInterleavingLowerConstantA(_ value: Lane) {
         let mismatches = Mismatches("interleavingLower with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7D47_8425_10D0_7853)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7D47_8425_10D0_7853)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.interleavingLower(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.interleavingLowerU64(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.interleavingLowerU64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -26,18 +26,18 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkInterleavingLowerConstantB(_ value: H.Lane) {
+    private func checkInterleavingLowerConstantB(_ value: Lane) {
         let mismatches = Mismatches("interleavingLower with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8649_3A25_1603_5115)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8649_3A25_1603_5115)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.interleavingLower(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.interleavingLowerU64(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.interleavingLowerU64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -105,23 +105,23 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func interleavingLowerConstantSplatMax() {
-        checkInterleavingLowerConstantA(H.Lane.max)
-        checkInterleavingLowerConstantB(H.Lane.max)
+        checkInterleavingLowerConstantA(Lane.max)
+        checkInterleavingLowerConstantB(Lane.max)
     }
 
     @inline(__always)
-    private func checkInterleavingUpperConstantA(_ value: H.Lane) {
+    private func checkInterleavingUpperConstantA(_ value: Lane) {
         let mismatches = Mismatches("interleavingUpper with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE184_B5BF_C404_9838)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE184_B5BF_C404_9838)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.interleavingUpper(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.interleavingUpperU64(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.interleavingUpperU64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -129,18 +129,18 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkInterleavingUpperConstantB(_ value: H.Lane) {
+    private func checkInterleavingUpperConstantB(_ value: Lane) {
         let mismatches = Mismatches("interleavingUpper with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFC8A_3BBF_D39D_CC6A)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFC8A_3BBF_D39D_CC6A)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.interleavingUpper(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.interleavingUpperU64(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.interleavingUpperU64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -208,23 +208,23 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func interleavingUpperConstantSplatMax() {
-        checkInterleavingUpperConstantA(H.Lane.max)
-        checkInterleavingUpperConstantB(H.Lane.max)
+        checkInterleavingUpperConstantA(Lane.max)
+        checkInterleavingUpperConstantB(Lane.max)
     }
 
     @inline(__always)
-    private func checkInterleavingEvenConstantA(_ value: H.Lane) {
+    private func checkInterleavingEvenConstantA(_ value: Lane) {
         let mismatches = Mismatches("interleavingEven with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6C28_CEEA_6AD4_B156)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6C28_CEEA_6AD4_B156)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.interleavingEven(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.interleavingEvenU64(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.interleavingEvenU64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -232,18 +232,18 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkInterleavingEvenConstantB(_ value: H.Lane) {
+    private func checkInterleavingEvenConstantB(_ value: Lane) {
         let mismatches = Mismatches("interleavingEven with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x646D_38EA_66B6_D194)
+        let aInputs = Inputs.vectors(H.self, seed: 0x646D_38EA_66B6_D194)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.interleavingEven(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.interleavingEvenU64(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.interleavingEvenU64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -311,23 +311,23 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func interleavingEvenConstantSplatMax() {
-        checkInterleavingEvenConstantA(H.Lane.max)
-        checkInterleavingEvenConstantB(H.Lane.max)
+        checkInterleavingEvenConstantA(Lane.max)
+        checkInterleavingEvenConstantB(Lane.max)
     }
 
     @inline(__always)
-    private func checkInterleavingOddConstantA(_ value: H.Lane) {
+    private func checkInterleavingOddConstantA(_ value: Lane) {
         let mismatches = Mismatches("interleavingOdd with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3393_0299_5C96_F3C7)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3393_0299_5C96_F3C7)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.interleavingOdd(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.interleavingOddU64(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.interleavingOddU64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -335,18 +335,18 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkInterleavingOddConstantB(_ value: H.Lane) {
+    private func checkInterleavingOddConstantB(_ value: Lane) {
         let mismatches = Mismatches("interleavingOdd with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3B4E_9899_60B4_D389)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3B4E_9899_60B4_D389)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.interleavingOdd(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.interleavingOddU64(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.interleavingOddU64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -414,7 +414,7 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func interleavingOddConstantSplatMax() {
-        checkInterleavingOddConstantA(H.Lane.max)
-        checkInterleavingOddConstantB(H.Lane.max)
+        checkInterleavingOddConstantA(Lane.max)
+        checkInterleavingOddConstantB(Lane.max)
     }
 }

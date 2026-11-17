@@ -60,6 +60,6 @@ extension Inputs {
 
     package static func floatDemotions<V: ReferenceVector>(_ type: V.Type, seed: UInt64) -> [V]
     where V.Simd.Scalar: DemotionLane {
-        floatDemotions(V.Simd.self, seed: seed).map(V.init)
+        floatDemotions(V.Simd.self, seed: seed).map { V(referenceSimd: $0) }
     }
 }

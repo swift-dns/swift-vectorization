@@ -19,7 +19,7 @@ extension SIMDInt16CodegenTests {
 
     @Test func extractingBlockConstantIndex() {
         let mismatches = Mismatches("portExtractingBlockI16ConstantIndex")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8FE6_BA26_5DDB_0FA3)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8FE6_BA26_5DDB_0FA3)
         for a in aInputs {
             mismatches.check(
                 portExtractingBlockI16ConstantIndex(a),
@@ -47,7 +47,7 @@ extension SIMDInt16CodegenTests {
 
     @Test func replacingBlockConstantIndex() {
         let mismatches = Mismatches("portReplacingBlockI16ConstantIndex")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE0AC_00C7_297D_855F)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE0AC_00C7_297D_855F)
         let bInputs = Inputs.vectors(H.BlockVector.self, seed: 0xE0AC_02C7_297D_88C5).map(
             poisoningUpperBytes
         )

@@ -8,9 +8,9 @@ import Vectorization
 extension SIMDBFloat16ReferenceTests {
     @Test func replacingLane() {
         let mismatches = Mismatches("replacingLane")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x36C6_E302_5E5B_8FD7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x36C6_E302_5E5B_8FD7)
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x36C6_E502_5E5B_933D)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x36C6_E502_5E5B_933D)
         for (a, index, value) in mixedTriples(
             aInputs,
             indexInputs,
@@ -19,7 +19,7 @@ extension SIMDBFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.replacingLane(a, at: index, with: value),
-                H.Vector(raw: HighwayReference.replacingLaneBF16(a.raw, index, value.bitPattern)),
+                H(raw: HighwayReference.replacingLaneBF16(a.raw, index, value.bitPattern)),
                 "a: \(describe(a)), index: \(index), value: \(hex(value))"
             )
         }
@@ -28,9 +28,9 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func replacingLaneUnchecked() {
         let mismatches = Mismatches("replacingLane unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB0AB_B4D4_DFB8_A81B)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB0AB_B4D4_DFB8_A81B)
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xB0AB_B6D4_DFB8_AB81)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xB0AB_B6D4_DFB8_AB81)
         for (a, index, value) in mixedTriples(
             aInputs,
             indexInputs,
@@ -39,7 +39,7 @@ extension SIMDBFloat16ReferenceTests {
         ) {
             mismatches.check(
                 unsafe H.replacingLane(a, atUnchecked: index, with: value),
-                H.Vector(raw: HighwayReference.replacingLaneBF16(a.raw, index, value.bitPattern)),
+                H(raw: HighwayReference.replacingLaneBF16(a.raw, index, value.bitPattern)),
                 "a: \(describe(a)), index: \(index), value: \(hex(value))"
             )
         }

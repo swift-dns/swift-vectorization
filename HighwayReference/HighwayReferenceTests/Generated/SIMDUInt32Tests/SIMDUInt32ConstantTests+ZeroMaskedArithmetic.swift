@@ -7,24 +7,24 @@ import Vectorization
 
 extension SIMDUInt32ConstantTests {
     @inline(__always)
-    private func checkMultiplyPairwiseAddingWhereFromUInt16ConstantA(_ value: SIMDUInt16.Lane) {
+    private func checkMultiplyPairwiseAddingWhereFromUInt16ConstantA(_ value: UInt16) {
         let mismatches = Mismatches(
             "multiplyPairwiseAddingWhereFromUInt16 with a repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xDBC3_24B5_3E97_D9EF)
-        let bInputs = Inputs.conversions(SIMDUInt16.Vector.self, seed: 0xDBC3_26B5_3E97_DD55)
+        let bInputs = Inputs.conversions(SIMD<UInt16>.self, seed: 0xDBC3_26B5_3E97_DD55)
         mismatches.check(
-            SIMDUInt16.repeating(value),
-            SIMDUInt16.Vector(raw: HighwayReference.repeatingU16(value)),
+            SIMD<UInt16>.repeating(value),
+            SIMD<UInt16>(raw: HighwayReference.repeatingU16(value)),
             "repeating"
         )
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
-                H.multiplyPairwiseAdding(SIMDUInt16.repeating(value), b, where: mask),
-                H.Vector(
+                H.multiplyPairwiseAdding(SIMD<UInt16>.repeating(value), b, where: mask),
+                H(
                     raw: HighwayReference.multiplyPairwiseAddingWhereU16ToU32(
                         mask.raw,
-                        SIMDUInt16.repeating(value).raw,
+                        SIMD<UInt16>.repeating(value).raw,
                         b.raw
                     )
                 ),
@@ -35,25 +35,25 @@ extension SIMDUInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyPairwiseAddingWhereFromUInt16ConstantB(_ value: SIMDUInt16.Lane) {
+    private func checkMultiplyPairwiseAddingWhereFromUInt16ConstantB(_ value: UInt16) {
         let mismatches = Mismatches(
             "multiplyPairwiseAddingWhereFromUInt16 with b repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF6C8_A9B5_4E31_0C6E)
-        let aInputs = Inputs.conversions(SIMDUInt16.Vector.self, seed: 0xF6C8_AAB5_4E31_0E21)
+        let aInputs = Inputs.conversions(SIMD<UInt16>.self, seed: 0xF6C8_AAB5_4E31_0E21)
         mismatches.check(
-            SIMDUInt16.repeating(value),
-            SIMDUInt16.Vector(raw: HighwayReference.repeatingU16(value)),
+            SIMD<UInt16>.repeating(value),
+            SIMD<UInt16>(raw: HighwayReference.repeatingU16(value)),
             "repeating"
         )
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
-                H.multiplyPairwiseAdding(a, SIMDUInt16.repeating(value), where: mask),
-                H.Vector(
+                H.multiplyPairwiseAdding(a, SIMD<UInt16>.repeating(value), where: mask),
+                H(
                     raw: HighwayReference.multiplyPairwiseAddingWhereU16ToU32(
                         mask.raw,
                         a.raw,
-                        SIMDUInt16.repeating(value).raw
+                        SIMD<UInt16>.repeating(value).raw
                     )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a))"
@@ -123,7 +123,7 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func multiplyPairwiseAddingWhereFromUInt16ConstantSplatMax() {
-        checkMultiplyPairwiseAddingWhereFromUInt16ConstantA(SIMDUInt16.Lane.max)
-        checkMultiplyPairwiseAddingWhereFromUInt16ConstantB(SIMDUInt16.Lane.max)
+        checkMultiplyPairwiseAddingWhereFromUInt16ConstantA(UInt16.max)
+        checkMultiplyPairwiseAddingWhereFromUInt16ConstantB(UInt16.max)
     }
 }

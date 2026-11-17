@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDInt16CodegenTests {
     @Test func vectorZeroExtendingResizingFromBFloat16() {
         let mismatches = Mismatches("portVectorZeroExtendingResizingBF16ToI16")
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0xE708_DA82_8CD2_95AC)
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0xE708_DA82_8CD2_95AC)
         for a in aInputs {
             mismatches.check(
                 portVectorZeroExtendingResizingBF16ToI16(zeroExtendingResizing: a),
@@ -32,7 +32,7 @@ extension SIMDInt16CodegenTests {
 
     @Test func halfVectorZeroExtendingResizingFromBFloat16() {
         let mismatches = Mismatches("portHalfVectorZeroExtendingResizingBF16ToI16")
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0xDBA1_DAEB_675E_D62F)
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0xDBA1_DAEB_675E_D62F)
         for a in aInputs {
             mismatches.check(
                 portHalfVectorZeroExtendingResizingBF16ToI16(zeroExtendingResizing: a),
@@ -55,7 +55,7 @@ extension SIMDInt16CodegenTests {
 
     @Test func quarterVectorZeroExtendingResizingFromBFloat16() {
         let mismatches = Mismatches("portQuarterVectorZeroExtendingResizingBF16ToI16")
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x8890_1E69_D63A_E9A0)
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x8890_1E69_D63A_E9A0)
         for a in aInputs {
             mismatches.check(
                 portQuarterVectorZeroExtendingResizingBF16ToI16(zeroExtendingResizing: a),
@@ -78,8 +78,10 @@ extension SIMDInt16CodegenTests {
 
     @Test func vectorZeroExtendingResizingFromHalfBFloat16() {
         let mismatches = Mismatches("portVectorZeroExtendingResizingHalfBF16ToI16")
-        let aInputs = Inputs.conversions(SIMDBFloat16.HalfVector.self, seed: 0x9669_6E68_E45F_A0BD)
-            .map(poisoningUpperBytes)
+        let aInputs = Inputs.conversions(
+            SIMD<BFloat16>.HalfVector.self,
+            seed: 0x9669_6E68_E45F_A0BD
+        ).map(poisoningUpperBytes)
         for a in aInputs {
             mismatches.check(
                 portVectorZeroExtendingResizingHalfBF16ToI16(zeroExtendingResizing: a),
@@ -92,8 +94,10 @@ extension SIMDInt16CodegenTests {
 
     @Test func halfVectorZeroExtendingResizingFromHalfBFloat16() {
         let mismatches = Mismatches("portHalfVectorZeroExtendingResizingHalfBF16ToI16")
-        let aInputs = Inputs.conversions(SIMDBFloat16.HalfVector.self, seed: 0x0454_BED6_8428_51A2)
-            .map(poisoningUpperBytes)
+        let aInputs = Inputs.conversions(
+            SIMD<BFloat16>.HalfVector.self,
+            seed: 0x0454_BED6_8428_51A2
+        ).map(poisoningUpperBytes)
         for a in aInputs {
             mismatches.check(
                 portHalfVectorZeroExtendingResizingHalfBF16ToI16(zeroExtendingResizing: a),
@@ -106,8 +110,10 @@ extension SIMDInt16CodegenTests {
 
     @Test func quarterVectorZeroExtendingResizingFromHalfBFloat16() {
         let mismatches = Mismatches("portQuarterVectorZeroExtendingResizingHalfBF16ToI16")
-        let aInputs = Inputs.conversions(SIMDBFloat16.HalfVector.self, seed: 0x142E_B0F8_1D87_95F1)
-            .map(poisoningUpperBytes)
+        let aInputs = Inputs.conversions(
+            SIMD<BFloat16>.HalfVector.self,
+            seed: 0x142E_B0F8_1D87_95F1
+        ).map(poisoningUpperBytes)
         for a in aInputs {
             mismatches.check(
                 portQuarterVectorZeroExtendingResizingHalfBF16ToI16(zeroExtendingResizing: a),
@@ -121,7 +127,7 @@ extension SIMDInt16CodegenTests {
     @Test func vectorZeroExtendingResizingFromQuarterBFloat16() {
         let mismatches = Mismatches("portVectorZeroExtendingResizingQuarterBF16ToI16")
         let aInputs = Inputs.conversions(
-            SIMDBFloat16.QuarterVector.self,
+            SIMD<BFloat16>.QuarterVector.self,
             seed: 0x6FBD_445D_C9AB_2100
         ).map(poisoningUpperBytes)
         for a in aInputs {
@@ -137,7 +143,7 @@ extension SIMDInt16CodegenTests {
     @Test func halfVectorZeroExtendingResizingFromQuarterBFloat16() {
         let mismatches = Mismatches("portHalfVectorZeroExtendingResizingQuarterBF16ToI16")
         let aInputs = Inputs.conversions(
-            SIMDBFloat16.QuarterVector.self,
+            SIMD<BFloat16>.QuarterVector.self,
             seed: 0x01C8_D743_537C_C8C1
         ).map(poisoningUpperBytes)
         for a in aInputs {
@@ -153,7 +159,7 @@ extension SIMDInt16CodegenTests {
     @Test func quarterVectorZeroExtendingResizingFromQuarterBFloat16() {
         let mismatches = Mismatches("portQuarterVectorZeroExtendingResizingQuarterBF16ToI16")
         let aInputs = Inputs.conversions(
-            SIMDBFloat16.QuarterVector.self,
+            SIMD<BFloat16>.QuarterVector.self,
             seed: 0xFC31_382A_68CF_4514
         ).map(poisoningUpperBytes)
         for a in aInputs {
@@ -169,7 +175,7 @@ extension SIMDInt16CodegenTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func vectorConvertingFromFloat16() {
         let mismatches = Mismatches("portVectorConvertingF16ToI16")
-        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0xA540_051C_ACC2_2DD4)
+        let aInputs = Inputs.conversions(SIMD<Float16>.self, seed: 0xA540_051C_ACC2_2DD4)
         for a in aInputs {
             mismatches.check(
                 portVectorConvertingF16ToI16(converting: a),
@@ -196,7 +202,7 @@ extension SIMDInt16CodegenTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func vectorConvertingInRangeFromFloat16() {
         let mismatches = Mismatches("portVectorConvertingInRangeF16ToI16")
-        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0x4C2F_938E_B337_50CC)
+        let aInputs = Inputs.conversions(SIMD<Float16>.self, seed: 0x4C2F_938E_B337_50CC)
         for a in aInputs {
             mismatches.check(
                 portVectorConvertingInRangeF16ToI16(convertingInRange: a),
@@ -223,7 +229,7 @@ extension SIMDInt16CodegenTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func vectorRoundingToNearestOrEvenFromFloat16() {
         let mismatches = Mismatches("portVectorRoundingToNearestOrEvenF16ToI16")
-        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0x4E8E_5D26_715A_E051)
+        let aInputs = Inputs.conversions(SIMD<Float16>.self, seed: 0x4E8E_5D26_715A_E051)
         for a in aInputs {
             mismatches.check(
                 portVectorRoundingToNearestOrEvenF16ToI16(roundingToNearestOrEven: a),
@@ -250,7 +256,7 @@ extension SIMDInt16CodegenTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func vectorRoundingUpFromFloat16() {
         let mismatches = Mismatches("portVectorRoundingUpF16ToI16")
-        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0x9AE9_8A06_5207_97E4)
+        let aInputs = Inputs.conversions(SIMD<Float16>.self, seed: 0x9AE9_8A06_5207_97E4)
         for a in aInputs {
             mismatches.check(
                 portVectorRoundingUpF16ToI16(roundingUp: a),
@@ -277,7 +283,7 @@ extension SIMDInt16CodegenTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func vectorRoundingDownFromFloat16() {
         let mismatches = Mismatches("portVectorRoundingDownF16ToI16")
-        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0xEA63_E2C0_D6D3_3457)
+        let aInputs = Inputs.conversions(SIMD<Float16>.self, seed: 0xEA63_E2C0_D6D3_3457)
         for a in aInputs {
             mismatches.check(
                 portVectorRoundingDownF16ToI16(roundingDown: a),
@@ -305,7 +311,7 @@ extension SIMDInt16CodegenTests {
     @Test func vectorConvertingWhereFromFloat16() {
         let mismatches = Mismatches("portVectorConvertingWhereF16ToI16")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC2F6_9F92_24EE_2D55)
-        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0xC2F6_9E92_24EE_2BA2)
+        let aInputs = Inputs.conversions(SIMD<Float16>.self, seed: 0xC2F6_9E92_24EE_2BA2)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portVectorConvertingWhereF16ToI16(converting: a, where: mask),

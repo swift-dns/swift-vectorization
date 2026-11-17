@@ -7,9 +7,13 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
-    private func checkFirstLaneConstantA(_ value: H.Lane) {
+    private func checkFirstLaneConstantA(_ value: Lane) {
         let mismatches = Mismatches("firstLane with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         mismatches.check(
             H.firstLane(H.repeating(value)),
             HighwayReference.firstLaneF64(H.repeating(value).raw),
@@ -75,7 +79,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func firstLaneConstantSplatPayloadNaN() {
-        checkFirstLaneConstantA(H.Lane(nan: 1, signaling: false))
+        checkFirstLaneConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func firstLaneConstantSplatSignalingNaN() {
@@ -97,7 +101,7 @@ extension SIMDDoubleConstantTests {
     @inline(__always)
     private func checkLaneConstantIndex(_ index: Int) {
         let mismatches = Mismatches("lane with index \(index)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3964_3D45_439C_149D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3964_3D45_439C_149D)
         for a in aInputs {
             mismatches.check(
                 H.lane(a, at: index),
@@ -141,10 +145,14 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkLaneConstantA(_ value: H.Lane) {
+    private func checkLaneConstantA(_ value: Lane) {
         let mismatches = Mismatches("lane with a repeating \(hex(value))")
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for index in indexInputs {
             mismatches.check(
                 H.lane(H.repeating(value), at: index),
@@ -212,7 +220,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func laneConstantSplatPayloadNaN() {
-        checkLaneConstantA(H.Lane(nan: 1, signaling: false))
+        checkLaneConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func laneConstantSplatSignalingNaN() {
@@ -232,15 +240,19 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkReplacingLaneConstantA(_ value: H.Lane) {
+    private func checkReplacingLaneConstantA(_ value: Lane) {
         let mismatches = Mismatches("replacingLane with a repeating \(hex(value))")
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xF7FD_A26D_3211_19C1)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xF7FD_A26D_3211_19C1)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (index, value) in everyPair(indexInputs, valueInputs) {
             mismatches.check(
                 H.replacingLane(H.repeating(value), at: index, with: value),
-                HighwayReference.replacingLaneF64(H.repeating(value).raw, index, value),
+                H(raw: HighwayReference.replacingLaneF64(H.repeating(value).raw, index, value)),
                 "index: \(index), value: \(hex(value))"
             )
         }
@@ -304,7 +316,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func replacingLaneConstantSplatPayloadNaN() {
-        checkReplacingLaneConstantA(H.Lane(nan: 1, signaling: false))
+        checkReplacingLaneConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func replacingLaneConstantSplatSignalingNaN() {

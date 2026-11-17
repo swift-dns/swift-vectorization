@@ -5,25 +5,25 @@ public import Vectorization
 
 @inline(never)
 public func portGatherI32(from: UnsafePointer<Int32>, indices: SIMD<Int32>) -> SIMD<Int32> {
-    unsafe SIMDInt32.gather(from: from, indices: indices)
+    unsafe SIMD<Int32>.gather(from: from, indices: indices)
 }
 
 @inline(never)
 public func highwayGatherI32(from: UnsafePointer<Int32>, indices: SIMD<Int32>) -> SIMD<Int32> {
-    unsafe SIMDInt32.Vector(raw: HighwayReference.Nothrow.gatherI32(from, indices.raw))
+    unsafe SIMD<Int32>(raw: HighwayReference.Nothrow.gatherI32(from, indices.raw))
 }
 
 @inline(never)
 public func portGatherI32ConstantIndices(from: UnsafePointer<Int32>) -> SIMD<Int32> {
-    unsafe SIMDInt32.gather(from: from, indices: SIMDInt32.repeating(1))
+    unsafe SIMD<Int32>.gather(from: from, indices: SIMD<Int32>.repeating(1))
 }
 
 @inline(never)
 public func highwayGatherI32ConstantIndices(from: UnsafePointer<Int32>) -> SIMD<Int32> {
-    unsafe SIMDInt32.Vector(
+    unsafe SIMD<Int32>(
         raw: HighwayReference.Nothrow.gatherI32(
             from,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
         )
     )
 }
@@ -33,7 +33,7 @@ public func portGatherByteOffsetsI32(
     from: UnsafePointer<Int32>,
     byteOffsets: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.gather(from: from, byteOffsets: byteOffsets)
+    unsafe SIMD<Int32>.gather(from: from, byteOffsets: byteOffsets)
 }
 
 @inline(never)
@@ -41,24 +41,22 @@ public func highwayGatherByteOffsetsI32(
     from: UnsafePointer<Int32>,
     byteOffsets: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.Vector(
-        raw: HighwayReference.Nothrow.gatherByteOffsetsI32(from, byteOffsets.raw)
-    )
+    unsafe SIMD<Int32>(raw: HighwayReference.Nothrow.gatherByteOffsetsI32(from, byteOffsets.raw))
 }
 
 @inline(never)
 public func portGatherByteOffsetsI32ConstantByteOffsets(from: UnsafePointer<Int32>) -> SIMD<Int32> {
-    unsafe SIMDInt32.gather(from: from, byteOffsets: SIMDInt32.repeating(1))
+    unsafe SIMD<Int32>.gather(from: from, byteOffsets: SIMD<Int32>.repeating(1))
 }
 
 @inline(never)
 public func highwayGatherByteOffsetsI32ConstantByteOffsets(
     from: UnsafePointer<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.Vector(
+    unsafe SIMD<Int32>(
         raw: HighwayReference.Nothrow.gatherByteOffsetsI32(
             from,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
         )
     )
 }
@@ -69,7 +67,7 @@ public func portGatherFirstI32(
     indices: SIMD<Int32>,
     count: Int
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.gather(from: from, indices: indices, count: count)
+    unsafe SIMD<Int32>.gather(from: from, indices: indices, count: count)
 }
 
 @inline(never)
@@ -78,13 +76,13 @@ public func highwayGatherFirstI32(
     indices: SIMD<Int32>,
     count: Int
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.Vector(raw: HighwayReference.Nothrow.gatherFirstI32(from, indices.raw, count))
+    unsafe SIMD<Int32>(raw: HighwayReference.Nothrow.gatherFirstI32(from, indices.raw, count))
 }
 
 @inline(never)
 public func portGatherFirstI32ConstantIndices(from: UnsafePointer<Int32>, count: Int) -> SIMD<Int32>
 {
-    unsafe SIMDInt32.gather(from: from, indices: SIMDInt32.repeating(1), count: count)
+    unsafe SIMD<Int32>.gather(from: from, indices: SIMD<Int32>.repeating(1), count: count)
 }
 
 @inline(never)
@@ -92,10 +90,10 @@ public func highwayGatherFirstI32ConstantIndices(
     from: UnsafePointer<Int32>,
     count: Int
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.Vector(
+    unsafe SIMD<Int32>(
         raw: HighwayReference.Nothrow.gatherFirstI32(
             from,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(1)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(1)).raw,
             count
         )
     )
@@ -106,7 +104,7 @@ public func portGatherFirstI32ConstantCount(
     from: UnsafePointer<Int32>,
     indices: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.gather(from: from, indices: indices, count: 1)
+    unsafe SIMD<Int32>.gather(from: from, indices: indices, count: 1)
 }
 
 @inline(never)
@@ -114,7 +112,7 @@ public func highwayGatherFirstI32ConstantCount(
     from: UnsafePointer<Int32>,
     indices: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.Vector(raw: HighwayReference.Nothrow.gatherFirstI32(from, indices.raw, 1))
+    unsafe SIMD<Int32>(raw: HighwayReference.Nothrow.gatherFirstI32(from, indices.raw, 1))
 }
 
 @inline(never)
@@ -122,7 +120,7 @@ public func portGatherFirstI32ConstantCountTwo(
     from: UnsafePointer<Int32>,
     indices: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.gather(from: from, indices: indices, count: 2)
+    unsafe SIMD<Int32>.gather(from: from, indices: indices, count: 2)
 }
 
 @inline(never)
@@ -130,7 +128,7 @@ public func highwayGatherFirstI32ConstantCountTwo(
     from: UnsafePointer<Int32>,
     indices: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.Vector(raw: HighwayReference.Nothrow.gatherFirstI32(from, indices.raw, 2))
+    unsafe SIMD<Int32>(raw: HighwayReference.Nothrow.gatherFirstI32(from, indices.raw, 2))
 }
 
 @inline(never)
@@ -138,7 +136,7 @@ public func portGatherFirstI32ConstantCountLaneCount(
     from: UnsafePointer<Int32>,
     indices: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.gather(from: from, indices: indices, count: SIMDInt32.laneCount)
+    unsafe SIMD<Int32>.gather(from: from, indices: indices, count: SIMD<Int32>.laneCount)
 }
 
 @inline(never)
@@ -146,7 +144,7 @@ public func highwayGatherFirstI32ConstantCountLaneCount(
     from: UnsafePointer<Int32>,
     indices: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.Vector(
+    unsafe SIMD<Int32>(
         raw: HighwayReference.Nothrow.gatherFirstI32(
             from,
             indices.raw,
@@ -160,7 +158,7 @@ public func portGatherFirstI32ConstantCountTwiceLaneCount(
     from: UnsafePointer<Int32>,
     indices: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.gather(from: from, indices: indices, count: 2 * SIMDInt32.laneCount)
+    unsafe SIMD<Int32>.gather(from: from, indices: indices, count: 2 * SIMD<Int32>.laneCount)
 }
 
 @inline(never)
@@ -168,7 +166,7 @@ public func highwayGatherFirstI32ConstantCountTwiceLaneCount(
     from: UnsafePointer<Int32>,
     indices: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.Vector(
+    unsafe SIMD<Int32>(
         raw: HighwayReference.Nothrow.gatherFirstI32(
             from,
             indices.raw,
@@ -184,7 +182,7 @@ public func portGatherFirstOtherwiseI32(
     count: Int,
     otherwise: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.gather(from: from, indices: indices, count: count, otherwise: otherwise)
+    unsafe SIMD<Int32>.gather(from: from, indices: indices, count: count, otherwise: otherwise)
 }
 
 @inline(never)
@@ -194,7 +192,7 @@ public func highwayGatherFirstOtherwiseI32(
     count: Int,
     otherwise: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.Vector(
+    unsafe SIMD<Int32>(
         raw: HighwayReference.Nothrow.gatherFirstOtherwiseI32(
             otherwise.raw,
             from,
@@ -210,9 +208,9 @@ public func portGatherFirstOtherwiseI32ConstantIndices(
     count: Int,
     otherwise: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.gather(
+    unsafe SIMD<Int32>.gather(
         from: from,
-        indices: SIMDInt32.repeating(1),
+        indices: SIMD<Int32>.repeating(1),
         count: count,
         otherwise: otherwise
     )
@@ -224,11 +222,11 @@ public func highwayGatherFirstOtherwiseI32ConstantIndices(
     count: Int,
     otherwise: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.Vector(
+    unsafe SIMD<Int32>(
         raw: HighwayReference.Nothrow.gatherFirstOtherwiseI32(
             otherwise.raw,
             from,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(1)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(1)).raw,
             count
         )
     )
@@ -240,7 +238,7 @@ public func portGatherFirstOtherwiseI32ConstantCount(
     indices: SIMD<Int32>,
     otherwise: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.gather(from: from, indices: indices, count: 1, otherwise: otherwise)
+    unsafe SIMD<Int32>.gather(from: from, indices: indices, count: 1, otherwise: otherwise)
 }
 
 @inline(never)
@@ -249,7 +247,7 @@ public func highwayGatherFirstOtherwiseI32ConstantCount(
     indices: SIMD<Int32>,
     otherwise: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.Vector(
+    unsafe SIMD<Int32>(
         raw: HighwayReference.Nothrow.gatherFirstOtherwiseI32(otherwise.raw, from, indices.raw, 1)
     )
 }
@@ -260,11 +258,11 @@ public func portGatherFirstOtherwiseI32ConstantOtherwise(
     indices: SIMD<Int32>,
     count: Int
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.gather(
+    unsafe SIMD<Int32>.gather(
         from: from,
         indices: indices,
         count: count,
-        otherwise: SIMDInt32.repeating(26)
+        otherwise: SIMD<Int32>.repeating(26)
     )
 }
 
@@ -274,9 +272,9 @@ public func highwayGatherFirstOtherwiseI32ConstantOtherwise(
     indices: SIMD<Int32>,
     count: Int
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.Vector(
+    unsafe SIMD<Int32>(
         raw: HighwayReference.Nothrow.gatherFirstOtherwiseI32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             from,
             indices.raw,
             count
@@ -290,7 +288,7 @@ public func portGatherFirstOtherwiseI32ConstantCountTwo(
     indices: SIMD<Int32>,
     otherwise: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.gather(from: from, indices: indices, count: 2, otherwise: otherwise)
+    unsafe SIMD<Int32>.gather(from: from, indices: indices, count: 2, otherwise: otherwise)
 }
 
 @inline(never)
@@ -299,7 +297,7 @@ public func highwayGatherFirstOtherwiseI32ConstantCountTwo(
     indices: SIMD<Int32>,
     otherwise: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.Vector(
+    unsafe SIMD<Int32>(
         raw: HighwayReference.Nothrow.gatherFirstOtherwiseI32(otherwise.raw, from, indices.raw, 2)
     )
 }
@@ -310,10 +308,10 @@ public func portGatherFirstOtherwiseI32ConstantCountLaneCount(
     indices: SIMD<Int32>,
     otherwise: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.gather(
+    unsafe SIMD<Int32>.gather(
         from: from,
         indices: indices,
-        count: SIMDInt32.laneCount,
+        count: SIMD<Int32>.laneCount,
         otherwise: otherwise
     )
 }
@@ -324,7 +322,7 @@ public func highwayGatherFirstOtherwiseI32ConstantCountLaneCount(
     indices: SIMD<Int32>,
     otherwise: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.Vector(
+    unsafe SIMD<Int32>(
         raw: HighwayReference.Nothrow.gatherFirstOtherwiseI32(
             otherwise.raw,
             from,
@@ -340,10 +338,10 @@ public func portGatherFirstOtherwiseI32ConstantCountTwiceLaneCount(
     indices: SIMD<Int32>,
     otherwise: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.gather(
+    unsafe SIMD<Int32>.gather(
         from: from,
         indices: indices,
-        count: 2 * SIMDInt32.laneCount,
+        count: 2 * SIMD<Int32>.laneCount,
         otherwise: otherwise
     )
 }
@@ -354,7 +352,7 @@ public func highwayGatherFirstOtherwiseI32ConstantCountTwiceLaneCount(
     indices: SIMD<Int32>,
     otherwise: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.Vector(
+    unsafe SIMD<Int32>(
         raw: HighwayReference.Nothrow.gatherFirstOtherwiseI32(
             otherwise.raw,
             from,
@@ -370,7 +368,7 @@ public func portGatherWhereI32(
     indices: SIMD<Int32>,
     where mask: SIMD<Int32>.Mask
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.gather(from: from, indices: indices, where: mask)
+    unsafe SIMD<Int32>.gather(from: from, indices: indices, where: mask)
 }
 
 @inline(never)
@@ -379,9 +377,7 @@ public func highwayGatherWhereI32(
     indices: SIMD<Int32>,
     where mask: SIMD<Int32>.Mask
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.Vector(
-        raw: HighwayReference.Nothrow.gatherWhereI32(mask.raw, from, indices.raw)
-    )
+    unsafe SIMD<Int32>(raw: HighwayReference.Nothrow.gatherWhereI32(mask.raw, from, indices.raw))
 }
 
 @inline(never)
@@ -389,7 +385,7 @@ public func portGatherWhereI32ConstantIndices(
     from: UnsafePointer<Int32>,
     where mask: SIMD<Int32>.Mask
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.gather(from: from, indices: SIMDInt32.repeating(1), where: mask)
+    unsafe SIMD<Int32>.gather(from: from, indices: SIMD<Int32>.repeating(1), where: mask)
 }
 
 @inline(never)
@@ -397,11 +393,11 @@ public func highwayGatherWhereI32ConstantIndices(
     from: UnsafePointer<Int32>,
     where mask: SIMD<Int32>.Mask
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.Vector(
+    unsafe SIMD<Int32>(
         raw: HighwayReference.Nothrow.gatherWhereI32(
             mask.raw,
             from,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
         )
     )
 }
@@ -413,7 +409,7 @@ public func portGatherWhereOtherwiseI32(
     where mask: SIMD<Int32>.Mask,
     otherwise: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.gather(from: from, indices: indices, where: mask, otherwise: otherwise)
+    unsafe SIMD<Int32>.gather(from: from, indices: indices, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -423,7 +419,7 @@ public func highwayGatherWhereOtherwiseI32(
     where mask: SIMD<Int32>.Mask,
     otherwise: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.Vector(
+    unsafe SIMD<Int32>(
         raw: HighwayReference.Nothrow.gatherWhereOtherwiseI32(
             otherwise.raw,
             mask.raw,
@@ -439,9 +435,9 @@ public func portGatherWhereOtherwiseI32ConstantIndices(
     where mask: SIMD<Int32>.Mask,
     otherwise: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.gather(
+    unsafe SIMD<Int32>.gather(
         from: from,
-        indices: SIMDInt32.repeating(1),
+        indices: SIMD<Int32>.repeating(1),
         where: mask,
         otherwise: otherwise
     )
@@ -453,12 +449,12 @@ public func highwayGatherWhereOtherwiseI32ConstantIndices(
     where mask: SIMD<Int32>.Mask,
     otherwise: SIMD<Int32>
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.Vector(
+    unsafe SIMD<Int32>(
         raw: HighwayReference.Nothrow.gatherWhereOtherwiseI32(
             otherwise.raw,
             mask.raw,
             from,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
         )
     )
 }
@@ -469,11 +465,11 @@ public func portGatherWhereOtherwiseI32ConstantOtherwise(
     indices: SIMD<Int32>,
     where mask: SIMD<Int32>.Mask
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.gather(
+    unsafe SIMD<Int32>.gather(
         from: from,
         indices: indices,
         where: mask,
-        otherwise: SIMDInt32.repeating(26)
+        otherwise: SIMD<Int32>.repeating(26)
     )
 }
 
@@ -483,9 +479,9 @@ public func highwayGatherWhereOtherwiseI32ConstantOtherwise(
     indices: SIMD<Int32>,
     where mask: SIMD<Int32>.Mask
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.Vector(
+    unsafe SIMD<Int32>(
         raw: HighwayReference.Nothrow.gatherWhereOtherwiseI32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             mask.raw,
             from,
             indices.raw
@@ -496,7 +492,7 @@ public func highwayGatherWhereOtherwiseI32ConstantOtherwise(
 @inline(never)
 public func portScatterI32(_ a: SIMD<Int32>, to: UnsafeMutablePointer<Int32>, indices: SIMD<Int32>)
 {
-    unsafe SIMDInt32.scatter(a, to: to, indices: indices)
+    unsafe SIMD<Int32>.scatter(a, to: to, indices: indices)
 }
 
 @inline(never)
@@ -510,13 +506,13 @@ public func highwayScatterI32(
 
 @inline(never)
 public func portScatterI32ConstantA(to: UnsafeMutablePointer<Int32>, indices: SIMD<Int32>) {
-    unsafe SIMDInt32.scatter(SIMDInt32.repeating(26), to: to, indices: indices)
+    unsafe SIMD<Int32>.scatter(SIMD<Int32>.repeating(26), to: to, indices: indices)
 }
 
 @inline(never)
 public func highwayScatterI32ConstantA(to: UnsafeMutablePointer<Int32>, indices: SIMD<Int32>) {
     unsafe HighwayReference.Nothrow.scatterI32(
-        SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+        SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
         to,
         indices.raw
     )
@@ -524,7 +520,7 @@ public func highwayScatterI32ConstantA(to: UnsafeMutablePointer<Int32>, indices:
 
 @inline(never)
 public func portScatterI32ConstantIndices(_ a: SIMD<Int32>, to: UnsafeMutablePointer<Int32>) {
-    unsafe SIMDInt32.scatter(a, to: to, indices: SIMDInt32.repeating(1))
+    unsafe SIMD<Int32>.scatter(a, to: to, indices: SIMD<Int32>.repeating(1))
 }
 
 @inline(never)
@@ -532,7 +528,7 @@ public func highwayScatterI32ConstantIndices(_ a: SIMD<Int32>, to: UnsafeMutable
     unsafe HighwayReference.Nothrow.scatterI32(
         a.raw,
         to,
-        SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
+        SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
     )
 }
 
@@ -542,7 +538,7 @@ public func portScatterByteOffsetsI32(
     to: UnsafeMutablePointer<Int32>,
     byteOffsets: SIMD<Int32>
 ) {
-    unsafe SIMDInt32.scatter(a, to: to, byteOffsets: byteOffsets)
+    unsafe SIMD<Int32>.scatter(a, to: to, byteOffsets: byteOffsets)
 }
 
 @inline(never)
@@ -559,7 +555,7 @@ public func portScatterByteOffsetsI32ConstantA(
     to: UnsafeMutablePointer<Int32>,
     byteOffsets: SIMD<Int32>
 ) {
-    unsafe SIMDInt32.scatter(SIMDInt32.repeating(26), to: to, byteOffsets: byteOffsets)
+    unsafe SIMD<Int32>.scatter(SIMD<Int32>.repeating(26), to: to, byteOffsets: byteOffsets)
 }
 
 @inline(never)
@@ -568,7 +564,7 @@ public func highwayScatterByteOffsetsI32ConstantA(
     byteOffsets: SIMD<Int32>
 ) {
     unsafe HighwayReference.Nothrow.scatterByteOffsetsI32(
-        SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+        SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
         to,
         byteOffsets.raw
     )
@@ -579,7 +575,7 @@ public func portScatterByteOffsetsI32ConstantByteOffsets(
     _ a: SIMD<Int32>,
     to: UnsafeMutablePointer<Int32>
 ) {
-    unsafe SIMDInt32.scatter(a, to: to, byteOffsets: SIMDInt32.repeating(1))
+    unsafe SIMD<Int32>.scatter(a, to: to, byteOffsets: SIMD<Int32>.repeating(1))
 }
 
 @inline(never)
@@ -590,7 +586,7 @@ public func highwayScatterByteOffsetsI32ConstantByteOffsets(
     unsafe HighwayReference.Nothrow.scatterByteOffsetsI32(
         a.raw,
         to,
-        SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
+        SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
     )
 }
 
@@ -601,7 +597,7 @@ public func portScatterFirstI32(
     indices: SIMD<Int32>,
     count: Int
 ) {
-    unsafe SIMDInt32.scatter(a, to: to, indices: indices, count: count)
+    unsafe SIMD<Int32>.scatter(a, to: to, indices: indices, count: count)
 }
 
 @inline(never)
@@ -620,7 +616,7 @@ public func portScatterFirstI32ConstantA(
     indices: SIMD<Int32>,
     count: Int
 ) {
-    unsafe SIMDInt32.scatter(SIMDInt32.repeating(26), to: to, indices: indices, count: count)
+    unsafe SIMD<Int32>.scatter(SIMD<Int32>.repeating(26), to: to, indices: indices, count: count)
 }
 
 @inline(never)
@@ -630,7 +626,7 @@ public func highwayScatterFirstI32ConstantA(
     count: Int
 ) {
     unsafe HighwayReference.Nothrow.scatterFirstI32(
-        SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+        SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
         to,
         indices.raw,
         count
@@ -643,7 +639,7 @@ public func portScatterFirstI32ConstantIndices(
     to: UnsafeMutablePointer<Int32>,
     count: Int
 ) {
-    unsafe SIMDInt32.scatter(a, to: to, indices: SIMDInt32.repeating(1), count: count)
+    unsafe SIMD<Int32>.scatter(a, to: to, indices: SIMD<Int32>.repeating(1), count: count)
 }
 
 @inline(never)
@@ -655,7 +651,7 @@ public func highwayScatterFirstI32ConstantIndices(
     unsafe HighwayReference.Nothrow.scatterFirstI32(
         a.raw,
         to,
-        SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(1)).raw,
+        SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(1)).raw,
         count
     )
 }
@@ -666,7 +662,7 @@ public func portScatterFirstI32ConstantCount(
     to: UnsafeMutablePointer<Int32>,
     indices: SIMD<Int32>
 ) {
-    unsafe SIMDInt32.scatter(a, to: to, indices: indices, count: 1)
+    unsafe SIMD<Int32>.scatter(a, to: to, indices: indices, count: 1)
 }
 
 @inline(never)
@@ -684,7 +680,7 @@ public func portScatterFirstI32ConstantCountTwo(
     to: UnsafeMutablePointer<Int32>,
     indices: SIMD<Int32>
 ) {
-    unsafe SIMDInt32.scatter(a, to: to, indices: indices, count: 2)
+    unsafe SIMD<Int32>.scatter(a, to: to, indices: indices, count: 2)
 }
 
 @inline(never)
@@ -702,7 +698,7 @@ public func portScatterFirstI32ConstantCountLaneCount(
     to: UnsafeMutablePointer<Int32>,
     indices: SIMD<Int32>
 ) {
-    unsafe SIMDInt32.scatter(a, to: to, indices: indices, count: SIMDInt32.laneCount)
+    unsafe SIMD<Int32>.scatter(a, to: to, indices: indices, count: SIMD<Int32>.laneCount)
 }
 
 @inline(never)
@@ -725,7 +721,7 @@ public func portScatterFirstI32ConstantCountTwiceLaneCount(
     to: UnsafeMutablePointer<Int32>,
     indices: SIMD<Int32>
 ) {
-    unsafe SIMDInt32.scatter(a, to: to, indices: indices, count: 2 * SIMDInt32.laneCount)
+    unsafe SIMD<Int32>.scatter(a, to: to, indices: indices, count: 2 * SIMD<Int32>.laneCount)
 }
 
 @inline(never)
@@ -749,7 +745,7 @@ public func portScatterWhereI32(
     indices: SIMD<Int32>,
     where mask: SIMD<Int32>.Mask
 ) {
-    unsafe SIMDInt32.scatter(a, to: to, indices: indices, where: mask)
+    unsafe SIMD<Int32>.scatter(a, to: to, indices: indices, where: mask)
 }
 
 @inline(never)
@@ -768,7 +764,7 @@ public func portScatterWhereI32ConstantA(
     indices: SIMD<Int32>,
     where mask: SIMD<Int32>.Mask
 ) {
-    unsafe SIMDInt32.scatter(SIMDInt32.repeating(26), to: to, indices: indices, where: mask)
+    unsafe SIMD<Int32>.scatter(SIMD<Int32>.repeating(26), to: to, indices: indices, where: mask)
 }
 
 @inline(never)
@@ -778,7 +774,7 @@ public func highwayScatterWhereI32ConstantA(
     where mask: SIMD<Int32>.Mask
 ) {
     unsafe HighwayReference.Nothrow.scatterWhereI32(
-        SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+        SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
         mask.raw,
         to,
         indices.raw
@@ -791,7 +787,7 @@ public func portScatterWhereI32ConstantIndices(
     to: UnsafeMutablePointer<Int32>,
     where mask: SIMD<Int32>.Mask
 ) {
-    unsafe SIMDInt32.scatter(a, to: to, indices: SIMDInt32.repeating(1), where: mask)
+    unsafe SIMD<Int32>.scatter(a, to: to, indices: SIMD<Int32>.repeating(1), where: mask)
 }
 
 @inline(never)
@@ -804,6 +800,6 @@ public func highwayScatterWhereI32ConstantIndices(
         a.raw,
         mask.raw,
         to,
-        SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
+        SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
     )
 }

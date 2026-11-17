@@ -8,5 +8,6 @@ import Vectorization
 
 @Suite("SIMDFloat codegen against Highway")
 struct SIMDFloatCodegenTests {
-    typealias H = SIMDFloat
+    typealias H = SIMD<Float>
+    typealias Lane = Float
 }

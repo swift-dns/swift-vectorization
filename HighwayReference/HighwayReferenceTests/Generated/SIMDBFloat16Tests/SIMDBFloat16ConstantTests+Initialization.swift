@@ -7,21 +7,21 @@ import Vectorization
 
 extension SIMDBFloat16ConstantTests {
     @inline(__always)
-    private func checkRepeatingWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkRepeatingWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "repeatingWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x4F8F_AA6A_420F_AA81)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x4F8F_A76A_420F_A568)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x4F8F_A76A_420F_A568)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for (mask, value) in everyPair(maskInputs, valueInputs) {
             mismatches.check(
                 H.repeating(value, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.repeatingWhereOtherwiseBF16(
                         H.repeating(value).raw,
                         mask.raw,
@@ -35,78 +35,78 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatZero() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x0000))
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x0000))
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatNegativeZero() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x8000))
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x8000))
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatOne() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x3F80))
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x3F80))
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatMinusOne() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0xBF80))
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0xBF80))
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatTwo() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x4000))
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x4000))
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatHalf() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x3F00))
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x3F00))
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatFour() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x4080))
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x4080))
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatQuarter() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x3E80))
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x3E80))
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatOnePointFive() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x3FC0))
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatMinusTwoPointFive() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0xC020))
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0xC020))
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatInfinity() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x7F80))
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x7F80))
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatMinusInfinity() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0xFF80))
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0xFF80))
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatNaN() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x7FC0))
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatMinusNaN() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0xFFC0))
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatPayloadNaN() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x7FC1))
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatSignalingNaN() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x7F81))
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x7F81))
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatMinusSignalingNaN() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0xFF81))
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0xFF81))
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatLeastNonzero() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x0001))
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x0001))
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatGreatest() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x7F7F))
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x7F7F))
     }
 }

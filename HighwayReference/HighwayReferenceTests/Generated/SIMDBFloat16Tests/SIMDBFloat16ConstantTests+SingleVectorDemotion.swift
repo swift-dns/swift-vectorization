@@ -7,17 +7,19 @@ import Vectorization
 
 extension SIMDBFloat16ConstantTests {
     @inline(__always)
-    private func checkHalfVectorConvertingFromFloatConstantA(_ value: SIMDFloat.Lane) {
+    private func checkHalfVectorConvertingFromFloatConstantA(_ value: Float) {
         let mismatches = Mismatches("halfVectorConvertingFromFloat with a repeating \(hex(value))")
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         mismatches.check(
-            H.halfVector(converting: SIMDFloat.repeating(value)),
+            H.halfVector(converting: SIMD<Float>.repeating(value)),
             H.HalfVector(
-                raw: HighwayReference.halfVectorConvertingF32ToBF16(SIMDFloat.repeating(value).raw)
+                raw: HighwayReference.halfVectorConvertingF32ToBF16(
+                    SIMD<Float>.repeating(value).raw
+                )
             ),
             ""
         )
@@ -81,7 +83,7 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func halfVectorConvertingFromFloatConstantSplatPayloadNaN() {
-        checkHalfVectorConvertingFromFloatConstantA(SIMDFloat.Lane(nan: 1, signaling: false))
+        checkHalfVectorConvertingFromFloatConstantA(Float(nan: 1, signaling: false))
     }
 
     @Test func halfVectorConvertingFromFloatConstantSplatSignalingNaN() {

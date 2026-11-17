@@ -5,38 +5,37 @@ public import Vectorization
 
 @inline(never)
 public func portMaskedLowercaseI8(_ v: SIMD<Int8>) -> SIMD<Int8> {
-    SIMDInt8.bitwiseOr(
+    SIMD<Int8>.bitwiseOr(
         v,
-        SIMDInt8.selectingOrZero(
-            SIMDInt8.lessThan(
-                SIMDInt8.subtracting(v, SIMDInt8.repeating(0x41)),
-                SIMDInt8.repeating(26)
+        SIMD<Int8>.selectingOrZero(
+            SIMD<Int8>.lessThan(
+                SIMD<Int8>.subtracting(v, SIMD<Int8>.repeating(0x41)),
+                SIMD<Int8>.repeating(26)
             ),
-            SIMDInt8.repeating(0x20)
+            SIMD<Int8>.repeating(0x20)
         )
     )
 }
 
 @inline(never)
 public func highwayMaskedLowercaseI8(_ v: SIMD<Int8>) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.bitwiseOrI8(
             v.raw,
-            SIMDInt8.Vector(
+            SIMD<Int8>(
                 raw: HighwayReference.Nothrow.selectingOrZeroI8(
-                    SIMDInt8.Mask(
+                    SIMD<Int8>.Mask(
                         raw: HighwayReference.Nothrow.lessThanI8(
-                            SIMDInt8.Vector(
+                            SIMD<Int8>(
                                 raw: HighwayReference.Nothrow.subtractingI8(
                                     v.raw,
-                                    SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(0x41))
-                                        .raw
+                                    SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(0x41)).raw
                                 )
                             ).raw,
-                            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+                            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
                         )
                     ).raw,
-                    SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(0x20)).raw
+                    SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(0x20)).raw
                 )
             ).raw
         )
@@ -45,16 +44,16 @@ public func highwayMaskedLowercaseI8(_ v: SIMD<Int8>) -> SIMD<Int8> {
 
 @inline(never)
 public func portNoneAboveI8(_ v: SIMD<Int8>) -> Bool {
-    SIMDInt8.allFalse(SIMDInt8.greaterThan(v, SIMDInt8.repeating(26)))
+    SIMD<Int8>.allFalse(SIMD<Int8>.greaterThan(v, SIMD<Int8>.repeating(26)))
 }
 
 @inline(never)
 public func highwayNoneAboveI8(_ v: SIMD<Int8>) -> Bool {
     HighwayReference.Nothrow.allFalseI8(
-        SIMDInt8.Mask(
+        SIMD<Int8>.Mask(
             raw: HighwayReference.Nothrow.greaterThanI8(
                 v.raw,
-                SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+                SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
             )
         ).raw
     )
@@ -63,13 +62,13 @@ public func highwayNoneAboveI8(_ v: SIMD<Int8>) -> Bool {
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portSumAboveSpanI8(above t: Int8, in values: Span<Int8>) -> Int8 {
-    let laneCount = SIMDInt8.laneCount
-    let threshold = SIMDInt8.repeating(t)
+    let laneCount = SIMD<Int8>.laneCount
+    let threshold = SIMD<Int8>.repeating(t)
     var total: Int8 = 0
     var remainingValuesSpan = values
     while remainingValuesSpan.count >= laneCount {
-        let loaded = SIMDInt8.load(from: remainingValuesSpan)
-        total &+= SIMDInt8.sum(loaded, where: SIMDInt8.greaterThan(loaded, threshold))
+        let loaded = SIMD<Int8>.load(from: remainingValuesSpan)
+        total &+= SIMD<Int8>.sum(loaded, where: SIMD<Int8>.greaterThan(loaded, threshold))
         let remainingValuesRange = unsafe Range<Int>(
             uncheckedBounds: (laneCount, remainingValuesSpan.count)
         )
@@ -106,16 +105,16 @@ public func portCountEqualAboveSpanI8(
     in values: Span<Int8>,
     matching others: Span<Int8>
 ) -> Int {
-    let laneCount = SIMDInt8.laneCount
-    let threshold = SIMDInt8.repeating(t)
+    let laneCount = SIMD<Int8>.laneCount
+    let threshold = SIMD<Int8>.repeating(t)
     var count = 0
     var remainingValuesSpan = values
     var remainingOthersSpan = others
     while remainingValuesSpan.count >= laneCount && remainingOthersSpan.count >= laneCount {
-        let loaded = SIMDInt8.load(from: remainingValuesSpan)
-        let other = SIMDInt8.load(from: remainingOthersSpan)
-        count &+= SIMDInt8.trueCount(
-            SIMDInt8.equalTo(loaded, other, where: SIMDInt8.greaterThan(loaded, threshold))
+        let loaded = SIMD<Int8>.load(from: remainingValuesSpan)
+        let other = SIMD<Int8>.load(from: remainingOthersSpan)
+        count &+= SIMD<Int8>.trueCount(
+            SIMD<Int8>.equalTo(loaded, other, where: SIMD<Int8>.greaterThan(loaded, threshold))
         )
         let remainingValuesRange = unsafe Range<Int>(
             uncheckedBounds: (laneCount, remainingValuesSpan.count)
@@ -169,13 +168,17 @@ public func portClampAboveSpanI8(
     in values: Span<Int8>,
     into output: inout MutableSpan<Int8>
 ) -> Int {
-    let laneCount = SIMDInt8.laneCount
-    let limit = SIMDInt8.repeating(t)
+    let laneCount = SIMD<Int8>.laneCount
+    let limit = SIMD<Int8>.repeating(t)
     var remainingValuesSpan = values
     var remainingOutputSpan = output._mutatingExtracting(...)
     while remainingValuesSpan.count >= laneCount && remainingOutputSpan.count >= laneCount {
-        let loaded = SIMDInt8.load(from: remainingValuesSpan)
-        SIMDInt8.store(limit, to: &remainingOutputSpan, where: SIMDInt8.greaterThan(loaded, limit))
+        let loaded = SIMD<Int8>.load(from: remainingValuesSpan)
+        SIMD<Int8>.store(
+            limit,
+            to: &remainingOutputSpan,
+            where: SIMD<Int8>.greaterThan(loaded, limit)
+        )
         let remainingValuesRange = unsafe Range<Int>(
             uncheckedBounds: (laneCount, remainingValuesSpan.count)
         )
@@ -231,14 +234,14 @@ public func portSelectBelowSpanI8(
     in values: Span<Int8>,
     into output: inout MutableSpan<Int8>
 ) -> Int {
-    let laneCount = SIMDInt8.laneCount
-    let threshold = SIMDInt8.repeating(t)
+    let laneCount = SIMD<Int8>.laneCount
+    let threshold = SIMD<Int8>.repeating(t)
     var remainingValuesSpan = values
     var remainingOutputSpan = output._mutatingExtracting(...)
     while remainingValuesSpan.count >= laneCount && remainingOutputSpan.count >= laneCount {
-        let loaded = SIMDInt8.load(from: remainingValuesSpan)
-        SIMDInt8.store(
-            SIMDInt8.selectingOrZero(SIMDInt8.lessThan(loaded, threshold), loaded),
+        let loaded = SIMD<Int8>.load(from: remainingValuesSpan)
+        SIMD<Int8>.store(
+            SIMD<Int8>.selectingOrZero(SIMD<Int8>.lessThan(loaded, threshold), loaded),
             to: &remainingOutputSpan
         )
         let remainingValuesRange = unsafe Range<Int>(

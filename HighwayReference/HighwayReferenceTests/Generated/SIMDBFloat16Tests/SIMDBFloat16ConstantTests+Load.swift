@@ -7,17 +7,13 @@ import Vectorization
 
 extension SIMDBFloat16ConstantTests {
     @inline(__always)
-    private func checkLoadWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkLoadWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches("loadWhereOtherwise with otherwise repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xD9C5_701D_48B6_1D94)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xD9C5_731D_48B6_22AD
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xD9C5_731D_48B6_22AD)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for (mask, from) in everyPair(maskInputs, fromInputs) {
@@ -28,7 +24,7 @@ extension SIMDBFloat16ConstantTests {
                         where: mask,
                         otherwise: H.repeating(value)
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadWhereOtherwiseBF16(
                             H.repeating(value).raw,
                             mask.raw,
@@ -47,93 +43,89 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func loadWhereOtherwiseConstantSplatZero() {
-        checkLoadWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x0000))
+        checkLoadWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x0000))
     }
 
     @Test func loadWhereOtherwiseConstantSplatNegativeZero() {
-        checkLoadWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x8000))
+        checkLoadWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x8000))
     }
 
     @Test func loadWhereOtherwiseConstantSplatOne() {
-        checkLoadWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x3F80))
+        checkLoadWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x3F80))
     }
 
     @Test func loadWhereOtherwiseConstantSplatMinusOne() {
-        checkLoadWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0xBF80))
+        checkLoadWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0xBF80))
     }
 
     @Test func loadWhereOtherwiseConstantSplatTwo() {
-        checkLoadWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x4000))
+        checkLoadWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x4000))
     }
 
     @Test func loadWhereOtherwiseConstantSplatHalf() {
-        checkLoadWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x3F00))
+        checkLoadWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x3F00))
     }
 
     @Test func loadWhereOtherwiseConstantSplatFour() {
-        checkLoadWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x4080))
+        checkLoadWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x4080))
     }
 
     @Test func loadWhereOtherwiseConstantSplatQuarter() {
-        checkLoadWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x3E80))
+        checkLoadWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x3E80))
     }
 
     @Test func loadWhereOtherwiseConstantSplatOnePointFive() {
-        checkLoadWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x3FC0))
+        checkLoadWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func loadWhereOtherwiseConstantSplatMinusTwoPointFive() {
-        checkLoadWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0xC020))
+        checkLoadWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0xC020))
     }
 
     @Test func loadWhereOtherwiseConstantSplatInfinity() {
-        checkLoadWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x7F80))
+        checkLoadWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x7F80))
     }
 
     @Test func loadWhereOtherwiseConstantSplatMinusInfinity() {
-        checkLoadWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0xFF80))
+        checkLoadWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0xFF80))
     }
 
     @Test func loadWhereOtherwiseConstantSplatNaN() {
-        checkLoadWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x7FC0))
+        checkLoadWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func loadWhereOtherwiseConstantSplatMinusNaN() {
-        checkLoadWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0xFFC0))
+        checkLoadWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func loadWhereOtherwiseConstantSplatPayloadNaN() {
-        checkLoadWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x7FC1))
+        checkLoadWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func loadWhereOtherwiseConstantSplatSignalingNaN() {
-        checkLoadWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x7F81))
+        checkLoadWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x7F81))
     }
 
     @Test func loadWhereOtherwiseConstantSplatMinusSignalingNaN() {
-        checkLoadWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0xFF81))
+        checkLoadWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0xFF81))
     }
 
     @Test func loadWhereOtherwiseConstantSplatLeastNonzero() {
-        checkLoadWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x0001))
+        checkLoadWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x0001))
     }
 
     @Test func loadWhereOtherwiseConstantSplatGreatest() {
-        checkLoadWhereOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x7F7F))
+        checkLoadWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkLoadFirstOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkLoadFirstOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches("loadFirstOtherwise with otherwise repeating \(hex(value))")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x91D0_7F2C_8875_F4F1
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x91D0_7F2C_8875_F4F1)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for (from, count) in everyPair(fromInputs, countInputs) {
@@ -144,7 +136,7 @@ extension SIMDBFloat16ConstantTests {
                         count: count,
                         otherwise: H.repeating(value)
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstOtherwiseBF16(
                             H.repeating(value).raw,
                             source.baseAddress!,
@@ -163,99 +155,99 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func loadFirstOtherwiseConstantSplatZero() {
-        checkLoadFirstOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x0000))
+        checkLoadFirstOtherwiseConstantOtherwise(Lane(bitPattern: 0x0000))
     }
 
     @Test func loadFirstOtherwiseConstantSplatNegativeZero() {
-        checkLoadFirstOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x8000))
+        checkLoadFirstOtherwiseConstantOtherwise(Lane(bitPattern: 0x8000))
     }
 
     @Test func loadFirstOtherwiseConstantSplatOne() {
-        checkLoadFirstOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x3F80))
+        checkLoadFirstOtherwiseConstantOtherwise(Lane(bitPattern: 0x3F80))
     }
 
     @Test func loadFirstOtherwiseConstantSplatMinusOne() {
-        checkLoadFirstOtherwiseConstantOtherwise(H.Lane(bitPattern: 0xBF80))
+        checkLoadFirstOtherwiseConstantOtherwise(Lane(bitPattern: 0xBF80))
     }
 
     @Test func loadFirstOtherwiseConstantSplatTwo() {
-        checkLoadFirstOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x4000))
+        checkLoadFirstOtherwiseConstantOtherwise(Lane(bitPattern: 0x4000))
     }
 
     @Test func loadFirstOtherwiseConstantSplatHalf() {
-        checkLoadFirstOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x3F00))
+        checkLoadFirstOtherwiseConstantOtherwise(Lane(bitPattern: 0x3F00))
     }
 
     @Test func loadFirstOtherwiseConstantSplatFour() {
-        checkLoadFirstOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x4080))
+        checkLoadFirstOtherwiseConstantOtherwise(Lane(bitPattern: 0x4080))
     }
 
     @Test func loadFirstOtherwiseConstantSplatQuarter() {
-        checkLoadFirstOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x3E80))
+        checkLoadFirstOtherwiseConstantOtherwise(Lane(bitPattern: 0x3E80))
     }
 
     @Test func loadFirstOtherwiseConstantSplatOnePointFive() {
-        checkLoadFirstOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x3FC0))
+        checkLoadFirstOtherwiseConstantOtherwise(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func loadFirstOtherwiseConstantSplatMinusTwoPointFive() {
-        checkLoadFirstOtherwiseConstantOtherwise(H.Lane(bitPattern: 0xC020))
+        checkLoadFirstOtherwiseConstantOtherwise(Lane(bitPattern: 0xC020))
     }
 
     @Test func loadFirstOtherwiseConstantSplatInfinity() {
-        checkLoadFirstOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x7F80))
+        checkLoadFirstOtherwiseConstantOtherwise(Lane(bitPattern: 0x7F80))
     }
 
     @Test func loadFirstOtherwiseConstantSplatMinusInfinity() {
-        checkLoadFirstOtherwiseConstantOtherwise(H.Lane(bitPattern: 0xFF80))
+        checkLoadFirstOtherwiseConstantOtherwise(Lane(bitPattern: 0xFF80))
     }
 
     @Test func loadFirstOtherwiseConstantSplatNaN() {
-        checkLoadFirstOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x7FC0))
+        checkLoadFirstOtherwiseConstantOtherwise(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func loadFirstOtherwiseConstantSplatMinusNaN() {
-        checkLoadFirstOtherwiseConstantOtherwise(H.Lane(bitPattern: 0xFFC0))
+        checkLoadFirstOtherwiseConstantOtherwise(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func loadFirstOtherwiseConstantSplatPayloadNaN() {
-        checkLoadFirstOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x7FC1))
+        checkLoadFirstOtherwiseConstantOtherwise(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func loadFirstOtherwiseConstantSplatSignalingNaN() {
-        checkLoadFirstOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x7F81))
+        checkLoadFirstOtherwiseConstantOtherwise(Lane(bitPattern: 0x7F81))
     }
 
     @Test func loadFirstOtherwiseConstantSplatMinusSignalingNaN() {
-        checkLoadFirstOtherwiseConstantOtherwise(H.Lane(bitPattern: 0xFF81))
+        checkLoadFirstOtherwiseConstantOtherwise(Lane(bitPattern: 0xFF81))
     }
 
     @Test func loadFirstOtherwiseConstantSplatLeastNonzero() {
-        checkLoadFirstOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x0001))
+        checkLoadFirstOtherwiseConstantOtherwise(Lane(bitPattern: 0x0001))
     }
 
     @Test func loadFirstOtherwiseConstantSplatGreatest() {
-        checkLoadFirstOtherwiseConstantOtherwise(H.Lane(bitPattern: 0x7F7F))
+        checkLoadFirstOtherwiseConstantOtherwise(Lane(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkLoadingUpperHalfConstantA(_ value: H.Lane) {
+    private func checkLoadingUpperHalfConstantA(_ value: Lane) {
         let mismatches = Mismatches("loadingUpperHalf with a repeating \(hex(value))")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: H.laneCount / 2,
             seed: 0xE7D7_0852_FC84_F4CC
         )
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for from in fromInputs {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadingUpperHalf(H.repeating(value), from: source.baseAddress!),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadingUpperHalfBF16(
                             source.baseAddress!,
                             H.repeating(value).raw
@@ -269,78 +261,78 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func loadingUpperHalfConstantSplatZero() {
-        checkLoadingUpperHalfConstantA(H.Lane(bitPattern: 0x0000))
+        checkLoadingUpperHalfConstantA(Lane(bitPattern: 0x0000))
     }
 
     @Test func loadingUpperHalfConstantSplatNegativeZero() {
-        checkLoadingUpperHalfConstantA(H.Lane(bitPattern: 0x8000))
+        checkLoadingUpperHalfConstantA(Lane(bitPattern: 0x8000))
     }
 
     @Test func loadingUpperHalfConstantSplatOne() {
-        checkLoadingUpperHalfConstantA(H.Lane(bitPattern: 0x3F80))
+        checkLoadingUpperHalfConstantA(Lane(bitPattern: 0x3F80))
     }
 
     @Test func loadingUpperHalfConstantSplatMinusOne() {
-        checkLoadingUpperHalfConstantA(H.Lane(bitPattern: 0xBF80))
+        checkLoadingUpperHalfConstantA(Lane(bitPattern: 0xBF80))
     }
 
     @Test func loadingUpperHalfConstantSplatTwo() {
-        checkLoadingUpperHalfConstantA(H.Lane(bitPattern: 0x4000))
+        checkLoadingUpperHalfConstantA(Lane(bitPattern: 0x4000))
     }
 
     @Test func loadingUpperHalfConstantSplatHalf() {
-        checkLoadingUpperHalfConstantA(H.Lane(bitPattern: 0x3F00))
+        checkLoadingUpperHalfConstantA(Lane(bitPattern: 0x3F00))
     }
 
     @Test func loadingUpperHalfConstantSplatFour() {
-        checkLoadingUpperHalfConstantA(H.Lane(bitPattern: 0x4080))
+        checkLoadingUpperHalfConstantA(Lane(bitPattern: 0x4080))
     }
 
     @Test func loadingUpperHalfConstantSplatQuarter() {
-        checkLoadingUpperHalfConstantA(H.Lane(bitPattern: 0x3E80))
+        checkLoadingUpperHalfConstantA(Lane(bitPattern: 0x3E80))
     }
 
     @Test func loadingUpperHalfConstantSplatOnePointFive() {
-        checkLoadingUpperHalfConstantA(H.Lane(bitPattern: 0x3FC0))
+        checkLoadingUpperHalfConstantA(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func loadingUpperHalfConstantSplatMinusTwoPointFive() {
-        checkLoadingUpperHalfConstantA(H.Lane(bitPattern: 0xC020))
+        checkLoadingUpperHalfConstantA(Lane(bitPattern: 0xC020))
     }
 
     @Test func loadingUpperHalfConstantSplatInfinity() {
-        checkLoadingUpperHalfConstantA(H.Lane(bitPattern: 0x7F80))
+        checkLoadingUpperHalfConstantA(Lane(bitPattern: 0x7F80))
     }
 
     @Test func loadingUpperHalfConstantSplatMinusInfinity() {
-        checkLoadingUpperHalfConstantA(H.Lane(bitPattern: 0xFF80))
+        checkLoadingUpperHalfConstantA(Lane(bitPattern: 0xFF80))
     }
 
     @Test func loadingUpperHalfConstantSplatNaN() {
-        checkLoadingUpperHalfConstantA(H.Lane(bitPattern: 0x7FC0))
+        checkLoadingUpperHalfConstantA(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func loadingUpperHalfConstantSplatMinusNaN() {
-        checkLoadingUpperHalfConstantA(H.Lane(bitPattern: 0xFFC0))
+        checkLoadingUpperHalfConstantA(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func loadingUpperHalfConstantSplatPayloadNaN() {
-        checkLoadingUpperHalfConstantA(H.Lane(bitPattern: 0x7FC1))
+        checkLoadingUpperHalfConstantA(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func loadingUpperHalfConstantSplatSignalingNaN() {
-        checkLoadingUpperHalfConstantA(H.Lane(bitPattern: 0x7F81))
+        checkLoadingUpperHalfConstantA(Lane(bitPattern: 0x7F81))
     }
 
     @Test func loadingUpperHalfConstantSplatMinusSignalingNaN() {
-        checkLoadingUpperHalfConstantA(H.Lane(bitPattern: 0xFF81))
+        checkLoadingUpperHalfConstantA(Lane(bitPattern: 0xFF81))
     }
 
     @Test func loadingUpperHalfConstantSplatLeastNonzero() {
-        checkLoadingUpperHalfConstantA(H.Lane(bitPattern: 0x0001))
+        checkLoadingUpperHalfConstantA(Lane(bitPattern: 0x0001))
     }
 
     @Test func loadingUpperHalfConstantSplatGreatest() {
-        checkLoadingUpperHalfConstantA(H.Lane(bitPattern: 0x7F7F))
+        checkLoadingUpperHalfConstantA(Lane(bitPattern: 0x7F7F))
     }
 }

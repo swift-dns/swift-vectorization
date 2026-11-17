@@ -8,18 +8,18 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
-    private func checkOddEvenBlocksConstantA(_ value: H.Lane) {
+    private func checkOddEvenBlocksConstantA(_ value: Lane) {
         let mismatches = Mismatches("oddEvenBlocks with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1CE7_38EA_C1BC_96F3)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1CE7_38EA_C1BC_96F3)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.oddEvenBlocks(H.repeating(value), b),
-                HighwayReference.oddEvenBlocksF16(H.repeating(value).raw, b.raw),
+                H(raw: HighwayReference.oddEvenBlocksF16(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -27,18 +27,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkOddEvenBlocksConstantB(_ value: H.Lane) {
+    private func checkOddEvenBlocksConstantB(_ value: Lane) {
         let mismatches = Mismatches("oddEvenBlocks with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x25E9_6EEA_C6F0_4935)
+        let aInputs = Inputs.vectors(H.self, seed: 0x25E9_6EEA_C6F0_4935)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.oddEvenBlocks(a, H.repeating(value)),
-                HighwayReference.oddEvenBlocksF16(a.raw, H.repeating(value).raw),
+                H(raw: HighwayReference.oddEvenBlocksF16(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -116,8 +116,8 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func oddEvenBlocksConstantSplatPayloadNaN() {
-        checkOddEvenBlocksConstantA(H.Lane(nan: 1, signaling: false))
-        checkOddEvenBlocksConstantB(H.Lane(nan: 1, signaling: false))
+        checkOddEvenBlocksConstantA(Lane(nan: 1, signaling: false))
+        checkOddEvenBlocksConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func oddEvenBlocksConstantSplatSignalingNaN() {
@@ -141,16 +141,16 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkSwappingAdjacentBlocksConstantA(_ value: H.Lane) {
+    private func checkSwappingAdjacentBlocksConstantA(_ value: Lane) {
         let mismatches = Mismatches("swappingAdjacentBlocks with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
             H.swappingAdjacentBlocks(H.repeating(value)),
-            HighwayReference.swappingAdjacentBlocksF16(H.repeating(value).raw),
+            H(raw: HighwayReference.swappingAdjacentBlocksF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -213,7 +213,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func swappingAdjacentBlocksConstantSplatPayloadNaN() {
-        checkSwappingAdjacentBlocksConstantA(H.Lane(nan: 1, signaling: false))
+        checkSwappingAdjacentBlocksConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func swappingAdjacentBlocksConstantSplatSignalingNaN() {
@@ -233,18 +233,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkInterleavingEvenBlocksConstantA(_ value: H.Lane) {
+    private func checkInterleavingEvenBlocksConstantA(_ value: Lane) {
         let mismatches = Mismatches("interleavingEvenBlocks with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF7CD_AE46_904A_2D0C)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF7CD_AE46_904A_2D0C)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.interleavingEvenBlocks(H.repeating(value), b),
-                HighwayReference.interleavingEvenBlocksF16(H.repeating(value).raw, b.raw),
+                H(raw: HighwayReference.interleavingEvenBlocksF16(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -252,18 +252,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkInterleavingEvenBlocksConstantB(_ value: H.Lane) {
+    private func checkInterleavingEvenBlocksConstantB(_ value: Lane) {
         let mismatches = Mismatches("interleavingEvenBlocks with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1120_3446_9E71_CCBE)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1120_3446_9E71_CCBE)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.interleavingEvenBlocks(a, H.repeating(value)),
-                HighwayReference.interleavingEvenBlocksF16(a.raw, H.repeating(value).raw),
+                H(raw: HighwayReference.interleavingEvenBlocksF16(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -341,8 +341,8 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func interleavingEvenBlocksConstantSplatPayloadNaN() {
-        checkInterleavingEvenBlocksConstantA(H.Lane(nan: 1, signaling: false))
-        checkInterleavingEvenBlocksConstantB(H.Lane(nan: 1, signaling: false))
+        checkInterleavingEvenBlocksConstantA(Lane(nan: 1, signaling: false))
+        checkInterleavingEvenBlocksConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func interleavingEvenBlocksConstantSplatSignalingNaN() {
@@ -366,18 +366,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkInterleavingOddBlocksConstantA(_ value: H.Lane) {
+    private func checkInterleavingOddBlocksConstantA(_ value: Lane) {
         let mismatches = Mismatches("interleavingOddBlocks with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x92EA_859E_CAFC_9D01)
+        let bInputs = Inputs.vectors(H.self, seed: 0x92EA_859E_CAFC_9D01)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.interleavingOddBlocks(H.repeating(value), b),
-                HighwayReference.interleavingOddBlocksF16(H.repeating(value).raw, b.raw),
+                H(raw: HighwayReference.interleavingOddBlocksF16(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -385,18 +385,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkInterleavingOddBlocksConstantB(_ value: H.Lane) {
+    private func checkInterleavingOddBlocksConstantB(_ value: Lane) {
         let mismatches = Mismatches("interleavingOddBlocks with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7997_FF9E_BCD4_FD4F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7997_FF9E_BCD4_FD4F)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.interleavingOddBlocks(a, H.repeating(value)),
-                HighwayReference.interleavingOddBlocksF16(a.raw, H.repeating(value).raw),
+                H(raw: HighwayReference.interleavingOddBlocksF16(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -474,8 +474,8 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func interleavingOddBlocksConstantSplatPayloadNaN() {
-        checkInterleavingOddBlocksConstantA(H.Lane(nan: 1, signaling: false))
-        checkInterleavingOddBlocksConstantB(H.Lane(nan: 1, signaling: false))
+        checkInterleavingOddBlocksConstantA(Lane(nan: 1, signaling: false))
+        checkInterleavingOddBlocksConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func interleavingOddBlocksConstantSplatSignalingNaN() {
@@ -499,18 +499,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkInterleavingLowerBlocksConstantA(_ value: H.Lane) {
+    private func checkInterleavingLowerBlocksConstantA(_ value: Lane) {
         let mismatches = Mismatches("interleavingLowerBlocks with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0580_D627_4710_4E2D)
+        let bInputs = Inputs.vectors(H.self, seed: 0x0580_D627_4710_4E2D)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.interleavingLowerBlocks(H.repeating(value), b),
-                HighwayReference.interleavingLowerBlocksF16(H.repeating(value).raw, b.raw),
+                H(raw: HighwayReference.interleavingLowerBlocksF16(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -518,18 +518,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkInterleavingLowerBlocksConstantB(_ value: H.Lane) {
+    private func checkInterleavingLowerBlocksConstantB(_ value: Lane) {
         let mismatches = Mismatches("interleavingLowerBlocks with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEC2E_5027_38E8_AE7B)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEC2E_5027_38E8_AE7B)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.interleavingLowerBlocks(a, H.repeating(value)),
-                HighwayReference.interleavingLowerBlocksF16(a.raw, H.repeating(value).raw),
+                H(raw: HighwayReference.interleavingLowerBlocksF16(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -607,8 +607,8 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func interleavingLowerBlocksConstantSplatPayloadNaN() {
-        checkInterleavingLowerBlocksConstantA(H.Lane(nan: 1, signaling: false))
-        checkInterleavingLowerBlocksConstantB(H.Lane(nan: 1, signaling: false))
+        checkInterleavingLowerBlocksConstantA(Lane(nan: 1, signaling: false))
+        checkInterleavingLowerBlocksConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func interleavingLowerBlocksConstantSplatSignalingNaN() {
@@ -632,18 +632,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkInterleavingUpperBlocksConstantA(_ value: H.Lane) {
+    private func checkInterleavingUpperBlocksConstantA(_ value: Lane) {
         let mismatches = Mismatches("interleavingUpperBlocks with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE55C_4E18_89AE_190A)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE55C_4E18_89AE_190A)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.interleavingUpperBlocks(H.repeating(value), b),
-                HighwayReference.interleavingUpperBlocksF16(H.repeating(value).raw, b.raw),
+                H(raw: HighwayReference.interleavingUpperBlocksF16(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -651,18 +651,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkInterleavingUpperBlocksConstantB(_ value: H.Lane) {
+    private func checkInterleavingUpperBlocksConstantB(_ value: Lane) {
         let mismatches = Mismatches("interleavingUpperBlocks with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDCC7_9818_84D8_1228)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDCC7_9818_84D8_1228)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.interleavingUpperBlocks(a, H.repeating(value)),
-                HighwayReference.interleavingUpperBlocksF16(a.raw, H.repeating(value).raw),
+                H(raw: HighwayReference.interleavingUpperBlocksF16(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -740,8 +740,8 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func interleavingUpperBlocksConstantSplatPayloadNaN() {
-        checkInterleavingUpperBlocksConstantA(H.Lane(nan: 1, signaling: false))
-        checkInterleavingUpperBlocksConstantB(H.Lane(nan: 1, signaling: false))
+        checkInterleavingUpperBlocksConstantA(Lane(nan: 1, signaling: false))
+        checkInterleavingUpperBlocksConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func interleavingUpperBlocksConstantSplatSignalingNaN() {
@@ -765,20 +765,22 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkBroadcastingLaneConstantA(_ value: H.Lane) {
+    private func checkBroadcastingLaneConstantA(_ value: Lane) {
         let mismatches = Mismatches("broadcastingLane with a repeating \(hex(value))")
         let laneInputs = Array(0...H.laneCount - 1)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for lane in laneInputs {
             mismatches.check(
                 H.broadcasting(H.repeating(value), lane: lane),
-                HighwayReference.broadcastingLaneF16(
-                    H.repeating(value).raw,
-                    Int32(truncatingIfNeeded: lane)
+                H(
+                    raw: HighwayReference.broadcastingLaneF16(
+                        H.repeating(value).raw,
+                        Int32(truncatingIfNeeded: lane)
+                    )
                 ),
                 "lane: \(lane)"
             )
@@ -843,7 +845,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func broadcastingLaneConstantSplatPayloadNaN() {
-        checkBroadcastingLaneConstantA(H.Lane(nan: 1, signaling: false))
+        checkBroadcastingLaneConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func broadcastingLaneConstantSplatSignalingNaN() {
@@ -863,20 +865,22 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkBroadcastingBlockConstantA(_ value: H.Lane) {
+    private func checkBroadcastingBlockConstantA(_ value: Lane) {
         let mismatches = Mismatches("broadcastingBlock with a repeating \(hex(value))")
         let blockInputs = Array(0...H.laneCount / 8 - 1)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for block in blockInputs {
             mismatches.check(
                 H.broadcasting(H.repeating(value), block: block),
-                HighwayReference.broadcastingBlockF16(
-                    H.repeating(value).raw,
-                    Int32(truncatingIfNeeded: block)
+                H(
+                    raw: HighwayReference.broadcastingBlockF16(
+                        H.repeating(value).raw,
+                        Int32(truncatingIfNeeded: block)
+                    )
                 ),
                 "block: \(block)"
             )
@@ -941,7 +945,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func broadcastingBlockConstantSplatPayloadNaN() {
-        checkBroadcastingBlockConstantA(H.Lane(nan: 1, signaling: false))
+        checkBroadcastingBlockConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func broadcastingBlockConstantSplatSignalingNaN() {

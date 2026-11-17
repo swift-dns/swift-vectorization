@@ -9,8 +9,8 @@ import Vectorization
 extension SIMDBFloat16CodegenTests {
     @Test func store() {
         let mismatches = Mismatches("portStoreBF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x71B9_5D12_6070_6D9F)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x71B9_5D12_6070_6D9F)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -27,8 +27,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeBeforeGuardPage() {
         let mismatches = Mismatches("portStoreBF16 before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC13D_8197_0ED2_DCA4)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC13D_8197_0ED2_DCA4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portStoreBF16(a, to: destination)
@@ -43,7 +43,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeConstantA() {
         let mismatches = Mismatches("portStoreBF16ConstantA")
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         var portLanes = sentinel
         portLanes.withUnsafeMutableBufferPointer { destination in
             unsafe portStoreBF16ConstantA(to: destination.baseAddress!)
@@ -58,7 +58,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeConstantABeforeGuardPage() {
         let mismatches = Mismatches("portStoreBF16ConstantA before a guard page")
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
             unsafe portStoreBF16ConstantA(to: destination)
         }
@@ -71,8 +71,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeAligned() {
         let mismatches = Mismatches("portStoreAlignedBF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7154_FB5A_8906_A66B)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7154_FB5A_8906_A66B)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             let (_, portLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
                 destination in unsafe portStoreAlignedBF16(a, to: destination)
@@ -87,8 +87,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeAlignedBeforeGuardPage() {
         let mismatches = Mismatches("portStoreAlignedBF16 before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1776_00BE_7C37_AD70)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1776_00BE_7C37_AD70)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portStoreAlignedBF16(a, to: destination)
@@ -103,7 +103,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeAlignedConstantA() {
         let mismatches = Mismatches("portStoreAlignedBF16ConstantA")
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         let (_, portLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
             destination in unsafe portStoreAlignedBF16ConstantA(to: destination)
         }
@@ -116,7 +116,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeAlignedConstantABeforeGuardPage() {
         let mismatches = Mismatches("portStoreAlignedBF16ConstantA before a guard page")
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
             unsafe portStoreAlignedBF16ConstantA(to: destination)
         }
@@ -129,9 +129,9 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeFirst() {
         let mismatches = Mismatches("portStoreFirstBF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9482_D5C9_2E5F_24A1)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9482_D5C9_2E5F_24A1)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, count) in everyPair(aInputs, countInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -148,9 +148,9 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeFirstBeforeGuardPage() {
         let mismatches = Mismatches("portStoreFirstBF16 before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x42F4_9366_1DDC_189E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x42F4_9366_1DDC_189E)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, count) in everyPair(aInputs, countInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(count))) {
                 destination in unsafe portStoreFirstBF16(a, to: destination, count: count)
@@ -166,7 +166,7 @@ extension SIMDBFloat16CodegenTests {
     @Test func storeFirstConstantA() {
         let mismatches = Mismatches("portStoreFirstBF16ConstantA")
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for count in countInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -184,7 +184,7 @@ extension SIMDBFloat16CodegenTests {
     @Test func storeFirstConstantABeforeGuardPage() {
         let mismatches = Mismatches("portStoreFirstBF16ConstantA before a guard page")
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for count in countInputs {
             let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(count))) {
                 destination in unsafe portStoreFirstBF16ConstantA(to: destination, count: count)
@@ -199,8 +199,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeFirstConstantCount() {
         let mismatches = Mismatches("portStoreFirstBF16ConstantCount")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x54E5_C9D5_F1A1_8A72)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x54E5_C9D5_F1A1_8A72)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -217,8 +217,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeFirstConstantCountBeforeGuardPage() {
         let mismatches = Mismatches("portStoreFirstBF16ConstantCount before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC2B9_A61B_1C29_A1D3)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC2B9_A61B_1C29_A1D3)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(1))) { destination in
                 unsafe portStoreFirstBF16ConstantCount(a, to: destination)
@@ -233,8 +233,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeFirstConstantCountTwo() {
         let mismatches = Mismatches("portStoreFirstBF16ConstantCountTwo")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD048_61A4_9C31_FDCE)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD048_61A4_9C31_FDCE)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -251,8 +251,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeFirstConstantCountTwoBeforeGuardPage() {
         let mismatches = Mismatches("portStoreFirstBF16ConstantCountTwo before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC01C_4EAE_2973_B3FF)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC01C_4EAE_2973_B3FF)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(2))) { destination in
                 unsafe portStoreFirstBF16ConstantCountTwo(a, to: destination)
@@ -267,8 +267,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeFirstConstantCountLaneCount() {
         let mismatches = Mismatches("portStoreFirstBF16ConstantCountLaneCount")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3473_AA7A_D059_9C69)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3473_AA7A_D059_9C69)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -285,14 +285,14 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeFirstConstantCountLaneCountBeforeGuardPage() {
         let mismatches = Mismatches("portStoreFirstBF16ConstantCountLaneCount before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x289E_ED59_E4B5_8246)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0x289E_ED59_E4B5_8246)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(
-                Array(sentinel.prefix(SIMDBFloat16.laneCount))
+                Array(sentinel.prefix(SIMD<BFloat16>.laneCount))
             ) { destination in unsafe portStoreFirstBF16ConstantCountLaneCount(a, to: destination) }
             let (_, referenceLanes) = unsafe withGuardedLanes(
-                Array(sentinel.prefix(SIMDBFloat16.laneCount))
+                Array(sentinel.prefix(SIMD<BFloat16>.laneCount))
             ) { destination in
                 unsafe highwayStoreFirstBF16ConstantCountLaneCount(a, to: destination)
             }
@@ -303,8 +303,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeFirstConstantCountTwiceLaneCount() {
         let mismatches = Mismatches("portStoreFirstBF16ConstantCountTwiceLaneCount")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF923_D480_3F12_10F7)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF923_D480_3F12_10F7)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -329,16 +329,16 @@ extension SIMDBFloat16CodegenTests {
         let mismatches = Mismatches(
             "portStoreFirstBF16ConstantCountTwiceLaneCount before a guard page"
         )
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2971_3815_5769_849C)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2971_3815_5769_849C)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(
-                Array(sentinel.prefix(2 * SIMDBFloat16.laneCount))
+                Array(sentinel.prefix(2 * SIMD<BFloat16>.laneCount))
             ) { destination in
                 unsafe portStoreFirstBF16ConstantCountTwiceLaneCount(a, to: destination)
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(
-                Array(sentinel.prefix(2 * SIMDBFloat16.laneCount))
+                Array(sentinel.prefix(2 * SIMD<BFloat16>.laneCount))
             ) { destination in
                 unsafe highwayStoreFirstBF16ConstantCountTwiceLaneCount(a, to: destination)
             }
@@ -349,9 +349,9 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeWhere() {
         let mismatches = Mismatches("portStoreWhereBF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3792_023E_124A_C54C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3792_023E_124A_C54C)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3792_033E_124A_C6FF)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -372,9 +372,9 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeWhereBeforeGuardPage() {
         let mismatches = Mismatches("portStoreWhereBF16 before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2977_A2DB_56D3_2785)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2977_A2DB_56D3_2785)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x2977_A1DB_56D3_25D2)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portStoreWhereBF16(a, to: destination, where: mask)
@@ -394,7 +394,7 @@ extension SIMDBFloat16CodegenTests {
     @Test func storeWhereConstantA() {
         let mismatches = Mismatches("portStoreWhereBF16ConstantA")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8AE4_4273_39F7_F012)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for mask in maskInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -412,7 +412,7 @@ extension SIMDBFloat16CodegenTests {
     @Test func storeWhereConstantABeforeGuardPage() {
         let mismatches = Mismatches("portStoreWhereBF16ConstantA before a guard page")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x19B3_5228_7888_7F05)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for mask in maskInputs {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portStoreWhereBF16ConstantA(to: destination, where: mask)
@@ -428,8 +428,8 @@ extension SIMDBFloat16CodegenTests {
     @Test func storeRepeating() {
         let mismatches = Mismatches("portStoreRepeatingBF16")
         let countInputs = Inputs.counts(through: 2 * H.laneCount)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x8A04_819C_3FEF_1111)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x8A04_819C_3FEF_1111)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for (count, value) in everyPair(countInputs, valueInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -447,8 +447,8 @@ extension SIMDBFloat16CodegenTests {
     @Test func storeRepeatingBeforeGuardPage() {
         let mismatches = Mismatches("portStoreRepeatingBF16 before a guard page")
         let countInputs = Inputs.counts(through: H.laneCount)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xD65C_B6CB_4401_3E3C)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xD65C_B6CB_4401_3E3C)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (count, value) in everyPair(countInputs, valueInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(count))) {
                 destination in unsafe portStoreRepeatingBF16(value, count: count, to: destination)
@@ -465,7 +465,7 @@ extension SIMDBFloat16CodegenTests {
     @Test func storeRepeatingConstantValue() {
         let mismatches = Mismatches("portStoreRepeatingBF16ConstantValue")
         let countInputs = Inputs.counts(through: 2 * H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for count in countInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -489,7 +489,7 @@ extension SIMDBFloat16CodegenTests {
     @Test func storeRepeatingConstantValueBeforeGuardPage() {
         let mismatches = Mismatches("portStoreRepeatingBF16ConstantValue before a guard page")
         let countInputs = Inputs.counts(through: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for count in countInputs {
             let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(count))) {
                 destination in
@@ -506,8 +506,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeRepeatingConstantCount() {
         let mismatches = Mismatches("portStoreRepeatingBF16ConstantCount")
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xF491_E1E7_E1A5_B9D4)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xF491_E1E7_E1A5_B9D4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for value in valueInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -524,8 +524,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeRepeatingConstantCountBeforeGuardPage() {
         let mismatches = Mismatches("portStoreRepeatingBF16ConstantCount before a guard page")
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x5498_3736_F427_B87F)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x5498_3736_F427_B87F)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for value in valueInputs {
             let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(1))) { destination in
                 unsafe portStoreRepeatingBF16ConstantCount(value, to: destination)
@@ -540,8 +540,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeRepeatingConstantCountTwo() {
         let mismatches = Mismatches("portStoreRepeatingBF16ConstantCountTwo")
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x1919_1E83_AF96_EAEA)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x1919_1E83_AF96_EAEA)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for value in valueInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -561,8 +561,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeRepeatingConstantCountTwoBeforeGuardPage() {
         let mismatches = Mismatches("portStoreRepeatingBF16ConstantCountTwo before a guard page")
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x3E2D_E1E1_C649_D33D)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x3E2D_E1E1_C649_D33D)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for value in valueInputs {
             let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(2))) { destination in
                 unsafe portStoreRepeatingBF16ConstantCountTwo(value, to: destination)
@@ -578,8 +578,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeRepeatingConstantCountLaneCount() {
         let mismatches = Mismatches("portStoreRepeatingBF16ConstantCountLaneCount")
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x80F6_049C_1E03_F699)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x80F6_049C_1E03_F699)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for value in valueInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -604,16 +604,16 @@ extension SIMDBFloat16CodegenTests {
         let mismatches = Mismatches(
             "portStoreRepeatingBF16ConstantCountLaneCount before a guard page"
         )
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x38E3_95DE_2206_87E4)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x38E3_95DE_2206_87E4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for value in valueInputs {
             let (_, portLanes) = unsafe withGuardedLanes(
-                Array(sentinel.prefix(SIMDBFloat16.laneCount))
+                Array(sentinel.prefix(SIMD<BFloat16>.laneCount))
             ) { destination in
                 unsafe portStoreRepeatingBF16ConstantCountLaneCount(value, to: destination)
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(
-                Array(sentinel.prefix(SIMDBFloat16.laneCount))
+                Array(sentinel.prefix(SIMD<BFloat16>.laneCount))
             ) { destination in
                 unsafe highwayStoreRepeatingBF16ConstantCountLaneCount(value, to: destination)
             }
@@ -624,8 +624,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func storeRepeatingConstantCountTwiceLaneCount() {
         let mismatches = Mismatches("portStoreRepeatingBF16ConstantCountTwiceLaneCount")
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x2926_DF74_4F25_CE4D)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x2926_DF74_4F25_CE4D)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for value in valueInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -650,16 +650,16 @@ extension SIMDBFloat16CodegenTests {
         let mismatches = Mismatches(
             "portStoreRepeatingBF16ConstantCountTwiceLaneCount before a guard page"
         )
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x4447_8FF2_C8BC_F7A8)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x4447_8FF2_C8BC_F7A8)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount)
         for value in valueInputs {
             let (_, portLanes) = unsafe withGuardedLanes(
-                Array(sentinel.prefix(2 * SIMDBFloat16.laneCount))
+                Array(sentinel.prefix(2 * SIMD<BFloat16>.laneCount))
             ) { destination in
                 unsafe portStoreRepeatingBF16ConstantCountTwiceLaneCount(value, to: destination)
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(
-                Array(sentinel.prefix(2 * SIMDBFloat16.laneCount))
+                Array(sentinel.prefix(2 * SIMD<BFloat16>.laneCount))
             ) { destination in
                 unsafe highwayStoreRepeatingBF16ConstantCountTwiceLaneCount(value, to: destination)
             }
@@ -672,11 +672,11 @@ extension SIMDBFloat16CodegenTests {
         let mismatches = Mismatches("portCopyBF16")
         let countInputs = Inputs.counts(through: 2 * H.laneCount)
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 2 * H.laneCount,
             seed: 0x9A2F_FFCF_A866_E826
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for (count, from) in everyPair(countInputs, fromInputs) {
             var portLanes = sentinel
             var referenceLanes = sentinel
@@ -704,12 +704,8 @@ extension SIMDBFloat16CodegenTests {
     @Test func copyBeforeGuardPage() {
         let mismatches = Mismatches("portCopyBF16 before a guard page")
         let countInputs = Inputs.counts(through: H.laneCount)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x2716_F7E2_ABF4_5C89
-        )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x2716_F7E2_ABF4_5C89)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (count, from) in everyPair(countInputs, fromInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(count))) {
                 destination in
@@ -731,11 +727,11 @@ extension SIMDBFloat16CodegenTests {
     @Test func copyConstantCount() {
         let mismatches = Mismatches("portCopyBF16ConstantCount")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 2 * H.laneCount,
             seed: 0xD5A8_ED09_17C0_41DD
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for from in fromInputs {
             var portLanes = sentinel
             var referenceLanes = sentinel
@@ -760,12 +756,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func copyConstantCountBeforeGuardPage() {
         let mismatches = Mismatches("portCopyBF16ConstantCount before a guard page")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x5AD6_407E_1BC9_CC18
-        )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x5AD6_407E_1BC9_CC18)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for from in fromInputs {
             let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(1))) { destination in
                 unsafe withGuardedLanes(Array(from.prefix(1))) { source in
@@ -786,11 +778,11 @@ extension SIMDBFloat16CodegenTests {
     @Test func copyConstantCountTwo() {
         let mismatches = Mismatches("portCopyBF16ConstantCountTwo")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 2 * H.laneCount,
             seed: 0x2934_A83E_9999_F639
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for from in fromInputs {
             var portLanes = sentinel
             var referenceLanes = sentinel
@@ -815,12 +807,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func copyConstantCountTwoBeforeGuardPage() {
         let mismatches = Mismatches("portCopyBF16ConstantCountTwo before a guard page")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xA925_8DD9_74A3_B7C4
-        )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xA925_8DD9_74A3_B7C4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for from in fromInputs {
             let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(2))) { destination in
                 unsafe withGuardedLanes(Array(from.prefix(2))) { source in
@@ -841,11 +829,11 @@ extension SIMDBFloat16CodegenTests {
     @Test func copyConstantCountLaneCount() {
         let mismatches = Mismatches("portCopyBF16ConstantCountLaneCount")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 2 * H.laneCount,
             seed: 0x2281_519E_7C67_16BE
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for from in fromInputs {
             var portLanes = sentinel
             var referenceLanes = sentinel
@@ -870,24 +858,20 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func copyConstantCountLaneCountBeforeGuardPage() {
         let mismatches = Mismatches("portCopyBF16ConstantCountLaneCount before a guard page")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x6C60_CC1E_E9B8_0601
-        )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x6C60_CC1E_E9B8_0601)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for from in fromInputs {
             let (_, portLanes) = unsafe withGuardedLanes(
-                Array(sentinel.prefix(SIMDBFloat16.laneCount))
+                Array(sentinel.prefix(SIMD<BFloat16>.laneCount))
             ) { destination in
-                unsafe withGuardedLanes(Array(from.prefix(SIMDBFloat16.laneCount))) { source in
+                unsafe withGuardedLanes(Array(from.prefix(SIMD<BFloat16>.laneCount))) { source in
                     unsafe portCopyBF16ConstantCountLaneCount(from: source, to: destination)
                 }.result
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(
-                Array(sentinel.prefix(SIMDBFloat16.laneCount))
+                Array(sentinel.prefix(SIMD<BFloat16>.laneCount))
             ) { destination in
-                unsafe withGuardedLanes(Array(from.prefix(SIMDBFloat16.laneCount))) { source in
+                unsafe withGuardedLanes(Array(from.prefix(SIMD<BFloat16>.laneCount))) { source in
                     unsafe highwayCopyBF16ConstantCountLaneCount(from: source, to: destination)
                 }.result
             }
@@ -899,11 +883,11 @@ extension SIMDBFloat16CodegenTests {
     @Test func copyConstantCountTwiceLaneCount() {
         let mismatches = Mismatches("portCopyBF16ConstantCountTwiceLaneCount")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 2 * H.laneCount,
             seed: 0x4B8F_683A_8634_6AAC
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for from in fromInputs {
             var portLanes = sentinel
             var referenceLanes = sentinel
@@ -929,23 +913,25 @@ extension SIMDBFloat16CodegenTests {
     @Test func copyConstantCountTwiceLaneCountBeforeGuardPage() {
         let mismatches = Mismatches("portCopyBF16ConstantCountTwiceLaneCount before a guard page")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 2 * H.laneCount,
             seed: 0x233F_162D_8F7F_D417
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount)
         for from in fromInputs {
             let (_, portLanes) = unsafe withGuardedLanes(
-                Array(sentinel.prefix(2 * SIMDBFloat16.laneCount))
+                Array(sentinel.prefix(2 * SIMD<BFloat16>.laneCount))
             ) { destination in
-                unsafe withGuardedLanes(Array(from.prefix(2 * SIMDBFloat16.laneCount))) { source in
+                unsafe withGuardedLanes(Array(from.prefix(2 * SIMD<BFloat16>.laneCount))) {
+                    source in
                     unsafe portCopyBF16ConstantCountTwiceLaneCount(from: source, to: destination)
                 }.result
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(
-                Array(sentinel.prefix(2 * SIMDBFloat16.laneCount))
+                Array(sentinel.prefix(2 * SIMD<BFloat16>.laneCount))
             ) { destination in
-                unsafe withGuardedLanes(Array(from.prefix(2 * SIMDBFloat16.laneCount))) { source in
+                unsafe withGuardedLanes(Array(from.prefix(2 * SIMD<BFloat16>.laneCount))) {
+                    source in
                     unsafe highwayCopyBF16ConstantCountTwiceLaneCount(from: source, to: destination)
                 }.result
             }
@@ -959,7 +945,7 @@ extension SIMDBFloat16CodegenTests {
         let aInputs = Inputs.vectors(H.HalfVector.self, seed: 0x6BFC_6B82_DEC2_34AE).map(
             poisoningUpperBytes
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount / 2 + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount / 2 + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -979,7 +965,7 @@ extension SIMDBFloat16CodegenTests {
         let aInputs = Inputs.vectors(H.HalfVector.self, seed: 0x34AA_0B61_2299_4F9F).map(
             poisoningUpperBytes
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount / 2)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount / 2)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portStoreHalfBF16(a, to: destination)
@@ -997,7 +983,7 @@ extension SIMDBFloat16CodegenTests {
         let aInputs = Inputs.vectors(H.QuarterVector.self, seed: 0x767D_200C_6590_325B).map(
             poisoningUpperBytes
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount / 4 + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount / 4 + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -1017,7 +1003,7 @@ extension SIMDBFloat16CodegenTests {
         let aInputs = Inputs.vectors(H.QuarterVector.self, seed: 0x88AD_1FC4_408F_CA80).map(
             poisoningUpperBytes
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount / 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount / 4)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portStoreQuarterBF16(a, to: destination)
@@ -1035,7 +1021,7 @@ extension SIMDBFloat16CodegenTests {
         let aInputs = Inputs.vectors(H.BlockVector.self, seed: 0x41C6_C36B_1C29_5DA6).map(
             poisoningUpperBytes
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 16 / MemoryLayout<H.Lane>.size + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 16 / MemoryLayout<Lane>.size + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -1055,7 +1041,7 @@ extension SIMDBFloat16CodegenTests {
         let aInputs = Inputs.vectors(H.BlockVector.self, seed: 0x8122_F0EF_EDEF_CE57).map(
             poisoningUpperBytes
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 16 / MemoryLayout<H.Lane>.size)
+        let sentinel = Inputs.sentinel(Lane.self, count: 16 / MemoryLayout<Lane>.size)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portStoreBlockBF16(a, to: destination)

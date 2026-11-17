@@ -16,7 +16,7 @@ extension HighwayReferenceInt64 {
     public static func loadExpanded(fromUnchecked span: Span<Lane>, where mask: Mask) -> SIMD {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return span.withUnsafeBufferPointer {
-            unsafe SIMDInt64.Vector(
+            unsafe SIMD(
                 raw: HighwayReference.Nothrow.loadExpandedWhereI64(
                     mask.raw,
                     $0.baseAddress.unsafelyUnwrapped
@@ -45,7 +45,7 @@ extension HighwayReferenceInt64 {
     ) -> SIMD {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return span.withUnsafeBufferPointer {
-            unsafe SIMDInt64.Vector(
+            unsafe SIMD(
                 raw: HighwayReference.Nothrow.loadExpandedWhereOtherwiseI64(
                     otherwise.raw,
                     mask.raw,
@@ -59,24 +59,24 @@ extension HighwayReferenceInt64 {
 
 @inline(never)
 public func portExpandedI64(_ a: SIMD<Int64>, where mask: SIMD<Int64>.Mask) -> SIMD<Int64> {
-    SIMDInt64.expanded(a, where: mask)
+    SIMD<Int64>.expanded(a, where: mask)
 }
 
 @inline(never)
 public func highwayExpandedI64(_ a: SIMD<Int64>, where mask: SIMD<Int64>.Mask) -> SIMD<Int64> {
-    SIMDInt64.Vector(raw: HighwayReference.Nothrow.expandedI64(a.raw, mask.raw))
+    SIMD<Int64>(raw: HighwayReference.Nothrow.expandedI64(a.raw, mask.raw))
 }
 
 @inline(never)
 public func portExpandedI64ConstantA(where mask: SIMD<Int64>.Mask) -> SIMD<Int64> {
-    SIMDInt64.expanded(SIMDInt64.repeating(26), where: mask)
+    SIMD<Int64>.expanded(SIMD<Int64>.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayExpandedI64ConstantA(where mask: SIMD<Int64>.Mask) -> SIMD<Int64> {
-    SIMDInt64.Vector(
+    SIMD<Int64>(
         raw: HighwayReference.Nothrow.expandedI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             mask.raw
         )
     )
@@ -87,7 +87,7 @@ public func portLoadExpandedWhereI64(
     from: UnsafePointer<Int64>,
     where mask: SIMD<Int64>.Mask
 ) -> SIMD<Int64> {
-    unsafe SIMDInt64.loadExpanded(from: from, where: mask)
+    unsafe SIMD<Int64>.loadExpanded(from: from, where: mask)
 }
 
 @inline(never)
@@ -95,7 +95,7 @@ public func highwayLoadExpandedWhereI64(
     from: UnsafePointer<Int64>,
     where mask: SIMD<Int64>.Mask
 ) -> SIMD<Int64> {
-    unsafe SIMDInt64.Vector(raw: HighwayReference.Nothrow.loadExpandedWhereI64(mask.raw, from))
+    unsafe SIMD<Int64>(raw: HighwayReference.Nothrow.loadExpandedWhereI64(mask.raw, from))
 }
 
 @inline(never)
@@ -104,7 +104,7 @@ public func portLoadExpandedWhereOtherwiseI64(
     where mask: SIMD<Int64>.Mask,
     otherwise: SIMD<Int64>
 ) -> SIMD<Int64> {
-    unsafe SIMDInt64.loadExpanded(from: from, where: mask, otherwise: otherwise)
+    unsafe SIMD<Int64>.loadExpanded(from: from, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -113,7 +113,7 @@ public func highwayLoadExpandedWhereOtherwiseI64(
     where mask: SIMD<Int64>.Mask,
     otherwise: SIMD<Int64>
 ) -> SIMD<Int64> {
-    unsafe SIMDInt64.Vector(
+    unsafe SIMD<Int64>(
         raw: HighwayReference.Nothrow.loadExpandedWhereOtherwiseI64(otherwise.raw, mask.raw, from)
     )
 }
@@ -123,7 +123,7 @@ public func portLoadExpandedWhereOtherwiseI64ConstantOtherwise(
     from: UnsafePointer<Int64>,
     where mask: SIMD<Int64>.Mask
 ) -> SIMD<Int64> {
-    unsafe SIMDInt64.loadExpanded(from: from, where: mask, otherwise: SIMDInt64.repeating(26))
+    unsafe SIMD<Int64>.loadExpanded(from: from, where: mask, otherwise: SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
@@ -131,9 +131,9 @@ public func highwayLoadExpandedWhereOtherwiseI64ConstantOtherwise(
     from: UnsafePointer<Int64>,
     where mask: SIMD<Int64>.Mask
 ) -> SIMD<Int64> {
-    unsafe SIMDInt64.Vector(
+    unsafe SIMD<Int64>(
         raw: HighwayReference.Nothrow.loadExpandedWhereOtherwiseI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             mask.raw,
             from
         )

@@ -7,15 +7,15 @@ import Vectorization
 
 extension SIMDUInt8ConstantTests {
     @inline(__always)
-    private func checkStoreInterleaved2ConstantA(_ value: H.Lane) {
+    private func checkStoreInterleaved2ConstantA(_ value: Lane) {
         let mismatches = Mismatches("storeInterleaved2 with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE78B_0F1C_564F_720E)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE78B_0F1C_564F_720E)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for b in bInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -35,15 +35,15 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkStoreInterleaved2ConstantB(_ value: H.Lane) {
+    private func checkStoreInterleaved2ConstantB(_ value: Lane) {
         let mismatches = Mismatches("storeInterleaved2 with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDEF5_D91C_5178_91AC)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDEF5_D91C_5178_91AC)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -103,16 +103,16 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkStoreInterleaved3ConstantA(_ value: H.Lane) {
+    private func checkStoreInterleaved3ConstantA(_ value: Lane) {
         let mismatches = Mismatches("storeInterleaved3 with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD009_E880_5865_DBDF)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xD009_E980_5865_DD92)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD009_E880_5865_DBDF)
+        let cInputs = Inputs.vectors(H.self, seed: 0xD009_E980_5865_DD92)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 3 * H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 3 * H.laneCount + 4)
         for (b, c) in everyPair(bInputs, cInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -133,16 +133,16 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkStoreInterleaved3ConstantB(_ value: H.Lane) {
+    private func checkStoreInterleaved3ConstantB(_ value: Lane) {
         let mismatches = Mismatches("storeInterleaved3 with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD89F_1E80_5D3C_BC41)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xD89F_1C80_5D3C_B8DB)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD89F_1E80_5D3C_BC41)
+        let cInputs = Inputs.vectors(H.self, seed: 0xD89F_1C80_5D3C_B8DB)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 3 * H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 3 * H.laneCount + 4)
         for (a, c) in everyPair(aInputs, cInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -163,16 +163,16 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkStoreInterleaved3ConstantC(_ value: H.Lane) {
+    private func checkStoreInterleaved3ConstantC(_ value: Lane) {
         let mismatches = Mismatches("storeInterleaved3 with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE20D_B580_62CC_3236)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE20D_B680_62CC_33E9)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE20D_B580_62CC_3236)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE20D_B680_62CC_33E9)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 3 * H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 3 * H.laneCount + 4)
         for (a, b) in everyPair(aInputs, bInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -241,17 +241,17 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkStoreInterleaved4ConstantA(_ value: H.Lane) {
+    private func checkStoreInterleaved4ConstantA(_ value: Lane) {
         let mismatches = Mismatches("storeInterleaved4 with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x55B2_AB16_8289_2E1C)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x55B2_AE16_8289_3335)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0x55B2_AD16_8289_3182)
+        let bInputs = Inputs.vectors(H.self, seed: 0x55B2_AB16_8289_2E1C)
+        let cInputs = Inputs.vectors(H.self, seed: 0x55B2_AE16_8289_3335)
+        let dInputs = Inputs.vectors(H.self, seed: 0x55B2_AD16_8289_3182)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 * H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount + 4)
         for (b, c, d) in mixedTriples(bInputs, cInputs, dInputs, seed: 0xC397_1B65_3064_53A9) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -283,17 +283,17 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkStoreInterleaved4ConstantB(_ value: H.Lane) {
+    private func checkStoreInterleaved4ConstantB(_ value: Lane) {
         let mismatches = Mismatches("storeInterleaved4 with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6F05_3116_90B0_CDCE)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x6F05_2F16_90B0_CA68)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0x6F05_3016_90B0_CC1B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6F05_3116_90B0_CDCE)
+        let cInputs = Inputs.vectors(H.self, seed: 0x6F05_2F16_90B0_CA68)
+        let dInputs = Inputs.vectors(H.self, seed: 0x6F05_3016_90B0_CC1B)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 * H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount + 4)
         for (a, c, d) in mixedTriples(aInputs, cInputs, dInputs, seed: 0xB71F_88AF_4FD8_ED2A) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -325,17 +325,17 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkStoreInterleaved4ConstantC(_ value: H.Lane) {
+    private func checkStoreInterleaved4ConstantC(_ value: Lane) {
         let mismatches = Mismatches("storeInterleaved4 with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6602_FA16_8B7D_19D9)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6602_F916_8B7D_1826)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0x6602_F716_8B7D_14C0)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6602_FA16_8B7D_19D9)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6602_F916_8B7D_1826)
+        let dInputs = Inputs.vectors(H.self, seed: 0x6602_F716_8B7D_14C0)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 * H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount + 4)
         for (a, b, d) in mixedTriples(aInputs, bInputs, dInputs, seed: 0x51F1_9B2F_5D46_C893) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -367,17 +367,17 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkStoreInterleaved4ConstantD(_ value: H.Lane) {
+    private func checkStoreInterleaved4ConstantD(_ value: Lane) {
         let mismatches = Mismatches("storeInterleaved4 with d repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8108_7F16_9B16_4C58)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8108_8016_9B16_4E0B)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x8108_8116_9B16_4FBE)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8108_7F16_9B16_4C58)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8108_8016_9B16_4E0B)
+        let cInputs = Inputs.vectors(H.self, seed: 0x8108_8116_9B16_4FBE)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 * H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount + 4)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x6E59_8648_D7A0_B614) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in

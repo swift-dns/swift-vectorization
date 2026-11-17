@@ -10,13 +10,13 @@ extension SIMDFloat16ReferenceTests {
     @Test func selecting() {
         let mismatches = Mismatches("selecting")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x4166_B54C_8616_FE46)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4166_B64C_8616_FFF9)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4166_B34C_8616_FAE0)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4166_B64C_8616_FFF9)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4166_B34C_8616_FAE0)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xE250_7E21_1857_CB42)
         {
             mismatches.check(
                 H.selecting(mask, a, b),
-                HighwayReference.selectingF16(mask.raw, a.raw, b.raw),
+                H(raw: HighwayReference.selectingF16(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -26,13 +26,13 @@ extension SIMDFloat16ReferenceTests {
     @Test func selectingNonCanonical() {
         let mismatches = Mismatches("selecting with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x2F61_0622_31AA_A475)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2F61_0522_31AA_A2C2)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2F61_0422_31AA_A10F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2F61_0522_31AA_A2C2)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2F61_0422_31AA_A10F)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xAF5F_01AF_667E_64A7)
         {
             mismatches.check(
                 H.selecting(mask, a, b),
-                HighwayReference.selectingF16(mask.raw, a.raw, b.raw),
+                H(raw: HighwayReference.selectingF16(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -42,11 +42,11 @@ extension SIMDFloat16ReferenceTests {
     @Test func selectingOrZero() {
         let mismatches = Mismatches("selectingOrZero")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x37D3_D36A_37DB_C565)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x37D3_D26A_37DB_C3B2)
+        let aInputs = Inputs.vectors(H.self, seed: 0x37D3_D26A_37DB_C3B2)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.selectingOrZero(mask, a),
-                HighwayReference.selectingOrZeroF16(mask.raw, a.raw),
+                H(raw: HighwayReference.selectingOrZeroF16(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -56,11 +56,11 @@ extension SIMDFloat16ReferenceTests {
     @Test func selectingOrZeroNonCanonical() {
         let mismatches = Mismatches("selectingOrZero with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x0FEE_595E_6B4D_9F62)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0FEE_5A5E_6B4D_A115)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0FEE_5A5E_6B4D_A115)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.selectingOrZero(mask, a),
-                HighwayReference.selectingOrZeroF16(mask.raw, a.raw),
+                H(raw: HighwayReference.selectingOrZeroF16(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -70,11 +70,11 @@ extension SIMDFloat16ReferenceTests {
     @Test func zeroingSelected() {
         let mismatches = Mismatches("zeroingSelected")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8987_17AE_E538_BC59)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8987_16AE_E538_BAA6)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8987_16AE_E538_BAA6)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.zeroingSelected(mask, a),
-                HighwayReference.zeroingSelectedF16(mask.raw, a.raw),
+                H(raw: HighwayReference.zeroingSelectedF16(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -84,11 +84,11 @@ extension SIMDFloat16ReferenceTests {
     @Test func zeroingSelectedNonCanonical() {
         let mismatches = Mismatches("zeroingSelected with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xF519_840E_5A89_849E)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF519_850E_5A89_8651)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF519_850E_5A89_8651)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.zeroingSelected(mask, a),
-                HighwayReference.zeroingSelectedF16(mask.raw, a.raw),
+                H(raw: HighwayReference.zeroingSelectedF16(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -97,13 +97,13 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func selectingByVector() {
         let mismatches = Mismatches("selectingByVector")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x83A3_052E_76BA_DFC8)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x83A3_062E_76BA_E17B)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x83A3_072E_76BA_E32E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x83A3_052E_76BA_DFC8)
+        let bInputs = Inputs.vectors(H.self, seed: 0x83A3_062E_76BA_E17B)
+        let cInputs = Inputs.vectors(H.self, seed: 0x83A3_072E_76BA_E32E)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xCBA9_4EA3_CAA0_A7C4) {
             mismatches.check(
                 H.selecting(a, b, c),
-                HighwayReference.selectingByVectorF16(a.raw, b.raw, c.raw),
+                H(raw: HighwayReference.selectingByVectorF16(a.raw, b.raw, c.raw)),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }

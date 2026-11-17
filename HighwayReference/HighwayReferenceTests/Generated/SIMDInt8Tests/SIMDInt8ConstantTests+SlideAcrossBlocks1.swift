@@ -9,11 +9,11 @@ extension SIMDInt8ConstantTests {
     @inline(__always)
     private func checkSlideUpLanesConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("slideUpLanes with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x80A0_97FB_FC1A_2930)
+        let aInputs = Inputs.vectors(H.self, seed: 0x80A0_97FB_FC1A_2930)
         for a in aInputs {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes),
-                H.Vector(raw: HighwayReference.slideUpLanesI8(a.raw, lanes)),
+                H(raw: HighwayReference.slideUpLanesI8(a.raw, lanes)),
                 "a: \(describe(a))"
             )
         }
@@ -279,12 +279,12 @@ extension SIMDInt8ConstantTests {
     @inline(__always)
     private func checkSlideUpLanesFillingWithConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("slideUpLanesFillingWith with lanes \(lanes)")
-        let fillInputs = Inputs.vectors(H.Vector.self, seed: 0x0BF2_A504_B225_B0F9)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0BF2_A404_B225_AF46)
+        let fillInputs = Inputs.vectors(H.self, seed: 0x0BF2_A504_B225_B0F9)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0BF2_A404_B225_AF46)
         for (fill, a) in everyPair(fillInputs, aInputs) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes, fillingWith: fill),
-                H.Vector(raw: HighwayReference.slideUpLanesFillingWithI8(fill.raw, a.raw, lanes)),
+                H(raw: HighwayReference.slideUpLanesFillingWithI8(fill.raw, a.raw, lanes)),
                 "fill: \(describe(fill)), a: \(describe(a))"
             )
         }
@@ -550,11 +550,11 @@ extension SIMDInt8ConstantTests {
     @inline(__always)
     private func checkSlideDownLanesConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("slideDownLanes with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x995A_8B3F_F0C7_E31D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x995A_8B3F_F0C7_E31D)
         for a in aInputs {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes),
-                H.Vector(raw: HighwayReference.slideDownLanesI8(a.raw, lanes)),
+                H(raw: HighwayReference.slideDownLanesI8(a.raw, lanes)),
                 "a: \(describe(a))"
             )
         }

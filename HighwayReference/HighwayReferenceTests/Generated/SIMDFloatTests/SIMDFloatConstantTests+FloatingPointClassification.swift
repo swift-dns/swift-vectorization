@@ -7,9 +7,13 @@ import Vectorization
 
 extension SIMDFloatConstantTests {
     @inline(__always)
-    private func checkIsNaNConstantA(_ value: H.Lane) {
+    private func checkIsNaNConstantA(_ value: Lane) {
         let mismatches = Mismatches("isNaN with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         mismatches.check(
             H.isNaN(H.repeating(value)),
             H.Mask(raw: HighwayReference.isNaNF32(H.repeating(value).raw)),
@@ -75,7 +79,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func isNaNConstantSplatPayloadNaN() {
-        checkIsNaNConstantA(H.Lane(nan: 1, signaling: false))
+        checkIsNaNConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func isNaNConstantSplatSignalingNaN() {
@@ -95,10 +99,14 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkIsEitherNaNConstantA(_ value: H.Lane) {
+    private func checkIsEitherNaNConstantA(_ value: Lane) {
         let mismatches = Mismatches("isEitherNaN with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC263_9A69_5CB1_4712)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0xC263_9A69_5CB1_4712)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for b in bInputs {
             mismatches.check(
                 H.isEitherNaN(H.repeating(value), b),
@@ -110,10 +118,14 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkIsEitherNaNConstantB(_ value: H.Lane) {
+    private func checkIsEitherNaNConstantB(_ value: Lane) {
         let mismatches = Mismatches("isEitherNaN with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB961_E469_577E_6E50)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0xB961_E469_577E_6E50)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for a in aInputs {
             mismatches.check(
                 H.isEitherNaN(a, H.repeating(value)),
@@ -195,8 +207,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func isEitherNaNConstantSplatPayloadNaN() {
-        checkIsEitherNaNConstantA(H.Lane(nan: 1, signaling: false))
-        checkIsEitherNaNConstantB(H.Lane(nan: 1, signaling: false))
+        checkIsEitherNaNConstantA(Lane(nan: 1, signaling: false))
+        checkIsEitherNaNConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func isEitherNaNConstantSplatSignalingNaN() {
@@ -220,9 +232,13 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkIsInfiniteConstantA(_ value: H.Lane) {
+    private func checkIsInfiniteConstantA(_ value: Lane) {
         let mismatches = Mismatches("isInfinite with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         mismatches.check(
             H.isInfinite(H.repeating(value)),
             H.Mask(raw: HighwayReference.isInfiniteF32(H.repeating(value).raw)),
@@ -288,7 +304,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func isInfiniteConstantSplatPayloadNaN() {
-        checkIsInfiniteConstantA(H.Lane(nan: 1, signaling: false))
+        checkIsInfiniteConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func isInfiniteConstantSplatSignalingNaN() {
@@ -308,9 +324,13 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkIsFiniteConstantA(_ value: H.Lane) {
+    private func checkIsFiniteConstantA(_ value: Lane) {
         let mismatches = Mismatches("isFinite with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         mismatches.check(
             H.isFinite(H.repeating(value)),
             H.Mask(raw: HighwayReference.isFiniteF32(H.repeating(value).raw)),
@@ -376,7 +396,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func isFiniteConstantSplatPayloadNaN() {
-        checkIsFiniteConstantA(H.Lane(nan: 1, signaling: false))
+        checkIsFiniteConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func isFiniteConstantSplatSignalingNaN() {

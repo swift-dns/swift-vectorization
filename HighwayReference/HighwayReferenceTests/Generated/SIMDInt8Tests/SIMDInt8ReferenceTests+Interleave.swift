@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDInt8ReferenceTests {
     @Test func interleavingLower() {
         let mismatches = Mismatches("interleavingLower")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x30F5_2E21_6ACB_FECF)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x30F5_2D21_6ACB_FD1C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x30F5_2E21_6ACB_FECF)
+        let bInputs = Inputs.vectors(H.self, seed: 0x30F5_2D21_6ACB_FD1C)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingLower(a, b),
-                H.Vector(raw: HighwayReference.interleavingLowerI8(a.raw, b.raw)),
+                H(raw: HighwayReference.interleavingLowerI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -22,12 +22,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func interleavingUpper() {
         let mismatches = Mismatches("interleavingUpper")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x355D_4744_9B7A_32B2)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x355D_4844_9B7A_3465)
+        let aInputs = Inputs.vectors(H.self, seed: 0x355D_4744_9B7A_32B2)
+        let bInputs = Inputs.vectors(H.self, seed: 0x355D_4844_9B7A_3465)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingUpper(a, b),
-                H.Vector(raw: HighwayReference.interleavingUpperI8(a.raw, b.raw)),
+                H(raw: HighwayReference.interleavingUpperI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -36,12 +36,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func interleavingEven() {
         let mismatches = Mismatches("interleavingEven")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7A71_6287_91B5_08C8)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7A71_6387_91B5_0A7B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7A71_6287_91B5_08C8)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7A71_6387_91B5_0A7B)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingEven(a, b),
-                H.Vector(raw: HighwayReference.interleavingEvenI8(a.raw, b.raw)),
+                H(raw: HighwayReference.interleavingEvenI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -50,12 +50,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func interleavingOdd() {
         let mismatches = Mismatches("interleavingOdd")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5A14_1180_5E50_3F03)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5A14_1080_5E50_3D50)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5A14_1180_5E50_3F03)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5A14_1080_5E50_3D50)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingOdd(a, b),
-                H.Vector(raw: HighwayReference.interleavingOddI8(a.raw, b.raw)),
+                H(raw: HighwayReference.interleavingOddI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

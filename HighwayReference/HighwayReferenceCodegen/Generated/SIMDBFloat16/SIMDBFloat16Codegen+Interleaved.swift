@@ -318,7 +318,7 @@ public func portLoadInterleaved2BF16(
     _ v0: inout SIMD<BFloat16>,
     _ v1: inout SIMD<BFloat16>
 ) {
-    unsafe SIMDBFloat16.loadInterleaved2(from: from, &v0, &v1)
+    unsafe SIMD<BFloat16>.loadInterleaved2(from: from, &v0, &v1)
 }
 
 @inline(never)
@@ -337,7 +337,7 @@ public func portLoadInterleaved3BF16(
     _ v1: inout SIMD<BFloat16>,
     _ v2: inout SIMD<BFloat16>
 ) {
-    unsafe SIMDBFloat16.loadInterleaved3(from: from, &v0, &v1, &v2)
+    unsafe SIMD<BFloat16>.loadInterleaved3(from: from, &v0, &v1, &v2)
 }
 
 @inline(never)
@@ -358,7 +358,7 @@ public func portLoadInterleaved4BF16(
     _ v2: inout SIMD<BFloat16>,
     _ v3: inout SIMD<BFloat16>
 ) {
-    unsafe SIMDBFloat16.loadInterleaved4(from: from, &v0, &v1, &v2, &v3)
+    unsafe SIMD<BFloat16>.loadInterleaved4(from: from, &v0, &v1, &v2, &v3)
 }
 
 @inline(never)
@@ -378,7 +378,7 @@ public func portStoreInterleaved2BF16(
     _ b: SIMD<BFloat16>,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.storeInterleaved2(a, b, to: to)
+    unsafe SIMD<BFloat16>.storeInterleaved2(a, b, to: to)
 }
 
 @inline(never)
@@ -395,8 +395,8 @@ public func portStoreInterleaved2BF16ConstantA(
     _ b: SIMD<BFloat16>,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.storeInterleaved2(
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+    unsafe SIMD<BFloat16>.storeInterleaved2(
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         b,
         to: to
     )
@@ -408,7 +408,7 @@ public func highwayStoreInterleaved2BF16ConstantA(
     to: UnsafeMutablePointer<BFloat16>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved2BF16(
-        SIMDBFloat16.Vector(
+        SIMD<BFloat16>(
             raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
         ).raw,
         b.raw,
@@ -421,9 +421,9 @@ public func portStoreInterleaved2BF16ConstantB(
     _ a: SIMD<BFloat16>,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.storeInterleaved2(
+    unsafe SIMD<BFloat16>.storeInterleaved2(
         a,
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         to: to
     )
 }
@@ -435,7 +435,7 @@ public func highwayStoreInterleaved2BF16ConstantB(
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved2BF16(
         a.raw,
-        SIMDBFloat16.Vector(
+        SIMD<BFloat16>(
             raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
         ).raw,
         to
@@ -449,7 +449,7 @@ public func portStoreInterleaved3BF16(
     _ c: SIMD<BFloat16>,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.storeInterleaved3(a, b, c, to: to)
+    unsafe SIMD<BFloat16>.storeInterleaved3(a, b, c, to: to)
 }
 
 @inline(never)
@@ -468,8 +468,8 @@ public func portStoreInterleaved3BF16ConstantA(
     _ c: SIMD<BFloat16>,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.storeInterleaved3(
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+    unsafe SIMD<BFloat16>.storeInterleaved3(
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         b,
         c,
         to: to
@@ -483,7 +483,7 @@ public func highwayStoreInterleaved3BF16ConstantA(
     to: UnsafeMutablePointer<BFloat16>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved3BF16(
-        SIMDBFloat16.Vector(
+        SIMD<BFloat16>(
             raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
         ).raw,
         b.raw,
@@ -498,9 +498,9 @@ public func portStoreInterleaved3BF16ConstantB(
     _ c: SIMD<BFloat16>,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.storeInterleaved3(
+    unsafe SIMD<BFloat16>.storeInterleaved3(
         a,
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         c,
         to: to
     )
@@ -514,7 +514,7 @@ public func highwayStoreInterleaved3BF16ConstantB(
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved3BF16(
         a.raw,
-        SIMDBFloat16.Vector(
+        SIMD<BFloat16>(
             raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
         ).raw,
         c.raw,
@@ -528,10 +528,10 @@ public func portStoreInterleaved3BF16ConstantC(
     _ b: SIMD<BFloat16>,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.storeInterleaved3(
+    unsafe SIMD<BFloat16>.storeInterleaved3(
         a,
         b,
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         to: to
     )
 }
@@ -545,7 +545,7 @@ public func highwayStoreInterleaved3BF16ConstantC(
     unsafe HighwayReference.Nothrow.storeInterleaved3BF16(
         a.raw,
         b.raw,
-        SIMDBFloat16.Vector(
+        SIMD<BFloat16>(
             raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
         ).raw,
         to
@@ -560,7 +560,7 @@ public func portStoreInterleaved4BF16(
     _ d: SIMD<BFloat16>,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.storeInterleaved4(a, b, c, d, to: to)
+    unsafe SIMD<BFloat16>.storeInterleaved4(a, b, c, d, to: to)
 }
 
 @inline(never)
@@ -581,8 +581,8 @@ public func portStoreInterleaved4BF16ConstantA(
     _ d: SIMD<BFloat16>,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.storeInterleaved4(
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+    unsafe SIMD<BFloat16>.storeInterleaved4(
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         b,
         c,
         d,
@@ -598,7 +598,7 @@ public func highwayStoreInterleaved4BF16ConstantA(
     to: UnsafeMutablePointer<BFloat16>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved4BF16(
-        SIMDBFloat16.Vector(
+        SIMD<BFloat16>(
             raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
         ).raw,
         b.raw,
@@ -615,9 +615,9 @@ public func portStoreInterleaved4BF16ConstantB(
     _ d: SIMD<BFloat16>,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.storeInterleaved4(
+    unsafe SIMD<BFloat16>.storeInterleaved4(
         a,
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         c,
         d,
         to: to
@@ -633,7 +633,7 @@ public func highwayStoreInterleaved4BF16ConstantB(
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved4BF16(
         a.raw,
-        SIMDBFloat16.Vector(
+        SIMD<BFloat16>(
             raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
         ).raw,
         c.raw,
@@ -649,10 +649,10 @@ public func portStoreInterleaved4BF16ConstantC(
     _ d: SIMD<BFloat16>,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.storeInterleaved4(
+    unsafe SIMD<BFloat16>.storeInterleaved4(
         a,
         b,
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         d,
         to: to
     )
@@ -668,7 +668,7 @@ public func highwayStoreInterleaved4BF16ConstantC(
     unsafe HighwayReference.Nothrow.storeInterleaved4BF16(
         a.raw,
         b.raw,
-        SIMDBFloat16.Vector(
+        SIMD<BFloat16>(
             raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
         ).raw,
         d.raw,
@@ -683,11 +683,11 @@ public func portStoreInterleaved4BF16ConstantD(
     _ c: SIMD<BFloat16>,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.storeInterleaved4(
+    unsafe SIMD<BFloat16>.storeInterleaved4(
         a,
         b,
         c,
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         to: to
     )
 }
@@ -703,7 +703,7 @@ public func highwayStoreInterleaved4BF16ConstantD(
         a.raw,
         b.raw,
         c.raw,
-        SIMDBFloat16.Vector(
+        SIMD<BFloat16>(
             raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
         ).raw,
         to

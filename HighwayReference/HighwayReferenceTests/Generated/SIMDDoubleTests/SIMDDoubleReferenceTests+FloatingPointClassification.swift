@@ -8,7 +8,7 @@ import Vectorization
 extension SIMDDoubleReferenceTests {
     @Test func isNaN() {
         let mismatches = Mismatches("isNaN")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAD1B_D91D_F8E2_4EB6)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAD1B_D91D_F8E2_4EB6)
         for a in aInputs {
             mismatches.check(
                 H.isNaN(a),
@@ -21,8 +21,8 @@ extension SIMDDoubleReferenceTests {
 
     @Test func isEitherNaN() {
         let mismatches = Mismatches("isEitherNaN")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9A70_E718_5082_9FAD)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9A70_E618_5082_9DFA)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9A70_E718_5082_9FAD)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9A70_E618_5082_9DFA)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.isEitherNaN(a, b),
@@ -35,7 +35,7 @@ extension SIMDDoubleReferenceTests {
 
     @Test func isInfinite() {
         let mismatches = Mismatches("isInfinite")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6FA4_7095_388D_FF7B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6FA4_7095_388D_FF7B)
         for a in aInputs {
             mismatches.check(
                 H.isInfinite(a),
@@ -48,7 +48,7 @@ extension SIMDDoubleReferenceTests {
 
     @Test func isFinite() {
         let mismatches = Mismatches("isFinite")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x189A_163F_AD01_8604)
+        let aInputs = Inputs.vectors(H.self, seed: 0x189A_163F_AD01_8604)
         for a in aInputs {
             mismatches.check(
                 H.isFinite(a),

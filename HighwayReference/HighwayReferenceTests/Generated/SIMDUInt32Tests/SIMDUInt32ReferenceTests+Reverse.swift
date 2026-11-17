@@ -8,11 +8,11 @@ import Vectorization
 extension SIMDUInt32ReferenceTests {
     @Test func reversed() {
         let mismatches = Mismatches("reversed")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4F35_CB69_1437_C877)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4F35_CB69_1437_C877)
         for a in aInputs {
             mismatches.check(
                 H.reversed(a),
-                H.Vector(raw: HighwayReference.reversedU32(a.raw)),
+                H(raw: HighwayReference.reversedU32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -21,11 +21,11 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func byteSwapped() {
         let mismatches = Mismatches("byteSwapped")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDB84_3880_D8D7_61A7)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDB84_3880_D8D7_61A7)
         for a in aInputs {
             mismatches.check(
                 H.byteSwapped(a),
-                H.Vector(raw: HighwayReference.byteSwappedU32(a.raw)),
+                H(raw: HighwayReference.byteSwappedU32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -34,11 +34,11 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func bitReversed() {
         let mismatches = Mismatches("bitReversed")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD24D_E356_6ADA_53AC)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD24D_E356_6ADA_53AC)
         for a in aInputs {
             mismatches.check(
                 H.bitReversed(a),
-                H.Vector(raw: HighwayReference.bitReversedU32(a.raw)),
+                H(raw: HighwayReference.bitReversedU32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -47,11 +47,11 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func reversedBlocks() {
         let mismatches = Mismatches("reversedBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7EC0_B489_B7DA_A021)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7EC0_B489_B7DA_A021)
         for a in aInputs {
             mismatches.check(
                 H.reversedBlocks(a),
-                H.Vector(raw: HighwayReference.reversedBlocksU32(a.raw)),
+                H(raw: HighwayReference.reversedBlocksU32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -60,11 +60,11 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func reversed2() {
         let mismatches = Mismatches("reversed2")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE994_6D8D_68FF_5E71)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE994_6D8D_68FF_5E71)
         for a in aInputs {
             mismatches.check(
                 H.reversed2(a),
-                H.Vector(raw: HighwayReference.reversed2U32(a.raw)),
+                H(raw: HighwayReference.reversed2U32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -73,11 +73,11 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func reversed4() {
         let mismatches = Mismatches("reversed4")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFB98_3B8D_7365_B67B)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFB98_3B8D_7365_B67B)
         for a in aInputs {
             mismatches.check(
                 H.reversed4(a),
-                H.Vector(raw: HighwayReference.reversed4U32(a.raw)),
+                H(raw: HighwayReference.reversed4U32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -87,11 +87,11 @@ extension SIMDUInt32ReferenceTests {
     @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
     func reversed8() {
         let mismatches = Mismatches("reversed8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1D7F_D78D_8664_002F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1D7F_D78D_8664_002F)
         for a in aInputs {
             mismatches.check(
                 H.reversed8(a),
-                H.Vector(raw: HighwayReference.reversed8U32(a.raw)),
+                H(raw: HighwayReference.reversed8U32(a.raw)),
                 "a: \(describe(a))"
             )
         }

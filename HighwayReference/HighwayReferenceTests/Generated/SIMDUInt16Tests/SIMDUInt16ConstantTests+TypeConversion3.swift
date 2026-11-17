@@ -8,19 +8,19 @@ import Vectorization
 extension SIMDUInt16ConstantTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @inline(__always)
-    private func checkVectorResizingFromFloat16ConstantA(_ value: SIMDFloat16.Lane) {
+    private func checkVectorResizingFromFloat16ConstantA(_ value: Float16) {
         let mismatches = Mismatches("vectorResizingFromFloat16 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDFloat16.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            SIMD<Float16>.repeating(value),
+            SIMD<Float16>(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
-        let port = H.vector(resizing: SIMDFloat16.repeating(value))
-        let reference = H.Vector(
-            raw: HighwayReference.vectorResizingF16ToU16(SIMDFloat16.repeating(value).raw)
+        let port = H.vector(resizing: SIMD<Float16>.repeating(value))
+        let reference = H(
+            raw: HighwayReference.vectorResizingF16ToU16(SIMD<Float16>.repeating(value).raw)
         )
-        let definedBytes = SIMDFloat16.laneCount * MemoryLayout<SIMDFloat16.Lane>.stride
-        let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<Float16>.laneCount * MemoryLayout<Float16>.stride
+        let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -122,7 +122,7 @@ extension SIMDUInt16ConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func vectorResizingFromFloat16ConstantSplatPayloadNaN() {
-        checkVectorResizingFromFloat16ConstantA(SIMDFloat16.Lane(nan: 1, signaling: false))
+        checkVectorResizingFromFloat16ConstantA(Float16(nan: 1, signaling: false))
     }
     #endif
 
@@ -152,19 +152,19 @@ extension SIMDUInt16ConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @inline(__always)
-    private func checkHalfVectorResizingFromFloat16ConstantA(_ value: SIMDFloat16.Lane) {
+    private func checkHalfVectorResizingFromFloat16ConstantA(_ value: Float16) {
         let mismatches = Mismatches("halfVectorResizingFromFloat16 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDFloat16.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            SIMD<Float16>.repeating(value),
+            SIMD<Float16>(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
-        let port = H.halfVector(resizing: SIMDFloat16.repeating(value))
+        let port = H.halfVector(resizing: SIMD<Float16>.repeating(value))
         let reference = H.HalfVector(
-            raw: HighwayReference.halfVectorResizingF16ToU16(SIMDFloat16.repeating(value).raw)
+            raw: HighwayReference.halfVectorResizingF16ToU16(SIMD<Float16>.repeating(value).raw)
         )
-        let definedBytes = SIMDFloat16.laneCount * MemoryLayout<SIMDFloat16.Lane>.stride
-        let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<Float16>.laneCount * MemoryLayout<Float16>.stride
+        let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -266,7 +266,7 @@ extension SIMDUInt16ConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func halfVectorResizingFromFloat16ConstantSplatPayloadNaN() {
-        checkHalfVectorResizingFromFloat16ConstantA(SIMDFloat16.Lane(nan: 1, signaling: false))
+        checkHalfVectorResizingFromFloat16ConstantA(Float16(nan: 1, signaling: false))
     }
     #endif
 
@@ -296,21 +296,21 @@ extension SIMDUInt16ConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @inline(__always)
-    private func checkQuarterVectorResizingFromFloat16ConstantA(_ value: SIMDFloat16.Lane) {
+    private func checkQuarterVectorResizingFromFloat16ConstantA(_ value: Float16) {
         let mismatches = Mismatches(
             "quarterVectorResizingFromFloat16 with a repeating \(hex(value))"
         )
         mismatches.check(
-            SIMDFloat16.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            SIMD<Float16>.repeating(value),
+            SIMD<Float16>(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
-        let port = H.quarterVector(resizing: SIMDFloat16.repeating(value))
+        let port = H.quarterVector(resizing: SIMD<Float16>.repeating(value))
         let reference = H.QuarterVector(
-            raw: HighwayReference.quarterVectorResizingF16ToU16(SIMDFloat16.repeating(value).raw)
+            raw: HighwayReference.quarterVectorResizingF16ToU16(SIMD<Float16>.repeating(value).raw)
         )
-        let definedBytes = SIMDFloat16.laneCount * MemoryLayout<SIMDFloat16.Lane>.stride
-        let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<Float16>.laneCount * MemoryLayout<Float16>.stride
+        let grownBytes = H.QuarterVector.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -412,7 +412,7 @@ extension SIMDUInt16ConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func quarterVectorResizingFromFloat16ConstantSplatPayloadNaN() {
-        checkQuarterVectorResizingFromFloat16ConstantA(SIMDFloat16.Lane(nan: 1, signaling: false))
+        checkQuarterVectorResizingFromFloat16ConstantA(Float16(nan: 1, signaling: false))
     }
     #endif
 
@@ -441,19 +441,19 @@ extension SIMDUInt16ConstantTests {
     #endif
 
     @inline(__always)
-    private func checkVectorResizingFromBFloat16ConstantA(_ value: SIMDBFloat16.Lane) {
+    private func checkVectorResizingFromBFloat16ConstantA(_ value: BFloat16) {
         let mismatches = Mismatches("vectorResizingFromBFloat16 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDBFloat16.repeating(value),
-            SIMDBFloat16.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            SIMD<BFloat16>.repeating(value),
+            SIMD<BFloat16>(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
-        let port = H.vector(resizing: SIMDBFloat16.repeating(value))
-        let reference = H.Vector(
-            raw: HighwayReference.vectorResizingBF16ToU16(SIMDBFloat16.repeating(value).raw)
+        let port = H.vector(resizing: SIMD<BFloat16>.repeating(value))
+        let reference = H(
+            raw: HighwayReference.vectorResizingBF16ToU16(SIMD<BFloat16>.repeating(value).raw)
         )
-        let definedBytes = SIMDBFloat16.laneCount * MemoryLayout<SIMDBFloat16.Lane>.stride
-        let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<BFloat16>.laneCount * MemoryLayout<BFloat16>.stride
+        let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -469,95 +469,95 @@ extension SIMDUInt16ConstantTests {
     }
 
     @Test func vectorResizingFromBFloat16ConstantSplatZero() {
-        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0000))
+        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x0000))
     }
 
     @Test func vectorResizingFromBFloat16ConstantSplatNegativeZero() {
-        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x8000))
+        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x8000))
     }
 
     @Test func vectorResizingFromBFloat16ConstantSplatOne() {
-        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F80))
+        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F80))
     }
 
     @Test func vectorResizingFromBFloat16ConstantSplatMinusOne() {
-        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xBF80))
+        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0xBF80))
     }
 
     @Test func vectorResizingFromBFloat16ConstantSplatTwo() {
-        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4000))
+        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x4000))
     }
 
     @Test func vectorResizingFromBFloat16ConstantSplatHalf() {
-        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F00))
+        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F00))
     }
 
     @Test func vectorResizingFromBFloat16ConstantSplatFour() {
-        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4080))
+        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x4080))
     }
 
     @Test func vectorResizingFromBFloat16ConstantSplatQuarter() {
-        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3E80))
+        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x3E80))
     }
 
     @Test func vectorResizingFromBFloat16ConstantSplatOnePointFive() {
-        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3FC0))
+        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x3FC0))
     }
 
     @Test func vectorResizingFromBFloat16ConstantSplatMinusTwoPointFive() {
-        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xC020))
+        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0xC020))
     }
 
     @Test func vectorResizingFromBFloat16ConstantSplatInfinity() {
-        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F80))
+        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F80))
     }
 
     @Test func vectorResizingFromBFloat16ConstantSplatMinusInfinity() {
-        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF80))
+        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF80))
     }
 
     @Test func vectorResizingFromBFloat16ConstantSplatNaN() {
-        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC0))
+        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC0))
     }
 
     @Test func vectorResizingFromBFloat16ConstantSplatMinusNaN() {
-        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFFC0))
+        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0xFFC0))
     }
 
     @Test func vectorResizingFromBFloat16ConstantSplatPayloadNaN() {
-        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC1))
+        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC1))
     }
 
     @Test func vectorResizingFromBFloat16ConstantSplatSignalingNaN() {
-        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F81))
+        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F81))
     }
 
     @Test func vectorResizingFromBFloat16ConstantSplatMinusSignalingNaN() {
-        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF81))
+        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF81))
     }
 
     @Test func vectorResizingFromBFloat16ConstantSplatLeastNonzero() {
-        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0001))
+        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x0001))
     }
 
     @Test func vectorResizingFromBFloat16ConstantSplatGreatest() {
-        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F7F))
+        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkHalfVectorResizingFromBFloat16ConstantA(_ value: SIMDBFloat16.Lane) {
+    private func checkHalfVectorResizingFromBFloat16ConstantA(_ value: BFloat16) {
         let mismatches = Mismatches("halfVectorResizingFromBFloat16 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDBFloat16.repeating(value),
-            SIMDBFloat16.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            SIMD<BFloat16>.repeating(value),
+            SIMD<BFloat16>(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
-        let port = H.halfVector(resizing: SIMDBFloat16.repeating(value))
+        let port = H.halfVector(resizing: SIMD<BFloat16>.repeating(value))
         let reference = H.HalfVector(
-            raw: HighwayReference.halfVectorResizingBF16ToU16(SIMDBFloat16.repeating(value).raw)
+            raw: HighwayReference.halfVectorResizingBF16ToU16(SIMD<BFloat16>.repeating(value).raw)
         )
-        let definedBytes = SIMDBFloat16.laneCount * MemoryLayout<SIMDBFloat16.Lane>.stride
-        let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<BFloat16>.laneCount * MemoryLayout<BFloat16>.stride
+        let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -573,97 +573,99 @@ extension SIMDUInt16ConstantTests {
     }
 
     @Test func halfVectorResizingFromBFloat16ConstantSplatZero() {
-        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0000))
+        checkHalfVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x0000))
     }
 
     @Test func halfVectorResizingFromBFloat16ConstantSplatNegativeZero() {
-        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x8000))
+        checkHalfVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x8000))
     }
 
     @Test func halfVectorResizingFromBFloat16ConstantSplatOne() {
-        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F80))
+        checkHalfVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F80))
     }
 
     @Test func halfVectorResizingFromBFloat16ConstantSplatMinusOne() {
-        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xBF80))
+        checkHalfVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0xBF80))
     }
 
     @Test func halfVectorResizingFromBFloat16ConstantSplatTwo() {
-        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4000))
+        checkHalfVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x4000))
     }
 
     @Test func halfVectorResizingFromBFloat16ConstantSplatHalf() {
-        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F00))
+        checkHalfVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F00))
     }
 
     @Test func halfVectorResizingFromBFloat16ConstantSplatFour() {
-        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4080))
+        checkHalfVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x4080))
     }
 
     @Test func halfVectorResizingFromBFloat16ConstantSplatQuarter() {
-        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3E80))
+        checkHalfVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x3E80))
     }
 
     @Test func halfVectorResizingFromBFloat16ConstantSplatOnePointFive() {
-        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3FC0))
+        checkHalfVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x3FC0))
     }
 
     @Test func halfVectorResizingFromBFloat16ConstantSplatMinusTwoPointFive() {
-        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xC020))
+        checkHalfVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0xC020))
     }
 
     @Test func halfVectorResizingFromBFloat16ConstantSplatInfinity() {
-        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F80))
+        checkHalfVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F80))
     }
 
     @Test func halfVectorResizingFromBFloat16ConstantSplatMinusInfinity() {
-        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF80))
+        checkHalfVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF80))
     }
 
     @Test func halfVectorResizingFromBFloat16ConstantSplatNaN() {
-        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC0))
+        checkHalfVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC0))
     }
 
     @Test func halfVectorResizingFromBFloat16ConstantSplatMinusNaN() {
-        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFFC0))
+        checkHalfVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0xFFC0))
     }
 
     @Test func halfVectorResizingFromBFloat16ConstantSplatPayloadNaN() {
-        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC1))
+        checkHalfVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC1))
     }
 
     @Test func halfVectorResizingFromBFloat16ConstantSplatSignalingNaN() {
-        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F81))
+        checkHalfVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F81))
     }
 
     @Test func halfVectorResizingFromBFloat16ConstantSplatMinusSignalingNaN() {
-        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF81))
+        checkHalfVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF81))
     }
 
     @Test func halfVectorResizingFromBFloat16ConstantSplatLeastNonzero() {
-        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0001))
+        checkHalfVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x0001))
     }
 
     @Test func halfVectorResizingFromBFloat16ConstantSplatGreatest() {
-        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F7F))
+        checkHalfVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkQuarterVectorResizingFromBFloat16ConstantA(_ value: SIMDBFloat16.Lane) {
+    private func checkQuarterVectorResizingFromBFloat16ConstantA(_ value: BFloat16) {
         let mismatches = Mismatches(
             "quarterVectorResizingFromBFloat16 with a repeating \(hex(value))"
         )
         mismatches.check(
-            SIMDBFloat16.repeating(value),
-            SIMDBFloat16.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            SIMD<BFloat16>.repeating(value),
+            SIMD<BFloat16>(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
-        let port = H.quarterVector(resizing: SIMDBFloat16.repeating(value))
+        let port = H.quarterVector(resizing: SIMD<BFloat16>.repeating(value))
         let reference = H.QuarterVector(
-            raw: HighwayReference.quarterVectorResizingBF16ToU16(SIMDBFloat16.repeating(value).raw)
+            raw: HighwayReference.quarterVectorResizingBF16ToU16(
+                SIMD<BFloat16>.repeating(value).raw
+            )
         )
-        let definedBytes = SIMDBFloat16.laneCount * MemoryLayout<SIMDBFloat16.Lane>.stride
-        let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<BFloat16>.laneCount * MemoryLayout<BFloat16>.stride
+        let grownBytes = H.QuarterVector.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -679,96 +681,96 @@ extension SIMDUInt16ConstantTests {
     }
 
     @Test func quarterVectorResizingFromBFloat16ConstantSplatZero() {
-        checkQuarterVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0000))
+        checkQuarterVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x0000))
     }
 
     @Test func quarterVectorResizingFromBFloat16ConstantSplatNegativeZero() {
-        checkQuarterVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x8000))
+        checkQuarterVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x8000))
     }
 
     @Test func quarterVectorResizingFromBFloat16ConstantSplatOne() {
-        checkQuarterVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F80))
+        checkQuarterVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F80))
     }
 
     @Test func quarterVectorResizingFromBFloat16ConstantSplatMinusOne() {
-        checkQuarterVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xBF80))
+        checkQuarterVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0xBF80))
     }
 
     @Test func quarterVectorResizingFromBFloat16ConstantSplatTwo() {
-        checkQuarterVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4000))
+        checkQuarterVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x4000))
     }
 
     @Test func quarterVectorResizingFromBFloat16ConstantSplatHalf() {
-        checkQuarterVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F00))
+        checkQuarterVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F00))
     }
 
     @Test func quarterVectorResizingFromBFloat16ConstantSplatFour() {
-        checkQuarterVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4080))
+        checkQuarterVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x4080))
     }
 
     @Test func quarterVectorResizingFromBFloat16ConstantSplatQuarter() {
-        checkQuarterVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3E80))
+        checkQuarterVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x3E80))
     }
 
     @Test func quarterVectorResizingFromBFloat16ConstantSplatOnePointFive() {
-        checkQuarterVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3FC0))
+        checkQuarterVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x3FC0))
     }
 
     @Test func quarterVectorResizingFromBFloat16ConstantSplatMinusTwoPointFive() {
-        checkQuarterVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xC020))
+        checkQuarterVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0xC020))
     }
 
     @Test func quarterVectorResizingFromBFloat16ConstantSplatInfinity() {
-        checkQuarterVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F80))
+        checkQuarterVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F80))
     }
 
     @Test func quarterVectorResizingFromBFloat16ConstantSplatMinusInfinity() {
-        checkQuarterVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF80))
+        checkQuarterVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF80))
     }
 
     @Test func quarterVectorResizingFromBFloat16ConstantSplatNaN() {
-        checkQuarterVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC0))
+        checkQuarterVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC0))
     }
 
     @Test func quarterVectorResizingFromBFloat16ConstantSplatMinusNaN() {
-        checkQuarterVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFFC0))
+        checkQuarterVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0xFFC0))
     }
 
     @Test func quarterVectorResizingFromBFloat16ConstantSplatPayloadNaN() {
-        checkQuarterVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC1))
+        checkQuarterVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC1))
     }
 
     @Test func quarterVectorResizingFromBFloat16ConstantSplatSignalingNaN() {
-        checkQuarterVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F81))
+        checkQuarterVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F81))
     }
 
     @Test func quarterVectorResizingFromBFloat16ConstantSplatMinusSignalingNaN() {
-        checkQuarterVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF81))
+        checkQuarterVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF81))
     }
 
     @Test func quarterVectorResizingFromBFloat16ConstantSplatLeastNonzero() {
-        checkQuarterVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0001))
+        checkQuarterVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x0001))
     }
 
     @Test func quarterVectorResizingFromBFloat16ConstantSplatGreatest() {
-        checkQuarterVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F7F))
+        checkQuarterVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkVectorZeroExtendingResizingFromUInt64ConstantA(_ value: SIMDUInt64.Lane) {
+    private func checkVectorZeroExtendingResizingFromUInt64ConstantA(_ value: UInt64) {
         let mismatches = Mismatches(
             "vectorZeroExtendingResizingFromUInt64 with a repeating \(hex(value))"
         )
         mismatches.check(
-            SIMDUInt64.repeating(value),
-            SIMDUInt64.Vector(raw: HighwayReference.repeatingU64(value)),
+            SIMD<UInt64>.repeating(value),
+            SIMD<UInt64>(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(zeroExtendingResizing: SIMDUInt64.repeating(value)),
-            H.Vector(
+            H.vector(zeroExtendingResizing: SIMD<UInt64>.repeating(value)),
+            H(
                 raw: HighwayReference.vectorZeroExtendingResizingU64ToU16(
-                    SIMDUInt64.repeating(value).raw
+                    SIMD<UInt64>.repeating(value).raw
                 )
             ),
             ""
@@ -825,24 +827,24 @@ extension SIMDUInt16ConstantTests {
     }
 
     @Test func vectorZeroExtendingResizingFromUInt64ConstantSplatMax() {
-        checkVectorZeroExtendingResizingFromUInt64ConstantA(SIMDUInt64.Lane.max)
+        checkVectorZeroExtendingResizingFromUInt64ConstantA(UInt64.max)
     }
 
     @inline(__always)
-    private func checkHalfVectorZeroExtendingResizingFromUInt64ConstantA(_ value: SIMDUInt64.Lane) {
+    private func checkHalfVectorZeroExtendingResizingFromUInt64ConstantA(_ value: UInt64) {
         let mismatches = Mismatches(
             "halfVectorZeroExtendingResizingFromUInt64 with a repeating \(hex(value))"
         )
         mismatches.check(
-            SIMDUInt64.repeating(value),
-            SIMDUInt64.Vector(raw: HighwayReference.repeatingU64(value)),
+            SIMD<UInt64>.repeating(value),
+            SIMD<UInt64>(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         mismatches.check(
-            H.halfVector(zeroExtendingResizing: SIMDUInt64.repeating(value)),
+            H.halfVector(zeroExtendingResizing: SIMD<UInt64>.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorZeroExtendingResizingU64ToU16(
-                    SIMDUInt64.repeating(value).raw
+                    SIMD<UInt64>.repeating(value).raw
                 )
             ),
             ""
@@ -899,26 +901,24 @@ extension SIMDUInt16ConstantTests {
     }
 
     @Test func halfVectorZeroExtendingResizingFromUInt64ConstantSplatMax() {
-        checkHalfVectorZeroExtendingResizingFromUInt64ConstantA(SIMDUInt64.Lane.max)
+        checkHalfVectorZeroExtendingResizingFromUInt64ConstantA(UInt64.max)
     }
 
     @inline(__always)
-    private func checkQuarterVectorZeroExtendingResizingFromUInt64ConstantA(
-        _ value: SIMDUInt64.Lane
-    ) {
+    private func checkQuarterVectorZeroExtendingResizingFromUInt64ConstantA(_ value: UInt64) {
         let mismatches = Mismatches(
             "quarterVectorZeroExtendingResizingFromUInt64 with a repeating \(hex(value))"
         )
         mismatches.check(
-            SIMDUInt64.repeating(value),
-            SIMDUInt64.Vector(raw: HighwayReference.repeatingU64(value)),
+            SIMD<UInt64>.repeating(value),
+            SIMD<UInt64>(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         mismatches.check(
-            H.quarterVector(zeroExtendingResizing: SIMDUInt64.repeating(value)),
+            H.quarterVector(zeroExtendingResizing: SIMD<UInt64>.repeating(value)),
             H.QuarterVector(
                 raw: HighwayReference.quarterVectorZeroExtendingResizingU64ToU16(
-                    SIMDUInt64.repeating(value).raw
+                    SIMD<UInt64>.repeating(value).raw
                 )
             ),
             ""
@@ -975,24 +975,24 @@ extension SIMDUInt16ConstantTests {
     }
 
     @Test func quarterVectorZeroExtendingResizingFromUInt64ConstantSplatMax() {
-        checkQuarterVectorZeroExtendingResizingFromUInt64ConstantA(SIMDUInt64.Lane.max)
+        checkQuarterVectorZeroExtendingResizingFromUInt64ConstantA(UInt64.max)
     }
 
     @inline(__always)
-    private func checkVectorZeroExtendingResizingFromInt64ConstantA(_ value: SIMDInt64.Lane) {
+    private func checkVectorZeroExtendingResizingFromInt64ConstantA(_ value: Int64) {
         let mismatches = Mismatches(
             "vectorZeroExtendingResizingFromInt64 with a repeating \(hex(value))"
         )
         mismatches.check(
-            SIMDInt64.repeating(value),
-            SIMDInt64.Vector(raw: HighwayReference.repeatingI64(value)),
+            SIMD<Int64>.repeating(value),
+            SIMD<Int64>(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(zeroExtendingResizing: SIMDInt64.repeating(value)),
-            H.Vector(
+            H.vector(zeroExtendingResizing: SIMD<Int64>.repeating(value)),
+            H(
                 raw: HighwayReference.vectorZeroExtendingResizingI64ToU16(
-                    SIMDInt64.repeating(value).raw
+                    SIMD<Int64>.repeating(value).raw
                 )
             ),
             ""
@@ -1069,10 +1069,10 @@ extension SIMDUInt16ConstantTests {
     }
 
     @Test func vectorZeroExtendingResizingFromInt64ConstantSplatMax() {
-        checkVectorZeroExtendingResizingFromInt64ConstantA(SIMDInt64.Lane.max)
+        checkVectorZeroExtendingResizingFromInt64ConstantA(Int64.max)
     }
 
     @Test func vectorZeroExtendingResizingFromInt64ConstantSplatMin() {
-        checkVectorZeroExtendingResizingFromInt64ConstantA(SIMDInt64.Lane.min)
+        checkVectorZeroExtendingResizingFromInt64ConstantA(Int64.min)
     }
 }

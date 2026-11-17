@@ -9,8 +9,8 @@ import Vectorization
 extension SIMDUInt8CodegenTests {
     @Test func interleavingLower() {
         let mismatches = Mismatches("portInterleavingLowerU8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBB7D_1CBA_CD02_2283)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xBB7D_1BBA_CD02_20D0)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBB7D_1CBA_CD02_2283)
+        let bInputs = Inputs.vectors(H.self, seed: 0xBB7D_1BBA_CD02_20D0)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portInterleavingLowerU8(a, b),
@@ -23,7 +23,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func interleavingLowerConstantA() {
         let mismatches = Mismatches("portInterleavingLowerU8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE62E_7D3A_756F_323F)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE62E_7D3A_756F_323F)
         for b in bInputs {
             mismatches.check(
                 portInterleavingLowerU8ConstantA(b),
@@ -36,7 +36,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func interleavingLowerConstantB() {
         let mismatches = Mismatches("portInterleavingLowerU8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEEC3_B33A_7A46_12A1)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEEC3_B33A_7A46_12A1)
         for a in aInputs {
             mismatches.check(
                 portInterleavingLowerU8ConstantB(a),
@@ -49,8 +49,8 @@ extension SIMDUInt8CodegenTests {
 
     @Test func interleavingUpper() {
         let mismatches = Mismatches("portInterleavingUpperU8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6E66_E31B_F9D5_ED36)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6E66_E41B_F9D5_EEE9)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6E66_E31B_F9D5_ED36)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6E66_E41B_F9D5_EEE9)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portInterleavingUpperU8(a, b),
@@ -63,7 +63,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func interleavingUpperConstantA() {
         let mismatches = Mismatches("portInterleavingUpperU8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x991F_1CBE_5ACC_B364)
+        let bInputs = Inputs.vectors(H.self, seed: 0x991F_1CBE_5ACC_B364)
         for b in bInputs {
             mismatches.check(
                 portInterleavingUpperU8ConstantA(b),
@@ -76,7 +76,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func interleavingUpperConstantB() {
         let mismatches = Mismatches("portInterleavingUpperU8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB2DE_82BE_6950_EE96)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB2DE_82BE_6950_EE96)
         for a in aInputs {
             mismatches.check(
                 portInterleavingUpperU8ConstantB(a),
@@ -89,8 +89,8 @@ extension SIMDUInt8CodegenTests {
 
     @Test func interleavingEven() {
         let mismatches = Mismatches("portInterleavingEvenU8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x59C5_F8FD_A0D2_9844)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x59C5_F9FD_A0D2_99F7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x59C5_F8FD_A0D2_9844)
+        let bInputs = Inputs.vectors(H.self, seed: 0x59C5_F9FD_A0D2_99F7)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portInterleavingEvenU8(a, b),
@@ -103,7 +103,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func interleavingEvenConstantA() {
         let mismatches = Mismatches("portInterleavingEvenU8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x62C8_5A83_29A5_676A)
+        let bInputs = Inputs.vectors(H.self, seed: 0x62C8_5A83_29A5_676A)
         for b in bInputs {
             mismatches.check(
                 portInterleavingEvenU8ConstantA(b),
@@ -116,7 +116,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func interleavingEvenConstantB() {
         let mismatches = Mismatches("portInterleavingEvenU8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5A33_2483_24CE_8708)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5A33_2483_24CE_8708)
         for a in aInputs {
             mismatches.check(
                 portInterleavingEvenU8ConstantB(a),
@@ -129,8 +129,8 @@ extension SIMDUInt8CodegenTests {
 
     @Test func interleavingOdd() {
         let mismatches = Mismatches("portInterleavingOddU8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB09E_6A2B_5499_9B6F)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB09E_692B_5499_99BC)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB09E_6A2B_5499_9B6F)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB09E_692B_5499_99BC)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portInterleavingOddU8(a, b),
@@ -143,7 +143,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func interleavingOddConstantA() {
         let mismatches = Mismatches("portInterleavingOddU8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6779_040A_6C7B_A6FB)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6779_040A_6C7B_A6FB)
         for b in bInputs {
             mismatches.check(
                 portInterleavingOddU8ConstantA(b),
@@ -156,7 +156,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func interleavingOddConstantB() {
         let mismatches = Mismatches("portInterleavingOddU8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x700E_3A0A_7152_875D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x700E_3A0A_7152_875D)
         for a in aInputs {
             mismatches.check(
                 portInterleavingOddU8ConstantB(a),

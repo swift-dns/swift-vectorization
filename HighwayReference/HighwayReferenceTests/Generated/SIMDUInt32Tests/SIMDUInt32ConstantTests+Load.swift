@@ -9,16 +9,12 @@ extension SIMDUInt32ConstantTests {
     @inline(__always)
     private func checkLoadFirstConstantCount(_ count: Int) {
         let mismatches = Mismatches("loadFirst with count \(count)")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xBB7E_5275_AA39_1A6C
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xBB7E_5275_AA39_1A6C)
         for from in fromInputs {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadFirst(from: source.baseAddress!, count: count),
-                    unsafe H.Vector(raw: HighwayReference.loadFirstU32(source.baseAddress!, count))
+                    unsafe H(raw: HighwayReference.loadFirstU32(source.baseAddress!, count))
                 )
             }
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
@@ -129,17 +125,13 @@ extension SIMDUInt32ConstantTests {
     @inline(__always)
     private func checkLoadFirstConstantCountBeforeGuardPage(_ count: Int) {
         let mismatches = Mismatches("loadFirst with count \(count) before a guard page")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x8A9E_1F81_A0EB_32E5
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x8A9E_1F81_A0EB_32E5)
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(Array(from.prefix(count))) {
                 source in
                 (
                     unsafe H.loadFirst(from: source, count: count),
-                    unsafe H.Vector(raw: HighwayReference.loadFirstU32(source, count))
+                    unsafe H(raw: HighwayReference.loadFirstU32(source, count))
                 )
             }.result
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
@@ -250,12 +242,8 @@ extension SIMDUInt32ConstantTests {
     @inline(__always)
     private func checkLoadFirstOtherwiseConstantCount(_ count: Int) {
         let mismatches = Mismatches("loadFirstOtherwise with count \(count)")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x9C0C_A854_D547_BF2E)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x9C0C_A954_D547_C0E1
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x9C0C_A854_D547_BF2E)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x9C0C_A954_D547_C0E1)
         for (otherwise, from) in everyPair(otherwiseInputs, fromInputs) {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
@@ -264,7 +252,7 @@ extension SIMDUInt32ConstantTests {
                         count: count,
                         otherwise: otherwise
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstOtherwiseU32(
                             otherwise.raw,
                             source.baseAddress!,
@@ -385,18 +373,14 @@ extension SIMDUInt32ConstantTests {
     @inline(__always)
     private func checkLoadFirstOtherwiseConstantCountBeforeGuardPage(_ count: Int) {
         let mismatches = Mismatches("loadFirstOtherwise with count \(count) before a guard page")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xEABF_E30B_9976_3B1F)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xEABF_E20B_9976_396C
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xEABF_E30B_9976_3B1F)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xEABF_E20B_9976_396C)
         for (otherwise, from) in everyPair(otherwiseInputs, fromInputs) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(Array(from.prefix(count))) {
                 source in
                 (
                     unsafe H.loadFirst(from: source, count: count, otherwise: otherwise),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstOtherwiseU32(otherwise.raw, source, count)
                     )
                 )
@@ -518,7 +502,7 @@ extension SIMDUInt32ConstantTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadFirstWidening(from: source.baseAddress!, count: count),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstWideningU8ToU32(source.baseAddress!, count)
                     )
                 )
@@ -639,7 +623,7 @@ extension SIMDUInt32ConstantTests {
                 source in
                 (
                     unsafe H.loadFirstWidening(from: source, count: count),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstWideningU8ToU32(
                             source,
                             min(count, H.laneCount)
@@ -764,7 +748,7 @@ extension SIMDUInt32ConstantTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadFirstWidening(from: source.baseAddress!, count: count),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstWideningU16ToU32(source.baseAddress!, count)
                     )
                 )
@@ -889,7 +873,7 @@ extension SIMDUInt32ConstantTests {
                 source in
                 (
                     unsafe H.loadFirstWidening(from: source, count: count),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstWideningU16ToU32(
                             source,
                             min(count, H.laneCount)

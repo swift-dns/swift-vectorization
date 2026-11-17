@@ -8,14 +8,14 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
-    private func checkStoreConstantA(_ value: H.Lane) {
+    private func checkStoreConstantA(_ value: Lane) {
         let mismatches = Mismatches("store with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         var portLanes = sentinel
         portLanes.withUnsafeMutableBufferPointer { destination in
             unsafe H.store(H.repeating(value), to: destination.baseAddress!)
@@ -85,7 +85,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func storeConstantSplatPayloadNaN() {
-        checkStoreConstantA(H.Lane(nan: 1, signaling: false))
+        checkStoreConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func storeConstantSplatSignalingNaN() {
@@ -105,14 +105,14 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkStoreAlignedConstantA(_ value: H.Lane) {
+    private func checkStoreAlignedConstantA(_ value: Lane) {
         let mismatches = Mismatches("storeAligned with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         let (_, portLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
             destination in unsafe H.storeAligned(H.repeating(value), to: destination)
         }
@@ -181,7 +181,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func storeAlignedConstantSplatPayloadNaN() {
-        checkStoreAlignedConstantA(H.Lane(nan: 1, signaling: false))
+        checkStoreAlignedConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func storeAlignedConstantSplatSignalingNaN() {
@@ -201,15 +201,15 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkStoreFirstConstantA(_ value: H.Lane) {
+    private func checkStoreFirstConstantA(_ value: Lane) {
         let mismatches = Mismatches("storeFirst with a repeating \(hex(value))")
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for count in countInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -285,7 +285,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func storeFirstConstantSplatPayloadNaN() {
-        checkStoreFirstConstantA(H.Lane(nan: 1, signaling: false))
+        checkStoreFirstConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func storeFirstConstantSplatSignalingNaN() {
@@ -305,15 +305,15 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkStoreWhereConstantA(_ value: H.Lane) {
+    private func checkStoreWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("storeWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xFD6F_11BA_532A_AB6C)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for mask in maskInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -389,7 +389,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func storeWhereConstantSplatPayloadNaN() {
-        checkStoreWhereConstantA(H.Lane(nan: 1, signaling: false))
+        checkStoreWhereConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func storeWhereConstantSplatSignalingNaN() {

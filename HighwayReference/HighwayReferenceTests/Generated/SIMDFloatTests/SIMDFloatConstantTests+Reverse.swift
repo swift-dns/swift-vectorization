@@ -7,12 +7,16 @@ import Vectorization
 
 extension SIMDFloatConstantTests {
     @inline(__always)
-    private func checkReversedConstantA(_ value: H.Lane) {
+    private func checkReversedConstantA(_ value: Lane) {
         let mismatches = Mismatches("reversed with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         mismatches.check(
             H.reversed(H.repeating(value)),
-            HighwayReference.reversedF32(H.repeating(value).raw),
+            H(raw: HighwayReference.reversedF32(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -75,7 +79,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func reversedConstantSplatPayloadNaN() {
-        checkReversedConstantA(H.Lane(nan: 1, signaling: false))
+        checkReversedConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func reversedConstantSplatSignalingNaN() {
@@ -95,12 +99,16 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkByteSwappedConstantA(_ value: H.Lane) {
+    private func checkByteSwappedConstantA(_ value: Lane) {
         let mismatches = Mismatches("byteSwapped with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         mismatches.check(
             H.byteSwapped(H.repeating(value)),
-            HighwayReference.byteSwappedF32(H.repeating(value).raw),
+            H(raw: HighwayReference.byteSwappedF32(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -163,7 +171,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func byteSwappedConstantSplatPayloadNaN() {
-        checkByteSwappedConstantA(H.Lane(nan: 1, signaling: false))
+        checkByteSwappedConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func byteSwappedConstantSplatSignalingNaN() {
@@ -183,12 +191,16 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkReversedBlocksConstantA(_ value: H.Lane) {
+    private func checkReversedBlocksConstantA(_ value: Lane) {
         let mismatches = Mismatches("reversedBlocks with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         mismatches.check(
             H.reversedBlocks(H.repeating(value)),
-            HighwayReference.reversedBlocksF32(H.repeating(value).raw),
+            H(raw: HighwayReference.reversedBlocksF32(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -251,7 +263,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func reversedBlocksConstantSplatPayloadNaN() {
-        checkReversedBlocksConstantA(H.Lane(nan: 1, signaling: false))
+        checkReversedBlocksConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func reversedBlocksConstantSplatSignalingNaN() {
@@ -271,12 +283,16 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkReversed2ConstantA(_ value: H.Lane) {
+    private func checkReversed2ConstantA(_ value: Lane) {
         let mismatches = Mismatches("reversed2 with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         mismatches.check(
             H.reversed2(H.repeating(value)),
-            HighwayReference.reversed2F32(H.repeating(value).raw),
+            H(raw: HighwayReference.reversed2F32(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -339,7 +355,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func reversed2ConstantSplatPayloadNaN() {
-        checkReversed2ConstantA(H.Lane(nan: 1, signaling: false))
+        checkReversed2ConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func reversed2ConstantSplatSignalingNaN() {
@@ -359,12 +375,16 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkReversed4ConstantA(_ value: H.Lane) {
+    private func checkReversed4ConstantA(_ value: Lane) {
         let mismatches = Mismatches("reversed4 with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         mismatches.check(
             H.reversed4(H.repeating(value)),
-            HighwayReference.reversed4F32(H.repeating(value).raw),
+            H(raw: HighwayReference.reversed4F32(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -427,7 +447,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func reversed4ConstantSplatPayloadNaN() {
-        checkReversed4ConstantA(H.Lane(nan: 1, signaling: false))
+        checkReversed4ConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func reversed4ConstantSplatSignalingNaN() {
@@ -447,12 +467,16 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkReversed8ConstantA(_ value: H.Lane) {
+    private func checkReversed8ConstantA(_ value: Lane) {
         let mismatches = Mismatches("reversed8 with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         mismatches.check(
             H.reversed8(H.repeating(value)),
-            HighwayReference.reversed8F32(H.repeating(value).raw),
+            H(raw: HighwayReference.reversed8F32(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -530,7 +554,7 @@ extension SIMDFloatConstantTests {
 
     @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
     func reversed8ConstantSplatPayloadNaN() {
-        checkReversed8ConstantA(H.Lane(nan: 1, signaling: false))
+        checkReversed8ConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))

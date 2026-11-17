@@ -7,5 +7,6 @@ import Vectorization
 
 @Suite("SIMDInt32 constants against Highway")
 struct SIMDInt32ConstantTests {
-    typealias H = SIMDInt32
+    typealias H = SIMD<Int32>
+    typealias Lane = Int32
 }

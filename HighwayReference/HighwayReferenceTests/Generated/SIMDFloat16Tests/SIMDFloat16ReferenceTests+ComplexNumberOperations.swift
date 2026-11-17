@@ -9,11 +9,11 @@ import Vectorization
 extension SIMDFloat16ReferenceTests {
     @Test func complexConjugate() {
         let mismatches = Mismatches("complexConjugate")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCF12_C583_5990_9172)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCF12_C583_5990_9172)
         for a in aInputs {
             mismatches.check(
                 H.complexConjugate(a),
-                HighwayReference.complexConjugateF16(a.raw),
+                H(raw: HighwayReference.complexConjugateF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -22,12 +22,13 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func multiplyingComplex() {
         let mismatches = Mismatches("multiplyingComplex")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x344B_4497_0E05_2B7C)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x344B_4597_0E05_2D2F)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(complexLanesOf: a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x344B_4497_0E05_2B7C)
+        let bInputs = Inputs.vectors(H.self, seed: 0x344B_4597_0E05_2D2F)
+        for (a, b) in everyPair(aInputs, bInputs)
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd) {
             mismatches.check(
                 H.multiplyingComplex(a, b),
-                HighwayReference.multiplyingComplexF16(a.raw, b.raw),
+                H(raw: HighwayReference.multiplyingComplexF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -36,12 +37,13 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func multiplyingComplexConjugate() {
         let mismatches = Mismatches("multiplyingComplexConjugate")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4F94_6475_59EE_431C)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4F94_6575_59EE_44CF)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(complexLanesOf: a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x4F94_6475_59EE_431C)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4F94_6575_59EE_44CF)
+        for (a, b) in everyPair(aInputs, bInputs)
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd) {
             mismatches.check(
                 H.multiplyingComplexConjugate(a, b),
-                HighwayReference.multiplyingComplexConjugateF16(a.raw, b.raw),
+                H(raw: HighwayReference.multiplyingComplexConjugateF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -50,14 +52,14 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func multiplyAddingComplex() {
         let mismatches = Mismatches("multiplyAddingComplex")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6D6B_169F_250A_36E1)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6D6B_159F_250A_352E)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x6D6B_149F_250A_337B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6D6B_169F_250A_36E1)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6D6B_159F_250A_352E)
+        let cInputs = Inputs.vectors(H.self, seed: 0x6D6B_149F_250A_337B)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xD621_06E9_0EA6_20DB)
-        where !hasUnorderedNaNs(complexLanesOf: a, b, c) {
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd, c.simd) {
             mismatches.check(
                 H.multiplyAddingComplex(a, b, c),
-                HighwayReference.multiplyAddingComplexF16(a.raw, b.raw, c.raw),
+                H(raw: HighwayReference.multiplyAddingComplexF16(a.raw, b.raw, c.raw)),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -66,14 +68,14 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func multiplyAddingComplexConjugate() {
         let mismatches = Mismatches("multiplyAddingComplexConjugate")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD32E_B5D5_7005_71FF)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD32E_B4D5_7005_704C)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xD32E_B7D5_7005_7565)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD32E_B5D5_7005_71FF)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD32E_B4D5_7005_704C)
+        let cInputs = Inputs.vectors(H.self, seed: 0xD32E_B7D5_7005_7565)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xB3C7_A52B_F61B_1E19)
-        where !hasUnorderedNaNs(complexLanesOf: a, b, c) {
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd, c.simd) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, b, c),
-                HighwayReference.multiplyAddingComplexConjugateF16(a.raw, b.raw, c.raw),
+                H(raw: HighwayReference.multiplyAddingComplexConjugateF16(a.raw, b.raw, c.raw)),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -82,24 +84,26 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func multiplyingComplexWhereOtherwise() {
         let mismatches = Mismatches("multiplyingComplexWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x5B2A_3FC1_3F74_FCAF)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x5B2A_3FC1_3F74_FCAF)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x5B2A_3EC1_3F74_FAFC)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5B2A_41C1_3F75_0015)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5B2A_40C1_3F74_FE62)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5B2A_41C1_3F75_0015)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5B2A_40C1_3F74_FE62)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
             aInputs,
             bInputs,
             seed: 0x296E_1920_F23A_1389
-        ) where !hasUnorderedNaNs(complexLanesOf: a, b) {
+        ) where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd) {
             mismatches.check(
                 H.multiplyingComplex(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.multiplyingComplexWhereOtherwiseF16(
-                    otherwise.raw,
-                    mask.raw,
-                    a.raw,
-                    b.raw
+                H(
+                    raw: HighwayReference.multiplyingComplexWhereOtherwiseF16(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
@@ -111,24 +115,26 @@ extension SIMDFloat16ReferenceTests {
         let mismatches = Mismatches(
             "multiplyingComplexWhereOtherwise with masks from arbitrary vectors"
         )
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x1324_51CD_9B67_073C)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x1324_51CD_9B67_073C)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x1324_52CD_9B67_08EF)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1324_53CD_9B67_0AA2)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1324_54CD_9B67_0C55)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1324_53CD_9B67_0AA2)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1324_54CD_9B67_0C55)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
             aInputs,
             bInputs,
             seed: 0xBE57_7998_9B0A_A490
-        ) where !hasUnorderedNaNs(complexLanesOf: a, b) {
+        ) where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd) {
             mismatches.check(
                 H.multiplyingComplex(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.multiplyingComplexWhereOtherwiseF16(
-                    otherwise.raw,
-                    mask.raw,
-                    a.raw,
-                    b.raw
+                H(
+                    raw: HighwayReference.multiplyingComplexWhereOtherwiseF16(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
@@ -139,13 +145,19 @@ extension SIMDFloat16ReferenceTests {
     @Test func multiplyingComplexConjugateWhere() {
         let mismatches = Mismatches("multiplyingComplexConjugateWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x2818_0E9F_193B_9B7D)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2818_0D9F_193B_99CA)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2818_0C9F_193B_9817)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2818_0D9F_193B_99CA)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2818_0C9F_193B_9817)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xCDD3_944A_84BB_63CF)
-        where !hasUnorderedNaNs(complexLanesOf: a, b) {
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd) {
             mismatches.check(
                 H.multiplyingComplexConjugate(a, b, where: mask),
-                HighwayReference.multiplyingComplexConjugateWhereF16(mask.raw, a.raw, b.raw),
+                H(
+                    raw: HighwayReference.multiplyingComplexConjugateWhereF16(
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -157,13 +169,19 @@ extension SIMDFloat16ReferenceTests {
             "multiplyingComplexConjugateWhere with masks from arbitrary vectors"
         )
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x59A4_CC49_823B_6B5A)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x59A4_CD49_823B_6D0D)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x59A4_CA49_823B_67F4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x59A4_CD49_823B_6D0D)
+        let bInputs = Inputs.vectors(H.self, seed: 0x59A4_CA49_823B_67F4)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x9E87_546A_2713_501E)
-        where !hasUnorderedNaNs(complexLanesOf: a, b) {
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd) {
             mismatches.check(
                 H.multiplyingComplexConjugate(a, b, where: mask),
-                HighwayReference.multiplyingComplexConjugateWhereF16(mask.raw, a.raw, b.raw),
+                H(
+                    raw: HighwayReference.multiplyingComplexConjugateWhereF16(
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -173,23 +191,25 @@ extension SIMDFloat16ReferenceTests {
     @Test func multiplyAddingComplexConjugateWhere() {
         let mismatches = Mismatches("multiplyAddingComplexConjugateWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA1DA_D4B5_7564_BA6C)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA1DA_D5B5_7564_BC1F)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA1DA_D6B5_7564_BDD2)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xA1DA_D7B5_7564_BF85)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA1DA_D5B5_7564_BC1F)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA1DA_D6B5_7564_BDD2)
+        let cInputs = Inputs.vectors(H.self, seed: 0xA1DA_D7B5_7564_BF85)
         for (mask, a, b, c) in mixedQuadruples(
             maskInputs,
             aInputs,
             bInputs,
             cInputs,
             seed: 0xDAD7_74A8_328B_D840
-        ) where !hasUnorderedNaNs(complexLanesOf: a, b, c) {
+        ) where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd, c.simd) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, b, c, where: mask),
-                HighwayReference.multiplyAddingComplexConjugateWhereF16(
-                    mask.raw,
-                    a.raw,
-                    b.raw,
-                    c.raw
+                H(
+                    raw: HighwayReference.multiplyAddingComplexConjugateWhereF16(
+                        mask.raw,
+                        a.raw,
+                        b.raw,
+                        c.raw
+                    )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
@@ -202,23 +222,25 @@ extension SIMDFloat16ReferenceTests {
             "multiplyAddingComplexConjugateWhere with masks from arbitrary vectors"
         )
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x8D7B_8B8C_2EA5_5FE3)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8D7B_8A8C_2EA5_5E30)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8D7B_8D8C_2EA5_6349)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x8D7B_8C8C_2EA5_6196)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8D7B_8A8C_2EA5_5E30)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8D7B_8D8C_2EA5_6349)
+        let cInputs = Inputs.vectors(H.self, seed: 0x8D7B_8C8C_2EA5_6196)
         for (mask, a, b, c) in mixedQuadruples(
             maskInputs,
             aInputs,
             bInputs,
             cInputs,
             seed: 0x6078_951B_B914_4E65
-        ) where !hasUnorderedNaNs(complexLanesOf: a, b, c) {
+        ) where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd, c.simd) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, b, c, where: mask),
-                HighwayReference.multiplyAddingComplexConjugateWhereF16(
-                    mask.raw,
-                    a.raw,
-                    b.raw,
-                    c.raw
+                H(
+                    raw: HighwayReference.multiplyAddingComplexConjugateWhereF16(
+                        mask.raw,
+                        a.raw,
+                        b.raw,
+                        c.raw
+                    )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )

@@ -5,94 +5,106 @@ public import Vectorization
 
 @inline(never)
 public func portComplexConjugateF32(_ a: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.complexConjugate(a)
+    SIMD<Float>.complexConjugate(a)
 }
 
 @inline(never)
 public func highwayComplexConjugateF32(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.complexConjugateF32(a.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.complexConjugateF32(a.raw))
 }
 
 @inline(never)
 public func portComplexConjugateF32ConstantA() -> SIMD<Float> {
-    SIMDFloat.complexConjugate(SIMDFloat.repeating(1.5))
+    SIMD<Float>.complexConjugate(SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayComplexConjugateF32ConstantA() -> SIMD<Float> {
-    HighwayReference.Nothrow.complexConjugateF32(HighwayReference.Nothrow.repeatingF32(1.5).raw)
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.complexConjugateF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
 public func portMultiplyingComplexF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.multiplyingComplex(a, b)
+    SIMD<Float>.multiplyingComplex(a, b)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyingComplexF32(a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.multiplyingComplexF32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMultiplyingComplexF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.multiplyingComplex(SIMDFloat.repeating(1.5), b)
+    SIMD<Float>.multiplyingComplex(SIMD<Float>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyingComplexF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingComplexF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyingComplexF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.multiplyingComplex(a, SIMDFloat.repeating(1.5))
+    SIMD<Float>.multiplyingComplex(a, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMultiplyingComplexF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyingComplexF32(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingComplexF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyingComplexConjugateF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.multiplyingComplexConjugate(a, b)
+    SIMD<Float>.multiplyingComplexConjugate(a, b)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexConjugateF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float>
 {
-    HighwayReference.Nothrow.multiplyingComplexConjugateF32(a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.multiplyingComplexConjugateF32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMultiplyingComplexConjugateF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.multiplyingComplexConjugate(SIMDFloat.repeating(1.5), b)
+    SIMD<Float>.multiplyingComplexConjugate(SIMD<Float>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexConjugateF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyingComplexConjugateF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingComplexConjugateF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyingComplexConjugateF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.multiplyingComplexConjugate(a, SIMDFloat.repeating(1.5))
+    SIMD<Float>.multiplyingComplexConjugate(a, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMultiplyingComplexConjugateF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyingComplexConjugateF32(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingComplexConjugateF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
@@ -102,7 +114,7 @@ public func portMultiplyAddingComplexF32(
     _ b: SIMD<Float>,
     _ c: SIMD<Float>
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyAddingComplex(a, b, c)
+    SIMD<Float>.multiplyAddingComplex(a, b, c)
 }
 
 @inline(never)
@@ -111,13 +123,13 @@ public func highwayMultiplyAddingComplexF32(
     _ b: SIMD<Float>,
     _ c: SIMD<Float>
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyAddingComplexF32(a.raw, b.raw, c.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.multiplyAddingComplexF32(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
 public func portMultiplyAddingComplexF32ConstantA(_ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float>
 {
-    SIMDFloat.multiplyAddingComplex(SIMDFloat.repeating(1.5), b, c)
+    SIMD<Float>.multiplyAddingComplex(SIMD<Float>.repeating(1.5), b, c)
 }
 
 @inline(never)
@@ -125,17 +137,19 @@ public func highwayMultiplyAddingComplexF32ConstantA(
     _ b: SIMD<Float>,
     _ c: SIMD<Float>
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyAddingComplexF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw,
-        c.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexF32ConstantB(_ a: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float>
 {
-    SIMDFloat.multiplyAddingComplex(a, SIMDFloat.repeating(1.5), c)
+    SIMD<Float>.multiplyAddingComplex(a, SIMD<Float>.repeating(1.5), c)
 }
 
 @inline(never)
@@ -143,17 +157,19 @@ public func highwayMultiplyAddingComplexF32ConstantB(
     _ a: SIMD<Float>,
     _ c: SIMD<Float>
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyAddingComplexF32(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        c.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexF32ConstantC(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float>
 {
-    SIMDFloat.multiplyAddingComplex(a, b, SIMDFloat.repeating(1.5))
+    SIMD<Float>.multiplyAddingComplex(a, b, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
@@ -161,10 +177,12 @@ public func highwayMultiplyAddingComplexF32ConstantC(
     _ a: SIMD<Float>,
     _ b: SIMD<Float>
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyAddingComplexF32(
-        a.raw,
-        b.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexF32(
+            a.raw,
+            b.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
@@ -174,7 +192,7 @@ public func portMultiplyAddingComplexConjugateF32(
     _ b: SIMD<Float>,
     _ c: SIMD<Float>
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyAddingComplexConjugate(a, b, c)
+    SIMD<Float>.multiplyAddingComplexConjugate(a, b, c)
 }
 
 @inline(never)
@@ -183,7 +201,9 @@ public func highwayMultiplyAddingComplexConjugateF32(
     _ b: SIMD<Float>,
     _ c: SIMD<Float>
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateF32(a.raw, b.raw, c.raw)
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateF32(a.raw, b.raw, c.raw)
+    )
 }
 
 @inline(never)
@@ -191,7 +211,7 @@ public func portMultiplyAddingComplexConjugateF32ConstantA(
     _ b: SIMD<Float>,
     _ c: SIMD<Float>
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyAddingComplexConjugate(SIMDFloat.repeating(1.5), b, c)
+    SIMD<Float>.multiplyAddingComplexConjugate(SIMD<Float>.repeating(1.5), b, c)
 }
 
 @inline(never)
@@ -199,10 +219,12 @@ public func highwayMultiplyAddingComplexConjugateF32ConstantA(
     _ b: SIMD<Float>,
     _ c: SIMD<Float>
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw,
-        c.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
@@ -211,7 +233,7 @@ public func portMultiplyAddingComplexConjugateF32ConstantB(
     _ a: SIMD<Float>,
     _ c: SIMD<Float>
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyAddingComplexConjugate(a, SIMDFloat.repeating(1.5), c)
+    SIMD<Float>.multiplyAddingComplexConjugate(a, SIMD<Float>.repeating(1.5), c)
 }
 
 @inline(never)
@@ -219,10 +241,12 @@ public func highwayMultiplyAddingComplexConjugateF32ConstantB(
     _ a: SIMD<Float>,
     _ c: SIMD<Float>
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateF32(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        c.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            c.raw
+        )
     )
 }
 
@@ -231,7 +255,7 @@ public func portMultiplyAddingComplexConjugateF32ConstantC(
     _ a: SIMD<Float>,
     _ b: SIMD<Float>
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyAddingComplexConjugate(a, b, SIMDFloat.repeating(1.5))
+    SIMD<Float>.multiplyAddingComplexConjugate(a, b, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
@@ -239,10 +263,12 @@ public func highwayMultiplyAddingComplexConjugateF32ConstantC(
     _ a: SIMD<Float>,
     _ b: SIMD<Float>
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateF32(
-        a.raw,
-        b.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateF32(
+            a.raw,
+            b.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
@@ -253,7 +279,7 @@ public func portMultiplyingComplexWhereOtherwiseF32(
     where mask: SIMD<Float>.Mask,
     otherwise: SIMD<Float>
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyingComplex(a, b, where: mask, otherwise: otherwise)
+    SIMD<Float>.multiplyingComplex(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -263,11 +289,13 @@ public func highwayMultiplyingComplexWhereOtherwiseF32(
     where mask: SIMD<Float>.Mask,
     otherwise: SIMD<Float>
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF32(
-        otherwise.raw,
-        mask.raw,
-        a.raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF32(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
     )
 }
 
@@ -277,7 +305,7 @@ public func portMultiplyingComplexWhereOtherwiseF32ConstantA(
     where mask: SIMD<Float>.Mask,
     otherwise: SIMD<Float>
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyingComplex(SIMDFloat.repeating(1.5), b, where: mask, otherwise: otherwise)
+    SIMD<Float>.multiplyingComplex(SIMD<Float>.repeating(1.5), b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -286,11 +314,13 @@ public func highwayMultiplyingComplexWhereOtherwiseF32ConstantA(
     where mask: SIMD<Float>.Mask,
     otherwise: SIMD<Float>
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF32(
-        otherwise.raw,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF32(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
@@ -300,7 +330,7 @@ public func portMultiplyingComplexWhereOtherwiseF32ConstantB(
     where mask: SIMD<Float>.Mask,
     otherwise: SIMD<Float>
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyingComplex(a, SIMDFloat.repeating(1.5), where: mask, otherwise: otherwise)
+    SIMD<Float>.multiplyingComplex(a, SIMD<Float>.repeating(1.5), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -309,11 +339,13 @@ public func highwayMultiplyingComplexWhereOtherwiseF32ConstantB(
     where mask: SIMD<Float>.Mask,
     otherwise: SIMD<Float>
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF32(
-        otherwise.raw,
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF32(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
@@ -323,7 +355,7 @@ public func portMultiplyingComplexWhereOtherwiseF32ConstantOtherwise(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyingComplex(a, b, where: mask, otherwise: SIMDFloat.repeating(1.5))
+    SIMD<Float>.multiplyingComplex(a, b, where: mask, otherwise: SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
@@ -332,11 +364,13 @@ public func highwayMultiplyingComplexWhereOtherwiseF32ConstantOtherwise(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        mask.raw,
-        a.raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
     )
 }
 
@@ -346,7 +380,7 @@ public func portMultiplyingComplexConjugateWhereF32(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyingComplexConjugate(a, b, where: mask)
+    SIMD<Float>.multiplyingComplexConjugate(a, b, where: mask)
 }
 
 @inline(never)
@@ -355,7 +389,9 @@ public func highwayMultiplyingComplexConjugateWhereF32(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyingComplexConjugateWhereF32(mask.raw, a.raw, b.raw)
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingComplexConjugateWhereF32(mask.raw, a.raw, b.raw)
+    )
 }
 
 @inline(never)
@@ -363,7 +399,7 @@ public func portMultiplyingComplexConjugateWhereF32ConstantA(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyingComplexConjugate(SIMDFloat.repeating(1.5), b, where: mask)
+    SIMD<Float>.multiplyingComplexConjugate(SIMD<Float>.repeating(1.5), b, where: mask)
 }
 
 @inline(never)
@@ -371,10 +407,12 @@ public func highwayMultiplyingComplexConjugateWhereF32ConstantA(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyingComplexConjugateWhereF32(
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingComplexConjugateWhereF32(
+            mask.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
@@ -383,7 +421,7 @@ public func portMultiplyingComplexConjugateWhereF32ConstantB(
     _ a: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyingComplexConjugate(a, SIMDFloat.repeating(1.5), where: mask)
+    SIMD<Float>.multiplyingComplexConjugate(a, SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
@@ -391,10 +429,12 @@ public func highwayMultiplyingComplexConjugateWhereF32ConstantB(
     _ a: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyingComplexConjugateWhereF32(
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingComplexConjugateWhereF32(
+            mask.raw,
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
@@ -405,7 +445,7 @@ public func portMultiplyAddingComplexConjugateWhereF32(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyAddingComplexConjugate(a, b, c, where: mask)
+    SIMD<Float>.multiplyAddingComplexConjugate(a, b, c, where: mask)
 }
 
 @inline(never)
@@ -415,7 +455,14 @@ public func highwayMultiplyAddingComplexConjugateWhereF32(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF32(mask.raw, a.raw, b.raw, c.raw)
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF32(
+            mask.raw,
+            a.raw,
+            b.raw,
+            c.raw
+        )
+    )
 }
 
 @inline(never)
@@ -424,7 +471,7 @@ public func portMultiplyAddingComplexConjugateWhereF32ConstantA(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyAddingComplexConjugate(SIMDFloat.repeating(1.5), b, c, where: mask)
+    SIMD<Float>.multiplyAddingComplexConjugate(SIMD<Float>.repeating(1.5), b, c, where: mask)
 }
 
 @inline(never)
@@ -433,11 +480,13 @@ public func highwayMultiplyAddingComplexConjugateWhereF32ConstantA(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF32(
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw,
-        c.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF32(
+            mask.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
@@ -447,7 +496,7 @@ public func portMultiplyAddingComplexConjugateWhereF32ConstantB(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyAddingComplexConjugate(a, SIMDFloat.repeating(1.5), c, where: mask)
+    SIMD<Float>.multiplyAddingComplexConjugate(a, SIMD<Float>.repeating(1.5), c, where: mask)
 }
 
 @inline(never)
@@ -456,11 +505,13 @@ public func highwayMultiplyAddingComplexConjugateWhereF32ConstantB(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF32(
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        c.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF32(
+            mask.raw,
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            c.raw
+        )
     )
 }
 
@@ -470,7 +521,7 @@ public func portMultiplyAddingComplexConjugateWhereF32ConstantC(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyAddingComplexConjugate(a, b, SIMDFloat.repeating(1.5), where: mask)
+    SIMD<Float>.multiplyAddingComplexConjugate(a, b, SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
@@ -479,10 +530,12 @@ public func highwayMultiplyAddingComplexConjugateWhereF32ConstantC(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF32(
-        mask.raw,
-        a.raw,
-        b.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF32(
+            mask.raw,
+            a.raw,
+            b.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }

@@ -5,24 +5,24 @@ public import Vectorization
 
 @inline(never)
 public func portOddEvenBlocksBF16(_ a: SIMD<BFloat16>, _ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.oddEvenBlocks(a, b)
+    SIMD<BFloat16>.oddEvenBlocks(a, b)
 }
 
 @inline(never)
 public func highwayOddEvenBlocksBF16(_ a: SIMD<BFloat16>, _ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.oddEvenBlocksBF16(a.raw, b.raw))
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.oddEvenBlocksBF16(a.raw, b.raw))
 }
 
 @inline(never)
 public func portOddEvenBlocksBF16ConstantA(_ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.oddEvenBlocks(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), b)
+    SIMD<BFloat16>.oddEvenBlocks(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)), b)
 }
 
 @inline(never)
 public func highwayOddEvenBlocksBF16ConstantA(_ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.oddEvenBlocksBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             b.raw
@@ -32,15 +32,15 @@ public func highwayOddEvenBlocksBF16ConstantA(_ b: SIMD<BFloat16>) -> SIMD<BFloa
 
 @inline(never)
 public func portOddEvenBlocksBF16ConstantB(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.oddEvenBlocks(a, SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+    SIMD<BFloat16>.oddEvenBlocks(a, SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayOddEvenBlocksBF16ConstantB(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.oddEvenBlocksBF16(
             a.raw,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -49,24 +49,24 @@ public func highwayOddEvenBlocksBF16ConstantB(_ a: SIMD<BFloat16>) -> SIMD<BFloa
 
 @inline(never)
 public func portSwappingAdjacentBlocksBF16(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.swappingAdjacentBlocks(a)
+    SIMD<BFloat16>.swappingAdjacentBlocks(a)
 }
 
 @inline(never)
 public func highwaySwappingAdjacentBlocksBF16(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.swappingAdjacentBlocksBF16(a.raw))
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.swappingAdjacentBlocksBF16(a.raw))
 }
 
 @inline(never)
 public func portSwappingAdjacentBlocksBF16ConstantA() -> SIMD<BFloat16> {
-    SIMDBFloat16.swappingAdjacentBlocks(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+    SIMD<BFloat16>.swappingAdjacentBlocks(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwaySwappingAdjacentBlocksBF16ConstantA() -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.swappingAdjacentBlocksBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -78,7 +78,7 @@ public func portInterleavingEvenBlocksBF16(
     _ a: SIMD<BFloat16>,
     _ b: SIMD<BFloat16>
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.interleavingEvenBlocks(a, b)
+    SIMD<BFloat16>.interleavingEvenBlocks(a, b)
 }
 
 @inline(never)
@@ -86,19 +86,19 @@ public func highwayInterleavingEvenBlocksBF16(
     _ a: SIMD<BFloat16>,
     _ b: SIMD<BFloat16>
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.interleavingEvenBlocksBF16(a.raw, b.raw))
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.interleavingEvenBlocksBF16(a.raw, b.raw))
 }
 
 @inline(never)
 public func portInterleavingEvenBlocksBF16ConstantA(_ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.interleavingEvenBlocks(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), b)
+    SIMD<BFloat16>.interleavingEvenBlocks(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)), b)
 }
 
 @inline(never)
 public func highwayInterleavingEvenBlocksBF16ConstantA(_ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.interleavingEvenBlocksBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             b.raw
@@ -108,15 +108,15 @@ public func highwayInterleavingEvenBlocksBF16ConstantA(_ b: SIMD<BFloat16>) -> S
 
 @inline(never)
 public func portInterleavingEvenBlocksBF16ConstantB(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.interleavingEvenBlocks(a, SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+    SIMD<BFloat16>.interleavingEvenBlocks(a, SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayInterleavingEvenBlocksBF16ConstantB(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.interleavingEvenBlocksBF16(
             a.raw,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -128,7 +128,7 @@ public func portInterleavingOddBlocksBF16(
     _ a: SIMD<BFloat16>,
     _ b: SIMD<BFloat16>
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.interleavingOddBlocks(a, b)
+    SIMD<BFloat16>.interleavingOddBlocks(a, b)
 }
 
 @inline(never)
@@ -136,19 +136,19 @@ public func highwayInterleavingOddBlocksBF16(
     _ a: SIMD<BFloat16>,
     _ b: SIMD<BFloat16>
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.interleavingOddBlocksBF16(a.raw, b.raw))
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.interleavingOddBlocksBF16(a.raw, b.raw))
 }
 
 @inline(never)
 public func portInterleavingOddBlocksBF16ConstantA(_ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.interleavingOddBlocks(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), b)
+    SIMD<BFloat16>.interleavingOddBlocks(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)), b)
 }
 
 @inline(never)
 public func highwayInterleavingOddBlocksBF16ConstantA(_ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.interleavingOddBlocksBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             b.raw
@@ -158,15 +158,15 @@ public func highwayInterleavingOddBlocksBF16ConstantA(_ b: SIMD<BFloat16>) -> SI
 
 @inline(never)
 public func portInterleavingOddBlocksBF16ConstantB(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.interleavingOddBlocks(a, SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+    SIMD<BFloat16>.interleavingOddBlocks(a, SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayInterleavingOddBlocksBF16ConstantB(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.interleavingOddBlocksBF16(
             a.raw,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -178,7 +178,7 @@ public func portInterleavingLowerBlocksBF16(
     _ a: SIMD<BFloat16>,
     _ b: SIMD<BFloat16>
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.interleavingLowerBlocks(a, b)
+    SIMD<BFloat16>.interleavingLowerBlocks(a, b)
 }
 
 @inline(never)
@@ -186,19 +186,19 @@ public func highwayInterleavingLowerBlocksBF16(
     _ a: SIMD<BFloat16>,
     _ b: SIMD<BFloat16>
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.interleavingLowerBlocksBF16(a.raw, b.raw))
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.interleavingLowerBlocksBF16(a.raw, b.raw))
 }
 
 @inline(never)
 public func portInterleavingLowerBlocksBF16ConstantA(_ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.interleavingLowerBlocks(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), b)
+    SIMD<BFloat16>.interleavingLowerBlocks(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)), b)
 }
 
 @inline(never)
 public func highwayInterleavingLowerBlocksBF16ConstantA(_ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.interleavingLowerBlocksBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             b.raw
@@ -208,15 +208,15 @@ public func highwayInterleavingLowerBlocksBF16ConstantA(_ b: SIMD<BFloat16>) -> 
 
 @inline(never)
 public func portInterleavingLowerBlocksBF16ConstantB(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.interleavingLowerBlocks(a, SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+    SIMD<BFloat16>.interleavingLowerBlocks(a, SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayInterleavingLowerBlocksBF16ConstantB(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.interleavingLowerBlocksBF16(
             a.raw,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -228,7 +228,7 @@ public func portInterleavingUpperBlocksBF16(
     _ a: SIMD<BFloat16>,
     _ b: SIMD<BFloat16>
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.interleavingUpperBlocks(a, b)
+    SIMD<BFloat16>.interleavingUpperBlocks(a, b)
 }
 
 @inline(never)
@@ -236,19 +236,19 @@ public func highwayInterleavingUpperBlocksBF16(
     _ a: SIMD<BFloat16>,
     _ b: SIMD<BFloat16>
 ) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.interleavingUpperBlocksBF16(a.raw, b.raw))
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.interleavingUpperBlocksBF16(a.raw, b.raw))
 }
 
 @inline(never)
 public func portInterleavingUpperBlocksBF16ConstantA(_ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.interleavingUpperBlocks(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), b)
+    SIMD<BFloat16>.interleavingUpperBlocks(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)), b)
 }
 
 @inline(never)
 public func highwayInterleavingUpperBlocksBF16ConstantA(_ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.interleavingUpperBlocksBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             b.raw
@@ -258,15 +258,15 @@ public func highwayInterleavingUpperBlocksBF16ConstantA(_ b: SIMD<BFloat16>) -> 
 
 @inline(never)
 public func portInterleavingUpperBlocksBF16ConstantB(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.interleavingUpperBlocks(a, SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+    SIMD<BFloat16>.interleavingUpperBlocks(a, SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayInterleavingUpperBlocksBF16ConstantB(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.interleavingUpperBlocksBF16(
             a.raw,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -275,17 +275,17 @@ public func highwayInterleavingUpperBlocksBF16ConstantB(_ a: SIMD<BFloat16>) -> 
 
 @inline(never)
 public func portBroadcastingBlockBF16ConstantA() -> SIMD<BFloat16> {
-    unsafe SIMDBFloat16.broadcasting(
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+    unsafe SIMD<BFloat16>.broadcasting(
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         blockUnchecked: 0
     )
 }
 
 @inline(never)
 public func highwayBroadcastingBlockBF16ConstantA() -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.broadcastingBlockBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             0
@@ -295,10 +295,10 @@ public func highwayBroadcastingBlockBF16ConstantA() -> SIMD<BFloat16> {
 
 @inline(never)
 public func portBroadcastingBlockBF16ConstantBlock(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    unsafe SIMDBFloat16.broadcasting(a, blockUnchecked: 0)
+    unsafe SIMD<BFloat16>.broadcasting(a, blockUnchecked: 0)
 }
 
 @inline(never)
 public func highwayBroadcastingBlockBF16ConstantBlock(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.broadcastingBlockBF16(a.raw, 0))
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.broadcastingBlockBF16(a.raw, 0))
 }

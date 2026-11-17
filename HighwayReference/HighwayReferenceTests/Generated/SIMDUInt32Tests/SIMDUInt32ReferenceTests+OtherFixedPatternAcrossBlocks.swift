@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDUInt32ReferenceTests {
     @Test func oddEvenBlocks() {
         let mismatches = Mismatches("oddEvenBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x49AC_82E7_748F_6C7A)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x49AC_83E7_748F_6E2D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x49AC_82E7_748F_6C7A)
+        let bInputs = Inputs.vectors(H.self, seed: 0x49AC_83E7_748F_6E2D)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.oddEvenBlocks(a, b),
-                H.Vector(raw: HighwayReference.oddEvenBlocksU32(a.raw, b.raw)),
+                H(raw: HighwayReference.oddEvenBlocksU32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -22,11 +22,11 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func swappingAdjacentBlocks() {
         let mismatches = Mismatches("swappingAdjacentBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0C3C_B6B8_5D09_65AA)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0C3C_B6B8_5D09_65AA)
         for a in aInputs {
             mismatches.check(
                 H.swappingAdjacentBlocks(a),
-                H.Vector(raw: HighwayReference.swappingAdjacentBlocksU32(a.raw)),
+                H(raw: HighwayReference.swappingAdjacentBlocksU32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -35,12 +35,12 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func interleavingEvenBlocks() {
         let mismatches = Mismatches("interleavingEvenBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDDE2_B5F1_74F9_267D)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xDDE2_B4F1_74F9_24CA)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDDE2_B5F1_74F9_267D)
+        let bInputs = Inputs.vectors(H.self, seed: 0xDDE2_B4F1_74F9_24CA)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingEvenBlocks(a, b),
-                H.Vector(raw: HighwayReference.interleavingEvenBlocksU32(a.raw, b.raw)),
+                H(raw: HighwayReference.interleavingEvenBlocksU32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -49,12 +49,12 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func interleavingOddBlocks() {
         let mismatches = Mismatches("interleavingOddBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE88F_4F86_6602_576C)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE88F_5086_6602_591F)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE88F_4F86_6602_576C)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE88F_5086_6602_591F)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingOddBlocks(a, b),
-                H.Vector(raw: HighwayReference.interleavingOddBlocksU32(a.raw, b.raw)),
+                H(raw: HighwayReference.interleavingOddBlocksU32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -63,12 +63,12 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func interleavingLowerBlocks() {
         let mismatches = Mismatches("interleavingLowerBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x73A0_E065_A6B2_FBB4)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x73A0_E165_A6B2_FD67)
+        let aInputs = Inputs.vectors(H.self, seed: 0x73A0_E065_A6B2_FBB4)
+        let bInputs = Inputs.vectors(H.self, seed: 0x73A0_E165_A6B2_FD67)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingLowerBlocks(a, b),
-                H.Vector(raw: HighwayReference.interleavingLowerBlocksU32(a.raw, b.raw)),
+                H(raw: HighwayReference.interleavingLowerBlocksU32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -77,12 +77,12 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func interleavingUpperBlocks() {
         let mismatches = Mismatches("interleavingUpperBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC5BE_98E8_BC6A_2CCD)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC5BE_97E8_BC6A_2B1A)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC5BE_98E8_BC6A_2CCD)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC5BE_97E8_BC6A_2B1A)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingUpperBlocks(a, b),
-                H.Vector(raw: HighwayReference.interleavingUpperBlocksU32(a.raw, b.raw)),
+                H(raw: HighwayReference.interleavingUpperBlocksU32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -91,12 +91,12 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func broadcastingLane() {
         let mismatches = Mismatches("broadcastingLane")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4D08_5352_E98A_5C1E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4D08_5352_E98A_5C1E)
         let laneInputs = Array(0...H.laneCount - 1)
         for (a, lane) in everyPair(aInputs, laneInputs) {
             mismatches.check(
                 H.broadcasting(a, lane: lane),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingLaneU32(
                         a.raw,
                         Int32(truncatingIfNeeded: lane)
@@ -110,12 +110,12 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func broadcastingLaneUnchecked() {
         let mismatches = Mismatches("broadcastingLane unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEBB1_7109_2F8F_1198)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEBB1_7109_2F8F_1198)
         let laneInputs = Array(0...H.laneCount - 1)
         for (a, lane) in everyPair(aInputs, laneInputs) {
             mismatches.check(
                 unsafe H.broadcasting(a, laneUnchecked: lane),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingLaneU32(
                         a.raw,
                         Int32(truncatingIfNeeded: lane)
@@ -129,12 +129,12 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func broadcastingBlock() {
         let mismatches = Mismatches("broadcastingBlock")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE4F4_74A7_5172_2E5B)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE4F4_74A7_5172_2E5B)
         let blockInputs = Array(0...H.laneCount / 4 - 1)
         for (a, block) in everyPair(aInputs, blockInputs) {
             mismatches.check(
                 H.broadcasting(a, block: block),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingBlockU32(
                         a.raw,
                         Int32(truncatingIfNeeded: block)
@@ -148,12 +148,12 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func broadcastingBlockUnchecked() {
         let mismatches = Mismatches("broadcastingBlock unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC7D5_0798_99C1_BC6F)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC7D5_0798_99C1_BC6F)
         let blockInputs = Array(0...H.laneCount / 4 - 1)
         for (a, block) in everyPair(aInputs, blockInputs) {
             mismatches.check(
                 unsafe H.broadcasting(a, blockUnchecked: block),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingBlockU32(
                         a.raw,
                         Int32(truncatingIfNeeded: block)

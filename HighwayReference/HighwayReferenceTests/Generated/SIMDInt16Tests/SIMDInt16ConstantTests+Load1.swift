@@ -9,12 +9,8 @@ extension SIMDInt16ConstantTests {
     @inline(__always)
     private func checkLoadFirstOtherwiseConstantCount(_ count: Int) {
         let mismatches = Mismatches("loadFirstOtherwise with count \(count)")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x23F1_2111_4D82_0D90)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x23F1_2211_4D82_0F43
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x23F1_2111_4D82_0D90)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x23F1_2211_4D82_0F43)
         for (otherwise, from) in everyPair(otherwiseInputs, fromInputs) {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
@@ -23,7 +19,7 @@ extension SIMDInt16ConstantTests {
                         count: count,
                         otherwise: otherwise
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstOtherwiseI16(
                             otherwise.raw,
                             source.baseAddress!,
@@ -208,18 +204,14 @@ extension SIMDInt16ConstantTests {
     @inline(__always)
     private func checkLoadFirstOtherwiseConstantCountBeforeGuardPage(_ count: Int) {
         let mismatches = Mismatches("loadFirstOtherwise with count \(count) before a guard page")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x0D2C_E395_CAB0_2FA9)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x0D2C_E295_CAB0_2DF6
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x0D2C_E395_CAB0_2FA9)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x0D2C_E295_CAB0_2DF6)
         for (otherwise, from) in everyPair(otherwiseInputs, fromInputs) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(Array(from.prefix(count))) {
                 source in
                 (
                     unsafe H.loadFirst(from: source, count: count, otherwise: otherwise),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstOtherwiseI16(otherwise.raw, source, count)
                     )
                 )

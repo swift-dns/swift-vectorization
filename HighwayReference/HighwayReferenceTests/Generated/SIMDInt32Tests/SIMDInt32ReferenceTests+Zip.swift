@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDInt32ReferenceTests {
     @Test func zippingLowerFromInt16() {
         let mismatches = Mismatches("zippingLowerFromInt16")
-        let aInputs = Inputs.conversions(SIMDInt16.Vector.self, seed: 0xF8E7_2645_6201_9A17)
-        let bInputs = Inputs.conversions(SIMDInt16.Vector.self, seed: 0xF8E7_2545_6201_9864)
+        let aInputs = Inputs.conversions(SIMD<Int16>.self, seed: 0xF8E7_2645_6201_9A17)
+        let bInputs = Inputs.conversions(SIMD<Int16>.self, seed: 0xF8E7_2545_6201_9864)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.zippingLower(a, b),
-                H.Vector(raw: HighwayReference.zippingLowerI16ToI32(a.raw, b.raw)),
+                H(raw: HighwayReference.zippingLowerI16ToI32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -22,12 +22,12 @@ extension SIMDInt32ReferenceTests {
 
     @Test func zippingUpperFromInt16() {
         let mismatches = Mismatches("zippingUpperFromInt16")
-        let aInputs = Inputs.conversions(SIMDInt16.Vector.self, seed: 0x80AC_5B1B_CF4D_CD68)
-        let bInputs = Inputs.conversions(SIMDInt16.Vector.self, seed: 0x80AC_5C1B_CF4D_CF1B)
+        let aInputs = Inputs.conversions(SIMD<Int16>.self, seed: 0x80AC_5B1B_CF4D_CD68)
+        let bInputs = Inputs.conversions(SIMD<Int16>.self, seed: 0x80AC_5C1B_CF4D_CF1B)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.zippingUpper(a, b),
-                H.Vector(raw: HighwayReference.zippingUpperI16ToI32(a.raw, b.raw)),
+                H(raw: HighwayReference.zippingUpperI16ToI32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

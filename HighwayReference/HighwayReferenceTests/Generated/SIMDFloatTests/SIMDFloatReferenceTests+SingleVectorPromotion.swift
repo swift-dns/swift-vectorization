@@ -9,12 +9,12 @@ extension SIMDFloatReferenceTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func vectorWideningFromHalfFloat16() {
         let mismatches = Mismatches("vectorWideningFromHalfFloat16")
-        let aInputs = Inputs.conversions(SIMDFloat16.HalfVector.self, seed: 0xD3AF_6C2C_B461_8AA8)
+        let aInputs = Inputs.conversions(SIMD<Float16>.HalfVector.self, seed: 0xD3AF_6C2C_B461_8AA8)
             .map(poisoningUpperBytes)
         for a in aInputs {
             mismatches.check(
                 H.vector(widening: a),
-                HighwayReference.vectorWideningHalfF16ToF32(a.raw),
+                H(raw: HighwayReference.vectorWideningHalfF16ToF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -25,11 +25,11 @@ extension SIMDFloatReferenceTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func vectorWideningLowerFromFloat16() {
         let mismatches = Mismatches("vectorWideningLowerFromFloat16")
-        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0xC966_97F8_B58B_AA72)
+        let aInputs = Inputs.conversions(SIMD<Float16>.self, seed: 0xC966_97F8_B58B_AA72)
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningLower: a),
-                HighwayReference.vectorWideningLowerF16ToF32(a.raw),
+                H(raw: HighwayReference.vectorWideningLowerF16ToF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -40,11 +40,11 @@ extension SIMDFloatReferenceTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func vectorWideningUpperFromFloat16() {
         let mismatches = Mismatches("vectorWideningUpperFromFloat16")
-        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0xE0E1_E212_5C4F_EDE1)
+        let aInputs = Inputs.conversions(SIMD<Float16>.self, seed: 0xE0E1_E212_5C4F_EDE1)
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningUpper: a),
-                HighwayReference.vectorWideningUpperF16ToF32(a.raw),
+                H(raw: HighwayReference.vectorWideningUpperF16ToF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -55,11 +55,11 @@ extension SIMDFloatReferenceTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func vectorWideningEvenFromFloat16() {
         let mismatches = Mismatches("vectorWideningEvenFromFloat16")
-        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0xB24D_9B4F_C0C3_8BF3)
+        let aInputs = Inputs.conversions(SIMD<Float16>.self, seed: 0xB24D_9B4F_C0C3_8BF3)
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningEven: a),
-                HighwayReference.vectorWideningEvenF16ToF32(a.raw),
+                H(raw: HighwayReference.vectorWideningEvenF16ToF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -70,11 +70,11 @@ extension SIMDFloatReferenceTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func vectorWideningOddFromFloat16() {
         let mismatches = Mismatches("vectorWideningOddFromFloat16")
-        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0xC35D_15D6_B962_642E)
+        let aInputs = Inputs.conversions(SIMD<Float16>.self, seed: 0xC35D_15D6_B962_642E)
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningOdd: a),
-                HighwayReference.vectorWideningOddF16ToF32(a.raw),
+                H(raw: HighwayReference.vectorWideningOddF16ToF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -84,12 +84,14 @@ extension SIMDFloatReferenceTests {
 
     @Test func vectorWideningFromHalfBFloat16() {
         let mismatches = Mismatches("vectorWideningFromHalfBFloat16")
-        let aInputs = Inputs.conversions(SIMDBFloat16.HalfVector.self, seed: 0x64C5_84D8_79D8_C552)
-            .map(poisoningUpperBytes)
+        let aInputs = Inputs.conversions(
+            SIMD<BFloat16>.HalfVector.self,
+            seed: 0x64C5_84D8_79D8_C552
+        ).map(poisoningUpperBytes)
         for a in aInputs {
             mismatches.check(
                 H.vector(widening: a),
-                HighwayReference.vectorWideningHalfBF16ToF32(a.raw),
+                H(raw: HighwayReference.vectorWideningHalfBF16ToF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -98,11 +100,11 @@ extension SIMDFloatReferenceTests {
 
     @Test func vectorWideningLowerFromBFloat16() {
         let mismatches = Mismatches("vectorWideningLowerFromBFloat16")
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0xF8C1_C3BE_7A38_9314)
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0xF8C1_C3BE_7A38_9314)
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningLower: a),
-                HighwayReference.vectorWideningLowerBF16ToF32(a.raw),
+                H(raw: HighwayReference.vectorWideningLowerBF16ToF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -111,11 +113,11 @@ extension SIMDFloatReferenceTests {
 
     @Test func vectorWideningUpperFromBFloat16() {
         let mismatches = Mismatches("vectorWideningUpperFromBFloat16")
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x098B_BB36_933F_5751)
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x098B_BB36_933F_5751)
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningUpper: a),
-                HighwayReference.vectorWideningUpperBF16ToF32(a.raw),
+                H(raw: HighwayReference.vectorWideningUpperBF16ToF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -124,11 +126,11 @@ extension SIMDFloatReferenceTests {
 
     @Test func vectorWideningEvenFromBFloat16() {
         let mismatches = Mismatches("vectorWideningEvenFromBFloat16")
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x37EE_876A_63AE_A213)
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x37EE_876A_63AE_A213)
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningEven: a),
-                HighwayReference.vectorWideningEvenBF16ToF32(a.raw),
+                H(raw: HighwayReference.vectorWideningEvenBF16ToF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -137,11 +139,11 @@ extension SIMDFloatReferenceTests {
 
     @Test func vectorWideningOddFromBFloat16() {
         let mismatches = Mismatches("vectorWideningOddFromBFloat16")
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x27F7_86E9_563E_9B18)
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x27F7_86E9_563E_9B18)
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningOdd: a),
-                HighwayReference.vectorWideningOddBF16ToF32(a.raw),
+                H(raw: HighwayReference.vectorWideningOddBF16ToF32(a.raw)),
                 "a: \(describe(a))"
             )
         }

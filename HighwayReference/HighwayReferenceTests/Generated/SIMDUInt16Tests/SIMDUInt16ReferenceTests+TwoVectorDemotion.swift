@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDUInt16ReferenceTests {
     @Test func vectorClampingFromUInt32() {
         let mismatches = Mismatches("vectorClampingFromUInt32")
-        let aInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0x0FED_2603_A7CC_53BC)
-        let bInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0x0FED_2703_A7CC_556F)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0x0FED_2603_A7CC_53BC)
+        let bInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0x0FED_2703_A7CC_556F)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.vector(clamping: a, b),
-                H.Vector(raw: HighwayReference.vectorClampingU32ToU16(a.raw, b.raw)),
+                H(raw: HighwayReference.vectorClampingU32ToU16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -22,12 +22,12 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func vectorClampingFromInt32() {
         let mismatches = Mismatches("vectorClampingFromInt32")
-        let aInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xFA08_AD44_481A_FE05)
-        let bInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xFA08_AC44_481A_FC52)
+        let aInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xFA08_AD44_481A_FE05)
+        let bInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xFA08_AC44_481A_FC52)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.vector(clamping: a, b),
-                H.Vector(raw: HighwayReference.vectorClampingI32ToU16(a.raw, b.raw)),
+                H(raw: HighwayReference.vectorClampingI32ToU16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -36,12 +36,12 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func vectorClampingInAnyOrderFromUInt32() {
         let mismatches = Mismatches("vectorClampingInAnyOrderFromUInt32")
-        let aInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0xAE61_CB03_0027_C589)
-        let bInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0xAE61_CA03_0027_C3D6)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0xAE61_CB03_0027_C589)
+        let bInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0xAE61_CA03_0027_C3D6)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.vector(clampingInAnyOrder: a, b),
-                H.Vector(raw: HighwayReference.vectorClampingInAnyOrderU32ToU16(a.raw, b.raw)),
+                H(raw: HighwayReference.vectorClampingInAnyOrderU32ToU16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -50,12 +50,12 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func vectorClampingInAnyOrderFromInt32() {
         let mismatches = Mismatches("vectorClampingInAnyOrderFromInt32")
-        let aInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xD690_EB20_3342_AAC2)
-        let bInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xD690_EC20_3342_AC75)
+        let aInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xD690_EB20_3342_AAC2)
+        let bInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xD690_EC20_3342_AC75)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.vector(clampingInAnyOrder: a, b),
-                H.Vector(raw: HighwayReference.vectorClampingInAnyOrderI32ToU16(a.raw, b.raw)),
+                H(raw: HighwayReference.vectorClampingInAnyOrderI32ToU16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -64,14 +64,14 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func vectorClampingShiftedRightByFromUInt32() {
         let mismatches = Mismatches("vectorClampingShiftedRightByFromUInt32")
-        let aInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0xB65A_03DF_B464_D5D4)
-        let bInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0xB65A_04DF_B464_D787)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0xB65A_03DF_B464_D5D4)
+        let bInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0xB65A_04DF_B464_D787)
         let bitsInputs = Array(0...31)
         for (a, b, bits) in mixedTriples(aInputs, bInputs, bitsInputs, seed: 0x3906_999B_104C_F488)
         {
             mismatches.check(
                 H.vector(clamping: a, b, shiftedRightBy: bits),
-                H.Vector(
+                H(
                     raw: HighwayReference.vectorClampingShiftedRightByU32ToU16(
                         a.raw,
                         b.raw,
@@ -86,14 +86,14 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func vectorClampingShiftedRightByFromUInt32Unchecked() {
         let mismatches = Mismatches("vectorClampingShiftedRightByFromUInt32 unchecked")
-        let aInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0x4CFA_6F11_B39F_918A)
-        let bInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0x4CFA_7011_B39F_933D)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0x4CFA_6F11_B39F_918A)
+        let bInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0x4CFA_7011_B39F_933D)
         let bitsInputs = Array(0...31)
         for (a, b, bits) in mixedTriples(aInputs, bInputs, bitsInputs, seed: 0xE8DA_391F_7844_6A4E)
         {
             mismatches.check(
                 unsafe H.vector(clamping: a, b, shiftedRightByUnchecked: bits),
-                H.Vector(
+                H(
                     raw: HighwayReference.vectorClampingShiftedRightByU32ToU16(
                         a.raw,
                         b.raw,
@@ -108,14 +108,14 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func vectorClampingShiftedRightByFromInt32() {
         let mismatches = Mismatches("vectorClampingShiftedRightByFromInt32")
-        let aInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0x36AC_E41A_96FE_DAAD)
-        let bInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0x36AC_E31A_96FE_D8FA)
+        let aInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0x36AC_E41A_96FE_DAAD)
+        let bInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0x36AC_E31A_96FE_D8FA)
         let bitsInputs = Array(0...31)
         for (a, b, bits) in mixedTriples(aInputs, bInputs, bitsInputs, seed: 0x3691_0D5E_12F1_1A7F)
         {
             mismatches.check(
                 H.vector(clamping: a, b, shiftedRightBy: bits),
-                H.Vector(
+                H(
                     raw: HighwayReference.vectorClampingShiftedRightByI32ToU16(
                         a.raw,
                         b.raw,
@@ -130,14 +130,14 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func vectorClampingShiftedRightByFromInt32Unchecked() {
         let mismatches = Mismatches("vectorClampingShiftedRightByFromInt32 unchecked")
-        let aInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xD2E5_1D6E_3CD2_452D)
-        let bInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xD2E5_1C6E_3CD2_437A)
+        let aInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xD2E5_1D6E_3CD2_452D)
+        let bInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xD2E5_1C6E_3CD2_437A)
         let bitsInputs = Array(0...31)
         for (a, b, bits) in mixedTriples(aInputs, bInputs, bitsInputs, seed: 0x5286_3620_AD7B_ADFF)
         {
             mismatches.check(
                 unsafe H.vector(clamping: a, b, shiftedRightByUnchecked: bits),
-                H.Vector(
+                H(
                     raw: HighwayReference.vectorClampingShiftedRightByI32ToU16(
                         a.raw,
                         b.raw,
@@ -152,14 +152,14 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func vectorClampingRoundingShiftedRightByFromUInt32() {
         let mismatches = Mismatches("vectorClampingRoundingShiftedRightByFromUInt32")
-        let aInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0x0C32_A51C_A903_3288)
-        let bInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0x0C32_A61C_A903_343B)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0x0C32_A51C_A903_3288)
+        let bInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0x0C32_A61C_A903_343B)
         let bitsInputs = Array(0...31)
         for (a, b, bits) in mixedTriples(aInputs, bInputs, bitsInputs, seed: 0xC21D_A854_D728_9904)
         {
             mismatches.check(
                 H.vector(clamping: a, b, roundingShiftedRightBy: bits),
-                H.Vector(
+                H(
                     raw: HighwayReference.vectorClampingRoundingShiftedRightByU32ToU16(
                         a.raw,
                         b.raw,
@@ -174,14 +174,14 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func vectorClampingRoundingShiftedRightByFromUInt32Unchecked() {
         let mismatches = Mismatches("vectorClampingRoundingShiftedRightByFromUInt32 unchecked")
-        let aInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0x672E_BF4A_5A76_866E)
-        let bInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0x672E_C04A_5A76_8821)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0x672E_BF4A_5A76_866E)
+        let bInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0x672E_C04A_5A76_8821)
         let bitsInputs = Array(0...31)
         for (a, b, bits) in mixedTriples(aInputs, bInputs, bitsInputs, seed: 0x2676_FC93_D09F_164A)
         {
             mismatches.check(
                 unsafe H.vector(clamping: a, b, roundingShiftedRightByUnchecked: bits),
-                H.Vector(
+                H(
                     raw: HighwayReference.vectorClampingRoundingShiftedRightByU32ToU16(
                         a.raw,
                         b.raw,
@@ -196,14 +196,14 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func vectorClampingRoundingShiftedRightByFromInt32() {
         let mismatches = Mismatches("vectorClampingRoundingShiftedRightByFromInt32")
-        let aInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xFB9D_C9A8_3899_E6D1)
-        let bInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xFB9D_C8A8_3899_E51E)
+        let aInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xFB9D_C9A8_3899_E6D1)
+        let bInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xFB9D_C8A8_3899_E51E)
         let bitsInputs = Array(0...31)
         for (a, b, bits) in mixedTriples(aInputs, bInputs, bitsInputs, seed: 0x86AD_FC2D_6C07_1F0B)
         {
             mismatches.check(
                 H.vector(clamping: a, b, roundingShiftedRightBy: bits),
-                H.Vector(
+                H(
                     raw: HighwayReference.vectorClampingRoundingShiftedRightByI32ToU16(
                         a.raw,
                         b.raw,
@@ -218,14 +218,14 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func vectorClampingRoundingShiftedRightByFromInt32Unchecked() {
         let mismatches = Mismatches("vectorClampingRoundingShiftedRightByFromInt32 unchecked")
-        let aInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0x156B_D8CC_2FD0_0311)
-        let bInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0x156B_D7CC_2FD0_015E)
+        let aInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0x156B_D8CC_2FD0_0311)
+        let bInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0x156B_D7CC_2FD0_015E)
         let bitsInputs = Array(0...31)
         for (a, b, bits) in mixedTriples(aInputs, bInputs, bitsInputs, seed: 0x0DBE_4ED6_D592_AACB)
         {
             mismatches.check(
                 unsafe H.vector(clamping: a, b, roundingShiftedRightByUnchecked: bits),
-                H.Vector(
+                H(
                     raw: HighwayReference.vectorClampingRoundingShiftedRightByI32ToU16(
                         a.raw,
                         b.raw,
@@ -240,14 +240,14 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func vectorClampingInAnyOrderShiftedRightByFromUInt32() {
         let mismatches = Mismatches("vectorClampingInAnyOrderShiftedRightByFromUInt32")
-        let aInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0x9C4D_FAE0_E55C_DC39)
-        let bInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0x9C4D_F9E0_E55C_DA86)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0x9C4D_FAE0_E55C_DC39)
+        let bInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0x9C4D_F9E0_E55C_DA86)
         let bitsInputs = Array(0...31)
         for (a, b, bits) in mixedTriples(aInputs, bInputs, bitsInputs, seed: 0xE121_03A3_5635_BC73)
         {
             mismatches.check(
                 H.vector(clampingInAnyOrder: a, b, shiftedRightBy: bits),
-                H.Vector(
+                H(
                     raw: HighwayReference.vectorClampingInAnyOrderShiftedRightByU32ToU16(
                         a.raw,
                         b.raw,
@@ -262,14 +262,14 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func vectorClampingInAnyOrderShiftedRightByFromUInt32Unchecked() {
         let mismatches = Mismatches("vectorClampingInAnyOrderShiftedRightByFromUInt32 unchecked")
-        let aInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0xEFC5_5C30_6B0B_66D9)
-        let bInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0xEFC5_5B30_6B0B_6526)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0xEFC5_5C30_6B0B_66D9)
+        let bInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0xEFC5_5B30_6B0B_6526)
         let bitsInputs = Array(0...31)
         for (a, b, bits) in mixedTriples(aInputs, bInputs, bitsInputs, seed: 0xEAAE_1B34_4A3E_1793)
         {
             mismatches.check(
                 unsafe H.vector(clampingInAnyOrder: a, b, shiftedRightByUnchecked: bits),
-                H.Vector(
+                H(
                     raw: HighwayReference.vectorClampingInAnyOrderShiftedRightByU32ToU16(
                         a.raw,
                         b.raw,
@@ -284,14 +284,14 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func vectorClampingInAnyOrderShiftedRightByFromInt32() {
         let mismatches = Mismatches("vectorClampingInAnyOrderShiftedRightByFromInt32")
-        let aInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0x7478_AD1E_50D8_7C72)
-        let bInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0x7478_AE1E_50D8_7E25)
+        let aInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0x7478_AD1E_50D8_7C72)
+        let bInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0x7478_AE1E_50D8_7E25)
         let bitsInputs = Array(0...31)
         for (a, b, bits) in mixedTriples(aInputs, bInputs, bitsInputs, seed: 0x4BB2_A258_2CE6_7FB6)
         {
             mismatches.check(
                 H.vector(clampingInAnyOrder: a, b, shiftedRightBy: bits),
-                H.Vector(
+                H(
                     raw: HighwayReference.vectorClampingInAnyOrderShiftedRightByI32ToU16(
                         a.raw,
                         b.raw,
@@ -306,14 +306,14 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func vectorClampingInAnyOrderShiftedRightByFromInt32Unchecked() {
         let mismatches = Mismatches("vectorClampingInAnyOrderShiftedRightByFromInt32 unchecked")
-        let aInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0x72DF_9593_56A0_A4AC)
-        let bInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0x72DF_9693_56A0_A65F)
+        let aInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0x72DF_9593_56A0_A4AC)
+        let bInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0x72DF_9693_56A0_A65F)
         let bitsInputs = Array(0...31)
         for (a, b, bits) in mixedTriples(aInputs, bInputs, bitsInputs, seed: 0xA74F_9048_C7FA_3200)
         {
             mismatches.check(
                 unsafe H.vector(clampingInAnyOrder: a, b, shiftedRightByUnchecked: bits),
-                H.Vector(
+                H(
                     raw: HighwayReference.vectorClampingInAnyOrderShiftedRightByI32ToU16(
                         a.raw,
                         b.raw,
@@ -328,14 +328,14 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func vectorClampingInAnyOrderRoundingShiftedRightByFromUInt32() {
         let mismatches = Mismatches("vectorClampingInAnyOrderRoundingShiftedRightByFromUInt32")
-        let aInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0x1E49_1C95_FAC4_F1D5)
-        let bInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0x1E49_1B95_FAC4_F022)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0x1E49_1C95_FAC4_F1D5)
+        let bInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0x1E49_1B95_FAC4_F022)
         let bitsInputs = Array(0...31)
         for (a, b, bits) in mixedTriples(aInputs, bInputs, bitsInputs, seed: 0x2990_6412_AE82_7F07)
         {
             mismatches.check(
                 H.vector(clampingInAnyOrder: a, b, roundingShiftedRightBy: bits),
-                H.Vector(
+                H(
                     raw: HighwayReference.vectorClampingInAnyOrderRoundingShiftedRightByU32ToU16(
                         a.raw,
                         b.raw,
@@ -352,14 +352,14 @@ extension SIMDUInt16ReferenceTests {
         let mismatches = Mismatches(
             "vectorClampingInAnyOrderRoundingShiftedRightByFromUInt32 unchecked"
         )
-        let aInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0x8386_9304_F977_8EF5)
-        let bInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0x8386_9204_F977_8D42)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0x8386_9304_F977_8EF5)
+        let bInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0x8386_9204_F977_8D42)
         let bitsInputs = Array(0...31)
         for (a, b, bits) in mixedTriples(aInputs, bInputs, bitsInputs, seed: 0xFE22_64C9_C9C1_7827)
         {
             mismatches.check(
                 unsafe H.vector(clampingInAnyOrder: a, b, roundingShiftedRightByUnchecked: bits),
-                H.Vector(
+                H(
                     raw: HighwayReference.vectorClampingInAnyOrderRoundingShiftedRightByU32ToU16(
                         a.raw,
                         b.raw,
@@ -374,14 +374,14 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func vectorClampingInAnyOrderRoundingShiftedRightByFromInt32() {
         let mismatches = Mismatches("vectorClampingInAnyOrderRoundingShiftedRightByFromInt32")
-        let aInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0x38A4_DE4E_FB28_10DE)
-        let bInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0x38A4_DF4E_FB28_1291)
+        let aInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0x38A4_DE4E_FB28_10DE)
+        let bInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0x38A4_DF4E_FB28_1291)
         let bitsInputs = Array(0...31)
         for (a, b, bits) in mixedTriples(aInputs, bInputs, bitsInputs, seed: 0x7899_6463_7FA7_52FA)
         {
             mismatches.check(
                 H.vector(clampingInAnyOrder: a, b, roundingShiftedRightBy: bits),
-                H.Vector(
+                H(
                     raw: HighwayReference.vectorClampingInAnyOrderRoundingShiftedRightByI32ToU16(
                         a.raw,
                         b.raw,
@@ -398,14 +398,14 @@ extension SIMDUInt16ReferenceTests {
         let mismatches = Mismatches(
             "vectorClampingInAnyOrderRoundingShiftedRightByFromInt32 unchecked"
         )
-        let aInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0x7027_E662_08AE_3658)
-        let bInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0x7027_E762_08AE_380B)
+        let aInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0x7027_E662_08AE_3658)
+        let bInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0x7027_E762_08AE_380B)
         let bitsInputs = Array(0...31)
         for (a, b, bits) in mixedTriples(aInputs, bInputs, bitsInputs, seed: 0x4DA9_A8DE_1B7B_C414)
         {
             mismatches.check(
                 unsafe H.vector(clampingInAnyOrder: a, b, roundingShiftedRightByUnchecked: bits),
-                H.Vector(
+                H(
                     raw: HighwayReference.vectorClampingInAnyOrderRoundingShiftedRightByI32ToU16(
                         a.raw,
                         b.raw,
@@ -420,12 +420,12 @@ extension SIMDUInt16ReferenceTests {
 
     @Test func vectorTruncatingIfNeededFromUInt32() {
         let mismatches = Mismatches("vectorTruncatingIfNeededFromUInt32")
-        let aInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0xDF4E_5E20_D847_0556)
-        let bInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0xDF4E_5F20_D847_0709)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0xDF4E_5E20_D847_0556)
+        let bInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0xDF4E_5F20_D847_0709)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.vector(truncatingIfNeeded: a, b),
-                H.Vector(raw: HighwayReference.vectorTruncatingIfNeededU32ToU16(a.raw, b.raw)),
+                H(raw: HighwayReference.vectorTruncatingIfNeededU32ToU16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

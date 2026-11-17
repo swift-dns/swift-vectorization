@@ -5,62 +5,62 @@ public import Vectorization
 
 @inline(never)
 public func portHalfVectorClampingU64ToU32(clamping a: SIMD<UInt64>) -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.halfVector(clamping: a)
+    SIMD<UInt32>.halfVector(clamping: a)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingU64ToU32(clamping a: SIMD<UInt64>) -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.HalfVector(raw: HighwayReference.Nothrow.halfVectorClampingU64ToU32(a.raw))
+    SIMD<UInt32>.HalfVector(raw: HighwayReference.Nothrow.halfVectorClampingU64ToU32(a.raw))
 }
 
 @inline(never)
 public func portHalfVectorClampingU64ToU32ConstantA() -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.halfVector(clamping: SIMDUInt64.repeating(26))
+    SIMD<UInt32>.halfVector(clamping: SIMD<UInt64>.repeating(26))
 }
 
 @inline(never)
 public func highwayHalfVectorClampingU64ToU32ConstantA() -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.HalfVector(
+    SIMD<UInt32>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingU64ToU32(
-            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
+            SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portHalfVectorClampingI64ToU32(clamping a: SIMD<Int64>) -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.halfVector(clamping: a)
+    SIMD<UInt32>.halfVector(clamping: a)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingI64ToU32(clamping a: SIMD<Int64>) -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.HalfVector(raw: HighwayReference.Nothrow.halfVectorClampingI64ToU32(a.raw))
+    SIMD<UInt32>.HalfVector(raw: HighwayReference.Nothrow.halfVectorClampingI64ToU32(a.raw))
 }
 
 @inline(never)
 public func portHalfVectorClampingI64ToU32ConstantA() -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.halfVector(clamping: SIMDInt64.repeating(26))
+    SIMD<UInt32>.halfVector(clamping: SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
 public func highwayHalfVectorClampingI64ToU32ConstantA() -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.HalfVector(
+    SIMD<UInt32>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingI64ToU32(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portHalfVectorClampingShiftedRightByU64ToU32ConstantA() -> SIMD<UInt32>.HalfVector {
-    unsafe SIMDUInt32.halfVector(clamping: SIMDUInt64.repeating(26), shiftedRightByUnchecked: 1)
+    unsafe SIMD<UInt32>.halfVector(clamping: SIMD<UInt64>.repeating(26), shiftedRightByUnchecked: 1)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingShiftedRightByU64ToU32ConstantA() -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.HalfVector(
+    SIMD<UInt32>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingShiftedRightByU64ToU32(
-            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
+            SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
             1
         )
     )
@@ -70,14 +70,14 @@ public func highwayHalfVectorClampingShiftedRightByU64ToU32ConstantA() -> SIMD<U
 public func portHalfVectorClampingShiftedRightByU64ToU32ConstantBits(
     clamping a: SIMD<UInt64>
 ) -> SIMD<UInt32>.HalfVector {
-    unsafe SIMDUInt32.halfVector(clamping: a, shiftedRightByUnchecked: 1)
+    unsafe SIMD<UInt32>.halfVector(clamping: a, shiftedRightByUnchecked: 1)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingShiftedRightByU64ToU32ConstantBits(
     clamping a: SIMD<UInt64>
 ) -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.HalfVector(
+    SIMD<UInt32>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingShiftedRightByU64ToU32(a.raw, 1)
     )
 }
@@ -86,28 +86,28 @@ public func highwayHalfVectorClampingShiftedRightByU64ToU32ConstantBits(
 public func portHalfVectorClampingShiftedRightByU64ToU32ConstantBitsWidthDifference(
     clamping a: SIMD<UInt64>
 ) -> SIMD<UInt32>.HalfVector {
-    unsafe SIMDUInt32.halfVector(clamping: a, shiftedRightByUnchecked: 32)
+    unsafe SIMD<UInt32>.halfVector(clamping: a, shiftedRightByUnchecked: 32)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingShiftedRightByU64ToU32ConstantBitsWidthDifference(
     clamping a: SIMD<UInt64>
 ) -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.HalfVector(
+    SIMD<UInt32>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingShiftedRightByU64ToU32(a.raw, 32)
     )
 }
 
 @inline(never)
 public func portHalfVectorClampingShiftedRightByI64ToU32ConstantA() -> SIMD<UInt32>.HalfVector {
-    unsafe SIMDUInt32.halfVector(clamping: SIMDInt64.repeating(26), shiftedRightByUnchecked: 1)
+    unsafe SIMD<UInt32>.halfVector(clamping: SIMD<Int64>.repeating(26), shiftedRightByUnchecked: 1)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingShiftedRightByI64ToU32ConstantA() -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.HalfVector(
+    SIMD<UInt32>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingShiftedRightByI64ToU32(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             1
         )
     )
@@ -117,14 +117,14 @@ public func highwayHalfVectorClampingShiftedRightByI64ToU32ConstantA() -> SIMD<U
 public func portHalfVectorClampingShiftedRightByI64ToU32ConstantBits(
     clamping a: SIMD<Int64>
 ) -> SIMD<UInt32>.HalfVector {
-    unsafe SIMDUInt32.halfVector(clamping: a, shiftedRightByUnchecked: 1)
+    unsafe SIMD<UInt32>.halfVector(clamping: a, shiftedRightByUnchecked: 1)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingShiftedRightByI64ToU32ConstantBits(
     clamping a: SIMD<Int64>
 ) -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.HalfVector(
+    SIMD<UInt32>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingShiftedRightByI64ToU32(a.raw, 1)
     )
 }
@@ -133,14 +133,14 @@ public func highwayHalfVectorClampingShiftedRightByI64ToU32ConstantBits(
 public func portHalfVectorClampingShiftedRightByI64ToU32ConstantBitsWidthDifference(
     clamping a: SIMD<Int64>
 ) -> SIMD<UInt32>.HalfVector {
-    unsafe SIMDUInt32.halfVector(clamping: a, shiftedRightByUnchecked: 32)
+    unsafe SIMD<UInt32>.halfVector(clamping: a, shiftedRightByUnchecked: 32)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingShiftedRightByI64ToU32ConstantBitsWidthDifference(
     clamping a: SIMD<Int64>
 ) -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.HalfVector(
+    SIMD<UInt32>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingShiftedRightByI64ToU32(a.raw, 32)
     )
 }
@@ -149,8 +149,8 @@ public func highwayHalfVectorClampingShiftedRightByI64ToU32ConstantBitsWidthDiff
 public func portHalfVectorClampingRoundingShiftedRightByU64ToU32ConstantA()
     -> SIMD<UInt32>.HalfVector
 {
-    unsafe SIMDUInt32.halfVector(
-        clamping: SIMDUInt64.repeating(26),
+    unsafe SIMD<UInt32>.halfVector(
+        clamping: SIMD<UInt64>.repeating(26),
         roundingShiftedRightByUnchecked: 1
     )
 }
@@ -159,9 +159,9 @@ public func portHalfVectorClampingRoundingShiftedRightByU64ToU32ConstantA()
 public func highwayHalfVectorClampingRoundingShiftedRightByU64ToU32ConstantA()
     -> SIMD<UInt32>.HalfVector
 {
-    SIMDUInt32.HalfVector(
+    SIMD<UInt32>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingRoundingShiftedRightByU64ToU32(
-            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
+            SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
             1
         )
     )
@@ -171,14 +171,14 @@ public func highwayHalfVectorClampingRoundingShiftedRightByU64ToU32ConstantA()
 public func portHalfVectorClampingRoundingShiftedRightByU64ToU32ConstantBits(
     clamping a: SIMD<UInt64>
 ) -> SIMD<UInt32>.HalfVector {
-    unsafe SIMDUInt32.halfVector(clamping: a, roundingShiftedRightByUnchecked: 1)
+    unsafe SIMD<UInt32>.halfVector(clamping: a, roundingShiftedRightByUnchecked: 1)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingRoundingShiftedRightByU64ToU32ConstantBits(
     clamping a: SIMD<UInt64>
 ) -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.HalfVector(
+    SIMD<UInt32>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingRoundingShiftedRightByU64ToU32(a.raw, 1)
     )
 }
@@ -187,14 +187,14 @@ public func highwayHalfVectorClampingRoundingShiftedRightByU64ToU32ConstantBits(
 public func portHalfVectorClampingRoundingShiftedRightByU64ToU32ConstantBitsWidthDifference(
     clamping a: SIMD<UInt64>
 ) -> SIMD<UInt32>.HalfVector {
-    unsafe SIMDUInt32.halfVector(clamping: a, roundingShiftedRightByUnchecked: 32)
+    unsafe SIMD<UInt32>.halfVector(clamping: a, roundingShiftedRightByUnchecked: 32)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingRoundingShiftedRightByU64ToU32ConstantBitsWidthDifference(
     clamping a: SIMD<UInt64>
 ) -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.HalfVector(
+    SIMD<UInt32>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingRoundingShiftedRightByU64ToU32(a.raw, 32)
     )
 }
@@ -203,8 +203,8 @@ public func highwayHalfVectorClampingRoundingShiftedRightByU64ToU32ConstantBitsW
 public func portHalfVectorClampingRoundingShiftedRightByI64ToU32ConstantA()
     -> SIMD<UInt32>.HalfVector
 {
-    unsafe SIMDUInt32.halfVector(
-        clamping: SIMDInt64.repeating(26),
+    unsafe SIMD<UInt32>.halfVector(
+        clamping: SIMD<Int64>.repeating(26),
         roundingShiftedRightByUnchecked: 1
     )
 }
@@ -213,9 +213,9 @@ public func portHalfVectorClampingRoundingShiftedRightByI64ToU32ConstantA()
 public func highwayHalfVectorClampingRoundingShiftedRightByI64ToU32ConstantA()
     -> SIMD<UInt32>.HalfVector
 {
-    SIMDUInt32.HalfVector(
+    SIMD<UInt32>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingRoundingShiftedRightByI64ToU32(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             1
         )
     )
@@ -225,14 +225,14 @@ public func highwayHalfVectorClampingRoundingShiftedRightByI64ToU32ConstantA()
 public func portHalfVectorClampingRoundingShiftedRightByI64ToU32ConstantBits(
     clamping a: SIMD<Int64>
 ) -> SIMD<UInt32>.HalfVector {
-    unsafe SIMDUInt32.halfVector(clamping: a, roundingShiftedRightByUnchecked: 1)
+    unsafe SIMD<UInt32>.halfVector(clamping: a, roundingShiftedRightByUnchecked: 1)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingRoundingShiftedRightByI64ToU32ConstantBits(
     clamping a: SIMD<Int64>
 ) -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.HalfVector(
+    SIMD<UInt32>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingRoundingShiftedRightByI64ToU32(a.raw, 1)
     )
 }
@@ -241,14 +241,14 @@ public func highwayHalfVectorClampingRoundingShiftedRightByI64ToU32ConstantBits(
 public func portHalfVectorClampingRoundingShiftedRightByI64ToU32ConstantBitsWidthDifference(
     clamping a: SIMD<Int64>
 ) -> SIMD<UInt32>.HalfVector {
-    unsafe SIMDUInt32.halfVector(clamping: a, roundingShiftedRightByUnchecked: 32)
+    unsafe SIMD<UInt32>.halfVector(clamping: a, roundingShiftedRightByUnchecked: 32)
 }
 
 @inline(never)
 public func highwayHalfVectorClampingRoundingShiftedRightByI64ToU32ConstantBitsWidthDifference(
     clamping a: SIMD<Int64>
 ) -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.HalfVector(
+    SIMD<UInt32>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorClampingRoundingShiftedRightByI64ToU32(a.raw, 32)
     )
 }
@@ -256,26 +256,26 @@ public func highwayHalfVectorClampingRoundingShiftedRightByI64ToU32ConstantBitsW
 @inline(never)
 public func portHalfVectorConvertingF64ToU32(converting a: SIMD<Double>) -> SIMD<UInt32>.HalfVector
 {
-    SIMDUInt32.halfVector(converting: a)
+    SIMD<UInt32>.halfVector(converting: a)
 }
 
 @inline(never)
 public func highwayHalfVectorConvertingF64ToU32(
     converting a: SIMD<Double>
 ) -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.HalfVector(raw: HighwayReference.Nothrow.halfVectorConvertingF64ToU32(a.raw))
+    SIMD<UInt32>.HalfVector(raw: HighwayReference.Nothrow.halfVectorConvertingF64ToU32(a.raw))
 }
 
 @inline(never)
 public func portHalfVectorConvertingF64ToU32ConstantA() -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.halfVector(converting: SIMDDouble.repeating(1.5))
+    SIMD<UInt32>.halfVector(converting: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayHalfVectorConvertingF64ToU32ConstantA() -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.HalfVector(
+    SIMD<UInt32>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorConvertingF64ToU32(
-            HighwayReference.Nothrow.repeatingF64(1.5).raw
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
         )
     )
 }
@@ -284,26 +284,28 @@ public func highwayHalfVectorConvertingF64ToU32ConstantA() -> SIMD<UInt32>.HalfV
 public func portHalfVectorConvertingInRangeF64ToU32(
     convertingInRange a: SIMD<Double>
 ) -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.halfVector(convertingInRange: a)
+    SIMD<UInt32>.halfVector(convertingInRange: a)
 }
 
 @inline(never)
 public func highwayHalfVectorConvertingInRangeF64ToU32(
     convertingInRange a: SIMD<Double>
 ) -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.HalfVector(raw: HighwayReference.Nothrow.halfVectorConvertingInRangeF64ToU32(a.raw))
+    SIMD<UInt32>.HalfVector(
+        raw: HighwayReference.Nothrow.halfVectorConvertingInRangeF64ToU32(a.raw)
+    )
 }
 
 @inline(never)
 public func portHalfVectorConvertingInRangeF64ToU32ConstantA() -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.halfVector(convertingInRange: SIMDDouble.repeating(1.5))
+    SIMD<UInt32>.halfVector(convertingInRange: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayHalfVectorConvertingInRangeF64ToU32ConstantA() -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.HalfVector(
+    SIMD<UInt32>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorConvertingInRangeF64ToU32(
-            HighwayReference.Nothrow.repeatingF64(1.5).raw
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
         )
     )
 }
@@ -312,26 +314,28 @@ public func highwayHalfVectorConvertingInRangeF64ToU32ConstantA() -> SIMD<UInt32
 public func portHalfVectorTruncatingIfNeededU64ToU32(
     truncatingIfNeeded a: SIMD<UInt64>
 ) -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.halfVector(truncatingIfNeeded: a)
+    SIMD<UInt32>.halfVector(truncatingIfNeeded: a)
 }
 
 @inline(never)
 public func highwayHalfVectorTruncatingIfNeededU64ToU32(
     truncatingIfNeeded a: SIMD<UInt64>
 ) -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.HalfVector(raw: HighwayReference.Nothrow.halfVectorTruncatingIfNeededU64ToU32(a.raw))
+    SIMD<UInt32>.HalfVector(
+        raw: HighwayReference.Nothrow.halfVectorTruncatingIfNeededU64ToU32(a.raw)
+    )
 }
 
 @inline(never)
 public func portHalfVectorTruncatingIfNeededU64ToU32ConstantA() -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.halfVector(truncatingIfNeeded: SIMDUInt64.repeating(26))
+    SIMD<UInt32>.halfVector(truncatingIfNeeded: SIMD<UInt64>.repeating(26))
 }
 
 @inline(never)
 public func highwayHalfVectorTruncatingIfNeededU64ToU32ConstantA() -> SIMD<UInt32>.HalfVector {
-    SIMDUInt32.HalfVector(
+    SIMD<UInt32>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorTruncatingIfNeededU64ToU32(
-            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
+            SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
         )
     )
 }

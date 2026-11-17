@@ -12,8 +12,8 @@ extension SIMDUInt32ConstantTests {
             "halfVectorClampingRoundingShiftedRightByFromUInt64 with bits \(bits)"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt64>.self,
+            to: Lane.self,
             seed: 0xDF0B_04D7_2C0B_A7A8
         )
         for a in aInputs {
@@ -295,8 +295,8 @@ extension SIMDUInt32ConstantTests {
             "halfVectorClampingRoundingShiftedRightByFromUInt64 unchecked with bits \(bits)"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt64>.self,
+            to: Lane.self,
             seed: 0x1396_3E9A_B26E_F21A
         )
         for a in aInputs {
@@ -571,24 +571,22 @@ extension SIMDUInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkHalfVectorClampingRoundingShiftedRightByFromUInt64ConstantA(
-        _ value: SIMDUInt64.Lane
-    ) {
+    private func checkHalfVectorClampingRoundingShiftedRightByFromUInt64ConstantA(_ value: UInt64) {
         let mismatches = Mismatches(
             "halfVectorClampingRoundingShiftedRightByFromUInt64 with a repeating \(hex(value))"
         )
         let bitsInputs = Array(0...63)
         mismatches.check(
-            SIMDUInt64.repeating(value),
-            SIMDUInt64.Vector(raw: HighwayReference.repeatingU64(value)),
+            SIMD<UInt64>.repeating(value),
+            SIMD<UInt64>(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for bits in bitsInputs {
             mismatches.check(
-                H.halfVector(clamping: SIMDUInt64.repeating(value), roundingShiftedRightBy: bits),
+                H.halfVector(clamping: SIMD<UInt64>.repeating(value), roundingShiftedRightBy: bits),
                 H.HalfVector(
                     raw: HighwayReference.halfVectorClampingRoundingShiftedRightByU64ToU32(
-                        SIMDUInt64.repeating(value).raw,
+                        SIMD<UInt64>.repeating(value).raw,
                         Int32(truncatingIfNeeded: bits)
                     )
                 ),
@@ -647,6 +645,6 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func halfVectorClampingRoundingShiftedRightByFromUInt64ConstantSplatMax() {
-        checkHalfVectorClampingRoundingShiftedRightByFromUInt64ConstantA(SIMDUInt64.Lane.max)
+        checkHalfVectorClampingRoundingShiftedRightByFromUInt64ConstantA(UInt64.max)
     }
 }

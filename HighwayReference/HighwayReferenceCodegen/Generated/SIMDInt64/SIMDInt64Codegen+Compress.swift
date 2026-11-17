@@ -72,7 +72,7 @@ extension HighwayReferenceInt64 {
     public static func compressed(_ a: SIMD, bitsUnchecked span: Span<UInt8>) -> SIMD {
         assert(span.count >= (laneCount + 7) / 8, "Span has fewer bytes than a mask has bits")
         return span.withUnsafeBufferPointer {
-            unsafe SIMDInt64.Vector(
+            unsafe SIMD(
                 raw: HighwayReference.Nothrow.compressedBitsI64(
                     a.raw,
                     $0.baseAddress.unsafelyUnwrapped
@@ -117,24 +117,24 @@ extension HighwayReferenceInt64 {
 
 @inline(never)
 public func portCompressedI64(_ a: SIMD<Int64>, where mask: SIMD<Int64>.Mask) -> SIMD<Int64> {
-    SIMDInt64.compressed(a, where: mask)
+    SIMD<Int64>.compressed(a, where: mask)
 }
 
 @inline(never)
 public func highwayCompressedI64(_ a: SIMD<Int64>, where mask: SIMD<Int64>.Mask) -> SIMD<Int64> {
-    SIMDInt64.Vector(raw: HighwayReference.Nothrow.compressedI64(a.raw, mask.raw))
+    SIMD<Int64>(raw: HighwayReference.Nothrow.compressedI64(a.raw, mask.raw))
 }
 
 @inline(never)
 public func portCompressedI64ConstantA(where mask: SIMD<Int64>.Mask) -> SIMD<Int64> {
-    SIMDInt64.compressed(SIMDInt64.repeating(26), where: mask)
+    SIMD<Int64>.compressed(SIMD<Int64>.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayCompressedI64ConstantA(where mask: SIMD<Int64>.Mask) -> SIMD<Int64> {
-    SIMDInt64.Vector(
+    SIMD<Int64>(
         raw: HighwayReference.Nothrow.compressedI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             mask.raw
         )
     )
@@ -142,24 +142,24 @@ public func highwayCompressedI64ConstantA(where mask: SIMD<Int64>.Mask) -> SIMD<
 
 @inline(never)
 public func portCompressedNotI64(_ a: SIMD<Int64>, where mask: SIMD<Int64>.Mask) -> SIMD<Int64> {
-    SIMDInt64.compressedNot(a, where: mask)
+    SIMD<Int64>.compressedNot(a, where: mask)
 }
 
 @inline(never)
 public func highwayCompressedNotI64(_ a: SIMD<Int64>, where mask: SIMD<Int64>.Mask) -> SIMD<Int64> {
-    SIMDInt64.Vector(raw: HighwayReference.Nothrow.compressedNotI64(a.raw, mask.raw))
+    SIMD<Int64>(raw: HighwayReference.Nothrow.compressedNotI64(a.raw, mask.raw))
 }
 
 @inline(never)
 public func portCompressedNotI64ConstantA(where mask: SIMD<Int64>.Mask) -> SIMD<Int64> {
-    SIMDInt64.compressedNot(SIMDInt64.repeating(26), where: mask)
+    SIMD<Int64>.compressedNot(SIMD<Int64>.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayCompressedNotI64ConstantA(where mask: SIMD<Int64>.Mask) -> SIMD<Int64> {
-    SIMDInt64.Vector(
+    SIMD<Int64>(
         raw: HighwayReference.Nothrow.compressedNotI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             mask.raw
         )
     )
@@ -167,24 +167,24 @@ public func highwayCompressedNotI64ConstantA(where mask: SIMD<Int64>.Mask) -> SI
 
 @inline(never)
 public func portPartitionedI64(_ a: SIMD<Int64>, where mask: SIMD<Int64>.Mask) -> SIMD<Int64> {
-    SIMDInt64.partitioned(a, where: mask)
+    SIMD<Int64>.partitioned(a, where: mask)
 }
 
 @inline(never)
 public func highwayPartitionedI64(_ a: SIMD<Int64>, where mask: SIMD<Int64>.Mask) -> SIMD<Int64> {
-    SIMDInt64.Vector(raw: HighwayReference.Nothrow.partitionedI64(a.raw, mask.raw))
+    SIMD<Int64>(raw: HighwayReference.Nothrow.partitionedI64(a.raw, mask.raw))
 }
 
 @inline(never)
 public func portPartitionedI64ConstantA(where mask: SIMD<Int64>.Mask) -> SIMD<Int64> {
-    SIMDInt64.partitioned(SIMDInt64.repeating(26), where: mask)
+    SIMD<Int64>.partitioned(SIMD<Int64>.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayPartitionedI64ConstantA(where mask: SIMD<Int64>.Mask) -> SIMD<Int64> {
-    SIMDInt64.Vector(
+    SIMD<Int64>(
         raw: HighwayReference.Nothrow.partitionedI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             mask.raw
         )
     )
@@ -196,7 +196,7 @@ public func portStoreCompressedI64(
     where mask: SIMD<Int64>.Mask,
     to: UnsafeMutablePointer<Int64>
 ) -> Int {
-    unsafe SIMDInt64.storeCompressed(a, where: mask, to: to)
+    unsafe SIMD<Int64>.storeCompressed(a, where: mask, to: to)
 }
 
 @inline(never)
@@ -213,7 +213,7 @@ public func portStoreCompressedI64ConstantA(
     where mask: SIMD<Int64>.Mask,
     to: UnsafeMutablePointer<Int64>
 ) -> Int {
-    unsafe SIMDInt64.storeCompressed(SIMDInt64.repeating(26), where: mask, to: to)
+    unsafe SIMD<Int64>.storeCompressed(SIMD<Int64>.repeating(26), where: mask, to: to)
 }
 
 @inline(never)
@@ -222,7 +222,7 @@ public func highwayStoreCompressedI64ConstantA(
     to: UnsafeMutablePointer<Int64>
 ) -> Int {
     unsafe HighwayReference.Nothrow.storeCompressedI64(
-        SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+        SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
         mask.raw,
         to
     )
@@ -234,7 +234,7 @@ public func portStoreCompressedBlendedI64(
     where mask: SIMD<Int64>.Mask,
     to: UnsafeMutablePointer<Int64>
 ) -> Int {
-    unsafe SIMDInt64.storeCompressedBlended(a, where: mask, to: to)
+    unsafe SIMD<Int64>.storeCompressedBlended(a, where: mask, to: to)
 }
 
 @inline(never)
@@ -251,7 +251,7 @@ public func portStoreCompressedBlendedI64ConstantA(
     where mask: SIMD<Int64>.Mask,
     to: UnsafeMutablePointer<Int64>
 ) -> Int {
-    unsafe SIMDInt64.storeCompressedBlended(SIMDInt64.repeating(26), where: mask, to: to)
+    unsafe SIMD<Int64>.storeCompressedBlended(SIMD<Int64>.repeating(26), where: mask, to: to)
 }
 
 @inline(never)
@@ -260,7 +260,7 @@ public func highwayStoreCompressedBlendedI64ConstantA(
     to: UnsafeMutablePointer<Int64>
 ) -> Int {
     unsafe HighwayReference.Nothrow.storeCompressedBlendedI64(
-        SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+        SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
         mask.raw,
         to
     )
@@ -268,24 +268,24 @@ public func highwayStoreCompressedBlendedI64ConstantA(
 
 @inline(never)
 public func portCompressedBitsI64(_ a: SIMD<Int64>, bits: UnsafePointer<UInt8>) -> SIMD<Int64> {
-    unsafe SIMDInt64.compressed(a, bits: bits)
+    unsafe SIMD<Int64>.compressed(a, bits: bits)
 }
 
 @inline(never)
 public func highwayCompressedBitsI64(_ a: SIMD<Int64>, bits: UnsafePointer<UInt8>) -> SIMD<Int64> {
-    unsafe SIMDInt64.Vector(raw: HighwayReference.Nothrow.compressedBitsI64(a.raw, bits))
+    unsafe SIMD<Int64>(raw: HighwayReference.Nothrow.compressedBitsI64(a.raw, bits))
 }
 
 @inline(never)
 public func portCompressedBitsI64ConstantA(bits: UnsafePointer<UInt8>) -> SIMD<Int64> {
-    unsafe SIMDInt64.compressed(SIMDInt64.repeating(26), bits: bits)
+    unsafe SIMD<Int64>.compressed(SIMD<Int64>.repeating(26), bits: bits)
 }
 
 @inline(never)
 public func highwayCompressedBitsI64ConstantA(bits: UnsafePointer<UInt8>) -> SIMD<Int64> {
-    unsafe SIMDInt64.Vector(
+    unsafe SIMD<Int64>(
         raw: HighwayReference.Nothrow.compressedBitsI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             bits
         )
     )
@@ -297,7 +297,7 @@ public func portStoreCompressedBitsI64(
     bits: UnsafePointer<UInt8>,
     to: UnsafeMutablePointer<Int64>
 ) -> Int {
-    unsafe SIMDInt64.storeCompressed(a, bits: bits, to: to)
+    unsafe SIMD<Int64>.storeCompressed(a, bits: bits, to: to)
 }
 
 @inline(never)
@@ -314,7 +314,7 @@ public func portStoreCompressedBitsI64ConstantA(
     bits: UnsafePointer<UInt8>,
     to: UnsafeMutablePointer<Int64>
 ) -> Int {
-    unsafe SIMDInt64.storeCompressed(SIMDInt64.repeating(26), bits: bits, to: to)
+    unsafe SIMD<Int64>.storeCompressed(SIMD<Int64>.repeating(26), bits: bits, to: to)
 }
 
 @inline(never)
@@ -323,7 +323,7 @@ public func highwayStoreCompressedBitsI64ConstantA(
     to: UnsafeMutablePointer<Int64>
 ) -> Int {
     unsafe HighwayReference.Nothrow.storeCompressedBitsI64(
-        SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+        SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
         bits,
         to
     )

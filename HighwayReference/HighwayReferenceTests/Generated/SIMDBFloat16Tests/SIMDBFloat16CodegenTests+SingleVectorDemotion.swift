@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDBFloat16CodegenTests {
     @Test func halfVectorConvertingFromFloat() {
         let mismatches = Mismatches("portHalfVectorConvertingF32ToBF16")
-        let aInputs = Inputs.bfloat16Demotions(SIMDFloat.Vector.self, seed: 0x3B08_A66B_E962_BF21)
+        let aInputs = Inputs.bfloat16Demotions(SIMD<Float>.self, seed: 0x3B08_A66B_E962_BF21)
         for a in aInputs {
             mismatches.check(
                 portHalfVectorConvertingF32ToBF16(converting: a),

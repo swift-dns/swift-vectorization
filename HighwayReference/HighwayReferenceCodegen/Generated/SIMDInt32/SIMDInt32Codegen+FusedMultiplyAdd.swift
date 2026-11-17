@@ -9,7 +9,7 @@ public func portMultiplyAddingI32(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.multiplyAdding(a, b, c)
+    SIMD<Int32>.multiplyAdding(a, b, c)
 }
 
 @inline(never)
@@ -18,19 +18,19 @@ public func highwayMultiplyAddingI32(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.multiplyAddingI32(a.raw, b.raw, c.raw))
+    SIMD<Int32>(raw: HighwayReference.Nothrow.multiplyAddingI32(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
 public func portMultiplyAddingI32ConstantA(_ b: SIMD<Int32>, _ c: SIMD<Int32>) -> SIMD<Int32> {
-    SIMDInt32.multiplyAdding(SIMDInt32.repeating(26), b, c)
+    SIMD<Int32>.multiplyAdding(SIMD<Int32>.repeating(26), b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingI32ConstantA(_ b: SIMD<Int32>, _ c: SIMD<Int32>) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.multiplyAddingI32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             b.raw,
             c.raw
         )
@@ -39,15 +39,15 @@ public func highwayMultiplyAddingI32ConstantA(_ b: SIMD<Int32>, _ c: SIMD<Int32>
 
 @inline(never)
 public func portMultiplyAddingI32ConstantB(_ a: SIMD<Int32>, _ c: SIMD<Int32>) -> SIMD<Int32> {
-    SIMDInt32.multiplyAdding(a, SIMDInt32.repeating(26), c)
+    SIMD<Int32>.multiplyAdding(a, SIMD<Int32>.repeating(26), c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingI32ConstantB(_ a: SIMD<Int32>, _ c: SIMD<Int32>) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.multiplyAddingI32(
             a.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             c.raw
         )
     )
@@ -55,16 +55,16 @@ public func highwayMultiplyAddingI32ConstantB(_ a: SIMD<Int32>, _ c: SIMD<Int32>
 
 @inline(never)
 public func portMultiplyAddingI32ConstantC(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
-    SIMDInt32.multiplyAdding(a, b, SIMDInt32.repeating(26))
+    SIMD<Int32>.multiplyAdding(a, b, SIMD<Int32>.repeating(26))
 }
 
 @inline(never)
 public func highwayMultiplyAddingI32ConstantC(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.multiplyAddingI32(
             a.raw,
             b.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
         )
     )
 }
@@ -75,7 +75,7 @@ public func portNegatedMultiplyAddingI32(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.negatedMultiplyAdding(a, b, c)
+    SIMD<Int32>.negatedMultiplyAdding(a, b, c)
 }
 
 @inline(never)
@@ -84,13 +84,13 @@ public func highwayNegatedMultiplyAddingI32(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.negatedMultiplyAddingI32(a.raw, b.raw, c.raw))
+    SIMD<Int32>(raw: HighwayReference.Nothrow.negatedMultiplyAddingI32(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
 public func portNegatedMultiplyAddingI32ConstantA(_ b: SIMD<Int32>, _ c: SIMD<Int32>) -> SIMD<Int32>
 {
-    SIMDInt32.negatedMultiplyAdding(SIMDInt32.repeating(26), b, c)
+    SIMD<Int32>.negatedMultiplyAdding(SIMD<Int32>.repeating(26), b, c)
 }
 
 @inline(never)
@@ -98,9 +98,9 @@ public func highwayNegatedMultiplyAddingI32ConstantA(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.negatedMultiplyAddingI32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             b.raw,
             c.raw
         )
@@ -110,7 +110,7 @@ public func highwayNegatedMultiplyAddingI32ConstantA(
 @inline(never)
 public func portNegatedMultiplyAddingI32ConstantB(_ a: SIMD<Int32>, _ c: SIMD<Int32>) -> SIMD<Int32>
 {
-    SIMDInt32.negatedMultiplyAdding(a, SIMDInt32.repeating(26), c)
+    SIMD<Int32>.negatedMultiplyAdding(a, SIMD<Int32>.repeating(26), c)
 }
 
 @inline(never)
@@ -118,10 +118,10 @@ public func highwayNegatedMultiplyAddingI32ConstantB(
     _ a: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.negatedMultiplyAddingI32(
             a.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             c.raw
         )
     )
@@ -130,7 +130,7 @@ public func highwayNegatedMultiplyAddingI32ConstantB(
 @inline(never)
 public func portNegatedMultiplyAddingI32ConstantC(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32>
 {
-    SIMDInt32.negatedMultiplyAdding(a, b, SIMDInt32.repeating(26))
+    SIMD<Int32>.negatedMultiplyAdding(a, b, SIMD<Int32>.repeating(26))
 }
 
 @inline(never)
@@ -138,11 +138,11 @@ public func highwayNegatedMultiplyAddingI32ConstantC(
     _ a: SIMD<Int32>,
     _ b: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.negatedMultiplyAddingI32(
             a.raw,
             b.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
         )
     )
 }
@@ -153,7 +153,7 @@ public func portMultiplySubtractingI32(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.multiplySubtracting(a, b, c)
+    SIMD<Int32>.multiplySubtracting(a, b, c)
 }
 
 @inline(never)
@@ -162,12 +162,12 @@ public func highwayMultiplySubtractingI32(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.multiplySubtractingI32(a.raw, b.raw, c.raw))
+    SIMD<Int32>(raw: HighwayReference.Nothrow.multiplySubtractingI32(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
 public func portMultiplySubtractingI32ConstantA(_ b: SIMD<Int32>, _ c: SIMD<Int32>) -> SIMD<Int32> {
-    SIMDInt32.multiplySubtracting(SIMDInt32.repeating(26), b, c)
+    SIMD<Int32>.multiplySubtracting(SIMD<Int32>.repeating(26), b, c)
 }
 
 @inline(never)
@@ -175,9 +175,9 @@ public func highwayMultiplySubtractingI32ConstantA(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.multiplySubtractingI32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             b.raw,
             c.raw
         )
@@ -186,7 +186,7 @@ public func highwayMultiplySubtractingI32ConstantA(
 
 @inline(never)
 public func portMultiplySubtractingI32ConstantB(_ a: SIMD<Int32>, _ c: SIMD<Int32>) -> SIMD<Int32> {
-    SIMDInt32.multiplySubtracting(a, SIMDInt32.repeating(26), c)
+    SIMD<Int32>.multiplySubtracting(a, SIMD<Int32>.repeating(26), c)
 }
 
 @inline(never)
@@ -194,10 +194,10 @@ public func highwayMultiplySubtractingI32ConstantB(
     _ a: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.multiplySubtractingI32(
             a.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             c.raw
         )
     )
@@ -205,7 +205,7 @@ public func highwayMultiplySubtractingI32ConstantB(
 
 @inline(never)
 public func portMultiplySubtractingI32ConstantC(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
-    SIMDInt32.multiplySubtracting(a, b, SIMDInt32.repeating(26))
+    SIMD<Int32>.multiplySubtracting(a, b, SIMD<Int32>.repeating(26))
 }
 
 @inline(never)
@@ -213,11 +213,11 @@ public func highwayMultiplySubtractingI32ConstantC(
     _ a: SIMD<Int32>,
     _ b: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.multiplySubtractingI32(
             a.raw,
             b.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
         )
     )
 }
@@ -228,7 +228,7 @@ public func portNegatedMultiplySubtractingI32(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.negatedMultiplySubtracting(a, b, c)
+    SIMD<Int32>.negatedMultiplySubtracting(a, b, c)
 }
 
 @inline(never)
@@ -237,9 +237,7 @@ public func highwayNegatedMultiplySubtractingI32(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
-        raw: HighwayReference.Nothrow.negatedMultiplySubtractingI32(a.raw, b.raw, c.raw)
-    )
+    SIMD<Int32>(raw: HighwayReference.Nothrow.negatedMultiplySubtractingI32(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
@@ -247,7 +245,7 @@ public func portNegatedMultiplySubtractingI32ConstantA(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.negatedMultiplySubtracting(SIMDInt32.repeating(26), b, c)
+    SIMD<Int32>.negatedMultiplySubtracting(SIMD<Int32>.repeating(26), b, c)
 }
 
 @inline(never)
@@ -255,9 +253,9 @@ public func highwayNegatedMultiplySubtractingI32ConstantA(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.negatedMultiplySubtractingI32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             b.raw,
             c.raw
         )
@@ -269,7 +267,7 @@ public func portNegatedMultiplySubtractingI32ConstantB(
     _ a: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.negatedMultiplySubtracting(a, SIMDInt32.repeating(26), c)
+    SIMD<Int32>.negatedMultiplySubtracting(a, SIMD<Int32>.repeating(26), c)
 }
 
 @inline(never)
@@ -277,10 +275,10 @@ public func highwayNegatedMultiplySubtractingI32ConstantB(
     _ a: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.negatedMultiplySubtractingI32(
             a.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             c.raw
         )
     )
@@ -291,7 +289,7 @@ public func portNegatedMultiplySubtractingI32ConstantC(
     _ a: SIMD<Int32>,
     _ b: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.negatedMultiplySubtracting(a, b, SIMDInt32.repeating(26))
+    SIMD<Int32>.negatedMultiplySubtracting(a, b, SIMD<Int32>.repeating(26))
 }
 
 @inline(never)
@@ -299,11 +297,11 @@ public func highwayNegatedMultiplySubtractingI32ConstantC(
     _ a: SIMD<Int32>,
     _ b: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.negatedMultiplySubtractingI32(
             a.raw,
             b.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
         )
     )
 }
@@ -314,7 +312,7 @@ public func portMultiplyAddingSubtractingI32(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.multiplyAddingSubtracting(a, b, c)
+    SIMD<Int32>.multiplyAddingSubtracting(a, b, c)
 }
 
 @inline(never)
@@ -323,9 +321,7 @@ public func highwayMultiplyAddingSubtractingI32(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
-        raw: HighwayReference.Nothrow.multiplyAddingSubtractingI32(a.raw, b.raw, c.raw)
-    )
+    SIMD<Int32>(raw: HighwayReference.Nothrow.multiplyAddingSubtractingI32(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
@@ -333,7 +329,7 @@ public func portMultiplyAddingSubtractingI32ConstantA(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.multiplyAddingSubtracting(SIMDInt32.repeating(26), b, c)
+    SIMD<Int32>.multiplyAddingSubtracting(SIMD<Int32>.repeating(26), b, c)
 }
 
 @inline(never)
@@ -341,9 +337,9 @@ public func highwayMultiplyAddingSubtractingI32ConstantA(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.multiplyAddingSubtractingI32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             b.raw,
             c.raw
         )
@@ -355,7 +351,7 @@ public func portMultiplyAddingSubtractingI32ConstantB(
     _ a: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.multiplyAddingSubtracting(a, SIMDInt32.repeating(26), c)
+    SIMD<Int32>.multiplyAddingSubtracting(a, SIMD<Int32>.repeating(26), c)
 }
 
 @inline(never)
@@ -363,10 +359,10 @@ public func highwayMultiplyAddingSubtractingI32ConstantB(
     _ a: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.multiplyAddingSubtractingI32(
             a.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             c.raw
         )
     )
@@ -377,7 +373,7 @@ public func portMultiplyAddingSubtractingI32ConstantC(
     _ a: SIMD<Int32>,
     _ b: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.multiplyAddingSubtracting(a, b, SIMDInt32.repeating(26))
+    SIMD<Int32>.multiplyAddingSubtracting(a, b, SIMD<Int32>.repeating(26))
 }
 
 @inline(never)
@@ -385,11 +381,11 @@ public func highwayMultiplyAddingSubtractingI32ConstantC(
     _ a: SIMD<Int32>,
     _ b: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.multiplyAddingSubtractingI32(
             a.raw,
             b.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
         )
     )
 }
@@ -400,7 +396,7 @@ public func portMultiplySubtractingAddingI32(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.multiplySubtractingAdding(a, b, c)
+    SIMD<Int32>.multiplySubtractingAdding(a, b, c)
 }
 
 @inline(never)
@@ -409,9 +405,7 @@ public func highwayMultiplySubtractingAddingI32(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
-        raw: HighwayReference.Nothrow.multiplySubtractingAddingI32(a.raw, b.raw, c.raw)
-    )
+    SIMD<Int32>(raw: HighwayReference.Nothrow.multiplySubtractingAddingI32(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
@@ -419,7 +413,7 @@ public func portMultiplySubtractingAddingI32ConstantA(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.multiplySubtractingAdding(SIMDInt32.repeating(26), b, c)
+    SIMD<Int32>.multiplySubtractingAdding(SIMD<Int32>.repeating(26), b, c)
 }
 
 @inline(never)
@@ -427,9 +421,9 @@ public func highwayMultiplySubtractingAddingI32ConstantA(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.multiplySubtractingAddingI32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             b.raw,
             c.raw
         )
@@ -441,7 +435,7 @@ public func portMultiplySubtractingAddingI32ConstantB(
     _ a: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.multiplySubtractingAdding(a, SIMDInt32.repeating(26), c)
+    SIMD<Int32>.multiplySubtractingAdding(a, SIMD<Int32>.repeating(26), c)
 }
 
 @inline(never)
@@ -449,10 +443,10 @@ public func highwayMultiplySubtractingAddingI32ConstantB(
     _ a: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.multiplySubtractingAddingI32(
             a.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             c.raw
         )
     )
@@ -463,7 +457,7 @@ public func portMultiplySubtractingAddingI32ConstantC(
     _ a: SIMD<Int32>,
     _ b: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.multiplySubtractingAdding(a, b, SIMDInt32.repeating(26))
+    SIMD<Int32>.multiplySubtractingAdding(a, b, SIMD<Int32>.repeating(26))
 }
 
 @inline(never)
@@ -471,11 +465,11 @@ public func highwayMultiplySubtractingAddingI32ConstantC(
     _ a: SIMD<Int32>,
     _ b: SIMD<Int32>
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.multiplySubtractingAddingI32(
             a.raw,
             b.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
         )
     )
 }

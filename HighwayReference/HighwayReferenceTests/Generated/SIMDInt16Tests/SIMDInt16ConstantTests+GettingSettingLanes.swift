@@ -9,7 +9,7 @@ extension SIMDInt16ConstantTests {
     @inline(__always)
     private func checkLaneConstantIndex(_ index: Int) {
         let mismatches = Mismatches("lane with index \(index)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x60D4_99A7_FE06_EFAD)
+        let aInputs = Inputs.vectors(H.self, seed: 0x60D4_99A7_FE06_EFAD)
         for a in aInputs {
             mismatches.check(
                 H.lane(a, at: index),
@@ -149,12 +149,12 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
-    private func checkLaneConstantA(_ value: H.Lane) {
+    private func checkLaneConstantA(_ value: Lane) {
         let mismatches = Mismatches("lane with a repeating \(hex(value))")
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI16(value)),
+            H(raw: HighwayReference.repeatingI16(value)),
             "repeating"
         )
         for index in indexInputs {
@@ -228,22 +228,22 @@ extension SIMDInt16ConstantTests {
     }
 
     @Test func laneConstantSplatMax() {
-        checkLaneConstantA(H.Lane.max)
+        checkLaneConstantA(Lane.max)
     }
 
     @Test func laneConstantSplatMin() {
-        checkLaneConstantA(H.Lane.min)
+        checkLaneConstantA(Lane.min)
     }
 
     @inline(__always)
     private func checkReplacingLaneConstantIndex(_ index: Int) {
         let mismatches = Mismatches("replacingLane with index \(index)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA566_7D46_7C7C_A7B4)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xA566_7F46_7C7C_AB1A)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA566_7D46_7C7C_A7B4)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xA566_7F46_7C7C_AB1A)
         for (a, value) in everyPair(aInputs, valueInputs) {
             mismatches.check(
                 H.replacingLane(a, at: index, with: value),
-                H.Vector(raw: HighwayReference.replacingLaneI16(a.raw, index, value)),
+                H(raw: HighwayReference.replacingLaneI16(a.raw, index, value)),
                 "a: \(describe(a)), value: \(hex(value))"
             )
         }

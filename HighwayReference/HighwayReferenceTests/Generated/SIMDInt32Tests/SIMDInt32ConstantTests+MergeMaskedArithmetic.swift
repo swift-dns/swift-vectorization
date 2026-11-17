@@ -7,17 +7,17 @@ import Vectorization
 
 extension SIMDInt32ConstantTests {
     @inline(__always)
-    private func checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "negatedMultiplySubtractingWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x9419_CD2A_6686_596B)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9419_CE2A_6686_5B1E)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9419_CF2A_6686_5CD1)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x9419_D02A_6686_5E84)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9419_CE2A_6686_5B1E)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9419_CF2A_6686_5CD1)
+        let cInputs = Inputs.vectors(H.self, seed: 0x9419_D02A_6686_5E84)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI32(value)),
+            H(raw: HighwayReference.repeatingI32(value)),
             "repeating"
         )
         for (mask, a, b, c) in mixedQuadruples(
@@ -29,7 +29,7 @@ extension SIMDInt32ConstantTests {
         ) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, b, c, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.negatedMultiplySubtractingWhereOtherwiseI32(
                         H.repeating(value).raw,
                         mask.raw,
@@ -113,10 +113,10 @@ extension SIMDInt32ConstantTests {
     }
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatMax() {
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(H.Lane.max)
+        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(Lane.max)
     }
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatMin() {
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(H.Lane.min)
+        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(Lane.min)
     }
 }

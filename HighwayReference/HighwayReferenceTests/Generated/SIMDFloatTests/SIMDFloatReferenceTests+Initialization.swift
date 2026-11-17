@@ -8,17 +8,17 @@ import Vectorization
 extension SIMDFloatReferenceTests {
     @Test func zero() {
         let mismatches = Mismatches("zero")
-        mismatches.check(H.zero(), HighwayReference.zeroF32(), "")
+        mismatches.check(H.zero(), H(raw: HighwayReference.zeroF32()), "")
         mismatches.record()
     }
 
     @Test func repeating() {
         let mismatches = Mismatches("repeating")
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x4782_9570_B936_E395)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x4782_9570_B936_E395)
         for value in valueInputs {
             mismatches.check(
                 H.repeating(value),
-                HighwayReference.repeatingF32(value),
+                H(raw: HighwayReference.repeatingF32(value)),
                 "value: \(hex(value))"
             )
         }
@@ -27,46 +27,50 @@ extension SIMDFloatReferenceTests {
 
     @Test func iota() {
         let mismatches = Mismatches("iota")
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x042E_153E_76F5_AD61)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x042E_153E_76F5_AD61)
         for value in valueInputs {
-            mismatches.check(H.iota(value), HighwayReference.iotaF32(value), "value: \(hex(value))")
+            mismatches.check(
+                H.iota(value),
+                H(raw: HighwayReference.iotaF32(value)),
+                "value: \(hex(value))"
+            )
         }
         mismatches.record()
     }
 
     @Test func signBit() {
         let mismatches = Mismatches("signBit")
-        mismatches.check(H.signBit(), HighwayReference.signBitF32(), "")
+        mismatches.check(H.signBit(), H(raw: HighwayReference.signBitF32()), "")
         mismatches.record()
     }
 
     @Test func nan() {
         let mismatches = Mismatches("nan")
-        mismatches.check(H.nan(), HighwayReference.nanF32(), "")
+        mismatches.check(H.nan(), H(raw: HighwayReference.nanF32()), "")
         mismatches.record()
     }
 
     @Test func infinity() {
         let mismatches = Mismatches("infinity")
-        mismatches.check(H.infinity(), HighwayReference.infinityF32(), "")
+        mismatches.check(H.infinity(), H(raw: HighwayReference.infinityF32()), "")
         mismatches.record()
     }
 
     @Test func unspecified() {
         let mismatches = Mismatches("unspecified")
         _ = H.unspecified()
-        _ = HighwayReference.unspecifiedF32()
+        _ = H(raw: HighwayReference.unspecifiedF32())
         mismatches.record()
     }
 
     @Test func repeatingWhere() {
         let mismatches = Mismatches("repeatingWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xCBE0_589B_5B74_A4D6)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xCBE0_599B_5B74_A689)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xCBE0_599B_5B74_A689)
         for (mask, value) in everyPair(maskInputs, valueInputs) {
             mismatches.check(
                 H.repeating(value, where: mask),
-                HighwayReference.repeatingWhereF32(mask.raw, value),
+                H(raw: HighwayReference.repeatingWhereF32(mask.raw, value)),
                 "mask: \(describe(mask)), value: \(hex(value))"
             )
         }
@@ -76,11 +80,11 @@ extension SIMDFloatReferenceTests {
     @Test func repeatingWhereNonCanonical() {
         let mismatches = Mismatches("repeatingWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xD2F3_AD21_00D9_FC45)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xD2F3_AC21_00D9_FA92)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xD2F3_AC21_00D9_FA92)
         for (mask, value) in everyPair(maskInputs, valueInputs) {
             mismatches.check(
                 H.repeating(value, where: mask),
-                HighwayReference.repeatingWhereF32(mask.raw, value),
+                H(raw: HighwayReference.repeatingWhereF32(mask.raw, value)),
                 "mask: \(describe(mask)), value: \(hex(value))"
             )
         }
@@ -89,9 +93,9 @@ extension SIMDFloatReferenceTests {
 
     @Test func repeatingWhereOtherwise() {
         let mismatches = Mismatches("repeatingWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xF596_DAE1_4904_BD5E)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xF596_DAE1_4904_BD5E)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF596_DBE1_4904_BF11)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xF596_D8E1_4904_B9F8)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xF596_D8E1_4904_B9F8)
         for (otherwise, mask, value) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -100,7 +104,7 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.repeating(value, where: mask, otherwise: otherwise),
-                HighwayReference.repeatingWhereOtherwiseF32(otherwise.raw, mask.raw, value),
+                H(raw: HighwayReference.repeatingWhereOtherwiseF32(otherwise.raw, mask.raw, value)),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), value: \(hex(value))"
             )
         }
@@ -109,9 +113,9 @@ extension SIMDFloatReferenceTests {
 
     @Test func repeatingWhereOtherwiseNonCanonical() {
         let mismatches = Mismatches("repeatingWhereOtherwise with masks from arbitrary vectors")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x7DB9_E94F_920F_4B0D)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x7DB9_E94F_920F_4B0D)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x7DB9_E84F_920F_495A)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x7DB9_E74F_920F_47A7)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x7DB9_E74F_920F_47A7)
         for (otherwise, mask, value) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -120,7 +124,7 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.repeating(value, where: mask, otherwise: otherwise),
-                HighwayReference.repeatingWhereOtherwiseF32(otherwise.raw, mask.raw, value),
+                H(raw: HighwayReference.repeatingWhereOtherwiseF32(otherwise.raw, mask.raw, value)),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), value: \(hex(value))"
             )
         }
@@ -129,11 +133,18 @@ extension SIMDFloatReferenceTests {
 
     @Test func repeatingBlock() {
         let mismatches = Mismatches("repeatingBlock")
-        let vectorInputs = Inputs.vectors(H.Vector.self, seed: 0xDCFA_57CA_433F_3AE8)
+        let vectorInputs = Inputs.vectors(H.self, seed: 0xDCFA_57CA_433F_3AE8)
         for vector in vectorInputs {
             mismatches.check(
-                H.repeatingBlock(vector[0], vector[1], vector[2], vector[3]),
-                HighwayReference.repeatingBlockF32(vector[0], vector[1], vector[2], vector[3]),
+                H.repeatingBlock(vector.simd[0], vector.simd[1], vector.simd[2], vector.simd[3]),
+                H(
+                    raw: HighwayReference.repeatingBlockF32(
+                        vector.simd[0],
+                        vector.simd[1],
+                        vector.simd[2],
+                        vector.simd[3]
+                    )
+                ),
                 "lanes: \(describe(vector))"
             )
         }

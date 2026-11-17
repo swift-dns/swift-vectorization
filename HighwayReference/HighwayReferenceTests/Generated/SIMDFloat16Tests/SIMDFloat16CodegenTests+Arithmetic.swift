@@ -10,7 +10,7 @@ import Vectorization
 extension SIMDFloat16CodegenTests {
     @Test func negated() {
         let mismatches = Mismatches("portNegatedF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x786F_749E_6190_B8F4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x786F_749E_6190_B8F4)
         for a in aInputs {
             mismatches.check(portNegatedF16(a), highwayNegatedF16(a), "a: \(describe(a))")
         }
@@ -25,7 +25,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func magnitude() {
         let mismatches = Mismatches("portMagnitudeF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2C3A_B4B3_2802_EFA4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2C3A_B4B3_2802_EFA4)
         for a in aInputs {
             mismatches.check(portMagnitudeF16(a), highwayMagnitudeF16(a), "a: \(describe(a))")
         }
@@ -40,9 +40,9 @@ extension SIMDFloat16CodegenTests {
 
     @Test func adding() {
         let mismatches = Mismatches("portAddingF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC205_5053_F751_0C21)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC205_4F53_F751_0A6E)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0xC205_5053_F751_0C21)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC205_4F53_F751_0A6E)
+        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a.simd, b.simd) {
             mismatches.check(
                 portAddingF16(a, b),
                 highwayAddingF16(a, b),
@@ -54,7 +54,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func addingConstantA() {
         let mismatches = Mismatches("portAddingF16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4858_B5DB_3A66_9B55)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4858_B5DB_3A66_9B55)
         for b in bInputs {
             mismatches.check(
                 portAddingF16ConstantA(b),
@@ -67,7 +67,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func addingConstantB() {
         let mismatches = Mismatches("portAddingF16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2F73_2FDB_2C9B_CD83)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2F73_2FDB_2C9B_CD83)
         for a in aInputs {
             mismatches.check(
                 portAddingF16ConstantB(a),
@@ -80,8 +80,8 @@ extension SIMDFloat16CodegenTests {
 
     @Test func subtracting() {
         let mismatches = Mismatches("portSubtractingF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA022_BD8D_D867_E9F2)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA022_BE8D_D867_EBA5)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA022_BD8D_D867_E9F2)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA022_BE8D_D867_EBA5)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portSubtractingF16(a, b),
@@ -94,7 +94,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func subtractingConstantA() {
         let mismatches = Mismatches("portSubtractingF16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1673_B8D8_3CE7_D9C0)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1673_B8D8_3CE7_D9C0)
         for b in bInputs {
             mismatches.check(
                 portSubtractingF16ConstantA(b),
@@ -107,7 +107,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func subtractingConstantB() {
         let mismatches = Mismatches("portSubtractingF16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3033_3ED8_4B6C_4B52)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3033_3ED8_4B6C_4B52)
         for a in aInputs {
             mismatches.check(
                 portSubtractingF16ConstantB(a),
@@ -120,8 +120,8 @@ extension SIMDFloat16CodegenTests {
 
     @Test func dividing() {
         let mismatches = Mismatches("portDividingF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x95D8_B40B_CF1B_59FE)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x95D8_B50B_CF1B_5BB1)
+        let aInputs = Inputs.vectors(H.self, seed: 0x95D8_B40B_CF1B_59FE)
+        let bInputs = Inputs.vectors(H.self, seed: 0x95D8_B50B_CF1B_5BB1)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portDividingF16(a, b),
@@ -134,7 +134,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func dividingConstantA() {
         let mismatches = Mismatches("portDividingF16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5D28_B82C_52F3_22EC)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5D28_B82C_52F3_22EC)
         for b in bInputs {
             mismatches.check(
                 portDividingF16ConstantA(b),
@@ -147,7 +147,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func dividingConstantB() {
         let mismatches = Mismatches("portDividingF16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x782E_3E2C_628C_571E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x782E_3E2C_628C_571E)
         for a in aInputs {
             mismatches.check(
                 portDividingF16ConstantB(a),
@@ -160,7 +160,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func squareRoot() {
         let mismatches = Mismatches("portSquareRootF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0FF4_71B1_0C84_D157)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0FF4_71B1_0C84_D157)
         for a in aInputs {
             mismatches.check(portSquareRootF16(a), highwaySquareRootF16(a), "a: \(describe(a))")
         }
@@ -175,8 +175,8 @@ extension SIMDFloat16CodegenTests {
 
     @Test func absoluteDifference() {
         let mismatches = Mismatches("portAbsoluteDifferenceF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF669_976B_20A2_77C6)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF669_986B_20A2_7979)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF669_976B_20A2_77C6)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF669_986B_20A2_7979)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portAbsoluteDifferenceF16(a, b),
@@ -189,7 +189,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func absoluteDifferenceConstantA() {
         let mismatches = Mismatches("portAbsoluteDifferenceF16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1B24_6D12_E88B_A734)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1B24_6D12_E88B_A734)
         for b in bInputs {
             mismatches.check(
                 portAbsoluteDifferenceF16ConstantA(b),
@@ -202,7 +202,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func absoluteDifferenceConstantB() {
         let mismatches = Mismatches("portAbsoluteDifferenceF16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3409_D312_F656_3EA6)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3409_D312_F656_3EA6)
         for a in aInputs {
             mismatches.check(
                 portAbsoluteDifferenceF16ConstantB(a),
@@ -215,10 +215,10 @@ extension SIMDFloat16CodegenTests {
 
     @Test func addingSubtracting() {
         let mismatches = Mismatches("portAddingSubtractingF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0169_1C47_F962_AF59)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0169_1B47_F962_ADA6)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(alternatingNegation: a, b)
-        {
+        let aInputs = Inputs.vectors(H.self, seed: 0x0169_1C47_F962_AF59)
+        let bInputs = Inputs.vectors(H.self, seed: 0x0169_1B47_F962_ADA6)
+        for (a, b) in everyPair(aInputs, bInputs)
+        where !hasUnorderedNaNs(alternatingNegation: a.simd, b.simd) {
             mismatches.check(
                 portAddingSubtractingF16(a, b),
                 highwayAddingSubtractingF16(a, b),
@@ -230,7 +230,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func addingSubtractingConstantA() {
         let mismatches = Mismatches("portAddingSubtractingF16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x902C_8F20_DB6C_858D)
+        let bInputs = Inputs.vectors(H.self, seed: 0x902C_8F20_DB6C_858D)
         for b in bInputs {
             mismatches.check(
                 portAddingSubtractingF16ConstantA(b),
@@ -243,7 +243,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func addingSubtractingConstantB() {
         let mismatches = Mismatches("portAddingSubtractingF16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7527_0920_CBD3_515B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7527_0920_CBD3_515B)
         for a in aInputs {
             mismatches.check(
                 portAddingSubtractingF16ConstantB(a),
@@ -256,11 +256,11 @@ extension SIMDFloat16CodegenTests {
 
     @Test func clamped() {
         let mismatches = Mismatches("portClampedF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x50A9_9C53_9983_BB58)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x50A9_9D53_9983_BD0B)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x50A9_9E53_9983_BEBE)
+        let aInputs = Inputs.vectors(H.self, seed: 0x50A9_9C53_9983_BB58)
+        let bInputs = Inputs.vectors(H.self, seed: 0x50A9_9D53_9983_BD0B)
+        let cInputs = Inputs.vectors(H.self, seed: 0x50A9_9E53_9983_BEBE)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xB4AF_E2C3_32F2_7B14)
-        where !hasUnorderedNaNs(a, b, c) {
+        where !hasUnorderedNaNs(a.simd, b.simd, c.simd) {
             mismatches.check(
                 portClampedF16(a, between: b, and: c),
                 highwayClampedF16(a, between: b, and: c),
@@ -272,9 +272,9 @@ extension SIMDFloat16CodegenTests {
 
     @Test func clampedConstantA() {
         let mismatches = Mismatches("portClampedF16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x04BA_0C2D_951A_ACAE)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x04BA_0B2D_951A_AAFB)
-        for (b, c) in everyPair(bInputs, cInputs) where !hasUnorderedNaNs(b, c) {
+        let bInputs = Inputs.vectors(H.self, seed: 0x04BA_0C2D_951A_ACAE)
+        let cInputs = Inputs.vectors(H.self, seed: 0x04BA_0B2D_951A_AAFB)
+        for (b, c) in everyPair(bInputs, cInputs) where !hasUnorderedNaNs(b.simd, c.simd) {
             mismatches.check(
                 portClampedF16ConstantA(between: b, and: c),
                 highwayClampedF16ConstantA(between: b, and: c),
@@ -286,9 +286,9 @@ extension SIMDFloat16CodegenTests {
 
     @Test func clampedConstantB() {
         let mismatches = Mismatches("portClampedF16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFC24_D62D_9043_CC4C)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xFC24_D82D_9043_CFB2)
-        for (a, c) in everyPair(aInputs, cInputs) where !hasUnorderedNaNs(a, c) {
+        let aInputs = Inputs.vectors(H.self, seed: 0xFC24_D62D_9043_CC4C)
+        let cInputs = Inputs.vectors(H.self, seed: 0xFC24_D82D_9043_CFB2)
+        for (a, c) in everyPair(aInputs, cInputs) where !hasUnorderedNaNs(a.simd, c.simd) {
             mismatches.check(
                 portClampedF16ConstantB(a, and: c),
                 highwayClampedF16ConstantB(a, and: c),
@@ -300,9 +300,9 @@ extension SIMDFloat16CodegenTests {
 
     @Test func clampedConstantC() {
         let mismatches = Mismatches("portClampedF16ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF2B6_3F2D_8AB4_5657)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF2B6_3E2D_8AB4_54A4)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0xF2B6_3F2D_8AB4_5657)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF2B6_3E2D_8AB4_54A4)
+        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a.simd, b.simd) {
             mismatches.check(
                 portClampedF16ConstantC(a, between: b),
                 highwayClampedF16ConstantC(a, between: b),
@@ -314,7 +314,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func approximateReciprocal() {
         let mismatches = Mismatches("portApproximateReciprocalF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9DFA_2FD4_E9A9_BEC4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9DFA_2FD4_E9A9_BEC4)
         for a in aInputs {
             mismatches.check(
                 portApproximateReciprocalF16(a),
@@ -337,7 +337,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func approximateReciprocalSquareRoot() {
         let mismatches = Mismatches("portApproximateReciprocalSquareRootF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5082_5CBE_CD53_0203)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5082_5CBE_CD53_0203)
         for a in aInputs {
             mismatches.check(
                 portApproximateReciprocalSquareRootF16(a),
@@ -360,9 +360,10 @@ extension SIMDFloat16CodegenTests {
 
     @Test func pairwiseAdding() {
         let mismatches = Mismatches("portPairwiseAddingF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1096_ED10_B6F4_9C81)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1096_EC10_B6F4_9ACE)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(adjacentLanesOf: a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x1096_ED10_B6F4_9C81)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1096_EC10_B6F4_9ACE)
+        for (a, b) in everyPair(aInputs, bInputs)
+        where !hasUnorderedNaNs(adjacentLanesOf: a.simd, b.simd) {
             mismatches.check(
                 portPairwiseAddingF16(a, b),
                 highwayPairwiseAddingF16(a, b),
@@ -374,8 +375,8 @@ extension SIMDFloat16CodegenTests {
 
     @Test func pairwiseAddingConstantA() {
         let mismatches = Mismatches("portPairwiseAddingF16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE7C6_C8EE_CD42_6735)
-        for b in bInputs where !hasUnorderedNaNs(adjacentLanesOf: b) {
+        let bInputs = Inputs.vectors(H.self, seed: 0xE7C6_C8EE_CD42_6735)
+        for b in bInputs where !hasUnorderedNaNs(adjacentLanesOf: b.simd) {
             mismatches.check(
                 portPairwiseAddingF16ConstantA(b),
                 highwayPairwiseAddingF16ConstantA(b),
@@ -387,8 +388,8 @@ extension SIMDFloat16CodegenTests {
 
     @Test func pairwiseAddingConstantB() {
         let mismatches = Mismatches("portPairwiseAddingF16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCD2D_C2EE_BE05_2B63)
-        for a in aInputs where !hasUnorderedNaNs(adjacentLanesOf: a) {
+        let aInputs = Inputs.vectors(H.self, seed: 0xCD2D_C2EE_BE05_2B63)
+        for a in aInputs where !hasUnorderedNaNs(adjacentLanesOf: a.simd) {
             mismatches.check(
                 portPairwiseAddingF16ConstantB(a),
                 highwayPairwiseAddingF16ConstantB(a),
@@ -400,8 +401,8 @@ extension SIMDFloat16CodegenTests {
 
     @Test func pairwiseSubtracting() {
         let mismatches = Mismatches("portPairwiseSubtractingF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFEAA_070C_F75B_AFD2)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xFEAA_080C_F75B_B185)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFEAA_070C_F75B_AFD2)
+        let bInputs = Inputs.vectors(H.self, seed: 0xFEAA_080C_F75B_B185)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portPairwiseSubtractingF16(a, b),
@@ -414,7 +415,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func pairwiseSubtractingConstantA() {
         let mismatches = Mismatches("portPairwiseSubtractingF16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x39E1_6C8E_45B2_5D20)
+        let bInputs = Inputs.vectors(H.self, seed: 0x39E1_6C8E_45B2_5D20)
         for b in bInputs {
             mismatches.check(
                 portPairwiseSubtractingF16ConstantA(b),
@@ -427,7 +428,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func pairwiseSubtractingConstantB() {
         let mismatches = Mismatches("portPairwiseSubtractingF16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x53A0_728E_5435_F532)
+        let aInputs = Inputs.vectors(H.self, seed: 0x53A0_728E_5435_F532)
         for a in aInputs {
             mismatches.check(
                 portPairwiseSubtractingF16ConstantB(a),
@@ -440,7 +441,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func exponent() {
         let mismatches = Mismatches("portExponentF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xABDB_8F27_0612_CBAB)
+        let aInputs = Inputs.vectors(H.self, seed: 0xABDB_8F27_0612_CBAB)
         for a in aInputs {
             mismatches.check(portExponentF16(a), highwayExponentF16(a), "a: \(describe(a))")
         }

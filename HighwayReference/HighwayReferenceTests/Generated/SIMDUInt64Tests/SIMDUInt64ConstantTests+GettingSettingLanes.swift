@@ -9,7 +9,7 @@ extension SIMDUInt64ConstantTests {
     @inline(__always)
     private func checkLaneConstantIndex(_ index: Int) {
         let mismatches = Mismatches("lane with index \(index)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6895_D176_0A89_A6DA)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6895_D176_0A89_A6DA)
         for a in aInputs {
             mismatches.check(
                 H.lane(a, at: index),
@@ -53,12 +53,12 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkLaneConstantA(_ value: H.Lane) {
+    private func checkLaneConstantA(_ value: Lane) {
         let mismatches = Mismatches("lane with a repeating \(hex(value))")
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for index in indexInputs {
@@ -120,6 +120,6 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func laneConstantSplatMax() {
-        checkLaneConstantA(H.Lane.max)
+        checkLaneConstantA(Lane.max)
     }
 }

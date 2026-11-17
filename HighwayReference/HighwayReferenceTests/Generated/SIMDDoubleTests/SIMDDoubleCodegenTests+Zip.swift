@@ -9,8 +9,8 @@ import Vectorization
 extension SIMDDoubleCodegenTests {
     @Test func zippingLowerFromFloat() {
         let mismatches = Mismatches("portZippingLowerF32ToF64")
-        let aInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0x9313_3775_1B49_98E1)
-        let bInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0x9313_3675_1B49_972E)
+        let aInputs = Inputs.conversions(SIMD<Float>.self, seed: 0x9313_3775_1B49_98E1)
+        let bInputs = Inputs.conversions(SIMD<Float>.self, seed: 0x9313_3675_1B49_972E)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portZippingLowerF32ToF64(a, b),
@@ -23,7 +23,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func zippingLowerFromFloatConstantA() {
         let mismatches = Mismatches("portZippingLowerF32ToF64ConstantA")
-        let bInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0x42E9_A4C2_2638_1C15)
+        let bInputs = Inputs.conversions(SIMD<Float>.self, seed: 0x42E9_A4C2_2638_1C15)
         for b in bInputs {
             mismatches.check(
                 portZippingLowerF32ToF64ConstantA(b),
@@ -36,7 +36,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func zippingLowerFromFloatConstantB() {
         let mismatches = Mismatches("portZippingLowerF32ToF64ConstantB")
-        let aInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0x2A04_1EC2_186D_4E43)
+        let aInputs = Inputs.conversions(SIMD<Float>.self, seed: 0x2A04_1EC2_186D_4E43)
         for a in aInputs {
             mismatches.check(
                 portZippingLowerF32ToF64ConstantB(a),
@@ -49,8 +49,8 @@ extension SIMDDoubleCodegenTests {
 
     @Test func zippingUpperFromFloat() {
         let mismatches = Mismatches("portZippingUpperF32ToF64")
-        let aInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0x17B0_90D3_4259_C8DE)
-        let bInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0x17B0_91D3_4259_CA91)
+        let aInputs = Inputs.conversions(SIMD<Float>.self, seed: 0x17B0_90D3_4259_C8DE)
+        let bInputs = Inputs.conversions(SIMD<Float>.self, seed: 0x17B0_91D3_4259_CA91)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portZippingUpperF32ToF64(a, b),
@@ -63,7 +63,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func zippingUpperFromFloatConstantA() {
         let mismatches = Mismatches("portZippingUpperF32ToF64ConstantA")
-        let bInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0xEAD5_5551_BB95_2F4C)
+        let bInputs = Inputs.conversions(SIMD<Float>.self, seed: 0xEAD5_5551_BB95_2F4C)
         for b in bInputs {
             mismatches.check(
                 portZippingUpperF32ToF64ConstantA(b),
@@ -76,7 +76,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func zippingUpperFromFloatConstantB() {
         let mismatches = Mismatches("portZippingUpperF32ToF64ConstantB")
-        let aInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0x0427_DB51_C9BC_CEFE)
+        let aInputs = Inputs.conversions(SIMD<Float>.self, seed: 0x0427_DB51_C9BC_CEFE)
         for a in aInputs {
             mismatches.check(
                 portZippingUpperF32ToF64ConstantB(a),

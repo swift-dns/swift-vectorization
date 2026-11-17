@@ -16,7 +16,7 @@ extension HighwayReferenceInt8 {
     public static func loadExpanded(fromUnchecked span: Span<Lane>, where mask: Mask) -> SIMD {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return span.withUnsafeBufferPointer {
-            unsafe SIMDInt8.Vector(
+            unsafe SIMD(
                 raw: HighwayReference.Nothrow.loadExpandedWhereI8(
                     mask.raw,
                     $0.baseAddress.unsafelyUnwrapped
@@ -45,7 +45,7 @@ extension HighwayReferenceInt8 {
     ) -> SIMD {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return span.withUnsafeBufferPointer {
-            unsafe SIMDInt8.Vector(
+            unsafe SIMD(
                 raw: HighwayReference.Nothrow.loadExpandedWhereOtherwiseI8(
                     otherwise.raw,
                     mask.raw,
@@ -59,24 +59,24 @@ extension HighwayReferenceInt8 {
 
 @inline(never)
 public func portExpandedI8(_ a: SIMD<Int8>, where mask: SIMD<Int8>.Mask) -> SIMD<Int8> {
-    SIMDInt8.expanded(a, where: mask)
+    SIMD<Int8>.expanded(a, where: mask)
 }
 
 @inline(never)
 public func highwayExpandedI8(_ a: SIMD<Int8>, where mask: SIMD<Int8>.Mask) -> SIMD<Int8> {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.expandedI8(a.raw, mask.raw))
+    SIMD<Int8>(raw: HighwayReference.Nothrow.expandedI8(a.raw, mask.raw))
 }
 
 @inline(never)
 public func portExpandedI8ConstantA(where mask: SIMD<Int8>.Mask) -> SIMD<Int8> {
-    SIMDInt8.expanded(SIMDInt8.repeating(26), where: mask)
+    SIMD<Int8>.expanded(SIMD<Int8>.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayExpandedI8ConstantA(where mask: SIMD<Int8>.Mask) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.expandedI8(
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             mask.raw
         )
     )
@@ -87,7 +87,7 @@ public func portLoadExpandedWhereI8(
     from: UnsafePointer<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    unsafe SIMDInt8.loadExpanded(from: from, where: mask)
+    unsafe SIMD<Int8>.loadExpanded(from: from, where: mask)
 }
 
 @inline(never)
@@ -95,7 +95,7 @@ public func highwayLoadExpandedWhereI8(
     from: UnsafePointer<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    unsafe SIMDInt8.Vector(raw: HighwayReference.Nothrow.loadExpandedWhereI8(mask.raw, from))
+    unsafe SIMD<Int8>(raw: HighwayReference.Nothrow.loadExpandedWhereI8(mask.raw, from))
 }
 
 @inline(never)
@@ -104,7 +104,7 @@ public func portLoadExpandedWhereOtherwiseI8(
     where mask: SIMD<Int8>.Mask,
     otherwise: SIMD<Int8>
 ) -> SIMD<Int8> {
-    unsafe SIMDInt8.loadExpanded(from: from, where: mask, otherwise: otherwise)
+    unsafe SIMD<Int8>.loadExpanded(from: from, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -113,7 +113,7 @@ public func highwayLoadExpandedWhereOtherwiseI8(
     where mask: SIMD<Int8>.Mask,
     otherwise: SIMD<Int8>
 ) -> SIMD<Int8> {
-    unsafe SIMDInt8.Vector(
+    unsafe SIMD<Int8>(
         raw: HighwayReference.Nothrow.loadExpandedWhereOtherwiseI8(otherwise.raw, mask.raw, from)
     )
 }
@@ -123,7 +123,7 @@ public func portLoadExpandedWhereOtherwiseI8ConstantOtherwise(
     from: UnsafePointer<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    unsafe SIMDInt8.loadExpanded(from: from, where: mask, otherwise: SIMDInt8.repeating(26))
+    unsafe SIMD<Int8>.loadExpanded(from: from, where: mask, otherwise: SIMD<Int8>.repeating(26))
 }
 
 @inline(never)
@@ -131,9 +131,9 @@ public func highwayLoadExpandedWhereOtherwiseI8ConstantOtherwise(
     from: UnsafePointer<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    unsafe SIMDInt8.Vector(
+    unsafe SIMD<Int8>(
         raw: HighwayReference.Nothrow.loadExpandedWhereOtherwiseI8(
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             mask.raw,
             from
         )

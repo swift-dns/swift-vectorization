@@ -5,7 +5,7 @@ public import Vectorization
 
 @inline(never)
 public func portAllTrueI16(_ mask: SIMD<Int16>.Mask) -> Bool {
-    SIMDInt16.allTrue(mask)
+    SIMD<Int16>.allTrue(mask)
 }
 
 @inline(never)
@@ -15,7 +15,7 @@ public func highwayAllTrueI16(_ mask: SIMD<Int16>.Mask) -> Bool {
 
 @inline(never)
 public func portAllFalseI16(_ mask: SIMD<Int16>.Mask) -> Bool {
-    SIMDInt16.allFalse(mask)
+    SIMD<Int16>.allFalse(mask)
 }
 
 @inline(never)
@@ -25,7 +25,7 @@ public func highwayAllFalseI16(_ mask: SIMD<Int16>.Mask) -> Bool {
 
 @inline(never)
 public func portTrueCountI16(_ mask: SIMD<Int16>.Mask) -> Int {
-    SIMDInt16.trueCount(mask)
+    SIMD<Int16>.trueCount(mask)
 }
 
 @inline(never)
@@ -35,7 +35,7 @@ public func highwayTrueCountI16(_ mask: SIMD<Int16>.Mask) -> Int {
 
 @inline(never)
 public func portFirstTrueIndexI16(_ mask: SIMD<Int16>.Mask) -> Int {
-    SIMDInt16.firstTrueIndex(mask)
+    SIMD<Int16>.firstTrueIndex(mask)
 }
 
 @inline(never)
@@ -45,7 +45,7 @@ public func highwayFirstTrueIndexI16(_ mask: SIMD<Int16>.Mask) -> Int {
 
 @inline(never)
 public func portLastTrueIndexI16(_ mask: SIMD<Int16>.Mask) -> Int {
-    SIMDInt16.lastTrueIndex(mask)
+    SIMD<Int16>.lastTrueIndex(mask)
 }
 
 @inline(never)
@@ -55,7 +55,7 @@ public func highwayLastTrueIndexI16(_ mask: SIMD<Int16>.Mask) -> Int {
 
 @inline(never)
 public func portKnownFirstTrueIndexI16(_ mask: SIMD<Int16>.Mask) -> Int {
-    SIMDInt16.knownFirstTrueIndex(mask)
+    SIMD<Int16>.knownFirstTrueIndex(mask)
 }
 
 @inline(never)
@@ -65,7 +65,7 @@ public func highwayKnownFirstTrueIndexI16(_ mask: SIMD<Int16>.Mask) -> Int {
 
 @inline(never)
 public func portKnownLastTrueIndexI16(_ mask: SIMD<Int16>.Mask) -> Int {
-    SIMDInt16.knownLastTrueIndex(mask)
+    SIMD<Int16>.knownLastTrueIndex(mask)
 }
 
 @inline(never)

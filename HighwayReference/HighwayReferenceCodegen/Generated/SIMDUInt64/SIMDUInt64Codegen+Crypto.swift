@@ -5,7 +5,7 @@ public import Vectorization
 
 @inline(never)
 public func portCarrylessMultiplyingLowerU64(_ a: SIMD<UInt64>, _ b: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.carrylessMultiplyingLower(a, b)
+    SIMD<UInt64>.carrylessMultiplyingLower(a, b)
 }
 
 @inline(never)
@@ -13,19 +13,19 @@ public func highwayCarrylessMultiplyingLowerU64(
     _ a: SIMD<UInt64>,
     _ b: SIMD<UInt64>
 ) -> SIMD<UInt64> {
-    SIMDUInt64.Vector(raw: HighwayReference.Nothrow.carrylessMultiplyingLowerU64(a.raw, b.raw))
+    SIMD<UInt64>(raw: HighwayReference.Nothrow.carrylessMultiplyingLowerU64(a.raw, b.raw))
 }
 
 @inline(never)
 public func portCarrylessMultiplyingLowerU64ConstantA(_ b: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.carrylessMultiplyingLower(SIMDUInt64.repeating(26), b)
+    SIMD<UInt64>.carrylessMultiplyingLower(SIMD<UInt64>.repeating(26), b)
 }
 
 @inline(never)
 public func highwayCarrylessMultiplyingLowerU64ConstantA(_ b: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.Vector(
+    SIMD<UInt64>(
         raw: HighwayReference.Nothrow.carrylessMultiplyingLowerU64(
-            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
+            SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
             b.raw
         )
     )
@@ -33,22 +33,22 @@ public func highwayCarrylessMultiplyingLowerU64ConstantA(_ b: SIMD<UInt64>) -> S
 
 @inline(never)
 public func portCarrylessMultiplyingLowerU64ConstantB(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.carrylessMultiplyingLower(a, SIMDUInt64.repeating(26))
+    SIMD<UInt64>.carrylessMultiplyingLower(a, SIMD<UInt64>.repeating(26))
 }
 
 @inline(never)
 public func highwayCarrylessMultiplyingLowerU64ConstantB(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.Vector(
+    SIMD<UInt64>(
         raw: HighwayReference.Nothrow.carrylessMultiplyingLowerU64(
             a.raw,
-            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
+            SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portCarrylessMultiplyingUpperU64(_ a: SIMD<UInt64>, _ b: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.carrylessMultiplyingUpper(a, b)
+    SIMD<UInt64>.carrylessMultiplyingUpper(a, b)
 }
 
 @inline(never)
@@ -56,19 +56,19 @@ public func highwayCarrylessMultiplyingUpperU64(
     _ a: SIMD<UInt64>,
     _ b: SIMD<UInt64>
 ) -> SIMD<UInt64> {
-    SIMDUInt64.Vector(raw: HighwayReference.Nothrow.carrylessMultiplyingUpperU64(a.raw, b.raw))
+    SIMD<UInt64>(raw: HighwayReference.Nothrow.carrylessMultiplyingUpperU64(a.raw, b.raw))
 }
 
 @inline(never)
 public func portCarrylessMultiplyingUpperU64ConstantA(_ b: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.carrylessMultiplyingUpper(SIMDUInt64.repeating(26), b)
+    SIMD<UInt64>.carrylessMultiplyingUpper(SIMD<UInt64>.repeating(26), b)
 }
 
 @inline(never)
 public func highwayCarrylessMultiplyingUpperU64ConstantA(_ b: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.Vector(
+    SIMD<UInt64>(
         raw: HighwayReference.Nothrow.carrylessMultiplyingUpperU64(
-            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
+            SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
             b.raw
         )
     )
@@ -76,15 +76,15 @@ public func highwayCarrylessMultiplyingUpperU64ConstantA(_ b: SIMD<UInt64>) -> S
 
 @inline(never)
 public func portCarrylessMultiplyingUpperU64ConstantB(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.carrylessMultiplyingUpper(a, SIMDUInt64.repeating(26))
+    SIMD<UInt64>.carrylessMultiplyingUpper(a, SIMD<UInt64>.repeating(26))
 }
 
 @inline(never)
 public func highwayCarrylessMultiplyingUpperU64ConstantB(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-    SIMDUInt64.Vector(
+    SIMD<UInt64>(
         raw: HighwayReference.Nothrow.carrylessMultiplyingUpperU64(
             a.raw,
-            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
+            SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
         )
     )
 }

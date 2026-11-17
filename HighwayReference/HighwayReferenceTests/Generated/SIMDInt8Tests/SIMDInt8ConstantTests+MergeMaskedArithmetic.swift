@@ -7,17 +7,17 @@ import Vectorization
 
 extension SIMDInt8ConstantTests {
     @inline(__always)
-    private func checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "negatedMultiplySubtractingWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xCA2D_03BD_983C_40DC)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCA2D_06BD_983C_45F5)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCA2D_05BD_983C_4442)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xCA2D_00BD_983C_3BC3)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCA2D_06BD_983C_45F5)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCA2D_05BD_983C_4442)
+        let cInputs = Inputs.vectors(H.self, seed: 0xCA2D_00BD_983C_3BC3)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for (mask, a, b, c) in mixedQuadruples(
@@ -29,7 +29,7 @@ extension SIMDInt8ConstantTests {
         ) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, b, c, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.negatedMultiplySubtractingWhereOtherwiseI8(
                         H.repeating(value).raw,
                         mask.raw,

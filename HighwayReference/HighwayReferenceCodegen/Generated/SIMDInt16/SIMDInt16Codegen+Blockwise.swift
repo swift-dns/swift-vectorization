@@ -8,7 +8,7 @@ public func portTableLookupBytesI16(
     _ a: SIMD<Int16>,
     atUnchecked indices: SIMD<Int16>
 ) -> SIMD<Int16> {
-    unsafe SIMDInt16.tableLookupBytes(a, atUnchecked: indices)
+    unsafe SIMD<Int16>.tableLookupBytes(a, atUnchecked: indices)
 }
 
 @inline(never)
@@ -16,19 +16,19 @@ public func highwayTableLookupBytesI16(
     _ a: SIMD<Int16>,
     atUnchecked indices: SIMD<Int16>
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.tableLookupBytesI16(a.raw, indices.raw))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.tableLookupBytesI16(a.raw, indices.raw))
 }
 
 @inline(never)
 public func portTableLookupBytesI16ConstantA(atUnchecked indices: SIMD<Int16>) -> SIMD<Int16> {
-    unsafe SIMDInt16.tableLookupBytes(SIMDInt16.repeating(26), atUnchecked: indices)
+    unsafe SIMD<Int16>.tableLookupBytes(SIMD<Int16>.repeating(26), atUnchecked: indices)
 }
 
 @inline(never)
 public func highwayTableLookupBytesI16ConstantA(atUnchecked indices: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.tableLookupBytesI16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             indices.raw
         )
     )
@@ -36,15 +36,15 @@ public func highwayTableLookupBytesI16ConstantA(atUnchecked indices: SIMD<Int16>
 
 @inline(never)
 public func portTableLookupBytesI16ConstantIndices(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    unsafe SIMDInt16.tableLookupBytes(a, atUnchecked: SIMDInt16.repeating(3))
+    unsafe SIMD<Int16>.tableLookupBytes(a, atUnchecked: SIMD<Int16>.repeating(3))
 }
 
 @inline(never)
 public func highwayTableLookupBytesI16ConstantIndices(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.tableLookupBytesI16(
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(3)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(3)).raw
         )
     )
 }
@@ -54,7 +54,7 @@ public func portTableLookupBytesOrZeroI16(
     _ a: SIMD<Int16>,
     atUnchecked indices: SIMD<Int16>
 ) -> SIMD<Int16> {
-    unsafe SIMDInt16.tableLookupBytesOrZero(a, atUnchecked: indices)
+    unsafe SIMD<Int16>.tableLookupBytesOrZero(a, atUnchecked: indices)
 }
 
 @inline(never)
@@ -62,22 +62,22 @@ public func highwayTableLookupBytesOrZeroI16(
     _ a: SIMD<Int16>,
     atUnchecked indices: SIMD<Int16>
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.tableLookupBytesOrZeroI16(a.raw, indices.raw))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.tableLookupBytesOrZeroI16(a.raw, indices.raw))
 }
 
 @inline(never)
 public func portTableLookupBytesOrZeroI16ConstantA(atUnchecked indices: SIMD<Int16>) -> SIMD<Int16>
 {
-    unsafe SIMDInt16.tableLookupBytesOrZero(SIMDInt16.repeating(26), atUnchecked: indices)
+    unsafe SIMD<Int16>.tableLookupBytesOrZero(SIMD<Int16>.repeating(26), atUnchecked: indices)
 }
 
 @inline(never)
 public func highwayTableLookupBytesOrZeroI16ConstantA(
     atUnchecked indices: SIMD<Int16>
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.tableLookupBytesOrZeroI16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             indices.raw
         )
     )
@@ -85,39 +85,39 @@ public func highwayTableLookupBytesOrZeroI16ConstantA(
 
 @inline(never)
 public func portTableLookupBytesOrZeroI16ConstantIndices(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    unsafe SIMDInt16.tableLookupBytesOrZero(a, atUnchecked: SIMDInt16.repeating(3))
+    unsafe SIMD<Int16>.tableLookupBytesOrZero(a, atUnchecked: SIMD<Int16>.repeating(3))
 }
 
 @inline(never)
 public func highwayTableLookupBytesOrZeroI16ConstantIndices(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.tableLookupBytesOrZeroI16(
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(3)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(3)).raw
         )
     )
 }
 
 @inline(never)
 public func portPairwiseAddingBlocksI16(_ a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.pairwiseAddingBlocks(a, b)
+    SIMD<Int16>.pairwiseAddingBlocks(a, b)
 }
 
 @inline(never)
 public func highwayPairwiseAddingBlocksI16(_ a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.pairwiseAddingBlocksI16(a.raw, b.raw))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.pairwiseAddingBlocksI16(a.raw, b.raw))
 }
 
 @inline(never)
 public func portPairwiseAddingBlocksI16ConstantA(_ b: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.pairwiseAddingBlocks(SIMDInt16.repeating(26), b)
+    SIMD<Int16>.pairwiseAddingBlocks(SIMD<Int16>.repeating(26), b)
 }
 
 @inline(never)
 public func highwayPairwiseAddingBlocksI16ConstantA(_ b: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.pairwiseAddingBlocksI16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw
         )
     )
@@ -125,39 +125,39 @@ public func highwayPairwiseAddingBlocksI16ConstantA(_ b: SIMD<Int16>) -> SIMD<In
 
 @inline(never)
 public func portPairwiseAddingBlocksI16ConstantB(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.pairwiseAddingBlocks(a, SIMDInt16.repeating(26))
+    SIMD<Int16>.pairwiseAddingBlocks(a, SIMD<Int16>.repeating(26))
 }
 
 @inline(never)
 public func highwayPairwiseAddingBlocksI16ConstantB(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.pairwiseAddingBlocksI16(
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portPairwiseSubtractingBlocksI16(_ a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.pairwiseSubtractingBlocks(a, b)
+    SIMD<Int16>.pairwiseSubtractingBlocks(a, b)
 }
 
 @inline(never)
 public func highwayPairwiseSubtractingBlocksI16(_ a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.pairwiseSubtractingBlocksI16(a.raw, b.raw))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.pairwiseSubtractingBlocksI16(a.raw, b.raw))
 }
 
 @inline(never)
 public func portPairwiseSubtractingBlocksI16ConstantA(_ b: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.pairwiseSubtractingBlocks(SIMDInt16.repeating(26), b)
+    SIMD<Int16>.pairwiseSubtractingBlocks(SIMD<Int16>.repeating(26), b)
 }
 
 @inline(never)
 public func highwayPairwiseSubtractingBlocksI16ConstantA(_ b: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.pairwiseSubtractingBlocksI16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw
         )
     )
@@ -165,29 +165,29 @@ public func highwayPairwiseSubtractingBlocksI16ConstantA(_ b: SIMD<Int16>) -> SI
 
 @inline(never)
 public func portPairwiseSubtractingBlocksI16ConstantB(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.pairwiseSubtractingBlocks(a, SIMDInt16.repeating(26))
+    SIMD<Int16>.pairwiseSubtractingBlocks(a, SIMD<Int16>.repeating(26))
 }
 
 @inline(never)
 public func highwayPairwiseSubtractingBlocksI16ConstantB(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.pairwiseSubtractingBlocksI16(
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portBroadcastingInBlocksI16ConstantA() -> SIMD<Int16> {
-    unsafe SIMDInt16.broadcastingInBlocks(SIMDInt16.repeating(26), laneUnchecked: 1)
+    unsafe SIMD<Int16>.broadcastingInBlocks(SIMD<Int16>.repeating(26), laneUnchecked: 1)
 }
 
 @inline(never)
 public func highwayBroadcastingInBlocksI16ConstantA() -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.broadcastingInBlocksI16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             1
         )
     )
@@ -195,10 +195,10 @@ public func highwayBroadcastingInBlocksI16ConstantA() -> SIMD<Int16> {
 
 @inline(never)
 public func portBroadcastingInBlocksI16ConstantLane(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    unsafe SIMDInt16.broadcastingInBlocks(a, laneUnchecked: 1)
+    unsafe SIMD<Int16>.broadcastingInBlocks(a, laneUnchecked: 1)
 }
 
 @inline(never)
 public func highwayBroadcastingInBlocksI16ConstantLane(_ a: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.broadcastingInBlocksI16(a.raw, 1))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.broadcastingInBlocksI16(a.raw, 1))
 }

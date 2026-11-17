@@ -39,7 +39,7 @@ extension HighwayReferenceBFloat16 {
 
 @inline(never)
 public func portStoreStreamingBF16(_ a: SIMD<BFloat16>, to: UnsafeMutablePointer<BFloat16>) {
-    unsafe SIMDBFloat16.storeStreaming(a, to: to)
+    unsafe SIMD<BFloat16>.storeStreaming(a, to: to)
 }
 
 @inline(never)
@@ -49,13 +49,13 @@ public func highwayStoreStreamingBF16(_ a: SIMD<BFloat16>, to: UnsafeMutablePoin
 
 @inline(never)
 public func portStoreStreamingBF16ConstantA(to: UnsafeMutablePointer<BFloat16>) {
-    unsafe SIMDBFloat16.storeStreaming(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), to: to)
+    unsafe SIMD<BFloat16>.storeStreaming(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)), to: to)
 }
 
 @inline(never)
 public func highwayStoreStreamingBF16ConstantA(to: UnsafeMutablePointer<BFloat16>) {
     unsafe HighwayReference.Nothrow.storeStreamingBF16(
-        SIMDBFloat16.Vector(
+        SIMD<BFloat16>(
             raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
         ).raw,
         to

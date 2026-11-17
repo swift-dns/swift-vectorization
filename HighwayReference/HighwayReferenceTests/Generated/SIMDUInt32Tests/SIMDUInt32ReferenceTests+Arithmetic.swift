@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDUInt32ReferenceTests {
     @Test func adding() {
         let mismatches = Mismatches("adding")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x89F0_7402_2161_B160)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x89F0_7502_2161_B313)
+        let aInputs = Inputs.vectors(H.self, seed: 0x89F0_7402_2161_B160)
+        let bInputs = Inputs.vectors(H.self, seed: 0x89F0_7502_2161_B313)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.adding(a, b),
-                H.Vector(raw: HighwayReference.addingU32(a.raw, b.raw)),
+                H(raw: HighwayReference.addingU32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -22,12 +22,12 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func subtracting() {
         let mismatches = Mismatches("subtracting")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBD5A_7627_8590_0855)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xBD5A_7527_8590_06A2)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBD5A_7627_8590_0855)
+        let bInputs = Inputs.vectors(H.self, seed: 0xBD5A_7527_8590_06A2)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.subtracting(a, b),
-                H.Vector(raw: HighwayReference.subtractingU32(a.raw, b.raw)),
+                H(raw: HighwayReference.subtractingU32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -36,12 +36,12 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func addingSubtracting() {
         let mismatches = Mismatches("addingSubtracting")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA3B5_9636_DC8E_18B2)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA3B5_9736_DC8E_1A65)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA3B5_9636_DC8E_18B2)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA3B5_9736_DC8E_1A65)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.addingSubtracting(a, b),
-                H.Vector(raw: HighwayReference.addingSubtractingU32(a.raw, b.raw)),
+                H(raw: HighwayReference.addingSubtractingU32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -50,20 +50,17 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func dividing() {
         let mismatches = Mismatches("dividing")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFB82_18A4_8B09_5507)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFB82_18A4_8B09_5507)
         let bInputs =
-            Inputs.vectors(H.Vector.self, seed: 0xFB82_17A4_8B09_5354)
-            + Inputs.vectors(H.Vector.self, seed: 0x8926_A768_E448_BF53).enumerated().map {
+            Inputs.vectors(H.self, seed: 0xFB82_17A4_8B09_5354)
+            + Inputs.vectors(H.self, seed: 0x8926_A768_E448_BF53).enumerated().map {
                 index,
-                vector in
-                H.Vector(
-                    vector.simd &>> H.Vector.Simd(repeating: H.Lane(truncatingIfNeeded: index))
-                )
+                vector in H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))
             }
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.dividing(a, b),
-                H.Vector(raw: HighwayReference.dividingU32(a.raw, b.raw)),
+                H(raw: HighwayReference.dividingU32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -72,13 +69,13 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func clamped() {
         let mismatches = Mismatches("clamped")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD5E6_F74F_3098_C7B7)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD5E6_F64F_3098_C604)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xD5E6_F94F_3098_CB1D)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD5E6_F74F_3098_C7B7)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD5E6_F64F_3098_C604)
+        let cInputs = Inputs.vectors(H.self, seed: 0xD5E6_F94F_3098_CB1D)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x567F_1953_34C2_0EB1) {
             mismatches.check(
                 H.clamped(a, between: b, and: c),
-                H.Vector(raw: HighwayReference.clampedU32(a.raw, b.raw, c.raw)),
+                H(raw: HighwayReference.clampedU32(a.raw, b.raw, c.raw)),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -87,12 +84,12 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func absoluteDifference() {
         let mismatches = Mismatches("absoluteDifference")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7170_1C6C_4E9C_FA8B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7170_1B6C_4E9C_F8D8)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7170_1C6C_4E9C_FA8B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7170_1B6C_4E9C_F8D8)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.absoluteDifference(a, b),
-                H.Vector(raw: HighwayReference.absoluteDifferenceU32(a.raw, b.raw)),
+                H(raw: HighwayReference.absoluteDifferenceU32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -101,20 +98,17 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func remainder() {
         let mismatches = Mismatches("remainder")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3E4E_800E_5546_BC7E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3E4E_800E_5546_BC7E)
         let bInputs =
-            Inputs.vectors(H.Vector.self, seed: 0x3E4E_810E_5546_BE31)
-            + Inputs.vectors(H.Vector.self, seed: 0xCBF3_E24F_02B1_954A).enumerated().map {
+            Inputs.vectors(H.self, seed: 0x3E4E_810E_5546_BE31)
+            + Inputs.vectors(H.self, seed: 0xCBF3_E24F_02B1_954A).enumerated().map {
                 index,
-                vector in
-                H.Vector(
-                    vector.simd &>> H.Vector.Simd(repeating: H.Lane(truncatingIfNeeded: index))
-                )
+                vector in H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))
             }
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.remainder(a, b),
-                H.Vector(raw: HighwayReference.remainderU32(a.raw, b.raw)),
+                H(raw: HighwayReference.remainderU32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -123,12 +117,12 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func saturatingAdding() {
         let mismatches = Mismatches("saturatingAdding")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF1DE_9D7B_5E1B_FF96)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF1DE_9E7B_5E1C_0149)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF1DE_9D7B_5E1B_FF96)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF1DE_9E7B_5E1C_0149)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.saturatingAdding(a, b),
-                H.Vector(raw: HighwayReference.saturatingAddingU32(a.raw, b.raw)),
+                H(raw: HighwayReference.saturatingAddingU32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -137,12 +131,12 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func saturatingSubtracting() {
         let mismatches = Mismatches("saturatingSubtracting")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x293A_FD75_F411_01C7)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x293A_FC75_F411_0014)
+        let aInputs = Inputs.vectors(H.self, seed: 0x293A_FD75_F411_01C7)
+        let bInputs = Inputs.vectors(H.self, seed: 0x293A_FC75_F411_0014)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.saturatingSubtracting(a, b),
-                H.Vector(raw: HighwayReference.saturatingSubtractingU32(a.raw, b.raw)),
+                H(raw: HighwayReference.saturatingSubtractingU32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -151,12 +145,12 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func roundedAverage() {
         let mismatches = Mismatches("roundedAverage")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2D66_8C03_2391_1121)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2D66_8B03_2391_0F6E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2D66_8C03_2391_1121)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2D66_8B03_2391_0F6E)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.roundedAverage(a, b),
-                H.Vector(raw: HighwayReference.roundedAverageU32(a.raw, b.raw)),
+                H(raw: HighwayReference.roundedAverageU32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -165,12 +159,12 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func pairwiseAdding() {
         let mismatches = Mismatches("pairwiseAdding")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9264_BA47_2429_3050)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9264_BB47_2429_3203)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9264_BA47_2429_3050)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9264_BB47_2429_3203)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.pairwiseAdding(a, b),
-                H.Vector(raw: HighwayReference.pairwiseAddingU32(a.raw, b.raw)),
+                H(raw: HighwayReference.pairwiseAddingU32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -179,12 +173,12 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func pairwiseSubtracting() {
         let mismatches = Mismatches("pairwiseSubtracting")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCABE_E258_C49E_DAC5)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCABE_E158_C49E_D912)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCABE_E258_C49E_DAC5)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCABE_E158_C49E_D912)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.pairwiseSubtracting(a, b),
-                H.Vector(raw: HighwayReference.pairwiseSubtractingU32(a.raw, b.raw)),
+                H(raw: HighwayReference.pairwiseSubtractingU32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -193,11 +187,11 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func sumsOf2FromUInt16() {
         let mismatches = Mismatches("sumsOf2FromUInt16")
-        let aInputs = Inputs.conversions(SIMDUInt16.Vector.self, seed: 0x8CB8_8F55_6672_E683)
+        let aInputs = Inputs.conversions(SIMD<UInt16>.self, seed: 0x8CB8_8F55_6672_E683)
         for a in aInputs {
             mismatches.check(
                 H.sumsOf2(a),
-                H.Vector(raw: HighwayReference.sumsOf2U16ToU32(a.raw)),
+                H(raw: HighwayReference.sumsOf2U16ToU32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -206,11 +200,11 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func sumsOf4FromUInt8() {
         let mismatches = Mismatches("sumsOf4FromUInt8")
-        let aInputs = Inputs.conversions(SIMDUInt8.Vector.self, seed: 0x9373_698F_A75F_E0F4)
+        let aInputs = Inputs.conversions(SIMD<UInt8>.self, seed: 0x9373_698F_A75F_E0F4)
         for a in aInputs {
             mismatches.check(
                 H.sumsOf4(a),
-                H.Vector(raw: HighwayReference.sumsOf4U8ToU32(a.raw)),
+                H(raw: HighwayReference.sumsOf4U8ToU32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -219,11 +213,11 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func biasedExponentFromFloat() {
         let mismatches = Mismatches("biasedExponentFromFloat")
-        let aInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0xE319_C3F1_6676_DDCE)
+        let aInputs = Inputs.conversions(SIMD<Float>.self, seed: 0xE319_C3F1_6676_DDCE)
         for a in aInputs {
             mismatches.check(
                 H.biasedExponent(a),
-                H.Vector(raw: HighwayReference.biasedExponentF32ToU32(a.raw)),
+                H(raw: HighwayReference.biasedExponentF32ToU32(a.raw)),
                 "a: \(describe(a))"
             )
         }

@@ -8,11 +8,11 @@ import Vectorization
 extension SIMDUInt32ReferenceTests {
     @Test func vectorWideningLowerFromUInt16() {
         let mismatches = Mismatches("vectorWideningLowerFromUInt16")
-        let aInputs = Inputs.conversions(SIMDUInt16.Vector.self, seed: 0xFDBC_557F_2B32_D96D)
+        let aInputs = Inputs.conversions(SIMD<UInt16>.self, seed: 0xFDBC_557F_2B32_D96D)
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningLower: a),
-                H.Vector(raw: HighwayReference.vectorWideningLowerU16ToU32(a.raw)),
+                H(raw: HighwayReference.vectorWideningLowerU16ToU32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -21,11 +21,11 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func vectorWideningUpperFromUInt16() {
         let mismatches = Mismatches("vectorWideningUpperFromUInt16")
-        let aInputs = Inputs.conversions(SIMDUInt16.Vector.self, seed: 0xA500_0DB6_3EF3_9AA4)
+        let aInputs = Inputs.conversions(SIMD<UInt16>.self, seed: 0xA500_0DB6_3EF3_9AA4)
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningUpper: a),
-                H.Vector(raw: HighwayReference.vectorWideningUpperU16ToU32(a.raw)),
+                H(raw: HighwayReference.vectorWideningUpperU16ToU32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -34,11 +34,11 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func vectorWideningEvenFromUInt16() {
         let mismatches = Mismatches("vectorWideningEvenFromUInt16")
-        let aInputs = Inputs.conversions(SIMDUInt16.Vector.self, seed: 0x434C_BB13_FCBC_79D4)
+        let aInputs = Inputs.conversions(SIMD<UInt16>.self, seed: 0x434C_BB13_FCBC_79D4)
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningEven: a),
-                H.Vector(raw: HighwayReference.vectorWideningEvenU16ToU32(a.raw)),
+                H(raw: HighwayReference.vectorWideningEvenU16ToU32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -47,11 +47,11 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func vectorWideningOddFromUInt16() {
         let mismatches = Mismatches("vectorWideningOddFromUInt16")
-        let aInputs = Inputs.conversions(SIMDUInt16.Vector.self, seed: 0xCF15_CAA1_8EC2_FAD5)
+        let aInputs = Inputs.conversions(SIMD<UInt16>.self, seed: 0xCF15_CAA1_8EC2_FAD5)
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningOdd: a),
-                H.Vector(raw: HighwayReference.vectorWideningOddU16ToU32(a.raw)),
+                H(raw: HighwayReference.vectorWideningOddU16ToU32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -60,12 +60,12 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func vectorWideningFromHalfUInt16() {
         let mismatches = Mismatches("vectorWideningFromHalfUInt16")
-        let aInputs = Inputs.conversions(SIMDUInt16.HalfVector.self, seed: 0xBFA4_BD69_D0FC_7829)
+        let aInputs = Inputs.conversions(SIMD<UInt16>.HalfVector.self, seed: 0xBFA4_BD69_D0FC_7829)
             .map(poisoningUpperBytes)
         for a in aInputs {
             mismatches.check(
                 H.vector(widening: a),
-                H.Vector(raw: HighwayReference.vectorWideningHalfU16ToU32(a.raw)),
+                H(raw: HighwayReference.vectorWideningHalfU16ToU32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -74,12 +74,14 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func vectorWideningFromQuarterUInt8() {
         let mismatches = Mismatches("vectorWideningFromQuarterUInt8")
-        let aInputs = Inputs.conversions(SIMDUInt8.QuarterVector.self, seed: 0x2258_4FB9_2174_2D43)
-            .map(poisoningUpperBytes)
+        let aInputs = Inputs.conversions(
+            SIMD<UInt8>.QuarterVector.self,
+            seed: 0x2258_4FB9_2174_2D43
+        ).map(poisoningUpperBytes)
         for a in aInputs {
             mismatches.check(
                 H.vector(widening: a),
-                H.Vector(raw: HighwayReference.vectorWideningQuarterU8ToU32(a.raw)),
+                H(raw: HighwayReference.vectorWideningQuarterU8ToU32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -88,12 +90,12 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func vectorWideningLowerFromHalfUInt8() {
         let mismatches = Mismatches("vectorWideningLowerFromHalfUInt8")
-        let aInputs = Inputs.conversions(SIMDUInt8.HalfVector.self, seed: 0x58FC_4F39_14F1_2A93)
+        let aInputs = Inputs.conversions(SIMD<UInt8>.HalfVector.self, seed: 0x58FC_4F39_14F1_2A93)
             .map(poisoningUpperBytes)
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningLower: a),
-                H.Vector(raw: HighwayReference.vectorWideningLowerHalfU8ToU32(a.raw)),
+                H(raw: HighwayReference.vectorWideningLowerHalfU8ToU32(a.raw)),
                 "a: \(describe(a))"
             )
         }

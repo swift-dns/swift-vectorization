@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDFloatCodegenTests {
     @Test func halfVectorConvertingFromUInt64() {
         let mismatches = Mismatches("portHalfVectorConvertingU64ToF32")
-        let aInputs = Inputs.floatDemotions(SIMDUInt64.Vector.self, seed: 0x965B_52AC_5399_ED33)
+        let aInputs = Inputs.floatDemotions(SIMD<UInt64>.self, seed: 0x965B_52AC_5399_ED33)
         for a in aInputs {
             mismatches.check(
                 portHalfVectorConvertingU64ToF32(converting: a),
@@ -32,7 +32,7 @@ extension SIMDFloatCodegenTests {
 
     @Test func halfVectorConvertingFromInt64() {
         let mismatches = Mismatches("portHalfVectorConvertingI64ToF32")
-        let aInputs = Inputs.floatDemotions(SIMDInt64.Vector.self, seed: 0x54FB_7DE5_5438_6B06)
+        let aInputs = Inputs.floatDemotions(SIMD<Int64>.self, seed: 0x54FB_7DE5_5438_6B06)
         for a in aInputs {
             mismatches.check(
                 portHalfVectorConvertingI64ToF32(converting: a),
@@ -55,7 +55,7 @@ extension SIMDFloatCodegenTests {
 
     @Test func halfVectorConvertingFromDouble() {
         let mismatches = Mismatches("portHalfVectorConvertingF64ToF32")
-        let aInputs = Inputs.floatDemotions(SIMDDouble.Vector.self, seed: 0xA36E_114E_CCEC_72A0)
+        let aInputs = Inputs.floatDemotions(SIMD<Double>.self, seed: 0xA36E_114E_CCEC_72A0)
         for a in aInputs {
             mismatches.check(
                 portHalfVectorConvertingF64ToF32(converting: a),

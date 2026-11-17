@@ -10,16 +10,14 @@ extension SIMDUInt8ConstantTests {
     private func checkAesKeyGenerationAssistConstantRoundConstant(_ roundConstant: UInt8) {
         let mismatches = Mismatches("aesKeyGenerationAssist with roundConstant \(roundConstant)")
         let aInputs =
-            Inputs.vectors(H.Vector.self, seed: 0x1FB2_4D1D_9CF9_3ACF)
+            Inputs.vectors(H.self, seed: 0x1FB2_4D1D_9CF9_3ACF)
             + (0..<256).map { start in
-                H.Vector(
-                    H.Vector.Simd((0..<H.laneCount).map { H.Lane(truncatingIfNeeded: start + $0) })
-                )
+                H(H.SIMDType((0..<H.laneCount).map { Lane(truncatingIfNeeded: start + $0) }))
             }
         for a in aInputs {
             mismatches.check(
                 H.aesKeyGenerationAssist(a, roundConstant: roundConstant),
-                H.Vector(raw: HighwayReference.aesKeyGenerationAssistU8(a.raw, roundConstant)),
+                H(raw: HighwayReference.aesKeyGenerationAssistU8(a.raw, roundConstant)),
                 "a: \(describe(a))"
             )
         }

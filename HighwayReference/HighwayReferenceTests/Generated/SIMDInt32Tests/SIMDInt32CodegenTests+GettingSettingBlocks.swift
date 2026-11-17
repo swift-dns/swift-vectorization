@@ -19,7 +19,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func extractingBlockConstantIndex() {
         let mismatches = Mismatches("portExtractingBlockI32ConstantIndex")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4978_BBE8_8692_8BD1)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4978_BBE8_8692_8BD1)
         for a in aInputs {
             mismatches.check(
                 portExtractingBlockI32ConstantIndex(a),
@@ -47,7 +47,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func replacingBlockConstantIndex() {
         let mismatches = Mismatches("portReplacingBlockI32ConstantIndex")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF1EA_EC2A_B6DD_B6B9)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF1EA_EC2A_B6DD_B6B9)
         let bInputs = Inputs.vectors(H.BlockVector.self, seed: 0xF1EA_EA2A_B6DD_B353).map(
             poisoningUpperBytes
         )

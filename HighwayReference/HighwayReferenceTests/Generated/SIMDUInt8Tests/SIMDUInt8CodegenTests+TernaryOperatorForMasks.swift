@@ -10,8 +10,8 @@ extension SIMDUInt8CodegenTests {
     @Test func selecting() {
         let mismatches = Mismatches("portSelectingU8")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x409D_DDF9_727E_EE9C)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x409D_DEF9_727E_F04F)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x409D_DFF9_727E_F202)
+        let aInputs = Inputs.vectors(H.self, seed: 0x409D_DEF9_727E_F04F)
+        let bInputs = Inputs.vectors(H.self, seed: 0x409D_DFF9_727E_F202)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x67E4_91BD_2855_D770)
         {
             mismatches.check(
@@ -26,7 +26,7 @@ extension SIMDUInt8CodegenTests {
     @Test func selectingConstantA() {
         let mismatches = Mismatches("portSelectingU8ConstantA")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB8C9_F8FC_924D_3A15)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB8C9_F6FC_924D_36AF)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB8C9_F6FC_924D_36AF)
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 portSelectingU8ConstantA(mask, b),
@@ -40,7 +40,7 @@ extension SIMDUInt8CodegenTests {
     @Test func selectingConstantB() {
         let mismatches = Mismatches("portSelectingU8ConstantB")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xAFC8_41FC_8D1A_5FA0)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAFC8_42FC_8D1A_6153)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAFC8_42FC_8D1A_6153)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portSelectingU8ConstantB(mask, a),
@@ -54,7 +54,7 @@ extension SIMDUInt8CodegenTests {
     @Test func selectingOrZero() {
         let mismatches = Mismatches("portSelectingOrZeroU8")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB40A_32B8_EF89_86E7)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB40A_31B8_EF89_8534)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB40A_31B8_EF89_8534)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portSelectingOrZeroU8(mask, a),
@@ -81,7 +81,7 @@ extension SIMDUInt8CodegenTests {
     @Test func zeroingSelected() {
         let mismatches = Mismatches("portZeroingSelectedU8")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF8DA_78CA_E2F9_7603)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF8DA_77CA_E2F9_7450)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF8DA_77CA_E2F9_7450)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portZeroingSelectedU8(mask, a),
@@ -107,9 +107,9 @@ extension SIMDUInt8CodegenTests {
 
     @Test func selectingByVector() {
         let mismatches = Mismatches("portSelectingByVectorU8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8C38_4627_AFCB_3E7A)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8C38_4727_AFCB_402D)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x8C38_4427_AFCB_3B14)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8C38_4627_AFCB_3E7A)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8C38_4727_AFCB_402D)
+        let cInputs = Inputs.vectors(H.self, seed: 0x8C38_4427_AFCB_3B14)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xDF2C_804F_0D47_77BE) {
             mismatches.check(
                 portSelectingByVectorU8(a, b, c),
@@ -122,8 +122,8 @@ extension SIMDUInt8CodegenTests {
 
     @Test func selectingByVectorConstantA() {
         let mismatches = Mismatches("portSelectingByVectorU8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCCB7_EE5A_16CF_F588)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xCCB7_F15A_16CF_FAA1)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCCB7_EE5A_16CF_F588)
+        let cInputs = Inputs.vectors(H.self, seed: 0xCCB7_F15A_16CF_FAA1)
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 portSelectingByVectorU8ConstantA(b, c),
@@ -136,8 +136,8 @@ extension SIMDUInt8CodegenTests {
 
     @Test func selectingByVectorConstantB() {
         let mismatches = Mismatches("portSelectingByVectorU8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE60A_745A_24F7_953A)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xE60A_725A_24F7_91D4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE60A_745A_24F7_953A)
+        let cInputs = Inputs.vectors(H.self, seed: 0xE60A_725A_24F7_91D4)
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 portSelectingByVectorU8ConstantB(a, c),
@@ -150,8 +150,8 @@ extension SIMDUInt8CodegenTests {
 
     @Test func selectingByVectorConstantC() {
         let mismatches = Mismatches("portSelectingByVectorU8ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDE4E_BD5A_20D9_7D65)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xDE4E_BC5A_20D9_7BB2)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDE4E_BD5A_20D9_7D65)
+        let bInputs = Inputs.vectors(H.self, seed: 0xDE4E_BC5A_20D9_7BB2)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portSelectingByVectorU8ConstantC(a, b),

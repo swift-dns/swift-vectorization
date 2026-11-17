@@ -9,7 +9,7 @@ public func portMaximumWhereI16(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.maximum(a, b, where: mask)
+    SIMD<Int16>.maximum(a, b, where: mask)
 }
 
 @inline(never)
@@ -18,7 +18,7 @@ public func highwayMaximumWhereI16(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.maximumWhereI16(mask.raw, a.raw, b.raw))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.maximumWhereI16(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -26,7 +26,7 @@ public func portMaximumWhereI16ConstantA(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.maximum(SIMDInt16.repeating(26), b, where: mask)
+    SIMD<Int16>.maximum(SIMD<Int16>.repeating(26), b, where: mask)
 }
 
 @inline(never)
@@ -34,10 +34,10 @@ public func highwayMaximumWhereI16ConstantA(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.maximumWhereI16(
             mask.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw
         )
     )
@@ -48,7 +48,7 @@ public func portMaximumWhereI16ConstantB(
     _ a: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.maximum(a, SIMDInt16.repeating(26), where: mask)
+    SIMD<Int16>.maximum(a, SIMD<Int16>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -56,11 +56,11 @@ public func highwayMaximumWhereI16ConstantB(
     _ a: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.maximumWhereI16(
             mask.raw,
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
@@ -71,7 +71,7 @@ public func portAddingWhereI16(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.adding(a, b, where: mask)
+    SIMD<Int16>.adding(a, b, where: mask)
 }
 
 @inline(never)
@@ -80,7 +80,7 @@ public func highwayAddingWhereI16(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.addingWhereI16(mask.raw, a.raw, b.raw))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.addingWhereI16(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -88,7 +88,7 @@ public func portAddingWhereI16ConstantA(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.adding(SIMDInt16.repeating(26), b, where: mask)
+    SIMD<Int16>.adding(SIMD<Int16>.repeating(26), b, where: mask)
 }
 
 @inline(never)
@@ -96,10 +96,10 @@ public func highwayAddingWhereI16ConstantA(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.addingWhereI16(
             mask.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw
         )
     )
@@ -110,7 +110,7 @@ public func portAddingWhereI16ConstantB(
     _ a: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.adding(a, SIMDInt16.repeating(26), where: mask)
+    SIMD<Int16>.adding(a, SIMD<Int16>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -118,11 +118,11 @@ public func highwayAddingWhereI16ConstantB(
     _ a: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.addingWhereI16(
             mask.raw,
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
@@ -133,7 +133,7 @@ public func portSubtractingWhereI16(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.subtracting(a, b, where: mask)
+    SIMD<Int16>.subtracting(a, b, where: mask)
 }
 
 @inline(never)
@@ -142,7 +142,7 @@ public func highwaySubtractingWhereI16(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.subtractingWhereI16(mask.raw, a.raw, b.raw))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.subtractingWhereI16(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -150,7 +150,7 @@ public func portSubtractingWhereI16ConstantA(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.subtracting(SIMDInt16.repeating(26), b, where: mask)
+    SIMD<Int16>.subtracting(SIMD<Int16>.repeating(26), b, where: mask)
 }
 
 @inline(never)
@@ -158,10 +158,10 @@ public func highwaySubtractingWhereI16ConstantA(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.subtractingWhereI16(
             mask.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw
         )
     )
@@ -172,7 +172,7 @@ public func portSubtractingWhereI16ConstantB(
     _ a: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.subtracting(a, SIMDInt16.repeating(26), where: mask)
+    SIMD<Int16>.subtracting(a, SIMD<Int16>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -180,11 +180,11 @@ public func highwaySubtractingWhereI16ConstantB(
     _ a: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.subtractingWhereI16(
             mask.raw,
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
@@ -195,7 +195,7 @@ public func portMultiplyingWhereI16(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.multiplying(a, b, where: mask)
+    SIMD<Int16>.multiplying(a, b, where: mask)
 }
 
 @inline(never)
@@ -204,7 +204,7 @@ public func highwayMultiplyingWhereI16(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.multiplyingWhereI16(mask.raw, a.raw, b.raw))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.multiplyingWhereI16(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -212,7 +212,7 @@ public func portMultiplyingWhereI16ConstantA(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.multiplying(SIMDInt16.repeating(26), b, where: mask)
+    SIMD<Int16>.multiplying(SIMD<Int16>.repeating(26), b, where: mask)
 }
 
 @inline(never)
@@ -220,10 +220,10 @@ public func highwayMultiplyingWhereI16ConstantA(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplyingWhereI16(
             mask.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw
         )
     )
@@ -234,7 +234,7 @@ public func portMultiplyingWhereI16ConstantB(
     _ a: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.multiplying(a, SIMDInt16.repeating(26), where: mask)
+    SIMD<Int16>.multiplying(a, SIMD<Int16>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -242,11 +242,11 @@ public func highwayMultiplyingWhereI16ConstantB(
     _ a: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplyingWhereI16(
             mask.raw,
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
@@ -257,7 +257,7 @@ public func portDividingWhereI16(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.dividing(a, b, where: mask)
+    SIMD<Int16>.dividing(a, b, where: mask)
 }
 
 @inline(never)
@@ -266,7 +266,7 @@ public func highwayDividingWhereI16(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.dividingWhereI16(mask.raw, a.raw, b.raw))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.dividingWhereI16(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -274,7 +274,7 @@ public func portDividingWhereI16ConstantA(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.dividing(SIMDInt16.repeating(26), b, where: mask)
+    SIMD<Int16>.dividing(SIMD<Int16>.repeating(26), b, where: mask)
 }
 
 @inline(never)
@@ -282,10 +282,10 @@ public func highwayDividingWhereI16ConstantA(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.dividingWhereI16(
             mask.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw
         )
     )
@@ -296,7 +296,7 @@ public func portDividingWhereI16ConstantB(
     _ a: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.dividing(a, SIMDInt16.repeating(26), where: mask)
+    SIMD<Int16>.dividing(a, SIMD<Int16>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -304,11 +304,11 @@ public func highwayDividingWhereI16ConstantB(
     _ a: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.dividingWhereI16(
             mask.raw,
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
@@ -319,7 +319,7 @@ public func portSaturatingAddingWhereI16(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.saturatingAdding(a, b, where: mask)
+    SIMD<Int16>.saturatingAdding(a, b, where: mask)
 }
 
 @inline(never)
@@ -328,7 +328,7 @@ public func highwaySaturatingAddingWhereI16(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.saturatingAddingWhereI16(mask.raw, a.raw, b.raw))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.saturatingAddingWhereI16(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -336,7 +336,7 @@ public func portSaturatingAddingWhereI16ConstantA(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.saturatingAdding(SIMDInt16.repeating(26), b, where: mask)
+    SIMD<Int16>.saturatingAdding(SIMD<Int16>.repeating(26), b, where: mask)
 }
 
 @inline(never)
@@ -344,10 +344,10 @@ public func highwaySaturatingAddingWhereI16ConstantA(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.saturatingAddingWhereI16(
             mask.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw
         )
     )
@@ -358,7 +358,7 @@ public func portSaturatingAddingWhereI16ConstantB(
     _ a: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.saturatingAdding(a, SIMDInt16.repeating(26), where: mask)
+    SIMD<Int16>.saturatingAdding(a, SIMD<Int16>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -366,11 +366,11 @@ public func highwaySaturatingAddingWhereI16ConstantB(
     _ a: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.saturatingAddingWhereI16(
             mask.raw,
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
@@ -381,7 +381,7 @@ public func portSaturatingSubtractingWhereI16(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.saturatingSubtracting(a, b, where: mask)
+    SIMD<Int16>.saturatingSubtracting(a, b, where: mask)
 }
 
 @inline(never)
@@ -390,9 +390,7 @@ public func highwaySaturatingSubtractingWhereI16(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
-        raw: HighwayReference.Nothrow.saturatingSubtractingWhereI16(mask.raw, a.raw, b.raw)
-    )
+    SIMD<Int16>(raw: HighwayReference.Nothrow.saturatingSubtractingWhereI16(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -400,7 +398,7 @@ public func portSaturatingSubtractingWhereI16ConstantA(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.saturatingSubtracting(SIMDInt16.repeating(26), b, where: mask)
+    SIMD<Int16>.saturatingSubtracting(SIMD<Int16>.repeating(26), b, where: mask)
 }
 
 @inline(never)
@@ -408,10 +406,10 @@ public func highwaySaturatingSubtractingWhereI16ConstantA(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.saturatingSubtractingWhereI16(
             mask.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw
         )
     )
@@ -422,7 +420,7 @@ public func portSaturatingSubtractingWhereI16ConstantB(
     _ a: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.saturatingSubtracting(a, SIMDInt16.repeating(26), where: mask)
+    SIMD<Int16>.saturatingSubtracting(a, SIMD<Int16>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -430,37 +428,37 @@ public func highwaySaturatingSubtractingWhereI16ConstantB(
     _ a: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.saturatingSubtractingWhereI16(
             mask.raw,
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portMagnitudeWhereI16(_ a: SIMD<Int16>, where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
-    SIMDInt16.magnitude(a, where: mask)
+    SIMD<Int16>.magnitude(a, where: mask)
 }
 
 @inline(never)
 public func highwayMagnitudeWhereI16(_ a: SIMD<Int16>, where mask: SIMD<Int16>.Mask) -> SIMD<Int16>
 {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.magnitudeWhereI16(mask.raw, a.raw))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.magnitudeWhereI16(mask.raw, a.raw))
 }
 
 @inline(never)
 public func portMagnitudeWhereI16ConstantA(where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
-    SIMDInt16.magnitude(SIMDInt16.repeating(26), where: mask)
+    SIMD<Int16>.magnitude(SIMD<Int16>.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayMagnitudeWhereI16ConstantA(where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.magnitudeWhereI16(
             mask.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
@@ -471,7 +469,7 @@ public func portMultiplyingFixedPoint15WhereI16(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.multiplyingFixedPoint15(a, b, where: mask)
+    SIMD<Int16>.multiplyingFixedPoint15(a, b, where: mask)
 }
 
 @inline(never)
@@ -480,7 +478,7 @@ public func highwayMultiplyingFixedPoint15WhereI16(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplyingFixedPoint15WhereI16(mask.raw, a.raw, b.raw)
     )
 }
@@ -490,7 +488,7 @@ public func portMultiplyingFixedPoint15WhereI16ConstantA(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.multiplyingFixedPoint15(SIMDInt16.repeating(26), b, where: mask)
+    SIMD<Int16>.multiplyingFixedPoint15(SIMD<Int16>.repeating(26), b, where: mask)
 }
 
 @inline(never)
@@ -498,10 +496,10 @@ public func highwayMultiplyingFixedPoint15WhereI16ConstantA(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplyingFixedPoint15WhereI16(
             mask.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw
         )
     )
@@ -512,7 +510,7 @@ public func portMultiplyingFixedPoint15WhereI16ConstantB(
     _ a: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.multiplyingFixedPoint15(a, SIMDInt16.repeating(26), where: mask)
+    SIMD<Int16>.multiplyingFixedPoint15(a, SIMD<Int16>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -520,11 +518,11 @@ public func highwayMultiplyingFixedPoint15WhereI16ConstantB(
     _ a: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplyingFixedPoint15WhereI16(
             mask.raw,
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
@@ -536,7 +534,7 @@ public func portMultiplyAddingWhereI16(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.multiplyAdding(a, b, c, where: mask)
+    SIMD<Int16>.multiplyAdding(a, b, c, where: mask)
 }
 
 @inline(never)
@@ -546,9 +544,7 @@ public func highwayMultiplyAddingWhereI16(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
-        raw: HighwayReference.Nothrow.multiplyAddingWhereI16(mask.raw, a.raw, b.raw, c.raw)
-    )
+    SIMD<Int16>(raw: HighwayReference.Nothrow.multiplyAddingWhereI16(mask.raw, a.raw, b.raw, c.raw))
 }
 
 @inline(never)
@@ -557,7 +553,7 @@ public func portMultiplyAddingWhereI16ConstantA(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.multiplyAdding(SIMDInt16.repeating(26), b, c, where: mask)
+    SIMD<Int16>.multiplyAdding(SIMD<Int16>.repeating(26), b, c, where: mask)
 }
 
 @inline(never)
@@ -566,10 +562,10 @@ public func highwayMultiplyAddingWhereI16ConstantA(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplyAddingWhereI16(
             mask.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw,
             c.raw
         )
@@ -582,7 +578,7 @@ public func portMultiplyAddingWhereI16ConstantB(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.multiplyAdding(a, SIMDInt16.repeating(26), c, where: mask)
+    SIMD<Int16>.multiplyAdding(a, SIMD<Int16>.repeating(26), c, where: mask)
 }
 
 @inline(never)
@@ -591,11 +587,11 @@ public func highwayMultiplyAddingWhereI16ConstantB(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplyAddingWhereI16(
             mask.raw,
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             c.raw
         )
     )
@@ -607,7 +603,7 @@ public func portMultiplyAddingWhereI16ConstantC(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.multiplyAdding(a, b, SIMDInt16.repeating(26), where: mask)
+    SIMD<Int16>.multiplyAdding(a, b, SIMD<Int16>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -616,12 +612,12 @@ public func highwayMultiplyAddingWhereI16ConstantC(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplyAddingWhereI16(
             mask.raw,
             a.raw,
             b.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
@@ -633,7 +629,7 @@ public func portMultiplySubtractingWhereI16(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.multiplySubtracting(a, b, c, where: mask)
+    SIMD<Int16>.multiplySubtracting(a, b, c, where: mask)
 }
 
 @inline(never)
@@ -643,7 +639,7 @@ public func highwayMultiplySubtractingWhereI16(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplySubtractingWhereI16(mask.raw, a.raw, b.raw, c.raw)
     )
 }
@@ -654,7 +650,7 @@ public func portMultiplySubtractingWhereI16ConstantA(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.multiplySubtracting(SIMDInt16.repeating(26), b, c, where: mask)
+    SIMD<Int16>.multiplySubtracting(SIMD<Int16>.repeating(26), b, c, where: mask)
 }
 
 @inline(never)
@@ -663,10 +659,10 @@ public func highwayMultiplySubtractingWhereI16ConstantA(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplySubtractingWhereI16(
             mask.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw,
             c.raw
         )
@@ -679,7 +675,7 @@ public func portMultiplySubtractingWhereI16ConstantB(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.multiplySubtracting(a, SIMDInt16.repeating(26), c, where: mask)
+    SIMD<Int16>.multiplySubtracting(a, SIMD<Int16>.repeating(26), c, where: mask)
 }
 
 @inline(never)
@@ -688,11 +684,11 @@ public func highwayMultiplySubtractingWhereI16ConstantB(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplySubtractingWhereI16(
             mask.raw,
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             c.raw
         )
     )
@@ -704,7 +700,7 @@ public func portMultiplySubtractingWhereI16ConstantC(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.multiplySubtracting(a, b, SIMDInt16.repeating(26), where: mask)
+    SIMD<Int16>.multiplySubtracting(a, b, SIMD<Int16>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -713,12 +709,12 @@ public func highwayMultiplySubtractingWhereI16ConstantC(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplySubtractingWhereI16(
             mask.raw,
             a.raw,
             b.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
@@ -730,7 +726,7 @@ public func portNegatedMultiplyAddingWhereI16(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.negatedMultiplyAdding(a, b, c, where: mask)
+    SIMD<Int16>.negatedMultiplyAdding(a, b, c, where: mask)
 }
 
 @inline(never)
@@ -740,7 +736,7 @@ public func highwayNegatedMultiplyAddingWhereI16(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereI16(mask.raw, a.raw, b.raw, c.raw)
     )
 }
@@ -751,7 +747,7 @@ public func portNegatedMultiplyAddingWhereI16ConstantA(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.negatedMultiplyAdding(SIMDInt16.repeating(26), b, c, where: mask)
+    SIMD<Int16>.negatedMultiplyAdding(SIMD<Int16>.repeating(26), b, c, where: mask)
 }
 
 @inline(never)
@@ -760,10 +756,10 @@ public func highwayNegatedMultiplyAddingWhereI16ConstantA(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereI16(
             mask.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw,
             c.raw
         )
@@ -776,7 +772,7 @@ public func portNegatedMultiplyAddingWhereI16ConstantB(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.negatedMultiplyAdding(a, SIMDInt16.repeating(26), c, where: mask)
+    SIMD<Int16>.negatedMultiplyAdding(a, SIMD<Int16>.repeating(26), c, where: mask)
 }
 
 @inline(never)
@@ -785,11 +781,11 @@ public func highwayNegatedMultiplyAddingWhereI16ConstantB(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereI16(
             mask.raw,
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             c.raw
         )
     )
@@ -801,7 +797,7 @@ public func portNegatedMultiplyAddingWhereI16ConstantC(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.negatedMultiplyAdding(a, b, SIMDInt16.repeating(26), where: mask)
+    SIMD<Int16>.negatedMultiplyAdding(a, b, SIMD<Int16>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -810,12 +806,12 @@ public func highwayNegatedMultiplyAddingWhereI16ConstantC(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereI16(
             mask.raw,
             a.raw,
             b.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
@@ -827,7 +823,7 @@ public func portNegatedMultiplySubtractingWhereI16(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.negatedMultiplySubtracting(a, b, c, where: mask)
+    SIMD<Int16>.negatedMultiplySubtracting(a, b, c, where: mask)
 }
 
 @inline(never)
@@ -837,7 +833,7 @@ public func highwayNegatedMultiplySubtractingWhereI16(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereI16(
             mask.raw,
             a.raw,
@@ -853,7 +849,7 @@ public func portNegatedMultiplySubtractingWhereI16ConstantA(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.negatedMultiplySubtracting(SIMDInt16.repeating(26), b, c, where: mask)
+    SIMD<Int16>.negatedMultiplySubtracting(SIMD<Int16>.repeating(26), b, c, where: mask)
 }
 
 @inline(never)
@@ -862,10 +858,10 @@ public func highwayNegatedMultiplySubtractingWhereI16ConstantA(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereI16(
             mask.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw,
             c.raw
         )
@@ -878,7 +874,7 @@ public func portNegatedMultiplySubtractingWhereI16ConstantB(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.negatedMultiplySubtracting(a, SIMDInt16.repeating(26), c, where: mask)
+    SIMD<Int16>.negatedMultiplySubtracting(a, SIMD<Int16>.repeating(26), c, where: mask)
 }
 
 @inline(never)
@@ -887,11 +883,11 @@ public func highwayNegatedMultiplySubtractingWhereI16ConstantB(
     _ c: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereI16(
             mask.raw,
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             c.raw
         )
     )
@@ -903,7 +899,7 @@ public func portNegatedMultiplySubtractingWhereI16ConstantC(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.negatedMultiplySubtracting(a, b, SIMDInt16.repeating(26), where: mask)
+    SIMD<Int16>.negatedMultiplySubtracting(a, b, SIMD<Int16>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -912,12 +908,12 @@ public func highwayNegatedMultiplySubtractingWhereI16ConstantC(
     _ b: SIMD<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereI16(
             mask.raw,
             a.raw,
             b.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }

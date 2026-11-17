@@ -16,7 +16,7 @@ extension HighwayReferenceInt16 {
     public static func loadExpanded(fromUnchecked span: Span<Lane>, where mask: Mask) -> SIMD {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return span.withUnsafeBufferPointer {
-            unsafe SIMDInt16.Vector(
+            unsafe SIMD(
                 raw: HighwayReference.Nothrow.loadExpandedWhereI16(
                     mask.raw,
                     $0.baseAddress.unsafelyUnwrapped
@@ -45,7 +45,7 @@ extension HighwayReferenceInt16 {
     ) -> SIMD {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return span.withUnsafeBufferPointer {
-            unsafe SIMDInt16.Vector(
+            unsafe SIMD(
                 raw: HighwayReference.Nothrow.loadExpandedWhereOtherwiseI16(
                     otherwise.raw,
                     mask.raw,
@@ -59,24 +59,24 @@ extension HighwayReferenceInt16 {
 
 @inline(never)
 public func portExpandedI16(_ a: SIMD<Int16>, where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
-    SIMDInt16.expanded(a, where: mask)
+    SIMD<Int16>.expanded(a, where: mask)
 }
 
 @inline(never)
 public func highwayExpandedI16(_ a: SIMD<Int16>, where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.expandedI16(a.raw, mask.raw))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.expandedI16(a.raw, mask.raw))
 }
 
 @inline(never)
 public func portExpandedI16ConstantA(where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
-    SIMDInt16.expanded(SIMDInt16.repeating(26), where: mask)
+    SIMD<Int16>.expanded(SIMD<Int16>.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayExpandedI16ConstantA(where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
-    SIMDInt16.Vector(
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.expandedI16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             mask.raw
         )
     )
@@ -87,7 +87,7 @@ public func portLoadExpandedWhereI16(
     from: UnsafePointer<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    unsafe SIMDInt16.loadExpanded(from: from, where: mask)
+    unsafe SIMD<Int16>.loadExpanded(from: from, where: mask)
 }
 
 @inline(never)
@@ -95,7 +95,7 @@ public func highwayLoadExpandedWhereI16(
     from: UnsafePointer<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    unsafe SIMDInt16.Vector(raw: HighwayReference.Nothrow.loadExpandedWhereI16(mask.raw, from))
+    unsafe SIMD<Int16>(raw: HighwayReference.Nothrow.loadExpandedWhereI16(mask.raw, from))
 }
 
 @inline(never)
@@ -104,7 +104,7 @@ public func portLoadExpandedWhereOtherwiseI16(
     where mask: SIMD<Int16>.Mask,
     otherwise: SIMD<Int16>
 ) -> SIMD<Int16> {
-    unsafe SIMDInt16.loadExpanded(from: from, where: mask, otherwise: otherwise)
+    unsafe SIMD<Int16>.loadExpanded(from: from, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -113,7 +113,7 @@ public func highwayLoadExpandedWhereOtherwiseI16(
     where mask: SIMD<Int16>.Mask,
     otherwise: SIMD<Int16>
 ) -> SIMD<Int16> {
-    unsafe SIMDInt16.Vector(
+    unsafe SIMD<Int16>(
         raw: HighwayReference.Nothrow.loadExpandedWhereOtherwiseI16(otherwise.raw, mask.raw, from)
     )
 }
@@ -123,7 +123,7 @@ public func portLoadExpandedWhereOtherwiseI16ConstantOtherwise(
     from: UnsafePointer<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    unsafe SIMDInt16.loadExpanded(from: from, where: mask, otherwise: SIMDInt16.repeating(26))
+    unsafe SIMD<Int16>.loadExpanded(from: from, where: mask, otherwise: SIMD<Int16>.repeating(26))
 }
 
 @inline(never)
@@ -131,9 +131,9 @@ public func highwayLoadExpandedWhereOtherwiseI16ConstantOtherwise(
     from: UnsafePointer<Int16>,
     where mask: SIMD<Int16>.Mask
 ) -> SIMD<Int16> {
-    unsafe SIMDInt16.Vector(
+    unsafe SIMD<Int16>(
         raw: HighwayReference.Nothrow.loadExpandedWhereOtherwiseI16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             mask.raw,
             from
         )

@@ -9,7 +9,7 @@ extension SIMDDoubleConstantTests {
     @inline(__always)
     private func checkExtractingBlockConstantIndex(_ index: Int) {
         let mismatches = Mismatches("extractingBlock with index \(index)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3D93_97A1_6A66_267B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3D93_97A1_6A66_267B)
         for a in aInputs {
             mismatches.check(
                 H.block(a, at: index),
@@ -44,7 +44,7 @@ extension SIMDDoubleConstantTests {
     @inline(__always)
     private func checkExtractingBlockUncheckedConstantIndex(_ index: Int) {
         let mismatches = Mismatches("extractingBlock unchecked with index \(index)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x346C_73A5_F411_2CE7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x346C_73A5_F411_2CE7)
         for a in aInputs {
             mismatches.check(
                 unsafe H.block(a, atUnchecked: index),
@@ -77,10 +77,14 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkExtractingBlockConstantA(_ value: H.Lane) {
+    private func checkExtractingBlockConstantA(_ value: Lane) {
         let mismatches = Mismatches("extractingBlock with a repeating \(hex(value))")
         let indexInputs = Array(0...H.laneCount / 2 - 1)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for index in indexInputs {
             mismatches.check(
                 H.block(H.repeating(value), at: index),
@@ -153,7 +157,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func extractingBlockConstantSplatPayloadNaN() {
-        checkExtractingBlockConstantA(H.Lane(nan: 1, signaling: false))
+        checkExtractingBlockConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func extractingBlockConstantSplatSignalingNaN() {
@@ -175,14 +179,20 @@ extension SIMDDoubleConstantTests {
     @inline(__always)
     private func checkReplacingBlockConstantIndex(_ index: Int) {
         let mismatches = Mismatches("replacingBlock with index \(index)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB274_A273_8FED_12C7)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB274_A273_8FED_12C7)
         let bInputs = Inputs.vectors(H.BlockVector.self, seed: 0xB274_A473_8FED_162D).map(
             poisoningUpperBytes
         )
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.replacingBlock(a, at: index, with: b),
-                HighwayReference.replacingBlockF64(a.raw, Int32(truncatingIfNeeded: index), b.raw),
+                H(
+                    raw: HighwayReference.replacingBlockF64(
+                        a.raw,
+                        Int32(truncatingIfNeeded: index),
+                        b.raw
+                    )
+                ),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -208,14 +218,20 @@ extension SIMDDoubleConstantTests {
     @inline(__always)
     private func checkReplacingBlockUncheckedConstantIndex(_ index: Int) {
         let mismatches = Mismatches("replacingBlock unchecked with index \(index)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1F49_0862_D0F7_2F43)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1F49_0862_D0F7_2F43)
         let bInputs = Inputs.vectors(H.BlockVector.self, seed: 0x1F49_0A62_D0F7_32A9).map(
             poisoningUpperBytes
         )
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 unsafe H.replacingBlock(a, atUnchecked: index, with: b),
-                HighwayReference.replacingBlockF64(a.raw, Int32(truncatingIfNeeded: index), b.raw),
+                H(
+                    raw: HighwayReference.replacingBlockF64(
+                        a.raw,
+                        Int32(truncatingIfNeeded: index),
+                        b.raw
+                    )
+                ),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -239,20 +255,26 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkReplacingBlockConstantA(_ value: H.Lane) {
+    private func checkReplacingBlockConstantA(_ value: Lane) {
         let mismatches = Mismatches("replacingBlock with a repeating \(hex(value))")
         let indexInputs = Array(0...H.laneCount / 2 - 1)
         let bInputs = Inputs.vectors(H.BlockVector.self, seed: 0x87D4_E7F2_A684_35D6).map(
             poisoningUpperBytes
         )
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (index, b) in everyPair(indexInputs, bInputs) {
             mismatches.check(
                 H.replacingBlock(H.repeating(value), at: index, with: b),
-                HighwayReference.replacingBlockF64(
-                    H.repeating(value).raw,
-                    Int32(truncatingIfNeeded: index),
-                    b.raw
+                H(
+                    raw: HighwayReference.replacingBlockF64(
+                        H.repeating(value).raw,
+                        Int32(truncatingIfNeeded: index),
+                        b.raw
+                    )
                 ),
                 "index: \(index), b: \(describe(b))"
             )
@@ -317,7 +339,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func replacingBlockConstantSplatPayloadNaN() {
-        checkReplacingBlockConstantA(H.Lane(nan: 1, signaling: false))
+        checkReplacingBlockConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func replacingBlockConstantSplatSignalingNaN() {

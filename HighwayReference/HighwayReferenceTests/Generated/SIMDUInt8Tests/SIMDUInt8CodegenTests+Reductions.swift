@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDUInt8CodegenTests {
     @Test func sum() {
         let mismatches = Mismatches("portSumU8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF530_E849_F859_1F1F)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF530_E849_F859_1F1F)
         for a in aInputs {
             mismatches.check(portSumU8(a), highwaySumU8(a), "a: \(describe(a))")
         }
@@ -24,7 +24,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func smallest() {
         let mismatches = Mismatches("portSmallestU8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x00BE_6DDB_4F06_40D3)
+        let aInputs = Inputs.vectors(H.self, seed: 0x00BE_6DDB_4F06_40D3)
         for a in aInputs {
             mismatches.check(portSmallestU8(a), highwaySmallestU8(a), "a: \(describe(a))")
         }
@@ -39,7 +39,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func largest() {
         let mismatches = Mismatches("portLargestU8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB673_6E48_4BD5_252C)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB673_6E48_4BD5_252C)
         for a in aInputs {
             mismatches.check(portLargestU8(a), highwayLargestU8(a), "a: \(describe(a))")
         }
@@ -54,7 +54,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func repeatingSum() {
         let mismatches = Mismatches("portRepeatingSumU8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6D38_9F4D_125F_0116)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6D38_9F4D_125F_0116)
         for a in aInputs {
             mismatches.check(portRepeatingSumU8(a), highwayRepeatingSumU8(a), "a: \(describe(a))")
         }
@@ -69,7 +69,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func repeatingSmallest() {
         let mismatches = Mismatches("portRepeatingSmallestU8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x972B_7A3F_79FD_3E98)
+        let aInputs = Inputs.vectors(H.self, seed: 0x972B_7A3F_79FD_3E98)
         for a in aInputs {
             mismatches.check(
                 portRepeatingSmallestU8(a),
@@ -92,7 +92,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func repeatingLargest() {
         let mismatches = Mismatches("portRepeatingLargestU8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2F5A_2026_1DED_CBC1)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2F5A_2026_1DED_CBC1)
         for a in aInputs {
             mismatches.check(
                 portRepeatingLargestU8(a),

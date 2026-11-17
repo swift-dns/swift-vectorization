@@ -5,26 +5,26 @@ public import Vectorization
 
 @inline(never)
 public func portCreate2I32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> (SIMD<Int32>, SIMD<Int32>) {
-    SIMDInt32.create2(a, b)
+    SIMD<Int32>.create2(a, b)
 }
 
 @inline(never)
 public func highwayCreate2I32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> (SIMD<Int32>, SIMD<Int32>) {
-    { tuple in (SIMDInt32.Vector(raw: tuple.v0), SIMDInt32.Vector(raw: tuple.v1)) }(
+    { tuple in (SIMD<Int32>(raw: tuple.v0), SIMD<Int32>(raw: tuple.v1)) }(
         HighwayReference.Nothrow.create2I32(a.raw, b.raw)
     )
 }
 
 @inline(never)
 public func portCreate2I32ConstantA(_ b: SIMD<Int32>) -> (SIMD<Int32>, SIMD<Int32>) {
-    SIMDInt32.create2(SIMDInt32.repeating(26), b)
+    SIMD<Int32>.create2(SIMD<Int32>.repeating(26), b)
 }
 
 @inline(never)
 public func highwayCreate2I32ConstantA(_ b: SIMD<Int32>) -> (SIMD<Int32>, SIMD<Int32>) {
-    { tuple in (SIMDInt32.Vector(raw: tuple.v0), SIMDInt32.Vector(raw: tuple.v1)) }(
+    { tuple in (SIMD<Int32>(raw: tuple.v0), SIMD<Int32>(raw: tuple.v1)) }(
         HighwayReference.Nothrow.create2I32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             b.raw
         )
     )
@@ -32,15 +32,15 @@ public func highwayCreate2I32ConstantA(_ b: SIMD<Int32>) -> (SIMD<Int32>, SIMD<I
 
 @inline(never)
 public func portCreate2I32ConstantB(_ a: SIMD<Int32>) -> (SIMD<Int32>, SIMD<Int32>) {
-    SIMDInt32.create2(a, SIMDInt32.repeating(26))
+    SIMD<Int32>.create2(a, SIMD<Int32>.repeating(26))
 }
 
 @inline(never)
 public func highwayCreate2I32ConstantB(_ a: SIMD<Int32>) -> (SIMD<Int32>, SIMD<Int32>) {
-    { tuple in (SIMDInt32.Vector(raw: tuple.v0), SIMDInt32.Vector(raw: tuple.v1)) }(
+    { tuple in (SIMD<Int32>(raw: tuple.v0), SIMD<Int32>(raw: tuple.v1)) }(
         HighwayReference.Nothrow.create2I32(
             a.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
         )
     )
 }
@@ -48,7 +48,7 @@ public func highwayCreate2I32ConstantB(_ a: SIMD<Int32>) -> (SIMD<Int32>, SIMD<I
 @inline(never)
 public func portGet2I32(_ tuple: (SIMD<Int32>, SIMD<Int32>), atUnchecked index: Int) -> SIMD<Int32>
 {
-    unsafe SIMDInt32.get2(tuple, atUnchecked: index)
+    unsafe SIMD<Int32>.get2(tuple, atUnchecked: index)
 }
 
 @inline(never)
@@ -56,7 +56,7 @@ public func highwayGet2I32(
     _ tuple: (SIMD<Int32>, SIMD<Int32>),
     atUnchecked index: Int
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.get2I32(
             cvectorization_ops_tuple2_i32(v0: tuple.0.raw, v1: tuple.1.raw),
             index
@@ -66,12 +66,12 @@ public func highwayGet2I32(
 
 @inline(never)
 public func portGet2I32ConstantIndex(_ tuple: (SIMD<Int32>, SIMD<Int32>)) -> SIMD<Int32> {
-    unsafe SIMDInt32.get2(tuple, atUnchecked: 1)
+    unsafe SIMD<Int32>.get2(tuple, atUnchecked: 1)
 }
 
 @inline(never)
 public func highwayGet2I32ConstantIndex(_ tuple: (SIMD<Int32>, SIMD<Int32>)) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.get2I32(
             cvectorization_ops_tuple2_i32(v0: tuple.0.raw, v1: tuple.1.raw),
             1
@@ -85,7 +85,7 @@ public func portSet2I32(
     atUnchecked index: Int,
     to a: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>) {
-    unsafe SIMDInt32.set2(tuple, atUnchecked: index, to: a)
+    unsafe SIMD<Int32>.set2(tuple, atUnchecked: index, to: a)
 }
 
 @inline(never)
@@ -94,7 +94,7 @@ public func highwaySet2I32(
     atUnchecked index: Int,
     to a: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>) {
-    { tuple in (SIMDInt32.Vector(raw: tuple.v0), SIMDInt32.Vector(raw: tuple.v1)) }(
+    { tuple in (SIMD<Int32>(raw: tuple.v0), SIMD<Int32>(raw: tuple.v1)) }(
         HighwayReference.Nothrow.set2I32(
             cvectorization_ops_tuple2_i32(v0: tuple.0.raw, v1: tuple.1.raw),
             index,
@@ -108,7 +108,7 @@ public func portSet2I32ConstantIndex(
     _ tuple: (SIMD<Int32>, SIMD<Int32>),
     to a: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>) {
-    unsafe SIMDInt32.set2(tuple, atUnchecked: 1, to: a)
+    unsafe SIMD<Int32>.set2(tuple, atUnchecked: 1, to: a)
 }
 
 @inline(never)
@@ -116,7 +116,7 @@ public func highwaySet2I32ConstantIndex(
     _ tuple: (SIMD<Int32>, SIMD<Int32>),
     to a: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>) {
-    { tuple in (SIMDInt32.Vector(raw: tuple.v0), SIMDInt32.Vector(raw: tuple.v1)) }(
+    { tuple in (SIMD<Int32>(raw: tuple.v0), SIMD<Int32>(raw: tuple.v1)) }(
         HighwayReference.Nothrow.set2I32(
             cvectorization_ops_tuple2_i32(v0: tuple.0.raw, v1: tuple.1.raw),
             1,
@@ -130,7 +130,7 @@ public func portSet2I32ConstantA(
     _ tuple: (SIMD<Int32>, SIMD<Int32>),
     atUnchecked index: Int
 ) -> (SIMD<Int32>, SIMD<Int32>) {
-    unsafe SIMDInt32.set2(tuple, atUnchecked: index, to: SIMDInt32.repeating(26))
+    unsafe SIMD<Int32>.set2(tuple, atUnchecked: index, to: SIMD<Int32>.repeating(26))
 }
 
 @inline(never)
@@ -138,11 +138,11 @@ public func highwaySet2I32ConstantA(
     _ tuple: (SIMD<Int32>, SIMD<Int32>),
     atUnchecked index: Int
 ) -> (SIMD<Int32>, SIMD<Int32>) {
-    { tuple in (SIMDInt32.Vector(raw: tuple.v0), SIMDInt32.Vector(raw: tuple.v1)) }(
+    { tuple in (SIMD<Int32>(raw: tuple.v0), SIMD<Int32>(raw: tuple.v1)) }(
         HighwayReference.Nothrow.set2I32(
             cvectorization_ops_tuple2_i32(v0: tuple.0.raw, v1: tuple.1.raw),
             index,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
         )
     )
 }
@@ -153,7 +153,7 @@ public func portCreate3I32(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
-    SIMDInt32.create3(a, b, c)
+    SIMD<Int32>.create3(a, b, c)
 }
 
 @inline(never)
@@ -162,11 +162,7 @@ public func highwayCreate3I32(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
-    { tuple in
-        (
-            SIMDInt32.Vector(raw: tuple.v0), SIMDInt32.Vector(raw: tuple.v1),
-            SIMDInt32.Vector(raw: tuple.v2)
-        )
+    { tuple in (SIMD<Int32>(raw: tuple.v0), SIMD<Int32>(raw: tuple.v1), SIMD<Int32>(raw: tuple.v2))
     }(HighwayReference.Nothrow.create3I32(a.raw, b.raw, c.raw))
 }
 
@@ -175,7 +171,7 @@ public func portCreate3I32ConstantA(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
-    SIMDInt32.create3(SIMDInt32.repeating(26), b, c)
+    SIMD<Int32>.create3(SIMD<Int32>.repeating(26), b, c)
 }
 
 @inline(never)
@@ -183,14 +179,10 @@ public func highwayCreate3I32ConstantA(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
-    { tuple in
-        (
-            SIMDInt32.Vector(raw: tuple.v0), SIMDInt32.Vector(raw: tuple.v1),
-            SIMDInt32.Vector(raw: tuple.v2)
-        )
+    { tuple in (SIMD<Int32>(raw: tuple.v0), SIMD<Int32>(raw: tuple.v1), SIMD<Int32>(raw: tuple.v2))
     }(
         HighwayReference.Nothrow.create3I32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             b.raw,
             c.raw
         )
@@ -202,7 +194,7 @@ public func portCreate3I32ConstantB(
     _ a: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
-    SIMDInt32.create3(a, SIMDInt32.repeating(26), c)
+    SIMD<Int32>.create3(a, SIMD<Int32>.repeating(26), c)
 }
 
 @inline(never)
@@ -210,15 +202,11 @@ public func highwayCreate3I32ConstantB(
     _ a: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
-    { tuple in
-        (
-            SIMDInt32.Vector(raw: tuple.v0), SIMDInt32.Vector(raw: tuple.v1),
-            SIMDInt32.Vector(raw: tuple.v2)
-        )
+    { tuple in (SIMD<Int32>(raw: tuple.v0), SIMD<Int32>(raw: tuple.v1), SIMD<Int32>(raw: tuple.v2))
     }(
         HighwayReference.Nothrow.create3I32(
             a.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             c.raw
         )
     )
@@ -229,7 +217,7 @@ public func portCreate3I32ConstantC(
     _ a: SIMD<Int32>,
     _ b: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
-    SIMDInt32.create3(a, b, SIMDInt32.repeating(26))
+    SIMD<Int32>.create3(a, b, SIMD<Int32>.repeating(26))
 }
 
 @inline(never)
@@ -237,16 +225,12 @@ public func highwayCreate3I32ConstantC(
     _ a: SIMD<Int32>,
     _ b: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
-    { tuple in
-        (
-            SIMDInt32.Vector(raw: tuple.v0), SIMDInt32.Vector(raw: tuple.v1),
-            SIMDInt32.Vector(raw: tuple.v2)
-        )
+    { tuple in (SIMD<Int32>(raw: tuple.v0), SIMD<Int32>(raw: tuple.v1), SIMD<Int32>(raw: tuple.v2))
     }(
         HighwayReference.Nothrow.create3I32(
             a.raw,
             b.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
         )
     )
 }
@@ -256,7 +240,7 @@ public func portGet3I32(
     _ tuple: (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>),
     atUnchecked index: Int
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.get3(tuple, atUnchecked: index)
+    unsafe SIMD<Int32>.get3(tuple, atUnchecked: index)
 }
 
 @inline(never)
@@ -264,7 +248,7 @@ public func highwayGet3I32(
     _ tuple: (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>),
     atUnchecked index: Int
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.get3I32(
             cvectorization_ops_tuple3_i32(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
             index
@@ -276,14 +260,14 @@ public func highwayGet3I32(
 public func portGet3I32ConstantIndex(
     _ tuple: (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>)
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.get3(tuple, atUnchecked: 1)
+    unsafe SIMD<Int32>.get3(tuple, atUnchecked: 1)
 }
 
 @inline(never)
 public func highwayGet3I32ConstantIndex(
     _ tuple: (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>)
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.get3I32(
             cvectorization_ops_tuple3_i32(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
             1
@@ -297,7 +281,7 @@ public func portSet3I32(
     atUnchecked index: Int,
     to a: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
-    unsafe SIMDInt32.set3(tuple, atUnchecked: index, to: a)
+    unsafe SIMD<Int32>.set3(tuple, atUnchecked: index, to: a)
 }
 
 @inline(never)
@@ -306,11 +290,7 @@ public func highwaySet3I32(
     atUnchecked index: Int,
     to a: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
-    { tuple in
-        (
-            SIMDInt32.Vector(raw: tuple.v0), SIMDInt32.Vector(raw: tuple.v1),
-            SIMDInt32.Vector(raw: tuple.v2)
-        )
+    { tuple in (SIMD<Int32>(raw: tuple.v0), SIMD<Int32>(raw: tuple.v1), SIMD<Int32>(raw: tuple.v2))
     }(
         HighwayReference.Nothrow.set3I32(
             cvectorization_ops_tuple3_i32(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
@@ -325,7 +305,7 @@ public func portSet3I32ConstantIndex(
     _ tuple: (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>),
     to a: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
-    unsafe SIMDInt32.set3(tuple, atUnchecked: 1, to: a)
+    unsafe SIMD<Int32>.set3(tuple, atUnchecked: 1, to: a)
 }
 
 @inline(never)
@@ -333,11 +313,7 @@ public func highwaySet3I32ConstantIndex(
     _ tuple: (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>),
     to a: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
-    { tuple in
-        (
-            SIMDInt32.Vector(raw: tuple.v0), SIMDInt32.Vector(raw: tuple.v1),
-            SIMDInt32.Vector(raw: tuple.v2)
-        )
+    { tuple in (SIMD<Int32>(raw: tuple.v0), SIMD<Int32>(raw: tuple.v1), SIMD<Int32>(raw: tuple.v2))
     }(
         HighwayReference.Nothrow.set3I32(
             cvectorization_ops_tuple3_i32(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
@@ -352,7 +328,7 @@ public func portSet3I32ConstantA(
     _ tuple: (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>),
     atUnchecked index: Int
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
-    unsafe SIMDInt32.set3(tuple, atUnchecked: index, to: SIMDInt32.repeating(26))
+    unsafe SIMD<Int32>.set3(tuple, atUnchecked: index, to: SIMD<Int32>.repeating(26))
 }
 
 @inline(never)
@@ -360,16 +336,12 @@ public func highwaySet3I32ConstantA(
     _ tuple: (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>),
     atUnchecked index: Int
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
-    { tuple in
-        (
-            SIMDInt32.Vector(raw: tuple.v0), SIMDInt32.Vector(raw: tuple.v1),
-            SIMDInt32.Vector(raw: tuple.v2)
-        )
+    { tuple in (SIMD<Int32>(raw: tuple.v0), SIMD<Int32>(raw: tuple.v1), SIMD<Int32>(raw: tuple.v2))
     }(
         HighwayReference.Nothrow.set3I32(
             cvectorization_ops_tuple3_i32(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
             index,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
         )
     )
 }
@@ -381,7 +353,7 @@ public func portCreate4I32(
     _ c: SIMD<Int32>,
     _ d: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
-    SIMDInt32.create4(a, b, c, d)
+    SIMD<Int32>.create4(a, b, c, d)
 }
 
 @inline(never)
@@ -393,8 +365,8 @@ public func highwayCreate4I32(
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
     { tuple in
         (
-            SIMDInt32.Vector(raw: tuple.v0), SIMDInt32.Vector(raw: tuple.v1),
-            SIMDInt32.Vector(raw: tuple.v2), SIMDInt32.Vector(raw: tuple.v3)
+            SIMD<Int32>(raw: tuple.v0), SIMD<Int32>(raw: tuple.v1), SIMD<Int32>(raw: tuple.v2),
+            SIMD<Int32>(raw: tuple.v3)
         )
     }(HighwayReference.Nothrow.create4I32(a.raw, b.raw, c.raw, d.raw))
 }
@@ -405,7 +377,7 @@ public func portCreate4I32ConstantA(
     _ c: SIMD<Int32>,
     _ d: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
-    SIMDInt32.create4(SIMDInt32.repeating(26), b, c, d)
+    SIMD<Int32>.create4(SIMD<Int32>.repeating(26), b, c, d)
 }
 
 @inline(never)
@@ -416,12 +388,12 @@ public func highwayCreate4I32ConstantA(
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
     { tuple in
         (
-            SIMDInt32.Vector(raw: tuple.v0), SIMDInt32.Vector(raw: tuple.v1),
-            SIMDInt32.Vector(raw: tuple.v2), SIMDInt32.Vector(raw: tuple.v3)
+            SIMD<Int32>(raw: tuple.v0), SIMD<Int32>(raw: tuple.v1), SIMD<Int32>(raw: tuple.v2),
+            SIMD<Int32>(raw: tuple.v3)
         )
     }(
         HighwayReference.Nothrow.create4I32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             b.raw,
             c.raw,
             d.raw
@@ -435,7 +407,7 @@ public func portCreate4I32ConstantB(
     _ c: SIMD<Int32>,
     _ d: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
-    SIMDInt32.create4(a, SIMDInt32.repeating(26), c, d)
+    SIMD<Int32>.create4(a, SIMD<Int32>.repeating(26), c, d)
 }
 
 @inline(never)
@@ -446,13 +418,13 @@ public func highwayCreate4I32ConstantB(
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
     { tuple in
         (
-            SIMDInt32.Vector(raw: tuple.v0), SIMDInt32.Vector(raw: tuple.v1),
-            SIMDInt32.Vector(raw: tuple.v2), SIMDInt32.Vector(raw: tuple.v3)
+            SIMD<Int32>(raw: tuple.v0), SIMD<Int32>(raw: tuple.v1), SIMD<Int32>(raw: tuple.v2),
+            SIMD<Int32>(raw: tuple.v3)
         )
     }(
         HighwayReference.Nothrow.create4I32(
             a.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             c.raw,
             d.raw
         )
@@ -465,7 +437,7 @@ public func portCreate4I32ConstantC(
     _ b: SIMD<Int32>,
     _ d: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
-    SIMDInt32.create4(a, b, SIMDInt32.repeating(26), d)
+    SIMD<Int32>.create4(a, b, SIMD<Int32>.repeating(26), d)
 }
 
 @inline(never)
@@ -476,14 +448,14 @@ public func highwayCreate4I32ConstantC(
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
     { tuple in
         (
-            SIMDInt32.Vector(raw: tuple.v0), SIMDInt32.Vector(raw: tuple.v1),
-            SIMDInt32.Vector(raw: tuple.v2), SIMDInt32.Vector(raw: tuple.v3)
+            SIMD<Int32>(raw: tuple.v0), SIMD<Int32>(raw: tuple.v1), SIMD<Int32>(raw: tuple.v2),
+            SIMD<Int32>(raw: tuple.v3)
         )
     }(
         HighwayReference.Nothrow.create4I32(
             a.raw,
             b.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             d.raw
         )
     )
@@ -495,7 +467,7 @@ public func portCreate4I32ConstantD(
     _ b: SIMD<Int32>,
     _ c: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
-    SIMDInt32.create4(a, b, c, SIMDInt32.repeating(26))
+    SIMD<Int32>.create4(a, b, c, SIMD<Int32>.repeating(26))
 }
 
 @inline(never)
@@ -506,15 +478,15 @@ public func highwayCreate4I32ConstantD(
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
     { tuple in
         (
-            SIMDInt32.Vector(raw: tuple.v0), SIMDInt32.Vector(raw: tuple.v1),
-            SIMDInt32.Vector(raw: tuple.v2), SIMDInt32.Vector(raw: tuple.v3)
+            SIMD<Int32>(raw: tuple.v0), SIMD<Int32>(raw: tuple.v1), SIMD<Int32>(raw: tuple.v2),
+            SIMD<Int32>(raw: tuple.v3)
         )
     }(
         HighwayReference.Nothrow.create4I32(
             a.raw,
             b.raw,
             c.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
         )
     )
 }
@@ -524,7 +496,7 @@ public func portGet4I32(
     _ tuple: (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>, SIMD<Int32>),
     atUnchecked index: Int
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.get4(tuple, atUnchecked: index)
+    unsafe SIMD<Int32>.get4(tuple, atUnchecked: index)
 }
 
 @inline(never)
@@ -532,7 +504,7 @@ public func highwayGet4I32(
     _ tuple: (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>, SIMD<Int32>),
     atUnchecked index: Int
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.get4I32(
             cvectorization_ops_tuple4_i32(
                 v0: tuple.0.raw,
@@ -549,14 +521,14 @@ public func highwayGet4I32(
 public func portGet4I32ConstantIndex(
     _ tuple: (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>, SIMD<Int32>)
 ) -> SIMD<Int32> {
-    unsafe SIMDInt32.get4(tuple, atUnchecked: 1)
+    unsafe SIMD<Int32>.get4(tuple, atUnchecked: 1)
 }
 
 @inline(never)
 public func highwayGet4I32ConstantIndex(
     _ tuple: (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>, SIMD<Int32>)
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.get4I32(
             cvectorization_ops_tuple4_i32(
                 v0: tuple.0.raw,
@@ -575,7 +547,7 @@ public func portSet4I32(
     atUnchecked index: Int,
     to a: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
-    unsafe SIMDInt32.set4(tuple, atUnchecked: index, to: a)
+    unsafe SIMD<Int32>.set4(tuple, atUnchecked: index, to: a)
 }
 
 @inline(never)
@@ -586,8 +558,8 @@ public func highwaySet4I32(
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
     { tuple in
         (
-            SIMDInt32.Vector(raw: tuple.v0), SIMDInt32.Vector(raw: tuple.v1),
-            SIMDInt32.Vector(raw: tuple.v2), SIMDInt32.Vector(raw: tuple.v3)
+            SIMD<Int32>(raw: tuple.v0), SIMD<Int32>(raw: tuple.v1), SIMD<Int32>(raw: tuple.v2),
+            SIMD<Int32>(raw: tuple.v3)
         )
     }(
         HighwayReference.Nothrow.set4I32(
@@ -608,7 +580,7 @@ public func portSet4I32ConstantIndex(
     _ tuple: (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>, SIMD<Int32>),
     to a: SIMD<Int32>
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
-    unsafe SIMDInt32.set4(tuple, atUnchecked: 1, to: a)
+    unsafe SIMD<Int32>.set4(tuple, atUnchecked: 1, to: a)
 }
 
 @inline(never)
@@ -618,8 +590,8 @@ public func highwaySet4I32ConstantIndex(
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
     { tuple in
         (
-            SIMDInt32.Vector(raw: tuple.v0), SIMDInt32.Vector(raw: tuple.v1),
-            SIMDInt32.Vector(raw: tuple.v2), SIMDInt32.Vector(raw: tuple.v3)
+            SIMD<Int32>(raw: tuple.v0), SIMD<Int32>(raw: tuple.v1), SIMD<Int32>(raw: tuple.v2),
+            SIMD<Int32>(raw: tuple.v3)
         )
     }(
         HighwayReference.Nothrow.set4I32(
@@ -640,7 +612,7 @@ public func portSet4I32ConstantA(
     _ tuple: (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>, SIMD<Int32>),
     atUnchecked index: Int
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
-    unsafe SIMDInt32.set4(tuple, atUnchecked: index, to: SIMDInt32.repeating(26))
+    unsafe SIMD<Int32>.set4(tuple, atUnchecked: index, to: SIMD<Int32>.repeating(26))
 }
 
 @inline(never)
@@ -650,8 +622,8 @@ public func highwaySet4I32ConstantA(
 ) -> (SIMD<Int32>, SIMD<Int32>, SIMD<Int32>, SIMD<Int32>) {
     { tuple in
         (
-            SIMDInt32.Vector(raw: tuple.v0), SIMDInt32.Vector(raw: tuple.v1),
-            SIMDInt32.Vector(raw: tuple.v2), SIMDInt32.Vector(raw: tuple.v3)
+            SIMD<Int32>(raw: tuple.v0), SIMD<Int32>(raw: tuple.v1), SIMD<Int32>(raw: tuple.v2),
+            SIMD<Int32>(raw: tuple.v3)
         )
     }(
         HighwayReference.Nothrow.set4I32(
@@ -662,7 +634,7 @@ public func highwaySet4I32ConstantA(
                 v3: tuple.3.raw
             ),
             index,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
         )
     )
 }

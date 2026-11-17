@@ -8,18 +8,23 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
-    private func checkMultiplyingByPowerOf2FromInt16ConstantA(_ value: H.Lane) {
+    private func checkMultiplyingByPowerOf2FromInt16ConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyingByPowerOf2FromInt16 with a repeating \(hex(value))")
-        let bInputs = Inputs.exponents(SIMDInt16.Vector.self, seed: 0x25D4_5A67_FFD2_1065)
+        let bInputs = Inputs.exponents(SIMD<Int16>.self, seed: 0x25D4_5A67_FFD2_1065)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.multiplyingByPowerOf2(H.repeating(value), b),
-                HighwayReference.multiplyingByPowerOf2I16ToF16(H.repeating(value).raw, b.raw),
+                H(
+                    raw: HighwayReference.multiplyingByPowerOf2I16ToF16(
+                        H.repeating(value).raw,
+                        b.raw
+                    )
+                ),
                 "b: \(describe(b))"
             )
         }
@@ -27,20 +32,22 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingByPowerOf2FromInt16ConstantB(_ value: SIMDInt16.Lane) {
+    private func checkMultiplyingByPowerOf2FromInt16ConstantB(_ value: Int16) {
         let mismatches = Mismatches("multiplyingByPowerOf2FromInt16 with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0C15_5467_F14E_7853)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0C15_5467_F14E_7853)
         mismatches.check(
-            SIMDInt16.repeating(value),
-            SIMDInt16.Vector(raw: HighwayReference.repeatingI16(value)),
+            SIMD<Int16>.repeating(value),
+            SIMD<Int16>(raw: HighwayReference.repeatingI16(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
-                H.multiplyingByPowerOf2(a, SIMDInt16.repeating(value)),
-                HighwayReference.multiplyingByPowerOf2I16ToF16(
-                    a.raw,
-                    SIMDInt16.repeating(value).raw
+                H.multiplyingByPowerOf2(a, SIMD<Int16>.repeating(value)),
+                H(
+                    raw: HighwayReference.multiplyingByPowerOf2I16ToF16(
+                        a.raw,
+                        SIMD<Int16>.repeating(value).raw
+                    )
                 ),
                 "a: \(describe(a))"
             )
@@ -105,7 +112,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func multiplyingByPowerOf2FromInt16ConstantSplatPayloadNaN() {
-        checkMultiplyingByPowerOf2FromInt16ConstantA(H.Lane(nan: 1, signaling: false))
+        checkMultiplyingByPowerOf2FromInt16ConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyingByPowerOf2FromInt16ConstantSplatSignalingNaN() {
@@ -185,26 +192,26 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func multiplyingByPowerOf2FromInt16ConstantSIMDInt16SplatMax() {
-        checkMultiplyingByPowerOf2FromInt16ConstantB(SIMDInt16.Lane.max)
+        checkMultiplyingByPowerOf2FromInt16ConstantB(Int16.max)
     }
 
     @Test func multiplyingByPowerOf2FromInt16ConstantSIMDInt16SplatMin() {
-        checkMultiplyingByPowerOf2FromInt16ConstantB(SIMDInt16.Lane.min)
+        checkMultiplyingByPowerOf2FromInt16ConstantB(Int16.min)
     }
 
     @inline(__always)
-    private func checkMultiplyingConstantA(_ value: H.Lane) {
+    private func checkMultiplyingConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplying with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x02D3_8082_A41F_330E)
+        let bInputs = Inputs.vectors(H.self, seed: 0x02D3_8082_A41F_330E)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
-        for b in bInputs where !hasUnorderedNaNs(H.repeating(value), b) {
+        for b in bInputs where !hasUnorderedNaNs(H.repeating(value).simd, b.simd) {
             mismatches.check(
                 H.multiplying(H.repeating(value), b),
-                HighwayReference.multiplyingF16(H.repeating(value).raw, b.raw),
+                H(raw: HighwayReference.multiplyingF16(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -212,18 +219,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingConstantB(_ value: H.Lane) {
+    private func checkMultiplyingConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplying with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFA3E_4A82_9F48_52AC)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFA3E_4A82_9F48_52AC)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
-        for a in aInputs where !hasUnorderedNaNs(a, H.repeating(value)) {
+        for a in aInputs where !hasUnorderedNaNs(a.simd, H.repeating(value).simd) {
             mismatches.check(
                 H.multiplying(a, H.repeating(value)),
-                HighwayReference.multiplyingF16(a.raw, H.repeating(value).raw),
+                H(raw: HighwayReference.multiplyingF16(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -307,8 +314,8 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func multiplyingConstantSplatPayloadNaN() {
-        checkMultiplyingConstantA(H.Lane(nan: 1, signaling: false))
-        checkMultiplyingConstantB(H.Lane(nan: 1, signaling: false))
+        checkMultiplyingConstantA(Lane(nan: 1, signaling: false))
+        checkMultiplyingConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyingConstantSplatSignalingNaN() {
@@ -332,18 +339,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingRoundedConstantA(_ value: H.Lane) {
+    private func checkMultiplyingRoundedConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyingRounded with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1436_2FFF_DCFE_EBF7)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1436_2FFF_DCFE_EBF7)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
-        for b in bInputs where !hasUnorderedNaNs(H.repeating(value), b) {
+        for b in bInputs where !hasUnorderedNaNs(H.repeating(value).simd, b.simd) {
             mismatches.check(
                 H.multiplyingRounded(H.repeating(value), b),
-                HighwayReference.multiplyingRoundedF16(H.repeating(value).raw, b.raw),
+                H(raw: HighwayReference.multiplyingRoundedF16(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -351,18 +358,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingRoundedConstantB(_ value: H.Lane) {
+    private func checkMultiplyingRoundedConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplyingRounded with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1CCB_45FF_E1D5_95F9)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1CCB_45FF_E1D5_95F9)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
-        for a in aInputs where !hasUnorderedNaNs(a, H.repeating(value)) {
+        for a in aInputs where !hasUnorderedNaNs(a.simd, H.repeating(value).simd) {
             mismatches.check(
                 H.multiplyingRounded(a, H.repeating(value)),
-                HighwayReference.multiplyingRoundedF16(a.raw, H.repeating(value).raw),
+                H(raw: HighwayReference.multiplyingRoundedF16(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -446,8 +453,8 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func multiplyingRoundedConstantSplatPayloadNaN() {
-        checkMultiplyingRoundedConstantA(H.Lane(nan: 1, signaling: false))
-        checkMultiplyingRoundedConstantB(H.Lane(nan: 1, signaling: false))
+        checkMultiplyingRoundedConstantA(Lane(nan: 1, signaling: false))
+        checkMultiplyingRoundedConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyingRoundedConstantSplatSignalingNaN() {
@@ -471,18 +478,23 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingByFloorPowerOf2ConstantA(_ value: H.Lane) {
+    private func checkMultiplyingByFloorPowerOf2ConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyingByFloorPowerOf2 with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x27BF_2E21_6870_B58D)
+        let bInputs = Inputs.vectors(H.self, seed: 0x27BF_2E21_6870_B58D)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.multiplyingByFloorPowerOf2(H.repeating(value), b),
-                HighwayReference.multiplyingByFloorPowerOf2F16(H.repeating(value).raw, b.raw),
+                H(
+                    raw: HighwayReference.multiplyingByFloorPowerOf2F16(
+                        H.repeating(value).raw,
+                        b.raw
+                    )
+                ),
                 "b: \(describe(b))"
             )
         }
@@ -490,18 +502,23 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingByFloorPowerOf2ConstantB(_ value: H.Lane) {
+    private func checkMultiplyingByFloorPowerOf2ConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplyingByFloorPowerOf2 with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0CB9_A821_58D7_815B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0CB9_A821_58D7_815B)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.multiplyingByFloorPowerOf2(a, H.repeating(value)),
-                HighwayReference.multiplyingByFloorPowerOf2F16(a.raw, H.repeating(value).raw),
+                H(
+                    raw: HighwayReference.multiplyingByFloorPowerOf2F16(
+                        a.raw,
+                        H.repeating(value).raw
+                    )
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -579,8 +596,8 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func multiplyingByFloorPowerOf2ConstantSplatPayloadNaN() {
-        checkMultiplyingByFloorPowerOf2ConstantA(H.Lane(nan: 1, signaling: false))
-        checkMultiplyingByFloorPowerOf2ConstantB(H.Lane(nan: 1, signaling: false))
+        checkMultiplyingByFloorPowerOf2ConstantA(Lane(nan: 1, signaling: false))
+        checkMultiplyingByFloorPowerOf2ConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyingByFloorPowerOf2ConstantSplatSignalingNaN() {

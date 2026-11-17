@@ -5,24 +5,24 @@ public import Vectorization
 
 @inline(never)
 public func portMultiplyingI8(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> SIMD<Int8> {
-    SIMDInt8.multiplying(a, b)
+    SIMD<Int8>.multiplying(a, b)
 }
 
 @inline(never)
 public func highwayMultiplyingI8(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> SIMD<Int8> {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.multiplyingI8(a.raw, b.raw))
+    SIMD<Int8>(raw: HighwayReference.Nothrow.multiplyingI8(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMultiplyingI8ConstantA(_ b: SIMD<Int8>) -> SIMD<Int8> {
-    SIMDInt8.multiplying(SIMDInt8.repeating(26), b)
+    SIMD<Int8>.multiplying(SIMD<Int8>.repeating(26), b)
 }
 
 @inline(never)
 public func highwayMultiplyingI8ConstantA(_ b: SIMD<Int8>) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.multiplyingI8(
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             b.raw
         )
     )
@@ -30,39 +30,39 @@ public func highwayMultiplyingI8ConstantA(_ b: SIMD<Int8>) -> SIMD<Int8> {
 
 @inline(never)
 public func portMultiplyingI8ConstantB(_ a: SIMD<Int8>) -> SIMD<Int8> {
-    SIMDInt8.multiplying(a, SIMDInt8.repeating(26))
+    SIMD<Int8>.multiplying(a, SIMD<Int8>.repeating(26))
 }
 
 @inline(never)
 public func highwayMultiplyingI8ConstantB(_ a: SIMD<Int8>) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.multiplyingI8(
             a.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portMultiplyingHighI8(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> SIMD<Int8> {
-    SIMDInt8.multiplyingHigh(a, b)
+    SIMD<Int8>.multiplyingHigh(a, b)
 }
 
 @inline(never)
 public func highwayMultiplyingHighI8(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> SIMD<Int8> {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.multiplyingHighI8(a.raw, b.raw))
+    SIMD<Int8>(raw: HighwayReference.Nothrow.multiplyingHighI8(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMultiplyingHighI8ConstantA(_ b: SIMD<Int8>) -> SIMD<Int8> {
-    SIMDInt8.multiplyingHigh(SIMDInt8.repeating(26), b)
+    SIMD<Int8>.multiplyingHigh(SIMD<Int8>.repeating(26), b)
 }
 
 @inline(never)
 public func highwayMultiplyingHighI8ConstantA(_ b: SIMD<Int8>) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.multiplyingHighI8(
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             b.raw
         )
     )
@@ -70,15 +70,15 @@ public func highwayMultiplyingHighI8ConstantA(_ b: SIMD<Int8>) -> SIMD<Int8> {
 
 @inline(never)
 public func portMultiplyingHighI8ConstantB(_ a: SIMD<Int8>) -> SIMD<Int8> {
-    SIMDInt8.multiplyingHigh(a, SIMDInt8.repeating(26))
+    SIMD<Int8>.multiplyingHigh(a, SIMD<Int8>.repeating(26))
 }
 
 @inline(never)
 public func highwayMultiplyingHighI8ConstantB(_ a: SIMD<Int8>) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.multiplyingHighI8(
             a.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
         )
     )
 }

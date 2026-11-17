@@ -5,14 +5,14 @@ public import Vectorization
 
 @inline(never)
 public func portExtractingBlockU16ConstantA() -> SIMD<UInt16>.BlockVector {
-    unsafe SIMDUInt16.block(SIMDUInt16.repeating(26), atUnchecked: 0)
+    unsafe SIMD<UInt16>.block(SIMD<UInt16>.repeating(26), atUnchecked: 0)
 }
 
 @inline(never)
 public func highwayExtractingBlockU16ConstantA() -> SIMD<UInt16>.BlockVector {
-    SIMDUInt16.BlockVector(
+    SIMD<UInt16>.BlockVector(
         raw: HighwayReference.Nothrow.extractingBlockU16(
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
             0
         )
     )
@@ -20,24 +20,24 @@ public func highwayExtractingBlockU16ConstantA() -> SIMD<UInt16>.BlockVector {
 
 @inline(never)
 public func portExtractingBlockU16ConstantIndex(_ a: SIMD<UInt16>) -> SIMD<UInt16>.BlockVector {
-    unsafe SIMDUInt16.block(a, atUnchecked: 0)
+    unsafe SIMD<UInt16>.block(a, atUnchecked: 0)
 }
 
 @inline(never)
 public func highwayExtractingBlockU16ConstantIndex(_ a: SIMD<UInt16>) -> SIMD<UInt16>.BlockVector {
-    SIMDUInt16.BlockVector(raw: HighwayReference.Nothrow.extractingBlockU16(a.raw, 0))
+    SIMD<UInt16>.BlockVector(raw: HighwayReference.Nothrow.extractingBlockU16(a.raw, 0))
 }
 
 @inline(never)
 public func portReplacingBlockU16ConstantA(with b: SIMD<UInt16>.BlockVector) -> SIMD<UInt16> {
-    unsafe SIMDUInt16.replacingBlock(SIMDUInt16.repeating(26), atUnchecked: 0, with: b)
+    unsafe SIMD<UInt16>.replacingBlock(SIMD<UInt16>.repeating(26), atUnchecked: 0, with: b)
 }
 
 @inline(never)
 public func highwayReplacingBlockU16ConstantA(with b: SIMD<UInt16>.BlockVector) -> SIMD<UInt16> {
-    SIMDUInt16.Vector(
+    SIMD<UInt16>(
         raw: HighwayReference.Nothrow.replacingBlockU16(
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
             0,
             b.raw
         )
@@ -49,7 +49,7 @@ public func portReplacingBlockU16ConstantIndex(
     _ a: SIMD<UInt16>,
     with b: SIMD<UInt16>.BlockVector
 ) -> SIMD<UInt16> {
-    unsafe SIMDUInt16.replacingBlock(a, atUnchecked: 0, with: b)
+    unsafe SIMD<UInt16>.replacingBlock(a, atUnchecked: 0, with: b)
 }
 
 @inline(never)
@@ -57,5 +57,5 @@ public func highwayReplacingBlockU16ConstantIndex(
     _ a: SIMD<UInt16>,
     with b: SIMD<UInt16>.BlockVector
 ) -> SIMD<UInt16> {
-    SIMDUInt16.Vector(raw: HighwayReference.Nothrow.replacingBlockU16(a.raw, 0, b.raw))
+    SIMD<UInt16>(raw: HighwayReference.Nothrow.replacingBlockU16(a.raw, 0, b.raw))
 }

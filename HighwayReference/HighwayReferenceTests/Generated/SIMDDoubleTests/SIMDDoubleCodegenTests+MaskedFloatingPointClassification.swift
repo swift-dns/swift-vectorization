@@ -10,7 +10,7 @@ extension SIMDDoubleCodegenTests {
     @Test func isNaNWhere() {
         let mismatches = Mismatches("portIsNaNWhereF64")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x5159_00B6_C2CB_DDDB)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5158_FFB6_C2CB_DC28)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5158_FFB6_C2CB_DC28)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portIsNaNWhereF64(a, where: mask),

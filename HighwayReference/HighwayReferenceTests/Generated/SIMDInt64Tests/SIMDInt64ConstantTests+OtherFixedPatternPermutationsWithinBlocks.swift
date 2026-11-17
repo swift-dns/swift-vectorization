@@ -7,16 +7,16 @@ import Vectorization
 
 extension SIMDInt64ConstantTests {
     @inline(__always)
-    private func checkDuplicatingEvenConstantA(_ value: H.Lane) {
+    private func checkDuplicatingEvenConstantA(_ value: Lane) {
         let mismatches = Mismatches("duplicatingEven with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         mismatches.check(
             H.duplicatingEven(H.repeating(value)),
-            H.Vector(raw: HighwayReference.duplicatingEvenI64(H.repeating(value).raw)),
+            H(raw: HighwayReference.duplicatingEvenI64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -91,24 +91,24 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func duplicatingEvenConstantSplatMax() {
-        checkDuplicatingEvenConstantA(H.Lane.max)
+        checkDuplicatingEvenConstantA(Lane.max)
     }
 
     @Test func duplicatingEvenConstantSplatMin() {
-        checkDuplicatingEvenConstantA(H.Lane.min)
+        checkDuplicatingEvenConstantA(Lane.min)
     }
 
     @inline(__always)
-    private func checkDuplicatingOddConstantA(_ value: H.Lane) {
+    private func checkDuplicatingOddConstantA(_ value: Lane) {
         let mismatches = Mismatches("duplicatingOdd with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         mismatches.check(
             H.duplicatingOdd(H.repeating(value)),
-            H.Vector(raw: HighwayReference.duplicatingOddI64(H.repeating(value).raw)),
+            H(raw: HighwayReference.duplicatingOddI64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -183,10 +183,10 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func duplicatingOddConstantSplatMax() {
-        checkDuplicatingOddConstantA(H.Lane.max)
+        checkDuplicatingOddConstantA(Lane.max)
     }
 
     @Test func duplicatingOddConstantSplatMin() {
-        checkDuplicatingOddConstantA(H.Lane.min)
+        checkDuplicatingOddConstantA(Lane.min)
     }
 }

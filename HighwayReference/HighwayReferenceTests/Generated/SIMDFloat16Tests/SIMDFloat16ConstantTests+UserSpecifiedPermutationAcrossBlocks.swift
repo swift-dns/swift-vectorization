@@ -8,7 +8,7 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
-    private func checkTableLookupLanesConstantA(_ value: H.Lane) {
+    private func checkTableLookupLanesConstantA(_ value: Lane) {
         let mismatches = Mismatches("tableLookupLanes with a repeating \(hex(value))")
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
@@ -18,13 +18,13 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for indices in indicesInputs {
             mismatches.check(
                 H.tableLookupLanes(H.repeating(value), at: indices),
-                HighwayReference.tableLookupLanesF16(H.repeating(value).raw, indices.raw),
+                H(raw: HighwayReference.tableLookupLanesF16(H.repeating(value).raw, indices.raw)),
                 "indices: \(describe(indices))"
             )
         }
@@ -88,7 +88,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func tableLookupLanesConstantSplatPayloadNaN() {
-        checkTableLookupLanesConstantA(H.Lane(nan: 1, signaling: false))
+        checkTableLookupLanesConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func tableLookupLanesConstantSplatSignalingNaN() {
@@ -108,9 +108,9 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkTwoTablesLookupLanesConstantA(_ value: H.Lane) {
+    private func checkTwoTablesLookupLanesConstantA(_ value: Lane) {
         let mismatches = Mismatches("twoTablesLookupLanes with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD6E9_E7ED_3894_E7E4)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD6E9_E7ED_3894_E7E4)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 2 * H.laneCount,
@@ -119,16 +119,18 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (b, indices) in everyPair(bInputs, indicesInputs) {
             mismatches.check(
                 H.twoTablesLookupLanes(H.repeating(value), b, at: indices),
-                HighwayReference.twoTablesLookupLanesF16(
-                    H.repeating(value).raw,
-                    b.raw,
-                    indices.raw
+                H(
+                    raw: HighwayReference.twoTablesLookupLanesF16(
+                        H.repeating(value).raw,
+                        b.raw,
+                        indices.raw
+                    )
                 ),
                 "b: \(describe(b)), indices: \(describe(indices))"
             )
@@ -137,9 +139,9 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkTwoTablesLookupLanesConstantB(_ value: H.Lane) {
+    private func checkTwoTablesLookupLanesConstantB(_ value: Lane) {
         let mismatches = Mismatches("twoTablesLookupLanes with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF0A9_4DED_4719_2316)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF0A9_4DED_4719_2316)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 2 * H.laneCount,
@@ -148,16 +150,18 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 H.twoTablesLookupLanes(a, H.repeating(value), at: indices),
-                HighwayReference.twoTablesLookupLanesF16(
-                    a.raw,
-                    H.repeating(value).raw,
-                    indices.raw
+                H(
+                    raw: HighwayReference.twoTablesLookupLanesF16(
+                        a.raw,
+                        H.repeating(value).raw,
+                        indices.raw
+                    )
                 ),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
@@ -236,8 +240,8 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func twoTablesLookupLanesConstantSplatPayloadNaN() {
-        checkTwoTablesLookupLanesConstantA(H.Lane(nan: 1, signaling: false))
-        checkTwoTablesLookupLanesConstantB(H.Lane(nan: 1, signaling: false))
+        checkTwoTablesLookupLanesConstantA(Lane(nan: 1, signaling: false))
+        checkTwoTablesLookupLanesConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func twoTablesLookupLanesConstantSplatSignalingNaN() {
@@ -261,7 +265,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkShuffledPer4LanesConstantA(_ value: H.Lane) {
+    private func checkShuffledPer4LanesConstantA(_ value: Lane) {
         let mismatches = Mismatches("shuffledPer4Lanes with a repeating \(hex(value))")
         let i3Inputs = Array(0...3)
         let i2Inputs = Array(0...3)
@@ -269,7 +273,7 @@ extension SIMDFloat16ConstantTests {
         let i0Inputs = Array(0...3)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (i3, i2, i1, i0) in mixedQuadruples(
@@ -281,12 +285,14 @@ extension SIMDFloat16ConstantTests {
         ) {
             mismatches.check(
                 H.shuffledPer4Lanes(H.repeating(value), i3, i2, i1, i0),
-                HighwayReference.shuffledPer4LanesF16(
-                    H.repeating(value).raw,
-                    Int32(truncatingIfNeeded: i3),
-                    Int32(truncatingIfNeeded: i2),
-                    Int32(truncatingIfNeeded: i1),
-                    Int32(truncatingIfNeeded: i0)
+                H(
+                    raw: HighwayReference.shuffledPer4LanesF16(
+                        H.repeating(value).raw,
+                        Int32(truncatingIfNeeded: i3),
+                        Int32(truncatingIfNeeded: i2),
+                        Int32(truncatingIfNeeded: i1),
+                        Int32(truncatingIfNeeded: i0)
+                    )
                 ),
                 "i3: \(i3), i2: \(i2), i1: \(i1), i0: \(i0)"
             )
@@ -351,7 +357,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func shuffledPer4LanesConstantSplatPayloadNaN() {
-        checkShuffledPer4LanesConstantA(H.Lane(nan: 1, signaling: false))
+        checkShuffledPer4LanesConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func shuffledPer4LanesConstantSplatSignalingNaN() {

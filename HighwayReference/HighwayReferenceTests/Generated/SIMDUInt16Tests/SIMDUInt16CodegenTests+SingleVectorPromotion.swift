@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDUInt16CodegenTests {
     @Test func vectorWideningLowerFromUInt8() {
         let mismatches = Mismatches("portVectorWideningLowerU8ToU16")
-        let aInputs = Inputs.conversions(SIMDUInt8.Vector.self, seed: 0x8B20_C289_01F9_9982)
+        let aInputs = Inputs.conversions(SIMD<UInt8>.self, seed: 0x8B20_C289_01F9_9982)
         for a in aInputs {
             mismatches.check(
                 portVectorWideningLowerU8ToU16(wideningLower: a),
@@ -32,7 +32,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func vectorWideningUpperFromUInt8() {
         let mismatches = Mismatches("portVectorWideningUpperU8ToU16")
-        let aInputs = Inputs.conversions(SIMDUInt8.Vector.self, seed: 0x2614_7DD4_FDE7_1349)
+        let aInputs = Inputs.conversions(SIMD<UInt8>.self, seed: 0x2614_7DD4_FDE7_1349)
         for a in aInputs {
             mismatches.check(
                 portVectorWideningUpperU8ToU16(wideningUpper: a),
@@ -55,7 +55,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func vectorWideningEvenFromUInt8() {
         let mismatches = Mismatches("portVectorWideningEvenU8ToU16")
-        let aInputs = Inputs.conversions(SIMDUInt8.Vector.self, seed: 0x5175_D68D_B6A0_CA41)
+        let aInputs = Inputs.conversions(SIMD<UInt8>.self, seed: 0x5175_D68D_B6A0_CA41)
         for a in aInputs {
             mismatches.check(
                 portVectorWideningEvenU8ToU16(wideningEven: a),
@@ -78,7 +78,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func vectorWideningOddFromUInt8() {
         let mismatches = Mismatches("portVectorWideningOddU8ToU16")
-        let aInputs = Inputs.conversions(SIMDUInt8.Vector.self, seed: 0x6BC7_6CC4_5907_B7D2)
+        let aInputs = Inputs.conversions(SIMD<UInt8>.self, seed: 0x6BC7_6CC4_5907_B7D2)
         for a in aInputs {
             mismatches.check(
                 portVectorWideningOddU8ToU16(wideningOdd: a),
@@ -101,7 +101,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func vectorWideningFromHalfUInt8() {
         let mismatches = Mismatches("portVectorWideningHalfU8ToU16")
-        let aInputs = Inputs.conversions(SIMDUInt8.HalfVector.self, seed: 0xBAEA_2DA3_6346_629A)
+        let aInputs = Inputs.conversions(SIMD<UInt8>.HalfVector.self, seed: 0xBAEA_2DA3_6346_629A)
             .map(poisoningUpperBytes)
         for a in aInputs {
             mismatches.check(

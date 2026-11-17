@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDFloat16ReferenceTests {
     @Test func isNegative() {
         let mismatches = Mismatches("isNegative")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x102D_10EE_AFEB_D6CB)
+        let aInputs = Inputs.vectors(H.self, seed: 0x102D_10EE_AFEB_D6CB)
         for a in aInputs {
             mismatches.check(
                 H.isNegative(a),
@@ -22,8 +22,8 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func equalTo() {
         let mismatches = Mismatches("equalTo")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0135_B136_2D79_2E93)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0135_B036_2D79_2CE0)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0135_B136_2D79_2E93)
+        let bInputs = Inputs.vectors(H.self, seed: 0x0135_B036_2D79_2CE0)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.equalTo(a, b),
@@ -36,8 +36,8 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func notEqualTo() {
         let mismatches = Mismatches("notEqualTo")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFE14_D877_1AB3_E4AE)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xFE14_D977_1AB3_E661)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFE14_D877_1AB3_E4AE)
+        let bInputs = Inputs.vectors(H.self, seed: 0xFE14_D977_1AB3_E661)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.notEqualTo(a, b),
@@ -50,8 +50,8 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func lessThan() {
         let mismatches = Mismatches("lessThan")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4DA5_82B0_7798_7FA6)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4DA5_83B0_7798_8159)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4DA5_82B0_7798_7FA6)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4DA5_83B0_7798_8159)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.lessThan(a, b),
@@ -64,8 +64,8 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func greaterThan() {
         let mismatches = Mismatches("greaterThan")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x78D7_D48B_1DC4_64EB)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x78D7_D38B_1DC4_6338)
+        let aInputs = Inputs.vectors(H.self, seed: 0x78D7_D48B_1DC4_64EB)
+        let bInputs = Inputs.vectors(H.self, seed: 0x78D7_D38B_1DC4_6338)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.greaterThan(a, b),
@@ -78,8 +78,8 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func lessThanOrEqualTo() {
         let mismatches = Mismatches("lessThanOrEqualTo")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x36E1_98B9_402C_4DBE)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x36E1_99B9_402C_4F71)
+        let aInputs = Inputs.vectors(H.self, seed: 0x36E1_98B9_402C_4DBE)
+        let bInputs = Inputs.vectors(H.self, seed: 0x36E1_99B9_402C_4F71)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.lessThanOrEqualTo(a, b),
@@ -92,8 +92,8 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func greaterThanOrEqualTo() {
         let mismatches = Mismatches("greaterThanOrEqualTo")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2299_419B_1F3D_A041)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2299_409B_1F3D_9E8E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2299_419B_1F3D_A041)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2299_409B_1F3D_9E8E)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.greaterThanOrEqualTo(a, b),

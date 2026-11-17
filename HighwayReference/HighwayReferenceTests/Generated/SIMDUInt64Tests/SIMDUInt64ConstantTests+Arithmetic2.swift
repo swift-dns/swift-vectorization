@@ -7,16 +7,16 @@ import Vectorization
 
 extension SIMDUInt64ConstantTests {
     @inline(__always)
-    private func checkSumsOf8FromUInt8ConstantA(_ value: SIMDUInt8.Lane) {
+    private func checkSumsOf8FromUInt8ConstantA(_ value: UInt8) {
         let mismatches = Mismatches("sumsOf8FromUInt8 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt8.repeating(value),
-            SIMDUInt8.Vector(raw: HighwayReference.repeatingU8(value)),
+            SIMD<UInt8>.repeating(value),
+            SIMD<UInt8>(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         mismatches.check(
-            H.sumsOf8(SIMDUInt8.repeating(value)),
-            H.Vector(raw: HighwayReference.sumsOf8U8ToU64(SIMDUInt8.repeating(value).raw)),
+            H.sumsOf8(SIMD<UInt8>.repeating(value)),
+            H(raw: HighwayReference.sumsOf8U8ToU64(SIMD<UInt8>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -55,22 +55,22 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkSumsOf8AbsoluteDifferencesFromUInt8ConstantA(_ value: SIMDUInt8.Lane) {
+    private func checkSumsOf8AbsoluteDifferencesFromUInt8ConstantA(_ value: UInt8) {
         let mismatches = Mismatches(
             "sumsOf8AbsoluteDifferencesFromUInt8 with a repeating \(hex(value))"
         )
-        let bInputs = Inputs.conversions(SIMDUInt8.Vector.self, seed: 0x45E1_C3C5_3F9F_2C78)
+        let bInputs = Inputs.conversions(SIMD<UInt8>.self, seed: 0x45E1_C3C5_3F9F_2C78)
         mismatches.check(
-            SIMDUInt8.repeating(value),
-            SIMDUInt8.Vector(raw: HighwayReference.repeatingU8(value)),
+            SIMD<UInt8>.repeating(value),
+            SIMD<UInt8>(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
-                H.sumsOf8AbsoluteDifferences(SIMDUInt8.repeating(value), b),
-                H.Vector(
+                H.sumsOf8AbsoluteDifferences(SIMD<UInt8>.repeating(value), b),
+                H(
                     raw: HighwayReference.sumsOf8AbsoluteDifferencesU8ToU64(
-                        SIMDUInt8.repeating(value).raw,
+                        SIMD<UInt8>.repeating(value).raw,
                         b.raw
                     )
                 ),
@@ -81,23 +81,23 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkSumsOf8AbsoluteDifferencesFromUInt8ConstantB(_ value: SIMDUInt8.Lane) {
+    private func checkSumsOf8AbsoluteDifferencesFromUInt8ConstantB(_ value: UInt8) {
         let mismatches = Mismatches(
             "sumsOf8AbsoluteDifferencesFromUInt8 with b repeating \(hex(value))"
         )
-        let aInputs = Inputs.conversions(SIMDUInt8.Vector.self, seed: 0x60E7_49C5_4F38_60AA)
+        let aInputs = Inputs.conversions(SIMD<UInt8>.self, seed: 0x60E7_49C5_4F38_60AA)
         mismatches.check(
-            SIMDUInt8.repeating(value),
-            SIMDUInt8.Vector(raw: HighwayReference.repeatingU8(value)),
+            SIMD<UInt8>.repeating(value),
+            SIMD<UInt8>(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
-                H.sumsOf8AbsoluteDifferences(a, SIMDUInt8.repeating(value)),
-                H.Vector(
+                H.sumsOf8AbsoluteDifferences(a, SIMD<UInt8>.repeating(value)),
+                H(
                     raw: HighwayReference.sumsOf8AbsoluteDifferencesU8ToU64(
                         a.raw,
-                        SIMDUInt8.repeating(value).raw
+                        SIMD<UInt8>.repeating(value).raw
                     )
                 ),
                 "a: \(describe(a))"
@@ -147,16 +147,16 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkBiasedExponentFromDoubleConstantA(_ value: SIMDDouble.Lane) {
+    private func checkBiasedExponentFromDoubleConstantA(_ value: Double) {
         let mismatches = Mismatches("biasedExponentFromDouble with a repeating \(hex(value))")
         mismatches.check(
-            SIMDDouble.repeating(value),
-            HighwayReference.repeatingF64(value),
+            SIMD<Double>.repeating(value),
+            SIMD<Double>(raw: HighwayReference.repeatingF64(value)),
             "repeating"
         )
         mismatches.check(
-            H.biasedExponent(SIMDDouble.repeating(value)),
-            H.Vector(raw: HighwayReference.biasedExponentF64ToU64(SIMDDouble.repeating(value).raw)),
+            H.biasedExponent(SIMD<Double>.repeating(value)),
+            H(raw: HighwayReference.biasedExponentF64ToU64(SIMD<Double>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -219,7 +219,7 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func biasedExponentFromDoubleConstantSplatPayloadNaN() {
-        checkBiasedExponentFromDoubleConstantA(SIMDDouble.Lane(nan: 1, signaling: false))
+        checkBiasedExponentFromDoubleConstantA(Double(nan: 1, signaling: false))
     }
 
     @Test func biasedExponentFromDoubleConstantSplatSignalingNaN() {

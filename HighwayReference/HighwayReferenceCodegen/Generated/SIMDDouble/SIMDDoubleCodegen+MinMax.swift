@@ -5,192 +5,240 @@ public import Vectorization
 
 @inline(never)
 public func portMinimumF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.minimum(a, b)
+    SIMD<Double>.minimum(a, b)
 }
 
 @inline(never)
 public func highwayMinimumF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.minimumF64(a.raw, b.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.minimumF64(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMinimumF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.minimum(SIMDDouble.repeating(1.5), b)
+    SIMD<Double>.minimum(SIMD<Double>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayMinimumF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.minimumF64(HighwayReference.Nothrow.repeatingF64(1.5).raw, b.raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.minimumF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
 public func portMinimumF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.minimum(a, SIMDDouble.repeating(1.5))
+    SIMD<Double>.minimum(a, SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMinimumF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.minimumF64(a.raw, HighwayReference.Nothrow.repeatingF64(1.5).raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.minimumF64(
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
 public func portMaximumF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.maximum(a, b)
+    SIMD<Double>.maximum(a, b)
 }
 
 @inline(never)
 public func highwayMaximumF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.maximumF64(a.raw, b.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.maximumF64(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMaximumF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.maximum(SIMDDouble.repeating(1.5), b)
+    SIMD<Double>.maximum(SIMD<Double>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayMaximumF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.maximumF64(HighwayReference.Nothrow.repeatingF64(1.5).raw, b.raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.maximumF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
 public func portMaximumF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.maximum(a, SIMDDouble.repeating(1.5))
+    SIMD<Double>.maximum(a, SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMaximumF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.maximumF64(a.raw, HighwayReference.Nothrow.repeatingF64(1.5).raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.maximumF64(
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
 public func portMinimumNumberF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.minimumNumber(a, b)
+    SIMD<Double>.minimumNumber(a, b)
 }
 
 @inline(never)
 public func highwayMinimumNumberF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.minimumNumberF64(a.raw, b.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.minimumNumberF64(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMinimumNumberF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.minimumNumber(SIMDDouble.repeating(1.5), b)
+    SIMD<Double>.minimumNumber(SIMD<Double>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayMinimumNumberF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.minimumNumberF64(HighwayReference.Nothrow.repeatingF64(1.5).raw, b.raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.minimumNumberF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
 public func portMinimumNumberF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.minimumNumber(a, SIMDDouble.repeating(1.5))
+    SIMD<Double>.minimumNumber(a, SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMinimumNumberF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.minimumNumberF64(a.raw, HighwayReference.Nothrow.repeatingF64(1.5).raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.minimumNumberF64(
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
 public func portMaximumNumberF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.maximumNumber(a, b)
+    SIMD<Double>.maximumNumber(a, b)
 }
 
 @inline(never)
 public func highwayMaximumNumberF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.maximumNumberF64(a.raw, b.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.maximumNumberF64(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMaximumNumberF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.maximumNumber(SIMDDouble.repeating(1.5), b)
+    SIMD<Double>.maximumNumber(SIMD<Double>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayMaximumNumberF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.maximumNumberF64(HighwayReference.Nothrow.repeatingF64(1.5).raw, b.raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.maximumNumberF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
 public func portMaximumNumberF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.maximumNumber(a, SIMDDouble.repeating(1.5))
+    SIMD<Double>.maximumNumber(a, SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMaximumNumberF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.maximumNumberF64(a.raw, HighwayReference.Nothrow.repeatingF64(1.5).raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.maximumNumberF64(
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
 public func portMinimumMagnitudeF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.minimumMagnitude(a, b)
+    SIMD<Double>.minimumMagnitude(a, b)
 }
 
 @inline(never)
 public func highwayMinimumMagnitudeF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.minimumMagnitudeF64(a.raw, b.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.minimumMagnitudeF64(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMinimumMagnitudeF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.minimumMagnitude(SIMDDouble.repeating(1.5), b)
+    SIMD<Double>.minimumMagnitude(SIMD<Double>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayMinimumMagnitudeF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.minimumMagnitudeF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        b.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.minimumMagnitudeF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMinimumMagnitudeF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.minimumMagnitude(a, SIMDDouble.repeating(1.5))
+    SIMD<Double>.minimumMagnitude(a, SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMinimumMagnitudeF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.minimumMagnitudeF64(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.minimumMagnitudeF64(
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portMaximumMagnitudeF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.maximumMagnitude(a, b)
+    SIMD<Double>.maximumMagnitude(a, b)
 }
 
 @inline(never)
 public func highwayMaximumMagnitudeF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.maximumMagnitudeF64(a.raw, b.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.maximumMagnitudeF64(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMaximumMagnitudeF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.maximumMagnitude(SIMDDouble.repeating(1.5), b)
+    SIMD<Double>.maximumMagnitude(SIMD<Double>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayMaximumMagnitudeF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.maximumMagnitudeF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
-        b.raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.maximumMagnitudeF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMaximumMagnitudeF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.maximumMagnitude(a, SIMDDouble.repeating(1.5))
+    SIMD<Double>.maximumMagnitude(a, SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMaximumMagnitudeF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.maximumMagnitudeF64(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.maximumMagnitudeF64(
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }

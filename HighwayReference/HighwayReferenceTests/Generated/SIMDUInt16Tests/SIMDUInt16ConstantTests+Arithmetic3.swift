@@ -9,18 +9,16 @@ import Vectorization
 extension SIMDUInt16ConstantTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @inline(__always)
-    private func checkBiasedExponentFromFloat16ConstantA(_ value: SIMDFloat16.Lane) {
+    private func checkBiasedExponentFromFloat16ConstantA(_ value: Float16) {
         let mismatches = Mismatches("biasedExponentFromFloat16 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDFloat16.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            SIMD<Float16>.repeating(value),
+            SIMD<Float16>(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
-            H.biasedExponent(SIMDFloat16.repeating(value)),
-            H.Vector(
-                raw: HighwayReference.biasedExponentF16ToU16(SIMDFloat16.repeating(value).raw)
-            ),
+            H.biasedExponent(SIMD<Float16>.repeating(value)),
+            H(raw: HighwayReference.biasedExponentF16ToU16(SIMD<Float16>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -113,7 +111,7 @@ extension SIMDUInt16ConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func biasedExponentFromFloat16ConstantSplatPayloadNaN() {
-        checkBiasedExponentFromFloat16ConstantA(SIMDFloat16.Lane(nan: 1, signaling: false))
+        checkBiasedExponentFromFloat16ConstantA(Float16(nan: 1, signaling: false))
     }
     #endif
 

@@ -21,9 +21,19 @@ extension Inputs {
         return conversions(type, seed: seed) + splats + windows
     }
 
+    package static func bfloat16Demotions<V: ReferenceVector>(_ type: V.Type, seed: UInt64) -> [V]
+    where V.Simd.Scalar == Float {
+        bfloat16Demotions(V.Simd.self, seed: seed).map { V(referenceSimd: $0) }
+    }
+
     package static func accumulators<V: Swift.SIMD>(_ type: V.Type, seed: UInt64) -> [V]
     where V.Scalar: ReferenceLane & BinaryFloatingPoint {
         vectors(type, seed: seed)
+    }
+
+    package static func accumulators<V: ReferenceVector>(_ type: V.Type, seed: UInt64) -> [V]
+    where V.Simd.Scalar: BinaryFloatingPoint {
+        accumulators(V.Simd.self, seed: seed).map { V(referenceSimd: $0) }
     }
 }
 
@@ -57,7 +67,7 @@ private func isUnordered(_ terms: NaNTerm?...) -> Bool {
 private func widenedProduct<A: ReferenceVector>(_ a: A, _ b: A, _ lane: Int) -> NaNTerm?
 where A.InputLane == BFloat16, A.Simd.Scalar == UInt16 {
     func value(_ vector: A) -> Float {
-        Float(BFloat16(bitPattern: vector.simd[lane]))
+        Float(BFloat16(bitPattern: vector.referenceSimd[lane]))
     }
     return product(of: value(a), value(b))
 }
@@ -112,7 +122,7 @@ where A.InputLane == BFloat16, A.Simd.Scalar == UInt16 {
 
 private func singles<A: ReferenceVector>(of vector: A, _ lanes: Range<Int>) -> [Float]
 where A.InputLane == BFloat16, A.Simd.Scalar == UInt16 {
-    lanes.map { Float(BFloat16(bitPattern: vector.simd[$0])) }
+    lanes.map { Float(BFloat16(bitPattern: vector.referenceSimd[$0])) }
 }
 
 package func hasFoldedNaNs<A: ReferenceVector>(
@@ -123,6 +133,6 @@ package func hasFoldedNaNs<A: ReferenceVector>(
     Float(multiplier) == -1
         && (0..<A.Simd.scalarCount).contains { lane in
             (parity == nil || lane % 2 == parity)
-                && Float(BFloat16(bitPattern: other.simd[lane])).isNaN
+                && Float(BFloat16(bitPattern: other.referenceSimd[lane])).isNaN
         }
 }

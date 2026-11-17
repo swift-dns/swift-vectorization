@@ -7,12 +7,12 @@ import Vectorization
 
 extension SIMDUInt64ConstantTests {
     @inline(__always)
-    private func checkSmallestWhereConstantA(_ value: H.Lane) {
+    private func checkSmallestWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("smallestWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7743_4743_73AE_5DED)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for mask in maskInputs {
@@ -74,16 +74,16 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func smallestWhereConstantSplatMax() {
-        checkSmallestWhereConstantA(H.Lane.max)
+        checkSmallestWhereConstantA(Lane.max)
     }
 
     @inline(__always)
-    private func checkLargestWhereConstantA(_ value: H.Lane) {
+    private func checkLargestWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("largestWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xDEDB_D762_84AB_7F22)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for mask in maskInputs {
@@ -145,6 +145,6 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func largestWhereConstantSplatMax() {
-        checkLargestWhereConstantA(H.Lane.max)
+        checkLargestWhereConstantA(Lane.max)
     }
 }

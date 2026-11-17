@@ -8,19 +8,19 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
-    private func checkSelectingConstantA(_ value: H.Lane) {
+    private func checkSelectingConstantA(_ value: Lane) {
         let mismatches = Mismatches("selecting with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC2A5_4CD7_1250_FC71)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC2A5_4AD7_1250_F90B)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC2A5_4AD7_1250_F90B)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 H.selecting(mask, H.repeating(value), b),
-                HighwayReference.selectingF16(mask.raw, H.repeating(value).raw, b.raw),
+                H(raw: HighwayReference.selectingF16(mask.raw, H.repeating(value).raw, b.raw)),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -28,19 +28,19 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkSelectingConstantB(_ value: H.Lane) {
+    private func checkSelectingConstantB(_ value: Lane) {
         let mismatches = Mismatches("selecting with b repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xBAEA_15D7_0E33_BE1C)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBAEA_16D7_0E33_BFCF)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBAEA_16D7_0E33_BFCF)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.selecting(mask, a, H.repeating(value)),
-                HighwayReference.selectingF16(mask.raw, a.raw, H.repeating(value).raw),
+                H(raw: HighwayReference.selectingF16(mask.raw, a.raw, H.repeating(value).raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -118,8 +118,8 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func selectingConstantSplatPayloadNaN() {
-        checkSelectingConstantA(H.Lane(nan: 1, signaling: false))
-        checkSelectingConstantB(H.Lane(nan: 1, signaling: false))
+        checkSelectingConstantA(Lane(nan: 1, signaling: false))
+        checkSelectingConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func selectingConstantSplatSignalingNaN() {
@@ -143,18 +143,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkSelectingOrZeroConstantA(_ value: H.Lane) {
+    private func checkSelectingOrZeroConstantA(_ value: Lane) {
         let mismatches = Mismatches("selectingOrZero with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE4A4_4511_BCB3_3594)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for mask in maskInputs {
             mismatches.check(
                 H.selectingOrZero(mask, H.repeating(value)),
-                HighwayReference.selectingOrZeroF16(mask.raw, H.repeating(value).raw),
+                H(raw: HighwayReference.selectingOrZeroF16(mask.raw, H.repeating(value).raw)),
                 "mask: \(describe(mask))"
             )
         }
@@ -218,7 +218,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func selectingOrZeroConstantSplatPayloadNaN() {
-        checkSelectingOrZeroConstantA(H.Lane(nan: 1, signaling: false))
+        checkSelectingOrZeroConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func selectingOrZeroConstantSplatSignalingNaN() {
@@ -238,18 +238,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkZeroingSelectedConstantA(_ value: H.Lane) {
+    private func checkZeroingSelectedConstantA(_ value: Lane) {
         let mismatches = Mismatches("zeroingSelected with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC175_2DDA_86F8_1A98)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for mask in maskInputs {
             mismatches.check(
                 H.zeroingSelected(mask, H.repeating(value)),
-                HighwayReference.zeroingSelectedF16(mask.raw, H.repeating(value).raw),
+                H(raw: HighwayReference.zeroingSelectedF16(mask.raw, H.repeating(value).raw)),
                 "mask: \(describe(mask))"
             )
         }
@@ -313,7 +313,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func zeroingSelectedConstantSplatPayloadNaN() {
-        checkZeroingSelectedConstantA(H.Lane(nan: 1, signaling: false))
+        checkZeroingSelectedConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func zeroingSelectedConstantSplatSignalingNaN() {
@@ -333,19 +333,19 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkSelectingByVectorConstantA(_ value: H.Lane) {
+    private func checkSelectingByVectorConstantA(_ value: Lane) {
         let mismatches = Mismatches("selectingByVector with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4A56_1D0F_FD69_26B4)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x4A56_200F_FD69_2BCD)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4A56_1D0F_FD69_26B4)
+        let cInputs = Inputs.vectors(H.self, seed: 0x4A56_200F_FD69_2BCD)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 H.selecting(H.repeating(value), b, c),
-                HighwayReference.selectingByVectorF16(H.repeating(value).raw, b.raw, c.raw),
+                H(raw: HighwayReference.selectingByVectorF16(H.repeating(value).raw, b.raw, c.raw)),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -353,19 +353,19 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkSelectingByVectorConstantB(_ value: H.Lane) {
+    private func checkSelectingByVectorConstantB(_ value: Lane) {
         let mismatches = Mismatches("selectingByVector with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x633B_8310_0B33_BE26)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x633B_8110_0B33_BAC0)
+        let aInputs = Inputs.vectors(H.self, seed: 0x633B_8310_0B33_BE26)
+        let cInputs = Inputs.vectors(H.self, seed: 0x633B_8110_0B33_BAC0)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 H.selecting(a, H.repeating(value), c),
-                HighwayReference.selectingByVectorF16(a.raw, H.repeating(value).raw, c.raw),
+                H(raw: HighwayReference.selectingByVectorF16(a.raw, H.repeating(value).raw, c.raw)),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -373,19 +373,19 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkSelectingByVectorConstantC(_ value: H.Lane) {
+    private func checkSelectingByVectorConstantC(_ value: Lane) {
         let mismatches = Mismatches("selectingByVector with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5AA6_6C10_065D_1271)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5AA6_6B10_065D_10BE)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5AA6_6C10_065D_1271)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5AA6_6B10_065D_10BE)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.selecting(a, b, H.repeating(value)),
-                HighwayReference.selectingByVectorF16(a.raw, b.raw, H.repeating(value).raw),
+                H(raw: HighwayReference.selectingByVectorF16(a.raw, b.raw, H.repeating(value).raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -477,9 +477,9 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func selectingByVectorConstantSplatPayloadNaN() {
-        checkSelectingByVectorConstantA(H.Lane(nan: 1, signaling: false))
-        checkSelectingByVectorConstantB(H.Lane(nan: 1, signaling: false))
-        checkSelectingByVectorConstantC(H.Lane(nan: 1, signaling: false))
+        checkSelectingByVectorConstantA(Lane(nan: 1, signaling: false))
+        checkSelectingByVectorConstantB(Lane(nan: 1, signaling: false))
+        checkSelectingByVectorConstantC(Lane(nan: 1, signaling: false))
     }
 
     @Test func selectingByVectorConstantSplatSignalingNaN() {

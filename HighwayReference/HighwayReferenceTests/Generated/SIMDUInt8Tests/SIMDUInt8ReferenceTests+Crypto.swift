@@ -9,17 +9,15 @@ extension SIMDUInt8ReferenceTests {
     @Test func aesRound() {
         let mismatches = Mismatches("aesRound")
         let aInputs =
-            Inputs.vectors(H.Vector.self, seed: 0x7EF8_9397_E4C3_6557)
+            Inputs.vectors(H.self, seed: 0x7EF8_9397_E4C3_6557)
             + (0..<256).map { start in
-                H.Vector(
-                    H.Vector.Simd((0..<H.laneCount).map { H.Lane(truncatingIfNeeded: start + $0) })
-                )
+                H(H.SIMDType((0..<H.laneCount).map { Lane(truncatingIfNeeded: start + $0) }))
             }
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7EF8_9297_E4C3_63A4)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7EF8_9297_E4C3_63A4)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.aesRound(a, roundKey: b),
-                H.Vector(raw: HighwayReference.aesRoundU8(a.raw, b.raw)),
+                H(raw: HighwayReference.aesRoundU8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -29,17 +27,15 @@ extension SIMDUInt8ReferenceTests {
     @Test func aesLastRound() {
         let mismatches = Mismatches("aesLastRound")
         let aInputs =
-            Inputs.vectors(H.Vector.self, seed: 0x98BA_E92E_8275_29F7)
+            Inputs.vectors(H.self, seed: 0x98BA_E92E_8275_29F7)
             + (0..<256).map { start in
-                H.Vector(
-                    H.Vector.Simd((0..<H.laneCount).map { H.Lane(truncatingIfNeeded: start + $0) })
-                )
+                H(H.SIMDType((0..<H.laneCount).map { Lane(truncatingIfNeeded: start + $0) }))
             }
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x98BA_E82E_8275_2844)
+        let bInputs = Inputs.vectors(H.self, seed: 0x98BA_E82E_8275_2844)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.aesLastRound(a, roundKey: b),
-                H.Vector(raw: HighwayReference.aesLastRoundU8(a.raw, b.raw)),
+                H(raw: HighwayReference.aesLastRoundU8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -49,17 +45,15 @@ extension SIMDUInt8ReferenceTests {
     @Test func aesRoundInverse() {
         let mismatches = Mismatches("aesRoundInverse")
         let aInputs =
-            Inputs.vectors(H.Vector.self, seed: 0xB0A4_CA76_71A2_526B)
+            Inputs.vectors(H.self, seed: 0xB0A4_CA76_71A2_526B)
             + (0..<256).map { start in
-                H.Vector(
-                    H.Vector.Simd((0..<H.laneCount).map { H.Lane(truncatingIfNeeded: start + $0) })
-                )
+                H(H.SIMDType((0..<H.laneCount).map { Lane(truncatingIfNeeded: start + $0) }))
             }
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB0A4_C976_71A2_50B8)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB0A4_C976_71A2_50B8)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.aesRoundInverse(a, roundKey: b),
-                H.Vector(raw: HighwayReference.aesRoundInverseU8(a.raw, b.raw)),
+                H(raw: HighwayReference.aesRoundInverseU8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -69,17 +63,15 @@ extension SIMDUInt8ReferenceTests {
     @Test func aesLastRoundInverse() {
         let mismatches = Mismatches("aesLastRoundInverse")
         let aInputs =
-            Inputs.vectors(H.Vector.self, seed: 0x799C_5422_5755_074B)
+            Inputs.vectors(H.self, seed: 0x799C_5422_5755_074B)
             + (0..<256).map { start in
-                H.Vector(
-                    H.Vector.Simd((0..<H.laneCount).map { H.Lane(truncatingIfNeeded: start + $0) })
-                )
+                H(H.SIMDType((0..<H.laneCount).map { Lane(truncatingIfNeeded: start + $0) }))
             }
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x799C_5322_5755_0598)
+        let bInputs = Inputs.vectors(H.self, seed: 0x799C_5322_5755_0598)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.aesLastRoundInverse(a, roundKey: b),
-                H.Vector(raw: HighwayReference.aesLastRoundInverseU8(a.raw, b.raw)),
+                H(raw: HighwayReference.aesLastRoundInverseU8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -89,16 +81,14 @@ extension SIMDUInt8ReferenceTests {
     @Test func aesInverseMixColumns() {
         let mismatches = Mismatches("aesInverseMixColumns")
         let aInputs =
-            Inputs.vectors(H.Vector.self, seed: 0x1444_CEB0_5E0A_A5FE)
+            Inputs.vectors(H.self, seed: 0x1444_CEB0_5E0A_A5FE)
             + (0..<256).map { start in
-                H.Vector(
-                    H.Vector.Simd((0..<H.laneCount).map { H.Lane(truncatingIfNeeded: start + $0) })
-                )
+                H(H.SIMDType((0..<H.laneCount).map { Lane(truncatingIfNeeded: start + $0) }))
             }
         for a in aInputs {
             mismatches.check(
                 H.aesInverseMixColumns(a),
-                H.Vector(raw: HighwayReference.aesInverseMixColumnsU8(a.raw)),
+                H(raw: HighwayReference.aesInverseMixColumnsU8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -108,17 +98,15 @@ extension SIMDUInt8ReferenceTests {
     @Test func aesKeyGenerationAssist() {
         let mismatches = Mismatches("aesKeyGenerationAssist")
         let aInputs =
-            Inputs.vectors(H.Vector.self, seed: 0x9871_BD87_DD5D_0361)
+            Inputs.vectors(H.self, seed: 0x9871_BD87_DD5D_0361)
             + (0..<256).map { start in
-                H.Vector(
-                    H.Vector.Simd((0..<H.laneCount).map { H.Lane(truncatingIfNeeded: start + $0) })
-                )
+                H(H.SIMDType((0..<H.laneCount).map { Lane(truncatingIfNeeded: start + $0) }))
             }
         let roundConstantInputs = [UInt8](0...255)
         for (a, roundConstant) in everyPair(aInputs, roundConstantInputs) {
             mismatches.check(
                 H.aesKeyGenerationAssist(a, roundConstant: roundConstant),
-                H.Vector(raw: HighwayReference.aesKeyGenerationAssistU8(a.raw, roundConstant)),
+                H(raw: HighwayReference.aesKeyGenerationAssistU8(a.raw, roundConstant)),
                 "a: \(describe(a)), roundConstant: \(roundConstant)"
             )
         }

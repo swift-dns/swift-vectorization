@@ -5,25 +5,27 @@ public import Vectorization
 
 @inline(never)
 public func portSquareRootWhereF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mask) -> SIMD<Float> {
-    SIMDFloat.squareRoot(a, where: mask)
+    SIMD<Float>.squareRoot(a, where: mask)
 }
 
 @inline(never)
 public func highwaySquareRootWhereF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mask) -> SIMD<Float>
 {
-    HighwayReference.Nothrow.squareRootWhereF32(mask.raw, a.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.squareRootWhereF32(mask.raw, a.raw))
 }
 
 @inline(never)
 public func portSquareRootWhereF32ConstantA(where mask: SIMD<Float>.Mask) -> SIMD<Float> {
-    SIMDFloat.squareRoot(SIMDFloat.repeating(1.5), where: mask)
+    SIMD<Float>.squareRoot(SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
 public func highwaySquareRootWhereF32ConstantA(where mask: SIMD<Float>.Mask) -> SIMD<Float> {
-    HighwayReference.Nothrow.squareRootWhereF32(
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.squareRootWhereF32(
+            mask.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
@@ -33,7 +35,7 @@ public func portMaximumWhereF32(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.maximum(a, b, where: mask)
+    SIMD<Float>.maximum(a, b, where: mask)
 }
 
 @inline(never)
@@ -42,7 +44,7 @@ public func highwayMaximumWhereF32(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.maximumWhereF32(mask.raw, a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.maximumWhereF32(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -50,7 +52,7 @@ public func portMaximumWhereF32ConstantA(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.maximum(SIMDFloat.repeating(1.5), b, where: mask)
+    SIMD<Float>.maximum(SIMD<Float>.repeating(1.5), b, where: mask)
 }
 
 @inline(never)
@@ -58,10 +60,12 @@ public func highwayMaximumWhereF32ConstantA(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.maximumWhereF32(
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.maximumWhereF32(
+            mask.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
@@ -70,7 +74,7 @@ public func portMaximumWhereF32ConstantB(
     _ a: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.maximum(a, SIMDFloat.repeating(1.5), where: mask)
+    SIMD<Float>.maximum(a, SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
@@ -78,10 +82,12 @@ public func highwayMaximumWhereF32ConstantB(
     _ a: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.maximumWhereF32(
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.maximumWhereF32(
+            mask.raw,
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
@@ -91,7 +97,7 @@ public func portAddingWhereF32(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.adding(a, b, where: mask)
+    SIMD<Float>.adding(a, b, where: mask)
 }
 
 @inline(never)
@@ -100,7 +106,7 @@ public func highwayAddingWhereF32(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.addingWhereF32(mask.raw, a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.addingWhereF32(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -108,7 +114,7 @@ public func portAddingWhereF32ConstantA(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.adding(SIMDFloat.repeating(1.5), b, where: mask)
+    SIMD<Float>.adding(SIMD<Float>.repeating(1.5), b, where: mask)
 }
 
 @inline(never)
@@ -116,10 +122,12 @@ public func highwayAddingWhereF32ConstantA(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.addingWhereF32(
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.addingWhereF32(
+            mask.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
@@ -128,7 +136,7 @@ public func portAddingWhereF32ConstantB(
     _ a: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.adding(a, SIMDFloat.repeating(1.5), where: mask)
+    SIMD<Float>.adding(a, SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
@@ -136,10 +144,12 @@ public func highwayAddingWhereF32ConstantB(
     _ a: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.addingWhereF32(
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.addingWhereF32(
+            mask.raw,
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
@@ -149,7 +159,7 @@ public func portSubtractingWhereF32(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.subtracting(a, b, where: mask)
+    SIMD<Float>.subtracting(a, b, where: mask)
 }
 
 @inline(never)
@@ -158,7 +168,7 @@ public func highwaySubtractingWhereF32(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.subtractingWhereF32(mask.raw, a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.subtractingWhereF32(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -166,7 +176,7 @@ public func portSubtractingWhereF32ConstantA(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.subtracting(SIMDFloat.repeating(1.5), b, where: mask)
+    SIMD<Float>.subtracting(SIMD<Float>.repeating(1.5), b, where: mask)
 }
 
 @inline(never)
@@ -174,10 +184,12 @@ public func highwaySubtractingWhereF32ConstantA(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.subtractingWhereF32(
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.subtractingWhereF32(
+            mask.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
@@ -186,7 +198,7 @@ public func portSubtractingWhereF32ConstantB(
     _ a: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.subtracting(a, SIMDFloat.repeating(1.5), where: mask)
+    SIMD<Float>.subtracting(a, SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
@@ -194,10 +206,12 @@ public func highwaySubtractingWhereF32ConstantB(
     _ a: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.subtractingWhereF32(
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.subtractingWhereF32(
+            mask.raw,
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
@@ -207,7 +221,7 @@ public func portMultiplyingWhereF32(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.multiplying(a, b, where: mask)
+    SIMD<Float>.multiplying(a, b, where: mask)
 }
 
 @inline(never)
@@ -216,7 +230,7 @@ public func highwayMultiplyingWhereF32(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyingWhereF32(mask.raw, a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.multiplyingWhereF32(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -224,7 +238,7 @@ public func portMultiplyingWhereF32ConstantA(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.multiplying(SIMDFloat.repeating(1.5), b, where: mask)
+    SIMD<Float>.multiplying(SIMD<Float>.repeating(1.5), b, where: mask)
 }
 
 @inline(never)
@@ -232,10 +246,12 @@ public func highwayMultiplyingWhereF32ConstantA(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyingWhereF32(
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingWhereF32(
+            mask.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
@@ -244,7 +260,7 @@ public func portMultiplyingWhereF32ConstantB(
     _ a: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.multiplying(a, SIMDFloat.repeating(1.5), where: mask)
+    SIMD<Float>.multiplying(a, SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
@@ -252,10 +268,12 @@ public func highwayMultiplyingWhereF32ConstantB(
     _ a: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyingWhereF32(
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingWhereF32(
+            mask.raw,
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
@@ -265,7 +283,7 @@ public func portDividingWhereF32(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.dividing(a, b, where: mask)
+    SIMD<Float>.dividing(a, b, where: mask)
 }
 
 @inline(never)
@@ -274,7 +292,7 @@ public func highwayDividingWhereF32(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.dividingWhereF32(mask.raw, a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.dividingWhereF32(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -282,7 +300,7 @@ public func portDividingWhereF32ConstantA(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.dividing(SIMDFloat.repeating(1.5), b, where: mask)
+    SIMD<Float>.dividing(SIMD<Float>.repeating(1.5), b, where: mask)
 }
 
 @inline(never)
@@ -290,10 +308,12 @@ public func highwayDividingWhereF32ConstantA(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.dividingWhereF32(
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.dividingWhereF32(
+            mask.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
@@ -302,7 +322,7 @@ public func portDividingWhereF32ConstantB(
     _ a: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.dividing(a, SIMDFloat.repeating(1.5), where: mask)
+    SIMD<Float>.dividing(a, SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
@@ -310,10 +330,12 @@ public func highwayDividingWhereF32ConstantB(
     _ a: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.dividingWhereF32(
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.dividingWhereF32(
+            mask.raw,
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
@@ -324,7 +346,7 @@ public func portMultiplyAddingWhereF32(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyAdding(a, b, c, where: mask)
+    SIMD<Float>.multiplyAdding(a, b, c, where: mask)
 }
 
 @inline(never)
@@ -334,7 +356,7 @@ public func highwayMultiplyAddingWhereF32(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyAddingWhereF32(mask.raw, a.raw, b.raw, c.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.multiplyAddingWhereF32(mask.raw, a.raw, b.raw, c.raw))
 }
 
 @inline(never)
@@ -343,7 +365,7 @@ public func portMultiplyAddingWhereF32ConstantA(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyAdding(SIMDFloat.repeating(1.5), b, c, where: mask)
+    SIMD<Float>.multiplyAdding(SIMD<Float>.repeating(1.5), b, c, where: mask)
 }
 
 @inline(never)
@@ -352,11 +374,13 @@ public func highwayMultiplyAddingWhereF32ConstantA(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyAddingWhereF32(
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw,
-        c.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingWhereF32(
+            mask.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
@@ -366,7 +390,7 @@ public func portMultiplyAddingWhereF32ConstantB(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyAdding(a, SIMDFloat.repeating(1.5), c, where: mask)
+    SIMD<Float>.multiplyAdding(a, SIMD<Float>.repeating(1.5), c, where: mask)
 }
 
 @inline(never)
@@ -375,11 +399,13 @@ public func highwayMultiplyAddingWhereF32ConstantB(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyAddingWhereF32(
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        c.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingWhereF32(
+            mask.raw,
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            c.raw
+        )
     )
 }
 
@@ -389,7 +415,7 @@ public func portMultiplyAddingWhereF32ConstantC(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyAdding(a, b, SIMDFloat.repeating(1.5), where: mask)
+    SIMD<Float>.multiplyAdding(a, b, SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
@@ -398,11 +424,13 @@ public func highwayMultiplyAddingWhereF32ConstantC(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyAddingWhereF32(
-        mask.raw,
-        a.raw,
-        b.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingWhereF32(
+            mask.raw,
+            a.raw,
+            b.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
@@ -413,7 +441,7 @@ public func portMultiplySubtractingWhereF32(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.multiplySubtracting(a, b, c, where: mask)
+    SIMD<Float>.multiplySubtracting(a, b, c, where: mask)
 }
 
 @inline(never)
@@ -423,7 +451,9 @@ public func highwayMultiplySubtractingWhereF32(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplySubtractingWhereF32(mask.raw, a.raw, b.raw, c.raw)
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplySubtractingWhereF32(mask.raw, a.raw, b.raw, c.raw)
+    )
 }
 
 @inline(never)
@@ -432,7 +462,7 @@ public func portMultiplySubtractingWhereF32ConstantA(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.multiplySubtracting(SIMDFloat.repeating(1.5), b, c, where: mask)
+    SIMD<Float>.multiplySubtracting(SIMD<Float>.repeating(1.5), b, c, where: mask)
 }
 
 @inline(never)
@@ -441,11 +471,13 @@ public func highwayMultiplySubtractingWhereF32ConstantA(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplySubtractingWhereF32(
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw,
-        c.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplySubtractingWhereF32(
+            mask.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
@@ -455,7 +487,7 @@ public func portMultiplySubtractingWhereF32ConstantB(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.multiplySubtracting(a, SIMDFloat.repeating(1.5), c, where: mask)
+    SIMD<Float>.multiplySubtracting(a, SIMD<Float>.repeating(1.5), c, where: mask)
 }
 
 @inline(never)
@@ -464,11 +496,13 @@ public func highwayMultiplySubtractingWhereF32ConstantB(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplySubtractingWhereF32(
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        c.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplySubtractingWhereF32(
+            mask.raw,
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            c.raw
+        )
     )
 }
 
@@ -478,7 +512,7 @@ public func portMultiplySubtractingWhereF32ConstantC(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.multiplySubtracting(a, b, SIMDFloat.repeating(1.5), where: mask)
+    SIMD<Float>.multiplySubtracting(a, b, SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
@@ -487,11 +521,13 @@ public func highwayMultiplySubtractingWhereF32ConstantC(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplySubtractingWhereF32(
-        mask.raw,
-        a.raw,
-        b.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplySubtractingWhereF32(
+            mask.raw,
+            a.raw,
+            b.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
@@ -502,7 +538,7 @@ public func portNegatedMultiplyAddingWhereF32(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.negatedMultiplyAdding(a, b, c, where: mask)
+    SIMD<Float>.negatedMultiplyAdding(a, b, c, where: mask)
 }
 
 @inline(never)
@@ -512,7 +548,9 @@ public func highwayNegatedMultiplyAddingWhereF32(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.negatedMultiplyAddingWhereF32(mask.raw, a.raw, b.raw, c.raw)
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereF32(mask.raw, a.raw, b.raw, c.raw)
+    )
 }
 
 @inline(never)
@@ -521,7 +559,7 @@ public func portNegatedMultiplyAddingWhereF32ConstantA(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.negatedMultiplyAdding(SIMDFloat.repeating(1.5), b, c, where: mask)
+    SIMD<Float>.negatedMultiplyAdding(SIMD<Float>.repeating(1.5), b, c, where: mask)
 }
 
 @inline(never)
@@ -530,11 +568,13 @@ public func highwayNegatedMultiplyAddingWhereF32ConstantA(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.negatedMultiplyAddingWhereF32(
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw,
-        c.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereF32(
+            mask.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
@@ -544,7 +584,7 @@ public func portNegatedMultiplyAddingWhereF32ConstantB(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.negatedMultiplyAdding(a, SIMDFloat.repeating(1.5), c, where: mask)
+    SIMD<Float>.negatedMultiplyAdding(a, SIMD<Float>.repeating(1.5), c, where: mask)
 }
 
 @inline(never)
@@ -553,11 +593,13 @@ public func highwayNegatedMultiplyAddingWhereF32ConstantB(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.negatedMultiplyAddingWhereF32(
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        c.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereF32(
+            mask.raw,
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            c.raw
+        )
     )
 }
 
@@ -567,7 +609,7 @@ public func portNegatedMultiplyAddingWhereF32ConstantC(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.negatedMultiplyAdding(a, b, SIMDFloat.repeating(1.5), where: mask)
+    SIMD<Float>.negatedMultiplyAdding(a, b, SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
@@ -576,11 +618,13 @@ public func highwayNegatedMultiplyAddingWhereF32ConstantC(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.negatedMultiplyAddingWhereF32(
-        mask.raw,
-        a.raw,
-        b.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereF32(
+            mask.raw,
+            a.raw,
+            b.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
@@ -591,7 +635,7 @@ public func portNegatedMultiplySubtractingWhereF32(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.negatedMultiplySubtracting(a, b, c, where: mask)
+    SIMD<Float>.negatedMultiplySubtracting(a, b, c, where: mask)
 }
 
 @inline(never)
@@ -601,7 +645,14 @@ public func highwayNegatedMultiplySubtractingWhereF32(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.negatedMultiplySubtractingWhereF32(mask.raw, a.raw, b.raw, c.raw)
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereF32(
+            mask.raw,
+            a.raw,
+            b.raw,
+            c.raw
+        )
+    )
 }
 
 @inline(never)
@@ -610,7 +661,7 @@ public func portNegatedMultiplySubtractingWhereF32ConstantA(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.negatedMultiplySubtracting(SIMDFloat.repeating(1.5), b, c, where: mask)
+    SIMD<Float>.negatedMultiplySubtracting(SIMD<Float>.repeating(1.5), b, c, where: mask)
 }
 
 @inline(never)
@@ -619,11 +670,13 @@ public func highwayNegatedMultiplySubtractingWhereF32ConstantA(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.negatedMultiplySubtractingWhereF32(
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw,
-        c.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereF32(
+            mask.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
@@ -633,7 +686,7 @@ public func portNegatedMultiplySubtractingWhereF32ConstantB(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.negatedMultiplySubtracting(a, SIMDFloat.repeating(1.5), c, where: mask)
+    SIMD<Float>.negatedMultiplySubtracting(a, SIMD<Float>.repeating(1.5), c, where: mask)
 }
 
 @inline(never)
@@ -642,11 +695,13 @@ public func highwayNegatedMultiplySubtractingWhereF32ConstantB(
     _ c: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.negatedMultiplySubtractingWhereF32(
-        mask.raw,
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        c.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereF32(
+            mask.raw,
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            c.raw
+        )
     )
 }
 
@@ -656,7 +711,7 @@ public func portNegatedMultiplySubtractingWhereF32ConstantC(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.negatedMultiplySubtracting(a, b, SIMDFloat.repeating(1.5), where: mask)
+    SIMD<Float>.negatedMultiplySubtracting(a, b, SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
@@ -665,11 +720,13 @@ public func highwayNegatedMultiplySubtractingWhereF32ConstantC(
     _ b: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.negatedMultiplySubtractingWhereF32(
-        mask.raw,
-        a.raw,
-        b.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereF32(
+            mask.raw,
+            a.raw,
+            b.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
@@ -678,7 +735,7 @@ public func portApproximateReciprocalWhereF32(
     _ a: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.approximateReciprocal(a, where: mask)
+    SIMD<Float>.approximateReciprocal(a, where: mask)
 }
 
 @inline(never)
@@ -686,22 +743,24 @@ public func highwayApproximateReciprocalWhereF32(
     _ a: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.approximateReciprocalWhereF32(mask.raw, a.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.approximateReciprocalWhereF32(mask.raw, a.raw))
 }
 
 @inline(never)
 public func portApproximateReciprocalWhereF32ConstantA(where mask: SIMD<Float>.Mask) -> SIMD<Float>
 {
-    SIMDFloat.approximateReciprocal(SIMDFloat.repeating(1.5), where: mask)
+    SIMD<Float>.approximateReciprocal(SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
 public func highwayApproximateReciprocalWhereF32ConstantA(
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.approximateReciprocalWhereF32(
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.approximateReciprocalWhereF32(
+            mask.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
@@ -710,7 +769,7 @@ public func portApproximateReciprocalSquareRootWhereF32(
     _ a: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.approximateReciprocalSquareRoot(a, where: mask)
+    SIMD<Float>.approximateReciprocalSquareRoot(a, where: mask)
 }
 
 @inline(never)
@@ -718,23 +777,27 @@ public func highwayApproximateReciprocalSquareRootWhereF32(
     _ a: SIMD<Float>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.approximateReciprocalSquareRootWhereF32(mask.raw, a.raw)
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.approximateReciprocalSquareRootWhereF32(mask.raw, a.raw)
+    )
 }
 
 @inline(never)
 public func portApproximateReciprocalSquareRootWhereF32ConstantA(
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.approximateReciprocalSquareRoot(SIMDFloat.repeating(1.5), where: mask)
+    SIMD<Float>.approximateReciprocalSquareRoot(SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
 public func highwayApproximateReciprocalSquareRootWhereF32ConstantA(
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.approximateReciprocalSquareRootWhereF32(
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.approximateReciprocalSquareRootWhereF32(
+            mask.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
@@ -744,7 +807,7 @@ public func portMultiplyPairwiseAddingWhereBF16ToF32(
     _ b: SIMD<BFloat16>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyPairwiseAdding(a, b, where: mask)
+    SIMD<Float>.multiplyPairwiseAdding(a, b, where: mask)
 }
 
 @inline(never)
@@ -753,7 +816,9 @@ public func highwayMultiplyPairwiseAddingWhereBF16ToF32(
     _ b: SIMD<BFloat16>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyPairwiseAddingWhereBF16ToF32(mask.raw, a.raw, b.raw)
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyPairwiseAddingWhereBF16ToF32(mask.raw, a.raw, b.raw)
+    )
 }
 
 @inline(never)
@@ -761,8 +826,8 @@ public func portMultiplyPairwiseAddingWhereBF16ToF32ConstantA(
     _ b: SIMD<BFloat16>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyPairwiseAdding(
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+    SIMD<Float>.multiplyPairwiseAdding(
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         b,
         where: mask
     )
@@ -773,12 +838,14 @@ public func highwayMultiplyPairwiseAddingWhereBF16ToF32ConstantA(
     _ b: SIMD<BFloat16>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyPairwiseAddingWhereBF16ToF32(
-        mask.raw,
-        SIMDBFloat16.Vector(
-            raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
-        ).raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyPairwiseAddingWhereBF16ToF32(
+            mask.raw,
+            SIMD<BFloat16>(
+                raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
+        )
     )
 }
 
@@ -787,9 +854,9 @@ public func portMultiplyPairwiseAddingWhereBF16ToF32ConstantB(
     _ a: SIMD<BFloat16>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    SIMDFloat.multiplyPairwiseAdding(
+    SIMD<Float>.multiplyPairwiseAdding(
         a,
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         where: mask
     )
 }
@@ -799,11 +866,13 @@ public func highwayMultiplyPairwiseAddingWhereBF16ToF32ConstantB(
     _ a: SIMD<BFloat16>,
     where mask: SIMD<Float>.Mask
 ) -> SIMD<Float> {
-    HighwayReference.Nothrow.multiplyPairwiseAddingWhereBF16ToF32(
-        mask.raw,
-        a.raw,
-        SIMDBFloat16.Vector(
-            raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
-        ).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyPairwiseAddingWhereBF16ToF32(
+            mask.raw,
+            a.raw,
+            SIMD<BFloat16>(
+                raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }

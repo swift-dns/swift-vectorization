@@ -7,10 +7,10 @@ import Vectorization
 
 extension SIMDBFloat16ConstantTests {
     @inline(__always)
-    private func checkTableLookupBytesConstantA(_ value: H.Lane) {
+    private func checkTableLookupBytesConstantA(_ value: Lane) {
         let mismatches = Mismatches("tableLookupBytes with a repeating \(hex(value))")
         let indicesInputs = Inputs.tableIndices(
-            H.Vector.self,
+            H.self,
             perByte: true,
             count: 16,
             seed: 0x2DB1_DE8D_F250_132F,
@@ -18,15 +18,13 @@ extension SIMDBFloat16ConstantTests {
         )
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for indices in indicesInputs {
             mismatches.check(
                 H.tableLookupBytes(H.repeating(value), at: indices),
-                H.Vector(
-                    raw: HighwayReference.tableLookupBytesBF16(H.repeating(value).raw, indices.raw)
-                ),
+                H(raw: HighwayReference.tableLookupBytesBF16(H.repeating(value).raw, indices.raw)),
                 "indices: \(describe(indices))"
             )
         }
@@ -34,86 +32,86 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func tableLookupBytesConstantSplatZero() {
-        checkTableLookupBytesConstantA(H.Lane(bitPattern: 0x0000))
+        checkTableLookupBytesConstantA(Lane(bitPattern: 0x0000))
     }
 
     @Test func tableLookupBytesConstantSplatNegativeZero() {
-        checkTableLookupBytesConstantA(H.Lane(bitPattern: 0x8000))
+        checkTableLookupBytesConstantA(Lane(bitPattern: 0x8000))
     }
 
     @Test func tableLookupBytesConstantSplatOne() {
-        checkTableLookupBytesConstantA(H.Lane(bitPattern: 0x3F80))
+        checkTableLookupBytesConstantA(Lane(bitPattern: 0x3F80))
     }
 
     @Test func tableLookupBytesConstantSplatMinusOne() {
-        checkTableLookupBytesConstantA(H.Lane(bitPattern: 0xBF80))
+        checkTableLookupBytesConstantA(Lane(bitPattern: 0xBF80))
     }
 
     @Test func tableLookupBytesConstantSplatTwo() {
-        checkTableLookupBytesConstantA(H.Lane(bitPattern: 0x4000))
+        checkTableLookupBytesConstantA(Lane(bitPattern: 0x4000))
     }
 
     @Test func tableLookupBytesConstantSplatHalf() {
-        checkTableLookupBytesConstantA(H.Lane(bitPattern: 0x3F00))
+        checkTableLookupBytesConstantA(Lane(bitPattern: 0x3F00))
     }
 
     @Test func tableLookupBytesConstantSplatFour() {
-        checkTableLookupBytesConstantA(H.Lane(bitPattern: 0x4080))
+        checkTableLookupBytesConstantA(Lane(bitPattern: 0x4080))
     }
 
     @Test func tableLookupBytesConstantSplatQuarter() {
-        checkTableLookupBytesConstantA(H.Lane(bitPattern: 0x3E80))
+        checkTableLookupBytesConstantA(Lane(bitPattern: 0x3E80))
     }
 
     @Test func tableLookupBytesConstantSplatOnePointFive() {
-        checkTableLookupBytesConstantA(H.Lane(bitPattern: 0x3FC0))
+        checkTableLookupBytesConstantA(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func tableLookupBytesConstantSplatMinusTwoPointFive() {
-        checkTableLookupBytesConstantA(H.Lane(bitPattern: 0xC020))
+        checkTableLookupBytesConstantA(Lane(bitPattern: 0xC020))
     }
 
     @Test func tableLookupBytesConstantSplatInfinity() {
-        checkTableLookupBytesConstantA(H.Lane(bitPattern: 0x7F80))
+        checkTableLookupBytesConstantA(Lane(bitPattern: 0x7F80))
     }
 
     @Test func tableLookupBytesConstantSplatMinusInfinity() {
-        checkTableLookupBytesConstantA(H.Lane(bitPattern: 0xFF80))
+        checkTableLookupBytesConstantA(Lane(bitPattern: 0xFF80))
     }
 
     @Test func tableLookupBytesConstantSplatNaN() {
-        checkTableLookupBytesConstantA(H.Lane(bitPattern: 0x7FC0))
+        checkTableLookupBytesConstantA(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func tableLookupBytesConstantSplatMinusNaN() {
-        checkTableLookupBytesConstantA(H.Lane(bitPattern: 0xFFC0))
+        checkTableLookupBytesConstantA(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func tableLookupBytesConstantSplatPayloadNaN() {
-        checkTableLookupBytesConstantA(H.Lane(bitPattern: 0x7FC1))
+        checkTableLookupBytesConstantA(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func tableLookupBytesConstantSplatSignalingNaN() {
-        checkTableLookupBytesConstantA(H.Lane(bitPattern: 0x7F81))
+        checkTableLookupBytesConstantA(Lane(bitPattern: 0x7F81))
     }
 
     @Test func tableLookupBytesConstantSplatMinusSignalingNaN() {
-        checkTableLookupBytesConstantA(H.Lane(bitPattern: 0xFF81))
+        checkTableLookupBytesConstantA(Lane(bitPattern: 0xFF81))
     }
 
     @Test func tableLookupBytesConstantSplatLeastNonzero() {
-        checkTableLookupBytesConstantA(H.Lane(bitPattern: 0x0001))
+        checkTableLookupBytesConstantA(Lane(bitPattern: 0x0001))
     }
 
     @Test func tableLookupBytesConstantSplatGreatest() {
-        checkTableLookupBytesConstantA(H.Lane(bitPattern: 0x7F7F))
+        checkTableLookupBytesConstantA(Lane(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkTableLookupBytesOrZeroConstantA(_ value: H.Lane) {
+    private func checkTableLookupBytesOrZeroConstantA(_ value: Lane) {
         let mismatches = Mismatches("tableLookupBytesOrZero with a repeating \(hex(value))")
         let indicesInputs = Inputs.tableIndices(
-            H.Vector.self,
+            H.self,
             offset: 128,
             perByte: true,
             count: 144,
@@ -122,13 +120,13 @@ extension SIMDBFloat16ConstantTests {
         )
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for indices in indicesInputs {
             mismatches.check(
                 H.tableLookupBytesOrZero(H.repeating(value), at: indices),
-                H.Vector(
+                H(
                     raw: HighwayReference.tableLookupBytesOrZeroBF16(
                         H.repeating(value).raw,
                         indices.raw
@@ -141,78 +139,78 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func tableLookupBytesOrZeroConstantSplatZero() {
-        checkTableLookupBytesOrZeroConstantA(H.Lane(bitPattern: 0x0000))
+        checkTableLookupBytesOrZeroConstantA(Lane(bitPattern: 0x0000))
     }
 
     @Test func tableLookupBytesOrZeroConstantSplatNegativeZero() {
-        checkTableLookupBytesOrZeroConstantA(H.Lane(bitPattern: 0x8000))
+        checkTableLookupBytesOrZeroConstantA(Lane(bitPattern: 0x8000))
     }
 
     @Test func tableLookupBytesOrZeroConstantSplatOne() {
-        checkTableLookupBytesOrZeroConstantA(H.Lane(bitPattern: 0x3F80))
+        checkTableLookupBytesOrZeroConstantA(Lane(bitPattern: 0x3F80))
     }
 
     @Test func tableLookupBytesOrZeroConstantSplatMinusOne() {
-        checkTableLookupBytesOrZeroConstantA(H.Lane(bitPattern: 0xBF80))
+        checkTableLookupBytesOrZeroConstantA(Lane(bitPattern: 0xBF80))
     }
 
     @Test func tableLookupBytesOrZeroConstantSplatTwo() {
-        checkTableLookupBytesOrZeroConstantA(H.Lane(bitPattern: 0x4000))
+        checkTableLookupBytesOrZeroConstantA(Lane(bitPattern: 0x4000))
     }
 
     @Test func tableLookupBytesOrZeroConstantSplatHalf() {
-        checkTableLookupBytesOrZeroConstantA(H.Lane(bitPattern: 0x3F00))
+        checkTableLookupBytesOrZeroConstantA(Lane(bitPattern: 0x3F00))
     }
 
     @Test func tableLookupBytesOrZeroConstantSplatFour() {
-        checkTableLookupBytesOrZeroConstantA(H.Lane(bitPattern: 0x4080))
+        checkTableLookupBytesOrZeroConstantA(Lane(bitPattern: 0x4080))
     }
 
     @Test func tableLookupBytesOrZeroConstantSplatQuarter() {
-        checkTableLookupBytesOrZeroConstantA(H.Lane(bitPattern: 0x3E80))
+        checkTableLookupBytesOrZeroConstantA(Lane(bitPattern: 0x3E80))
     }
 
     @Test func tableLookupBytesOrZeroConstantSplatOnePointFive() {
-        checkTableLookupBytesOrZeroConstantA(H.Lane(bitPattern: 0x3FC0))
+        checkTableLookupBytesOrZeroConstantA(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func tableLookupBytesOrZeroConstantSplatMinusTwoPointFive() {
-        checkTableLookupBytesOrZeroConstantA(H.Lane(bitPattern: 0xC020))
+        checkTableLookupBytesOrZeroConstantA(Lane(bitPattern: 0xC020))
     }
 
     @Test func tableLookupBytesOrZeroConstantSplatInfinity() {
-        checkTableLookupBytesOrZeroConstantA(H.Lane(bitPattern: 0x7F80))
+        checkTableLookupBytesOrZeroConstantA(Lane(bitPattern: 0x7F80))
     }
 
     @Test func tableLookupBytesOrZeroConstantSplatMinusInfinity() {
-        checkTableLookupBytesOrZeroConstantA(H.Lane(bitPattern: 0xFF80))
+        checkTableLookupBytesOrZeroConstantA(Lane(bitPattern: 0xFF80))
     }
 
     @Test func tableLookupBytesOrZeroConstantSplatNaN() {
-        checkTableLookupBytesOrZeroConstantA(H.Lane(bitPattern: 0x7FC0))
+        checkTableLookupBytesOrZeroConstantA(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func tableLookupBytesOrZeroConstantSplatMinusNaN() {
-        checkTableLookupBytesOrZeroConstantA(H.Lane(bitPattern: 0xFFC0))
+        checkTableLookupBytesOrZeroConstantA(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func tableLookupBytesOrZeroConstantSplatPayloadNaN() {
-        checkTableLookupBytesOrZeroConstantA(H.Lane(bitPattern: 0x7FC1))
+        checkTableLookupBytesOrZeroConstantA(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func tableLookupBytesOrZeroConstantSplatSignalingNaN() {
-        checkTableLookupBytesOrZeroConstantA(H.Lane(bitPattern: 0x7F81))
+        checkTableLookupBytesOrZeroConstantA(Lane(bitPattern: 0x7F81))
     }
 
     @Test func tableLookupBytesOrZeroConstantSplatMinusSignalingNaN() {
-        checkTableLookupBytesOrZeroConstantA(H.Lane(bitPattern: 0xFF81))
+        checkTableLookupBytesOrZeroConstantA(Lane(bitPattern: 0xFF81))
     }
 
     @Test func tableLookupBytesOrZeroConstantSplatLeastNonzero() {
-        checkTableLookupBytesOrZeroConstantA(H.Lane(bitPattern: 0x0001))
+        checkTableLookupBytesOrZeroConstantA(Lane(bitPattern: 0x0001))
     }
 
     @Test func tableLookupBytesOrZeroConstantSplatGreatest() {
-        checkTableLookupBytesOrZeroConstantA(H.Lane(bitPattern: 0x7F7F))
+        checkTableLookupBytesOrZeroConstantA(Lane(bitPattern: 0x7F7F))
     }
 }

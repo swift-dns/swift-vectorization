@@ -7,16 +7,26 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
-    private func checkMultiplySubtractingAddingConstantA(_ value: H.Lane) {
+    private func checkMultiplySubtractingAddingConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplySubtractingAdding with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1BA4_9B32_454A_5830)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x1BA4_9E32_454A_5D49)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x1BA4_9B32_454A_5830)
+        let cInputs = Inputs.vectors(H.self, seed: 0x1BA4_9E32_454A_5D49)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (b, c) in everyPair(bInputs, cInputs)
-        where !hasUnorderedNaNs(multiplying: H.repeating(value), b, adding: c) {
+        where !hasUnorderedNaNs(multiplying: H.repeating(value).simd, b.simd, adding: c.simd) {
             mismatches.check(
                 H.multiplySubtractingAdding(H.repeating(value), b, c),
-                HighwayReference.multiplySubtractingAddingF64(H.repeating(value).raw, b.raw, c.raw),
+                H(
+                    raw: HighwayReference.multiplySubtractingAddingF64(
+                        H.repeating(value).raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -24,16 +34,26 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplySubtractingAddingConstantB(_ value: H.Lane) {
+    private func checkMultiplySubtractingAddingConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplySubtractingAdding with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x363D_A132_5487_9402)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x363D_9F32_5487_909C)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x363D_A132_5487_9402)
+        let cInputs = Inputs.vectors(H.self, seed: 0x363D_9F32_5487_909C)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (a, c) in everyPair(aInputs, cInputs)
-        where !hasUnorderedNaNs(multiplying: a, H.repeating(value), adding: c) {
+        where !hasUnorderedNaNs(multiplying: a.simd, H.repeating(value).simd, adding: c.simd) {
             mismatches.check(
                 H.multiplySubtractingAdding(a, H.repeating(value), c),
-                HighwayReference.multiplySubtractingAddingF64(a.raw, H.repeating(value).raw, c.raw),
+                H(
+                    raw: HighwayReference.multiplySubtractingAddingF64(
+                        a.raw,
+                        H.repeating(value).raw,
+                        c.raw
+                    )
+                ),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -41,16 +61,26 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplySubtractingAddingConstantC(_ value: H.Lane) {
+    private func checkMultiplySubtractingAddingConstantC(_ value: Lane) {
         let mismatches = Mismatches("multiplySubtractingAdding with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2DA8_8A32_4FB0_E84D)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2DA8_8932_4FB0_E69A)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x2DA8_8A32_4FB0_E84D)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2DA8_8932_4FB0_E69A)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (a, b) in everyPair(aInputs, bInputs)
-        where !hasUnorderedNaNs(multiplying: a, b, adding: H.repeating(value)) {
+        where !hasUnorderedNaNs(multiplying: a.simd, b.simd, adding: H.repeating(value).simd) {
             mismatches.check(
                 H.multiplySubtractingAdding(a, b, H.repeating(value)),
-                HighwayReference.multiplySubtractingAddingF64(a.raw, b.raw, H.repeating(value).raw),
+                H(
+                    raw: HighwayReference.multiplySubtractingAddingF64(
+                        a.raw,
+                        b.raw,
+                        H.repeating(value).raw
+                    )
+                ),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -272,9 +302,9 @@ extension SIMDDoubleConstantTests {
             "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
             isIntermittent: true
         ) {
-            checkMultiplySubtractingAddingConstantA(H.Lane(nan: 1, signaling: false))
-            checkMultiplySubtractingAddingConstantB(H.Lane(nan: 1, signaling: false))
-            checkMultiplySubtractingAddingConstantC(H.Lane(nan: 1, signaling: false))
+            checkMultiplySubtractingAddingConstantA(Lane(nan: 1, signaling: false))
+            checkMultiplySubtractingAddingConstantB(Lane(nan: 1, signaling: false))
+            checkMultiplySubtractingAddingConstantC(Lane(nan: 1, signaling: false))
         } when: {
             isAmd64 && !isDarwin
                 && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))

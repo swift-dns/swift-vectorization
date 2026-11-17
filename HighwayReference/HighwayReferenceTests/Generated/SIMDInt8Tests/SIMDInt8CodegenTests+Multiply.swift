@@ -9,8 +9,8 @@ import Vectorization
 extension SIMDInt8CodegenTests {
     @Test func multiplying() {
         let mismatches = Mismatches("portMultiplyingI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x354A_9AAB_4DE3_E8A8)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x354A_9BAB_4DE3_EA5B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x354A_9AAB_4DE3_E8A8)
+        let bInputs = Inputs.vectors(H.self, seed: 0x354A_9BAB_4DE3_EA5B)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMultiplyingI8(a, b),
@@ -23,7 +23,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func multiplyingConstantA() {
         let mismatches = Mismatches("portMultiplyingI8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC07C_4406_DAC3_F23E)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC07C_4406_DAC3_F23E)
         for b in bInputs {
             mismatches.check(
                 portMultiplyingI8ConstantA(b),
@@ -36,7 +36,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func multiplyingConstantB() {
         let mismatches = Mismatches("portMultiplyingI8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB8C1_0E06_D6A6_B59C)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB8C1_0E06_D6A6_B59C)
         for a in aInputs {
             mismatches.check(
                 portMultiplyingI8ConstantB(a),
@@ -49,8 +49,8 @@ extension SIMDInt8CodegenTests {
 
     @Test func multiplyingHigh() {
         let mismatches = Mismatches("portMultiplyingHighI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC5E9_5F2A_0BA9_6BA4)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC5E9_602A_0BA9_6D57)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC5E9_5F2A_0BA9_6BA4)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC5E9_602A_0BA9_6D57)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMultiplyingHighI8(a, b),
@@ -63,7 +63,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func multiplyingHighConstantA() {
         let mismatches = Mismatches("portMultiplyingHighI8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA85A_A434_582D_99CA)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA85A_A434_582D_99CA)
         for b in bInputs {
             mismatches.check(
                 portMultiplyingHighI8ConstantA(b),
@@ -76,7 +76,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func multiplyingHighConstantB() {
         let mismatches = Mismatches("portMultiplyingHighI8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9FC5_EE34_5357_92E8)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9FC5_EE34_5357_92E8)
         for a in aInputs {
             mismatches.check(
                 portMultiplyingHighI8ConstantB(a),

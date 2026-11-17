@@ -9,7 +9,7 @@ public func portMaximumWhereI8(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.maximum(a, b, where: mask)
+    SIMD<Int8>.maximum(a, b, where: mask)
 }
 
 @inline(never)
@@ -18,13 +18,13 @@ public func highwayMaximumWhereI8(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.maximumWhereI8(mask.raw, a.raw, b.raw))
+    SIMD<Int8>(raw: HighwayReference.Nothrow.maximumWhereI8(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portMaximumWhereI8ConstantA(_ b: SIMD<Int8>, where mask: SIMD<Int8>.Mask) -> SIMD<Int8>
 {
-    SIMDInt8.maximum(SIMDInt8.repeating(26), b, where: mask)
+    SIMD<Int8>.maximum(SIMD<Int8>.repeating(26), b, where: mask)
 }
 
 @inline(never)
@@ -32,10 +32,10 @@ public func highwayMaximumWhereI8ConstantA(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.maximumWhereI8(
             mask.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             b.raw
         )
     )
@@ -44,7 +44,7 @@ public func highwayMaximumWhereI8ConstantA(
 @inline(never)
 public func portMaximumWhereI8ConstantB(_ a: SIMD<Int8>, where mask: SIMD<Int8>.Mask) -> SIMD<Int8>
 {
-    SIMDInt8.maximum(a, SIMDInt8.repeating(26), where: mask)
+    SIMD<Int8>.maximum(a, SIMD<Int8>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -52,11 +52,11 @@ public func highwayMaximumWhereI8ConstantB(
     _ a: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.maximumWhereI8(
             mask.raw,
             a.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
         )
     )
 }
@@ -67,7 +67,7 @@ public func portAddingWhereI8(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.adding(a, b, where: mask)
+    SIMD<Int8>.adding(a, b, where: mask)
 }
 
 @inline(never)
@@ -76,12 +76,12 @@ public func highwayAddingWhereI8(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.addingWhereI8(mask.raw, a.raw, b.raw))
+    SIMD<Int8>(raw: HighwayReference.Nothrow.addingWhereI8(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portAddingWhereI8ConstantA(_ b: SIMD<Int8>, where mask: SIMD<Int8>.Mask) -> SIMD<Int8> {
-    SIMDInt8.adding(SIMDInt8.repeating(26), b, where: mask)
+    SIMD<Int8>.adding(SIMD<Int8>.repeating(26), b, where: mask)
 }
 
 @inline(never)
@@ -89,10 +89,10 @@ public func highwayAddingWhereI8ConstantA(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.addingWhereI8(
             mask.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             b.raw
         )
     )
@@ -100,7 +100,7 @@ public func highwayAddingWhereI8ConstantA(
 
 @inline(never)
 public func portAddingWhereI8ConstantB(_ a: SIMD<Int8>, where mask: SIMD<Int8>.Mask) -> SIMD<Int8> {
-    SIMDInt8.adding(a, SIMDInt8.repeating(26), where: mask)
+    SIMD<Int8>.adding(a, SIMD<Int8>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -108,11 +108,11 @@ public func highwayAddingWhereI8ConstantB(
     _ a: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.addingWhereI8(
             mask.raw,
             a.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
         )
     )
 }
@@ -123,7 +123,7 @@ public func portSubtractingWhereI8(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.subtracting(a, b, where: mask)
+    SIMD<Int8>.subtracting(a, b, where: mask)
 }
 
 @inline(never)
@@ -132,7 +132,7 @@ public func highwaySubtractingWhereI8(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.subtractingWhereI8(mask.raw, a.raw, b.raw))
+    SIMD<Int8>(raw: HighwayReference.Nothrow.subtractingWhereI8(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -140,7 +140,7 @@ public func portSubtractingWhereI8ConstantA(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.subtracting(SIMDInt8.repeating(26), b, where: mask)
+    SIMD<Int8>.subtracting(SIMD<Int8>.repeating(26), b, where: mask)
 }
 
 @inline(never)
@@ -148,10 +148,10 @@ public func highwaySubtractingWhereI8ConstantA(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.subtractingWhereI8(
             mask.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             b.raw
         )
     )
@@ -162,7 +162,7 @@ public func portSubtractingWhereI8ConstantB(
     _ a: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.subtracting(a, SIMDInt8.repeating(26), where: mask)
+    SIMD<Int8>.subtracting(a, SIMD<Int8>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -170,11 +170,11 @@ public func highwaySubtractingWhereI8ConstantB(
     _ a: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.subtractingWhereI8(
             mask.raw,
             a.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
         )
     )
 }
@@ -185,7 +185,7 @@ public func portMultiplyingWhereI8(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.multiplying(a, b, where: mask)
+    SIMD<Int8>.multiplying(a, b, where: mask)
 }
 
 @inline(never)
@@ -194,7 +194,7 @@ public func highwayMultiplyingWhereI8(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.multiplyingWhereI8(mask.raw, a.raw, b.raw))
+    SIMD<Int8>(raw: HighwayReference.Nothrow.multiplyingWhereI8(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -202,7 +202,7 @@ public func portMultiplyingWhereI8ConstantA(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.multiplying(SIMDInt8.repeating(26), b, where: mask)
+    SIMD<Int8>.multiplying(SIMD<Int8>.repeating(26), b, where: mask)
 }
 
 @inline(never)
@@ -210,10 +210,10 @@ public func highwayMultiplyingWhereI8ConstantA(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.multiplyingWhereI8(
             mask.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             b.raw
         )
     )
@@ -224,7 +224,7 @@ public func portMultiplyingWhereI8ConstantB(
     _ a: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.multiplying(a, SIMDInt8.repeating(26), where: mask)
+    SIMD<Int8>.multiplying(a, SIMD<Int8>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -232,11 +232,11 @@ public func highwayMultiplyingWhereI8ConstantB(
     _ a: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.multiplyingWhereI8(
             mask.raw,
             a.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
         )
     )
 }
@@ -247,7 +247,7 @@ public func portDividingWhereI8(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.dividing(a, b, where: mask)
+    SIMD<Int8>.dividing(a, b, where: mask)
 }
 
 @inline(never)
@@ -256,13 +256,13 @@ public func highwayDividingWhereI8(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.dividingWhereI8(mask.raw, a.raw, b.raw))
+    SIMD<Int8>(raw: HighwayReference.Nothrow.dividingWhereI8(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portDividingWhereI8ConstantA(_ b: SIMD<Int8>, where mask: SIMD<Int8>.Mask) -> SIMD<Int8>
 {
-    SIMDInt8.dividing(SIMDInt8.repeating(26), b, where: mask)
+    SIMD<Int8>.dividing(SIMD<Int8>.repeating(26), b, where: mask)
 }
 
 @inline(never)
@@ -270,10 +270,10 @@ public func highwayDividingWhereI8ConstantA(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.dividingWhereI8(
             mask.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             b.raw
         )
     )
@@ -282,7 +282,7 @@ public func highwayDividingWhereI8ConstantA(
 @inline(never)
 public func portDividingWhereI8ConstantB(_ a: SIMD<Int8>, where mask: SIMD<Int8>.Mask) -> SIMD<Int8>
 {
-    SIMDInt8.dividing(a, SIMDInt8.repeating(26), where: mask)
+    SIMD<Int8>.dividing(a, SIMD<Int8>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -290,11 +290,11 @@ public func highwayDividingWhereI8ConstantB(
     _ a: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.dividingWhereI8(
             mask.raw,
             a.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
         )
     )
 }
@@ -305,7 +305,7 @@ public func portSaturatingAddingWhereI8(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.saturatingAdding(a, b, where: mask)
+    SIMD<Int8>.saturatingAdding(a, b, where: mask)
 }
 
 @inline(never)
@@ -314,7 +314,7 @@ public func highwaySaturatingAddingWhereI8(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.saturatingAddingWhereI8(mask.raw, a.raw, b.raw))
+    SIMD<Int8>(raw: HighwayReference.Nothrow.saturatingAddingWhereI8(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -322,7 +322,7 @@ public func portSaturatingAddingWhereI8ConstantA(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.saturatingAdding(SIMDInt8.repeating(26), b, where: mask)
+    SIMD<Int8>.saturatingAdding(SIMD<Int8>.repeating(26), b, where: mask)
 }
 
 @inline(never)
@@ -330,10 +330,10 @@ public func highwaySaturatingAddingWhereI8ConstantA(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.saturatingAddingWhereI8(
             mask.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             b.raw
         )
     )
@@ -344,7 +344,7 @@ public func portSaturatingAddingWhereI8ConstantB(
     _ a: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.saturatingAdding(a, SIMDInt8.repeating(26), where: mask)
+    SIMD<Int8>.saturatingAdding(a, SIMD<Int8>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -352,11 +352,11 @@ public func highwaySaturatingAddingWhereI8ConstantB(
     _ a: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.saturatingAddingWhereI8(
             mask.raw,
             a.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
         )
     )
 }
@@ -367,7 +367,7 @@ public func portSaturatingSubtractingWhereI8(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.saturatingSubtracting(a, b, where: mask)
+    SIMD<Int8>.saturatingSubtracting(a, b, where: mask)
 }
 
 @inline(never)
@@ -376,9 +376,7 @@ public func highwaySaturatingSubtractingWhereI8(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
-        raw: HighwayReference.Nothrow.saturatingSubtractingWhereI8(mask.raw, a.raw, b.raw)
-    )
+    SIMD<Int8>(raw: HighwayReference.Nothrow.saturatingSubtractingWhereI8(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -386,7 +384,7 @@ public func portSaturatingSubtractingWhereI8ConstantA(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.saturatingSubtracting(SIMDInt8.repeating(26), b, where: mask)
+    SIMD<Int8>.saturatingSubtracting(SIMD<Int8>.repeating(26), b, where: mask)
 }
 
 @inline(never)
@@ -394,10 +392,10 @@ public func highwaySaturatingSubtractingWhereI8ConstantA(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.saturatingSubtractingWhereI8(
             mask.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             b.raw
         )
     )
@@ -408,7 +406,7 @@ public func portSaturatingSubtractingWhereI8ConstantB(
     _ a: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.saturatingSubtracting(a, SIMDInt8.repeating(26), where: mask)
+    SIMD<Int8>.saturatingSubtracting(a, SIMD<Int8>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -416,36 +414,36 @@ public func highwaySaturatingSubtractingWhereI8ConstantB(
     _ a: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.saturatingSubtractingWhereI8(
             mask.raw,
             a.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portMagnitudeWhereI8(_ a: SIMD<Int8>, where mask: SIMD<Int8>.Mask) -> SIMD<Int8> {
-    SIMDInt8.magnitude(a, where: mask)
+    SIMD<Int8>.magnitude(a, where: mask)
 }
 
 @inline(never)
 public func highwayMagnitudeWhereI8(_ a: SIMD<Int8>, where mask: SIMD<Int8>.Mask) -> SIMD<Int8> {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.magnitudeWhereI8(mask.raw, a.raw))
+    SIMD<Int8>(raw: HighwayReference.Nothrow.magnitudeWhereI8(mask.raw, a.raw))
 }
 
 @inline(never)
 public func portMagnitudeWhereI8ConstantA(where mask: SIMD<Int8>.Mask) -> SIMD<Int8> {
-    SIMDInt8.magnitude(SIMDInt8.repeating(26), where: mask)
+    SIMD<Int8>.magnitude(SIMD<Int8>.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayMagnitudeWhereI8ConstantA(where mask: SIMD<Int8>.Mask) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.magnitudeWhereI8(
             mask.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
         )
     )
 }
@@ -457,7 +455,7 @@ public func portMultiplyAddingWhereI8(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.multiplyAdding(a, b, c, where: mask)
+    SIMD<Int8>.multiplyAdding(a, b, c, where: mask)
 }
 
 @inline(never)
@@ -467,9 +465,7 @@ public func highwayMultiplyAddingWhereI8(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
-        raw: HighwayReference.Nothrow.multiplyAddingWhereI8(mask.raw, a.raw, b.raw, c.raw)
-    )
+    SIMD<Int8>(raw: HighwayReference.Nothrow.multiplyAddingWhereI8(mask.raw, a.raw, b.raw, c.raw))
 }
 
 @inline(never)
@@ -478,7 +474,7 @@ public func portMultiplyAddingWhereI8ConstantA(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.multiplyAdding(SIMDInt8.repeating(26), b, c, where: mask)
+    SIMD<Int8>.multiplyAdding(SIMD<Int8>.repeating(26), b, c, where: mask)
 }
 
 @inline(never)
@@ -487,10 +483,10 @@ public func highwayMultiplyAddingWhereI8ConstantA(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.multiplyAddingWhereI8(
             mask.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             b.raw,
             c.raw
         )
@@ -503,7 +499,7 @@ public func portMultiplyAddingWhereI8ConstantB(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.multiplyAdding(a, SIMDInt8.repeating(26), c, where: mask)
+    SIMD<Int8>.multiplyAdding(a, SIMD<Int8>.repeating(26), c, where: mask)
 }
 
 @inline(never)
@@ -512,11 +508,11 @@ public func highwayMultiplyAddingWhereI8ConstantB(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.multiplyAddingWhereI8(
             mask.raw,
             a.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             c.raw
         )
     )
@@ -528,7 +524,7 @@ public func portMultiplyAddingWhereI8ConstantC(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.multiplyAdding(a, b, SIMDInt8.repeating(26), where: mask)
+    SIMD<Int8>.multiplyAdding(a, b, SIMD<Int8>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -537,12 +533,12 @@ public func highwayMultiplyAddingWhereI8ConstantC(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.multiplyAddingWhereI8(
             mask.raw,
             a.raw,
             b.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
         )
     )
 }
@@ -554,7 +550,7 @@ public func portMultiplySubtractingWhereI8(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.multiplySubtracting(a, b, c, where: mask)
+    SIMD<Int8>.multiplySubtracting(a, b, c, where: mask)
 }
 
 @inline(never)
@@ -564,7 +560,7 @@ public func highwayMultiplySubtractingWhereI8(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.multiplySubtractingWhereI8(mask.raw, a.raw, b.raw, c.raw)
     )
 }
@@ -575,7 +571,7 @@ public func portMultiplySubtractingWhereI8ConstantA(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.multiplySubtracting(SIMDInt8.repeating(26), b, c, where: mask)
+    SIMD<Int8>.multiplySubtracting(SIMD<Int8>.repeating(26), b, c, where: mask)
 }
 
 @inline(never)
@@ -584,10 +580,10 @@ public func highwayMultiplySubtractingWhereI8ConstantA(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.multiplySubtractingWhereI8(
             mask.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             b.raw,
             c.raw
         )
@@ -600,7 +596,7 @@ public func portMultiplySubtractingWhereI8ConstantB(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.multiplySubtracting(a, SIMDInt8.repeating(26), c, where: mask)
+    SIMD<Int8>.multiplySubtracting(a, SIMD<Int8>.repeating(26), c, where: mask)
 }
 
 @inline(never)
@@ -609,11 +605,11 @@ public func highwayMultiplySubtractingWhereI8ConstantB(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.multiplySubtractingWhereI8(
             mask.raw,
             a.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             c.raw
         )
     )
@@ -625,7 +621,7 @@ public func portMultiplySubtractingWhereI8ConstantC(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.multiplySubtracting(a, b, SIMDInt8.repeating(26), where: mask)
+    SIMD<Int8>.multiplySubtracting(a, b, SIMD<Int8>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -634,12 +630,12 @@ public func highwayMultiplySubtractingWhereI8ConstantC(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.multiplySubtractingWhereI8(
             mask.raw,
             a.raw,
             b.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
         )
     )
 }
@@ -651,7 +647,7 @@ public func portNegatedMultiplyAddingWhereI8(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.negatedMultiplyAdding(a, b, c, where: mask)
+    SIMD<Int8>.negatedMultiplyAdding(a, b, c, where: mask)
 }
 
 @inline(never)
@@ -661,7 +657,7 @@ public func highwayNegatedMultiplyAddingWhereI8(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereI8(mask.raw, a.raw, b.raw, c.raw)
     )
 }
@@ -672,7 +668,7 @@ public func portNegatedMultiplyAddingWhereI8ConstantA(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.negatedMultiplyAdding(SIMDInt8.repeating(26), b, c, where: mask)
+    SIMD<Int8>.negatedMultiplyAdding(SIMD<Int8>.repeating(26), b, c, where: mask)
 }
 
 @inline(never)
@@ -681,10 +677,10 @@ public func highwayNegatedMultiplyAddingWhereI8ConstantA(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereI8(
             mask.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             b.raw,
             c.raw
         )
@@ -697,7 +693,7 @@ public func portNegatedMultiplyAddingWhereI8ConstantB(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.negatedMultiplyAdding(a, SIMDInt8.repeating(26), c, where: mask)
+    SIMD<Int8>.negatedMultiplyAdding(a, SIMD<Int8>.repeating(26), c, where: mask)
 }
 
 @inline(never)
@@ -706,11 +702,11 @@ public func highwayNegatedMultiplyAddingWhereI8ConstantB(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereI8(
             mask.raw,
             a.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             c.raw
         )
     )
@@ -722,7 +718,7 @@ public func portNegatedMultiplyAddingWhereI8ConstantC(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.negatedMultiplyAdding(a, b, SIMDInt8.repeating(26), where: mask)
+    SIMD<Int8>.negatedMultiplyAdding(a, b, SIMD<Int8>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -731,12 +727,12 @@ public func highwayNegatedMultiplyAddingWhereI8ConstantC(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereI8(
             mask.raw,
             a.raw,
             b.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
         )
     )
 }
@@ -748,7 +744,7 @@ public func portNegatedMultiplySubtractingWhereI8(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.negatedMultiplySubtracting(a, b, c, where: mask)
+    SIMD<Int8>.negatedMultiplySubtracting(a, b, c, where: mask)
 }
 
 @inline(never)
@@ -758,7 +754,7 @@ public func highwayNegatedMultiplySubtractingWhereI8(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereI8(
             mask.raw,
             a.raw,
@@ -774,7 +770,7 @@ public func portNegatedMultiplySubtractingWhereI8ConstantA(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.negatedMultiplySubtracting(SIMDInt8.repeating(26), b, c, where: mask)
+    SIMD<Int8>.negatedMultiplySubtracting(SIMD<Int8>.repeating(26), b, c, where: mask)
 }
 
 @inline(never)
@@ -783,10 +779,10 @@ public func highwayNegatedMultiplySubtractingWhereI8ConstantA(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereI8(
             mask.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             b.raw,
             c.raw
         )
@@ -799,7 +795,7 @@ public func portNegatedMultiplySubtractingWhereI8ConstantB(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.negatedMultiplySubtracting(a, SIMDInt8.repeating(26), c, where: mask)
+    SIMD<Int8>.negatedMultiplySubtracting(a, SIMD<Int8>.repeating(26), c, where: mask)
 }
 
 @inline(never)
@@ -808,11 +804,11 @@ public func highwayNegatedMultiplySubtractingWhereI8ConstantB(
     _ c: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereI8(
             mask.raw,
             a.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             c.raw
         )
     )
@@ -824,7 +820,7 @@ public func portNegatedMultiplySubtractingWhereI8ConstantC(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.negatedMultiplySubtracting(a, b, SIMDInt8.repeating(26), where: mask)
+    SIMD<Int8>.negatedMultiplySubtracting(a, b, SIMD<Int8>.repeating(26), where: mask)
 }
 
 @inline(never)
@@ -833,12 +829,12 @@ public func highwayNegatedMultiplySubtractingWhereI8ConstantC(
     _ b: SIMD<Int8>,
     where mask: SIMD<Int8>.Mask
 ) -> SIMD<Int8> {
-    SIMDInt8.Vector(
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereI8(
             mask.raw,
             a.raw,
             b.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
         )
     )
 }

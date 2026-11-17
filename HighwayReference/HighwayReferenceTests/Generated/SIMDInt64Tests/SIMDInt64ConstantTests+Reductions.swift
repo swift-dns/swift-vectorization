@@ -7,11 +7,11 @@ import Vectorization
 
 extension SIMDInt64ConstantTests {
     @inline(__always)
-    private func checkSmallestConstantA(_ value: H.Lane) {
+    private func checkSmallestConstantA(_ value: Lane) {
         let mismatches = Mismatches("smallest with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         mismatches.check(
@@ -91,19 +91,19 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func smallestConstantSplatMax() {
-        checkSmallestConstantA(H.Lane.max)
+        checkSmallestConstantA(Lane.max)
     }
 
     @Test func smallestConstantSplatMin() {
-        checkSmallestConstantA(H.Lane.min)
+        checkSmallestConstantA(Lane.min)
     }
 
     @inline(__always)
-    private func checkLargestConstantA(_ value: H.Lane) {
+    private func checkLargestConstantA(_ value: Lane) {
         let mismatches = Mismatches("largest with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         mismatches.check(
@@ -183,10 +183,10 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func largestConstantSplatMax() {
-        checkLargestConstantA(H.Lane.max)
+        checkLargestConstantA(Lane.max)
     }
 
     @Test func largestConstantSplatMin() {
-        checkLargestConstantA(H.Lane.min)
+        checkLargestConstantA(Lane.min)
     }
 }

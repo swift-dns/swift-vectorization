@@ -5,192 +5,240 @@ public import Vectorization
 
 @inline(never)
 public func portMinimumF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.minimum(a, b)
+    SIMD<Float>.minimum(a, b)
 }
 
 @inline(never)
 public func highwayMinimumF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.minimumF32(a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.minimumF32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMinimumF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.minimum(SIMDFloat.repeating(1.5), b)
+    SIMD<Float>.minimum(SIMD<Float>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayMinimumF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.minimumF32(HighwayReference.Nothrow.repeatingF32(1.5).raw, b.raw)
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.minimumF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
 public func portMinimumF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.minimum(a, SIMDFloat.repeating(1.5))
+    SIMD<Float>.minimum(a, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMinimumF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.minimumF32(a.raw, HighwayReference.Nothrow.repeatingF32(1.5).raw)
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.minimumF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
 public func portMaximumF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.maximum(a, b)
+    SIMD<Float>.maximum(a, b)
 }
 
 @inline(never)
 public func highwayMaximumF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.maximumF32(a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.maximumF32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMaximumF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.maximum(SIMDFloat.repeating(1.5), b)
+    SIMD<Float>.maximum(SIMD<Float>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayMaximumF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.maximumF32(HighwayReference.Nothrow.repeatingF32(1.5).raw, b.raw)
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.maximumF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
 public func portMaximumF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.maximum(a, SIMDFloat.repeating(1.5))
+    SIMD<Float>.maximum(a, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMaximumF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.maximumF32(a.raw, HighwayReference.Nothrow.repeatingF32(1.5).raw)
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.maximumF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
 public func portMinimumNumberF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.minimumNumber(a, b)
+    SIMD<Float>.minimumNumber(a, b)
 }
 
 @inline(never)
 public func highwayMinimumNumberF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.minimumNumberF32(a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.minimumNumberF32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMinimumNumberF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.minimumNumber(SIMDFloat.repeating(1.5), b)
+    SIMD<Float>.minimumNumber(SIMD<Float>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayMinimumNumberF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.minimumNumberF32(HighwayReference.Nothrow.repeatingF32(1.5).raw, b.raw)
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.minimumNumberF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
 public func portMinimumNumberF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.minimumNumber(a, SIMDFloat.repeating(1.5))
+    SIMD<Float>.minimumNumber(a, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMinimumNumberF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.minimumNumberF32(a.raw, HighwayReference.Nothrow.repeatingF32(1.5).raw)
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.minimumNumberF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
 public func portMaximumNumberF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.maximumNumber(a, b)
+    SIMD<Float>.maximumNumber(a, b)
 }
 
 @inline(never)
 public func highwayMaximumNumberF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.maximumNumberF32(a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.maximumNumberF32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMaximumNumberF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.maximumNumber(SIMDFloat.repeating(1.5), b)
+    SIMD<Float>.maximumNumber(SIMD<Float>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayMaximumNumberF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.maximumNumberF32(HighwayReference.Nothrow.repeatingF32(1.5).raw, b.raw)
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.maximumNumberF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
 public func portMaximumNumberF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.maximumNumber(a, SIMDFloat.repeating(1.5))
+    SIMD<Float>.maximumNumber(a, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMaximumNumberF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.maximumNumberF32(a.raw, HighwayReference.Nothrow.repeatingF32(1.5).raw)
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.maximumNumberF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
 public func portMinimumMagnitudeF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.minimumMagnitude(a, b)
+    SIMD<Float>.minimumMagnitude(a, b)
 }
 
 @inline(never)
 public func highwayMinimumMagnitudeF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.minimumMagnitudeF32(a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.minimumMagnitudeF32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMinimumMagnitudeF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.minimumMagnitude(SIMDFloat.repeating(1.5), b)
+    SIMD<Float>.minimumMagnitude(SIMD<Float>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayMinimumMagnitudeF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.minimumMagnitudeF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.minimumMagnitudeF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMinimumMagnitudeF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.minimumMagnitude(a, SIMDFloat.repeating(1.5))
+    SIMD<Float>.minimumMagnitude(a, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMinimumMagnitudeF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.minimumMagnitudeF32(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.minimumMagnitudeF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portMaximumMagnitudeF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.maximumMagnitude(a, b)
+    SIMD<Float>.maximumMagnitude(a, b)
 }
 
 @inline(never)
 public func highwayMaximumMagnitudeF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.maximumMagnitudeF32(a.raw, b.raw)
+    SIMD<Float>(raw: HighwayReference.Nothrow.maximumMagnitudeF32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMaximumMagnitudeF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.maximumMagnitude(SIMDFloat.repeating(1.5), b)
+    SIMD<Float>.maximumMagnitude(SIMD<Float>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayMaximumMagnitudeF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.maximumMagnitudeF32(
-        HighwayReference.Nothrow.repeatingF32(1.5).raw,
-        b.raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.maximumMagnitudeF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMaximumMagnitudeF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    SIMDFloat.maximumMagnitude(a, SIMDFloat.repeating(1.5))
+    SIMD<Float>.maximumMagnitude(a, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMaximumMagnitudeF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
-    HighwayReference.Nothrow.maximumMagnitudeF32(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.maximumMagnitudeF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }

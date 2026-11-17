@@ -7,26 +7,26 @@ public import Vectorization
 @inline(never)
 public func portHalfVectorConvertingF32ToF16(converting a: SIMD<Float>) -> SIMD<Float16>.HalfVector
 {
-    SIMDFloat16.halfVector(converting: a)
+    SIMD<Float16>.halfVector(converting: a)
 }
 
 @inline(never)
 public func highwayHalfVectorConvertingF32ToF16(
     converting a: SIMD<Float>
 ) -> SIMD<Float16>.HalfVector {
-    SIMDFloat16.HalfVector(raw: HighwayReference.Nothrow.halfVectorConvertingF32ToF16(a.raw))
+    SIMD<Float16>.HalfVector(raw: HighwayReference.Nothrow.halfVectorConvertingF32ToF16(a.raw))
 }
 
 @inline(never)
 public func portHalfVectorConvertingF32ToF16ConstantA() -> SIMD<Float16>.HalfVector {
-    SIMDFloat16.halfVector(converting: SIMDFloat.repeating(1.5))
+    SIMD<Float16>.halfVector(converting: SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayHalfVectorConvertingF32ToF16ConstantA() -> SIMD<Float16>.HalfVector {
-    SIMDFloat16.HalfVector(
+    SIMD<Float16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorConvertingF32ToF16(
-            HighwayReference.Nothrow.repeatingF32(1.5).raw
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
         )
     )
 }
@@ -35,26 +35,28 @@ public func highwayHalfVectorConvertingF32ToF16ConstantA() -> SIMD<Float16>.Half
 public func portQuarterVectorConvertingF64ToF16(
     converting a: SIMD<Double>
 ) -> SIMD<Float16>.QuarterVector {
-    SIMDFloat16.quarterVector(converting: a)
+    SIMD<Float16>.quarterVector(converting: a)
 }
 
 @inline(never)
 public func highwayQuarterVectorConvertingF64ToF16(
     converting a: SIMD<Double>
 ) -> SIMD<Float16>.QuarterVector {
-    SIMDFloat16.QuarterVector(raw: HighwayReference.Nothrow.quarterVectorConvertingF64ToF16(a.raw))
+    SIMD<Float16>.QuarterVector(
+        raw: HighwayReference.Nothrow.quarterVectorConvertingF64ToF16(a.raw)
+    )
 }
 
 @inline(never)
 public func portQuarterVectorConvertingF64ToF16ConstantA() -> SIMD<Float16>.QuarterVector {
-    SIMDFloat16.quarterVector(converting: SIMDDouble.repeating(1.5))
+    SIMD<Float16>.quarterVector(converting: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayQuarterVectorConvertingF64ToF16ConstantA() -> SIMD<Float16>.QuarterVector {
-    SIMDFloat16.QuarterVector(
+    SIMD<Float16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorConvertingF64ToF16(
-            HighwayReference.Nothrow.repeatingF64(1.5).raw
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
         )
     )
 }

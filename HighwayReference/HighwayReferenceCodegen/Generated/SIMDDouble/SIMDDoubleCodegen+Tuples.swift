@@ -5,36 +5,44 @@ public import Vectorization
 
 @inline(never)
 public func portCreate2F64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> (SIMD<Double>, SIMD<Double>) {
-    SIMDDouble.create2(a, b)
+    SIMD<Double>.create2(a, b)
 }
 
 @inline(never)
 public func highwayCreate2F64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> (SIMD<Double>, SIMD<Double>)
 {
-    { tuple in (tuple.v0, tuple.v1) }(HighwayReference.Nothrow.create2F64(a.raw, b.raw))
+    { tuple in (SIMD<Double>(raw: tuple.v0), SIMD<Double>(raw: tuple.v1)) }(
+        HighwayReference.Nothrow.create2F64(a.raw, b.raw)
+    )
 }
 
 @inline(never)
 public func portCreate2F64ConstantA(_ b: SIMD<Double>) -> (SIMD<Double>, SIMD<Double>) {
-    SIMDDouble.create2(SIMDDouble.repeating(1.5), b)
+    SIMD<Double>.create2(SIMD<Double>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayCreate2F64ConstantA(_ b: SIMD<Double>) -> (SIMD<Double>, SIMD<Double>) {
-    { tuple in (tuple.v0, tuple.v1) }(
-        HighwayReference.Nothrow.create2F64(HighwayReference.Nothrow.repeatingF64(1.5).raw, b.raw)
+    { tuple in (SIMD<Double>(raw: tuple.v0), SIMD<Double>(raw: tuple.v1)) }(
+        HighwayReference.Nothrow.create2F64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portCreate2F64ConstantB(_ a: SIMD<Double>) -> (SIMD<Double>, SIMD<Double>) {
-    SIMDDouble.create2(a, SIMDDouble.repeating(1.5))
+    SIMD<Double>.create2(a, SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayCreate2F64ConstantB(_ a: SIMD<Double>) -> (SIMD<Double>, SIMD<Double>) {
-    { tuple in (tuple.v0, tuple.v1) }(
-        HighwayReference.Nothrow.create2F64(a.raw, HighwayReference.Nothrow.repeatingF64(1.5).raw)
+    { tuple in (SIMD<Double>(raw: tuple.v0), SIMD<Double>(raw: tuple.v1)) }(
+        HighwayReference.Nothrow.create2F64(
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
@@ -43,7 +51,7 @@ public func portGet2F64(
     _ tuple: (SIMD<Double>, SIMD<Double>),
     atUnchecked index: Int
 ) -> SIMD<Double> {
-    unsafe SIMDDouble.get2(tuple, atUnchecked: index)
+    unsafe SIMD<Double>.get2(tuple, atUnchecked: index)
 }
 
 @inline(never)
@@ -51,22 +59,26 @@ public func highwayGet2F64(
     _ tuple: (SIMD<Double>, SIMD<Double>),
     atUnchecked index: Int
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.get2F64(
-        cvectorization_ops_tuple2_f64(v0: tuple.0.raw, v1: tuple.1.raw),
-        index
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.get2F64(
+            cvectorization_ops_tuple2_f64(v0: tuple.0.raw, v1: tuple.1.raw),
+            index
+        )
     )
 }
 
 @inline(never)
 public func portGet2F64ConstantIndex(_ tuple: (SIMD<Double>, SIMD<Double>)) -> SIMD<Double> {
-    unsafe SIMDDouble.get2(tuple, atUnchecked: 1)
+    unsafe SIMD<Double>.get2(tuple, atUnchecked: 1)
 }
 
 @inline(never)
 public func highwayGet2F64ConstantIndex(_ tuple: (SIMD<Double>, SIMD<Double>)) -> SIMD<Double> {
-    HighwayReference.Nothrow.get2F64(
-        cvectorization_ops_tuple2_f64(v0: tuple.0.raw, v1: tuple.1.raw),
-        1
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.get2F64(
+            cvectorization_ops_tuple2_f64(v0: tuple.0.raw, v1: tuple.1.raw),
+            1
+        )
     )
 }
 
@@ -76,7 +88,7 @@ public func portSet2F64(
     atUnchecked index: Int,
     to a: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>) {
-    unsafe SIMDDouble.set2(tuple, atUnchecked: index, to: a)
+    unsafe SIMD<Double>.set2(tuple, atUnchecked: index, to: a)
 }
 
 @inline(never)
@@ -85,7 +97,7 @@ public func highwaySet2F64(
     atUnchecked index: Int,
     to a: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>) {
-    { tuple in (tuple.v0, tuple.v1) }(
+    { tuple in (SIMD<Double>(raw: tuple.v0), SIMD<Double>(raw: tuple.v1)) }(
         HighwayReference.Nothrow.set2F64(
             cvectorization_ops_tuple2_f64(v0: tuple.0.raw, v1: tuple.1.raw),
             index,
@@ -99,7 +111,7 @@ public func portSet2F64ConstantIndex(
     _ tuple: (SIMD<Double>, SIMD<Double>),
     to a: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>) {
-    unsafe SIMDDouble.set2(tuple, atUnchecked: 1, to: a)
+    unsafe SIMD<Double>.set2(tuple, atUnchecked: 1, to: a)
 }
 
 @inline(never)
@@ -107,7 +119,7 @@ public func highwaySet2F64ConstantIndex(
     _ tuple: (SIMD<Double>, SIMD<Double>),
     to a: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>) {
-    { tuple in (tuple.v0, tuple.v1) }(
+    { tuple in (SIMD<Double>(raw: tuple.v0), SIMD<Double>(raw: tuple.v1)) }(
         HighwayReference.Nothrow.set2F64(
             cvectorization_ops_tuple2_f64(v0: tuple.0.raw, v1: tuple.1.raw),
             1,
@@ -121,7 +133,7 @@ public func portSet2F64ConstantA(
     _ tuple: (SIMD<Double>, SIMD<Double>),
     atUnchecked index: Int
 ) -> (SIMD<Double>, SIMD<Double>) {
-    unsafe SIMDDouble.set2(tuple, atUnchecked: index, to: SIMDDouble.repeating(1.5))
+    unsafe SIMD<Double>.set2(tuple, atUnchecked: index, to: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
@@ -129,11 +141,11 @@ public func highwaySet2F64ConstantA(
     _ tuple: (SIMD<Double>, SIMD<Double>),
     atUnchecked index: Int
 ) -> (SIMD<Double>, SIMD<Double>) {
-    { tuple in (tuple.v0, tuple.v1) }(
+    { tuple in (SIMD<Double>(raw: tuple.v0), SIMD<Double>(raw: tuple.v1)) }(
         HighwayReference.Nothrow.set2F64(
             cvectorization_ops_tuple2_f64(v0: tuple.0.raw, v1: tuple.1.raw),
             index,
-            HighwayReference.Nothrow.repeatingF64(1.5).raw
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
         )
     )
 }
@@ -144,7 +156,7 @@ public func portCreate3F64(
     _ b: SIMD<Double>,
     _ c: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    SIMDDouble.create3(a, b, c)
+    SIMD<Double>.create3(a, b, c)
 }
 
 @inline(never)
@@ -153,9 +165,9 @@ public func highwayCreate3F64(
     _ b: SIMD<Double>,
     _ c: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
-        HighwayReference.Nothrow.create3F64(a.raw, b.raw, c.raw)
-    )
+    { tuple in
+        (SIMD<Double>(raw: tuple.v0), SIMD<Double>(raw: tuple.v1), SIMD<Double>(raw: tuple.v2))
+    }(HighwayReference.Nothrow.create3F64(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
@@ -163,7 +175,7 @@ public func portCreate3F64ConstantA(
     _ b: SIMD<Double>,
     _ c: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    SIMDDouble.create3(SIMDDouble.repeating(1.5), b, c)
+    SIMD<Double>.create3(SIMD<Double>.repeating(1.5), b, c)
 }
 
 @inline(never)
@@ -171,9 +183,11 @@ public func highwayCreate3F64ConstantA(
     _ b: SIMD<Double>,
     _ c: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
+    { tuple in
+        (SIMD<Double>(raw: tuple.v0), SIMD<Double>(raw: tuple.v1), SIMD<Double>(raw: tuple.v2))
+    }(
         HighwayReference.Nothrow.create3F64(
-            HighwayReference.Nothrow.repeatingF64(1.5).raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
             b.raw,
             c.raw
         )
@@ -185,7 +199,7 @@ public func portCreate3F64ConstantB(
     _ a: SIMD<Double>,
     _ c: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    SIMDDouble.create3(a, SIMDDouble.repeating(1.5), c)
+    SIMD<Double>.create3(a, SIMD<Double>.repeating(1.5), c)
 }
 
 @inline(never)
@@ -193,10 +207,12 @@ public func highwayCreate3F64ConstantB(
     _ a: SIMD<Double>,
     _ c: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
+    { tuple in
+        (SIMD<Double>(raw: tuple.v0), SIMD<Double>(raw: tuple.v1), SIMD<Double>(raw: tuple.v2))
+    }(
         HighwayReference.Nothrow.create3F64(
             a.raw,
-            HighwayReference.Nothrow.repeatingF64(1.5).raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
             c.raw
         )
     )
@@ -207,7 +223,7 @@ public func portCreate3F64ConstantC(
     _ a: SIMD<Double>,
     _ b: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    SIMDDouble.create3(a, b, SIMDDouble.repeating(1.5))
+    SIMD<Double>.create3(a, b, SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
@@ -215,11 +231,13 @@ public func highwayCreate3F64ConstantC(
     _ a: SIMD<Double>,
     _ b: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
+    { tuple in
+        (SIMD<Double>(raw: tuple.v0), SIMD<Double>(raw: tuple.v1), SIMD<Double>(raw: tuple.v2))
+    }(
         HighwayReference.Nothrow.create3F64(
             a.raw,
             b.raw,
-            HighwayReference.Nothrow.repeatingF64(1.5).raw
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
         )
     )
 }
@@ -229,7 +247,7 @@ public func portGet3F64(
     _ tuple: (SIMD<Double>, SIMD<Double>, SIMD<Double>),
     atUnchecked index: Int
 ) -> SIMD<Double> {
-    unsafe SIMDDouble.get3(tuple, atUnchecked: index)
+    unsafe SIMD<Double>.get3(tuple, atUnchecked: index)
 }
 
 @inline(never)
@@ -237,9 +255,11 @@ public func highwayGet3F64(
     _ tuple: (SIMD<Double>, SIMD<Double>, SIMD<Double>),
     atUnchecked index: Int
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.get3F64(
-        cvectorization_ops_tuple3_f64(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
-        index
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.get3F64(
+            cvectorization_ops_tuple3_f64(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
+            index
+        )
     )
 }
 
@@ -247,16 +267,18 @@ public func highwayGet3F64(
 public func portGet3F64ConstantIndex(
     _ tuple: (SIMD<Double>, SIMD<Double>, SIMD<Double>)
 ) -> SIMD<Double> {
-    unsafe SIMDDouble.get3(tuple, atUnchecked: 1)
+    unsafe SIMD<Double>.get3(tuple, atUnchecked: 1)
 }
 
 @inline(never)
 public func highwayGet3F64ConstantIndex(
     _ tuple: (SIMD<Double>, SIMD<Double>, SIMD<Double>)
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.get3F64(
-        cvectorization_ops_tuple3_f64(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
-        1
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.get3F64(
+            cvectorization_ops_tuple3_f64(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
+            1
+        )
     )
 }
 
@@ -266,7 +288,7 @@ public func portSet3F64(
     atUnchecked index: Int,
     to a: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    unsafe SIMDDouble.set3(tuple, atUnchecked: index, to: a)
+    unsafe SIMD<Double>.set3(tuple, atUnchecked: index, to: a)
 }
 
 @inline(never)
@@ -275,7 +297,9 @@ public func highwaySet3F64(
     atUnchecked index: Int,
     to a: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
+    { tuple in
+        (SIMD<Double>(raw: tuple.v0), SIMD<Double>(raw: tuple.v1), SIMD<Double>(raw: tuple.v2))
+    }(
         HighwayReference.Nothrow.set3F64(
             cvectorization_ops_tuple3_f64(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
             index,
@@ -289,7 +313,7 @@ public func portSet3F64ConstantIndex(
     _ tuple: (SIMD<Double>, SIMD<Double>, SIMD<Double>),
     to a: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    unsafe SIMDDouble.set3(tuple, atUnchecked: 1, to: a)
+    unsafe SIMD<Double>.set3(tuple, atUnchecked: 1, to: a)
 }
 
 @inline(never)
@@ -297,7 +321,9 @@ public func highwaySet3F64ConstantIndex(
     _ tuple: (SIMD<Double>, SIMD<Double>, SIMD<Double>),
     to a: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
+    { tuple in
+        (SIMD<Double>(raw: tuple.v0), SIMD<Double>(raw: tuple.v1), SIMD<Double>(raw: tuple.v2))
+    }(
         HighwayReference.Nothrow.set3F64(
             cvectorization_ops_tuple3_f64(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
             1,
@@ -311,7 +337,7 @@ public func portSet3F64ConstantA(
     _ tuple: (SIMD<Double>, SIMD<Double>, SIMD<Double>),
     atUnchecked index: Int
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    unsafe SIMDDouble.set3(tuple, atUnchecked: index, to: SIMDDouble.repeating(1.5))
+    unsafe SIMD<Double>.set3(tuple, atUnchecked: index, to: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
@@ -319,11 +345,13 @@ public func highwaySet3F64ConstantA(
     _ tuple: (SIMD<Double>, SIMD<Double>, SIMD<Double>),
     atUnchecked index: Int
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
+    { tuple in
+        (SIMD<Double>(raw: tuple.v0), SIMD<Double>(raw: tuple.v1), SIMD<Double>(raw: tuple.v2))
+    }(
         HighwayReference.Nothrow.set3F64(
             cvectorization_ops_tuple3_f64(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
             index,
-            HighwayReference.Nothrow.repeatingF64(1.5).raw
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
         )
     )
 }
@@ -335,7 +363,7 @@ public func portCreate4F64(
     _ c: SIMD<Double>,
     _ d: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    SIMDDouble.create4(a, b, c, d)
+    SIMD<Double>.create4(a, b, c, d)
 }
 
 @inline(never)
@@ -345,9 +373,12 @@ public func highwayCreate4F64(
     _ c: SIMD<Double>,
     _ d: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
-        HighwayReference.Nothrow.create4F64(a.raw, b.raw, c.raw, d.raw)
-    )
+    { tuple in
+        (
+            SIMD<Double>(raw: tuple.v0), SIMD<Double>(raw: tuple.v1), SIMD<Double>(raw: tuple.v2),
+            SIMD<Double>(raw: tuple.v3)
+        )
+    }(HighwayReference.Nothrow.create4F64(a.raw, b.raw, c.raw, d.raw))
 }
 
 @inline(never)
@@ -356,7 +387,7 @@ public func portCreate4F64ConstantA(
     _ c: SIMD<Double>,
     _ d: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    SIMDDouble.create4(SIMDDouble.repeating(1.5), b, c, d)
+    SIMD<Double>.create4(SIMD<Double>.repeating(1.5), b, c, d)
 }
 
 @inline(never)
@@ -365,9 +396,14 @@ public func highwayCreate4F64ConstantA(
     _ c: SIMD<Double>,
     _ d: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
+    { tuple in
+        (
+            SIMD<Double>(raw: tuple.v0), SIMD<Double>(raw: tuple.v1), SIMD<Double>(raw: tuple.v2),
+            SIMD<Double>(raw: tuple.v3)
+        )
+    }(
         HighwayReference.Nothrow.create4F64(
-            HighwayReference.Nothrow.repeatingF64(1.5).raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
             b.raw,
             c.raw,
             d.raw
@@ -381,7 +417,7 @@ public func portCreate4F64ConstantB(
     _ c: SIMD<Double>,
     _ d: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    SIMDDouble.create4(a, SIMDDouble.repeating(1.5), c, d)
+    SIMD<Double>.create4(a, SIMD<Double>.repeating(1.5), c, d)
 }
 
 @inline(never)
@@ -390,10 +426,15 @@ public func highwayCreate4F64ConstantB(
     _ c: SIMD<Double>,
     _ d: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
+    { tuple in
+        (
+            SIMD<Double>(raw: tuple.v0), SIMD<Double>(raw: tuple.v1), SIMD<Double>(raw: tuple.v2),
+            SIMD<Double>(raw: tuple.v3)
+        )
+    }(
         HighwayReference.Nothrow.create4F64(
             a.raw,
-            HighwayReference.Nothrow.repeatingF64(1.5).raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
             c.raw,
             d.raw
         )
@@ -406,7 +447,7 @@ public func portCreate4F64ConstantC(
     _ b: SIMD<Double>,
     _ d: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    SIMDDouble.create4(a, b, SIMDDouble.repeating(1.5), d)
+    SIMD<Double>.create4(a, b, SIMD<Double>.repeating(1.5), d)
 }
 
 @inline(never)
@@ -415,11 +456,16 @@ public func highwayCreate4F64ConstantC(
     _ b: SIMD<Double>,
     _ d: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
+    { tuple in
+        (
+            SIMD<Double>(raw: tuple.v0), SIMD<Double>(raw: tuple.v1), SIMD<Double>(raw: tuple.v2),
+            SIMD<Double>(raw: tuple.v3)
+        )
+    }(
         HighwayReference.Nothrow.create4F64(
             a.raw,
             b.raw,
-            HighwayReference.Nothrow.repeatingF64(1.5).raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
             d.raw
         )
     )
@@ -431,7 +477,7 @@ public func portCreate4F64ConstantD(
     _ b: SIMD<Double>,
     _ c: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    SIMDDouble.create4(a, b, c, SIMDDouble.repeating(1.5))
+    SIMD<Double>.create4(a, b, c, SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
@@ -440,12 +486,17 @@ public func highwayCreate4F64ConstantD(
     _ b: SIMD<Double>,
     _ c: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
+    { tuple in
+        (
+            SIMD<Double>(raw: tuple.v0), SIMD<Double>(raw: tuple.v1), SIMD<Double>(raw: tuple.v2),
+            SIMD<Double>(raw: tuple.v3)
+        )
+    }(
         HighwayReference.Nothrow.create4F64(
             a.raw,
             b.raw,
             c.raw,
-            HighwayReference.Nothrow.repeatingF64(1.5).raw
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
         )
     )
 }
@@ -455,7 +506,7 @@ public func portGet4F64(
     _ tuple: (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>),
     atUnchecked index: Int
 ) -> SIMD<Double> {
-    unsafe SIMDDouble.get4(tuple, atUnchecked: index)
+    unsafe SIMD<Double>.get4(tuple, atUnchecked: index)
 }
 
 @inline(never)
@@ -463,14 +514,16 @@ public func highwayGet4F64(
     _ tuple: (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>),
     atUnchecked index: Int
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.get4F64(
-        cvectorization_ops_tuple4_f64(
-            v0: tuple.0.raw,
-            v1: tuple.1.raw,
-            v2: tuple.2.raw,
-            v3: tuple.3.raw
-        ),
-        index
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.get4F64(
+            cvectorization_ops_tuple4_f64(
+                v0: tuple.0.raw,
+                v1: tuple.1.raw,
+                v2: tuple.2.raw,
+                v3: tuple.3.raw
+            ),
+            index
+        )
     )
 }
 
@@ -478,21 +531,23 @@ public func highwayGet4F64(
 public func portGet4F64ConstantIndex(
     _ tuple: (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>)
 ) -> SIMD<Double> {
-    unsafe SIMDDouble.get4(tuple, atUnchecked: 1)
+    unsafe SIMD<Double>.get4(tuple, atUnchecked: 1)
 }
 
 @inline(never)
 public func highwayGet4F64ConstantIndex(
     _ tuple: (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>)
 ) -> SIMD<Double> {
-    HighwayReference.Nothrow.get4F64(
-        cvectorization_ops_tuple4_f64(
-            v0: tuple.0.raw,
-            v1: tuple.1.raw,
-            v2: tuple.2.raw,
-            v3: tuple.3.raw
-        ),
-        1
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.get4F64(
+            cvectorization_ops_tuple4_f64(
+                v0: tuple.0.raw,
+                v1: tuple.1.raw,
+                v2: tuple.2.raw,
+                v3: tuple.3.raw
+            ),
+            1
+        )
     )
 }
 
@@ -502,7 +557,7 @@ public func portSet4F64(
     atUnchecked index: Int,
     to a: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    unsafe SIMDDouble.set4(tuple, atUnchecked: index, to: a)
+    unsafe SIMD<Double>.set4(tuple, atUnchecked: index, to: a)
 }
 
 @inline(never)
@@ -511,7 +566,12 @@ public func highwaySet4F64(
     atUnchecked index: Int,
     to a: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
+    { tuple in
+        (
+            SIMD<Double>(raw: tuple.v0), SIMD<Double>(raw: tuple.v1), SIMD<Double>(raw: tuple.v2),
+            SIMD<Double>(raw: tuple.v3)
+        )
+    }(
         HighwayReference.Nothrow.set4F64(
             cvectorization_ops_tuple4_f64(
                 v0: tuple.0.raw,
@@ -530,7 +590,7 @@ public func portSet4F64ConstantIndex(
     _ tuple: (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>),
     to a: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    unsafe SIMDDouble.set4(tuple, atUnchecked: 1, to: a)
+    unsafe SIMD<Double>.set4(tuple, atUnchecked: 1, to: a)
 }
 
 @inline(never)
@@ -538,7 +598,12 @@ public func highwaySet4F64ConstantIndex(
     _ tuple: (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>),
     to a: SIMD<Double>
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
+    { tuple in
+        (
+            SIMD<Double>(raw: tuple.v0), SIMD<Double>(raw: tuple.v1), SIMD<Double>(raw: tuple.v2),
+            SIMD<Double>(raw: tuple.v3)
+        )
+    }(
         HighwayReference.Nothrow.set4F64(
             cvectorization_ops_tuple4_f64(
                 v0: tuple.0.raw,
@@ -557,7 +622,7 @@ public func portSet4F64ConstantA(
     _ tuple: (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>),
     atUnchecked index: Int
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    unsafe SIMDDouble.set4(tuple, atUnchecked: index, to: SIMDDouble.repeating(1.5))
+    unsafe SIMD<Double>.set4(tuple, atUnchecked: index, to: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
@@ -565,7 +630,12 @@ public func highwaySet4F64ConstantA(
     _ tuple: (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>),
     atUnchecked index: Int
 ) -> (SIMD<Double>, SIMD<Double>, SIMD<Double>, SIMD<Double>) {
-    { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
+    { tuple in
+        (
+            SIMD<Double>(raw: tuple.v0), SIMD<Double>(raw: tuple.v1), SIMD<Double>(raw: tuple.v2),
+            SIMD<Double>(raw: tuple.v3)
+        )
+    }(
         HighwayReference.Nothrow.set4F64(
             cvectorization_ops_tuple4_f64(
                 v0: tuple.0.raw,
@@ -574,7 +644,7 @@ public func highwaySet4F64ConstantA(
                 v3: tuple.3.raw
             ),
             index,
-            HighwayReference.Nothrow.repeatingF64(1.5).raw
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
         )
     )
 }

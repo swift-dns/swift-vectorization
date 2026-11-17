@@ -6,81 +6,97 @@ public import Vectorization
 
 @inline(never)
 public func portOddEvenF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.oddEven(a, b)
+    SIMD<Float16>.oddEven(a, b)
 }
 
 @inline(never)
 public func highwayOddEvenF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.oddEvenF16(a.raw, b.raw)
+    SIMD<Float16>(raw: HighwayReference.Nothrow.oddEvenF16(a.raw, b.raw))
 }
 
 @inline(never)
 public func portOddEvenF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.oddEven(SIMDFloat16.repeating(Float16(bitPattern: 26)), b)
+    SIMD<Float16>.oddEven(SIMD<Float16>.repeating(Float16(bitPattern: 26)), b)
 }
 
 @inline(never)
 public func highwayOddEvenF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.oddEvenF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
-        b.raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.oddEvenF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portOddEvenF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.oddEven(a, SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    SIMD<Float16>.oddEven(a, SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayOddEvenF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.oddEvenF16(
-        a.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.oddEvenF16(
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portDuplicatingEvenF16(_ a: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.duplicatingEven(a)
+    SIMD<Float16>.duplicatingEven(a)
 }
 
 @inline(never)
 public func highwayDuplicatingEvenF16(_ a: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.duplicatingEvenF16(a.raw)
+    SIMD<Float16>(raw: HighwayReference.Nothrow.duplicatingEvenF16(a.raw))
 }
 
 @inline(never)
 public func portDuplicatingEvenF16ConstantA() -> SIMD<Float16> {
-    SIMDFloat16.duplicatingEven(SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    SIMD<Float16>.duplicatingEven(SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayDuplicatingEvenF16ConstantA() -> SIMD<Float16> {
-    HighwayReference.Nothrow.duplicatingEvenF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.duplicatingEvenF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portDuplicatingOddF16(_ a: SIMD<Float16>) -> SIMD<Float16> {
-    SIMDFloat16.duplicatingOdd(a)
+    SIMD<Float16>.duplicatingOdd(a)
 }
 
 @inline(never)
 public func highwayDuplicatingOddF16(_ a: SIMD<Float16>) -> SIMD<Float16> {
-    HighwayReference.Nothrow.duplicatingOddF16(a.raw)
+    SIMD<Float16>(raw: HighwayReference.Nothrow.duplicatingOddF16(a.raw))
 }
 
 @inline(never)
 public func portDuplicatingOddF16ConstantA() -> SIMD<Float16> {
-    SIMDFloat16.duplicatingOdd(SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    SIMD<Float16>.duplicatingOdd(SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayDuplicatingOddF16ConstantA() -> SIMD<Float16> {
-    HighwayReference.Nothrow.duplicatingOddF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.duplicatingOddF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 #endif

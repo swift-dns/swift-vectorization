@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDUInt32ReferenceTests {
     @Test func oddEven() {
         let mismatches = Mismatches("oddEven")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8861_5D19_5D7F_ADF4)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8861_5E19_5D7F_AFA7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8861_5D19_5D7F_ADF4)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8861_5E19_5D7F_AFA7)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.oddEven(a, b),
-                H.Vector(raw: HighwayReference.oddEvenU32(a.raw, b.raw)),
+                H(raw: HighwayReference.oddEvenU32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -22,11 +22,11 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func duplicatingEven() {
         let mismatches = Mismatches("duplicatingEven")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5811_6C9C_04A7_B64F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5811_6C9C_04A7_B64F)
         for a in aInputs {
             mismatches.check(
                 H.duplicatingEven(a),
-                H.Vector(raw: HighwayReference.duplicatingEvenU32(a.raw)),
+                H(raw: HighwayReference.duplicatingEvenU32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -35,11 +35,11 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func duplicatingOdd() {
         let mismatches = Mismatches("duplicatingOdd")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x57A0_B6F7_0ECE_F006)
+        let aInputs = Inputs.vectors(H.self, seed: 0x57A0_B6F7_0ECE_F006)
         for a in aInputs {
             mismatches.check(
                 H.duplicatingOdd(a),
-                H.Vector(raw: HighwayReference.duplicatingOddU32(a.raw)),
+                H(raw: HighwayReference.duplicatingOddU32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -48,11 +48,11 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func shuffled1032() {
         let mismatches = Mismatches("shuffled1032")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF1B1_B25A_2D91_615A)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF1B1_B25A_2D91_615A)
         for a in aInputs {
             mismatches.check(
                 H.shuffled1032(a),
-                H.Vector(raw: HighwayReference.shuffled1032U32(a.raw)),
+                H(raw: HighwayReference.shuffled1032U32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -61,11 +61,11 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func shuffled0321() {
         let mismatches = Mismatches("shuffled0321")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3D3C_4721_114F_8A86)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3D3C_4721_114F_8A86)
         for a in aInputs {
             mismatches.check(
                 H.shuffled0321(a),
-                H.Vector(raw: HighwayReference.shuffled0321U32(a.raw)),
+                H(raw: HighwayReference.shuffled0321U32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -74,11 +74,11 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func shuffled2103() {
         let mismatches = Mismatches("shuffled2103")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x77C6_A810_2883_79DA)
+        let aInputs = Inputs.vectors(H.self, seed: 0x77C6_A810_2883_79DA)
         for a in aInputs {
             mismatches.check(
                 H.shuffled2103(a),
-                H.Vector(raw: HighwayReference.shuffled2103U32(a.raw)),
+                H(raw: HighwayReference.shuffled2103U32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -87,11 +87,11 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func shuffled2301() {
         let mismatches = Mismatches("shuffled2301")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9456_3970_7D09_826A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9456_3970_7D09_826A)
         for a in aInputs {
             mismatches.check(
                 H.shuffled2301(a),
-                H.Vector(raw: HighwayReference.shuffled2301U32(a.raw)),
+                H(raw: HighwayReference.shuffled2301U32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -100,11 +100,11 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func shuffled0123() {
         let mismatches = Mismatches("shuffled0123")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE60A_556A_49CC_2D4E)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE60A_556A_49CC_2D4E)
         for a in aInputs {
             mismatches.check(
                 H.shuffled0123(a),
-                H.Vector(raw: HighwayReference.shuffled0123U32(a.raw)),
+                H(raw: HighwayReference.shuffled0123U32(a.raw)),
                 "a: \(describe(a))"
             )
         }

@@ -9,12 +9,12 @@ extension SIMD where Lane == Int32 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_vector_i32) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_vector_i32(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_vector_i32 { cvectorization_ops_from_raw_vector_i32(raw) }
+    public var simd: SIMDType { cvectorization_ops_from_raw_vector_i32(raw) }
 }
 
 extension SIMD.Mask where Lane == Int32 {
@@ -24,14 +24,12 @@ extension SIMD.Mask where Lane == Int32 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: SIMDMask<cvectorization_ops_mask_i32>) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_mask_i32(simd._storage)
     }
 
     @export(implementation) @inline(always)
-    public var simd: SIMDMask<cvectorization_ops_mask_i32> {
-        SIMDMask<cvectorization_ops_mask_i32>(cvectorization_ops_from_raw_mask_i32(raw))
-    }
+    public var simd: SIMDType { SIMDType(cvectorization_ops_from_raw_mask_i32(raw)) }
 }
 
 extension SIMD.HalfVector where Lane == Int32 {
@@ -41,14 +39,12 @@ extension SIMD.HalfVector where Lane == Int32 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_half_vector_i32) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_half_vector_i32(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_half_vector_i32 {
-        cvectorization_ops_from_raw_half_vector_i32(raw)
-    }
+    public var simd: SIMDType { cvectorization_ops_from_raw_half_vector_i32(raw) }
 }
 
 extension SIMD.HalfMask where Lane == Int32 {
@@ -58,14 +54,12 @@ extension SIMD.HalfMask where Lane == Int32 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_half_mask_i32) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_half_mask_i32(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_half_mask_i32 {
-        cvectorization_ops_from_raw_half_mask_i32(raw)
-    }
+    public var simd: SIMDType { cvectorization_ops_from_raw_half_mask_i32(raw) }
 }
 
 extension SIMD.BlockVector where Lane == Int32 {
@@ -75,12 +69,12 @@ extension SIMD.BlockVector where Lane == Int32 {
     }
 
     @export(implementation) @inline(always)
-    public init(_ simd: cvectorization_ops_block_i32) {
+    public init(_ simd: SIMDType) {
         raw = cvectorization_ops_to_raw_block_i32(simd)
     }
 
     @export(implementation) @inline(always)
-    public var simd: cvectorization_ops_block_i32 { cvectorization_ops_from_raw_block_i32(raw) }
+    public var simd: SIMDType { cvectorization_ops_from_raw_block_i32(raw) }
 }
 
 extension SIMD where Lane == Int32 {

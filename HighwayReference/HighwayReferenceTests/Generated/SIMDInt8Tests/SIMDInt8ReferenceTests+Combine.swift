@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDInt8ReferenceTests {
     @Test func concatenatingLowerLower() {
         let mismatches = Mismatches("concatenatingLowerLower")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD44A_013E_660D_65D8)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD44A_023E_660D_678B)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD44A_013E_660D_65D8)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD44A_023E_660D_678B)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingLowerLower(a, b),
-                H.Vector(raw: HighwayReference.concatenatingLowerLowerI8(a.raw, b.raw)),
+                H(raw: HighwayReference.concatenatingLowerLowerI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -22,12 +22,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func concatenatingUpperUpper() {
         let mismatches = Mismatches("concatenatingUpperUpper")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDC1C_A918_A978_F42E)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xDC1C_AA18_A978_F5E1)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDC1C_A918_A978_F42E)
+        let bInputs = Inputs.vectors(H.self, seed: 0xDC1C_AA18_A978_F5E1)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingUpperUpper(a, b),
-                H.Vector(raw: HighwayReference.concatenatingUpperUpperI8(a.raw, b.raw)),
+                H(raw: HighwayReference.concatenatingUpperUpperI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -36,12 +36,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func concatenatingLowerUpper() {
         let mismatches = Mismatches("concatenatingLowerUpper")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB7CC_BEAB_569D_5861)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB7CC_BDAB_569D_56AE)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB7CC_BEAB_569D_5861)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB7CC_BDAB_569D_56AE)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingLowerUpper(a, b),
-                H.Vector(raw: HighwayReference.concatenatingLowerUpperI8(a.raw, b.raw)),
+                H(raw: HighwayReference.concatenatingLowerUpperI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -50,12 +50,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func concatenatingUpperLower() {
         let mismatches = Mismatches("concatenatingUpperLower")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x77FB_4C7A_97F8_3ABB)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x77FB_4B7A_97F8_3908)
+        let aInputs = Inputs.vectors(H.self, seed: 0x77FB_4C7A_97F8_3ABB)
+        let bInputs = Inputs.vectors(H.self, seed: 0x77FB_4B7A_97F8_3908)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingUpperLower(a, b),
-                H.Vector(raw: HighwayReference.concatenatingUpperLowerI8(a.raw, b.raw)),
+                H(raw: HighwayReference.concatenatingUpperLowerI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -64,12 +64,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func concatenatingOdd() {
         let mismatches = Mismatches("concatenatingOdd")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA23D_938A_FC3C_2679)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA23D_928A_FC3C_24C6)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA23D_938A_FC3C_2679)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA23D_928A_FC3C_24C6)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingOdd(a, b),
-                H.Vector(raw: HighwayReference.concatenatingOddI8(a.raw, b.raw)),
+                H(raw: HighwayReference.concatenatingOddI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -78,12 +78,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func concatenatingEven() {
         let mismatches = Mismatches("concatenatingEven")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4212_60A4_DE7C_364E)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4212_61A4_DE7C_3801)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4212_60A4_DE7C_364E)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4212_61A4_DE7C_3801)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingEven(a, b),
-                H.Vector(raw: HighwayReference.concatenatingEvenI8(a.raw, b.raw)),
+                H(raw: HighwayReference.concatenatingEvenI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -92,12 +92,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func interleavingWholeLower() {
         let mismatches = Mismatches("interleavingWholeLower")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x158E_6379_590C_EE04)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x158E_6479_590C_EFB7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x158E_6379_590C_EE04)
+        let bInputs = Inputs.vectors(H.self, seed: 0x158E_6479_590C_EFB7)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingWholeLower(a, b),
-                H.Vector(raw: HighwayReference.interleavingWholeLowerI8(a.raw, b.raw)),
+                H(raw: HighwayReference.interleavingWholeLowerI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -106,12 +106,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func interleavingWholeUpper() {
         let mismatches = Mismatches("interleavingWholeUpper")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x966D_D781_3D39_3DAD)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x966D_D681_3D39_3BFA)
+        let aInputs = Inputs.vectors(H.self, seed: 0x966D_D781_3D39_3DAD)
+        let bInputs = Inputs.vectors(H.self, seed: 0x966D_D681_3D39_3BFA)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingWholeUpper(a, b),
-                H.Vector(raw: HighwayReference.interleavingWholeUpperI8(a.raw, b.raw)),
+                H(raw: HighwayReference.interleavingWholeUpperI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -120,7 +120,7 @@ extension SIMDInt8ReferenceTests {
 
     @Test func lowerHalf() {
         let mismatches = Mismatches("lowerHalf")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF815_1D16_5859_6F74)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF815_1D16_5859_6F74)
         for a in aInputs {
             mismatches.check(
                 H.lowerHalf(a),
@@ -133,14 +133,14 @@ extension SIMDInt8ReferenceTests {
 
     @Test func lowerHalfResized() {
         let mismatches = Mismatches("lowerHalf resized with its unspecified lanes zeroed")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6882_B747_A989_D32A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6882_B747_A989_D32A)
         for a in aInputs {
             mismatches.check(
                 H.selectingOrZero(
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.lowerHalf(a))
                 ),
-                H.Vector(raw: HighwayReference.resizedLowerHalfI8(a.raw)),
+                H(raw: HighwayReference.resizedLowerHalfI8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -149,7 +149,7 @@ extension SIMDInt8ReferenceTests {
 
     @Test func upperHalf() {
         let mismatches = Mismatches("upperHalf")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF9FF_3FF0_7077_99E9)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF9FF_3FF0_7077_99E9)
         for a in aInputs {
             mismatches.check(
                 H.upperHalf(a),
@@ -162,14 +162,14 @@ extension SIMDInt8ReferenceTests {
 
     @Test func upperHalfResized() {
         let mismatches = Mismatches("upperHalf resized with its unspecified lanes zeroed")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x70DC_DACF_EA27_3645)
+        let aInputs = Inputs.vectors(H.self, seed: 0x70DC_DACF_EA27_3645)
         for a in aInputs {
             mismatches.check(
                 H.selectingOrZero(
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.upperHalf(a))
                 ),
-                H.Vector(raw: HighwayReference.resizedUpperHalfI8(a.raw)),
+                H(raw: HighwayReference.resizedUpperHalfI8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -187,7 +187,7 @@ extension SIMDInt8ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.combining(a, b),
-                H.Vector(raw: HighwayReference.combiningI8(a.raw, b.raw)),
+                H(raw: HighwayReference.combiningI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -202,7 +202,7 @@ extension SIMDInt8ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.zeroExtending(a),
-                H.Vector(raw: HighwayReference.zeroExtendingI8(a.raw)),
+                H(raw: HighwayReference.zeroExtendingI8(a.raw)),
                 "a: \(describe(a))"
             )
         }

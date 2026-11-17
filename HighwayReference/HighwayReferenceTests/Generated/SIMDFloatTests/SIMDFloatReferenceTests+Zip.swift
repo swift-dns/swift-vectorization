@@ -10,12 +10,12 @@ extension SIMDFloatReferenceTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func zippingLowerFromFloat16() {
         let mismatches = Mismatches("zippingLowerFromFloat16")
-        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0x0FD2_59BA_19F8_2BD9)
-        let bInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0x0FD2_58BA_19F8_2A26)
+        let aInputs = Inputs.conversions(SIMD<Float16>.self, seed: 0x0FD2_59BA_19F8_2BD9)
+        let bInputs = Inputs.conversions(SIMD<Float16>.self, seed: 0x0FD2_58BA_19F8_2A26)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.zippingLower(a, b),
-                HighwayReference.zippingLowerF16ToF32(a.raw, b.raw),
+                H(raw: HighwayReference.zippingLowerF16ToF32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

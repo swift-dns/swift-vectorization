@@ -7,15 +7,15 @@ import Vectorization
 
 extension SIMDFloatConstantTests {
     @inline(__always)
-    private func checkLoadWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkLoadWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches("loadWhereOtherwise with otherwise repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3DC7_64B2_51F5_E1E6)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x3DC7_63B2_51F5_E033
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x3DC7_63B2_51F5_E033)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
         )
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         for (mask, from) in everyPair(maskInputs, fromInputs) {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
@@ -24,10 +24,12 @@ extension SIMDFloatConstantTests {
                         where: mask,
                         otherwise: H.repeating(value)
                     ),
-                    unsafe HighwayReference.loadWhereOtherwiseF32(
-                        H.repeating(value).raw,
-                        mask.raw,
-                        source.baseAddress!
+                    unsafe H(
+                        raw: HighwayReference.loadWhereOtherwiseF32(
+                            H.repeating(value).raw,
+                            mask.raw,
+                            source.baseAddress!
+                        )
                     )
                 )
             }
@@ -97,7 +99,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func loadWhereOtherwiseConstantSplatPayloadNaN() {
-        checkLoadWhereOtherwiseConstantOtherwise(H.Lane(nan: 1, signaling: false))
+        checkLoadWhereOtherwiseConstantOtherwise(Lane(nan: 1, signaling: false))
     }
 
     @Test func loadWhereOtherwiseConstantSplatSignalingNaN() {
@@ -119,12 +121,8 @@ extension SIMDFloatConstantTests {
     @inline(__always)
     private func checkLoadFirstOtherwiseConstantCount(_ count: Int) {
         let mismatches = Mismatches("loadFirstOtherwise with count \(count)")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x430A_1524_FCD5_A539)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x430A_1424_FCD5_A386
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x430A_1524_FCD5_A539)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x430A_1424_FCD5_A386)
         for (otherwise, from) in everyPair(otherwiseInputs, fromInputs) {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
@@ -133,10 +131,12 @@ extension SIMDFloatConstantTests {
                         count: count,
                         otherwise: otherwise
                     ),
-                    unsafe HighwayReference.loadFirstOtherwiseF32(
-                        otherwise.raw,
-                        source.baseAddress!,
-                        count
+                    unsafe H(
+                        raw: HighwayReference.loadFirstOtherwiseF32(
+                            otherwise.raw,
+                            source.baseAddress!,
+                            count
+                        )
                     )
                 )
             }
@@ -252,18 +252,16 @@ extension SIMDFloatConstantTests {
     @inline(__always)
     private func checkLoadFirstOtherwiseConstantCountBeforeGuardPage(_ count: Int) {
         let mismatches = Mismatches("loadFirstOtherwise with count \(count) before a guard page")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x76B6_C526_0310_F876)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x76B6_C626_0310_FA29
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x76B6_C526_0310_F876)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x76B6_C626_0310_FA29)
         for (otherwise, from) in everyPair(otherwiseInputs, fromInputs) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(Array(from.prefix(count))) {
                 source in
                 (
                     unsafe H.loadFirst(from: source, count: count, otherwise: otherwise),
-                    unsafe HighwayReference.loadFirstOtherwiseF32(otherwise.raw, source, count)
+                    unsafe H(
+                        raw: HighwayReference.loadFirstOtherwiseF32(otherwise.raw, source, count)
+                    )
                 )
             }.result
             mismatches.check(
@@ -376,15 +374,15 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkLoadFirstOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkLoadFirstOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches("loadFirstOtherwise with otherwise repeating \(hex(value))")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x37C1_C7DB_70CA_E78F
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x37C1_C7DB_70CA_E78F)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (from, count) in everyPair(fromInputs, countInputs) {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
@@ -393,10 +391,12 @@ extension SIMDFloatConstantTests {
                         count: count,
                         otherwise: H.repeating(value)
                     ),
-                    unsafe HighwayReference.loadFirstOtherwiseF32(
-                        H.repeating(value).raw,
-                        source.baseAddress!,
-                        count
+                    unsafe H(
+                        raw: HighwayReference.loadFirstOtherwiseF32(
+                            H.repeating(value).raw,
+                            source.baseAddress!,
+                            count
+                        )
                     )
                 )
             }
@@ -466,7 +466,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func loadFirstOtherwiseConstantSplatPayloadNaN() {
-        checkLoadFirstOtherwiseConstantOtherwise(H.Lane(nan: 1, signaling: false))
+        checkLoadFirstOtherwiseConstantOtherwise(Lane(nan: 1, signaling: false))
     }
 
     @Test func loadFirstOtherwiseConstantSplatSignalingNaN() {
@@ -486,21 +486,27 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkLoadingUpperHalfConstantA(_ value: H.Lane) {
+    private func checkLoadingUpperHalfConstantA(_ value: Lane) {
         let mismatches = Mismatches("loadingUpperHalf with a repeating \(hex(value))")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: H.laneCount / 2,
             seed: 0xBB3E_7F39_1716_392E
         )
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for from in fromInputs {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadingUpperHalf(H.repeating(value), from: source.baseAddress!),
-                    unsafe HighwayReference.loadingUpperHalfF32(
-                        source.baseAddress!,
-                        H.repeating(value).raw
+                    unsafe H(
+                        raw: HighwayReference.loadingUpperHalfF32(
+                            source.baseAddress!,
+                            H.repeating(value).raw
+                        )
                     )
                 )
             }
@@ -566,7 +572,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func loadingUpperHalfConstantSplatPayloadNaN() {
-        checkLoadingUpperHalfConstantA(H.Lane(nan: 1, signaling: false))
+        checkLoadingUpperHalfConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func loadingUpperHalfConstantSplatSignalingNaN() {

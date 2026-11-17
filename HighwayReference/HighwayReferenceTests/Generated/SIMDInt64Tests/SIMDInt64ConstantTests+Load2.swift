@@ -14,7 +14,7 @@ extension SIMDInt64ConstantTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadFirstWidening(from: source.baseAddress!, count: count),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstWideningU8ToI64(source.baseAddress!, count)
                     )
                 )
@@ -103,7 +103,7 @@ extension SIMDInt64ConstantTests {
                 source in
                 (
                     unsafe H.loadFirstWidening(from: source, count: count),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstWideningU8ToI64(
                             source,
                             min(count, H.laneCount)
@@ -196,7 +196,7 @@ extension SIMDInt64ConstantTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadFirstWidening(from: source.baseAddress!, count: count),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstWideningU16ToI64(source.baseAddress!, count)
                     )
                 )
@@ -289,7 +289,7 @@ extension SIMDInt64ConstantTests {
                 source in
                 (
                     unsafe H.loadFirstWidening(from: source, count: count),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstWideningU16ToI64(
                             source,
                             min(count, H.laneCount)
@@ -382,7 +382,7 @@ extension SIMDInt64ConstantTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadFirstWidening(from: source.baseAddress!, count: count),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstWideningU32ToI64(source.baseAddress!, count)
                     )
                 )
@@ -475,7 +475,7 @@ extension SIMDInt64ConstantTests {
                 source in
                 (
                     unsafe H.loadFirstWidening(from: source, count: count),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstWideningU32ToI64(
                             source,
                             min(count, H.laneCount)
@@ -564,7 +564,7 @@ extension SIMDInt64ConstantTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadFirstWidening(from: source.baseAddress!, count: count),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstWideningI8ToI64(source.baseAddress!, count)
                     )
                 )
@@ -653,7 +653,7 @@ extension SIMDInt64ConstantTests {
                 source in
                 (
                     unsafe H.loadFirstWidening(from: source, count: count),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstWideningI8ToI64(
                             source,
                             min(count, H.laneCount)
@@ -742,7 +742,7 @@ extension SIMDInt64ConstantTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadFirstWidening(from: source.baseAddress!, count: count),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstWideningI16ToI64(source.baseAddress!, count)
                     )
                 )
@@ -831,7 +831,7 @@ extension SIMDInt64ConstantTests {
                 source in
                 (
                     unsafe H.loadFirstWidening(from: source, count: count),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstWideningI16ToI64(
                             source,
                             min(count, H.laneCount)
@@ -920,7 +920,7 @@ extension SIMDInt64ConstantTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadFirstWidening(from: source.baseAddress!, count: count),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstWideningI32ToI64(source.baseAddress!, count)
                     )
                 )
@@ -1009,7 +1009,7 @@ extension SIMDInt64ConstantTests {
                 source in
                 (
                     unsafe H.loadFirstWidening(from: source, count: count),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstWideningI32ToI64(
                             source,
                             min(count, H.laneCount)
@@ -1098,7 +1098,7 @@ extension SIMDInt64ConstantTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadFirstWidening(from: source.baseAddress!, count: count),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstWideningF32ToI64(source.baseAddress!, count)
                     )
                 )
@@ -1187,7 +1187,7 @@ extension SIMDInt64ConstantTests {
                 source in
                 (
                     unsafe H.loadFirstWidening(from: source, count: count),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstWideningF32ToI64(
                             source,
                             min(count, H.laneCount)

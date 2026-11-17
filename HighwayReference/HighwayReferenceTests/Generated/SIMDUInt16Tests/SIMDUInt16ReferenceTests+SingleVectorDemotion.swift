@@ -9,8 +9,8 @@ extension SIMDUInt16ReferenceTests {
     @Test func halfVectorClampingFromUInt32() {
         let mismatches = Mismatches("halfVectorClampingFromUInt32")
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt32>.self,
+            to: Lane.self,
             seed: 0xF10E_A518_D48D_72A5
         )
         for a in aInputs {
@@ -28,8 +28,8 @@ extension SIMDUInt16ReferenceTests {
             "halfVectorClampingFromUInt32 resized with its unspecified lanes zeroed"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt32>.self,
+            to: Lane.self,
             seed: 0xDFA1_BC59_E42B_D0E1
         )
         for a in aInputs {
@@ -38,7 +38,7 @@ extension SIMDUInt16ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(clamping: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorClampingU32ToU16(a.raw)),
+                H(raw: HighwayReference.resizedHalfVectorClampingU32ToU16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -48,8 +48,8 @@ extension SIMDUInt16ReferenceTests {
     @Test func halfVectorClampingFromInt32() {
         let mismatches = Mismatches("halfVectorClampingFromInt32")
         let aInputs = Inputs.integerDemotions(
-            SIMDInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<Int32>.self,
+            to: Lane.self,
             seed: 0xB2BC_99FE_0C47_F32E
         )
         for a in aInputs {
@@ -67,8 +67,8 @@ extension SIMDUInt16ReferenceTests {
             "halfVectorClampingFromInt32 resized with its unspecified lanes zeroed"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<Int32>.self,
+            to: Lane.self,
             seed: 0x0E93_97D4_4EBC_F124
         )
         for a in aInputs {
@@ -77,7 +77,7 @@ extension SIMDUInt16ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(clamping: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorClampingI32ToU16(a.raw)),
+                H(raw: HighwayReference.resizedHalfVectorClampingI32ToU16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -87,8 +87,8 @@ extension SIMDUInt16ReferenceTests {
     @Test func halfVectorClampingShiftedRightByFromUInt32() {
         let mismatches = Mismatches("halfVectorClampingShiftedRightByFromUInt32")
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt32>.self,
+            to: Lane.self,
             seed: 0xC613_BD22_DCDF_E6D5
         )
         let bitsInputs = Array(0...31)
@@ -110,8 +110,8 @@ extension SIMDUInt16ReferenceTests {
     @Test func halfVectorClampingShiftedRightByFromUInt32Unchecked() {
         let mismatches = Mismatches("halfVectorClampingShiftedRightByFromUInt32 unchecked")
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt32>.self,
+            to: Lane.self,
             seed: 0x3E73_799B_0AE5_BDF5
         )
         let bitsInputs = Array(0...31)
@@ -133,8 +133,8 @@ extension SIMDUInt16ReferenceTests {
     @Test func halfVectorClampingShiftedRightByFromInt32() {
         let mismatches = Mismatches("halfVectorClampingShiftedRightByFromInt32")
         let aInputs = Inputs.integerDemotions(
-            SIMDInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<Int32>.self,
+            to: Lane.self,
             seed: 0x2E1C_F7FB_BCB4_C7DE
         )
         let bitsInputs = Array(0...31)
@@ -156,8 +156,8 @@ extension SIMDUInt16ReferenceTests {
     @Test func halfVectorClampingShiftedRightByFromInt32Unchecked() {
         let mismatches = Mismatches("halfVectorClampingShiftedRightByFromInt32 unchecked")
         let aInputs = Inputs.integerDemotions(
-            SIMDInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<Int32>.self,
+            to: Lane.self,
             seed: 0x3171_13A3_B3F9_CB58
         )
         let bitsInputs = Array(0...31)
@@ -179,8 +179,8 @@ extension SIMDUInt16ReferenceTests {
     @Test func halfVectorClampingRoundingShiftedRightByFromUInt32() {
         let mismatches = Mismatches("halfVectorClampingRoundingShiftedRightByFromUInt32")
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt32>.self,
+            to: Lane.self,
             seed: 0xC399_F075_3E31_1E91
         )
         let bitsInputs = Array(0...31)
@@ -202,8 +202,8 @@ extension SIMDUInt16ReferenceTests {
     @Test func halfVectorClampingRoundingShiftedRightByFromUInt32Unchecked() {
         let mismatches = Mismatches("halfVectorClampingRoundingShiftedRightByFromUInt32 unchecked")
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt32>.self,
+            to: Lane.self,
             seed: 0xCE2A_3007_46CF_FCD1
         )
         let bitsInputs = Array(0...31)
@@ -225,8 +225,8 @@ extension SIMDUInt16ReferenceTests {
     @Test func halfVectorClampingRoundingShiftedRightByFromInt32() {
         let mismatches = Mismatches("halfVectorClampingRoundingShiftedRightByFromInt32")
         let aInputs = Inputs.integerDemotions(
-            SIMDInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<Int32>.self,
+            to: Lane.self,
             seed: 0x37D8_7947_2CF9_A35A
         )
         let bitsInputs = Array(0...31)
@@ -248,8 +248,8 @@ extension SIMDUInt16ReferenceTests {
     @Test func halfVectorClampingRoundingShiftedRightByFromInt32Unchecked() {
         let mismatches = Mismatches("halfVectorClampingRoundingShiftedRightByFromInt32 unchecked")
         let aInputs = Inputs.integerDemotions(
-            SIMDInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<Int32>.self,
+            to: Lane.self,
             seed: 0xDC0A_13E5_BD20_B794
         )
         let bitsInputs = Array(0...31)
@@ -271,8 +271,8 @@ extension SIMDUInt16ReferenceTests {
     @Test func quarterVectorClampingFromUInt64() {
         let mismatches = Mismatches("quarterVectorClampingFromUInt64")
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt64>.self,
+            to: Lane.self,
             seed: 0x0DF2_89D5_0B9D_041B
         )
         for a in aInputs {
@@ -290,8 +290,8 @@ extension SIMDUInt16ReferenceTests {
             "quarterVectorClampingFromUInt64 resized with its unspecified lanes zeroed"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt64>.self,
+            to: Lane.self,
             seed: 0x14AD_FE4F_EFC7_CE87
         )
         for a in aInputs {
@@ -300,7 +300,7 @@ extension SIMDUInt16ReferenceTests {
                     H.firstLanes(count: H.laneCount / 4),
                     H.vector(resizing: H.quarterVector(clamping: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedQuarterVectorClampingU64ToU16(a.raw)),
+                H(raw: HighwayReference.resizedQuarterVectorClampingU64ToU16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -310,8 +310,8 @@ extension SIMDUInt16ReferenceTests {
     @Test func quarterVectorClampingFromInt64() {
         let mismatches = Mismatches("quarterVectorClampingFromInt64")
         let aInputs = Inputs.integerDemotions(
-            SIMDInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<Int64>.self,
+            to: Lane.self,
             seed: 0x9D73_F16F_09C1_EA3E
         )
         for a in aInputs {
@@ -329,8 +329,8 @@ extension SIMDUInt16ReferenceTests {
             "quarterVectorClampingFromInt64 resized with its unspecified lanes zeroed"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<Int64>.self,
+            to: Lane.self,
             seed: 0x986A_815B_D00D_08F4
         )
         for a in aInputs {
@@ -339,7 +339,7 @@ extension SIMDUInt16ReferenceTests {
                     H.firstLanes(count: H.laneCount / 4),
                     H.vector(resizing: H.quarterVector(clamping: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedQuarterVectorClampingI64ToU16(a.raw)),
+                H(raw: HighwayReference.resizedQuarterVectorClampingI64ToU16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -349,8 +349,8 @@ extension SIMDUInt16ReferenceTests {
     @Test func quarterVectorClampingShiftedRightByFromUInt64() {
         let mismatches = Mismatches("quarterVectorClampingShiftedRightByFromUInt64")
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt64>.self,
+            to: Lane.self,
             seed: 0xFD52_1BE9_6280_0BE3
         )
         let bitsInputs = Array(0...63)
@@ -372,8 +372,8 @@ extension SIMDUInt16ReferenceTests {
     @Test func quarterVectorClampingShiftedRightByFromUInt64Unchecked() {
         let mismatches = Mismatches("quarterVectorClampingShiftedRightByFromUInt64 unchecked")
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt64>.self,
+            to: Lane.self,
             seed: 0xA624_DC13_A7F1_CDD7
         )
         let bitsInputs = Array(0...63)
@@ -395,8 +395,8 @@ extension SIMDUInt16ReferenceTests {
     @Test func quarterVectorClampingShiftedRightByFromInt64() {
         let mismatches = Mismatches("quarterVectorClampingShiftedRightByFromInt64")
         let aInputs = Inputs.integerDemotions(
-            SIMDInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<Int64>.self,
+            to: Lane.self,
             seed: 0xD5F9_5549_C52D_6DB6
         )
         let bitsInputs = Array(0...63)
@@ -418,8 +418,8 @@ extension SIMDUInt16ReferenceTests {
     @Test func quarterVectorClampingShiftedRightByFromInt64Unchecked() {
         let mismatches = Mismatches("quarterVectorClampingShiftedRightByFromInt64 unchecked")
         let aInputs = Inputs.integerDemotions(
-            SIMDInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<Int64>.self,
+            to: Lane.self,
             seed: 0x2052_D543_BA41_C450
         )
         let bitsInputs = Array(0...63)
@@ -441,8 +441,8 @@ extension SIMDUInt16ReferenceTests {
     @Test func quarterVectorClampingRoundingShiftedRightByFromUInt64() {
         let mismatches = Mismatches("quarterVectorClampingRoundingShiftedRightByFromUInt64")
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt64>.self,
+            to: Lane.self,
             seed: 0xD2CF_0827_C7CD_8107
         )
         let bitsInputs = Array(0...63)
@@ -466,8 +466,8 @@ extension SIMDUInt16ReferenceTests {
             "quarterVectorClampingRoundingShiftedRightByFromUInt64 unchecked"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt64>.self,
+            to: Lane.self,
             seed: 0x8137_F1B3_ECC1_AB4B
         )
         let bitsInputs = Array(0...63)
@@ -489,8 +489,8 @@ extension SIMDUInt16ReferenceTests {
     @Test func quarterVectorClampingRoundingShiftedRightByFromInt64() {
         let mismatches = Mismatches("quarterVectorClampingRoundingShiftedRightByFromInt64")
         let aInputs = Inputs.integerDemotions(
-            SIMDInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<Int64>.self,
+            to: Lane.self,
             seed: 0x33F7_3891_C194_3BDA
         )
         let bitsInputs = Array(0...63)
@@ -514,8 +514,8 @@ extension SIMDUInt16ReferenceTests {
             "quarterVectorClampingRoundingShiftedRightByFromInt64 unchecked"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<Int64>.self,
+            to: Lane.self,
             seed: 0x44B6_9CE5_1025_0914
         )
         let bitsInputs = Array(0...63)
@@ -537,8 +537,8 @@ extension SIMDUInt16ReferenceTests {
     @Test func halfVectorTruncatingIfNeededFromUInt32() {
         let mismatches = Mismatches("halfVectorTruncatingIfNeededFromUInt32")
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt32>.self,
+            to: Lane.self,
             seed: 0x126B_3B99_89F5_238F
         )
         for a in aInputs {
@@ -556,8 +556,8 @@ extension SIMDUInt16ReferenceTests {
             "halfVectorTruncatingIfNeededFromUInt32 resized with its unspecified lanes zeroed"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt32>.self,
+            to: Lane.self,
             seed: 0x438A_34EE_F3B7_306B
         )
         for a in aInputs {
@@ -566,7 +566,7 @@ extension SIMDUInt16ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(truncatingIfNeeded: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorTruncatingIfNeededU32ToU16(a.raw)),
+                H(raw: HighwayReference.resizedHalfVectorTruncatingIfNeededU32ToU16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -576,8 +576,8 @@ extension SIMDUInt16ReferenceTests {
     @Test func quarterVectorTruncatingIfNeededFromUInt64() {
         let mismatches = Mismatches("quarterVectorTruncatingIfNeededFromUInt64")
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt64>.self,
+            to: Lane.self,
             seed: 0x7EF7_87BE_5287_7E71
         )
         for a in aInputs {
@@ -597,8 +597,8 @@ extension SIMDUInt16ReferenceTests {
             "quarterVectorTruncatingIfNeededFromUInt64 resized with its unspecified lanes zeroed"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt64>.self,
+            to: Lane.self,
             seed: 0x9336_22E6_4758_5C1D
         )
         for a in aInputs {
@@ -607,9 +607,7 @@ extension SIMDUInt16ReferenceTests {
                     H.firstLanes(count: H.laneCount / 4),
                     H.vector(resizing: H.quarterVector(truncatingIfNeeded: a))
                 ),
-                H.Vector(
-                    raw: HighwayReference.resizedQuarterVectorTruncatingIfNeededU64ToU16(a.raw)
-                ),
+                H(raw: HighwayReference.resizedQuarterVectorTruncatingIfNeededU64ToU16(a.raw)),
                 "a: \(describe(a))"
             )
         }

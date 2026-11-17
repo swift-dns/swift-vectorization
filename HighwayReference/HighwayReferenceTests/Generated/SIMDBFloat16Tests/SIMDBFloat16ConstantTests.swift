@@ -7,5 +7,6 @@ import Vectorization
 
 @Suite("SIMDBFloat16 constants against Highway")
 struct SIMDBFloat16ConstantTests {
-    typealias H = SIMDBFloat16
+    typealias H = SIMD<BFloat16>
+    typealias Lane = BFloat16
 }

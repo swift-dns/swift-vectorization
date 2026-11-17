@@ -229,7 +229,7 @@ extension HighwayReferenceUInt16 {
 
 @inline(never)
 public func portStoreU16(_ a: SIMD<UInt16>, to: UnsafeMutablePointer<UInt16>) {
-    unsafe SIMDUInt16.store(a, to: to)
+    unsafe SIMD<UInt16>.store(a, to: to)
 }
 
 @inline(never)
@@ -239,20 +239,20 @@ public func highwayStoreU16(_ a: SIMD<UInt16>, to: UnsafeMutablePointer<UInt16>)
 
 @inline(never)
 public func portStoreU16ConstantA(to: UnsafeMutablePointer<UInt16>) {
-    unsafe SIMDUInt16.store(SIMDUInt16.repeating(26), to: to)
+    unsafe SIMD<UInt16>.store(SIMD<UInt16>.repeating(26), to: to)
 }
 
 @inline(never)
 public func highwayStoreU16ConstantA(to: UnsafeMutablePointer<UInt16>) {
     unsafe HighwayReference.Nothrow.storeU16(
-        SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+        SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
         to
     )
 }
 
 @inline(never)
 public func portStoreAlignedU16(_ a: SIMD<UInt16>, to: UnsafeMutablePointer<UInt16>) {
-    unsafe SIMDUInt16.storeAligned(a, to: to)
+    unsafe SIMD<UInt16>.storeAligned(a, to: to)
 }
 
 @inline(never)
@@ -262,20 +262,20 @@ public func highwayStoreAlignedU16(_ a: SIMD<UInt16>, to: UnsafeMutablePointer<U
 
 @inline(never)
 public func portStoreAlignedU16ConstantA(to: UnsafeMutablePointer<UInt16>) {
-    unsafe SIMDUInt16.storeAligned(SIMDUInt16.repeating(26), to: to)
+    unsafe SIMD<UInt16>.storeAligned(SIMD<UInt16>.repeating(26), to: to)
 }
 
 @inline(never)
 public func highwayStoreAlignedU16ConstantA(to: UnsafeMutablePointer<UInt16>) {
     unsafe HighwayReference.Nothrow.storeAlignedU16(
-        SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+        SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
         to
     )
 }
 
 @inline(never)
 public func portStoreFirstU16(_ a: SIMD<UInt16>, to: UnsafeMutablePointer<UInt16>, count: Int) {
-    unsafe SIMDUInt16.storeFirst(a, to: to, count: count)
+    unsafe SIMD<UInt16>.storeFirst(a, to: to, count: count)
 }
 
 @inline(never)
@@ -285,13 +285,13 @@ public func highwayStoreFirstU16(_ a: SIMD<UInt16>, to: UnsafeMutablePointer<UIn
 
 @inline(never)
 public func portStoreFirstU16ConstantA(to: UnsafeMutablePointer<UInt16>, count: Int) {
-    unsafe SIMDUInt16.storeFirst(SIMDUInt16.repeating(26), to: to, count: count)
+    unsafe SIMD<UInt16>.storeFirst(SIMD<UInt16>.repeating(26), to: to, count: count)
 }
 
 @inline(never)
 public func highwayStoreFirstU16ConstantA(to: UnsafeMutablePointer<UInt16>, count: Int) {
     unsafe HighwayReference.Nothrow.storeFirstU16(
-        SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+        SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
         to,
         count
     )
@@ -299,7 +299,7 @@ public func highwayStoreFirstU16ConstantA(to: UnsafeMutablePointer<UInt16>, coun
 
 @inline(never)
 public func portStoreFirstU16ConstantCount(_ a: SIMD<UInt16>, to: UnsafeMutablePointer<UInt16>) {
-    unsafe SIMDUInt16.storeFirst(a, to: to, count: 1)
+    unsafe SIMD<UInt16>.storeFirst(a, to: to, count: 1)
 }
 
 @inline(never)
@@ -309,7 +309,7 @@ public func highwayStoreFirstU16ConstantCount(_ a: SIMD<UInt16>, to: UnsafeMutab
 
 @inline(never)
 public func portStoreFirstU16ConstantCountTwo(_ a: SIMD<UInt16>, to: UnsafeMutablePointer<UInt16>) {
-    unsafe SIMDUInt16.storeFirst(a, to: to, count: 2)
+    unsafe SIMD<UInt16>.storeFirst(a, to: to, count: 2)
 }
 
 @inline(never)
@@ -325,7 +325,7 @@ public func portStoreFirstU16ConstantCountLaneCount(
     _ a: SIMD<UInt16>,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe SIMDUInt16.storeFirst(a, to: to, count: SIMDUInt16.laneCount)
+    unsafe SIMD<UInt16>.storeFirst(a, to: to, count: SIMD<UInt16>.laneCount)
 }
 
 @inline(never)
@@ -345,7 +345,7 @@ public func portStoreFirstU16ConstantCountTwiceLaneCount(
     _ a: SIMD<UInt16>,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe SIMDUInt16.storeFirst(a, to: to, count: 2 * SIMDUInt16.laneCount)
+    unsafe SIMD<UInt16>.storeFirst(a, to: to, count: 2 * SIMD<UInt16>.laneCount)
 }
 
 @inline(never)
@@ -366,7 +366,7 @@ public func portStoreWhereU16(
     to: UnsafeMutablePointer<UInt16>,
     where mask: SIMD<UInt16>.Mask
 ) {
-    unsafe SIMDUInt16.store(a, to: to, where: mask)
+    unsafe SIMD<UInt16>.store(a, to: to, where: mask)
 }
 
 @inline(never)
@@ -383,7 +383,7 @@ public func portStoreWhereU16ConstantA(
     to: UnsafeMutablePointer<UInt16>,
     where mask: SIMD<UInt16>.Mask
 ) {
-    unsafe SIMDUInt16.store(SIMDUInt16.repeating(26), to: to, where: mask)
+    unsafe SIMD<UInt16>.store(SIMD<UInt16>.repeating(26), to: to, where: mask)
 }
 
 @inline(never)
@@ -392,7 +392,7 @@ public func highwayStoreWhereU16ConstantA(
     where mask: SIMD<UInt16>.Mask
 ) {
     unsafe HighwayReference.Nothrow.storeWhereU16(
-        SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+        SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
         mask.raw,
         to
     )
@@ -400,7 +400,7 @@ public func highwayStoreWhereU16ConstantA(
 
 @inline(never)
 public func portStoreRepeatingU16(_ value: UInt16, count: Int, to: UnsafeMutablePointer<UInt16>) {
-    unsafe SIMDUInt16.storeRepeating(value, count: count, to: to)
+    unsafe SIMD<UInt16>.storeRepeating(value, count: count, to: to)
 }
 
 @inline(never)
@@ -411,7 +411,7 @@ public func highwayStoreRepeatingU16(_ value: UInt16, count: Int, to: UnsafeMuta
 
 @inline(never)
 public func portStoreRepeatingU16ConstantValue(count: Int, to: UnsafeMutablePointer<UInt16>) {
-    unsafe SIMDUInt16.storeRepeating(26, count: count, to: to)
+    unsafe SIMD<UInt16>.storeRepeating(26, count: count, to: to)
 }
 
 @inline(never)
@@ -421,7 +421,7 @@ public func highwayStoreRepeatingU16ConstantValue(count: Int, to: UnsafeMutableP
 
 @inline(never)
 public func portStoreRepeatingU16ConstantCount(_ value: UInt16, to: UnsafeMutablePointer<UInt16>) {
-    unsafe SIMDUInt16.storeRepeating(value, count: 1, to: to)
+    unsafe SIMD<UInt16>.storeRepeating(value, count: 1, to: to)
 }
 
 @inline(never)
@@ -433,7 +433,7 @@ public func highwayStoreRepeatingU16ConstantCount(_ value: UInt16, to: UnsafeMut
 @inline(never)
 public func portStoreRepeatingU16ConstantCountTwo(_ value: UInt16, to: UnsafeMutablePointer<UInt16>)
 {
-    unsafe SIMDUInt16.storeRepeating(value, count: 2, to: to)
+    unsafe SIMD<UInt16>.storeRepeating(value, count: 2, to: to)
 }
 
 @inline(never)
@@ -449,7 +449,7 @@ public func portStoreRepeatingU16ConstantCountLaneCount(
     _ value: UInt16,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe SIMDUInt16.storeRepeating(value, count: SIMDUInt16.laneCount, to: to)
+    unsafe SIMD<UInt16>.storeRepeating(value, count: SIMD<UInt16>.laneCount, to: to)
 }
 
 @inline(never)
@@ -469,7 +469,7 @@ public func portStoreRepeatingU16ConstantCountTwiceLaneCount(
     _ value: UInt16,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe SIMDUInt16.storeRepeating(value, count: 2 * SIMDUInt16.laneCount, to: to)
+    unsafe SIMD<UInt16>.storeRepeating(value, count: 2 * SIMD<UInt16>.laneCount, to: to)
 }
 
 @inline(never)
@@ -486,7 +486,7 @@ public func highwayStoreRepeatingU16ConstantCountTwiceLaneCount(
 
 @inline(never)
 public func portCopyU16(count: Int, from: UnsafePointer<UInt16>, to: UnsafeMutablePointer<UInt16>) {
-    unsafe SIMDUInt16.copy(count: count, from: from, to: to)
+    unsafe SIMD<UInt16>.copy(count: count, from: from, to: to)
 }
 
 @inline(never)
@@ -501,7 +501,7 @@ public func highwayCopyU16(
 @inline(never)
 public func portCopyU16ConstantCount(from: UnsafePointer<UInt16>, to: UnsafeMutablePointer<UInt16>)
 {
-    unsafe SIMDUInt16.copy(count: 1, from: from, to: to)
+    unsafe SIMD<UInt16>.copy(count: 1, from: from, to: to)
 }
 
 @inline(never)
@@ -517,7 +517,7 @@ public func portCopyU16ConstantCountTwo(
     from: UnsafePointer<UInt16>,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe SIMDUInt16.copy(count: 2, from: from, to: to)
+    unsafe SIMD<UInt16>.copy(count: 2, from: from, to: to)
 }
 
 @inline(never)
@@ -533,7 +533,7 @@ public func portCopyU16ConstantCountLaneCount(
     from: UnsafePointer<UInt16>,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe SIMDUInt16.copy(count: SIMDUInt16.laneCount, from: from, to: to)
+    unsafe SIMD<UInt16>.copy(count: SIMD<UInt16>.laneCount, from: from, to: to)
 }
 
 @inline(never)
@@ -549,7 +549,7 @@ public func portCopyU16ConstantCountTwiceLaneCount(
     from: UnsafePointer<UInt16>,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe SIMDUInt16.copy(count: 2 * SIMDUInt16.laneCount, from: from, to: to)
+    unsafe SIMD<UInt16>.copy(count: 2 * SIMD<UInt16>.laneCount, from: from, to: to)
 }
 
 @inline(never)
@@ -562,7 +562,7 @@ public func highwayCopyU16ConstantCountTwiceLaneCount(
 
 @inline(never)
 public func portStoreTruncatingU8U16(_ a: SIMD<UInt16>, to: UnsafeMutablePointer<UInt8>) {
-    unsafe SIMDUInt16.storeTruncating(a, to: to)
+    unsafe SIMD<UInt16>.storeTruncating(a, to: to)
 }
 
 @inline(never)
@@ -572,20 +572,20 @@ public func highwayStoreTruncatingU8U16(_ a: SIMD<UInt16>, to: UnsafeMutablePoin
 
 @inline(never)
 public func portStoreTruncatingU8U16ConstantA(to: UnsafeMutablePointer<UInt8>) {
-    unsafe SIMDUInt16.storeTruncating(SIMDUInt16.repeating(26), to: to)
+    unsafe SIMD<UInt16>.storeTruncating(SIMD<UInt16>.repeating(26), to: to)
 }
 
 @inline(never)
 public func highwayStoreTruncatingU8U16ConstantA(to: UnsafeMutablePointer<UInt8>) {
     unsafe HighwayReference.Nothrow.storeTruncatingU8U16(
-        SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+        SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
         to
     )
 }
 
 @inline(never)
 public func portStoreHalfU16(_ a: SIMD<UInt16>.HalfVector, to: UnsafeMutablePointer<UInt16>) {
-    unsafe SIMDUInt16.store(a, to: to)
+    unsafe SIMD<UInt16>.store(a, to: to)
 }
 
 @inline(never)
@@ -595,7 +595,7 @@ public func highwayStoreHalfU16(_ a: SIMD<UInt16>.HalfVector, to: UnsafeMutableP
 
 @inline(never)
 public func portStoreQuarterU16(_ a: SIMD<UInt16>.QuarterVector, to: UnsafeMutablePointer<UInt16>) {
-    unsafe SIMDUInt16.store(a, to: to)
+    unsafe SIMD<UInt16>.store(a, to: to)
 }
 
 @inline(never)
@@ -608,7 +608,7 @@ public func highwayStoreQuarterU16(
 
 @inline(never)
 public func portStoreBlockU16(_ a: SIMD<UInt16>.BlockVector, to: UnsafeMutablePointer<UInt16>) {
-    unsafe SIMDUInt16.store(a, to: to)
+    unsafe SIMD<UInt16>.store(a, to: to)
 }
 
 @inline(never)

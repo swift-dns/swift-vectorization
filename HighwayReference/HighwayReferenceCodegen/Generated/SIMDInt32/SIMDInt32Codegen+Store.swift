@@ -210,7 +210,7 @@ extension HighwayReferenceInt32 {
 
 @inline(never)
 public func portStoreI32(_ a: SIMD<Int32>, to: UnsafeMutablePointer<Int32>) {
-    unsafe SIMDInt32.store(a, to: to)
+    unsafe SIMD<Int32>.store(a, to: to)
 }
 
 @inline(never)
@@ -220,20 +220,20 @@ public func highwayStoreI32(_ a: SIMD<Int32>, to: UnsafeMutablePointer<Int32>) {
 
 @inline(never)
 public func portStoreI32ConstantA(to: UnsafeMutablePointer<Int32>) {
-    unsafe SIMDInt32.store(SIMDInt32.repeating(26), to: to)
+    unsafe SIMD<Int32>.store(SIMD<Int32>.repeating(26), to: to)
 }
 
 @inline(never)
 public func highwayStoreI32ConstantA(to: UnsafeMutablePointer<Int32>) {
     unsafe HighwayReference.Nothrow.storeI32(
-        SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+        SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
         to
     )
 }
 
 @inline(never)
 public func portStoreAlignedI32(_ a: SIMD<Int32>, to: UnsafeMutablePointer<Int32>) {
-    unsafe SIMDInt32.storeAligned(a, to: to)
+    unsafe SIMD<Int32>.storeAligned(a, to: to)
 }
 
 @inline(never)
@@ -243,20 +243,20 @@ public func highwayStoreAlignedI32(_ a: SIMD<Int32>, to: UnsafeMutablePointer<In
 
 @inline(never)
 public func portStoreAlignedI32ConstantA(to: UnsafeMutablePointer<Int32>) {
-    unsafe SIMDInt32.storeAligned(SIMDInt32.repeating(26), to: to)
+    unsafe SIMD<Int32>.storeAligned(SIMD<Int32>.repeating(26), to: to)
 }
 
 @inline(never)
 public func highwayStoreAlignedI32ConstantA(to: UnsafeMutablePointer<Int32>) {
     unsafe HighwayReference.Nothrow.storeAlignedI32(
-        SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+        SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
         to
     )
 }
 
 @inline(never)
 public func portStoreFirstI32(_ a: SIMD<Int32>, to: UnsafeMutablePointer<Int32>, count: Int) {
-    unsafe SIMDInt32.storeFirst(a, to: to, count: count)
+    unsafe SIMD<Int32>.storeFirst(a, to: to, count: count)
 }
 
 @inline(never)
@@ -266,13 +266,13 @@ public func highwayStoreFirstI32(_ a: SIMD<Int32>, to: UnsafeMutablePointer<Int3
 
 @inline(never)
 public func portStoreFirstI32ConstantA(to: UnsafeMutablePointer<Int32>, count: Int) {
-    unsafe SIMDInt32.storeFirst(SIMDInt32.repeating(26), to: to, count: count)
+    unsafe SIMD<Int32>.storeFirst(SIMD<Int32>.repeating(26), to: to, count: count)
 }
 
 @inline(never)
 public func highwayStoreFirstI32ConstantA(to: UnsafeMutablePointer<Int32>, count: Int) {
     unsafe HighwayReference.Nothrow.storeFirstI32(
-        SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+        SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
         to,
         count
     )
@@ -280,7 +280,7 @@ public func highwayStoreFirstI32ConstantA(to: UnsafeMutablePointer<Int32>, count
 
 @inline(never)
 public func portStoreFirstI32ConstantCount(_ a: SIMD<Int32>, to: UnsafeMutablePointer<Int32>) {
-    unsafe SIMDInt32.storeFirst(a, to: to, count: 1)
+    unsafe SIMD<Int32>.storeFirst(a, to: to, count: 1)
 }
 
 @inline(never)
@@ -290,7 +290,7 @@ public func highwayStoreFirstI32ConstantCount(_ a: SIMD<Int32>, to: UnsafeMutabl
 
 @inline(never)
 public func portStoreFirstI32ConstantCountTwo(_ a: SIMD<Int32>, to: UnsafeMutablePointer<Int32>) {
-    unsafe SIMDInt32.storeFirst(a, to: to, count: 2)
+    unsafe SIMD<Int32>.storeFirst(a, to: to, count: 2)
 }
 
 @inline(never)
@@ -304,7 +304,7 @@ public func portStoreFirstI32ConstantCountLaneCount(
     _ a: SIMD<Int32>,
     to: UnsafeMutablePointer<Int32>
 ) {
-    unsafe SIMDInt32.storeFirst(a, to: to, count: SIMDInt32.laneCount)
+    unsafe SIMD<Int32>.storeFirst(a, to: to, count: SIMD<Int32>.laneCount)
 }
 
 @inline(never)
@@ -324,7 +324,7 @@ public func portStoreFirstI32ConstantCountTwiceLaneCount(
     _ a: SIMD<Int32>,
     to: UnsafeMutablePointer<Int32>
 ) {
-    unsafe SIMDInt32.storeFirst(a, to: to, count: 2 * SIMDInt32.laneCount)
+    unsafe SIMD<Int32>.storeFirst(a, to: to, count: 2 * SIMD<Int32>.laneCount)
 }
 
 @inline(never)
@@ -345,7 +345,7 @@ public func portStoreWhereI32(
     to: UnsafeMutablePointer<Int32>,
     where mask: SIMD<Int32>.Mask
 ) {
-    unsafe SIMDInt32.store(a, to: to, where: mask)
+    unsafe SIMD<Int32>.store(a, to: to, where: mask)
 }
 
 @inline(never)
@@ -362,7 +362,7 @@ public func portStoreWhereI32ConstantA(
     to: UnsafeMutablePointer<Int32>,
     where mask: SIMD<Int32>.Mask
 ) {
-    unsafe SIMDInt32.store(SIMDInt32.repeating(26), to: to, where: mask)
+    unsafe SIMD<Int32>.store(SIMD<Int32>.repeating(26), to: to, where: mask)
 }
 
 @inline(never)
@@ -371,7 +371,7 @@ public func highwayStoreWhereI32ConstantA(
     where mask: SIMD<Int32>.Mask
 ) {
     unsafe HighwayReference.Nothrow.storeWhereI32(
-        SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+        SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
         mask.raw,
         to
     )
@@ -379,7 +379,7 @@ public func highwayStoreWhereI32ConstantA(
 
 @inline(never)
 public func portStoreRepeatingI32(_ value: Int32, count: Int, to: UnsafeMutablePointer<Int32>) {
-    unsafe SIMDInt32.storeRepeating(value, count: count, to: to)
+    unsafe SIMD<Int32>.storeRepeating(value, count: count, to: to)
 }
 
 @inline(never)
@@ -389,7 +389,7 @@ public func highwayStoreRepeatingI32(_ value: Int32, count: Int, to: UnsafeMutab
 
 @inline(never)
 public func portStoreRepeatingI32ConstantValue(count: Int, to: UnsafeMutablePointer<Int32>) {
-    unsafe SIMDInt32.storeRepeating(26, count: count, to: to)
+    unsafe SIMD<Int32>.storeRepeating(26, count: count, to: to)
 }
 
 @inline(never)
@@ -399,7 +399,7 @@ public func highwayStoreRepeatingI32ConstantValue(count: Int, to: UnsafeMutableP
 
 @inline(never)
 public func portStoreRepeatingI32ConstantCount(_ value: Int32, to: UnsafeMutablePointer<Int32>) {
-    unsafe SIMDInt32.storeRepeating(value, count: 1, to: to)
+    unsafe SIMD<Int32>.storeRepeating(value, count: 1, to: to)
 }
 
 @inline(never)
@@ -409,7 +409,7 @@ public func highwayStoreRepeatingI32ConstantCount(_ value: Int32, to: UnsafeMuta
 
 @inline(never)
 public func portStoreRepeatingI32ConstantCountTwo(_ value: Int32, to: UnsafeMutablePointer<Int32>) {
-    unsafe SIMDInt32.storeRepeating(value, count: 2, to: to)
+    unsafe SIMD<Int32>.storeRepeating(value, count: 2, to: to)
 }
 
 @inline(never)
@@ -425,7 +425,7 @@ public func portStoreRepeatingI32ConstantCountLaneCount(
     _ value: Int32,
     to: UnsafeMutablePointer<Int32>
 ) {
-    unsafe SIMDInt32.storeRepeating(value, count: SIMDInt32.laneCount, to: to)
+    unsafe SIMD<Int32>.storeRepeating(value, count: SIMD<Int32>.laneCount, to: to)
 }
 
 @inline(never)
@@ -445,7 +445,7 @@ public func portStoreRepeatingI32ConstantCountTwiceLaneCount(
     _ value: Int32,
     to: UnsafeMutablePointer<Int32>
 ) {
-    unsafe SIMDInt32.storeRepeating(value, count: 2 * SIMDInt32.laneCount, to: to)
+    unsafe SIMD<Int32>.storeRepeating(value, count: 2 * SIMD<Int32>.laneCount, to: to)
 }
 
 @inline(never)
@@ -462,7 +462,7 @@ public func highwayStoreRepeatingI32ConstantCountTwiceLaneCount(
 
 @inline(never)
 public func portCopyI32(count: Int, from: UnsafePointer<Int32>, to: UnsafeMutablePointer<Int32>) {
-    unsafe SIMDInt32.copy(count: count, from: from, to: to)
+    unsafe SIMD<Int32>.copy(count: count, from: from, to: to)
 }
 
 @inline(never)
@@ -473,7 +473,7 @@ public func highwayCopyI32(count: Int, from: UnsafePointer<Int32>, to: UnsafeMut
 
 @inline(never)
 public func portCopyI32ConstantCount(from: UnsafePointer<Int32>, to: UnsafeMutablePointer<Int32>) {
-    unsafe SIMDInt32.copy(count: 1, from: from, to: to)
+    unsafe SIMD<Int32>.copy(count: 1, from: from, to: to)
 }
 
 @inline(never)
@@ -485,7 +485,7 @@ public func highwayCopyI32ConstantCount(from: UnsafePointer<Int32>, to: UnsafeMu
 @inline(never)
 public func portCopyI32ConstantCountTwo(from: UnsafePointer<Int32>, to: UnsafeMutablePointer<Int32>)
 {
-    unsafe SIMDInt32.copy(count: 2, from: from, to: to)
+    unsafe SIMD<Int32>.copy(count: 2, from: from, to: to)
 }
 
 @inline(never)
@@ -501,7 +501,7 @@ public func portCopyI32ConstantCountLaneCount(
     from: UnsafePointer<Int32>,
     to: UnsafeMutablePointer<Int32>
 ) {
-    unsafe SIMDInt32.copy(count: SIMDInt32.laneCount, from: from, to: to)
+    unsafe SIMD<Int32>.copy(count: SIMD<Int32>.laneCount, from: from, to: to)
 }
 
 @inline(never)
@@ -517,7 +517,7 @@ public func portCopyI32ConstantCountTwiceLaneCount(
     from: UnsafePointer<Int32>,
     to: UnsafeMutablePointer<Int32>
 ) {
-    unsafe SIMDInt32.copy(count: 2 * SIMDInt32.laneCount, from: from, to: to)
+    unsafe SIMD<Int32>.copy(count: 2 * SIMD<Int32>.laneCount, from: from, to: to)
 }
 
 @inline(never)
@@ -530,7 +530,7 @@ public func highwayCopyI32ConstantCountTwiceLaneCount(
 
 @inline(never)
 public func portStoreHalfI32(_ a: SIMD<Int32>.HalfVector, to: UnsafeMutablePointer<Int32>) {
-    unsafe SIMDInt32.store(a, to: to)
+    unsafe SIMD<Int32>.store(a, to: to)
 }
 
 @inline(never)
@@ -540,7 +540,7 @@ public func highwayStoreHalfI32(_ a: SIMD<Int32>.HalfVector, to: UnsafeMutablePo
 
 @inline(never)
 public func portStoreBlockI32(_ a: SIMD<Int32>.BlockVector, to: UnsafeMutablePointer<Int32>) {
-    unsafe SIMDInt32.store(a, to: to)
+    unsafe SIMD<Int32>.store(a, to: to)
 }
 
 @inline(never)

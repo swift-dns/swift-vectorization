@@ -10,8 +10,8 @@ extension SIMDUInt16CodegenTests {
     @Test func halfVectorClampingFromUInt32() {
         let mismatches = Mismatches("portHalfVectorClampingU32ToU16")
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt32>.self,
+            to: Lane.self,
             seed: 0xF10E_A518_D48D_72A5
         )
         for a in aInputs {
@@ -37,8 +37,8 @@ extension SIMDUInt16CodegenTests {
     @Test func halfVectorClampingFromInt32() {
         let mismatches = Mismatches("portHalfVectorClampingI32ToU16")
         let aInputs = Inputs.integerDemotions(
-            SIMDInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<Int32>.self,
+            to: Lane.self,
             seed: 0xB2BC_99FE_0C47_F32E
         )
         for a in aInputs {
@@ -74,8 +74,8 @@ extension SIMDUInt16CodegenTests {
     @Test func halfVectorClampingShiftedRightByFromUInt32ConstantBits() {
         let mismatches = Mismatches("portHalfVectorClampingShiftedRightByU32ToU16ConstantBits")
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt32>.self,
+            to: Lane.self,
             seed: 0xD60F_1FA7_A142_665D
         )
         for a in aInputs {
@@ -93,8 +93,8 @@ extension SIMDUInt16CodegenTests {
             "portHalfVectorClampingShiftedRightByU32ToU16ConstantBitsWidthDifference"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt32>.self,
+            to: Lane.self,
             seed: 0xC2B2_D616_DA28_30AA
         )
         for a in aInputs {
@@ -124,8 +124,8 @@ extension SIMDUInt16CodegenTests {
     @Test func halfVectorClampingShiftedRightByFromInt32ConstantBits() {
         let mismatches = Mismatches("portHalfVectorClampingShiftedRightByI32ToU16ConstantBits")
         let aInputs = Inputs.integerDemotions(
-            SIMDInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<Int32>.self,
+            to: Lane.self,
             seed: 0x5FB0_6F91_4D24_4E4A
         )
         for a in aInputs {
@@ -143,8 +143,8 @@ extension SIMDUInt16CodegenTests {
             "portHalfVectorClampingShiftedRightByI32ToU16ConstantBitsWidthDifference"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<Int32>.self,
+            to: Lane.self,
             seed: 0x1E20_A372_BFFF_D707
         )
         for a in aInputs {
@@ -176,8 +176,8 @@ extension SIMDUInt16CodegenTests {
             "portHalfVectorClampingRoundingShiftedRightByU32ToU16ConstantBits"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt32>.self,
+            to: Lane.self,
             seed: 0xDC66_5214_54A2_F389
         )
         for a in aInputs {
@@ -195,8 +195,8 @@ extension SIMDUInt16CodegenTests {
             "portHalfVectorClampingRoundingShiftedRightByU32ToU16ConstantBitsWidthDifference"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt32>.self,
+            to: Lane.self,
             seed: 0x51BC_5D7A_E39B_9CDE
         )
         for a in aInputs {
@@ -228,8 +228,8 @@ extension SIMDUInt16CodegenTests {
             "portHalfVectorClampingRoundingShiftedRightByI32ToU16ConstantBits"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<Int32>.self,
+            to: Lane.self,
             seed: 0x40B8_EAC8_7629_0B26
         )
         for a in aInputs {
@@ -247,8 +247,8 @@ extension SIMDUInt16CodegenTests {
             "portHalfVectorClampingRoundingShiftedRightByI32ToU16ConstantBitsWidthDifference"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<Int32>.self,
+            to: Lane.self,
             seed: 0x28D5_770C_99BB_92BB
         )
         for a in aInputs {
@@ -268,8 +268,8 @@ extension SIMDUInt16CodegenTests {
     @Test func quarterVectorClampingFromUInt64() {
         let mismatches = Mismatches("portQuarterVectorClampingU64ToU16")
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt64>.self,
+            to: Lane.self,
             seed: 0x0DF2_89D5_0B9D_041B
         )
         for a in aInputs {
@@ -295,8 +295,8 @@ extension SIMDUInt16CodegenTests {
     @Test func quarterVectorClampingFromInt64() {
         let mismatches = Mismatches("portQuarterVectorClampingI64ToU16")
         let aInputs = Inputs.integerDemotions(
-            SIMDInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<Int64>.self,
+            to: Lane.self,
             seed: 0x9D73_F16F_09C1_EA3E
         )
         for a in aInputs {
@@ -332,8 +332,8 @@ extension SIMDUInt16CodegenTests {
     @Test func quarterVectorClampingShiftedRightByFromUInt64ConstantBits() {
         let mismatches = Mismatches("portQuarterVectorClampingShiftedRightByU64ToU16ConstantBits")
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt64>.self,
+            to: Lane.self,
             seed: 0x2ED2_9DF0_ABBD_08AF
         )
         for a in aInputs {
@@ -351,8 +351,8 @@ extension SIMDUInt16CodegenTests {
             "portQuarterVectorClampingShiftedRightByU64ToU16ConstantBitsWidthDifference"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt64>.self,
+            to: Lane.self,
             seed: 0xBE7C_8CA5_0DE2_3120
         )
         for a in aInputs {
@@ -382,8 +382,8 @@ extension SIMDUInt16CodegenTests {
     @Test func quarterVectorClampingShiftedRightByFromInt64ConstantBits() {
         let mismatches = Mismatches("portQuarterVectorClampingShiftedRightByI64ToU16ConstantBits")
         let aInputs = Inputs.integerDemotions(
-            SIMDInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<Int64>.self,
+            to: Lane.self,
             seed: 0xD1D3_ABBB_7A09_D2C2
         )
         for a in aInputs {
@@ -401,8 +401,8 @@ extension SIMDUInt16CodegenTests {
             "portQuarterVectorClampingShiftedRightByI64ToU16ConstantBitsWidthDifference"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<Int64>.self,
+            to: Lane.self,
             seed: 0xEC93_4639_36EE_B62F
         )
         for a in aInputs {
@@ -436,8 +436,8 @@ extension SIMDUInt16CodegenTests {
             "portQuarterVectorClampingRoundingShiftedRightByU64ToU16ConstantBits"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt64>.self,
+            to: Lane.self,
             seed: 0xD987_0F13_14C9_3A23
         )
         for a in aInputs {
@@ -455,8 +455,8 @@ extension SIMDUInt16CodegenTests {
             "portQuarterVectorClampingRoundingShiftedRightByU64ToU16ConstantBitsWidthDifference"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt64>.self,
+            to: Lane.self,
             seed: 0x81F3_E4C3_2065_ACBC
         )
         for a in aInputs {
@@ -490,8 +490,8 @@ extension SIMDUInt16CodegenTests {
             "portQuarterVectorClampingRoundingShiftedRightByI64ToU16ConstantBits"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<Int64>.self,
+            to: Lane.self,
             seed: 0xD83E_3BDE_BD68_7BA6
         )
         for a in aInputs {
@@ -509,8 +509,8 @@ extension SIMDUInt16CodegenTests {
             "portQuarterVectorClampingRoundingShiftedRightByI64ToU16ConstantBitsWidthDifference"
         )
         let aInputs = Inputs.integerDemotions(
-            SIMDInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<Int64>.self,
+            to: Lane.self,
             seed: 0x6CE5_04F3_3AD8_803B
         )
         for a in aInputs {
@@ -530,8 +530,8 @@ extension SIMDUInt16CodegenTests {
     @Test func halfVectorTruncatingIfNeededFromUInt32() {
         let mismatches = Mismatches("portHalfVectorTruncatingIfNeededU32ToU16")
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt32.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt32>.self,
+            to: Lane.self,
             seed: 0x126B_3B99_89F5_238F
         )
         for a in aInputs {
@@ -557,8 +557,8 @@ extension SIMDUInt16CodegenTests {
     @Test func quarterVectorTruncatingIfNeededFromUInt64() {
         let mismatches = Mismatches("portQuarterVectorTruncatingIfNeededU64ToU16")
         let aInputs = Inputs.integerDemotions(
-            SIMDUInt64.Vector.self,
-            to: H.Lane.self,
+            SIMD<UInt64>.self,
+            to: Lane.self,
             seed: 0x7EF7_87BE_5287_7E71
         )
         for a in aInputs {

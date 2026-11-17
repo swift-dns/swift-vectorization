@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDInt8ReferenceTests {
     @Test func slideUpLanes() {
         let mismatches = Mismatches("slideUpLanes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC88C_1578_B5F2_B8C5)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC88C_1578_B5F2_B8C5)
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes),
-                H.Vector(raw: HighwayReference.slideUpLanesI8(a.raw, lanes)),
+                H(raw: HighwayReference.slideUpLanesI8(a.raw, lanes)),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -22,12 +22,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func slideUpLanesOutOfContract() {
         let mismatches = Mismatches("slideUpLanes out of contract")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6229_2CFE_00A5_F78E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6229_2CFE_00A5_F78E)
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: false)
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes),
-                H.Vector(raw: HighwayReference.slideUpLanesI8(a.raw, lanes)),
+                H(raw: HighwayReference.slideUpLanesI8(a.raw, lanes)),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -36,8 +36,8 @@ extension SIMDInt8ReferenceTests {
 
     @Test func slideUpLanesFillingWith() {
         let mismatches = Mismatches("slideUpLanesFillingWith")
-        let fillInputs = Inputs.vectors(H.Vector.self, seed: 0xD36C_7E9F_2354_A3A2)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD36C_7F9F_2354_A555)
+        let fillInputs = Inputs.vectors(H.self, seed: 0xD36C_7E9F_2354_A3A2)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD36C_7F9F_2354_A555)
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
         for (fill, a, lanes) in mixedTriples(
             fillInputs,
@@ -47,7 +47,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes, fillingWith: fill),
-                H.Vector(raw: HighwayReference.slideUpLanesFillingWithI8(fill.raw, a.raw, lanes)),
+                H(raw: HighwayReference.slideUpLanesFillingWithI8(fill.raw, a.raw, lanes)),
                 "fill: \(describe(fill)), a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -56,8 +56,8 @@ extension SIMDInt8ReferenceTests {
 
     @Test func slideUpLanesFillingWithOutOfContract() {
         let mismatches = Mismatches("slideUpLanesFillingWith out of contract")
-        let fillInputs = Inputs.vectors(H.Vector.self, seed: 0xF571_F013_7B87_C52F)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF571_EF13_7B87_C37C)
+        let fillInputs = Inputs.vectors(H.self, seed: 0xF571_F013_7B87_C52F)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF571_EF13_7B87_C37C)
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: false)
         for (fill, a, lanes) in mixedTriples(
             fillInputs,
@@ -67,7 +67,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes, fillingWith: fill),
-                H.Vector(raw: HighwayReference.slideUpLanesFillingWithI8(fill.raw, a.raw, lanes)),
+                H(raw: HighwayReference.slideUpLanesFillingWithI8(fill.raw, a.raw, lanes)),
                 "fill: \(describe(fill)), a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -76,12 +76,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func slideDownLanes() {
         let mismatches = Mismatches("slideDownLanes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x24BD_D7C6_59A6_FDB6)
+        let aInputs = Inputs.vectors(H.self, seed: 0x24BD_D7C6_59A6_FDB6)
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes),
-                H.Vector(raw: HighwayReference.slideDownLanesI8(a.raw, lanes)),
+                H(raw: HighwayReference.slideDownLanesI8(a.raw, lanes)),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -90,12 +90,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func slideDownLanesOutOfContract() {
         let mismatches = Mismatches("slideDownLanes out of contract")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x331F_594E_B11B_6BA3)
+        let aInputs = Inputs.vectors(H.self, seed: 0x331F_594E_B11B_6BA3)
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: false)
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes),
-                H.Vector(raw: HighwayReference.slideDownLanesI8(a.raw, lanes)),
+                H(raw: HighwayReference.slideDownLanesI8(a.raw, lanes)),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -104,8 +104,8 @@ extension SIMDInt8ReferenceTests {
 
     @Test func slideDownLanesFillingWith() {
         let mismatches = Mismatches("slideDownLanesFillingWith")
-        let fillInputs = Inputs.vectors(H.Vector.self, seed: 0x6A3C_44B7_AA02_E4AB)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6A3C_43B7_AA02_E2F8)
+        let fillInputs = Inputs.vectors(H.self, seed: 0x6A3C_44B7_AA02_E4AB)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6A3C_43B7_AA02_E2F8)
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
         for (fill, a, lanes) in mixedTriples(
             fillInputs,
@@ -115,7 +115,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes, fillingWith: fill),
-                H.Vector(raw: HighwayReference.slideDownLanesFillingWithI8(fill.raw, a.raw, lanes)),
+                H(raw: HighwayReference.slideDownLanesFillingWithI8(fill.raw, a.raw, lanes)),
                 "fill: \(describe(fill)), a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -124,8 +124,8 @@ extension SIMDInt8ReferenceTests {
 
     @Test func slideDownLanesFillingWithOutOfContract() {
         let mismatches = Mismatches("slideDownLanesFillingWith out of contract")
-        let fillInputs = Inputs.vectors(H.Vector.self, seed: 0x47B0_4E31_083C_F6F0)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x47B0_4F31_083C_F8A3)
+        let fillInputs = Inputs.vectors(H.self, seed: 0x47B0_4E31_083C_F6F0)
+        let aInputs = Inputs.vectors(H.self, seed: 0x47B0_4F31_083C_F8A3)
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: false)
         for (fill, a, lanes) in mixedTriples(
             fillInputs,
@@ -135,7 +135,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes, fillingWith: fill),
-                H.Vector(raw: HighwayReference.slideDownLanesFillingWithI8(fill.raw, a.raw, lanes)),
+                H(raw: HighwayReference.slideDownLanesFillingWithI8(fill.raw, a.raw, lanes)),
                 "fill: \(describe(fill)), a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -144,11 +144,11 @@ extension SIMDInt8ReferenceTests {
 
     @Test func slide1Up() {
         let mismatches = Mismatches("slide1Up")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1B86_0A91_0629_004B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1B86_0A91_0629_004B)
         for a in aInputs {
             mismatches.check(
                 H.slide1Up(a),
-                H.Vector(raw: HighwayReference.slide1UpI8(a.raw)),
+                H(raw: HighwayReference.slide1UpI8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -157,12 +157,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func slide1UpFillingWith() {
         let mismatches = Mismatches("slide1UpFillingWith")
-        let fillInputs = Inputs.lanes(H.Lane.self, seed: 0x0E73_5686_B0B1_066C)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0E73_5786_B0B1_081F)
+        let fillInputs = Inputs.lanes(Lane.self, seed: 0x0E73_5686_B0B1_066C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0E73_5786_B0B1_081F)
         for (fill, a) in everyPair(fillInputs, aInputs) {
             mismatches.check(
                 H.slide1Up(a, fillingWith: fill),
-                H.Vector(raw: HighwayReference.slide1UpFillingWithI8(fill, a.raw)),
+                H(raw: HighwayReference.slide1UpFillingWithI8(fill, a.raw)),
                 "fill: \(hex(fill)), a: \(describe(a))"
             )
         }
@@ -171,11 +171,11 @@ extension SIMDInt8ReferenceTests {
 
     @Test func slide1Down() {
         let mismatches = Mismatches("slide1Down")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x23AE_4DD0_83D7_91D6)
+        let aInputs = Inputs.vectors(H.self, seed: 0x23AE_4DD0_83D7_91D6)
         for a in aInputs {
             mismatches.check(
                 H.slide1Down(a),
-                H.Vector(raw: HighwayReference.slide1DownI8(a.raw)),
+                H(raw: HighwayReference.slide1DownI8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -184,12 +184,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func slide1DownFillingWith() {
         let mismatches = Mismatches("slide1DownFillingWith")
-        let fillInputs = Inputs.lanes(H.Lane.self, seed: 0x998A_1641_BD67_6ECB)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x998A_1541_BD67_6D18)
+        let fillInputs = Inputs.lanes(Lane.self, seed: 0x998A_1641_BD67_6ECB)
+        let aInputs = Inputs.vectors(H.self, seed: 0x998A_1541_BD67_6D18)
         for (fill, a) in everyPair(fillInputs, aInputs) {
             mismatches.check(
                 H.slide1Down(a, fillingWith: fill),
-                H.Vector(raw: HighwayReference.slide1DownFillingWithI8(fill, a.raw)),
+                H(raw: HighwayReference.slide1DownFillingWithI8(fill, a.raw)),
                 "fill: \(hex(fill)), a: \(describe(a))"
             )
         }
@@ -198,14 +198,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func slideUpBlocks() {
         let mismatches = Mismatches("slideUpBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1EA4_E8D0_654A_4756)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1EA4_E8D0_654A_4756)
         let blocksInputs = Array(0...H.laneCount / 16 - 1)
         for (a, blocks) in everyPair(aInputs, blocksInputs) {
             mismatches.check(
                 H.slideUpBlocks(a, by: blocks),
-                H.Vector(
-                    raw: HighwayReference.slideUpBlocksI8(a.raw, Int32(truncatingIfNeeded: blocks))
-                ),
+                H(raw: HighwayReference.slideUpBlocksI8(a.raw, Int32(truncatingIfNeeded: blocks))),
                 "a: \(describe(a)), blocks: \(blocks)"
             )
         }
@@ -214,14 +212,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func slideUpBlocksUnchecked() {
         let mismatches = Mismatches("slideUpBlocks unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x501D_9683_DF42_6DB0)
+        let aInputs = Inputs.vectors(H.self, seed: 0x501D_9683_DF42_6DB0)
         let blocksInputs = Array(0...H.laneCount / 16 - 1)
         for (a, blocks) in everyPair(aInputs, blocksInputs) {
             mismatches.check(
                 unsafe H.slideUpBlocks(a, byUnchecked: blocks),
-                H.Vector(
-                    raw: HighwayReference.slideUpBlocksI8(a.raw, Int32(truncatingIfNeeded: blocks))
-                ),
+                H(raw: HighwayReference.slideUpBlocksI8(a.raw, Int32(truncatingIfNeeded: blocks))),
                 "a: \(describe(a)), blocks: \(blocks)"
             )
         }
@@ -230,12 +226,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func slideDownBlocks() {
         let mismatches = Mismatches("slideDownBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDBCA_619F_D2EF_7293)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDBCA_619F_D2EF_7293)
         let blocksInputs = Array(0...H.laneCount / 16 - 1)
         for (a, blocks) in everyPair(aInputs, blocksInputs) {
             mismatches.check(
                 H.slideDownBlocks(a, by: blocks),
-                H.Vector(
+                H(
                     raw: HighwayReference.slideDownBlocksI8(
                         a.raw,
                         Int32(truncatingIfNeeded: blocks)
@@ -249,12 +245,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func slideDownBlocksUnchecked() {
         let mismatches = Mismatches("slideDownBlocks unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x552A_B3E0_B498_14C7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x552A_B3E0_B498_14C7)
         let blocksInputs = Array(0...H.laneCount / 16 - 1)
         for (a, blocks) in everyPair(aInputs, blocksInputs) {
             mismatches.check(
                 unsafe H.slideDownBlocks(a, byUnchecked: blocks),
-                H.Vector(
+                H(
                     raw: HighwayReference.slideDownBlocksI8(
                         a.raw,
                         Int32(truncatingIfNeeded: blocks)
@@ -268,8 +264,8 @@ extension SIMDInt8ReferenceTests {
 
     @Test func combinedSlideDownLanes() {
         let mismatches = Mismatches("combinedSlideDownLanes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8208_2749_6CF5_4AF5)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8208_2649_6CF5_4942)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8208_2749_6CF5_4AF5)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8208_2649_6CF5_4942)
         let lanesInputs = Array(1...H.laneCount - 1)
         for (a, b, lanes) in mixedTriples(
             aInputs,
@@ -279,7 +275,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.combinedSlideDownLanes(a, b, by: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.combinedSlideDownLanesI8(
                         a.raw,
                         b.raw,
@@ -294,8 +290,8 @@ extension SIMDInt8ReferenceTests {
 
     @Test func combinedSlideDownLanesUnchecked() {
         let mismatches = Mismatches("combinedSlideDownLanes unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7E6A_9415_4EB5_4D55)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7E6A_9315_4EB5_4BA2)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7E6A_9415_4EB5_4D55)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7E6A_9315_4EB5_4BA2)
         let lanesInputs = Array(1...H.laneCount - 1)
         for (a, b, lanes) in mixedTriples(
             aInputs,
@@ -305,7 +301,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 unsafe H.combinedSlideDownLanes(a, b, byUnchecked: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.combinedSlideDownLanesI8(
                         a.raw,
                         b.raw,

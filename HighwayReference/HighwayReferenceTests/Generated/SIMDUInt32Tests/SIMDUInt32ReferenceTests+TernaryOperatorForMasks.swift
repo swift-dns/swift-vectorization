@@ -9,13 +9,13 @@ extension SIMDUInt32ReferenceTests {
     @Test func selecting() {
         let mismatches = Mismatches("selecting")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC92B_861D_266C_D669)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC92B_851D_266C_D4B6)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC92B_841D_266C_D303)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC92B_851D_266C_D4B6)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC92B_841D_266C_D303)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xBD67_B239_152F_1A23)
         {
             mismatches.check(
                 H.selecting(mask, a, b),
-                H.Vector(raw: HighwayReference.selectingU32(mask.raw, a.raw, b.raw)),
+                H(raw: HighwayReference.selectingU32(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -25,13 +25,13 @@ extension SIMDUInt32ReferenceTests {
     @Test func selectingNonCanonical() {
         let mismatches = Mismatches("selecting with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xF0B6_FE40_6ADE_C0EE)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF0B6_FF40_6ADE_C2A1)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF0B6_FC40_6ADE_BD88)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF0B6_FF40_6ADE_C2A1)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF0B6_FC40_6ADE_BD88)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xE5AC_6E05_7D2E_99CA)
         {
             mismatches.check(
                 H.selecting(mask, a, b),
-                H.Vector(raw: HighwayReference.selectingU32(mask.raw, a.raw, b.raw)),
+                H(raw: HighwayReference.selectingU32(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -41,11 +41,11 @@ extension SIMDUInt32ReferenceTests {
     @Test func selectingOrZero() {
         let mismatches = Mismatches("selectingOrZero")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB737_E5CE_C5FC_BE9A)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB737_E6CE_C5FC_C04D)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB737_E6CE_C5FC_C04D)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.selectingOrZero(mask, a),
-                H.Vector(raw: HighwayReference.selectingOrZeroU32(mask.raw, a.raw)),
+                H(raw: HighwayReference.selectingOrZeroU32(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -55,11 +55,11 @@ extension SIMDUInt32ReferenceTests {
     @Test func selectingOrZeroNonCanonical() {
         let mismatches = Mismatches("selectingOrZero with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x0FD1_DAB0_3C7B_D531)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0FD1_D9B0_3C7B_D37E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0FD1_D9B0_3C7B_D37E)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.selectingOrZero(mask, a),
-                H.Vector(raw: HighwayReference.selectingOrZeroU32(mask.raw, a.raw)),
+                H(raw: HighwayReference.selectingOrZeroU32(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -69,11 +69,11 @@ extension SIMDUInt32ReferenceTests {
     @Test func zeroingSelected() {
         let mismatches = Mismatches("zeroingSelected")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB6B5_C423_AC84_9E46)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB6B5_C523_AC84_9FF9)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB6B5_C523_AC84_9FF9)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.zeroingSelected(mask, a),
-                H.Vector(raw: HighwayReference.zeroingSelectedU32(mask.raw, a.raw)),
+                H(raw: HighwayReference.zeroingSelectedU32(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -83,11 +83,11 @@ extension SIMDUInt32ReferenceTests {
     @Test func zeroingSelectedNonCanonical() {
         let mismatches = Mismatches("zeroingSelected with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x2850_CFC2_7E76_4475)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2850_CEC2_7E76_42C2)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2850_CEC2_7E76_42C2)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.zeroingSelected(mask, a),
-                H.Vector(raw: HighwayReference.zeroingSelectedU32(mask.raw, a.raw)),
+                H(raw: HighwayReference.zeroingSelectedU32(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -96,13 +96,13 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func selectingByVector() {
         let mismatches = Mismatches("selectingByVector")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x901C_047E_ECE5_1ED3)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x901C_037E_ECE5_1D20)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x901C_067E_ECE5_2239)
+        let aInputs = Inputs.vectors(H.self, seed: 0x901C_047E_ECE5_1ED3)
+        let bInputs = Inputs.vectors(H.self, seed: 0x901C_037E_ECE5_1D20)
+        let cInputs = Inputs.vectors(H.self, seed: 0x901C_067E_ECE5_2239)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x339A_EFCD_EA04_F695) {
             mismatches.check(
                 H.selecting(a, b, c),
-                H.Vector(raw: HighwayReference.selectingByVectorU32(a.raw, b.raw, c.raw)),
+                H(raw: HighwayReference.selectingByVectorU32(a.raw, b.raw, c.raw)),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }

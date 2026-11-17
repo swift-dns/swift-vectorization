@@ -5,90 +5,112 @@ public import Vectorization
 
 @inline(never)
 public func portOddEvenF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.oddEven(a, b)
+    SIMD<Double>.oddEven(a, b)
 }
 
 @inline(never)
 public func highwayOddEvenF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.oddEvenF64(a.raw, b.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.oddEvenF64(a.raw, b.raw))
 }
 
 @inline(never)
 public func portOddEvenF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.oddEven(SIMDDouble.repeating(1.5), b)
+    SIMD<Double>.oddEven(SIMD<Double>.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwayOddEvenF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.oddEvenF64(HighwayReference.Nothrow.repeatingF64(1.5).raw, b.raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.oddEvenF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
 public func portOddEvenF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.oddEven(a, SIMDDouble.repeating(1.5))
+    SIMD<Double>.oddEven(a, SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayOddEvenF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.oddEvenF64(a.raw, HighwayReference.Nothrow.repeatingF64(1.5).raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.oddEvenF64(
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
 public func portDuplicatingEvenF64(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.duplicatingEven(a)
+    SIMD<Double>.duplicatingEven(a)
 }
 
 @inline(never)
 public func highwayDuplicatingEvenF64(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.duplicatingEvenF64(a.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.duplicatingEvenF64(a.raw))
 }
 
 @inline(never)
 public func portDuplicatingEvenF64ConstantA() -> SIMD<Double> {
-    SIMDDouble.duplicatingEven(SIMDDouble.repeating(1.5))
+    SIMD<Double>.duplicatingEven(SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayDuplicatingEvenF64ConstantA() -> SIMD<Double> {
-    HighwayReference.Nothrow.duplicatingEvenF64(HighwayReference.Nothrow.repeatingF64(1.5).raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.duplicatingEvenF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
 public func portDuplicatingOddF64(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.duplicatingOdd(a)
+    SIMD<Double>.duplicatingOdd(a)
 }
 
 @inline(never)
 public func highwayDuplicatingOddF64(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.duplicatingOddF64(a.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.duplicatingOddF64(a.raw))
 }
 
 @inline(never)
 public func portDuplicatingOddF64ConstantA() -> SIMD<Double> {
-    SIMDDouble.duplicatingOdd(SIMDDouble.repeating(1.5))
+    SIMD<Double>.duplicatingOdd(SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayDuplicatingOddF64ConstantA() -> SIMD<Double> {
-    HighwayReference.Nothrow.duplicatingOddF64(HighwayReference.Nothrow.repeatingF64(1.5).raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.duplicatingOddF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
 public func portShuffled01F64(_ a: SIMD<Double>) -> SIMD<Double> {
-    SIMDDouble.shuffled01(a)
+    SIMD<Double>.shuffled01(a)
 }
 
 @inline(never)
 public func highwayShuffled01F64(_ a: SIMD<Double>) -> SIMD<Double> {
-    HighwayReference.Nothrow.shuffled01F64(a.raw)
+    SIMD<Double>(raw: HighwayReference.Nothrow.shuffled01F64(a.raw))
 }
 
 @inline(never)
 public func portShuffled01F64ConstantA() -> SIMD<Double> {
-    SIMDDouble.shuffled01(SIMDDouble.repeating(1.5))
+    SIMD<Double>.shuffled01(SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayShuffled01F64ConstantA() -> SIMD<Double> {
-    HighwayReference.Nothrow.shuffled01F64(HighwayReference.Nothrow.repeatingF64(1.5).raw)
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.shuffled01F64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
+    )
 }

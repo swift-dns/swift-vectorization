@@ -7,18 +7,18 @@ import Vectorization
 
 extension SIMDInt8ConstantTests {
     @inline(__always)
-    private func checkMinimumConstantA(_ value: H.Lane) {
+    private func checkMinimumConstantA(_ value: Lane) {
         let mismatches = Mismatches("minimum with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA211_C168_99D9_2B78)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA211_C168_99D9_2B78)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.minimum(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.minimumI8(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.minimumI8(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -26,18 +26,18 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkMinimumConstantB(_ value: H.Lane) {
+    private func checkMinimumConstantB(_ value: Lane) {
         let mismatches = Mismatches("minimum with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBD17_4768_A972_5FAA)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBD17_4768_A972_5FAA)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.minimum(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.minimumI8(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.minimumI8(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -95,18 +95,18 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkMaximumConstantA(_ value: H.Lane) {
+    private func checkMaximumConstantA(_ value: Lane) {
         let mismatches = Mismatches("maximum with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD737_4E66_3475_1652)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD737_4E66_3475_1652)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.maximum(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.maximumI8(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.maximumI8(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -114,18 +114,18 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkMaximumConstantB(_ value: H.Lane) {
+    private func checkMaximumConstantB(_ value: Lane) {
         let mismatches = Mismatches("maximum with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCE35_9866_2F42_3D90)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCE35_9866_2F42_3D90)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.maximum(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.maximumI8(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.maximumI8(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }

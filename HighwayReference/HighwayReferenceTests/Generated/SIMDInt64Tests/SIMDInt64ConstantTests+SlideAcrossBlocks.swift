@@ -9,11 +9,11 @@ extension SIMDInt64ConstantTests {
     @inline(__always)
     private func checkSlideUpLanesConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("slideUpLanes with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x579A_0044_D1D4_D6C2)
+        let aInputs = Inputs.vectors(H.self, seed: 0x579A_0044_D1D4_D6C2)
         for a in aInputs {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes),
-                H.Vector(raw: HighwayReference.slideUpLanesI64(a.raw, lanes)),
+                H(raw: HighwayReference.slideUpLanesI64(a.raw, lanes)),
                 "a: \(describe(a))"
             )
         }
@@ -53,18 +53,18 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkSlideUpLanesConstantA(_ value: H.Lane) {
+    private func checkSlideUpLanesConstantA(_ value: Lane) {
         let mismatches = Mismatches("slideUpLanes with a repeating \(hex(value))")
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for lanes in lanesInputs {
             mismatches.check(
                 H.slideUpLanes(H.repeating(value), by: lanes),
-                H.Vector(raw: HighwayReference.slideUpLanesI64(H.repeating(value).raw, lanes)),
+                H(raw: HighwayReference.slideUpLanesI64(H.repeating(value).raw, lanes)),
                 "lanes: \(lanes)"
             )
         }
@@ -140,22 +140,22 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func slideUpLanesConstantSplatMax() {
-        checkSlideUpLanesConstantA(H.Lane.max)
+        checkSlideUpLanesConstantA(Lane.max)
     }
 
     @Test func slideUpLanesConstantSplatMin() {
-        checkSlideUpLanesConstantA(H.Lane.min)
+        checkSlideUpLanesConstantA(Lane.min)
     }
 
     @inline(__always)
     private func checkSlideUpLanesFillingWithConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("slideUpLanesFillingWith with lanes \(lanes)")
-        let fillInputs = Inputs.vectors(H.Vector.self, seed: 0xEC0F_5840_0577_6C3F)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEC0F_5740_0577_6A8C)
+        let fillInputs = Inputs.vectors(H.self, seed: 0xEC0F_5840_0577_6C3F)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEC0F_5740_0577_6A8C)
         for (fill, a) in everyPair(fillInputs, aInputs) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes, fillingWith: fill),
-                H.Vector(raw: HighwayReference.slideUpLanesFillingWithI64(fill.raw, a.raw, lanes)),
+                H(raw: HighwayReference.slideUpLanesFillingWithI64(fill.raw, a.raw, lanes)),
                 "fill: \(describe(fill)), a: \(describe(a))"
             )
         }
@@ -195,19 +195,19 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkSlideUpLanesFillingWithConstantFill(_ value: H.Lane) {
+    private func checkSlideUpLanesFillingWithConstantFill(_ value: Lane) {
         let mismatches = Mismatches("slideUpLanesFillingWith with fill repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8891_F095_52F3_B090)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8891_F095_52F3_B090)
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes, fillingWith: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.slideUpLanesFillingWithI64(
                         H.repeating(value).raw,
                         a.raw,
@@ -221,19 +221,19 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkSlideUpLanesFillingWithConstantA(_ value: H.Lane) {
+    private func checkSlideUpLanesFillingWithConstantA(_ value: Lane) {
         let mismatches = Mismatches("slideUpLanesFillingWith with a repeating \(hex(value))")
-        let fillInputs = Inputs.vectors(H.Vector.self, seed: 0xA7CE_CE8A_339A_DD3F)
+        let fillInputs = Inputs.vectors(H.self, seed: 0xA7CE_CE8A_339A_DD3F)
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (fill, lanes) in everyPair(fillInputs, lanesInputs) {
             mismatches.check(
                 H.slideUpLanes(H.repeating(value), by: lanes, fillingWith: fill),
-                H.Vector(
+                H(
                     raw: HighwayReference.slideUpLanesFillingWithI64(
                         fill.raw,
                         H.repeating(value).raw,
@@ -332,23 +332,23 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func slideUpLanesFillingWithConstantSplatMax() {
-        checkSlideUpLanesFillingWithConstantFill(H.Lane.max)
-        checkSlideUpLanesFillingWithConstantA(H.Lane.max)
+        checkSlideUpLanesFillingWithConstantFill(Lane.max)
+        checkSlideUpLanesFillingWithConstantA(Lane.max)
     }
 
     @Test func slideUpLanesFillingWithConstantSplatMin() {
-        checkSlideUpLanesFillingWithConstantFill(H.Lane.min)
-        checkSlideUpLanesFillingWithConstantA(H.Lane.min)
+        checkSlideUpLanesFillingWithConstantFill(Lane.min)
+        checkSlideUpLanesFillingWithConstantA(Lane.min)
     }
 
     @inline(__always)
     private func checkSlideDownLanesConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("slideDownLanes with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD93C_EA01_A28B_6C53)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD93C_EA01_A28B_6C53)
         for a in aInputs {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes),
-                H.Vector(raw: HighwayReference.slideDownLanesI64(a.raw, lanes)),
+                H(raw: HighwayReference.slideDownLanesI64(a.raw, lanes)),
                 "a: \(describe(a))"
             )
         }
@@ -390,14 +390,12 @@ extension SIMDInt64ConstantTests {
     @inline(__always)
     private func checkSlideDownLanesFillingWithConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("slideDownLanesFillingWith with lanes \(lanes)")
-        let fillInputs = Inputs.vectors(H.Vector.self, seed: 0x1AE1_2141_86BB_FF10)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1AE1_2241_86BC_00C3)
+        let fillInputs = Inputs.vectors(H.self, seed: 0x1AE1_2141_86BB_FF10)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1AE1_2241_86BC_00C3)
         for (fill, a) in everyPair(fillInputs, aInputs) {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes, fillingWith: fill),
-                H.Vector(
-                    raw: HighwayReference.slideDownLanesFillingWithI64(fill.raw, a.raw, lanes)
-                ),
+                H(raw: HighwayReference.slideDownLanesFillingWithI64(fill.raw, a.raw, lanes)),
                 "fill: \(describe(fill)), a: \(describe(a))"
             )
         }
@@ -439,13 +437,11 @@ extension SIMDInt64ConstantTests {
     @inline(__always)
     private func checkSlideUpBlocksConstantBlocks(_ blocks: Int) {
         let mismatches = Mismatches("slideUpBlocks with blocks \(blocks)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF33F_31E6_968F_D064)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF33F_31E6_968F_D064)
         for a in aInputs {
             mismatches.check(
                 H.slideUpBlocks(a, by: blocks),
-                H.Vector(
-                    raw: HighwayReference.slideUpBlocksI64(a.raw, Int32(truncatingIfNeeded: blocks))
-                ),
+                H(raw: HighwayReference.slideUpBlocksI64(a.raw, Int32(truncatingIfNeeded: blocks))),
                 "a: \(describe(a))"
             )
         }
@@ -471,13 +467,11 @@ extension SIMDInt64ConstantTests {
     @inline(__always)
     private func checkSlideUpBlocksUncheckedConstantBlocks(_ blocks: Int) {
         let mismatches = Mismatches("slideUpBlocks unchecked with blocks \(blocks)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1706_5E08_0D67_A88E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1706_5E08_0D67_A88E)
         for a in aInputs {
             mismatches.check(
                 unsafe H.slideUpBlocks(a, byUnchecked: blocks),
-                H.Vector(
-                    raw: HighwayReference.slideUpBlocksI64(a.raw, Int32(truncatingIfNeeded: blocks))
-                ),
+                H(raw: HighwayReference.slideUpBlocksI64(a.raw, Int32(truncatingIfNeeded: blocks))),
                 "a: \(describe(a))"
             )
         }
@@ -503,11 +497,11 @@ extension SIMDInt64ConstantTests {
     @inline(__always)
     private func checkSlideDownBlocksConstantBlocks(_ blocks: Int) {
         let mismatches = Mismatches("slideDownBlocks with blocks \(blocks)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x22D9_946E_390E_376D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x22D9_946E_390E_376D)
         for a in aInputs {
             mismatches.check(
                 H.slideDownBlocks(a, by: blocks),
-                H.Vector(
+                H(
                     raw: HighwayReference.slideDownBlocksI64(
                         a.raw,
                         Int32(truncatingIfNeeded: blocks)
@@ -538,11 +532,11 @@ extension SIMDInt64ConstantTests {
     @inline(__always)
     private func checkSlideDownBlocksUncheckedConstantBlocks(_ blocks: Int) {
         let mismatches = Mismatches("slideDownBlocks unchecked with blocks \(blocks)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBC46_8F9F_4B37_F619)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBC46_8F9F_4B37_F619)
         for a in aInputs {
             mismatches.check(
                 unsafe H.slideDownBlocks(a, byUnchecked: blocks),
-                H.Vector(
+                H(
                     raw: HighwayReference.slideDownBlocksI64(
                         a.raw,
                         Int32(truncatingIfNeeded: blocks)
@@ -573,12 +567,12 @@ extension SIMDInt64ConstantTests {
     @inline(__always)
     private func checkCombinedSlideDownLanesConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("combinedSlideDownLanes with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBAAF_B89D_90E4_DA02)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xBAAF_B99D_90E4_DBB5)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBAAF_B89D_90E4_DA02)
+        let bInputs = Inputs.vectors(H.self, seed: 0xBAAF_B99D_90E4_DBB5)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.combinedSlideDownLanes(a, b, by: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.combinedSlideDownLanesI64(
                         a.raw,
                         b.raw,
@@ -622,12 +616,12 @@ extension SIMDInt64ConstantTests {
     @inline(__always)
     private func checkCombinedSlideDownLanesUncheckedConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("combinedSlideDownLanes unchecked with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDC8F_FC16_E87E_6CC2)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xDC8F_FD16_E87E_6E75)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDC8F_FC16_E87E_6CC2)
+        let bInputs = Inputs.vectors(H.self, seed: 0xDC8F_FD16_E87E_6E75)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 unsafe H.combinedSlideDownLanes(a, b, byUnchecked: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.combinedSlideDownLanesI64(
                         a.raw,
                         b.raw,
@@ -669,19 +663,19 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkCombinedSlideDownLanesConstantA(_ value: H.Lane) {
+    private func checkCombinedSlideDownLanesConstantA(_ value: Lane) {
         let mismatches = Mismatches("combinedSlideDownLanes with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE4F9_AC5A_176B_C315)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE4F9_AC5A_176B_C315)
         let lanesInputs = Array(1...H.laneCount - 1)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (b, lanes) in everyPair(bInputs, lanesInputs) {
             mismatches.check(
                 H.combinedSlideDownLanes(H.repeating(value), b, by: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.combinedSlideDownLanesI64(
                         H.repeating(value).raw,
                         b.raw,
@@ -695,19 +689,19 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkCombinedSlideDownLanesConstantB(_ value: H.Lane) {
+    private func checkCombinedSlideDownLanesConstantB(_ value: Lane) {
         let mismatches = Mismatches("combinedSlideDownLanes with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCC14_265A_09A0_F543)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCC14_265A_09A0_F543)
         let lanesInputs = Array(1...H.laneCount - 1)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.combinedSlideDownLanes(a, H.repeating(value), by: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.combinedSlideDownLanesI64(
                         a.raw,
                         H.repeating(value).raw,
@@ -806,12 +800,12 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func combinedSlideDownLanesConstantSplatMax() {
-        checkCombinedSlideDownLanesConstantA(H.Lane.max)
-        checkCombinedSlideDownLanesConstantB(H.Lane.max)
+        checkCombinedSlideDownLanesConstantA(Lane.max)
+        checkCombinedSlideDownLanesConstantB(Lane.max)
     }
 
     @Test func combinedSlideDownLanesConstantSplatMin() {
-        checkCombinedSlideDownLanesConstantA(H.Lane.min)
-        checkCombinedSlideDownLanesConstantB(H.Lane.min)
+        checkCombinedSlideDownLanesConstantA(Lane.min)
+        checkCombinedSlideDownLanesConstantB(Lane.min)
     }
 }

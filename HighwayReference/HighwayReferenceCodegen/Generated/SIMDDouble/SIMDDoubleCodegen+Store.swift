@@ -210,7 +210,7 @@ extension HighwayReferenceDouble {
 
 @inline(never)
 public func portStoreF64(_ a: SIMD<Double>, to: UnsafeMutablePointer<Double>) {
-    unsafe SIMDDouble.store(a, to: to)
+    unsafe SIMD<Double>.store(a, to: to)
 }
 
 @inline(never)
@@ -220,17 +220,20 @@ public func highwayStoreF64(_ a: SIMD<Double>, to: UnsafeMutablePointer<Double>)
 
 @inline(never)
 public func portStoreF64ConstantA(to: UnsafeMutablePointer<Double>) {
-    unsafe SIMDDouble.store(SIMDDouble.repeating(1.5), to: to)
+    unsafe SIMD<Double>.store(SIMD<Double>.repeating(1.5), to: to)
 }
 
 @inline(never)
 public func highwayStoreF64ConstantA(to: UnsafeMutablePointer<Double>) {
-    unsafe HighwayReference.Nothrow.storeF64(HighwayReference.Nothrow.repeatingF64(1.5).raw, to)
+    unsafe HighwayReference.Nothrow.storeF64(
+        SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+        to
+    )
 }
 
 @inline(never)
 public func portStoreAlignedF64(_ a: SIMD<Double>, to: UnsafeMutablePointer<Double>) {
-    unsafe SIMDDouble.storeAligned(a, to: to)
+    unsafe SIMD<Double>.storeAligned(a, to: to)
 }
 
 @inline(never)
@@ -240,20 +243,20 @@ public func highwayStoreAlignedF64(_ a: SIMD<Double>, to: UnsafeMutablePointer<D
 
 @inline(never)
 public func portStoreAlignedF64ConstantA(to: UnsafeMutablePointer<Double>) {
-    unsafe SIMDDouble.storeAligned(SIMDDouble.repeating(1.5), to: to)
+    unsafe SIMD<Double>.storeAligned(SIMD<Double>.repeating(1.5), to: to)
 }
 
 @inline(never)
 public func highwayStoreAlignedF64ConstantA(to: UnsafeMutablePointer<Double>) {
     unsafe HighwayReference.Nothrow.storeAlignedF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
+        SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
         to
     )
 }
 
 @inline(never)
 public func portStoreFirstF64(_ a: SIMD<Double>, to: UnsafeMutablePointer<Double>, count: Int) {
-    unsafe SIMDDouble.storeFirst(a, to: to, count: count)
+    unsafe SIMD<Double>.storeFirst(a, to: to, count: count)
 }
 
 @inline(never)
@@ -263,13 +266,13 @@ public func highwayStoreFirstF64(_ a: SIMD<Double>, to: UnsafeMutablePointer<Dou
 
 @inline(never)
 public func portStoreFirstF64ConstantA(to: UnsafeMutablePointer<Double>, count: Int) {
-    unsafe SIMDDouble.storeFirst(SIMDDouble.repeating(1.5), to: to, count: count)
+    unsafe SIMD<Double>.storeFirst(SIMD<Double>.repeating(1.5), to: to, count: count)
 }
 
 @inline(never)
 public func highwayStoreFirstF64ConstantA(to: UnsafeMutablePointer<Double>, count: Int) {
     unsafe HighwayReference.Nothrow.storeFirstF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
+        SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
         to,
         count
     )
@@ -277,7 +280,7 @@ public func highwayStoreFirstF64ConstantA(to: UnsafeMutablePointer<Double>, coun
 
 @inline(never)
 public func portStoreFirstF64ConstantCount(_ a: SIMD<Double>, to: UnsafeMutablePointer<Double>) {
-    unsafe SIMDDouble.storeFirst(a, to: to, count: 1)
+    unsafe SIMD<Double>.storeFirst(a, to: to, count: 1)
 }
 
 @inline(never)
@@ -287,7 +290,7 @@ public func highwayStoreFirstF64ConstantCount(_ a: SIMD<Double>, to: UnsafeMutab
 
 @inline(never)
 public func portStoreFirstF64ConstantCountTwo(_ a: SIMD<Double>, to: UnsafeMutablePointer<Double>) {
-    unsafe SIMDDouble.storeFirst(a, to: to, count: 2)
+    unsafe SIMD<Double>.storeFirst(a, to: to, count: 2)
 }
 
 @inline(never)
@@ -303,7 +306,7 @@ public func portStoreFirstF64ConstantCountLaneCount(
     _ a: SIMD<Double>,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe SIMDDouble.storeFirst(a, to: to, count: SIMDDouble.laneCount)
+    unsafe SIMD<Double>.storeFirst(a, to: to, count: SIMD<Double>.laneCount)
 }
 
 @inline(never)
@@ -323,7 +326,7 @@ public func portStoreFirstF64ConstantCountTwiceLaneCount(
     _ a: SIMD<Double>,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe SIMDDouble.storeFirst(a, to: to, count: 2 * SIMDDouble.laneCount)
+    unsafe SIMD<Double>.storeFirst(a, to: to, count: 2 * SIMD<Double>.laneCount)
 }
 
 @inline(never)
@@ -344,7 +347,7 @@ public func portStoreWhereF64(
     to: UnsafeMutablePointer<Double>,
     where mask: SIMD<Double>.Mask
 ) {
-    unsafe SIMDDouble.store(a, to: to, where: mask)
+    unsafe SIMD<Double>.store(a, to: to, where: mask)
 }
 
 @inline(never)
@@ -361,7 +364,7 @@ public func portStoreWhereF64ConstantA(
     to: UnsafeMutablePointer<Double>,
     where mask: SIMD<Double>.Mask
 ) {
-    unsafe SIMDDouble.store(SIMDDouble.repeating(1.5), to: to, where: mask)
+    unsafe SIMD<Double>.store(SIMD<Double>.repeating(1.5), to: to, where: mask)
 }
 
 @inline(never)
@@ -370,7 +373,7 @@ public func highwayStoreWhereF64ConstantA(
     where mask: SIMD<Double>.Mask
 ) {
     unsafe HighwayReference.Nothrow.storeWhereF64(
-        HighwayReference.Nothrow.repeatingF64(1.5).raw,
+        SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
         mask.raw,
         to
     )
@@ -378,7 +381,7 @@ public func highwayStoreWhereF64ConstantA(
 
 @inline(never)
 public func portStoreRepeatingF64(_ value: Double, count: Int, to: UnsafeMutablePointer<Double>) {
-    unsafe SIMDDouble.storeRepeating(value, count: count, to: to)
+    unsafe SIMD<Double>.storeRepeating(value, count: count, to: to)
 }
 
 @inline(never)
@@ -389,7 +392,7 @@ public func highwayStoreRepeatingF64(_ value: Double, count: Int, to: UnsafeMuta
 
 @inline(never)
 public func portStoreRepeatingF64ConstantValue(count: Int, to: UnsafeMutablePointer<Double>) {
-    unsafe SIMDDouble.storeRepeating(1.5, count: count, to: to)
+    unsafe SIMD<Double>.storeRepeating(1.5, count: count, to: to)
 }
 
 @inline(never)
@@ -399,7 +402,7 @@ public func highwayStoreRepeatingF64ConstantValue(count: Int, to: UnsafeMutableP
 
 @inline(never)
 public func portStoreRepeatingF64ConstantCount(_ value: Double, to: UnsafeMutablePointer<Double>) {
-    unsafe SIMDDouble.storeRepeating(value, count: 1, to: to)
+    unsafe SIMD<Double>.storeRepeating(value, count: 1, to: to)
 }
 
 @inline(never)
@@ -411,7 +414,7 @@ public func highwayStoreRepeatingF64ConstantCount(_ value: Double, to: UnsafeMut
 @inline(never)
 public func portStoreRepeatingF64ConstantCountTwo(_ value: Double, to: UnsafeMutablePointer<Double>)
 {
-    unsafe SIMDDouble.storeRepeating(value, count: 2, to: to)
+    unsafe SIMD<Double>.storeRepeating(value, count: 2, to: to)
 }
 
 @inline(never)
@@ -427,7 +430,7 @@ public func portStoreRepeatingF64ConstantCountLaneCount(
     _ value: Double,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe SIMDDouble.storeRepeating(value, count: SIMDDouble.laneCount, to: to)
+    unsafe SIMD<Double>.storeRepeating(value, count: SIMD<Double>.laneCount, to: to)
 }
 
 @inline(never)
@@ -447,7 +450,7 @@ public func portStoreRepeatingF64ConstantCountTwiceLaneCount(
     _ value: Double,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe SIMDDouble.storeRepeating(value, count: 2 * SIMDDouble.laneCount, to: to)
+    unsafe SIMD<Double>.storeRepeating(value, count: 2 * SIMD<Double>.laneCount, to: to)
 }
 
 @inline(never)
@@ -464,7 +467,7 @@ public func highwayStoreRepeatingF64ConstantCountTwiceLaneCount(
 
 @inline(never)
 public func portCopyF64(count: Int, from: UnsafePointer<Double>, to: UnsafeMutablePointer<Double>) {
-    unsafe SIMDDouble.copy(count: count, from: from, to: to)
+    unsafe SIMD<Double>.copy(count: count, from: from, to: to)
 }
 
 @inline(never)
@@ -479,7 +482,7 @@ public func highwayCopyF64(
 @inline(never)
 public func portCopyF64ConstantCount(from: UnsafePointer<Double>, to: UnsafeMutablePointer<Double>)
 {
-    unsafe SIMDDouble.copy(count: 1, from: from, to: to)
+    unsafe SIMD<Double>.copy(count: 1, from: from, to: to)
 }
 
 @inline(never)
@@ -495,7 +498,7 @@ public func portCopyF64ConstantCountTwo(
     from: UnsafePointer<Double>,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe SIMDDouble.copy(count: 2, from: from, to: to)
+    unsafe SIMD<Double>.copy(count: 2, from: from, to: to)
 }
 
 @inline(never)
@@ -511,7 +514,7 @@ public func portCopyF64ConstantCountLaneCount(
     from: UnsafePointer<Double>,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe SIMDDouble.copy(count: SIMDDouble.laneCount, from: from, to: to)
+    unsafe SIMD<Double>.copy(count: SIMD<Double>.laneCount, from: from, to: to)
 }
 
 @inline(never)
@@ -527,7 +530,7 @@ public func portCopyF64ConstantCountTwiceLaneCount(
     from: UnsafePointer<Double>,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe SIMDDouble.copy(count: 2 * SIMDDouble.laneCount, from: from, to: to)
+    unsafe SIMD<Double>.copy(count: 2 * SIMD<Double>.laneCount, from: from, to: to)
 }
 
 @inline(never)
@@ -540,7 +543,7 @@ public func highwayCopyF64ConstantCountTwiceLaneCount(
 
 @inline(never)
 public func portStoreHalfF64(_ a: SIMD<Double>.HalfVector, to: UnsafeMutablePointer<Double>) {
-    unsafe SIMDDouble.store(a, to: to)
+    unsafe SIMD<Double>.store(a, to: to)
 }
 
 @inline(never)
@@ -550,7 +553,7 @@ public func highwayStoreHalfF64(_ a: SIMD<Double>.HalfVector, to: UnsafeMutableP
 
 @inline(never)
 public func portStoreBlockF64(_ a: SIMD<Double>.BlockVector, to: UnsafeMutablePointer<Double>) {
-    unsafe SIMDDouble.store(a, to: to)
+    unsafe SIMD<Double>.store(a, to: to)
 }
 
 @inline(never)

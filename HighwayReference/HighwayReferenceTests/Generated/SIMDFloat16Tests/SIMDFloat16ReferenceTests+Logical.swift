@@ -9,12 +9,12 @@ import Vectorization
 extension SIMDFloat16ReferenceTests {
     @Test func copyingSign() {
         let mismatches = Mismatches("copyingSign")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC56B_4C97_7C7B_8750)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC56B_4D97_7C7B_8903)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC56B_4C97_7C7B_8750)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC56B_4D97_7C7B_8903)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.copyingSign(a, from: b),
-                HighwayReference.copyingSignF16(a.raw, b.raw),
+                H(raw: HighwayReference.copyingSignF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -23,12 +23,12 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func copyingSignToMagnitude() {
         let mismatches = Mismatches("copyingSignToMagnitude")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x063F_C922_2F80_0D43)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x063F_C822_2F80_0B90)
+        let aInputs = Inputs.vectors(H.self, seed: 0x063F_C922_2F80_0D43)
+        let bInputs = Inputs.vectors(H.self, seed: 0x063F_C822_2F80_0B90)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.copyingSignToMagnitude(a, from: b),
-                HighwayReference.copyingSignToMagnitudeF16(a.raw, b.raw),
+                H(raw: HighwayReference.copyingSignToMagnitudeF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -37,12 +37,12 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func bitwiseAnd() {
         let mismatches = Mismatches("bitwiseAnd")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1567_E27B_B038_FD94)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1567_E37B_B038_FF47)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1567_E27B_B038_FD94)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1567_E37B_B038_FF47)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseAnd(a, b),
-                HighwayReference.bitwiseAndF16(a.raw, b.raw),
+                H(raw: HighwayReference.bitwiseAndF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -51,12 +51,12 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func bitwiseOr() {
         let mismatches = Mismatches("bitwiseOr")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCF21_7536_80FC_3908)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCF21_7636_80FC_3ABB)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCF21_7536_80FC_3908)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCF21_7636_80FC_3ABB)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseOr(a, b),
-                HighwayReference.bitwiseOrF16(a.raw, b.raw),
+                H(raw: HighwayReference.bitwiseOrF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -65,12 +65,12 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func bitwiseXor() {
         let mismatches = Mismatches("bitwiseXor")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE898_FC5D_771C_FAB4)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE898_FD5D_771C_FC67)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE898_FC5D_771C_FAB4)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE898_FD5D_771C_FC67)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseXor(a, b),
-                HighwayReference.bitwiseXorF16(a.raw, b.raw),
+                H(raw: HighwayReference.bitwiseXorF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -79,12 +79,12 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func bitwiseAndNot() {
         let mismatches = Mismatches("bitwiseAndNot")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAEAB_9065_94C2_E64B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xAEAB_8F65_94C2_E498)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAEAB_9065_94C2_E64B)
+        let bInputs = Inputs.vectors(H.self, seed: 0xAEAB_8F65_94C2_E498)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseAndNot(a, b),
-                HighwayReference.bitwiseAndNotF16(a.raw, b.raw),
+                H(raw: HighwayReference.bitwiseAndNotF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -93,13 +93,13 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func bitwiseAndXor() {
         let mismatches = Mismatches("bitwiseAndXor")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD484_FD33_232A_E717)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD484_FC33_232A_E564)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xD484_FF33_232A_EA7D)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD484_FD33_232A_E717)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD484_FC33_232A_E564)
+        let cInputs = Inputs.vectors(H.self, seed: 0xD484_FF33_232A_EA7D)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xBEA6_0103_27B9_9911) {
             mismatches.check(
                 H.bitwiseAndXor(a, b, c),
-                HighwayReference.bitwiseAndXorF16(a.raw, b.raw, c.raw),
+                H(raw: HighwayReference.bitwiseAndXorF16(a.raw, b.raw, c.raw)),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -108,13 +108,13 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func bitwiseXor3() {
         let mismatches = Mismatches("bitwiseXor3")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x05F3_8CD1_C82D_210F)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x05F3_8BD1_C82D_1F5C)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x05F3_8ED1_C82D_2475)
+        let aInputs = Inputs.vectors(H.self, seed: 0x05F3_8CD1_C82D_210F)
+        let bInputs = Inputs.vectors(H.self, seed: 0x05F3_8BD1_C82D_1F5C)
+        let cInputs = Inputs.vectors(H.self, seed: 0x05F3_8ED1_C82D_2475)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x6B2A_8893_AEF3_4069) {
             mismatches.check(
                 H.bitwiseXor(a, b, c),
-                HighwayReference.bitwiseXor3F16(a.raw, b.raw, c.raw),
+                H(raw: HighwayReference.bitwiseXor3F16(a.raw, b.raw, c.raw)),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -123,13 +123,13 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func bitwiseOr3() {
         let mismatches = Mismatches("bitwiseOr3")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4480_B19C_CA2C_EF6B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4480_B09C_CA2C_EDB8)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x4480_B39C_CA2C_F2D1)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4480_B19C_CA2C_EF6B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4480_B09C_CA2C_EDB8)
+        let cInputs = Inputs.vectors(H.self, seed: 0x4480_B39C_CA2C_F2D1)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x0DBE_D415_D53F_22CD) {
             mismatches.check(
                 H.bitwiseOr(a, b, c),
-                HighwayReference.bitwiseOr3F16(a.raw, b.raw, c.raw),
+                H(raw: HighwayReference.bitwiseOr3F16(a.raw, b.raw, c.raw)),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -138,13 +138,13 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func bitwiseOrAnd() {
         let mismatches = Mismatches("bitwiseOrAnd")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4674_4950_8A18_13B7)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4674_4850_8A18_1204)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x4674_4B50_8A18_171D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4674_4950_8A18_13B7)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4674_4850_8A18_1204)
+        let cInputs = Inputs.vectors(H.self, seed: 0x4674_4B50_8A18_171D)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x1795_B023_56D2_52B1) {
             mismatches.check(
                 H.bitwiseOrAnd(a, b, c),
-                HighwayReference.bitwiseOrAndF16(a.raw, b.raw, c.raw),
+                H(raw: HighwayReference.bitwiseOrAndF16(a.raw, b.raw, c.raw)),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -153,13 +153,13 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func bitwiseXorAndNot() {
         let mismatches = Mismatches("bitwiseXorAndNot")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDB45_DFD2_8405_F272)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xDB45_E0D2_8405_F425)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xDB45_DDD2_8405_EF0C)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDB45_DFD2_8405_F272)
+        let bInputs = Inputs.vectors(H.self, seed: 0xDB45_E0D2_8405_F425)
+        let cInputs = Inputs.vectors(H.self, seed: 0xDB45_DDD2_8405_EF0C)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x3D7F_D6F3_7446_91B6) {
             mismatches.check(
                 H.bitwiseXorAndNot(a, b, c),
-                HighwayReference.bitwiseXorAndNotF16(a.raw, b.raw, c.raw),
+                H(raw: HighwayReference.bitwiseXorAndNotF16(a.raw, b.raw, c.raw)),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -168,13 +168,13 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func bitwiseSelecting() {
         let mismatches = Mismatches("bitwiseSelecting")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2125_5A0B_C8FC_F0D9)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2125_590B_C8FC_EF26)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x2125_580B_C8FC_ED73)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2125_5A0B_C8FC_F0D9)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2125_590B_C8FC_EF26)
+        let cInputs = Inputs.vectors(H.self, seed: 0x2125_580B_C8FC_ED73)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xF7A1_CE44_3D33_0593) {
             mismatches.check(
                 H.bitwiseSelecting(a, b, c),
-                HighwayReference.bitwiseSelectingF16(a.raw, b.raw, c.raw),
+                H(raw: HighwayReference.bitwiseSelectingF16(a.raw, b.raw, c.raw)),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -184,13 +184,13 @@ extension SIMDFloat16ReferenceTests {
     @Test func bitwiseAndWhere() {
         let mismatches = Mismatches("bitwiseAndWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x4A88_EC0A_DF0C_E6B5)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4A88_EB0A_DF0C_E502)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4A88_EA0A_DF0C_E34F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4A88_EB0A_DF0C_E502)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4A88_EA0A_DF0C_E34F)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xC3D3_5092_F051_3967)
         {
             mismatches.check(
                 H.bitwiseAnd(a, b, where: mask),
-                HighwayReference.bitwiseAndWhereF16(mask.raw, a.raw, b.raw),
+                H(raw: HighwayReference.bitwiseAndWhereF16(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -200,13 +200,13 @@ extension SIMDFloat16ReferenceTests {
     @Test func bitwiseAndWhereNonCanonical() {
         let mismatches = Mismatches("bitwiseAndWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x2D68_468C_36DC_B8F2)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2D68_478C_36DC_BAA5)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2D68_448C_36DC_B58C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2D68_478C_36DC_BAA5)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2D68_448C_36DC_B58C)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x81C1_F3DC_93AE_1936)
         {
             mismatches.check(
                 H.bitwiseAnd(a, b, where: mask),
-                HighwayReference.bitwiseAndWhereF16(mask.raw, a.raw, b.raw),
+                H(raw: HighwayReference.bitwiseAndWhereF16(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -216,13 +216,13 @@ extension SIMDFloat16ReferenceTests {
     @Test func bitwiseOrWhere() {
         let mismatches = Mismatches("bitwiseOrWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xEB3D_193C_72EA_37A9)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEB3D_183C_72EA_35F6)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xEB3D_173C_72EA_3443)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEB3D_183C_72EA_35F6)
+        let bInputs = Inputs.vectors(H.self, seed: 0xEB3D_173C_72EA_3443)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x4438_EE13_99CB_89E3)
         {
             mismatches.check(
                 H.bitwiseOr(a, b, where: mask),
-                HighwayReference.bitwiseOrWhereF16(mask.raw, a.raw, b.raw),
+                H(raw: HighwayReference.bitwiseOrWhereF16(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -232,13 +232,13 @@ extension SIMDFloat16ReferenceTests {
     @Test func bitwiseOrWhereNonCanonical() {
         let mismatches = Mismatches("bitwiseOrWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x7F06_F475_FEF1_EA2E)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7F06_F575_FEF1_EBE1)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7F06_F275_FEF1_E6C8)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7F06_F575_FEF1_EBE1)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7F06_F275_FEF1_E6C8)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xAAB9_6462_C211_5E8A)
         {
             mismatches.check(
                 H.bitwiseOr(a, b, where: mask),
-                HighwayReference.bitwiseOrWhereF16(mask.raw, a.raw, b.raw),
+                H(raw: HighwayReference.bitwiseOrWhereF16(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -248,13 +248,13 @@ extension SIMDFloat16ReferenceTests {
     @Test func bitwiseXorWhere() {
         let mismatches = Mismatches("bitwiseXorWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x86DC_B433_7DDD_8615)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x86DC_B333_7DDD_8462)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x86DC_B233_7DDD_82AF)
+        let aInputs = Inputs.vectors(H.self, seed: 0x86DC_B333_7DDD_8462)
+        let bInputs = Inputs.vectors(H.self, seed: 0x86DC_B233_7DDD_82AF)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xCEA1_D550_3861_1AC7)
         {
             mismatches.check(
                 H.bitwiseXor(a, b, where: mask),
-                HighwayReference.bitwiseXorWhereF16(mask.raw, a.raw, b.raw),
+                H(raw: HighwayReference.bitwiseXorWhereF16(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -264,13 +264,13 @@ extension SIMDFloat16ReferenceTests {
     @Test func bitwiseXorWhereNonCanonical() {
         let mismatches = Mismatches("bitwiseXorWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x6BAB_464D_0BB2_DED2)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6BAB_474D_0BB2_E085)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6BAB_444D_0BB2_DB6C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6BAB_474D_0BB2_E085)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6BAB_444D_0BB2_DB6C)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x1F44_A0B2_1F4C_6A96)
         {
             mismatches.check(
                 H.bitwiseXor(a, b, where: mask),
-                HighwayReference.bitwiseXorWhereF16(mask.raw, a.raw, b.raw),
+                H(raw: HighwayReference.bitwiseXorWhereF16(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -279,10 +279,10 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func bitwiseAndWhereOtherwise() {
         let mismatches = Mismatches("bitwiseAndWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x58E7_9CD8_9D7A_9547)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x58E7_9CD8_9D7A_9547)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x58E7_9BD8_9D7A_9394)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x58E7_9ED8_9D7A_98AD)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x58E7_9DD8_9D7A_96FA)
+        let aInputs = Inputs.vectors(H.self, seed: 0x58E7_9ED8_9D7A_98AD)
+        let bInputs = Inputs.vectors(H.self, seed: 0x58E7_9DD8_9D7A_96FA)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -292,7 +292,14 @@ extension SIMDFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.bitwiseAnd(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseAndWhereOtherwiseF16(otherwise.raw, mask.raw, a.raw, b.raw),
+                H(
+                    raw: HighwayReference.bitwiseAndWhereOtherwiseF16(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -301,10 +308,10 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func bitwiseAndWhereOtherwiseNonCanonical() {
         let mismatches = Mismatches("bitwiseAndWhereOtherwise with masks from arbitrary vectors")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x3F4C_7BB7_F228_1614)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x3F4C_7BB7_F228_1614)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x3F4C_7CB7_F228_17C7)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3F4C_7DB7_F228_197A)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3F4C_7EB7_F228_1B2D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3F4C_7DB7_F228_197A)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3F4C_7EB7_F228_1B2D)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -314,7 +321,14 @@ extension SIMDFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.bitwiseAnd(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseAndWhereOtherwiseF16(otherwise.raw, mask.raw, a.raw, b.raw),
+                H(
+                    raw: HighwayReference.bitwiseAndWhereOtherwiseF16(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -323,10 +337,10 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func bitwiseOrWhereOtherwise() {
         let mismatches = Mismatches("bitwiseOrWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xEE53_A285_4556_F76B)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xEE53_A285_4556_F76B)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xEE53_A185_4556_F5B8)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEE53_A485_4556_FAD1)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xEE53_A385_4556_F91E)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEE53_A485_4556_FAD1)
+        let bInputs = Inputs.vectors(H.self, seed: 0xEE53_A385_4556_F91E)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -336,7 +350,14 @@ extension SIMDFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.bitwiseOr(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseOrWhereOtherwiseF16(otherwise.raw, mask.raw, a.raw, b.raw),
+                H(
+                    raw: HighwayReference.bitwiseOrWhereOtherwiseF16(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -345,10 +366,10 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func bitwiseOrWhereOtherwiseNonCanonical() {
         let mismatches = Mismatches("bitwiseOrWhereOtherwise with masks from arbitrary vectors")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x8E6D_01B6_4047_7B80)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x8E6D_01B6_4047_7B80)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x8E6D_02B6_4047_7D33)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8E6D_03B6_4047_7EE6)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8E6D_04B6_4047_8099)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8E6D_03B6_4047_7EE6)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8E6D_04B6_4047_8099)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -358,7 +379,14 @@ extension SIMDFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.bitwiseOr(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseOrWhereOtherwiseF16(otherwise.raw, mask.raw, a.raw, b.raw),
+                H(
+                    raw: HighwayReference.bitwiseOrWhereOtherwiseF16(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -367,10 +395,10 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func bitwiseXorWhereOtherwise() {
         let mismatches = Mismatches("bitwiseXorWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x0707_1BCE_3EE6_97E7)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x0707_1BCE_3EE6_97E7)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x0707_1ACE_3EE6_9634)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0707_1DCE_3EE6_9B4D)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0707_1CCE_3EE6_999A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0707_1DCE_3EE6_9B4D)
+        let bInputs = Inputs.vectors(H.self, seed: 0x0707_1CCE_3EE6_999A)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -380,7 +408,14 @@ extension SIMDFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.bitwiseXor(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseXorWhereOtherwiseF16(otherwise.raw, mask.raw, a.raw, b.raw),
+                H(
+                    raw: HighwayReference.bitwiseXorWhereOtherwiseF16(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -389,10 +424,10 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func bitwiseXorWhereOtherwiseNonCanonical() {
         let mismatches = Mismatches("bitwiseXorWhereOtherwise with masks from arbitrary vectors")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xC13E_0B64_B7A6_5534)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xC13E_0B64_B7A6_5534)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xC13E_0C64_B7A6_56E7)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC13E_0D64_B7A6_589A)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC13E_0E64_B7A6_5A4D)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC13E_0D64_B7A6_589A)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC13E_0E64_B7A6_5A4D)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -402,7 +437,14 @@ extension SIMDFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.bitwiseXor(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseXorWhereOtherwiseF16(otherwise.raw, mask.raw, a.raw, b.raw),
+                H(
+                    raw: HighwayReference.bitwiseXorWhereOtherwiseF16(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -411,7 +453,7 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func allBitsSet() {
         let mismatches = Mismatches("allBitsSet")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0C94_6EBE_475C_DF25)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0C94_6EBE_475C_DF25)
         for a in aInputs {
             mismatches.check(
                 H.allBitsSet(a),
@@ -424,7 +466,7 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func allBitsClear() {
         let mismatches = Mismatches("allBitsClear")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6DAA_5ABD_CCC9_1A04)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6DAA_5ABD_CCC9_1A04)
         for a in aInputs {
             mismatches.check(
                 H.allBitsClear(a),
@@ -437,11 +479,11 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func zeroingNegative() {
         let mismatches = Mismatches("zeroingNegative")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1522_005B_72EC_8C9F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1522_005B_72EC_8C9F)
         for a in aInputs {
             mismatches.check(
                 H.zeroingNegative(a),
-                HighwayReference.zeroingNegativeF16(a.raw),
+                H(raw: HighwayReference.zeroingNegativeF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -450,13 +492,13 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func selectingIfNegative() {
         let mismatches = Mismatches("selectingIfNegative")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5278_FD39_2768_20DA)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5278_FE39_2768_228D)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x5278_FB39_2768_1D74)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5278_FD39_2768_20DA)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5278_FE39_2768_228D)
+        let cInputs = Inputs.vectors(H.self, seed: 0x5278_FB39_2768_1D74)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x0D74_6807_0DCA_1C9E) {
             mismatches.check(
                 H.selectingIfNegative(a, b, c),
-                HighwayReference.selectingIfNegativeF16(a.raw, b.raw, c.raw),
+                H(raw: HighwayReference.selectingIfNegativeF16(a.raw, b.raw, c.raw)),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -465,12 +507,12 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func selectingIfNegativeOrZero() {
         let mismatches = Mismatches("selectingIfNegativeOrZero")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF8B2_5417_762F_E771)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF8B2_5317_762F_E5BE)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF8B2_5417_762F_E771)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF8B2_5317_762F_E5BE)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.selectingIfNegativeOrZero(a, b),
-                HighwayReference.selectingIfNegativeOrZeroF16(a.raw, b.raw),
+                H(raw: HighwayReference.selectingIfNegativeOrZeroF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -479,12 +521,12 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func zeroingIfNegative() {
         let mismatches = Mismatches("zeroingIfNegative")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD853_BD0B_E515_34F4)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD853_BE0B_E515_36A7)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD853_BD0B_E515_34F4)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD853_BE0B_E515_36A7)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.zeroingIfNegative(a, b),
-                HighwayReference.zeroingIfNegativeF16(a.raw, b.raw),
+                H(raw: HighwayReference.zeroingIfNegativeF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -493,12 +535,12 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func negatingIfNegative() {
         let mismatches = Mismatches("negatingIfNegative")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA19A_8CD4_DB54_1061)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA19A_8BD4_DB54_0EAE)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA19A_8CD4_DB54_1061)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA19A_8BD4_DB54_0EAE)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.negatingIfNegative(a, b),
-                HighwayReference.negatingIfNegativeF16(a.raw, b.raw),
+                H(raw: HighwayReference.negatingIfNegativeF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

@@ -7,21 +7,21 @@ import Vectorization
 
 extension SIMDInt64ConstantTests {
     @inline(__always)
-    private func checkRepeatingWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkRepeatingWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "repeatingWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x59D7_4F5C_3787_078D)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x59D7_4C5C_3787_0274)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x59D7_4C5C_3787_0274)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (mask, value) in everyPair(maskInputs, valueInputs) {
             mismatches.check(
                 H.repeating(value, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.repeatingWhereOtherwiseI64(
                         H.repeating(value).raw,
                         mask.raw,
@@ -103,10 +103,10 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatMax() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane.max)
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane.max)
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatMin() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane.min)
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane.min)
     }
 }

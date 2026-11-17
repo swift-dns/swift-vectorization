@@ -5,263 +5,263 @@ public import Vectorization
 
 @inline(never)
 public func portVectorWideningLowerU16ToI32(wideningLower a: SIMD<UInt16>) -> SIMD<Int32> {
-    SIMDInt32.vector(wideningLower: a)
+    SIMD<Int32>.vector(wideningLower: a)
 }
 
 @inline(never)
 public func highwayVectorWideningLowerU16ToI32(wideningLower a: SIMD<UInt16>) -> SIMD<Int32> {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.vectorWideningLowerU16ToI32(a.raw))
+    SIMD<Int32>(raw: HighwayReference.Nothrow.vectorWideningLowerU16ToI32(a.raw))
 }
 
 @inline(never)
 public func portVectorWideningLowerU16ToI32ConstantA() -> SIMD<Int32> {
-    SIMDInt32.vector(wideningLower: SIMDUInt16.repeating(26))
+    SIMD<Int32>.vector(wideningLower: SIMD<UInt16>.repeating(26))
 }
 
 @inline(never)
 public func highwayVectorWideningLowerU16ToI32ConstantA() -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.vectorWideningLowerU16ToI32(
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portVectorWideningLowerI16ToI32(wideningLower a: SIMD<Int16>) -> SIMD<Int32> {
-    SIMDInt32.vector(wideningLower: a)
+    SIMD<Int32>.vector(wideningLower: a)
 }
 
 @inline(never)
 public func highwayVectorWideningLowerI16ToI32(wideningLower a: SIMD<Int16>) -> SIMD<Int32> {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.vectorWideningLowerI16ToI32(a.raw))
+    SIMD<Int32>(raw: HighwayReference.Nothrow.vectorWideningLowerI16ToI32(a.raw))
 }
 
 @inline(never)
 public func portVectorWideningLowerI16ToI32ConstantA() -> SIMD<Int32> {
-    SIMDInt32.vector(wideningLower: SIMDInt16.repeating(26))
+    SIMD<Int32>.vector(wideningLower: SIMD<Int16>.repeating(26))
 }
 
 @inline(never)
 public func highwayVectorWideningLowerI16ToI32ConstantA() -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.vectorWideningLowerI16ToI32(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portVectorWideningUpperU16ToI32(wideningUpper a: SIMD<UInt16>) -> SIMD<Int32> {
-    SIMDInt32.vector(wideningUpper: a)
+    SIMD<Int32>.vector(wideningUpper: a)
 }
 
 @inline(never)
 public func highwayVectorWideningUpperU16ToI32(wideningUpper a: SIMD<UInt16>) -> SIMD<Int32> {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.vectorWideningUpperU16ToI32(a.raw))
+    SIMD<Int32>(raw: HighwayReference.Nothrow.vectorWideningUpperU16ToI32(a.raw))
 }
 
 @inline(never)
 public func portVectorWideningUpperU16ToI32ConstantA() -> SIMD<Int32> {
-    SIMDInt32.vector(wideningUpper: SIMDUInt16.repeating(26))
+    SIMD<Int32>.vector(wideningUpper: SIMD<UInt16>.repeating(26))
 }
 
 @inline(never)
 public func highwayVectorWideningUpperU16ToI32ConstantA() -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.vectorWideningUpperU16ToI32(
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portVectorWideningUpperI16ToI32(wideningUpper a: SIMD<Int16>) -> SIMD<Int32> {
-    SIMDInt32.vector(wideningUpper: a)
+    SIMD<Int32>.vector(wideningUpper: a)
 }
 
 @inline(never)
 public func highwayVectorWideningUpperI16ToI32(wideningUpper a: SIMD<Int16>) -> SIMD<Int32> {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.vectorWideningUpperI16ToI32(a.raw))
+    SIMD<Int32>(raw: HighwayReference.Nothrow.vectorWideningUpperI16ToI32(a.raw))
 }
 
 @inline(never)
 public func portVectorWideningUpperI16ToI32ConstantA() -> SIMD<Int32> {
-    SIMDInt32.vector(wideningUpper: SIMDInt16.repeating(26))
+    SIMD<Int32>.vector(wideningUpper: SIMD<Int16>.repeating(26))
 }
 
 @inline(never)
 public func highwayVectorWideningUpperI16ToI32ConstantA() -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.vectorWideningUpperI16ToI32(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portVectorWideningEvenU16ToI32(wideningEven a: SIMD<UInt16>) -> SIMD<Int32> {
-    SIMDInt32.vector(wideningEven: a)
+    SIMD<Int32>.vector(wideningEven: a)
 }
 
 @inline(never)
 public func highwayVectorWideningEvenU16ToI32(wideningEven a: SIMD<UInt16>) -> SIMD<Int32> {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.vectorWideningEvenU16ToI32(a.raw))
+    SIMD<Int32>(raw: HighwayReference.Nothrow.vectorWideningEvenU16ToI32(a.raw))
 }
 
 @inline(never)
 public func portVectorWideningEvenU16ToI32ConstantA() -> SIMD<Int32> {
-    SIMDInt32.vector(wideningEven: SIMDUInt16.repeating(26))
+    SIMD<Int32>.vector(wideningEven: SIMD<UInt16>.repeating(26))
 }
 
 @inline(never)
 public func highwayVectorWideningEvenU16ToI32ConstantA() -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.vectorWideningEvenU16ToI32(
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portVectorWideningEvenI16ToI32(wideningEven a: SIMD<Int16>) -> SIMD<Int32> {
-    SIMDInt32.vector(wideningEven: a)
+    SIMD<Int32>.vector(wideningEven: a)
 }
 
 @inline(never)
 public func highwayVectorWideningEvenI16ToI32(wideningEven a: SIMD<Int16>) -> SIMD<Int32> {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.vectorWideningEvenI16ToI32(a.raw))
+    SIMD<Int32>(raw: HighwayReference.Nothrow.vectorWideningEvenI16ToI32(a.raw))
 }
 
 @inline(never)
 public func portVectorWideningEvenI16ToI32ConstantA() -> SIMD<Int32> {
-    SIMDInt32.vector(wideningEven: SIMDInt16.repeating(26))
+    SIMD<Int32>.vector(wideningEven: SIMD<Int16>.repeating(26))
 }
 
 @inline(never)
 public func highwayVectorWideningEvenI16ToI32ConstantA() -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.vectorWideningEvenI16ToI32(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portVectorWideningOddU16ToI32(wideningOdd a: SIMD<UInt16>) -> SIMD<Int32> {
-    SIMDInt32.vector(wideningOdd: a)
+    SIMD<Int32>.vector(wideningOdd: a)
 }
 
 @inline(never)
 public func highwayVectorWideningOddU16ToI32(wideningOdd a: SIMD<UInt16>) -> SIMD<Int32> {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.vectorWideningOddU16ToI32(a.raw))
+    SIMD<Int32>(raw: HighwayReference.Nothrow.vectorWideningOddU16ToI32(a.raw))
 }
 
 @inline(never)
 public func portVectorWideningOddU16ToI32ConstantA() -> SIMD<Int32> {
-    SIMDInt32.vector(wideningOdd: SIMDUInt16.repeating(26))
+    SIMD<Int32>.vector(wideningOdd: SIMD<UInt16>.repeating(26))
 }
 
 @inline(never)
 public func highwayVectorWideningOddU16ToI32ConstantA() -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.vectorWideningOddU16ToI32(
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portVectorWideningOddI16ToI32(wideningOdd a: SIMD<Int16>) -> SIMD<Int32> {
-    SIMDInt32.vector(wideningOdd: a)
+    SIMD<Int32>.vector(wideningOdd: a)
 }
 
 @inline(never)
 public func highwayVectorWideningOddI16ToI32(wideningOdd a: SIMD<Int16>) -> SIMD<Int32> {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.vectorWideningOddI16ToI32(a.raw))
+    SIMD<Int32>(raw: HighwayReference.Nothrow.vectorWideningOddI16ToI32(a.raw))
 }
 
 @inline(never)
 public func portVectorWideningOddI16ToI32ConstantA() -> SIMD<Int32> {
-    SIMDInt32.vector(wideningOdd: SIMDInt16.repeating(26))
+    SIMD<Int32>.vector(wideningOdd: SIMD<Int16>.repeating(26))
 }
 
 @inline(never)
 public func highwayVectorWideningOddI16ToI32ConstantA() -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.vectorWideningOddI16ToI32(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portVectorWideningHalfU16ToI32(widening a: SIMD<UInt16>.HalfVector) -> SIMD<Int32> {
-    SIMDInt32.vector(widening: a)
+    SIMD<Int32>.vector(widening: a)
 }
 
 @inline(never)
 public func highwayVectorWideningHalfU16ToI32(widening a: SIMD<UInt16>.HalfVector) -> SIMD<Int32> {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.vectorWideningHalfU16ToI32(a.raw))
+    SIMD<Int32>(raw: HighwayReference.Nothrow.vectorWideningHalfU16ToI32(a.raw))
 }
 
 @inline(never)
 public func portVectorWideningHalfI16ToI32(widening a: SIMD<Int16>.HalfVector) -> SIMD<Int32> {
-    SIMDInt32.vector(widening: a)
+    SIMD<Int32>.vector(widening: a)
 }
 
 @inline(never)
 public func highwayVectorWideningHalfI16ToI32(widening a: SIMD<Int16>.HalfVector) -> SIMD<Int32> {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.vectorWideningHalfI16ToI32(a.raw))
+    SIMD<Int32>(raw: HighwayReference.Nothrow.vectorWideningHalfI16ToI32(a.raw))
 }
 
 @inline(never)
 public func portVectorWideningQuarterU8ToI32(widening a: SIMD<UInt8>.QuarterVector) -> SIMD<Int32> {
-    SIMDInt32.vector(widening: a)
+    SIMD<Int32>.vector(widening: a)
 }
 
 @inline(never)
 public func highwayVectorWideningQuarterU8ToI32(
     widening a: SIMD<UInt8>.QuarterVector
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.vectorWideningQuarterU8ToI32(a.raw))
+    SIMD<Int32>(raw: HighwayReference.Nothrow.vectorWideningQuarterU8ToI32(a.raw))
 }
 
 @inline(never)
 public func portVectorWideningQuarterI8ToI32(widening a: SIMD<Int8>.QuarterVector) -> SIMD<Int32> {
-    SIMDInt32.vector(widening: a)
+    SIMD<Int32>.vector(widening: a)
 }
 
 @inline(never)
 public func highwayVectorWideningQuarterI8ToI32(widening a: SIMD<Int8>.QuarterVector) -> SIMD<Int32>
 {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.vectorWideningQuarterI8ToI32(a.raw))
+    SIMD<Int32>(raw: HighwayReference.Nothrow.vectorWideningQuarterI8ToI32(a.raw))
 }
 
 @inline(never)
 public func portVectorWideningLowerHalfU8ToI32(
     wideningLower a: SIMD<UInt8>.HalfVector
 ) -> SIMD<Int32> {
-    SIMDInt32.vector(wideningLower: a)
+    SIMD<Int32>.vector(wideningLower: a)
 }
 
 @inline(never)
 public func highwayVectorWideningLowerHalfU8ToI32(
     wideningLower a: SIMD<UInt8>.HalfVector
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.vectorWideningLowerHalfU8ToI32(a.raw))
+    SIMD<Int32>(raw: HighwayReference.Nothrow.vectorWideningLowerHalfU8ToI32(a.raw))
 }
 
 @inline(never)
 public func portVectorWideningLowerHalfI8ToI32(
     wideningLower a: SIMD<Int8>.HalfVector
 ) -> SIMD<Int32> {
-    SIMDInt32.vector(wideningLower: a)
+    SIMD<Int32>.vector(wideningLower: a)
 }
 
 @inline(never)
 public func highwayVectorWideningLowerHalfI8ToI32(
     wideningLower a: SIMD<Int8>.HalfVector
 ) -> SIMD<Int32> {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.vectorWideningLowerHalfI8ToI32(a.raw))
+    SIMD<Int32>(raw: HighwayReference.Nothrow.vectorWideningLowerHalfI8ToI32(a.raw))
 }

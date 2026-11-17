@@ -9,8 +9,8 @@ import Vectorization
 extension SIMDInt64CodegenTests {
     @Test func multiplying() {
         let mismatches = Mismatches("portMultiplyingI64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2F24_A40B_1087_F0BA)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2F24_A50B_1087_F26D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2F24_A40B_1087_F0BA)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2F24_A50B_1087_F26D)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMultiplyingI64(a, b),
@@ -23,7 +23,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyingConstantA() {
         let mismatches = Mismatches("portMultiplyingI64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0B91_F5E9_E9A7_C5C8)
+        let bInputs = Inputs.vectors(H.self, seed: 0x0B91_F5E9_E9A7_C5C8)
         for b in bInputs {
             mismatches.check(
                 portMultiplyingI64ConstantA(b),
@@ -36,7 +36,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyingConstantB() {
         let mismatches = Mismatches("portMultiplyingI64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x24E4_7BE9_F7CF_657A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x24E4_7BE9_F7CF_657A)
         for a in aInputs {
             mismatches.check(
                 portMultiplyingI64ConstantB(a),
@@ -49,8 +49,8 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyingHigh() {
         let mismatches = Mismatches("portMultiplyingHighI64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB414_A0D1_9681_CBE2)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB414_A1D1_9681_CD95)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB414_A0D1_9681_CBE2)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB414_A1D1_9681_CD95)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMultiplyingHighI64(a, b),
@@ -63,7 +63,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyingHighConstantA() {
         let mismatches = Mismatches("portMultiplyingHighI64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE70E_66F7_12F6_B430)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE70E_66F7_12F6_B430)
         for b in bInputs {
             mismatches.check(
                 portMultiplyingHighI64ConstantA(b),
@@ -76,7 +76,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyingHighConstantB() {
         let mismatches = Mismatches("portMultiplyingHighI64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x01A7_6CF7_2233_F002)
+        let aInputs = Inputs.vectors(H.self, seed: 0x01A7_6CF7_2233_F002)
         for a in aInputs {
             mismatches.check(
                 portMultiplyingHighI64ConstantB(a),
@@ -89,8 +89,8 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyingEvenFromInt32() {
         let mismatches = Mismatches("portMultiplyingEvenI32ToI64")
-        let aInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xE4D9_5300_4C2F_E7F4)
-        let bInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xE4D9_5400_4C2F_E9A7)
+        let aInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xE4D9_5300_4C2F_E7F4)
+        let bInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xE4D9_5400_4C2F_E9A7)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMultiplyingEvenI32ToI64(a, b),
@@ -103,7 +103,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyingEvenFromInt32ConstantA() {
         let mismatches = Mismatches("portMultiplyingEvenI32ToI64ConstantA")
-        let bInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xA89B_44C5_D033_179A)
+        let bInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xA89B_44C5_D033_179A)
         for b in bInputs {
             mismatches.check(
                 portMultiplyingEvenI32ToI64ConstantA(b),
@@ -116,7 +116,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyingEvenFromInt32ConstantB() {
         let mismatches = Mismatches("portMultiplyingEvenI32ToI64ConstantB")
-        let aInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0x9F2C_8EC5_CAA3_6CF8)
+        let aInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0x9F2C_8EC5_CAA3_6CF8)
         for a in aInputs {
             mismatches.check(
                 portMultiplyingEvenI32ToI64ConstantB(a),
@@ -129,8 +129,8 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyingEven() {
         let mismatches = Mismatches("portMultiplyingEvenI64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB16D_ECEB_96D2_D98E)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB16D_EDEB_96D2_DB41)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB16D_ECEB_96D2_D98E)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB16D_EDEB_96D2_DB41)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMultiplyingEvenI64(a, b),
@@ -143,7 +143,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyingEvenConstantA() {
         let mismatches = Mismatches("portMultiplyingEvenI64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1EAD_A6F4_B154_E47C)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1EAD_A6F4_B154_E47C)
         for b in bInputs {
             mismatches.check(
                 portMultiplyingEvenI64ConstantA(b),
@@ -156,7 +156,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyingEvenConstantB() {
         let mismatches = Mismatches("portMultiplyingEvenI64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x39B3_2CF4_C0EE_18AE)
+        let aInputs = Inputs.vectors(H.self, seed: 0x39B3_2CF4_C0EE_18AE)
         for a in aInputs {
             mismatches.check(
                 portMultiplyingEvenI64ConstantB(a),
@@ -169,8 +169,8 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyingOddFromInt32() {
         let mismatches = Mismatches("portMultiplyingOddI32ToI64")
-        let aInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xA88C_6E5A_539E_1051)
-        let bInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xA88C_6D5A_539E_0E9E)
+        let aInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xA88C_6E5A_539E_1051)
+        let bInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xA88C_6D5A_539E_0E9E)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMultiplyingOddI32ToI64(a, b),
@@ -183,7 +183,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyingOddFromInt32ConstantA() {
         let mismatches = Mismatches("portMultiplyingOddI32ToI64ConstantA")
-        let bInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xC0FF_AF60_5FC4_C145)
+        let bInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xC0FF_AF60_5FC4_C145)
         for b in bInputs {
             mismatches.check(
                 portMultiplyingOddI32ToI64ConstantA(b),
@@ -196,7 +196,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyingOddFromInt32ConstantB() {
         let mismatches = Mismatches("portMultiplyingOddI32ToI64ConstantB")
-        let aInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xA740_2960_5140_4FB3)
+        let aInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xA740_2960_5140_4FB3)
         for a in aInputs {
             mismatches.check(
                 portMultiplyingOddI32ToI64ConstantB(a),
@@ -209,8 +209,8 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyingOdd() {
         let mismatches = Mismatches("portMultiplyingOddI64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1AFA_FA6E_83D1_15B9)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1AFA_F96E_83D1_1406)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1AFA_FA6E_83D1_15B9)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1AFA_F96E_83D1_1406)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMultiplyingOddI64(a, b),
@@ -223,7 +223,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyingOddConstantA() {
         let mismatches = Mismatches("portMultiplyingOddI64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE804_AD88_F545_BA6D)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE804_AD88_F545_BA6D)
         for b in bInputs {
             mismatches.check(
                 portMultiplyingOddI64ConstantA(b),
@@ -236,7 +236,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyingOddConstantB() {
         let mismatches = Mismatches("portMultiplyingOddI64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCEB2_2788_E71E_1ABB)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCEB2_2788_E71E_1ABB)
         for a in aInputs {
             mismatches.check(
                 portMultiplyingOddI64ConstantB(a),
@@ -249,9 +249,9 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyQuadAccumulatingFromInt16() {
         let mismatches = Mismatches("portMultiplyQuadAccumulatingI16ToI64")
-        let aInputs = Inputs.conversions(SIMDInt16.Vector.self, seed: 0x6794_C744_135C_6266)
-        let bInputs = Inputs.conversions(SIMDInt16.Vector.self, seed: 0x6794_C844_135C_6419)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x6794_C544_135C_5F00)
+        let aInputs = Inputs.conversions(SIMD<Int16>.self, seed: 0x6794_C744_135C_6266)
+        let bInputs = Inputs.conversions(SIMD<Int16>.self, seed: 0x6794_C844_135C_6419)
+        let cInputs = Inputs.vectors(H.self, seed: 0x6794_C544_135C_5F00)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x5711_033E_86B3_3DE2) {
             mismatches.check(
                 portMultiplyQuadAccumulatingI16ToI64(a, b, c),
@@ -264,8 +264,8 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyQuadAccumulatingFromInt16ConstantA() {
         let mismatches = Mismatches("portMultiplyQuadAccumulatingI16ToI64ConstantA")
-        let bInputs = Inputs.conversions(SIMDInt16.Vector.self, seed: 0x4C68_318F_ED70_1754)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x4C68_348F_ED70_1C6D)
+        let bInputs = Inputs.conversions(SIMD<Int16>.self, seed: 0x4C68_318F_ED70_1754)
+        let cInputs = Inputs.vectors(H.self, seed: 0x4C68_348F_ED70_1C6D)
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 portMultiplyQuadAccumulatingI16ToI64ConstantA(b, c),
@@ -278,8 +278,8 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyQuadAccumulatingFromInt16ConstantB() {
         let mismatches = Mismatches("portMultiplyQuadAccumulatingI16ToI64ConstantB")
-        let aInputs = Inputs.conversions(SIMDInt16.Vector.self, seed: 0x6701_178F_FCAD_1CC6)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x6701_158F_FCAD_1960)
+        let aInputs = Inputs.conversions(SIMD<Int16>.self, seed: 0x6701_178F_FCAD_1CC6)
+        let cInputs = Inputs.vectors(H.self, seed: 0x6701_158F_FCAD_1960)
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 portMultiplyQuadAccumulatingI16ToI64ConstantB(a, c),
@@ -292,8 +292,8 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyQuadAccumulatingFromInt16ConstantC() {
         let mismatches = Mismatches("portMultiplyQuadAccumulatingI16ToI64ConstantC")
-        let aInputs = Inputs.conversions(SIMDInt16.Vector.self, seed: 0x5E6C_008F_F7D6_7111)
-        let bInputs = Inputs.conversions(SIMDInt16.Vector.self, seed: 0x5E6B_FF8F_F7D6_6F5E)
+        let aInputs = Inputs.conversions(SIMD<Int16>.self, seed: 0x5E6C_008F_F7D6_7111)
+        let bInputs = Inputs.conversions(SIMD<Int16>.self, seed: 0x5E6B_FF8F_F7D6_6F5E)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMultiplyQuadAccumulatingI16ToI64ConstantC(a, b),
@@ -306,10 +306,10 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyAccumulatingFromInt32() {
         let mismatches = Mismatches("portMultiplyAccumulatingI32ToI64")
-        let aInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0x633C_8727_EB17_0A95)
-        let bInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0x633C_8627_EB17_08E2)
-        let cInputs = Inputs.accumulators(H.Vector.self, seed: 0x633C_8527_EB17_072F)
-        let v0Inputs = Inputs.accumulators(H.Vector.self, seed: 0x633C_8427_EB17_057C)
+        let aInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0x633C_8727_EB17_0A95)
+        let bInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0x633C_8627_EB17_08E2)
+        let cInputs = Inputs.accumulators(H.self, seed: 0x633C_8527_EB17_072F)
+        let v0Inputs = Inputs.accumulators(H.self, seed: 0x633C_8427_EB17_057C)
         for (a, b, c, v0) in mixedQuadruples(
             aInputs,
             bInputs,
@@ -337,9 +337,9 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyAccumulatingFromInt32ConstantA() {
         let mismatches = Mismatches("portMultiplyAccumulatingI32ToI64ConstantA")
-        let bInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xE990_5B42_485C_9BB9)
-        let cInputs = Inputs.accumulators(H.Vector.self, seed: 0xE990_5842_485C_96A0)
-        let v0Inputs = Inputs.accumulators(H.Vector.self, seed: 0xE990_5942_485C_9853)
+        let bInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xE990_5B42_485C_9BB9)
+        let cInputs = Inputs.accumulators(H.self, seed: 0xE990_5842_485C_96A0)
+        let v0Inputs = Inputs.accumulators(H.self, seed: 0xE990_5942_485C_9853)
         for (b, c, v0) in mixedTriples(bInputs, cInputs, v0Inputs, seed: 0x3964_C8A1_ECA0_5B82) {
             var p0 = v0
             var r0 = v0
@@ -361,9 +361,9 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyAccumulatingFromInt32ConstantB() {
         let mismatches = Mismatches("portMultiplyAccumulatingI32ToI64ConstantB")
-        let aInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xCEF7_7542_391F_9647)
-        let cInputs = Inputs.accumulators(H.Vector.self, seed: 0xCEF7_7742_391F_99AD)
-        let v0Inputs = Inputs.accumulators(H.Vector.self, seed: 0xCEF7_7642_391F_97FA)
+        let aInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xCEF7_7542_391F_9647)
+        let cInputs = Inputs.accumulators(H.self, seed: 0xCEF7_7742_391F_99AD)
+        let v0Inputs = Inputs.accumulators(H.self, seed: 0xCEF7_7642_391F_97FA)
         for (a, c, v0) in mixedTriples(aInputs, cInputs, v0Inputs, seed: 0xC142_7D24_4205_DBC1) {
             var p0 = v0
             var r0 = v0
@@ -385,9 +385,9 @@ extension SIMDInt64CodegenTests {
 
     @Test func multiplyAccumulatingFromInt32ConstantC() {
         let mismatches = Mismatches("portMultiplyAccumulatingI32ToI64ConstantC")
-        let aInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xD78C_8C42_3DF6_41FC)
-        let bInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xD78C_8D42_3DF6_43AF)
-        let v0Inputs = Inputs.accumulators(H.Vector.self, seed: 0xD78C_8F42_3DF6_4715)
+        let aInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xD78C_8C42_3DF6_41FC)
+        let bInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xD78C_8D42_3DF6_43AF)
+        let v0Inputs = Inputs.accumulators(H.self, seed: 0xD78C_8F42_3DF6_4715)
         for (a, b, v0) in mixedTriples(aInputs, bInputs, v0Inputs, seed: 0xC5EA_6D7C_3B9D_51D0) {
             var p0 = v0
             var r0 = v0

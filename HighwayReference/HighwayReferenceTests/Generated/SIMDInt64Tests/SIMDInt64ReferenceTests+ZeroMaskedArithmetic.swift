@@ -9,13 +9,13 @@ extension SIMDInt64ReferenceTests {
     @Test func maximumWhere() {
         let mismatches = Mismatches("maximumWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x2DD4_2376_284E_18E5)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2DD4_2276_284E_1732)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2DD4_2176_284E_157F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2DD4_2276_284E_1732)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2DD4_2176_284E_157F)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x6F1C_0ABF_9757_13D7)
         {
             mismatches.check(
                 H.maximum(a, b, where: mask),
-                H.Vector(raw: HighwayReference.maximumWhereI64(mask.raw, a.raw, b.raw)),
+                H(raw: HighwayReference.maximumWhereI64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -25,13 +25,13 @@ extension SIMDInt64ReferenceTests {
     @Test func maximumWhereNonCanonical() {
         let mismatches = Mismatches("maximumWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xF67A_AB92_DD9D_5AE2)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF67A_AC92_DD9D_5C95)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF67A_A992_DD9D_577C)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF67A_AC92_DD9D_5C95)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF67A_A992_DD9D_577C)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x3ADD_3B7A_7824_2FA6)
         {
             mismatches.check(
                 H.maximum(a, b, where: mask),
-                H.Vector(raw: HighwayReference.maximumWhereI64(mask.raw, a.raw, b.raw)),
+                H(raw: HighwayReference.maximumWhereI64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -41,13 +41,13 @@ extension SIMDInt64ReferenceTests {
     @Test func addingWhere() {
         let mismatches = Mismatches("addingWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1E45_F0AA_2D6E_C5F6)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1E45_F1AA_2D6E_C7A9)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1E45_EEAA_2D6E_C290)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1E45_F1AA_2D6E_C7A9)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1E45_EEAA_2D6E_C290)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x93E4_3E47_C814_EF72)
         {
             mismatches.check(
                 H.adding(a, b, where: mask),
-                H.Vector(raw: HighwayReference.addingWhereI64(mask.raw, a.raw, b.raw)),
+                H(raw: HighwayReference.addingWhereI64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -57,13 +57,13 @@ extension SIMDInt64ReferenceTests {
     @Test func addingWhereNonCanonical() {
         let mismatches = Mismatches("addingWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x6601_CADA_966B_B9E5)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6601_C9DA_966B_B832)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6601_C8DA_966B_B67F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6601_C9DA_966B_B832)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6601_C8DA_966B_B67F)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x469A_FB11_601E_FED7)
         {
             mismatches.check(
                 H.adding(a, b, where: mask),
-                H.Vector(raw: HighwayReference.addingWhereI64(mask.raw, a.raw, b.raw)),
+                H(raw: HighwayReference.addingWhereI64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -73,13 +73,13 @@ extension SIMDInt64ReferenceTests {
     @Test func subtractingWhere() {
         let mismatches = Mismatches("subtractingWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE1FD_4358_D740_063B)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE1FD_4258_D740_0488)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE1FD_4558_D740_09A1)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE1FD_4258_D740_0488)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE1FD_4558_D740_09A1)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x7C0C_C683_16E1_53DD)
         {
             mismatches.check(
                 H.subtracting(a, b, where: mask),
-                H.Vector(raw: HighwayReference.subtractingWhereI64(mask.raw, a.raw, b.raw)),
+                H(raw: HighwayReference.subtractingWhereI64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -89,13 +89,13 @@ extension SIMDInt64ReferenceTests {
     @Test func subtractingWhereNonCanonical() {
         let mismatches = Mismatches("subtractingWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x48BD_2044_EF47_D8D0)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x48BD_2144_EF47_DA83)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x48BD_2244_EF47_DC36)
+        let aInputs = Inputs.vectors(H.self, seed: 0x48BD_2144_EF47_DA83)
+        let bInputs = Inputs.vectors(H.self, seed: 0x48BD_2244_EF47_DC36)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x394D_910F_AFA9_F18C)
         {
             mismatches.check(
                 H.subtracting(a, b, where: mask),
-                H.Vector(raw: HighwayReference.subtractingWhereI64(mask.raw, a.raw, b.raw)),
+                H(raw: HighwayReference.subtractingWhereI64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -105,13 +105,13 @@ extension SIMDInt64ReferenceTests {
     @Test func multiplyingWhere() {
         let mismatches = Mismatches("multiplyingWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF535_3503_24D4_1C4F)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF535_3403_24D4_1A9C)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF535_3703_24D4_1FB5)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF535_3403_24D4_1A9C)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF535_3703_24D4_1FB5)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xC1EF_E42E_C795_7D29)
         {
             mismatches.check(
                 H.multiplying(a, b, where: mask),
-                H.Vector(raw: HighwayReference.multiplyingWhereI64(mask.raw, a.raw, b.raw)),
+                H(raw: HighwayReference.multiplyingWhereI64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -121,13 +121,13 @@ extension SIMDInt64ReferenceTests {
     @Test func multiplyingWhereNonCanonical() {
         let mismatches = Mismatches("multiplyingWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x78D1_3245_1E61_52DC)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x78D1_3345_1E61_548F)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x78D1_3445_1E61_5642)
+        let aInputs = Inputs.vectors(H.self, seed: 0x78D1_3345_1E61_548F)
+        let bInputs = Inputs.vectors(H.self, seed: 0x78D1_3445_1E61_5642)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xD692_DC32_A809_3730)
         {
             mismatches.check(
                 H.multiplying(a, b, where: mask),
-                H.Vector(raw: HighwayReference.multiplyingWhereI64(mask.raw, a.raw, b.raw)),
+                H(raw: HighwayReference.multiplyingWhereI64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -137,23 +137,18 @@ extension SIMDInt64ReferenceTests {
     @Test func dividingWhere() {
         let mismatches = Mismatches("dividingWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x89E9_D859_992F_B96F)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x89E9_D759_992F_B7BC)
+        let aInputs = Inputs.vectors(H.self, seed: 0x89E9_D759_992F_B7BC)
         let bInputs =
-            Inputs.vectors(H.Vector.self, seed: 0x89E9_DA59_992F_BCD5) + [
-                H.Vector(H.Vector.Simd(repeating: -1))
-            ]
-            + Inputs.vectors(H.Vector.self, seed: 0xCA2D_7D3A_70D5_D77E).enumerated().map {
+            Inputs.vectors(H.self, seed: 0x89E9_DA59_992F_BCD5) + [H(H.SIMDType(repeating: -1))]
+            + Inputs.vectors(H.self, seed: 0xCA2D_7D3A_70D5_D77E).enumerated().map {
                 index,
-                vector in
-                H.Vector(
-                    vector.simd &>> H.Vector.Simd(repeating: H.Lane(truncatingIfNeeded: index))
-                )
+                vector in H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))
             }
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xEF18_4705_E59F_59C9)
         {
             mismatches.check(
                 H.dividing(a, b, where: mask),
-                H.Vector(raw: HighwayReference.dividingWhereI64(mask.raw, a.raw, b.raw)),
+                H(raw: HighwayReference.dividingWhereI64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -163,23 +158,18 @@ extension SIMDInt64ReferenceTests {
     @Test func dividingWhereNonCanonical() {
         let mismatches = Mismatches("dividingWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xA0AA_7412_7D21_30FC)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA0AA_7512_7D21_32AF)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA0AA_7512_7D21_32AF)
         let bInputs =
-            Inputs.vectors(H.Vector.self, seed: 0xA0AA_7612_7D21_3462) + [
-                H.Vector(H.Vector.Simd(repeating: -1))
-            ]
-            + Inputs.vectors(H.Vector.self, seed: 0xA098_7004_B83B_C689).enumerated().map {
+            Inputs.vectors(H.self, seed: 0xA0AA_7612_7D21_3462) + [H(H.SIMDType(repeating: -1))]
+            + Inputs.vectors(H.self, seed: 0xA098_7004_B83B_C689).enumerated().map {
                 index,
-                vector in
-                H.Vector(
-                    vector.simd &>> H.Vector.Simd(repeating: H.Lane(truncatingIfNeeded: index))
-                )
+                vector in H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))
             }
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x2D6C_8192_3A13_96D0)
         {
             mismatches.check(
                 H.dividing(a, b, where: mask),
-                H.Vector(raw: HighwayReference.dividingWhereI64(mask.raw, a.raw, b.raw)),
+                H(raw: HighwayReference.dividingWhereI64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -189,11 +179,11 @@ extension SIMDInt64ReferenceTests {
     @Test func magnitudeWhere() {
         let mismatches = Mismatches("magnitudeWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA0EE_267E_1A01_2CD9)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA0EE_257E_1A01_2B26)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA0EE_257E_1A01_2B26)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.magnitude(a, where: mask),
-                H.Vector(raw: HighwayReference.magnitudeWhereI64(mask.raw, a.raw)),
+                H(raw: HighwayReference.magnitudeWhereI64(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -203,11 +193,11 @@ extension SIMDInt64ReferenceTests {
     @Test func magnitudeWhereNonCanonical() {
         let mismatches = Mismatches("magnitudeWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xF23A_D5B5_38BB_4D1E)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF23A_D6B5_38BB_4ED1)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF23A_D6B5_38BB_4ED1)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.magnitude(a, where: mask),
-                H.Vector(raw: HighwayReference.magnitudeWhereI64(mask.raw, a.raw)),
+                H(raw: HighwayReference.magnitudeWhereI64(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -217,9 +207,9 @@ extension SIMDInt64ReferenceTests {
     @Test func multiplyAddingWhere() {
         let mismatches = Mismatches("multiplyAddingWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x132D_2AB9_30B9_771E)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x132D_2BB9_30B9_78D1)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x132D_28B9_30B9_73B8)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x132D_29B9_30B9_756B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x132D_2BB9_30B9_78D1)
+        let bInputs = Inputs.vectors(H.self, seed: 0x132D_28B9_30B9_73B8)
+        let cInputs = Inputs.vectors(H.self, seed: 0x132D_29B9_30B9_756B)
         for (mask, a, b, c) in mixedQuadruples(
             maskInputs,
             aInputs,
@@ -229,9 +219,7 @@ extension SIMDInt64ReferenceTests {
         ) {
             mismatches.check(
                 H.multiplyAdding(a, b, c, where: mask),
-                H.Vector(
-                    raw: HighwayReference.multiplyAddingWhereI64(mask.raw, a.raw, b.raw, c.raw)
-                ),
+                H(raw: HighwayReference.multiplyAddingWhereI64(mask.raw, a.raw, b.raw, c.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -241,9 +229,9 @@ extension SIMDInt64ReferenceTests {
     @Test func multiplyAddingWhereNonCanonical() {
         let mismatches = Mismatches("multiplyAddingWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x2ED7_532E_9A9F_8ACD)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2ED7_522E_9A9F_891A)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2ED7_512E_9A9F_8767)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x2ED7_502E_9A9F_85B4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2ED7_522E_9A9F_891A)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2ED7_512E_9A9F_8767)
+        let cInputs = Inputs.vectors(H.self, seed: 0x2ED7_502E_9A9F_85B4)
         for (mask, a, b, c) in mixedQuadruples(
             maskInputs,
             aInputs,
@@ -253,9 +241,7 @@ extension SIMDInt64ReferenceTests {
         ) {
             mismatches.check(
                 H.multiplyAdding(a, b, c, where: mask),
-                H.Vector(
-                    raw: HighwayReference.multiplyAddingWhereI64(mask.raw, a.raw, b.raw, c.raw)
-                ),
+                H(raw: HighwayReference.multiplyAddingWhereI64(mask.raw, a.raw, b.raw, c.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -265,9 +251,9 @@ extension SIMDInt64ReferenceTests {
     @Test func multiplySubtractingWhere() {
         let mismatches = Mismatches("multiplySubtractingWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1EF7_C33A_2185_E113)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1EF7_C23A_2185_DF60)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1EF7_C53A_2185_E479)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x1EF7_C43A_2185_E2C6)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1EF7_C23A_2185_DF60)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1EF7_C53A_2185_E479)
+        let cInputs = Inputs.vectors(H.self, seed: 0x1EF7_C43A_2185_E2C6)
         for (mask, a, b, c) in mixedQuadruples(
             maskInputs,
             aInputs,
@@ -277,9 +263,7 @@ extension SIMDInt64ReferenceTests {
         ) {
             mismatches.check(
                 H.multiplySubtracting(a, b, c, where: mask),
-                H.Vector(
-                    raw: HighwayReference.multiplySubtractingWhereI64(mask.raw, a.raw, b.raw, c.raw)
-                ),
+                H(raw: HighwayReference.multiplySubtractingWhereI64(mask.raw, a.raw, b.raw, c.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -289,9 +273,9 @@ extension SIMDInt64ReferenceTests {
     @Test func multiplySubtractingWhereNonCanonical() {
         let mismatches = Mismatches("multiplySubtractingWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x7C01_8376_D4F4_7F68)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7C01_8476_D4F4_811B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7C01_8576_D4F4_82CE)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x7C01_8676_D4F4_8481)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7C01_8476_D4F4_811B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7C01_8576_D4F4_82CE)
+        let cInputs = Inputs.vectors(H.self, seed: 0x7C01_8676_D4F4_8481)
         for (mask, a, b, c) in mixedQuadruples(
             maskInputs,
             aInputs,
@@ -301,9 +285,7 @@ extension SIMDInt64ReferenceTests {
         ) {
             mismatches.check(
                 H.multiplySubtracting(a, b, c, where: mask),
-                H.Vector(
-                    raw: HighwayReference.multiplySubtractingWhereI64(mask.raw, a.raw, b.raw, c.raw)
-                ),
+                H(raw: HighwayReference.multiplySubtractingWhereI64(mask.raw, a.raw, b.raw, c.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -313,9 +295,9 @@ extension SIMDInt64ReferenceTests {
     @Test func negatedMultiplyAddingWhere() {
         let mismatches = Mismatches("negatedMultiplyAddingWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1D5E_324A_C201_25B2)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1D5E_334A_C201_2765)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1D5E_304A_C201_224C)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x1D5E_314A_C201_23FF)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1D5E_334A_C201_2765)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1D5E_304A_C201_224C)
+        let cInputs = Inputs.vectors(H.self, seed: 0x1D5E_314A_C201_23FF)
         for (mask, a, b, c) in mixedQuadruples(
             maskInputs,
             aInputs,
@@ -325,7 +307,7 @@ extension SIMDInt64ReferenceTests {
         ) {
             mismatches.check(
                 H.negatedMultiplyAdding(a, b, c, where: mask),
-                H.Vector(
+                H(
                     raw: HighwayReference.negatedMultiplyAddingWhereI64(
                         mask.raw,
                         a.raw,
@@ -342,9 +324,9 @@ extension SIMDInt64ReferenceTests {
     @Test func negatedMultiplyAddingWhereNonCanonical() {
         let mismatches = Mismatches("negatedMultiplyAddingWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x6A24_91A2_65DA_9B29)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6A24_90A2_65DA_9976)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6A24_8FA2_65DA_97C3)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x6A24_8EA2_65DA_9610)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6A24_90A2_65DA_9976)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6A24_8FA2_65DA_97C3)
+        let cInputs = Inputs.vectors(H.self, seed: 0x6A24_8EA2_65DA_9610)
         for (mask, a, b, c) in mixedQuadruples(
             maskInputs,
             aInputs,
@@ -354,7 +336,7 @@ extension SIMDInt64ReferenceTests {
         ) {
             mismatches.check(
                 H.negatedMultiplyAdding(a, b, c, where: mask),
-                H.Vector(
+                H(
                     raw: HighwayReference.negatedMultiplyAddingWhereI64(
                         mask.raw,
                         a.raw,
@@ -371,9 +353,9 @@ extension SIMDInt64ReferenceTests {
     @Test func negatedMultiplySubtractingWhere() {
         let mismatches = Mismatches("negatedMultiplySubtractingWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7BD0_FB4D_F7D5_7267)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7BD0_FA4D_F7D5_70B4)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7BD0_FD4D_F7D5_75CD)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x7BD0_FC4D_F7D5_741A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7BD0_FA4D_F7D5_70B4)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7BD0_FD4D_F7D5_75CD)
+        let cInputs = Inputs.vectors(H.self, seed: 0x7BD0_FC4D_F7D5_741A)
         for (mask, a, b, c) in mixedQuadruples(
             maskInputs,
             aInputs,
@@ -383,7 +365,7 @@ extension SIMDInt64ReferenceTests {
         ) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, b, c, where: mask),
-                H.Vector(
+                H(
                     raw: HighwayReference.negatedMultiplySubtractingWhereI64(
                         mask.raw,
                         a.raw,
@@ -402,9 +384,9 @@ extension SIMDInt64ReferenceTests {
             "negatedMultiplySubtractingWhere with masks from arbitrary vectors"
         )
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xE818_5C2C_A797_67B4)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE818_5D2C_A797_6967)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE818_5E2C_A797_6B1A)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xE818_5F2C_A797_6CCD)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE818_5D2C_A797_6967)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE818_5E2C_A797_6B1A)
+        let cInputs = Inputs.vectors(H.self, seed: 0xE818_5F2C_A797_6CCD)
         for (mask, a, b, c) in mixedQuadruples(
             maskInputs,
             aInputs,
@@ -414,7 +396,7 @@ extension SIMDInt64ReferenceTests {
         ) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, b, c, where: mask),
-                H.Vector(
+                H(
                     raw: HighwayReference.negatedMultiplySubtractingWhereI64(
                         mask.raw,
                         a.raw,

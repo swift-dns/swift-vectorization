@@ -9,9 +9,9 @@ import Vectorization
 extension SIMDBFloat16CodegenTests {
     @Test func replacingLane() {
         let mismatches = Mismatches("portReplacingLaneBF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x36C6_E302_5E5B_8FD7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x36C6_E302_5E5B_8FD7)
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x36C6_E502_5E5B_933D)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x36C6_E502_5E5B_933D)
         for (a, index, value) in mixedTriples(
             aInputs,
             indexInputs,
@@ -30,7 +30,7 @@ extension SIMDBFloat16CodegenTests {
     @Test func replacingLaneConstantA() {
         let mismatches = Mismatches("portReplacingLaneBF16ConstantA")
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xB7F3_5B0C_621A_5B16)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xB7F3_5B0C_621A_5B16)
         for (index, value) in everyPair(indexInputs, valueInputs) {
             mismatches.check(
                 portReplacingLaneBF16ConstantA(atUnchecked: index, with: value),
@@ -43,8 +43,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func replacingLaneConstantIndex() {
         let mismatches = Mismatches("portReplacingLaneBF16ConstantIndex")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5C8E_F784_021B_EB07)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x5C8E_F984_021B_EE6D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5C8E_F784_021B_EB07)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x5C8E_F984_021B_EE6D)
         for (a, value) in everyPair(aInputs, valueInputs) {
             mismatches.check(
                 portReplacingLaneBF16ConstantIndex(a, with: value),
@@ -57,7 +57,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func replacingLaneConstantValue() {
         let mismatches = Mismatches("portReplacingLaneBF16ConstantValue")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0A45_18DB_9474_E9A2)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0A45_18DB_9474_E9A2)
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
         for (a, index) in everyPair(aInputs, indexInputs) {
             mismatches.check(

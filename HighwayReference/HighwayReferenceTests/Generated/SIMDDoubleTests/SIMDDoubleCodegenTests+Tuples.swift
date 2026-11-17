@@ -9,8 +9,8 @@ import Vectorization
 extension SIMDDoubleCodegenTests {
     @Test func create2() {
         let mismatches = Mismatches("portCreate2F64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0FF9_8175_3198_A969)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0FF9_8075_3198_A7B6)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0FF9_8175_3198_A969)
+        let bInputs = Inputs.vectors(H.self, seed: 0x0FF9_8075_3198_A7B6)
         for (a, b) in everyPair(aInputs, bInputs) {
             let port = portCreate2F64(a, b)
             let reference = highwayCreate2F64(a, b)
@@ -22,7 +22,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func create2ConstantA() {
         let mismatches = Mismatches("portCreate2F64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB81E_EC00_5EC9_7BDD)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB81E_EC00_5EC9_7BDD)
         for b in bInputs {
             let port = portCreate2F64ConstantA(b)
             let reference = highwayCreate2F64ConstantA(b)
@@ -34,7 +34,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func create2ConstantB() {
         let mismatches = Mismatches("portCreate2F64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9D19_6600_4F30_47AB)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9D19_6600_4F30_47AB)
         for a in aInputs {
             let port = portCreate2F64ConstantB(a)
             let reference = highwayCreate2F64ConstantB(a)
@@ -46,9 +46,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func get2() {
         let mismatches = Mismatches("portGet2F64")
-        let tupleInputs = Inputs.tuples2(
-            of: Inputs.vectors(H.Vector.self, seed: 0x65BF_B7EB_E4A2_65A9)
-        )
+        let tupleInputs = Inputs.tuples2(of: Inputs.vectors(H.self, seed: 0x65BF_B7EB_E4A2_65A9))
         let indexInputs = Inputs.tupleIndices(count: 2)
         for (tuple, index) in everyPair(tupleInputs, indexInputs) {
             mismatches.check(
@@ -62,9 +60,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func get2ConstantIndex() {
         let mismatches = Mismatches("portGet2F64ConstantIndex")
-        let tupleInputs = Inputs.tuples2(
-            of: Inputs.vectors(H.Vector.self, seed: 0xA16F_0BE4_DC34_2F1D)
-        )
+        let tupleInputs = Inputs.tuples2(of: Inputs.vectors(H.self, seed: 0xA16F_0BE4_DC34_2F1D))
         for tuple in tupleInputs {
             mismatches.check(
                 portGet2F64ConstantIndex(tuple),
@@ -77,11 +73,9 @@ extension SIMDDoubleCodegenTests {
 
     @Test func set2() {
         let mismatches = Mismatches("portSet2F64")
-        let tupleInputs = Inputs.tuples2(
-            of: Inputs.vectors(H.Vector.self, seed: 0x4D5F_6916_884A_5E65)
-        )
+        let tupleInputs = Inputs.tuples2(of: Inputs.vectors(H.self, seed: 0x4D5F_6916_884A_5E65))
         let indexInputs = Inputs.tupleIndices(count: 2)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4D5F_6716_884A_5AFF)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4D5F_6716_884A_5AFF)
         for (tuple, index, a) in mixedTriples(
             tupleInputs,
             indexInputs,
@@ -106,10 +100,8 @@ extension SIMDDoubleCodegenTests {
 
     @Test func set2ConstantIndex() {
         let mismatches = Mismatches("portSet2F64ConstantIndex")
-        let tupleInputs = Inputs.tuples2(
-            of: Inputs.vectors(H.Vector.self, seed: 0xF3F2_B618_F97E_F671)
-        )
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF3F2_B418_F97E_F30B)
+        let tupleInputs = Inputs.tuples2(of: Inputs.vectors(H.self, seed: 0xF3F2_B618_F97E_F671))
+        let aInputs = Inputs.vectors(H.self, seed: 0xF3F2_B418_F97E_F30B)
         for (tuple, a) in everyPair(tupleInputs, aInputs) {
             let port = portSet2F64ConstantIndex(tuple, to: a)
             let reference = highwaySet2F64ConstantIndex(tuple, to: a)
@@ -129,9 +121,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func set2ConstantA() {
         let mismatches = Mismatches("portSet2F64ConstantA")
-        let tupleInputs = Inputs.tuples2(
-            of: Inputs.vectors(H.Vector.self, seed: 0xC3BC_45E6_C484_FC96)
-        )
+        let tupleInputs = Inputs.tuples2(of: Inputs.vectors(H.self, seed: 0xC3BC_45E6_C484_FC96))
         let indexInputs = Inputs.tupleIndices(count: 2)
         for (tuple, index) in everyPair(tupleInputs, indexInputs) {
             let port = portSet2F64ConstantA(tuple, atUnchecked: index)
@@ -152,9 +142,9 @@ extension SIMDDoubleCodegenTests {
 
     @Test func create3() {
         let mismatches = Mismatches("portCreate3F64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x18FB_3875_36CB_83DE)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x18FB_3975_36CB_8591)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x18FB_3675_36CB_8078)
+        let aInputs = Inputs.vectors(H.self, seed: 0x18FB_3875_36CB_83DE)
+        let bInputs = Inputs.vectors(H.self, seed: 0x18FB_3975_36CB_8591)
+        let cInputs = Inputs.vectors(H.self, seed: 0x18FB_3675_36CB_8078)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xE76D_620C_1153_43FA) {
             let port = portCreate3F64(a, b, c)
             let reference = highwayCreate3F64(a, b, c)
@@ -179,8 +169,8 @@ extension SIMDDoubleCodegenTests {
 
     @Test func create3ConstantA() {
         let mismatches = Mismatches("portCreate3F64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x379C_22C2_A7B8_104C)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x379C_25C2_A7B8_1565)
+        let bInputs = Inputs.vectors(H.self, seed: 0x379C_22C2_A7B8_104C)
+        let cInputs = Inputs.vectors(H.self, seed: 0x379C_25C2_A7B8_1565)
         for (b, c) in everyPair(bInputs, cInputs) {
             let port = portCreate3F64ConstantA(b, c)
             let reference = highwayCreate3F64ConstantA(b, c)
@@ -193,8 +183,8 @@ extension SIMDDoubleCodegenTests {
 
     @Test func create3ConstantB() {
         let mismatches = Mismatches("portCreate3F64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x50EE_A8C2_B5DF_AFFE)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x50EE_A6C2_B5DF_AC98)
+        let aInputs = Inputs.vectors(H.self, seed: 0x50EE_A8C2_B5DF_AFFE)
+        let cInputs = Inputs.vectors(H.self, seed: 0x50EE_A6C2_B5DF_AC98)
         for (a, c) in everyPair(aInputs, cInputs) {
             let port = portCreate3F64ConstantB(a, c)
             let reference = highwayCreate3F64ConstantB(a, c)
@@ -207,8 +197,8 @@ extension SIMDDoubleCodegenTests {
 
     @Test func create3ConstantC() {
         let mismatches = Mismatches("portCreate3F64ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x47EC_F1C2_B0AC_D589)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x47EC_F0C2_B0AC_D3D6)
+        let aInputs = Inputs.vectors(H.self, seed: 0x47EC_F1C2_B0AC_D589)
+        let bInputs = Inputs.vectors(H.self, seed: 0x47EC_F0C2_B0AC_D3D6)
         for (a, b) in everyPair(aInputs, bInputs) {
             let port = portCreate3F64ConstantC(a, b)
             let reference = highwayCreate3F64ConstantC(a, b)
@@ -221,9 +211,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func get3() {
         let mismatches = Mismatches("portGet3F64")
-        let tupleInputs = Inputs.tuples3(
-            of: Inputs.vectors(H.Vector.self, seed: 0x6EC1_6EEB_E9D5_401E)
-        )
+        let tupleInputs = Inputs.tuples3(of: Inputs.vectors(H.self, seed: 0x6EC1_6EEB_E9D5_401E))
         let indexInputs = Inputs.tupleIndices(count: 3)
         for (tuple, index) in everyPair(tupleInputs, indexInputs) {
             mismatches.check(
@@ -237,9 +225,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func get3ConstantIndex() {
         let mismatches = Mismatches("portGet3F64ConstantIndex")
-        let tupleInputs = Inputs.tuples3(
-            of: Inputs.vectors(H.Vector.self, seed: 0x2587_4172_CF3A_92A0)
-        )
+        let tupleInputs = Inputs.tuples3(of: Inputs.vectors(H.self, seed: 0x2587_4172_CF3A_92A0))
         for tuple in tupleInputs {
             mismatches.check(
                 portGet3F64ConstantIndex(tuple),
@@ -252,11 +238,9 @@ extension SIMDDoubleCodegenTests {
 
     @Test func set3() {
         let mismatches = Mismatches("portSet3F64")
-        let tupleInputs = Inputs.tuples3(
-            of: Inputs.vectors(H.Vector.self, seed: 0x551B_2016_8C68_763A)
-        )
+        let tupleInputs = Inputs.tuples3(of: Inputs.vectors(H.self, seed: 0x551B_2016_8C68_763A))
         let indexInputs = Inputs.tupleIndices(count: 3)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x551B_1E16_8C68_72D4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x551B_1E16_8C68_72D4)
         for (tuple, index, a) in mixedTriples(
             tupleInputs,
             indexInputs,
@@ -286,10 +270,8 @@ extension SIMDDoubleCodegenTests {
 
     @Test func set3ConstantIndex() {
         let mismatches = Mismatches("portSet3F64ConstantIndex")
-        let tupleInputs = Inputs.tuples3(
-            of: Inputs.vectors(H.Vector.self, seed: 0x029B_69CD_2512_D3E4)
-        )
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x029B_6BCD_2512_D74A)
+        let tupleInputs = Inputs.tuples3(of: Inputs.vectors(H.self, seed: 0x029B_69CD_2512_D3E4))
+        let aInputs = Inputs.vectors(H.self, seed: 0x029B_6BCD_2512_D74A)
         for (tuple, a) in everyPair(tupleInputs, aInputs) {
             let port = portSet3F64ConstantIndex(tuple, to: a)
             let reference = highwaySet3F64ConstantIndex(tuple, to: a)
@@ -314,9 +296,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func set3ConstantA() {
         let mismatches = Mismatches("portSet3F64ConstantA")
-        let tupleInputs = Inputs.tuples3(
-            of: Inputs.vectors(H.Vector.self, seed: 0x4E7A_868C_2A9A_AFFB)
-        )
+        let tupleInputs = Inputs.tuples3(of: Inputs.vectors(H.self, seed: 0x4E7A_868C_2A9A_AFFB))
         let indexInputs = Inputs.tupleIndices(count: 3)
         for (tuple, index) in everyPair(tupleInputs, indexInputs) {
             let port = portSet3F64ConstantA(tuple, atUnchecked: index)
@@ -342,10 +322,10 @@ extension SIMDDoubleCodegenTests {
 
     @Test func create4() {
         let mismatches = Mismatches("portCreate4F64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2190_4F75_3BA2_2F93)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2190_4E75_3BA2_2DE0)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x2190_5175_3BA2_32F9)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0x2190_5075_3BA2_3146)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2190_4F75_3BA2_2F93)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2190_4E75_3BA2_2DE0)
+        let cInputs = Inputs.vectors(H.self, seed: 0x2190_5175_3BA2_32F9)
+        let dInputs = Inputs.vectors(H.self, seed: 0x2190_5075_3BA2_3146)
         for (a, b, c, d) in mixedQuadruples(
             aInputs,
             bInputs,
@@ -381,9 +361,9 @@ extension SIMDDoubleCodegenTests {
 
     @Test func create4ConstantA() {
         let mismatches = Mismatches("portCreate4F64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCB0E_B995_E7CE_A70F)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xCB0E_BA95_E7CE_A8C2)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0xCB0E_BB95_E7CE_AA75)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCB0E_B995_E7CE_A70F)
+        let cInputs = Inputs.vectors(H.self, seed: 0xCB0E_BA95_E7CE_A8C2)
+        let dInputs = Inputs.vectors(H.self, seed: 0xCB0E_BB95_E7CE_AA75)
         for (b, c, d) in mixedTriples(bInputs, cInputs, dInputs, seed: 0xDBBB_052B_8800_C2B0) {
             let port = portCreate4F64ConstantA(b, c, d)
             let reference = highwayCreate4F64ConstantA(b, c, d)
@@ -413,9 +393,9 @@ extension SIMDDoubleCodegenTests {
 
     @Test func create4ConstantB() {
         let mismatches = Mismatches("portCreate4F64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD2C9_EF95_EBEB_E3B1)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xD2C9_ED95_EBEB_E04B)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0xD2C9_EC95_EBEB_DE98)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD2C9_EF95_EBEB_E3B1)
+        let cInputs = Inputs.vectors(H.self, seed: 0xD2C9_ED95_EBEB_E04B)
+        let dInputs = Inputs.vectors(H.self, seed: 0xD2C9_EC95_EBEB_DE98)
         for (a, c, d) in mixedTriples(aInputs, cInputs, dInputs, seed: 0xF0ED_E296_03A5_BBEB) {
             let port = portCreate4F64ConstantB(a, c, d)
             let reference = highwayCreate4F64ConstantB(a, c, d)
@@ -445,9 +425,9 @@ extension SIMDDoubleCodegenTests {
 
     @Test func create4ConstantC() {
         let mismatches = Mismatches("portCreate4F64ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDB5F_0695_F0C2_8F66)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xDB5F_0795_F0C2_9119)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0xDB5F_0595_F0C2_8DB3)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDB5F_0695_F0C2_8F66)
+        let bInputs = Inputs.vectors(H.self, seed: 0xDB5F_0795_F0C2_9119)
+        let dInputs = Inputs.vectors(H.self, seed: 0xDB5F_0595_F0C2_8DB3)
         for (a, b, d) in mixedTriples(aInputs, bInputs, dInputs, seed: 0x1D15_ED67_C3B1_2CE2) {
             let port = portCreate4F64ConstantC(a, b, d)
             let reference = highwayCreate4F64ConstantC(a, b, d)
@@ -477,9 +457,9 @@ extension SIMDDoubleCodegenTests {
 
     @Test func create4ConstantD() {
         let mismatches = Mismatches("portCreate4F64ConstantD")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE4CD_BD95_F652_3BBB)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE4CD_BC95_F652_3A08)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xE4CD_BF95_F652_3F21)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE4CD_BD95_F652_3BBB)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE4CD_BC95_F652_3A08)
+        let cInputs = Inputs.vectors(H.self, seed: 0xE4CD_BF95_F652_3F21)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xF2F7_8F08_6574_A05D) {
             let port = portCreate4F64ConstantD(a, b, c)
             let reference = highwayCreate4F64ConstantD(a, b, c)
@@ -509,9 +489,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func get4() {
         let mismatches = Mismatches("portGet4F64")
-        let tupleInputs = Inputs.tuples4(
-            of: Inputs.vectors(H.Vector.self, seed: 0x7756_85EB_EEAB_EBD3)
-        )
+        let tupleInputs = Inputs.tuples4(of: Inputs.vectors(H.self, seed: 0x7756_85EB_EEAB_EBD3))
         let indexInputs = Inputs.tupleIndices(count: 4)
         for (tuple, index) in everyPair(tupleInputs, indexInputs) {
             mismatches.check(
@@ -525,9 +503,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func get4ConstantIndex() {
         let mismatches = Mismatches("portGet4F64ConstantIndex")
-        let tupleInputs = Inputs.tuples4(
-            of: Inputs.vectors(H.Vector.self, seed: 0x489D_34D3_50E5_D96B)
-        )
+        let tupleInputs = Inputs.tuples4(of: Inputs.vectors(H.self, seed: 0x489D_34D3_50E5_D96B))
         for tuple in tupleInputs {
             mismatches.check(
                 portGet4F64ConstantIndex(tuple),
@@ -540,11 +516,9 @@ extension SIMDDoubleCodegenTests {
 
     @Test func set4() {
         let mismatches = Mismatches("portSet4F64")
-        let tupleInputs = Inputs.tuples4(
-            of: Inputs.vectors(H.Vector.self, seed: 0x1974_7F16_6AE6_9627)
-        )
+        let tupleInputs = Inputs.tuples4(of: Inputs.vectors(H.self, seed: 0x1974_7F16_6AE6_9627))
         let indexInputs = Inputs.tupleIndices(count: 4)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1974_8116_6AE6_998D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1974_8116_6AE6_998D)
         for (tuple, index, a) in mixedTriples(
             tupleInputs,
             indexInputs,
@@ -579,10 +553,8 @@ extension SIMDDoubleCodegenTests {
 
     @Test func set4ConstantIndex() {
         let mismatches = Mismatches("portSet4F64ConstantIndex")
-        let tupleInputs = Inputs.tuples4(
-            of: Inputs.vectors(H.Vector.self, seed: 0x06DC_3FB8_5A9E_1CF7)
-        )
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x06DC_41B8_5A9E_205D)
+        let tupleInputs = Inputs.tuples4(of: Inputs.vectors(H.self, seed: 0x06DC_3FB8_5A9E_1CF7))
+        let aInputs = Inputs.vectors(H.self, seed: 0x06DC_41B8_5A9E_205D)
         for (tuple, a) in everyPair(tupleInputs, aInputs) {
             let port = portSet4F64ConstantIndex(tuple, to: a)
             let reference = highwaySet4F64ConstantIndex(tuple, to: a)
@@ -612,9 +584,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func set4ConstantA() {
         let mismatches = Mismatches("portSet4F64ConstantA")
-        let tupleInputs = Inputs.tuples4(
-            of: Inputs.vectors(H.Vector.self, seed: 0x31D1_4FA4_24C7_4000)
-        )
+        let tupleInputs = Inputs.tuples4(of: Inputs.vectors(H.self, seed: 0x31D1_4FA4_24C7_4000))
         let indexInputs = Inputs.tupleIndices(count: 4)
         for (tuple, index) in everyPair(tupleInputs, indexInputs) {
             let port = portSet4F64ConstantA(tuple, atUnchecked: index)

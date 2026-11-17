@@ -8,7 +8,7 @@ import Vectorization
 extension SIMDUInt8ReferenceTests {
     @Test func firstLane() {
         let mismatches = Mismatches("firstLane")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7BEA_0BE1_8D26_811C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7BEA_0BE1_8D26_811C)
         for a in aInputs {
             mismatches.check(
                 H.firstLane(a),
@@ -21,7 +21,7 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func lane() {
         let mismatches = Mismatches("lane")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x99C8_24D1_5E59_8040)
+        let aInputs = Inputs.vectors(H.self, seed: 0x99C8_24D1_5E59_8040)
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
         for (a, index) in everyPair(aInputs, indexInputs) {
             mismatches.check(
@@ -35,7 +35,7 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func laneUnchecked() {
         let mismatches = Mismatches("lane unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1567_D53C_BC7F_0406)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1567_D53C_BC7F_0406)
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
         for (a, index) in everyPair(aInputs, indexInputs) {
             mismatches.check(
@@ -49,9 +49,9 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func replacingLane() {
         let mismatches = Mismatches("replacingLane")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFB31_AB4B_F2D3_4419)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFB31_AB4B_F2D3_4419)
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xFB31_A94B_F2D3_40B3)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xFB31_A94B_F2D3_40B3)
         for (a, index, value) in mixedTriples(
             aInputs,
             indexInputs,
@@ -60,7 +60,7 @@ extension SIMDUInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.replacingLane(a, at: index, with: value),
-                H.Vector(raw: HighwayReference.replacingLaneU8(a.raw, index, value)),
+                H(raw: HighwayReference.replacingLaneU8(a.raw, index, value)),
                 "a: \(describe(a)), index: \(index), value: \(hex(value))"
             )
         }
@@ -69,9 +69,9 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func replacingLaneUnchecked() {
         let mismatches = Mismatches("replacingLane unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x14C8_68B3_3C24_7AF9)
+        let aInputs = Inputs.vectors(H.self, seed: 0x14C8_68B3_3C24_7AF9)
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x14C8_66B3_3C24_7793)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x14C8_66B3_3C24_7793)
         for (a, index, value) in mixedTriples(
             aInputs,
             indexInputs,
@@ -80,7 +80,7 @@ extension SIMDUInt8ReferenceTests {
         ) {
             mismatches.check(
                 unsafe H.replacingLane(a, atUnchecked: index, with: value),
-                H.Vector(raw: HighwayReference.replacingLaneU8(a.raw, index, value)),
+                H(raw: HighwayReference.replacingLaneU8(a.raw, index, value)),
                 "a: \(describe(a)), index: \(index), value: \(hex(value))"
             )
         }

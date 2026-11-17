@@ -6,78 +6,78 @@ public import Vectorization
 
 @inline(never)
 public func portZeroF16() -> SIMD<Float16> {
-    SIMDFloat16.zero()
+    SIMD<Float16>.zero()
 }
 
 @inline(never)
 public func highwayZeroF16() -> SIMD<Float16> {
-    HighwayReference.Nothrow.zeroF16()
+    SIMD<Float16>(raw: HighwayReference.Nothrow.zeroF16())
 }
 
 @inline(never)
 public func portRepeatingF16(_ value: Float16) -> SIMD<Float16> {
-    SIMDFloat16.repeating(value)
+    SIMD<Float16>.repeating(value)
 }
 
 @inline(never)
 public func highwayRepeatingF16(_ value: Float16) -> SIMD<Float16> {
-    HighwayReference.Nothrow.repeatingF16(value.bitPattern)
+    SIMD<Float16>(raw: HighwayReference.Nothrow.repeatingF16(value.bitPattern))
 }
 
 @inline(never)
 public func portRepeatingF16ConstantValue() -> SIMD<Float16> {
-    SIMDFloat16.repeating(Float16(bitPattern: 26))
+    SIMD<Float16>.repeating(Float16(bitPattern: 26))
 }
 
 @inline(never)
 public func highwayRepeatingF16ConstantValue() -> SIMD<Float16> {
-    HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    SIMD<Float16>(raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern))
 }
 
 @inline(never)
 public func portSignBitF16() -> SIMD<Float16> {
-    SIMDFloat16.signBit()
+    SIMD<Float16>.signBit()
 }
 
 @inline(never)
 public func highwaySignBitF16() -> SIMD<Float16> {
-    HighwayReference.Nothrow.signBitF16()
+    SIMD<Float16>(raw: HighwayReference.Nothrow.signBitF16())
 }
 
 @inline(never)
 public func portNanF16() -> SIMD<Float16> {
-    SIMDFloat16.nan()
+    SIMD<Float16>.nan()
 }
 
 @inline(never)
 public func highwayNanF16() -> SIMD<Float16> {
-    HighwayReference.Nothrow.nanF16()
+    SIMD<Float16>(raw: HighwayReference.Nothrow.nanF16())
 }
 
 @inline(never)
 public func portInfinityF16() -> SIMD<Float16> {
-    SIMDFloat16.infinity()
+    SIMD<Float16>.infinity()
 }
 
 @inline(never)
 public func highwayInfinityF16() -> SIMD<Float16> {
-    HighwayReference.Nothrow.infinityF16()
+    SIMD<Float16>(raw: HighwayReference.Nothrow.infinityF16())
 }
 
 @inline(never)
 public func portUnspecifiedF16() -> SIMD<Float16> {
-    SIMDFloat16.unspecified()
+    SIMD<Float16>.unspecified()
 }
 
 @inline(never)
 public func highwayUnspecifiedF16() -> SIMD<Float16> {
-    HighwayReference.Nothrow.unspecifiedF16()
+    SIMD<Float16>(raw: HighwayReference.Nothrow.unspecifiedF16())
 }
 
 @inline(never)
 public func portRepeatingWhereF16(_ value: Float16, where mask: SIMD<Float16>.Mask) -> SIMD<Float16>
 {
-    SIMDFloat16.repeating(value, where: mask)
+    SIMD<Float16>.repeating(value, where: mask)
 }
 
 @inline(never)
@@ -85,17 +85,22 @@ public func highwayRepeatingWhereF16(
     _ value: Float16,
     where mask: SIMD<Float16>.Mask
 ) -> SIMD<Float16> {
-    HighwayReference.Nothrow.repeatingWhereF16(mask.raw, value.bitPattern)
+    SIMD<Float16>(raw: HighwayReference.Nothrow.repeatingWhereF16(mask.raw, value.bitPattern))
 }
 
 @inline(never)
 public func portRepeatingWhereF16ConstantValue(where mask: SIMD<Float16>.Mask) -> SIMD<Float16> {
-    SIMDFloat16.repeating(Float16(bitPattern: 26), where: mask)
+    SIMD<Float16>.repeating(Float16(bitPattern: 26), where: mask)
 }
 
 @inline(never)
 public func highwayRepeatingWhereF16ConstantValue(where mask: SIMD<Float16>.Mask) -> SIMD<Float16> {
-    HighwayReference.Nothrow.repeatingWhereF16(mask.raw, Float16(bitPattern: 26).bitPattern)
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.repeatingWhereF16(
+            mask.raw,
+            Float16(bitPattern: 26).bitPattern
+        )
+    )
 }
 
 @inline(never)
@@ -104,7 +109,7 @@ public func portRepeatingWhereOtherwiseF16(
     where mask: SIMD<Float16>.Mask,
     otherwise: SIMD<Float16>
 ) -> SIMD<Float16> {
-    SIMDFloat16.repeating(value, where: mask, otherwise: otherwise)
+    SIMD<Float16>.repeating(value, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -113,7 +118,13 @@ public func highwayRepeatingWhereOtherwiseF16(
     where mask: SIMD<Float16>.Mask,
     otherwise: SIMD<Float16>
 ) -> SIMD<Float16> {
-    HighwayReference.Nothrow.repeatingWhereOtherwiseF16(otherwise.raw, mask.raw, value.bitPattern)
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.repeatingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            value.bitPattern
+        )
+    )
 }
 
 @inline(never)
@@ -121,7 +132,7 @@ public func portRepeatingWhereOtherwiseF16ConstantValue(
     where mask: SIMD<Float16>.Mask,
     otherwise: SIMD<Float16>
 ) -> SIMD<Float16> {
-    SIMDFloat16.repeating(Float16(bitPattern: 26), where: mask, otherwise: otherwise)
+    SIMD<Float16>.repeating(Float16(bitPattern: 26), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
@@ -129,10 +140,12 @@ public func highwayRepeatingWhereOtherwiseF16ConstantValue(
     where mask: SIMD<Float16>.Mask,
     otherwise: SIMD<Float16>
 ) -> SIMD<Float16> {
-    HighwayReference.Nothrow.repeatingWhereOtherwiseF16(
-        otherwise.raw,
-        mask.raw,
-        Float16(bitPattern: 26).bitPattern
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.repeatingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            Float16(bitPattern: 26).bitPattern
+        )
     )
 }
 
@@ -141,10 +154,10 @@ public func portRepeatingWhereOtherwiseF16ConstantOtherwise(
     _ value: Float16,
     where mask: SIMD<Float16>.Mask
 ) -> SIMD<Float16> {
-    SIMDFloat16.repeating(
+    SIMD<Float16>.repeating(
         value,
         where: mask,
-        otherwise: SIMDFloat16.repeating(Float16(bitPattern: 26))
+        otherwise: SIMD<Float16>.repeating(Float16(bitPattern: 26))
     )
 }
 
@@ -153,45 +166,49 @@ public func highwayRepeatingWhereOtherwiseF16ConstantOtherwise(
     _ value: Float16,
     where mask: SIMD<Float16>.Mask
 ) -> SIMD<Float16> {
-    HighwayReference.Nothrow.repeatingWhereOtherwiseF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
-        mask.raw,
-        value.bitPattern
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.repeatingWhereOtherwiseF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            mask.raw,
+            value.bitPattern
+        )
     )
 }
 
 @inline(never)
 public func portIotaF16(_ value: Float16) -> SIMD<Float16> {
-    SIMDFloat16.iota(value)
+    SIMD<Float16>.iota(value)
 }
 
 @inline(never)
 public func highwayIotaF16(_ value: Float16) -> SIMD<Float16> {
-    HighwayReference.Nothrow.iotaF16(value.bitPattern)
+    SIMD<Float16>(raw: HighwayReference.Nothrow.iotaF16(value.bitPattern))
 }
 
 @inline(never)
 public func portIotaF16ConstantValue() -> SIMD<Float16> {
-    SIMDFloat16.iota(Float16(bitPattern: 26))
+    SIMD<Float16>.iota(Float16(bitPattern: 26))
 }
 
 @inline(never)
 public func highwayIotaF16ConstantValue() -> SIMD<Float16> {
-    HighwayReference.Nothrow.iotaF16(Float16(bitPattern: 26).bitPattern)
+    SIMD<Float16>(raw: HighwayReference.Nothrow.iotaF16(Float16(bitPattern: 26).bitPattern))
 }
 
 @inline(never)
 public func portRepeatingBlockF16(
-    _ v0: SIMDFloat16.Lane,
-    _ v1: SIMDFloat16.Lane,
-    _ v2: SIMDFloat16.Lane,
-    _ v3: SIMDFloat16.Lane,
-    _ v4: SIMDFloat16.Lane,
-    _ v5: SIMDFloat16.Lane,
-    _ v6: SIMDFloat16.Lane,
-    _ v7: SIMDFloat16.Lane
+    _ v0: Float16,
+    _ v1: Float16,
+    _ v2: Float16,
+    _ v3: Float16,
+    _ v4: Float16,
+    _ v5: Float16,
+    _ v6: Float16,
+    _ v7: Float16
 ) -> SIMD<Float16> {
-    SIMDFloat16.repeatingBlock(v0, v1, v2, v3, v4, v5, v6, v7)
+    SIMD<Float16>.repeatingBlock(v0, v1, v2, v3, v4, v5, v6, v7)
 }
 
 @inline(never)
@@ -205,15 +222,17 @@ public func highwayRepeatingBlockF16(
     _ v6: Float16,
     _ v7: Float16
 ) -> SIMD<Float16> {
-    HighwayReference.Nothrow.repeatingBlockF16(
-        v0.bitPattern,
-        v1.bitPattern,
-        v2.bitPattern,
-        v3.bitPattern,
-        v4.bitPattern,
-        v5.bitPattern,
-        v6.bitPattern,
-        v7.bitPattern
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.repeatingBlockF16(
+            v0.bitPattern,
+            v1.bitPattern,
+            v2.bitPattern,
+            v3.bitPattern,
+            v4.bitPattern,
+            v5.bitPattern,
+            v6.bitPattern,
+            v7.bitPattern
+        )
     )
 }
 #endif

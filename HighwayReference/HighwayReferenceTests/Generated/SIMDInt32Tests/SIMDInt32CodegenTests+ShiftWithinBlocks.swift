@@ -19,7 +19,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func shiftedLeftBytesConstantBytes() {
         let mismatches = Mismatches("portShiftedLeftBytesI32ConstantBytes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCDCD_22BC_4F58_1E0B)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCDCD_22BC_4F58_1E0B)
         for a in aInputs {
             mismatches.check(
                 portShiftedLeftBytesI32ConstantBytes(a),
@@ -42,7 +42,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func shiftedRightBytesConstantBytes() {
         let mismatches = Mismatches("portShiftedRightBytesI32ConstantBytes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC8D3_2F24_E626_8FE2)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC8D3_2F24_E626_8FE2)
         for a in aInputs {
             mismatches.check(
                 portShiftedRightBytesI32ConstantBytes(a),
@@ -65,7 +65,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func shiftedLeftLanesConstantLanes() {
         let mismatches = Mismatches("portShiftedLeftLanesI32ConstantLanes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x580E_81FC_5103_4BF3)
+        let aInputs = Inputs.vectors(H.self, seed: 0x580E_81FC_5103_4BF3)
         for a in aInputs {
             mismatches.check(
                 portShiftedLeftLanesI32ConstantLanes(a),
@@ -88,7 +88,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func shiftedRightLanesConstantLanes() {
         let mismatches = Mismatches("portShiftedRightLanesI32ConstantLanes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x85B5_1787_114F_7B6A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x85B5_1787_114F_7B6A)
         for a in aInputs {
             mismatches.check(
                 portShiftedRightLanesI32ConstantLanes(a),
@@ -101,7 +101,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func combinedShiftedRightBytesConstantA() {
         let mismatches = Mismatches("portCombinedShiftedRightBytesI32ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x89C1_BD57_861B_A55E)
+        let bInputs = Inputs.vectors(H.self, seed: 0x89C1_BD57_861B_A55E)
         for b in bInputs {
             mismatches.check(
                 portCombinedShiftedRightBytesI32ConstantA(b),
@@ -114,7 +114,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func combinedShiftedRightBytesConstantB() {
         let mismatches = Mismatches("portCombinedShiftedRightBytesI32ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8053_0757_808B_FABC)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8053_0757_808B_FABC)
         for a in aInputs {
             mismatches.check(
                 portCombinedShiftedRightBytesI32ConstantB(a),
@@ -127,8 +127,8 @@ extension SIMDInt32CodegenTests {
 
     @Test func combinedShiftedRightBytesConstantBytes() {
         let mismatches = Mismatches("portCombinedShiftedRightBytesI32ConstantBytes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x780B_2E37_8614_BDC1)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x780B_2D37_8614_BC0E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x780B_2E37_8614_BDC1)
+        let bInputs = Inputs.vectors(H.self, seed: 0x780B_2D37_8614_BC0E)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portCombinedShiftedRightBytesI32ConstantBytes(a, b),
@@ -141,7 +141,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func combinedShiftedRightLanesConstantA() {
         let mismatches = Mismatches("portCombinedShiftedRightLanesI32ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD9EF_235B_8182_032E)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD9EF_235B_8182_032E)
         for b in bInputs {
             mismatches.check(
                 portCombinedShiftedRightLanesI32ConstantA(b),
@@ -154,7 +154,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func combinedShiftedRightLanesConstantB() {
         let mismatches = Mismatches("portCombinedShiftedRightLanesI32ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD159_ED5B_7CAB_22CC)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD159_ED5B_7CAB_22CC)
         for a in aInputs {
             mismatches.check(
                 portCombinedShiftedRightLanesI32ConstantB(a),
@@ -167,8 +167,8 @@ extension SIMDInt32CodegenTests {
 
     @Test func combinedShiftedRightLanesConstantLanes() {
         let mismatches = Mismatches("portCombinedShiftedRightLanesI32ConstantLanes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x57ED_8E39_C648_2E01)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x57ED_8D39_C648_2C4E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x57ED_8E39_C648_2E01)
+        let bInputs = Inputs.vectors(H.self, seed: 0x57ED_8D39_C648_2C4E)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portCombinedShiftedRightLanesI32ConstantLanes(a, b),

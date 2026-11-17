@@ -9,9 +9,9 @@ import Vectorization
 extension SIMDUInt16CodegenTests {
     @Test func multiplyAdding() {
         let mismatches = Mismatches("portMultiplyAddingU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2493_76D7_CDA6_7D3A)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2493_77D7_CDA6_7EED)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x2493_74D7_CDA6_79D4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2493_76D7_CDA6_7D3A)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2493_77D7_CDA6_7EED)
+        let cInputs = Inputs.vectors(H.self, seed: 0x2493_74D7_CDA6_79D4)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xCDB4_9929_8A64_72FE) {
             mismatches.check(
                 portMultiplyAddingU16(a, b, c),
@@ -24,8 +24,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func multiplyAddingConstantA() {
         let mismatches = Mismatches("portMultiplyAddingU16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x739B_50F1_D2EF_3348)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x739B_53F1_D2EF_3861)
+        let bInputs = Inputs.vectors(H.self, seed: 0x739B_50F1_D2EF_3348)
+        let cInputs = Inputs.vectors(H.self, seed: 0x739B_53F1_D2EF_3861)
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 portMultiplyAddingU16ConstantA(b, c),
@@ -38,8 +38,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func multiplyAddingConstantB() {
         let mismatches = Mismatches("portMultiplyAddingU16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8CED_D6F1_E116_D2FA)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x8CED_D4F1_E116_CF94)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8CED_D6F1_E116_D2FA)
+        let cInputs = Inputs.vectors(H.self, seed: 0x8CED_D4F1_E116_CF94)
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 portMultiplyAddingU16ConstantB(a, c),
@@ -52,8 +52,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func multiplyAddingConstantC() {
         let mismatches = Mismatches("portMultiplyAddingU16ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8532_1FF1_DCF8_BB25)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8532_1EF1_DCF8_B972)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8532_1FF1_DCF8_BB25)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8532_1EF1_DCF8_B972)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMultiplyAddingU16ConstantC(a, b),
@@ -66,9 +66,9 @@ extension SIMDUInt16CodegenTests {
 
     @Test func negatedMultiplyAdding() {
         let mismatches = Mismatches("portNegatedMultiplyAddingU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDC26_56AA_7FB1_FC60)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xDC26_57AA_7FB1_FE13)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xDC26_58AA_7FB1_FFC6)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDC26_56AA_7FB1_FC60)
+        let bInputs = Inputs.vectors(H.self, seed: 0xDC26_57AA_7FB1_FE13)
+        let cInputs = Inputs.vectors(H.self, seed: 0xDC26_58AA_7FB1_FFC6)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xBB7D_7DAE_5736_655C) {
             mismatches.check(
                 portNegatedMultiplyAddingU16(a, b, c),
@@ -81,8 +81,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func negatedMultiplyAddingConstantA() {
         let mismatches = Mismatches("portNegatedMultiplyAddingU16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCB0B_B7BF_19A4_E556)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xCB0B_B6BF_19A4_E3A3)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCB0B_B7BF_19A4_E556)
+        let cInputs = Inputs.vectors(H.self, seed: 0xCB0B_B6BF_19A4_E3A3)
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 portNegatedMultiplyAddingU16ConstantA(b, c),
@@ -95,8 +95,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func negatedMultiplyAddingConstantB() {
         let mismatches = Mismatches("portNegatedMultiplyAddingU16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC350_21BF_1587_0594)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xC350_23BF_1587_08FA)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC350_21BF_1587_0594)
+        let cInputs = Inputs.vectors(H.self, seed: 0xC350_23BF_1587_08FA)
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 portNegatedMultiplyAddingU16ConstantB(a, c),
@@ -109,8 +109,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func negatedMultiplyAddingConstantC() {
         let mismatches = Mismatches("portNegatedMultiplyAddingU16ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBABA_EABF_10B0_237F)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xBABA_E9BF_10B0_21CC)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBABA_EABF_10B0_237F)
+        let bInputs = Inputs.vectors(H.self, seed: 0xBABA_E9BF_10B0_21CC)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portNegatedMultiplyAddingU16ConstantC(a, b),
@@ -123,9 +123,9 @@ extension SIMDUInt16CodegenTests {
 
     @Test func multiplySubtracting() {
         let mismatches = Mismatches("portMultiplySubtractingU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEECA_53FF_46CE_61FB)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xEECA_52FF_46CE_6048)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xEECA_55FF_46CE_6561)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEECA_53FF_46CE_61FB)
+        let bInputs = Inputs.vectors(H.self, seed: 0xEECA_52FF_46CE_6048)
+        let cInputs = Inputs.vectors(H.self, seed: 0xEECA_55FF_46CE_6561)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x4A8A_4335_7079_FC1D) {
             mismatches.check(
                 portMultiplySubtractingU16(a, b, c),
@@ -138,8 +138,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func multiplySubtractingConstantA() {
         let mismatches = Mismatches("portMultiplySubtractingU16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE047_9D97_92D6_0BF7)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xE047_9E97_92D6_0DAA)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE047_9D97_92D6_0BF7)
+        let cInputs = Inputs.vectors(H.self, seed: 0xE047_9E97_92D6_0DAA)
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 portMultiplySubtractingU16ConstantA(b, c),
@@ -152,8 +152,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func multiplySubtractingConstantB() {
         let mismatches = Mismatches("portMultiplySubtractingU16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE8DC_B397_97AC_B5F9)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xE8DC_B197_97AC_B293)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE8DC_B397_97AC_B5F9)
+        let cInputs = Inputs.vectors(H.self, seed: 0xE8DC_B197_97AC_B293)
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 portMultiplySubtractingU16ConstantB(a, c),
@@ -166,8 +166,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func multiplySubtractingConstantC() {
         let mismatches = Mismatches("portMultiplySubtractingU16ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF1DE_6A97_9CDF_906E)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF1DE_6B97_9CDF_9221)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF1DE_6A97_9CDF_906E)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF1DE_6B97_9CDF_9221)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMultiplySubtractingU16ConstantC(a, b),
@@ -180,9 +180,9 @@ extension SIMDUInt16CodegenTests {
 
     @Test func negatedMultiplySubtracting() {
         let mismatches = Mismatches("portNegatedMultiplySubtractingU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA5BA_71B7_62AB_0955)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA5BA_70B7_62AB_07A2)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xA5BA_6FB7_62AB_05EF)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA5BA_71B7_62AB_0955)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA5BA_70B7_62AB_07A2)
+        let cInputs = Inputs.vectors(H.self, seed: 0xA5BA_6FB7_62AB_05EF)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x4A8F_A212_D274_8187) {
             mismatches.check(
                 portNegatedMultiplySubtractingU16(a, b, c),
@@ -195,8 +195,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func negatedMultiplySubtractingConstantA() {
         let mismatches = Mismatches("portNegatedMultiplySubtractingU16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF510_A972_7FF5_8879)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xF510_A672_7FF5_8360)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF510_A972_7FF5_8879)
+        let cInputs = Inputs.vectors(H.self, seed: 0xF510_A672_7FF5_8360)
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 portNegatedMultiplySubtractingU16ConstantA(b, c),
@@ -209,8 +209,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func negatedMultiplySubtractingConstantB() {
         let mismatches = Mismatches("portNegatedMultiplySubtractingU16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDA77_C372_70B8_8307)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xDA77_C572_70B8_866D)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDA77_C372_70B8_8307)
+        let cInputs = Inputs.vectors(H.self, seed: 0xDA77_C572_70B8_866D)
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 portNegatedMultiplySubtractingU16ConstantB(a, c),
@@ -223,8 +223,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func negatedMultiplySubtractingConstantC() {
         let mismatches = Mismatches("portNegatedMultiplySubtractingU16ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE30C_DA72_758F_2EBC)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE30C_DB72_758F_306F)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE30C_DA72_758F_2EBC)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE30C_DB72_758F_306F)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portNegatedMultiplySubtractingU16ConstantC(a, b),
@@ -237,9 +237,9 @@ extension SIMDUInt16CodegenTests {
 
     @Test func multiplyAddingSubtracting() {
         let mismatches = Mismatches("portMultiplyAddingSubtractingU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x11E5_1AAA_2D33_5F90)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x11E5_1BAA_2D33_6143)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x11E5_1CAA_2D33_62F6)
+        let aInputs = Inputs.vectors(H.self, seed: 0x11E5_1AAA_2D33_5F90)
+        let bInputs = Inputs.vectors(H.self, seed: 0x11E5_1BAA_2D33_6143)
+        let cInputs = Inputs.vectors(H.self, seed: 0x11E5_1CAA_2D33_62F6)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xD246_3C9B_4C58_EFCC) {
             mismatches.check(
                 portMultiplyAddingSubtractingU16(a, b, c),
@@ -252,8 +252,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func multiplyAddingSubtractingConstantA() {
         let mismatches = Mismatches("portMultiplyAddingSubtractingU16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x46B3_53C1_92C5_4846)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x46B3_52C1_92C5_4693)
+        let bInputs = Inputs.vectors(H.self, seed: 0x46B3_53C1_92C5_4846)
+        let cInputs = Inputs.vectors(H.self, seed: 0x46B3_52C1_92C5_4693)
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 portMultiplyAddingSubtractingU16ConstantA(b, c),
@@ -266,8 +266,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func multiplyAddingSubtractingConstantB() {
         let mismatches = Mismatches("portMultiplyAddingSubtractingU16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3E1E_3DC1_8DEE_9E44)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x3E1E_3FC1_8DEE_A1AA)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3E1E_3DC1_8DEE_9E44)
+        let cInputs = Inputs.vectors(H.self, seed: 0x3E1E_3FC1_8DEE_A1AA)
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 portMultiplyAddingSubtractingU16ConstantB(a, c),
@@ -280,8 +280,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func multiplyAddingSubtractingConstantC() {
         let mismatches = Mismatches("portMultiplyAddingSubtractingU16ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x34AF_86C1_885E_F1EF)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x34AF_85C1_885E_F03C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x34AF_86C1_885E_F1EF)
+        let bInputs = Inputs.vectors(H.self, seed: 0x34AF_85C1_885E_F03C)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMultiplyAddingSubtractingU16ConstantC(a, b),
@@ -294,9 +294,9 @@ extension SIMDUInt16CodegenTests {
 
     @Test func multiplySubtractingAdding() {
         let mismatches = Mismatches("portMultiplySubtractingAddingU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x37DD_E765_36CA_D21E)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x37DD_E865_36CA_D3D1)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x37DD_E565_36CA_CEB8)
+        let aInputs = Inputs.vectors(H.self, seed: 0x37DD_E765_36CA_D21E)
+        let bInputs = Inputs.vectors(H.self, seed: 0x37DD_E865_36CA_D3D1)
+        let cInputs = Inputs.vectors(H.self, seed: 0x37DD_E565_36CA_CEB8)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xC276_FFDC_D229_2FBA) {
             mismatches.check(
                 portMultiplySubtractingAddingU16(a, b, c),
@@ -309,8 +309,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func multiplySubtractingAddingConstantA() {
         let mismatches = Mismatches("portMultiplySubtractingAddingU16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x73E7_1171_3074_2B8C)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x73E7_1471_3074_30A5)
+        let bInputs = Inputs.vectors(H.self, seed: 0x73E7_1171_3074_2B8C)
+        let cInputs = Inputs.vectors(H.self, seed: 0x73E7_1471_3074_30A5)
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 portMultiplySubtractingAddingU16ConstantA(b, c),
@@ -323,8 +323,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func multiplySubtractingAddingConstantB() {
         let mismatches = Mismatches("portMultiplySubtractingAddingU16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8D39_9771_3E9B_CB3E)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x8D39_9571_3E9B_C7D8)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8D39_9771_3E9B_CB3E)
+        let cInputs = Inputs.vectors(H.self, seed: 0x8D39_9571_3E9B_C7D8)
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 portMultiplySubtractingAddingU16ConstantB(a, c),
@@ -337,8 +337,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func multiplySubtractingAddingConstantC() {
         let mismatches = Mismatches("portMultiplySubtractingAddingU16ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8437_E071_3968_F0C9)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8437_DF71_3968_EF16)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8437_E071_3968_F0C9)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8437_DF71_3968_EF16)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMultiplySubtractingAddingU16ConstantC(a, b),

@@ -7,7 +7,8 @@ import Vectorization
 
 @Suite("SIMDDouble against Highway")
 struct SIMDDoubleReferenceTests {
-    typealias H = SIMDDouble
+    typealias H = SIMD<Double>
+    typealias Lane = Double
 
     @Test func laneCount() {
         let mismatches = Mismatches("laneCount")

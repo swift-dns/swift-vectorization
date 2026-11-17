@@ -50,17 +50,17 @@ extension HighwayReferenceInt16 {
 
 @inline(never)
 public func portVectorFromMaskI16(from mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
-    SIMDInt16.vector(from: mask)
+    SIMD<Int16>.vector(from: mask)
 }
 
 @inline(never)
 public func highwayVectorFromMaskI16(from mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorFromMaskI16(mask.raw))
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorFromMaskI16(mask.raw))
 }
 
 @inline(never)
 public func portBitsOfMaskI16(of mask: SIMD<Int16>.Mask) -> UInt64 {
-    SIMDInt16.bits(of: mask)
+    SIMD<Int16>.bits(of: mask)
 }
 
 @inline(never)
@@ -70,7 +70,7 @@ public func highwayBitsOfMaskI16(of mask: SIMD<Int16>.Mask) -> UInt64 {
 
 @inline(never)
 public func portStoreMaskI16(_ mask: SIMD<Int16>.Mask, to: UnsafeMutablePointer<UInt8>) -> Int {
-    unsafe SIMDInt16.storeMask(mask, to: to)
+    unsafe SIMD<Int16>.storeMask(mask, to: to)
 }
 
 @inline(never)
@@ -83,7 +83,7 @@ public func portMaskNarrowingU32ToI16(
     narrowing a: SIMD<UInt32>.Mask,
     _ b: SIMD<UInt32>.Mask
 ) -> SIMD<Int16>.Mask {
-    SIMDInt16.mask(narrowing: a, b)
+    SIMD<Int16>.mask(narrowing: a, b)
 }
 
 @inline(never)
@@ -91,7 +91,7 @@ public func highwayMaskNarrowingU32ToI16(
     narrowing a: SIMD<UInt32>.Mask,
     _ b: SIMD<UInt32>.Mask
 ) -> SIMD<Int16>.Mask {
-    SIMDInt16.Mask(raw: HighwayReference.Nothrow.maskNarrowingU32ToI16(a.raw, b.raw))
+    SIMD<Int16>.Mask(raw: HighwayReference.Nothrow.maskNarrowingU32ToI16(a.raw, b.raw))
 }
 
 @inline(never)
@@ -99,7 +99,7 @@ public func portMaskNarrowingI32ToI16(
     narrowing a: SIMD<Int32>.Mask,
     _ b: SIMD<Int32>.Mask
 ) -> SIMD<Int16>.Mask {
-    SIMDInt16.mask(narrowing: a, b)
+    SIMD<Int16>.mask(narrowing: a, b)
 }
 
 @inline(never)
@@ -107,7 +107,7 @@ public func highwayMaskNarrowingI32ToI16(
     narrowing a: SIMD<Int32>.Mask,
     _ b: SIMD<Int32>.Mask
 ) -> SIMD<Int16>.Mask {
-    SIMDInt16.Mask(raw: HighwayReference.Nothrow.maskNarrowingI32ToI16(a.raw, b.raw))
+    SIMD<Int16>.Mask(raw: HighwayReference.Nothrow.maskNarrowingI32ToI16(a.raw, b.raw))
 }
 
 @inline(never)
@@ -115,7 +115,7 @@ public func portMaskNarrowingF32ToI16(
     narrowing a: SIMD<Float>.Mask,
     _ b: SIMD<Float>.Mask
 ) -> SIMD<Int16>.Mask {
-    SIMDInt16.mask(narrowing: a, b)
+    SIMD<Int16>.mask(narrowing: a, b)
 }
 
 @inline(never)
@@ -123,141 +123,141 @@ public func highwayMaskNarrowingF32ToI16(
     narrowing a: SIMD<Float>.Mask,
     _ b: SIMD<Float>.Mask
 ) -> SIMD<Int16>.Mask {
-    SIMDInt16.Mask(raw: HighwayReference.Nothrow.maskNarrowingF32ToI16(a.raw, b.raw))
+    SIMD<Int16>.Mask(raw: HighwayReference.Nothrow.maskNarrowingF32ToI16(a.raw, b.raw))
 }
 
 @inline(never)
 public func portMaskWideningHalfU8ToI16(widening mask: SIMD<UInt8>.HalfMask) -> SIMD<Int16>.Mask {
-    SIMDInt16.mask(widening: mask)
+    SIMD<Int16>.mask(widening: mask)
 }
 
 @inline(never)
 public func highwayMaskWideningHalfU8ToI16(widening mask: SIMD<UInt8>.HalfMask) -> SIMD<Int16>.Mask
 {
-    SIMDInt16.Mask(raw: HighwayReference.Nothrow.maskWideningHalfU8ToI16(mask.raw))
+    SIMD<Int16>.Mask(raw: HighwayReference.Nothrow.maskWideningHalfU8ToI16(mask.raw))
 }
 
 @inline(never)
 public func portMaskWideningHalfI8ToI16(widening mask: SIMD<Int8>.HalfMask) -> SIMD<Int16>.Mask {
-    SIMDInt16.mask(widening: mask)
+    SIMD<Int16>.mask(widening: mask)
 }
 
 @inline(never)
 public func highwayMaskWideningHalfI8ToI16(widening mask: SIMD<Int8>.HalfMask) -> SIMD<Int16>.Mask {
-    SIMDInt16.Mask(raw: HighwayReference.Nothrow.maskWideningHalfI8ToI16(mask.raw))
+    SIMD<Int16>.Mask(raw: HighwayReference.Nothrow.maskWideningHalfI8ToI16(mask.raw))
 }
 
 @inline(never)
 public func portHalfMaskNarrowingU32ToI16(narrowing mask: SIMD<UInt32>.Mask) -> SIMD<Int16>.HalfMask
 {
-    SIMDInt16.halfMask(narrowing: mask)
+    SIMD<Int16>.halfMask(narrowing: mask)
 }
 
 @inline(never)
 public func highwayHalfMaskNarrowingU32ToI16(
     narrowing mask: SIMD<UInt32>.Mask
 ) -> SIMD<Int16>.HalfMask {
-    SIMDInt16.HalfMask(raw: HighwayReference.Nothrow.halfMaskNarrowingU32ToI16(mask.raw))
+    SIMD<Int16>.HalfMask(raw: HighwayReference.Nothrow.halfMaskNarrowingU32ToI16(mask.raw))
 }
 
 @inline(never)
 public func portHalfMaskNarrowingI32ToI16(narrowing mask: SIMD<Int32>.Mask) -> SIMD<Int16>.HalfMask
 {
-    SIMDInt16.halfMask(narrowing: mask)
+    SIMD<Int16>.halfMask(narrowing: mask)
 }
 
 @inline(never)
 public func highwayHalfMaskNarrowingI32ToI16(
     narrowing mask: SIMD<Int32>.Mask
 ) -> SIMD<Int16>.HalfMask {
-    SIMDInt16.HalfMask(raw: HighwayReference.Nothrow.halfMaskNarrowingI32ToI16(mask.raw))
+    SIMD<Int16>.HalfMask(raw: HighwayReference.Nothrow.halfMaskNarrowingI32ToI16(mask.raw))
 }
 
 @inline(never)
 public func portHalfMaskNarrowingF32ToI16(narrowing mask: SIMD<Float>.Mask) -> SIMD<Int16>.HalfMask
 {
-    SIMDInt16.halfMask(narrowing: mask)
+    SIMD<Int16>.halfMask(narrowing: mask)
 }
 
 @inline(never)
 public func highwayHalfMaskNarrowingF32ToI16(
     narrowing mask: SIMD<Float>.Mask
 ) -> SIMD<Int16>.HalfMask {
-    SIMDInt16.HalfMask(raw: HighwayReference.Nothrow.halfMaskNarrowingF32ToI16(mask.raw))
+    SIMD<Int16>.HalfMask(raw: HighwayReference.Nothrow.halfMaskNarrowingF32ToI16(mask.raw))
 }
 
 @inline(never)
 public func portQuarterMaskNarrowingU64ToI16(
     narrowing mask: SIMD<UInt64>.Mask
 ) -> SIMD<Int16>.QuarterMask {
-    SIMDInt16.quarterMask(narrowing: mask)
+    SIMD<Int16>.quarterMask(narrowing: mask)
 }
 
 @inline(never)
 public func highwayQuarterMaskNarrowingU64ToI16(
     narrowing mask: SIMD<UInt64>.Mask
 ) -> SIMD<Int16>.QuarterMask {
-    SIMDInt16.QuarterMask(raw: HighwayReference.Nothrow.quarterMaskNarrowingU64ToI16(mask.raw))
+    SIMD<Int16>.QuarterMask(raw: HighwayReference.Nothrow.quarterMaskNarrowingU64ToI16(mask.raw))
 }
 
 @inline(never)
 public func portQuarterMaskNarrowingI64ToI16(
     narrowing mask: SIMD<Int64>.Mask
 ) -> SIMD<Int16>.QuarterMask {
-    SIMDInt16.quarterMask(narrowing: mask)
+    SIMD<Int16>.quarterMask(narrowing: mask)
 }
 
 @inline(never)
 public func highwayQuarterMaskNarrowingI64ToI16(
     narrowing mask: SIMD<Int64>.Mask
 ) -> SIMD<Int16>.QuarterMask {
-    SIMDInt16.QuarterMask(raw: HighwayReference.Nothrow.quarterMaskNarrowingI64ToI16(mask.raw))
+    SIMD<Int16>.QuarterMask(raw: HighwayReference.Nothrow.quarterMaskNarrowingI64ToI16(mask.raw))
 }
 
 @inline(never)
 public func portQuarterMaskNarrowingF64ToI16(
     narrowing mask: SIMD<Double>.Mask
 ) -> SIMD<Int16>.QuarterMask {
-    SIMDInt16.quarterMask(narrowing: mask)
+    SIMD<Int16>.quarterMask(narrowing: mask)
 }
 
 @inline(never)
 public func highwayQuarterMaskNarrowingF64ToI16(
     narrowing mask: SIMD<Double>.Mask
 ) -> SIMD<Int16>.QuarterMask {
-    SIMDInt16.QuarterMask(raw: HighwayReference.Nothrow.quarterMaskNarrowingF64ToI16(mask.raw))
+    SIMD<Int16>.QuarterMask(raw: HighwayReference.Nothrow.quarterMaskNarrowingF64ToI16(mask.raw))
 }
 
 @inline(never)
 public func portMaskRebindingU16ToI16(rebinding mask: SIMD<UInt16>.Mask) -> SIMD<Int16>.Mask {
-    SIMDInt16.mask(rebinding: mask)
+    SIMD<Int16>.mask(rebinding: mask)
 }
 
 @inline(never)
 public func highwayMaskRebindingU16ToI16(rebinding mask: SIMD<UInt16>.Mask) -> SIMD<Int16>.Mask {
-    SIMDInt16.Mask(raw: HighwayReference.Nothrow.maskRebindingU16ToI16(mask.raw))
+    SIMD<Int16>.Mask(raw: HighwayReference.Nothrow.maskRebindingU16ToI16(mask.raw))
 }
 
 #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func portMaskRebindingF16ToI16(rebinding mask: SIMD<Float16>.Mask) -> SIMD<Int16>.Mask {
-    SIMDInt16.mask(rebinding: mask)
+    SIMD<Int16>.mask(rebinding: mask)
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func highwayMaskRebindingF16ToI16(rebinding mask: SIMD<Float16>.Mask) -> SIMD<Int16>.Mask {
-    SIMDInt16.Mask(raw: HighwayReference.Nothrow.maskRebindingF16ToI16(mask.raw))
+    SIMD<Int16>.Mask(raw: HighwayReference.Nothrow.maskRebindingF16ToI16(mask.raw))
 }
 #endif
 
 @inline(never)
 public func portMaskRebindingBF16ToI16(rebinding mask: SIMD<BFloat16>.Mask) -> SIMD<Int16>.Mask {
-    SIMDInt16.mask(rebinding: mask)
+    SIMD<Int16>.mask(rebinding: mask)
 }
 
 @inline(never)
 public func highwayMaskRebindingBF16ToI16(rebinding mask: SIMD<BFloat16>.Mask) -> SIMD<Int16>.Mask {
-    SIMDInt16.Mask(raw: HighwayReference.Nothrow.maskRebindingBF16ToI16(mask.raw))
+    SIMD<Int16>.Mask(raw: HighwayReference.Nothrow.maskRebindingBF16ToI16(mask.raw))
 }

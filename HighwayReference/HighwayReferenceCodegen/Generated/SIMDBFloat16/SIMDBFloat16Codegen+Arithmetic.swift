@@ -5,24 +5,24 @@ public import Vectorization
 
 @inline(never)
 public func portNegatedBF16(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.negated(a)
+    SIMD<BFloat16>.negated(a)
 }
 
 @inline(never)
 public func highwayNegatedBF16(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.negatedBF16(a.raw))
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.negatedBF16(a.raw))
 }
 
 @inline(never)
 public func portNegatedBF16ConstantA() -> SIMD<BFloat16> {
-    SIMDBFloat16.negated(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+    SIMD<BFloat16>.negated(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayNegatedBF16ConstantA() -> SIMD<BFloat16> {
-    SIMDBFloat16.Vector(
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.negatedBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )

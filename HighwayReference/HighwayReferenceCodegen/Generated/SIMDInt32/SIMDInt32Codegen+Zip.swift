@@ -5,24 +5,24 @@ public import Vectorization
 
 @inline(never)
 public func portZippingLowerI16ToI32(_ a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<Int32> {
-    SIMDInt32.zippingLower(a, b)
+    SIMD<Int32>.zippingLower(a, b)
 }
 
 @inline(never)
 public func highwayZippingLowerI16ToI32(_ a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<Int32> {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.zippingLowerI16ToI32(a.raw, b.raw))
+    SIMD<Int32>(raw: HighwayReference.Nothrow.zippingLowerI16ToI32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portZippingLowerI16ToI32ConstantA(_ b: SIMD<Int16>) -> SIMD<Int32> {
-    SIMDInt32.zippingLower(SIMDInt16.repeating(26), b)
+    SIMD<Int32>.zippingLower(SIMD<Int16>.repeating(26), b)
 }
 
 @inline(never)
 public func highwayZippingLowerI16ToI32ConstantA(_ b: SIMD<Int16>) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.zippingLowerI16ToI32(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw
         )
     )
@@ -30,39 +30,39 @@ public func highwayZippingLowerI16ToI32ConstantA(_ b: SIMD<Int16>) -> SIMD<Int32
 
 @inline(never)
 public func portZippingLowerI16ToI32ConstantB(_ a: SIMD<Int16>) -> SIMD<Int32> {
-    SIMDInt32.zippingLower(a, SIMDInt16.repeating(26))
+    SIMD<Int32>.zippingLower(a, SIMD<Int16>.repeating(26))
 }
 
 @inline(never)
 public func highwayZippingLowerI16ToI32ConstantB(_ a: SIMD<Int16>) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.zippingLowerI16ToI32(
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portZippingUpperI16ToI32(_ a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<Int32> {
-    SIMDInt32.zippingUpper(a, b)
+    SIMD<Int32>.zippingUpper(a, b)
 }
 
 @inline(never)
 public func highwayZippingUpperI16ToI32(_ a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<Int32> {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.zippingUpperI16ToI32(a.raw, b.raw))
+    SIMD<Int32>(raw: HighwayReference.Nothrow.zippingUpperI16ToI32(a.raw, b.raw))
 }
 
 @inline(never)
 public func portZippingUpperI16ToI32ConstantA(_ b: SIMD<Int16>) -> SIMD<Int32> {
-    SIMDInt32.zippingUpper(SIMDInt16.repeating(26), b)
+    SIMD<Int32>.zippingUpper(SIMD<Int16>.repeating(26), b)
 }
 
 @inline(never)
 public func highwayZippingUpperI16ToI32ConstantA(_ b: SIMD<Int16>) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.zippingUpperI16ToI32(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw
         )
     )
@@ -70,15 +70,15 @@ public func highwayZippingUpperI16ToI32ConstantA(_ b: SIMD<Int16>) -> SIMD<Int32
 
 @inline(never)
 public func portZippingUpperI16ToI32ConstantB(_ a: SIMD<Int16>) -> SIMD<Int32> {
-    SIMDInt32.zippingUpper(a, SIMDInt16.repeating(26))
+    SIMD<Int32>.zippingUpper(a, SIMD<Int16>.repeating(26))
 }
 
 @inline(never)
 public func highwayZippingUpperI16ToI32ConstantB(_ a: SIMD<Int16>) -> SIMD<Int32> {
-    SIMDInt32.Vector(
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.zippingUpperI16ToI32(
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }

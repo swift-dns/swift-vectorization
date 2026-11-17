@@ -14,11 +14,11 @@ extension SIMDUInt64ConstantTests {
         _ i0: Int
     ) {
         let mismatches = Mismatches("shuffledPer4Lanes with i3 \(i3), i2 \(i2), i1 \(i1), i0 \(i0)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x35A3_0083_0948_3B57)
+        let aInputs = Inputs.vectors(H.self, seed: 0x35A3_0083_0948_3B57)
         for a in aInputs {
             mismatches.check(
                 H.shuffledPer4Lanes(a, i3, i2, i1, i0),
-                H.Vector(
+                H(
                     raw: HighwayReference.shuffledPer4LanesU64(
                         a.raw,
                         Int32(truncatingIfNeeded: i3),
@@ -1067,11 +1067,11 @@ extension SIMDUInt64ConstantTests {
         let mismatches = Mismatches(
             "shuffledPer4Lanes unchecked with i3 \(i3), i2 \(i2), i1 \(i1), i0 \(i0)"
         )
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7E87_D82F_EC8E_E177)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7E87_D82F_EC8E_E177)
         for a in aInputs {
             mismatches.check(
                 unsafe H.shuffledPer4Lanes(a, unchecked: i3, i2, i1, i0),
-                H.Vector(
+                H(
                     raw: HighwayReference.shuffledPer4LanesU64(
                         a.raw,
                         Int32(truncatingIfNeeded: i3),
@@ -2111,7 +2111,7 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkShuffledPer4LanesConstantA(_ value: H.Lane) {
+    private func checkShuffledPer4LanesConstantA(_ value: Lane) {
         let mismatches = Mismatches("shuffledPer4Lanes with a repeating \(hex(value))")
         let i3Inputs = Array(0...3)
         let i2Inputs = Array(0...3)
@@ -2119,7 +2119,7 @@ extension SIMDUInt64ConstantTests {
         let i0Inputs = Array(0...3)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for (i3, i2, i1, i0) in mixedQuadruples(
@@ -2131,7 +2131,7 @@ extension SIMDUInt64ConstantTests {
         ) {
             mismatches.check(
                 H.shuffledPer4Lanes(H.repeating(value), i3, i2, i1, i0),
-                H.Vector(
+                H(
                     raw: HighwayReference.shuffledPer4LanesU64(
                         H.repeating(value).raw,
                         Int32(truncatingIfNeeded: i3),
@@ -2195,6 +2195,6 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func shuffledPer4LanesConstantSplatMax() {
-        checkShuffledPer4LanesConstantA(H.Lane.max)
+        checkShuffledPer4LanesConstantA(Lane.max)
     }
 }

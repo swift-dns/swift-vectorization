@@ -8,5 +8,6 @@ import Vectorization
 
 @Suite("SIMDInt64 codegen against Highway")
 struct SIMDInt64CodegenTests {
-    typealias H = SIMDInt64
+    typealias H = SIMD<Int64>
+    typealias Lane = Int64
 }

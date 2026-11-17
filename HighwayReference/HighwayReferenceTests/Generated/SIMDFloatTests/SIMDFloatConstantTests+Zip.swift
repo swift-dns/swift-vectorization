@@ -9,18 +9,23 @@ import Vectorization
 extension SIMDFloatConstantTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @inline(__always)
-    private func checkZippingLowerFromFloat16ConstantA(_ value: SIMDFloat16.Lane) {
+    private func checkZippingLowerFromFloat16ConstantA(_ value: Float16) {
         let mismatches = Mismatches("zippingLowerFromFloat16 with a repeating \(hex(value))")
-        let bInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0xB193_FC57_FAA9_7EBF)
+        let bInputs = Inputs.conversions(SIMD<Float16>.self, seed: 0xB193_FC57_FAA9_7EBF)
         mismatches.check(
-            SIMDFloat16.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            SIMD<Float16>.repeating(value),
+            SIMD<Float16>(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
-                H.zippingLower(SIMDFloat16.repeating(value), b),
-                HighwayReference.zippingLowerF16ToF32(SIMDFloat16.repeating(value).raw, b.raw),
+                H.zippingLower(SIMD<Float16>.repeating(value), b),
+                H(
+                    raw: HighwayReference.zippingLowerF16ToF32(
+                        SIMD<Float16>.repeating(value).raw,
+                        b.raw
+                    )
+                ),
                 "b: \(describe(b))"
             )
         }
@@ -30,18 +35,23 @@ extension SIMDFloatConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @inline(__always)
-    private func checkZippingLowerFromFloat16ConstantB(_ value: SIMDFloat16.Lane) {
+    private func checkZippingLowerFromFloat16ConstantB(_ value: Float16) {
         let mismatches = Mismatches("zippingLowerFromFloat16 with b repeating \(hex(value))")
-        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0xBA29_3257_FF80_5F21)
+        let aInputs = Inputs.conversions(SIMD<Float16>.self, seed: 0xBA29_3257_FF80_5F21)
         mismatches.check(
-            SIMDFloat16.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            SIMD<Float16>.repeating(value),
+            SIMD<Float16>(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
-                H.zippingLower(a, SIMDFloat16.repeating(value)),
-                HighwayReference.zippingLowerF16ToF32(a.raw, SIMDFloat16.repeating(value).raw),
+                H.zippingLower(a, SIMD<Float16>.repeating(value)),
+                H(
+                    raw: HighwayReference.zippingLowerF16ToF32(
+                        a.raw,
+                        SIMD<Float16>.repeating(value).raw
+                    )
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -149,8 +159,8 @@ extension SIMDFloatConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func zippingLowerFromFloat16ConstantSplatPayloadNaN() {
-        checkZippingLowerFromFloat16ConstantA(SIMDFloat16.Lane(nan: 1, signaling: false))
-        checkZippingLowerFromFloat16ConstantB(SIMDFloat16.Lane(nan: 1, signaling: false))
+        checkZippingLowerFromFloat16ConstantA(Float16(nan: 1, signaling: false))
+        checkZippingLowerFromFloat16ConstantB(Float16(nan: 1, signaling: false))
     }
     #endif
 

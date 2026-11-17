@@ -8,8 +8,8 @@ import Vectorization
 extension SIMDUInt32ReferenceTests {
     @Test func equalTo() {
         let mismatches = Mismatches("equalTo")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3587_1C88_B112_84CC)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3587_1D88_B112_867F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3587_1C88_B112_84CC)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3587_1D88_B112_867F)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.equalTo(a, b),
@@ -22,8 +22,8 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func notEqualTo() {
         let mismatches = Mismatches("notEqualTo")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2B41_BF00_1F40_5DDB)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2B41_BE00_1F40_5C28)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2B41_BF00_1F40_5DDB)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2B41_BE00_1F40_5C28)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.notEqualTo(a, b),
@@ -36,8 +36,8 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func lessThan() {
         let mismatches = Mismatches("lessThan")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA400_85F3_E968_5723)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA400_84F3_E968_5570)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA400_85F3_E968_5723)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA400_84F3_E968_5570)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.lessThan(a, b),
@@ -50,8 +50,8 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func greaterThan() {
         let mismatches = Mismatches("greaterThan")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0532_3A72_54E3_A4DC)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0532_3B72_54E3_A68F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0532_3A72_54E3_A4DC)
+        let bInputs = Inputs.vectors(H.self, seed: 0x0532_3B72_54E3_A68F)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.greaterThan(a, b),
@@ -64,8 +64,8 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func lessThanOrEqualTo() {
         let mismatches = Mismatches("lessThanOrEqualTo")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3B55_E22C_473E_2BB9)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3B55_E12C_473E_2A06)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3B55_E22C_473E_2BB9)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3B55_E12C_473E_2A06)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.lessThanOrEqualTo(a, b),
@@ -78,8 +78,8 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func greaterThanOrEqualTo() {
         let mismatches = Mismatches("greaterThanOrEqualTo")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3E46_F879_9A6B_5CD4)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3E46_F979_9A6B_5E87)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3E46_F879_9A6B_5CD4)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3E46_F979_9A6B_5E87)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.greaterThanOrEqualTo(a, b),
@@ -92,8 +92,8 @@ extension SIMDUInt32ReferenceTests {
 
     @Test func testingBit() {
         let mismatches = Mismatches("testingBit")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEF57_E92E_8224_8CDE)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xEF57_EA2E_8224_8E91)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEF57_E92E_8224_8CDE)
+        let bInputs = Inputs.vectors(H.self, seed: 0xEF57_EA2E_8224_8E91)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.testingBit(a, b),

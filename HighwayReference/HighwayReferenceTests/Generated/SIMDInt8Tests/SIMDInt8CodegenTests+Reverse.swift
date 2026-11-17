@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDInt8CodegenTests {
     @Test func reversed() {
         let mismatches = Mismatches("portReversedI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1F04_A734_3DCD_D968)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1F04_A734_3DCD_D968)
         for a in aInputs {
             mismatches.check(portReversedI8(a), highwayReversedI8(a), "a: \(describe(a))")
         }
@@ -24,7 +24,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func bitReversed() {
         let mismatches = Mismatches("portBitReversedI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7844_9570_9FD8_DD9D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7844_9570_9FD8_DD9D)
         for a in aInputs {
             mismatches.check(portBitReversedI8(a), highwayBitReversedI8(a), "a: \(describe(a))")
         }
@@ -39,7 +39,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func reversedBlocks() {
         let mismatches = Mismatches("portReversedBlocksI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC3D1_8BCC_A798_82AE)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC3D1_8BCC_A798_82AE)
         for a in aInputs {
             mismatches.check(
                 portReversedBlocksI8(a),
@@ -58,7 +58,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func reversed2() {
         let mismatches = Mismatches("portReversed2I8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDCEA_5AC4_A67D_E740)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDCEA_5AC4_A67D_E740)
         for a in aInputs {
             mismatches.check(portReversed2I8(a), highwayReversed2I8(a), "a: \(describe(a))")
         }
@@ -73,7 +73,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func reversed4() {
         let mismatches = Mismatches("portReversed4I8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCC9A_0CC4_9D89_FD36)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCC9A_0CC4_9D89_FD36)
         for a in aInputs {
             mismatches.check(portReversed4I8(a), highwayReversed4I8(a), "a: \(describe(a))")
         }
@@ -88,7 +88,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func reversed8() {
         let mismatches = Mismatches("portReversed8I8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3397_00C4_D799_D352)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3397_00C4_D799_D352)
         for a in aInputs {
             mismatches.check(portReversed8I8(a), highwayReversed8I8(a), "a: \(describe(a))")
         }

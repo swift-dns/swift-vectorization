@@ -9,8 +9,8 @@ import Vectorization
 extension SIMDDoubleCodegenTests {
     @Test func oddEvenBlocks() {
         let mismatches = Mismatches("portOddEvenBlocksF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCFA0_FB39_6378_964C)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCFA0_FC39_6378_97FF)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCFA0_FB39_6378_964C)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCFA0_FC39_6378_97FF)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portOddEvenBlocksF64(a, b),
@@ -23,7 +23,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func oddEvenBlocksConstantA() {
         let mismatches = Mismatches("portOddEvenBlocksF64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8769_7C80_0134_7312)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8769_7C80_0134_7312)
         for b in bInputs {
             mismatches.check(
                 portOddEvenBlocksF64ConstantA(b),
@@ -36,7 +36,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func oddEvenBlocksConstantB() {
         let mismatches = Mismatches("portOddEvenBlocksF64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7E67_C67F_FC01_9A50)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7E67_C67F_FC01_9A50)
         for a in aInputs {
             mismatches.check(
                 portOddEvenBlocksF64ConstantB(a),
@@ -49,7 +49,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func swappingAdjacentBlocks() {
         let mismatches = Mismatches("portSwappingAdjacentBlocksF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7986_B8A1_72F6_F850)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7986_B8A1_72F6_F850)
         for a in aInputs {
             mismatches.check(
                 portSwappingAdjacentBlocksF64(a),
@@ -72,8 +72,8 @@ extension SIMDDoubleCodegenTests {
 
     @Test func interleavingEvenBlocks() {
         let mismatches = Mismatches("portInterleavingEvenBlocksF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0001_1A61_8CD6_E973)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0001_1961_8CD6_E7C0)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0001_1A61_8CD6_E973)
+        let bInputs = Inputs.vectors(H.self, seed: 0x0001_1961_8CD6_E7C0)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portInterleavingEvenBlocksF64(a, b),
@@ -86,7 +86,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func interleavingEvenBlocksConstantA() {
         let mismatches = Mismatches("portInterleavingEvenBlocksF64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xDC96_900E_4CD5_606F)
+        let bInputs = Inputs.vectors(H.self, seed: 0xDC96_900E_4CD5_606F)
         for b in bInputs {
             mismatches.check(
                 portInterleavingEvenBlocksF64ConstantA(b),
@@ -99,7 +99,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func interleavingEvenBlocksConstantB() {
         let mismatches = Mismatches("portInterleavingEvenBlocksF64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE605_460E_5265_0B11)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE605_460E_5265_0B11)
         for a in aInputs {
             mismatches.check(
                 portInterleavingEvenBlocksF64ConstantB(a),
@@ -112,8 +112,8 @@ extension SIMDDoubleCodegenTests {
 
     @Test func interleavingOddBlocks() {
         let mismatches = Mismatches("portInterleavingOddBlocksF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBE44_1EB1_AAFA_5862)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xBE44_1FB1_AAFA_5A15)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBE44_1EB1_AAFA_5862)
+        let bInputs = Inputs.vectors(H.self, seed: 0xBE44_1FB1_AAFA_5A15)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portInterleavingOddBlocksF64(a, b),
@@ -126,7 +126,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func interleavingOddBlocksConstantA() {
         let mismatches = Mismatches("portInterleavingOddBlocksF64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB39D_9E82_F3EC_21B0)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB39D_9E82_F3EC_21B0)
         for b in bInputs {
             mismatches.check(
                 portInterleavingOddBlocksF64ConstantA(b),
@@ -139,7 +139,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func interleavingOddBlocksConstantB() {
         let mismatches = Mismatches("portInterleavingOddBlocksF64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCE36_A483_0329_5D82)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCE36_A483_0329_5D82)
         for a in aInputs {
             mismatches.check(
                 portInterleavingOddBlocksF64ConstantB(a),
@@ -152,8 +152,8 @@ extension SIMDDoubleCodegenTests {
 
     @Test func interleavingLowerBlocks() {
         let mismatches = Mismatches("portInterleavingLowerBlocksF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAA0E_537A_F669_C482)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xAA0E_547A_F669_C635)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAA0E_537A_F669_C482)
+        let bInputs = Inputs.vectors(H.self, seed: 0xAA0E_547A_F669_C635)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portInterleavingLowerBlocksF64(a, b),
@@ -166,7 +166,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func interleavingLowerBlocksConstantA() {
         let mismatches = Mismatches("portInterleavingLowerBlocksF64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9BC2_BECF_2AE1_B0D0)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9BC2_BECF_2AE1_B0D0)
         for b in bInputs {
             mismatches.check(
                 portInterleavingLowerBlocksF64ConstantA(b),
@@ -179,7 +179,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func interleavingLowerBlocksConstantB() {
         let mismatches = Mismatches("portInterleavingLowerBlocksF64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB4A8_44CF_38AC_7EA2)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB4A8_44CF_38AC_7EA2)
         for a in aInputs {
             mismatches.check(
                 portInterleavingLowerBlocksF64ConstantB(a),
@@ -192,8 +192,8 @@ extension SIMDDoubleCodegenTests {
 
     @Test func interleavingUpperBlocks() {
         let mismatches = Mismatches("portInterleavingUpperBlocksF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD5F8_B9C9_075A_660B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD5F8_B8C9_075A_6458)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD5F8_B9C9_075A_660B)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD5F8_B8C9_075A_6458)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portInterleavingUpperBlocksF64(a, b),
@@ -206,7 +206,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func interleavingUpperBlocksConstantA() {
         let mismatches = Mismatches("portInterleavingUpperBlocksF64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5A92_DDB6_F0CE_C0C7)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5A92_DDB6_F0CE_C0C7)
         for b in bInputs {
             mismatches.check(
                 portInterleavingUpperBlocksF64ConstantA(b),
@@ -219,7 +219,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func interleavingUpperBlocksConstantB() {
         let mismatches = Mismatches("portInterleavingUpperBlocksF64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x624E_73B6_F4EC_A089)
+        let aInputs = Inputs.vectors(H.self, seed: 0x624E_73B6_F4EC_A089)
         for a in aInputs {
             mismatches.check(
                 portInterleavingUpperBlocksF64ConstantB(a),
@@ -242,7 +242,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func broadcastingLaneConstantLane() {
         let mismatches = Mismatches("portBroadcastingLaneF64ConstantLane")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE8FC_032D_0FE1_78A2)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE8FC_032D_0FE1_78A2)
         for a in aInputs {
             mismatches.check(
                 portBroadcastingLaneF64ConstantLane(a),
@@ -265,7 +265,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func broadcastingBlockConstantBlock() {
         let mismatches = Mismatches("portBroadcastingBlockF64ConstantBlock")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x71A3_8A8A_5CE2_79C4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x71A3_8A8A_5CE2_79C4)
         for a in aInputs {
             mismatches.check(
                 portBroadcastingBlockF64ConstantBlock(a),

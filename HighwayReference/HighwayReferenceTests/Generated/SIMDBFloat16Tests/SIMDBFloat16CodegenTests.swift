@@ -8,5 +8,6 @@ import Vectorization
 
 @Suite("SIMDBFloat16 codegen against Highway")
 struct SIMDBFloat16CodegenTests {
-    typealias H = SIMDBFloat16
+    typealias H = SIMD<BFloat16>
+    typealias Lane = BFloat16
 }

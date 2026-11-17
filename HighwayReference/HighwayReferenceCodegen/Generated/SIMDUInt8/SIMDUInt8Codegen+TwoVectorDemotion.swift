@@ -5,25 +5,25 @@ public import Vectorization
 
 @inline(never)
 public func portVectorClampingU16ToU8(clamping a: SIMD<UInt16>, _ b: SIMD<UInt16>) -> SIMD<UInt8> {
-    SIMDUInt8.vector(clamping: a, b)
+    SIMD<UInt8>.vector(clamping: a, b)
 }
 
 @inline(never)
 public func highwayVectorClampingU16ToU8(clamping a: SIMD<UInt16>, _ b: SIMD<UInt16>) -> SIMD<UInt8>
 {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.vectorClampingU16ToU8(a.raw, b.raw))
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.vectorClampingU16ToU8(a.raw, b.raw))
 }
 
 @inline(never)
 public func portVectorClampingU16ToU8ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt8> {
-    SIMDUInt8.vector(clamping: SIMDUInt16.repeating(26), b)
+    SIMD<UInt8>.vector(clamping: SIMD<UInt16>.repeating(26), b)
 }
 
 @inline(never)
 public func highwayVectorClampingU16ToU8ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingU16ToU8(
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
             b.raw
         )
     )
@@ -31,39 +31,39 @@ public func highwayVectorClampingU16ToU8ConstantA(_ b: SIMD<UInt16>) -> SIMD<UIn
 
 @inline(never)
 public func portVectorClampingU16ToU8ConstantB(clamping a: SIMD<UInt16>) -> SIMD<UInt8> {
-    SIMDUInt8.vector(clamping: a, SIMDUInt16.repeating(26))
+    SIMD<UInt8>.vector(clamping: a, SIMD<UInt16>.repeating(26))
 }
 
 @inline(never)
 public func highwayVectorClampingU16ToU8ConstantB(clamping a: SIMD<UInt16>) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingU16ToU8(
             a.raw,
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portVectorClampingI16ToU8(clamping a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<UInt8> {
-    SIMDUInt8.vector(clamping: a, b)
+    SIMD<UInt8>.vector(clamping: a, b)
 }
 
 @inline(never)
 public func highwayVectorClampingI16ToU8(clamping a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.vectorClampingI16ToU8(a.raw, b.raw))
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.vectorClampingI16ToU8(a.raw, b.raw))
 }
 
 @inline(never)
 public func portVectorClampingI16ToU8ConstantA(_ b: SIMD<Int16>) -> SIMD<UInt8> {
-    SIMDUInt8.vector(clamping: SIMDInt16.repeating(26), b)
+    SIMD<UInt8>.vector(clamping: SIMD<Int16>.repeating(26), b)
 }
 
 @inline(never)
 public func highwayVectorClampingI16ToU8ConstantA(_ b: SIMD<Int16>) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingI16ToU8(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw
         )
     )
@@ -71,15 +71,15 @@ public func highwayVectorClampingI16ToU8ConstantA(_ b: SIMD<Int16>) -> SIMD<UInt
 
 @inline(never)
 public func portVectorClampingI16ToU8ConstantB(clamping a: SIMD<Int16>) -> SIMD<UInt8> {
-    SIMDUInt8.vector(clamping: a, SIMDInt16.repeating(26))
+    SIMD<UInt8>.vector(clamping: a, SIMD<Int16>.repeating(26))
 }
 
 @inline(never)
 public func highwayVectorClampingI16ToU8ConstantB(clamping a: SIMD<Int16>) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingI16ToU8(
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
@@ -89,7 +89,7 @@ public func portVectorClampingInAnyOrderU16ToU8(
     clampingInAnyOrder a: SIMD<UInt16>,
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.vector(clampingInAnyOrder: a, b)
+    SIMD<UInt8>.vector(clampingInAnyOrder: a, b)
 }
 
 @inline(never)
@@ -97,19 +97,19 @@ public func highwayVectorClampingInAnyOrderU16ToU8(
     clampingInAnyOrder a: SIMD<UInt16>,
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.vectorClampingInAnyOrderU16ToU8(a.raw, b.raw))
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.vectorClampingInAnyOrderU16ToU8(a.raw, b.raw))
 }
 
 @inline(never)
 public func portVectorClampingInAnyOrderU16ToU8ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt8> {
-    SIMDUInt8.vector(clampingInAnyOrder: SIMDUInt16.repeating(26), b)
+    SIMD<UInt8>.vector(clampingInAnyOrder: SIMD<UInt16>.repeating(26), b)
 }
 
 @inline(never)
 public func highwayVectorClampingInAnyOrderU16ToU8ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingInAnyOrderU16ToU8(
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
             b.raw
         )
     )
@@ -119,17 +119,17 @@ public func highwayVectorClampingInAnyOrderU16ToU8ConstantA(_ b: SIMD<UInt16>) -
 public func portVectorClampingInAnyOrderU16ToU8ConstantB(
     clampingInAnyOrder a: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.vector(clampingInAnyOrder: a, SIMDUInt16.repeating(26))
+    SIMD<UInt8>.vector(clampingInAnyOrder: a, SIMD<UInt16>.repeating(26))
 }
 
 @inline(never)
 public func highwayVectorClampingInAnyOrderU16ToU8ConstantB(
     clampingInAnyOrder a: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingInAnyOrderU16ToU8(
             a.raw,
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
         )
     )
 }
@@ -139,7 +139,7 @@ public func portVectorClampingInAnyOrderI16ToU8(
     clampingInAnyOrder a: SIMD<Int16>,
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.vector(clampingInAnyOrder: a, b)
+    SIMD<UInt8>.vector(clampingInAnyOrder: a, b)
 }
 
 @inline(never)
@@ -147,19 +147,19 @@ public func highwayVectorClampingInAnyOrderI16ToU8(
     clampingInAnyOrder a: SIMD<Int16>,
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.vectorClampingInAnyOrderI16ToU8(a.raw, b.raw))
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.vectorClampingInAnyOrderI16ToU8(a.raw, b.raw))
 }
 
 @inline(never)
 public func portVectorClampingInAnyOrderI16ToU8ConstantA(_ b: SIMD<Int16>) -> SIMD<UInt8> {
-    SIMDUInt8.vector(clampingInAnyOrder: SIMDInt16.repeating(26), b)
+    SIMD<UInt8>.vector(clampingInAnyOrder: SIMD<Int16>.repeating(26), b)
 }
 
 @inline(never)
 public func highwayVectorClampingInAnyOrderI16ToU8ConstantA(_ b: SIMD<Int16>) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingInAnyOrderI16ToU8(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw
         )
     )
@@ -169,31 +169,31 @@ public func highwayVectorClampingInAnyOrderI16ToU8ConstantA(_ b: SIMD<Int16>) ->
 public func portVectorClampingInAnyOrderI16ToU8ConstantB(
     clampingInAnyOrder a: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.vector(clampingInAnyOrder: a, SIMDInt16.repeating(26))
+    SIMD<UInt8>.vector(clampingInAnyOrder: a, SIMD<Int16>.repeating(26))
 }
 
 @inline(never)
 public func highwayVectorClampingInAnyOrderI16ToU8ConstantB(
     clampingInAnyOrder a: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingInAnyOrderI16ToU8(
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portVectorClampingShiftedRightByU16ToU8ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(clamping: SIMDUInt16.repeating(26), b, shiftedRightByUnchecked: 1)
+    unsafe SIMD<UInt8>.vector(clamping: SIMD<UInt16>.repeating(26), b, shiftedRightByUnchecked: 1)
 }
 
 @inline(never)
 public func highwayVectorClampingShiftedRightByU16ToU8ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingShiftedRightByU16ToU8(
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
             b.raw,
             1
         )
@@ -204,17 +204,17 @@ public func highwayVectorClampingShiftedRightByU16ToU8ConstantA(_ b: SIMD<UInt16
 public func portVectorClampingShiftedRightByU16ToU8ConstantB(
     clamping a: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(clamping: a, SIMDUInt16.repeating(26), shiftedRightByUnchecked: 1)
+    unsafe SIMD<UInt8>.vector(clamping: a, SIMD<UInt16>.repeating(26), shiftedRightByUnchecked: 1)
 }
 
 @inline(never)
 public func highwayVectorClampingShiftedRightByU16ToU8ConstantB(
     clamping a: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingShiftedRightByU16ToU8(
             a.raw,
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
             1
         )
     )
@@ -225,7 +225,7 @@ public func portVectorClampingShiftedRightByU16ToU8ConstantBits(
     clamping a: SIMD<UInt16>,
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(clamping: a, b, shiftedRightByUnchecked: 1)
+    unsafe SIMD<UInt8>.vector(clamping: a, b, shiftedRightByUnchecked: 1)
 }
 
 @inline(never)
@@ -233,9 +233,7 @@ public func highwayVectorClampingShiftedRightByU16ToU8ConstantBits(
     clamping a: SIMD<UInt16>,
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
-        raw: HighwayReference.Nothrow.vectorClampingShiftedRightByU16ToU8(a.raw, b.raw, 1)
-    )
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.vectorClampingShiftedRightByU16ToU8(a.raw, b.raw, 1))
 }
 
 @inline(never)
@@ -243,7 +241,7 @@ public func portVectorClampingShiftedRightByU16ToU8ConstantBitsWidthDifference(
     clamping a: SIMD<UInt16>,
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(clamping: a, b, shiftedRightByUnchecked: 8)
+    unsafe SIMD<UInt8>.vector(clamping: a, b, shiftedRightByUnchecked: 8)
 }
 
 @inline(never)
@@ -251,21 +249,19 @@ public func highwayVectorClampingShiftedRightByU16ToU8ConstantBitsWidthDifferenc
     clamping a: SIMD<UInt16>,
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
-        raw: HighwayReference.Nothrow.vectorClampingShiftedRightByU16ToU8(a.raw, b.raw, 8)
-    )
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.vectorClampingShiftedRightByU16ToU8(a.raw, b.raw, 8))
 }
 
 @inline(never)
 public func portVectorClampingShiftedRightByI16ToU8ConstantA(_ b: SIMD<Int16>) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(clamping: SIMDInt16.repeating(26), b, shiftedRightByUnchecked: 1)
+    unsafe SIMD<UInt8>.vector(clamping: SIMD<Int16>.repeating(26), b, shiftedRightByUnchecked: 1)
 }
 
 @inline(never)
 public func highwayVectorClampingShiftedRightByI16ToU8ConstantA(_ b: SIMD<Int16>) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingShiftedRightByI16ToU8(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw,
             1
         )
@@ -275,17 +271,17 @@ public func highwayVectorClampingShiftedRightByI16ToU8ConstantA(_ b: SIMD<Int16>
 @inline(never)
 public func portVectorClampingShiftedRightByI16ToU8ConstantB(clamping a: SIMD<Int16>) -> SIMD<UInt8>
 {
-    unsafe SIMDUInt8.vector(clamping: a, SIMDInt16.repeating(26), shiftedRightByUnchecked: 1)
+    unsafe SIMD<UInt8>.vector(clamping: a, SIMD<Int16>.repeating(26), shiftedRightByUnchecked: 1)
 }
 
 @inline(never)
 public func highwayVectorClampingShiftedRightByI16ToU8ConstantB(
     clamping a: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingShiftedRightByI16ToU8(
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             1
         )
     )
@@ -296,7 +292,7 @@ public func portVectorClampingShiftedRightByI16ToU8ConstantBits(
     clamping a: SIMD<Int16>,
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(clamping: a, b, shiftedRightByUnchecked: 1)
+    unsafe SIMD<UInt8>.vector(clamping: a, b, shiftedRightByUnchecked: 1)
 }
 
 @inline(never)
@@ -304,9 +300,7 @@ public func highwayVectorClampingShiftedRightByI16ToU8ConstantBits(
     clamping a: SIMD<Int16>,
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
-        raw: HighwayReference.Nothrow.vectorClampingShiftedRightByI16ToU8(a.raw, b.raw, 1)
-    )
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.vectorClampingShiftedRightByI16ToU8(a.raw, b.raw, 1))
 }
 
 @inline(never)
@@ -314,7 +308,7 @@ public func portVectorClampingShiftedRightByI16ToU8ConstantBitsWidthDifference(
     clamping a: SIMD<Int16>,
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(clamping: a, b, shiftedRightByUnchecked: 8)
+    unsafe SIMD<UInt8>.vector(clamping: a, b, shiftedRightByUnchecked: 8)
 }
 
 @inline(never)
@@ -322,17 +316,15 @@ public func highwayVectorClampingShiftedRightByI16ToU8ConstantBitsWidthDifferenc
     clamping a: SIMD<Int16>,
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
-        raw: HighwayReference.Nothrow.vectorClampingShiftedRightByI16ToU8(a.raw, b.raw, 8)
-    )
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.vectorClampingShiftedRightByI16ToU8(a.raw, b.raw, 8))
 }
 
 @inline(never)
 public func portVectorClampingRoundingShiftedRightByU16ToU8ConstantA(
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(
-        clamping: SIMDUInt16.repeating(26),
+    unsafe SIMD<UInt8>.vector(
+        clamping: SIMD<UInt16>.repeating(26),
         b,
         roundingShiftedRightByUnchecked: 1
     )
@@ -342,9 +334,9 @@ public func portVectorClampingRoundingShiftedRightByU16ToU8ConstantA(
 public func highwayVectorClampingRoundingShiftedRightByU16ToU8ConstantA(
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingRoundingShiftedRightByU16ToU8(
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
             b.raw,
             1
         )
@@ -355,9 +347,9 @@ public func highwayVectorClampingRoundingShiftedRightByU16ToU8ConstantA(
 public func portVectorClampingRoundingShiftedRightByU16ToU8ConstantB(
     clamping a: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(
+    unsafe SIMD<UInt8>.vector(
         clamping: a,
-        SIMDUInt16.repeating(26),
+        SIMD<UInt16>.repeating(26),
         roundingShiftedRightByUnchecked: 1
     )
 }
@@ -366,10 +358,10 @@ public func portVectorClampingRoundingShiftedRightByU16ToU8ConstantB(
 public func highwayVectorClampingRoundingShiftedRightByU16ToU8ConstantB(
     clamping a: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingRoundingShiftedRightByU16ToU8(
             a.raw,
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
             1
         )
     )
@@ -380,7 +372,7 @@ public func portVectorClampingRoundingShiftedRightByU16ToU8ConstantBits(
     clamping a: SIMD<UInt16>,
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(clamping: a, b, roundingShiftedRightByUnchecked: 1)
+    unsafe SIMD<UInt8>.vector(clamping: a, b, roundingShiftedRightByUnchecked: 1)
 }
 
 @inline(never)
@@ -388,7 +380,7 @@ public func highwayVectorClampingRoundingShiftedRightByU16ToU8ConstantBits(
     clamping a: SIMD<UInt16>,
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingRoundingShiftedRightByU16ToU8(a.raw, b.raw, 1)
     )
 }
@@ -398,7 +390,7 @@ public func portVectorClampingRoundingShiftedRightByU16ToU8ConstantBitsWidthDiff
     clamping a: SIMD<UInt16>,
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(clamping: a, b, roundingShiftedRightByUnchecked: 8)
+    unsafe SIMD<UInt8>.vector(clamping: a, b, roundingShiftedRightByUnchecked: 8)
 }
 
 @inline(never)
@@ -406,7 +398,7 @@ public func highwayVectorClampingRoundingShiftedRightByU16ToU8ConstantBitsWidthD
     clamping a: SIMD<UInt16>,
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingRoundingShiftedRightByU16ToU8(a.raw, b.raw, 8)
     )
 }
@@ -415,8 +407,8 @@ public func highwayVectorClampingRoundingShiftedRightByU16ToU8ConstantBitsWidthD
 public func portVectorClampingRoundingShiftedRightByI16ToU8ConstantA(
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(
-        clamping: SIMDInt16.repeating(26),
+    unsafe SIMD<UInt8>.vector(
+        clamping: SIMD<Int16>.repeating(26),
         b,
         roundingShiftedRightByUnchecked: 1
     )
@@ -426,9 +418,9 @@ public func portVectorClampingRoundingShiftedRightByI16ToU8ConstantA(
 public func highwayVectorClampingRoundingShiftedRightByI16ToU8ConstantA(
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingRoundingShiftedRightByI16ToU8(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw,
             1
         )
@@ -439,9 +431,9 @@ public func highwayVectorClampingRoundingShiftedRightByI16ToU8ConstantA(
 public func portVectorClampingRoundingShiftedRightByI16ToU8ConstantB(
     clamping a: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(
+    unsafe SIMD<UInt8>.vector(
         clamping: a,
-        SIMDInt16.repeating(26),
+        SIMD<Int16>.repeating(26),
         roundingShiftedRightByUnchecked: 1
     )
 }
@@ -450,10 +442,10 @@ public func portVectorClampingRoundingShiftedRightByI16ToU8ConstantB(
 public func highwayVectorClampingRoundingShiftedRightByI16ToU8ConstantB(
     clamping a: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingRoundingShiftedRightByI16ToU8(
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             1
         )
     )
@@ -464,7 +456,7 @@ public func portVectorClampingRoundingShiftedRightByI16ToU8ConstantBits(
     clamping a: SIMD<Int16>,
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(clamping: a, b, roundingShiftedRightByUnchecked: 1)
+    unsafe SIMD<UInt8>.vector(clamping: a, b, roundingShiftedRightByUnchecked: 1)
 }
 
 @inline(never)
@@ -472,7 +464,7 @@ public func highwayVectorClampingRoundingShiftedRightByI16ToU8ConstantBits(
     clamping a: SIMD<Int16>,
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingRoundingShiftedRightByI16ToU8(a.raw, b.raw, 1)
     )
 }
@@ -482,7 +474,7 @@ public func portVectorClampingRoundingShiftedRightByI16ToU8ConstantBitsWidthDiff
     clamping a: SIMD<Int16>,
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(clamping: a, b, roundingShiftedRightByUnchecked: 8)
+    unsafe SIMD<UInt8>.vector(clamping: a, b, roundingShiftedRightByUnchecked: 8)
 }
 
 @inline(never)
@@ -490,7 +482,7 @@ public func highwayVectorClampingRoundingShiftedRightByI16ToU8ConstantBitsWidthD
     clamping a: SIMD<Int16>,
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingRoundingShiftedRightByI16ToU8(a.raw, b.raw, 8)
     )
 }
@@ -499,8 +491,8 @@ public func highwayVectorClampingRoundingShiftedRightByI16ToU8ConstantBitsWidthD
 public func portVectorClampingInAnyOrderShiftedRightByU16ToU8ConstantA(
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(
-        clampingInAnyOrder: SIMDUInt16.repeating(26),
+    unsafe SIMD<UInt8>.vector(
+        clampingInAnyOrder: SIMD<UInt16>.repeating(26),
         b,
         shiftedRightByUnchecked: 1
     )
@@ -510,9 +502,9 @@ public func portVectorClampingInAnyOrderShiftedRightByU16ToU8ConstantA(
 public func highwayVectorClampingInAnyOrderShiftedRightByU16ToU8ConstantA(
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingInAnyOrderShiftedRightByU16ToU8(
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
             b.raw,
             1
         )
@@ -523,9 +515,9 @@ public func highwayVectorClampingInAnyOrderShiftedRightByU16ToU8ConstantA(
 public func portVectorClampingInAnyOrderShiftedRightByU16ToU8ConstantB(
     clampingInAnyOrder a: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(
+    unsafe SIMD<UInt8>.vector(
         clampingInAnyOrder: a,
-        SIMDUInt16.repeating(26),
+        SIMD<UInt16>.repeating(26),
         shiftedRightByUnchecked: 1
     )
 }
@@ -534,10 +526,10 @@ public func portVectorClampingInAnyOrderShiftedRightByU16ToU8ConstantB(
 public func highwayVectorClampingInAnyOrderShiftedRightByU16ToU8ConstantB(
     clampingInAnyOrder a: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingInAnyOrderShiftedRightByU16ToU8(
             a.raw,
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
             1
         )
     )
@@ -548,7 +540,7 @@ public func portVectorClampingInAnyOrderShiftedRightByU16ToU8ConstantBits(
     clampingInAnyOrder a: SIMD<UInt16>,
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(clampingInAnyOrder: a, b, shiftedRightByUnchecked: 1)
+    unsafe SIMD<UInt8>.vector(clampingInAnyOrder: a, b, shiftedRightByUnchecked: 1)
 }
 
 @inline(never)
@@ -556,7 +548,7 @@ public func highwayVectorClampingInAnyOrderShiftedRightByU16ToU8ConstantBits(
     clampingInAnyOrder a: SIMD<UInt16>,
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingInAnyOrderShiftedRightByU16ToU8(a.raw, b.raw, 1)
     )
 }
@@ -566,7 +558,7 @@ public func portVectorClampingInAnyOrderShiftedRightByU16ToU8ConstantBitsWidthDi
     clampingInAnyOrder a: SIMD<UInt16>,
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(clampingInAnyOrder: a, b, shiftedRightByUnchecked: 8)
+    unsafe SIMD<UInt8>.vector(clampingInAnyOrder: a, b, shiftedRightByUnchecked: 8)
 }
 
 @inline(never)
@@ -574,7 +566,7 @@ public func highwayVectorClampingInAnyOrderShiftedRightByU16ToU8ConstantBitsWidt
     clampingInAnyOrder a: SIMD<UInt16>,
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingInAnyOrderShiftedRightByU16ToU8(a.raw, b.raw, 8)
     )
 }
@@ -583,8 +575,8 @@ public func highwayVectorClampingInAnyOrderShiftedRightByU16ToU8ConstantBitsWidt
 public func portVectorClampingInAnyOrderShiftedRightByI16ToU8ConstantA(
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(
-        clampingInAnyOrder: SIMDInt16.repeating(26),
+    unsafe SIMD<UInt8>.vector(
+        clampingInAnyOrder: SIMD<Int16>.repeating(26),
         b,
         shiftedRightByUnchecked: 1
     )
@@ -594,9 +586,9 @@ public func portVectorClampingInAnyOrderShiftedRightByI16ToU8ConstantA(
 public func highwayVectorClampingInAnyOrderShiftedRightByI16ToU8ConstantA(
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingInAnyOrderShiftedRightByI16ToU8(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw,
             1
         )
@@ -607,9 +599,9 @@ public func highwayVectorClampingInAnyOrderShiftedRightByI16ToU8ConstantA(
 public func portVectorClampingInAnyOrderShiftedRightByI16ToU8ConstantB(
     clampingInAnyOrder a: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(
+    unsafe SIMD<UInt8>.vector(
         clampingInAnyOrder: a,
-        SIMDInt16.repeating(26),
+        SIMD<Int16>.repeating(26),
         shiftedRightByUnchecked: 1
     )
 }
@@ -618,10 +610,10 @@ public func portVectorClampingInAnyOrderShiftedRightByI16ToU8ConstantB(
 public func highwayVectorClampingInAnyOrderShiftedRightByI16ToU8ConstantB(
     clampingInAnyOrder a: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingInAnyOrderShiftedRightByI16ToU8(
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             1
         )
     )
@@ -632,7 +624,7 @@ public func portVectorClampingInAnyOrderShiftedRightByI16ToU8ConstantBits(
     clampingInAnyOrder a: SIMD<Int16>,
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(clampingInAnyOrder: a, b, shiftedRightByUnchecked: 1)
+    unsafe SIMD<UInt8>.vector(clampingInAnyOrder: a, b, shiftedRightByUnchecked: 1)
 }
 
 @inline(never)
@@ -640,7 +632,7 @@ public func highwayVectorClampingInAnyOrderShiftedRightByI16ToU8ConstantBits(
     clampingInAnyOrder a: SIMD<Int16>,
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingInAnyOrderShiftedRightByI16ToU8(a.raw, b.raw, 1)
     )
 }
@@ -650,7 +642,7 @@ public func portVectorClampingInAnyOrderShiftedRightByI16ToU8ConstantBitsWidthDi
     clampingInAnyOrder a: SIMD<Int16>,
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(clampingInAnyOrder: a, b, shiftedRightByUnchecked: 8)
+    unsafe SIMD<UInt8>.vector(clampingInAnyOrder: a, b, shiftedRightByUnchecked: 8)
 }
 
 @inline(never)
@@ -658,7 +650,7 @@ public func highwayVectorClampingInAnyOrderShiftedRightByI16ToU8ConstantBitsWidt
     clampingInAnyOrder a: SIMD<Int16>,
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingInAnyOrderShiftedRightByI16ToU8(a.raw, b.raw, 8)
     )
 }
@@ -667,8 +659,8 @@ public func highwayVectorClampingInAnyOrderShiftedRightByI16ToU8ConstantBitsWidt
 public func portVectorClampingInAnyOrderRoundingShiftedRightByU16ToU8ConstantA(
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(
-        clampingInAnyOrder: SIMDUInt16.repeating(26),
+    unsafe SIMD<UInt8>.vector(
+        clampingInAnyOrder: SIMD<UInt16>.repeating(26),
         b,
         roundingShiftedRightByUnchecked: 1
     )
@@ -678,9 +670,9 @@ public func portVectorClampingInAnyOrderRoundingShiftedRightByU16ToU8ConstantA(
 public func highwayVectorClampingInAnyOrderRoundingShiftedRightByU16ToU8ConstantA(
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingInAnyOrderRoundingShiftedRightByU16ToU8(
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
             b.raw,
             1
         )
@@ -691,9 +683,9 @@ public func highwayVectorClampingInAnyOrderRoundingShiftedRightByU16ToU8Constant
 public func portVectorClampingInAnyOrderRoundingShiftedRightByU16ToU8ConstantB(
     clampingInAnyOrder a: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(
+    unsafe SIMD<UInt8>.vector(
         clampingInAnyOrder: a,
-        SIMDUInt16.repeating(26),
+        SIMD<UInt16>.repeating(26),
         roundingShiftedRightByUnchecked: 1
     )
 }
@@ -702,10 +694,10 @@ public func portVectorClampingInAnyOrderRoundingShiftedRightByU16ToU8ConstantB(
 public func highwayVectorClampingInAnyOrderRoundingShiftedRightByU16ToU8ConstantB(
     clampingInAnyOrder a: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingInAnyOrderRoundingShiftedRightByU16ToU8(
             a.raw,
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
             1
         )
     )
@@ -716,7 +708,7 @@ public func portVectorClampingInAnyOrderRoundingShiftedRightByU16ToU8ConstantBit
     clampingInAnyOrder a: SIMD<UInt16>,
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(clampingInAnyOrder: a, b, roundingShiftedRightByUnchecked: 1)
+    unsafe SIMD<UInt8>.vector(clampingInAnyOrder: a, b, roundingShiftedRightByUnchecked: 1)
 }
 
 @inline(never)
@@ -724,7 +716,7 @@ public func highwayVectorClampingInAnyOrderRoundingShiftedRightByU16ToU8Constant
     clampingInAnyOrder a: SIMD<UInt16>,
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingInAnyOrderRoundingShiftedRightByU16ToU8(
             a.raw,
             b.raw,
@@ -738,7 +730,7 @@ public func portVectorClampingInAnyOrderRoundingShiftedRightByU16ToU8ConstantBit
     clampingInAnyOrder a: SIMD<UInt16>,
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(clampingInAnyOrder: a, b, roundingShiftedRightByUnchecked: 8)
+    unsafe SIMD<UInt8>.vector(clampingInAnyOrder: a, b, roundingShiftedRightByUnchecked: 8)
 }
 
 @inline(never)
@@ -746,7 +738,7 @@ public func highwayVectorClampingInAnyOrderRoundingShiftedRightByU16ToU8Constant
     clampingInAnyOrder a: SIMD<UInt16>,
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingInAnyOrderRoundingShiftedRightByU16ToU8(
             a.raw,
             b.raw,
@@ -759,8 +751,8 @@ public func highwayVectorClampingInAnyOrderRoundingShiftedRightByU16ToU8Constant
 public func portVectorClampingInAnyOrderRoundingShiftedRightByI16ToU8ConstantA(
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(
-        clampingInAnyOrder: SIMDInt16.repeating(26),
+    unsafe SIMD<UInt8>.vector(
+        clampingInAnyOrder: SIMD<Int16>.repeating(26),
         b,
         roundingShiftedRightByUnchecked: 1
     )
@@ -770,9 +762,9 @@ public func portVectorClampingInAnyOrderRoundingShiftedRightByI16ToU8ConstantA(
 public func highwayVectorClampingInAnyOrderRoundingShiftedRightByI16ToU8ConstantA(
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingInAnyOrderRoundingShiftedRightByI16ToU8(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw,
             1
         )
@@ -783,9 +775,9 @@ public func highwayVectorClampingInAnyOrderRoundingShiftedRightByI16ToU8Constant
 public func portVectorClampingInAnyOrderRoundingShiftedRightByI16ToU8ConstantB(
     clampingInAnyOrder a: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(
+    unsafe SIMD<UInt8>.vector(
         clampingInAnyOrder: a,
-        SIMDInt16.repeating(26),
+        SIMD<Int16>.repeating(26),
         roundingShiftedRightByUnchecked: 1
     )
 }
@@ -794,10 +786,10 @@ public func portVectorClampingInAnyOrderRoundingShiftedRightByI16ToU8ConstantB(
 public func highwayVectorClampingInAnyOrderRoundingShiftedRightByI16ToU8ConstantB(
     clampingInAnyOrder a: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingInAnyOrderRoundingShiftedRightByI16ToU8(
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             1
         )
     )
@@ -808,7 +800,7 @@ public func portVectorClampingInAnyOrderRoundingShiftedRightByI16ToU8ConstantBit
     clampingInAnyOrder a: SIMD<Int16>,
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(clampingInAnyOrder: a, b, roundingShiftedRightByUnchecked: 1)
+    unsafe SIMD<UInt8>.vector(clampingInAnyOrder: a, b, roundingShiftedRightByUnchecked: 1)
 }
 
 @inline(never)
@@ -816,7 +808,7 @@ public func highwayVectorClampingInAnyOrderRoundingShiftedRightByI16ToU8Constant
     clampingInAnyOrder a: SIMD<Int16>,
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingInAnyOrderRoundingShiftedRightByI16ToU8(
             a.raw,
             b.raw,
@@ -830,7 +822,7 @@ public func portVectorClampingInAnyOrderRoundingShiftedRightByI16ToU8ConstantBit
     clampingInAnyOrder a: SIMD<Int16>,
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    unsafe SIMDUInt8.vector(clampingInAnyOrder: a, b, roundingShiftedRightByUnchecked: 8)
+    unsafe SIMD<UInt8>.vector(clampingInAnyOrder: a, b, roundingShiftedRightByUnchecked: 8)
 }
 
 @inline(never)
@@ -838,7 +830,7 @@ public func highwayVectorClampingInAnyOrderRoundingShiftedRightByI16ToU8Constant
     clampingInAnyOrder a: SIMD<Int16>,
     _ b: SIMD<Int16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorClampingInAnyOrderRoundingShiftedRightByI16ToU8(
             a.raw,
             b.raw,
@@ -852,7 +844,7 @@ public func portVectorTruncatingIfNeededU16ToU8(
     truncatingIfNeeded a: SIMD<UInt16>,
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.vector(truncatingIfNeeded: a, b)
+    SIMD<UInt8>.vector(truncatingIfNeeded: a, b)
 }
 
 @inline(never)
@@ -860,19 +852,19 @@ public func highwayVectorTruncatingIfNeededU16ToU8(
     truncatingIfNeeded a: SIMD<UInt16>,
     _ b: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.vectorTruncatingIfNeededU16ToU8(a.raw, b.raw))
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.vectorTruncatingIfNeededU16ToU8(a.raw, b.raw))
 }
 
 @inline(never)
 public func portVectorTruncatingIfNeededU16ToU8ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt8> {
-    SIMDUInt8.vector(truncatingIfNeeded: SIMDUInt16.repeating(26), b)
+    SIMD<UInt8>.vector(truncatingIfNeeded: SIMD<UInt16>.repeating(26), b)
 }
 
 @inline(never)
 public func highwayVectorTruncatingIfNeededU16ToU8ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorTruncatingIfNeededU16ToU8(
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
             b.raw
         )
     )
@@ -882,17 +874,17 @@ public func highwayVectorTruncatingIfNeededU16ToU8ConstantA(_ b: SIMD<UInt16>) -
 public func portVectorTruncatingIfNeededU16ToU8ConstantB(
     truncatingIfNeeded a: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.vector(truncatingIfNeeded: a, SIMDUInt16.repeating(26))
+    SIMD<UInt8>.vector(truncatingIfNeeded: a, SIMD<UInt16>.repeating(26))
 }
 
 @inline(never)
 public func highwayVectorTruncatingIfNeededU16ToU8ConstantB(
     truncatingIfNeeded a: SIMD<UInt16>
 ) -> SIMD<UInt8> {
-    SIMDUInt8.Vector(
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.vectorTruncatingIfNeededU16ToU8(
             a.raw,
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
         )
     )
 }

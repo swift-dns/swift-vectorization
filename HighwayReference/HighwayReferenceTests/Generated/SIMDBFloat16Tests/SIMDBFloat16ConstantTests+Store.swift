@@ -7,14 +7,14 @@ import Vectorization
 
 extension SIMDBFloat16ConstantTests {
     @inline(__always)
-    private func checkStoreConstantA(_ value: H.Lane) {
+    private func checkStoreConstantA(_ value: Lane) {
         let mismatches = Mismatches("store with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         var portLanes = sentinel
         portLanes.withUnsafeMutableBufferPointer { destination in
             unsafe H.store(H.repeating(value), to: destination.baseAddress!)
@@ -28,90 +28,90 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func storeConstantSplatZero() {
-        checkStoreConstantA(H.Lane(bitPattern: 0x0000))
+        checkStoreConstantA(Lane(bitPattern: 0x0000))
     }
 
     @Test func storeConstantSplatNegativeZero() {
-        checkStoreConstantA(H.Lane(bitPattern: 0x8000))
+        checkStoreConstantA(Lane(bitPattern: 0x8000))
     }
 
     @Test func storeConstantSplatOne() {
-        checkStoreConstantA(H.Lane(bitPattern: 0x3F80))
+        checkStoreConstantA(Lane(bitPattern: 0x3F80))
     }
 
     @Test func storeConstantSplatMinusOne() {
-        checkStoreConstantA(H.Lane(bitPattern: 0xBF80))
+        checkStoreConstantA(Lane(bitPattern: 0xBF80))
     }
 
     @Test func storeConstantSplatTwo() {
-        checkStoreConstantA(H.Lane(bitPattern: 0x4000))
+        checkStoreConstantA(Lane(bitPattern: 0x4000))
     }
 
     @Test func storeConstantSplatHalf() {
-        checkStoreConstantA(H.Lane(bitPattern: 0x3F00))
+        checkStoreConstantA(Lane(bitPattern: 0x3F00))
     }
 
     @Test func storeConstantSplatFour() {
-        checkStoreConstantA(H.Lane(bitPattern: 0x4080))
+        checkStoreConstantA(Lane(bitPattern: 0x4080))
     }
 
     @Test func storeConstantSplatQuarter() {
-        checkStoreConstantA(H.Lane(bitPattern: 0x3E80))
+        checkStoreConstantA(Lane(bitPattern: 0x3E80))
     }
 
     @Test func storeConstantSplatOnePointFive() {
-        checkStoreConstantA(H.Lane(bitPattern: 0x3FC0))
+        checkStoreConstantA(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func storeConstantSplatMinusTwoPointFive() {
-        checkStoreConstantA(H.Lane(bitPattern: 0xC020))
+        checkStoreConstantA(Lane(bitPattern: 0xC020))
     }
 
     @Test func storeConstantSplatInfinity() {
-        checkStoreConstantA(H.Lane(bitPattern: 0x7F80))
+        checkStoreConstantA(Lane(bitPattern: 0x7F80))
     }
 
     @Test func storeConstantSplatMinusInfinity() {
-        checkStoreConstantA(H.Lane(bitPattern: 0xFF80))
+        checkStoreConstantA(Lane(bitPattern: 0xFF80))
     }
 
     @Test func storeConstantSplatNaN() {
-        checkStoreConstantA(H.Lane(bitPattern: 0x7FC0))
+        checkStoreConstantA(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func storeConstantSplatMinusNaN() {
-        checkStoreConstantA(H.Lane(bitPattern: 0xFFC0))
+        checkStoreConstantA(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func storeConstantSplatPayloadNaN() {
-        checkStoreConstantA(H.Lane(bitPattern: 0x7FC1))
+        checkStoreConstantA(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func storeConstantSplatSignalingNaN() {
-        checkStoreConstantA(H.Lane(bitPattern: 0x7F81))
+        checkStoreConstantA(Lane(bitPattern: 0x7F81))
     }
 
     @Test func storeConstantSplatMinusSignalingNaN() {
-        checkStoreConstantA(H.Lane(bitPattern: 0xFF81))
+        checkStoreConstantA(Lane(bitPattern: 0xFF81))
     }
 
     @Test func storeConstantSplatLeastNonzero() {
-        checkStoreConstantA(H.Lane(bitPattern: 0x0001))
+        checkStoreConstantA(Lane(bitPattern: 0x0001))
     }
 
     @Test func storeConstantSplatGreatest() {
-        checkStoreConstantA(H.Lane(bitPattern: 0x7F7F))
+        checkStoreConstantA(Lane(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkStoreAlignedConstantA(_ value: H.Lane) {
+    private func checkStoreAlignedConstantA(_ value: Lane) {
         let mismatches = Mismatches("storeAligned with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         let (_, portLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
             destination in unsafe H.storeAligned(H.repeating(value), to: destination)
         }
@@ -124,91 +124,91 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func storeAlignedConstantSplatZero() {
-        checkStoreAlignedConstantA(H.Lane(bitPattern: 0x0000))
+        checkStoreAlignedConstantA(Lane(bitPattern: 0x0000))
     }
 
     @Test func storeAlignedConstantSplatNegativeZero() {
-        checkStoreAlignedConstantA(H.Lane(bitPattern: 0x8000))
+        checkStoreAlignedConstantA(Lane(bitPattern: 0x8000))
     }
 
     @Test func storeAlignedConstantSplatOne() {
-        checkStoreAlignedConstantA(H.Lane(bitPattern: 0x3F80))
+        checkStoreAlignedConstantA(Lane(bitPattern: 0x3F80))
     }
 
     @Test func storeAlignedConstantSplatMinusOne() {
-        checkStoreAlignedConstantA(H.Lane(bitPattern: 0xBF80))
+        checkStoreAlignedConstantA(Lane(bitPattern: 0xBF80))
     }
 
     @Test func storeAlignedConstantSplatTwo() {
-        checkStoreAlignedConstantA(H.Lane(bitPattern: 0x4000))
+        checkStoreAlignedConstantA(Lane(bitPattern: 0x4000))
     }
 
     @Test func storeAlignedConstantSplatHalf() {
-        checkStoreAlignedConstantA(H.Lane(bitPattern: 0x3F00))
+        checkStoreAlignedConstantA(Lane(bitPattern: 0x3F00))
     }
 
     @Test func storeAlignedConstantSplatFour() {
-        checkStoreAlignedConstantA(H.Lane(bitPattern: 0x4080))
+        checkStoreAlignedConstantA(Lane(bitPattern: 0x4080))
     }
 
     @Test func storeAlignedConstantSplatQuarter() {
-        checkStoreAlignedConstantA(H.Lane(bitPattern: 0x3E80))
+        checkStoreAlignedConstantA(Lane(bitPattern: 0x3E80))
     }
 
     @Test func storeAlignedConstantSplatOnePointFive() {
-        checkStoreAlignedConstantA(H.Lane(bitPattern: 0x3FC0))
+        checkStoreAlignedConstantA(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func storeAlignedConstantSplatMinusTwoPointFive() {
-        checkStoreAlignedConstantA(H.Lane(bitPattern: 0xC020))
+        checkStoreAlignedConstantA(Lane(bitPattern: 0xC020))
     }
 
     @Test func storeAlignedConstantSplatInfinity() {
-        checkStoreAlignedConstantA(H.Lane(bitPattern: 0x7F80))
+        checkStoreAlignedConstantA(Lane(bitPattern: 0x7F80))
     }
 
     @Test func storeAlignedConstantSplatMinusInfinity() {
-        checkStoreAlignedConstantA(H.Lane(bitPattern: 0xFF80))
+        checkStoreAlignedConstantA(Lane(bitPattern: 0xFF80))
     }
 
     @Test func storeAlignedConstantSplatNaN() {
-        checkStoreAlignedConstantA(H.Lane(bitPattern: 0x7FC0))
+        checkStoreAlignedConstantA(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func storeAlignedConstantSplatMinusNaN() {
-        checkStoreAlignedConstantA(H.Lane(bitPattern: 0xFFC0))
+        checkStoreAlignedConstantA(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func storeAlignedConstantSplatPayloadNaN() {
-        checkStoreAlignedConstantA(H.Lane(bitPattern: 0x7FC1))
+        checkStoreAlignedConstantA(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func storeAlignedConstantSplatSignalingNaN() {
-        checkStoreAlignedConstantA(H.Lane(bitPattern: 0x7F81))
+        checkStoreAlignedConstantA(Lane(bitPattern: 0x7F81))
     }
 
     @Test func storeAlignedConstantSplatMinusSignalingNaN() {
-        checkStoreAlignedConstantA(H.Lane(bitPattern: 0xFF81))
+        checkStoreAlignedConstantA(Lane(bitPattern: 0xFF81))
     }
 
     @Test func storeAlignedConstantSplatLeastNonzero() {
-        checkStoreAlignedConstantA(H.Lane(bitPattern: 0x0001))
+        checkStoreAlignedConstantA(Lane(bitPattern: 0x0001))
     }
 
     @Test func storeAlignedConstantSplatGreatest() {
-        checkStoreAlignedConstantA(H.Lane(bitPattern: 0x7F7F))
+        checkStoreAlignedConstantA(Lane(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkStoreFirstConstantA(_ value: H.Lane) {
+    private func checkStoreFirstConstantA(_ value: Lane) {
         let mismatches = Mismatches("storeFirst with a repeating \(hex(value))")
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for count in countInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -228,91 +228,91 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func storeFirstConstantSplatZero() {
-        checkStoreFirstConstantA(H.Lane(bitPattern: 0x0000))
+        checkStoreFirstConstantA(Lane(bitPattern: 0x0000))
     }
 
     @Test func storeFirstConstantSplatNegativeZero() {
-        checkStoreFirstConstantA(H.Lane(bitPattern: 0x8000))
+        checkStoreFirstConstantA(Lane(bitPattern: 0x8000))
     }
 
     @Test func storeFirstConstantSplatOne() {
-        checkStoreFirstConstantA(H.Lane(bitPattern: 0x3F80))
+        checkStoreFirstConstantA(Lane(bitPattern: 0x3F80))
     }
 
     @Test func storeFirstConstantSplatMinusOne() {
-        checkStoreFirstConstantA(H.Lane(bitPattern: 0xBF80))
+        checkStoreFirstConstantA(Lane(bitPattern: 0xBF80))
     }
 
     @Test func storeFirstConstantSplatTwo() {
-        checkStoreFirstConstantA(H.Lane(bitPattern: 0x4000))
+        checkStoreFirstConstantA(Lane(bitPattern: 0x4000))
     }
 
     @Test func storeFirstConstantSplatHalf() {
-        checkStoreFirstConstantA(H.Lane(bitPattern: 0x3F00))
+        checkStoreFirstConstantA(Lane(bitPattern: 0x3F00))
     }
 
     @Test func storeFirstConstantSplatFour() {
-        checkStoreFirstConstantA(H.Lane(bitPattern: 0x4080))
+        checkStoreFirstConstantA(Lane(bitPattern: 0x4080))
     }
 
     @Test func storeFirstConstantSplatQuarter() {
-        checkStoreFirstConstantA(H.Lane(bitPattern: 0x3E80))
+        checkStoreFirstConstantA(Lane(bitPattern: 0x3E80))
     }
 
     @Test func storeFirstConstantSplatOnePointFive() {
-        checkStoreFirstConstantA(H.Lane(bitPattern: 0x3FC0))
+        checkStoreFirstConstantA(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func storeFirstConstantSplatMinusTwoPointFive() {
-        checkStoreFirstConstantA(H.Lane(bitPattern: 0xC020))
+        checkStoreFirstConstantA(Lane(bitPattern: 0xC020))
     }
 
     @Test func storeFirstConstantSplatInfinity() {
-        checkStoreFirstConstantA(H.Lane(bitPattern: 0x7F80))
+        checkStoreFirstConstantA(Lane(bitPattern: 0x7F80))
     }
 
     @Test func storeFirstConstantSplatMinusInfinity() {
-        checkStoreFirstConstantA(H.Lane(bitPattern: 0xFF80))
+        checkStoreFirstConstantA(Lane(bitPattern: 0xFF80))
     }
 
     @Test func storeFirstConstantSplatNaN() {
-        checkStoreFirstConstantA(H.Lane(bitPattern: 0x7FC0))
+        checkStoreFirstConstantA(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func storeFirstConstantSplatMinusNaN() {
-        checkStoreFirstConstantA(H.Lane(bitPattern: 0xFFC0))
+        checkStoreFirstConstantA(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func storeFirstConstantSplatPayloadNaN() {
-        checkStoreFirstConstantA(H.Lane(bitPattern: 0x7FC1))
+        checkStoreFirstConstantA(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func storeFirstConstantSplatSignalingNaN() {
-        checkStoreFirstConstantA(H.Lane(bitPattern: 0x7F81))
+        checkStoreFirstConstantA(Lane(bitPattern: 0x7F81))
     }
 
     @Test func storeFirstConstantSplatMinusSignalingNaN() {
-        checkStoreFirstConstantA(H.Lane(bitPattern: 0xFF81))
+        checkStoreFirstConstantA(Lane(bitPattern: 0xFF81))
     }
 
     @Test func storeFirstConstantSplatLeastNonzero() {
-        checkStoreFirstConstantA(H.Lane(bitPattern: 0x0001))
+        checkStoreFirstConstantA(Lane(bitPattern: 0x0001))
     }
 
     @Test func storeFirstConstantSplatGreatest() {
-        checkStoreFirstConstantA(H.Lane(bitPattern: 0x7F7F))
+        checkStoreFirstConstantA(Lane(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkStoreWhereConstantA(_ value: H.Lane) {
+    private func checkStoreWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("storeWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE92A_8277_0BA9_3B0C)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for mask in maskInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -332,78 +332,78 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func storeWhereConstantSplatZero() {
-        checkStoreWhereConstantA(H.Lane(bitPattern: 0x0000))
+        checkStoreWhereConstantA(Lane(bitPattern: 0x0000))
     }
 
     @Test func storeWhereConstantSplatNegativeZero() {
-        checkStoreWhereConstantA(H.Lane(bitPattern: 0x8000))
+        checkStoreWhereConstantA(Lane(bitPattern: 0x8000))
     }
 
     @Test func storeWhereConstantSplatOne() {
-        checkStoreWhereConstantA(H.Lane(bitPattern: 0x3F80))
+        checkStoreWhereConstantA(Lane(bitPattern: 0x3F80))
     }
 
     @Test func storeWhereConstantSplatMinusOne() {
-        checkStoreWhereConstantA(H.Lane(bitPattern: 0xBF80))
+        checkStoreWhereConstantA(Lane(bitPattern: 0xBF80))
     }
 
     @Test func storeWhereConstantSplatTwo() {
-        checkStoreWhereConstantA(H.Lane(bitPattern: 0x4000))
+        checkStoreWhereConstantA(Lane(bitPattern: 0x4000))
     }
 
     @Test func storeWhereConstantSplatHalf() {
-        checkStoreWhereConstantA(H.Lane(bitPattern: 0x3F00))
+        checkStoreWhereConstantA(Lane(bitPattern: 0x3F00))
     }
 
     @Test func storeWhereConstantSplatFour() {
-        checkStoreWhereConstantA(H.Lane(bitPattern: 0x4080))
+        checkStoreWhereConstantA(Lane(bitPattern: 0x4080))
     }
 
     @Test func storeWhereConstantSplatQuarter() {
-        checkStoreWhereConstantA(H.Lane(bitPattern: 0x3E80))
+        checkStoreWhereConstantA(Lane(bitPattern: 0x3E80))
     }
 
     @Test func storeWhereConstantSplatOnePointFive() {
-        checkStoreWhereConstantA(H.Lane(bitPattern: 0x3FC0))
+        checkStoreWhereConstantA(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func storeWhereConstantSplatMinusTwoPointFive() {
-        checkStoreWhereConstantA(H.Lane(bitPattern: 0xC020))
+        checkStoreWhereConstantA(Lane(bitPattern: 0xC020))
     }
 
     @Test func storeWhereConstantSplatInfinity() {
-        checkStoreWhereConstantA(H.Lane(bitPattern: 0x7F80))
+        checkStoreWhereConstantA(Lane(bitPattern: 0x7F80))
     }
 
     @Test func storeWhereConstantSplatMinusInfinity() {
-        checkStoreWhereConstantA(H.Lane(bitPattern: 0xFF80))
+        checkStoreWhereConstantA(Lane(bitPattern: 0xFF80))
     }
 
     @Test func storeWhereConstantSplatNaN() {
-        checkStoreWhereConstantA(H.Lane(bitPattern: 0x7FC0))
+        checkStoreWhereConstantA(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func storeWhereConstantSplatMinusNaN() {
-        checkStoreWhereConstantA(H.Lane(bitPattern: 0xFFC0))
+        checkStoreWhereConstantA(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func storeWhereConstantSplatPayloadNaN() {
-        checkStoreWhereConstantA(H.Lane(bitPattern: 0x7FC1))
+        checkStoreWhereConstantA(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func storeWhereConstantSplatSignalingNaN() {
-        checkStoreWhereConstantA(H.Lane(bitPattern: 0x7F81))
+        checkStoreWhereConstantA(Lane(bitPattern: 0x7F81))
     }
 
     @Test func storeWhereConstantSplatMinusSignalingNaN() {
-        checkStoreWhereConstantA(H.Lane(bitPattern: 0xFF81))
+        checkStoreWhereConstantA(Lane(bitPattern: 0xFF81))
     }
 
     @Test func storeWhereConstantSplatLeastNonzero() {
-        checkStoreWhereConstantA(H.Lane(bitPattern: 0x0001))
+        checkStoreWhereConstantA(Lane(bitPattern: 0x0001))
     }
 
     @Test func storeWhereConstantSplatGreatest() {
-        checkStoreWhereConstantA(H.Lane(bitPattern: 0x7F7F))
+        checkStoreWhereConstantA(Lane(bitPattern: 0x7F7F))
     }
 }

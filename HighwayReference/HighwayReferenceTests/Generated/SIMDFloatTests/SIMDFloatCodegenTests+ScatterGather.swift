@@ -9,13 +9,9 @@ import Vectorization
 extension SIMDFloatCodegenTests {
     @Test func gather() {
         let mismatches = Mismatches("portGatherF32")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x883B_FAF6_39B2_D4A9
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x883B_FAF6_39B2_D4A9)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x883B_F9F6_39B2_D2F6,
             inContract: true
@@ -38,13 +34,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherBeforeGuardPage() {
         let mismatches = Mismatches("portGatherF32 before a guard page")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xE7DC_8266_CEC2_4986
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xE7DC_8266_CEC2_4986)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xE7DC_8366_CEC2_4B39,
             inContract: true
@@ -67,11 +59,7 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherConstantIndices() {
         let mismatches = Mismatches("portGatherF32ConstantIndices")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x6796_937C_BF0A_0EF4
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x6796_937C_BF0A_0EF4)
         for from in fromInputs {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
@@ -86,11 +74,7 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherConstantIndicesBeforeGuardPage() {
         let mismatches = Mismatches("portGatherF32ConstantIndices before a guard page")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x921E_E7DF_7AFA_082D
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x921E_E7DF_7AFA_082D)
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
@@ -105,14 +89,10 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherByteOffsets() {
         let mismatches = Mismatches("portGatherByteOffsetsF32")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x89AC_131F_AEA6_2743
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x89AC_131F_AEA6_2743)
         let byteOffsetsInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
-            count: (H.laneCount - 1) * MemoryLayout<H.Lane>.stride + 1,
+            SIMD<Int32>.self,
+            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
             seed: 0x89AC_121F_AEA6_2590,
             inContract: true
         )
@@ -140,14 +120,10 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherByteOffsetsBeforeGuardPage() {
         let mismatches = Mismatches("portGatherByteOffsetsF32 before a guard page")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x830C_F480_B2DF_B3C8
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x830C_F480_B2DF_B3C8)
         let byteOffsetsInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
-            count: (H.laneCount - 1) * MemoryLayout<H.Lane>.stride + 1,
+            SIMD<Int32>.self,
+            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
             seed: 0x830C_F580_B2DF_B57B,
             inContract: true
         )
@@ -169,11 +145,7 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherByteOffsetsConstantByteOffsets() {
         let mismatches = Mismatches("portGatherByteOffsetsF32ConstantByteOffsets")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x0B92_059B_CCCB_4A2D
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x0B92_059B_CCCB_4A2D)
         for from in fromInputs {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
@@ -190,11 +162,7 @@ extension SIMDFloatCodegenTests {
         let mismatches = Mismatches(
             "portGatherByteOffsetsF32ConstantByteOffsets before a guard page"
         )
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xF898_EC24_91B6_787A
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xF898_EC24_91B6_787A)
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
@@ -209,13 +177,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherFirst() {
         let mismatches = Mismatches("portGatherFirstF32")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x8CBF_26BE_BDB6_BA5B
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x8CBF_26BE_BDB6_BA5B)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x8CBF_25BE_BDB6_B8A8,
             inContract: true
@@ -253,13 +217,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherFirstBeforeGuardPage() {
         let mismatches = Mismatches("portGatherFirstF32 before a guard page")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x07B2_B3ED_EB51_2280
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x07B2_B3ED_EB51_2280)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x07B2_B4ED_EB51_2433,
             inContract: true
@@ -289,11 +249,7 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherFirstConstantIndices() {
         let mismatches = Mismatches("portGatherFirstF32ConstantIndices")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x1A49_7E00_7FAC_5A6A
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x1A49_7E00_7FAC_5A6A)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
         for (from, count) in everyPair(fromInputs, countInputs) {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
@@ -319,11 +275,7 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherFirstConstantIndicesBeforeGuardPage() {
         let mismatches = Mismatches("portGatherFirstF32ConstantIndices before a guard page")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xBF0F_99A9_26B2_6A0B
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xBF0F_99A9_26B2_6A0B)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
         for (from, count) in everyPair(fromInputs, countInputs) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
@@ -343,13 +295,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherFirstConstantCount() {
         let mismatches = Mismatches("portGatherFirstF32ConstantCount")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x08C4_E0EC_9D79_C948
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x08C4_E0EC_9D79_C948)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x08C4_E1EC_9D79_CAFB,
             inContract: true
@@ -378,13 +326,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherFirstConstantCountBeforeGuardPage() {
         let mismatches = Mismatches("portGatherFirstF32ConstantCount before a guard page")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x83AA_2AE4_1D52_DF81
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x83AA_2AE4_1D52_DF81)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x83AA_29E4_1D52_DDCE,
             inContract: true
@@ -407,13 +351,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherFirstConstantCountTwo() {
         let mismatches = Mismatches("portGatherFirstF32ConstantCountTwo")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x1436_4748_94B5_6800
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x1436_4748_94B5_6800)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x1436_4848_94B5_69B3,
             inContract: true
@@ -442,13 +382,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherFirstConstantCountTwoBeforeGuardPage() {
         let mismatches = Mismatches("portGatherFirstF32ConstantCountTwo before a guard page")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x895A_2AB0_DC22_E0B9
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x895A_2AB0_DC22_E0B9)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x895A_29B0_DC22_DF06,
             inContract: true
@@ -471,13 +407,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherFirstConstantCountLaneCount() {
         let mismatches = Mismatches("portGatherFirstF32ConstantCountLaneCount")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x0AAD_BE60_E309_339B
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x0AAD_BE60_E309_339B)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x0AAD_BD60_E309_31E8,
             inContract: true
@@ -506,13 +438,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherFirstConstantCountLaneCountBeforeGuardPage() {
         let mismatches = Mismatches("portGatherFirstF32ConstantCountLaneCount before a guard page")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x15AC_98F5_23C8_37C0
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x15AC_98F5_23C8_37C0)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x15AC_99F5_23C8_3973,
             inContract: true
@@ -538,13 +466,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherFirstConstantCountTwiceLaneCount() {
         let mismatches = Mismatches("portGatherFirstF32ConstantCountTwiceLaneCount")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xD2EC_1DE9_5094_72E5
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xD2EC_1DE9_5094_72E5)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xD2EC_1CE9_5094_7132,
             inContract: true
@@ -575,13 +499,9 @@ extension SIMDFloatCodegenTests {
         let mismatches = Mismatches(
             "portGatherFirstF32ConstantCountTwiceLaneCount before a guard page"
         )
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xC354_1A7F_3C03_CFB2
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xC354_1A7F_3C03_CFB2)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xC354_1B7F_3C03_D165,
             inContract: true
@@ -610,14 +530,10 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherFirstOtherwise() {
         let mismatches = Mismatches("portGatherFirstOtherwiseF32")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x1C25_1213_A1F7_8C79)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x1C25_1113_A1F7_8AC6
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x1C25_1213_A1F7_8C79)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x1C25_1113_A1F7_8AC6)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x1C25_1013_A1F7_8913,
             inContract: true
@@ -658,14 +574,10 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherFirstOtherwiseBeforeGuardPage() {
         let mismatches = Mismatches("portGatherFirstOtherwiseF32 before a guard page")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x543B_D9F5_BDEB_E4B6)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x543B_DAF5_BDEB_E669
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x543B_D9F5_BDEB_E4B6)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x543B_DAF5_BDEB_E669)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x543B_D7F5_BDEB_E150,
             inContract: true
@@ -706,12 +618,8 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherFirstOtherwiseConstantIndices() {
         let mismatches = Mismatches("portGatherFirstOtherwiseF32ConstantIndices")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xF67A_C43C_DF00_8464)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xF67A_C53C_DF00_8617
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xF67A_C43C_DF00_8464)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xF67A_C53C_DF00_8617)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
         for (otherwise, from, count) in mixedTriples(
             otherwiseInputs,
@@ -746,12 +654,8 @@ extension SIMDFloatCodegenTests {
         let mismatches = Mismatches(
             "portGatherFirstOtherwiseF32ConstantIndices before a guard page"
         )
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xE486_0F36_46C5_503D)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xE486_0E36_46C5_4E8A
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xE486_0F36_46C5_503D)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xE486_0E36_46C5_4E8A)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
         for (otherwise, from, count) in mixedTriples(
             otherwiseInputs,
@@ -784,14 +688,10 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherFirstOtherwiseConstantCount() {
         let mismatches = Mismatches("portGatherFirstOtherwiseF32ConstantCount")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x73E8_1D01_BCB0_BD4A)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x73E8_1E01_BCB0_BEFD
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x73E8_1D01_BCB0_BD4A)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x73E8_1E01_BCB0_BEFD)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x73E8_1B01_BCB0_B9E4,
             inContract: true
@@ -827,14 +727,10 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherFirstOtherwiseConstantCountBeforeGuardPage() {
         let mismatches = Mismatches("portGatherFirstOtherwiseF32ConstantCount before a guard page")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x63A7_D03E_3924_DA2B)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x63A7_CF3E_3924_D878
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x63A7_D03E_3924_DA2B)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x63A7_CF3E_3924_D878)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x63A7_D23E_3924_DD91,
             inContract: true
@@ -870,13 +766,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherFirstOtherwiseConstantOtherwise() {
         let mismatches = Mismatches("portGatherFirstOtherwiseF32ConstantOtherwise")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xA1E2_A10D_9486_A480
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xA1E2_A10D_9486_A480)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xA1E2_A40D_9486_A999,
             inContract: true
@@ -916,13 +808,9 @@ extension SIMDFloatCodegenTests {
         let mismatches = Mismatches(
             "portGatherFirstOtherwiseF32ConstantOtherwise before a guard page"
         )
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x5E15_2CC1_351B_620B
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x5E15_2CC1_351B_620B)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x5E15_2DC1_351B_63BE,
             inContract: true
@@ -960,14 +848,10 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherFirstOtherwiseConstantCountTwo() {
         let mismatches = Mismatches("portGatherFirstOtherwiseF32ConstantCountTwo")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x1BC3_D6BC_7242_9DE6)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x1BC3_D7BC_7242_9F99
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x1BC3_D6BC_7242_9DE6)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x1BC3_D7BC_7242_9F99)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x1BC3_D4BC_7242_9A80,
             inContract: true
@@ -1005,14 +889,10 @@ extension SIMDFloatCodegenTests {
         let mismatches = Mismatches(
             "portGatherFirstOtherwiseF32ConstantCountTwo before a guard page"
         )
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xCF58_02B3_0C53_7C97)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xCF58_01B3_0C53_7AE4
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xCF58_02B3_0C53_7C97)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xCF58_01B3_0C53_7AE4)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xCF58_04B3_0C53_7FFD,
             inContract: true
@@ -1048,14 +928,10 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherFirstOtherwiseConstantCountLaneCount() {
         let mismatches = Mismatches("portGatherFirstOtherwiseF32ConstantCountLaneCount")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xA8E1_683F_C252_9C91)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xA8E1_673F_C252_9ADE
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xA8E1_683F_C252_9C91)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xA8E1_673F_C252_9ADE)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xA8E1_663F_C252_992B,
             inContract: true
@@ -1093,14 +969,10 @@ extension SIMDFloatCodegenTests {
         let mismatches = Mismatches(
             "portGatherFirstOtherwiseF32ConstantCountLaneCount before a guard page"
         )
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xBCEB_81CA_7124_392E)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xBCEB_82CA_7124_3AE1
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xBCEB_81CA_7124_392E)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xBCEB_82CA_7124_3AE1)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xBCEB_7FCA_7124_35C8,
             inContract: true
@@ -1136,14 +1008,10 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherFirstOtherwiseConstantCountTwiceLaneCount() {
         let mismatches = Mismatches("portGatherFirstOtherwiseF32ConstantCountTwiceLaneCount")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xD783_FD63_8BDA_42BF)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xD783_FC63_8BDA_410C
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xD783_FD63_8BDA_42BF)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xD783_FC63_8BDA_410C)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xD783_FF63_8BDA_4625,
             inContract: true
@@ -1181,14 +1049,10 @@ extension SIMDFloatCodegenTests {
         let mismatches = Mismatches(
             "portGatherFirstOtherwiseF32ConstantCountTwiceLaneCount before a guard page"
         )
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xDEC6_4C6F_C971_A404)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xDEC6_4D6F_C971_A5B7
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xDEC6_4C6F_C971_A404)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xDEC6_4D6F_C971_A5B7)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xDEC6_4E6F_C971_A76A,
             inContract: true
@@ -1225,13 +1089,9 @@ extension SIMDFloatCodegenTests {
     @Test func gatherWhere() {
         let mismatches = Mismatches("portGatherWhereF32")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6D5D_0765_0ACA_3EBA)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x6D5D_0865_0ACA_406D
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x6D5D_0865_0ACA_406D)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x6D5D_0565_0ACA_3B54,
             inContract: true
@@ -1269,13 +1129,9 @@ extension SIMDFloatCodegenTests {
     @Test func gatherWhereBeforeGuardPage() {
         let mismatches = Mismatches("portGatherWhereF32 before a guard page")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE81C_F5FF_082A_8DBB)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xE81C_F4FF_082A_8C08
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xE81C_F4FF_082A_8C08)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xE81C_F7FF_082A_9121,
             inContract: true
@@ -1305,11 +1161,7 @@ extension SIMDFloatCodegenTests {
     @Test func gatherWhereConstantIndices() {
         let mismatches = Mismatches("portGatherWhereF32ConstantIndices")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7E1A_23D6_0FC2_92A5)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x7E1A_22D6_0FC2_90F2
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x7E1A_22D6_0FC2_90F2)
         for (mask, from) in everyPair(maskInputs, fromInputs) {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
@@ -1335,11 +1187,7 @@ extension SIMDFloatCodegenTests {
     @Test func gatherWhereConstantIndicesBeforeGuardPage() {
         let mismatches = Mismatches("portGatherWhereF32ConstantIndices before a guard page")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1536_DD46_48AA_2472)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x1536_DE46_48AA_2625
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x1536_DE46_48AA_2625)
         for (mask, from) in everyPair(maskInputs, fromInputs) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
@@ -1358,15 +1206,11 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherWhereOtherwise() {
         let mismatches = Mismatches("portGatherWhereOtherwiseF32")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xCDCC_718B_46A6_4FC2)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xCDCC_718B_46A6_4FC2)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xCDCC_728B_46A6_5175)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xCDCC_6F8B_46A6_4C5C
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xCDCC_6F8B_46A6_4C5C)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xCDCC_708B_46A6_4E0F,
             inContract: true
@@ -1406,15 +1250,11 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherWhereOtherwiseBeforeGuardPage() {
         let mismatches = Mismatches("portGatherWhereOtherwiseF32 before a guard page")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xE66D_93A4_9551_ABC3)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xE66D_93A4_9551_ABC3)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE66D_92A4_9551_AA10)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xE66D_95A4_9551_AF29
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xE66D_95A4_9551_AF29)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xE66D_94A4_9551_AD76,
             inContract: true
@@ -1454,13 +1294,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func gatherWhereOtherwiseConstantIndices() {
         let mismatches = Mismatches("portGatherWhereOtherwiseF32ConstantIndices")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xF8E3_2877_D363_A0FD)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xF8E3_2877_D363_A0FD)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF8E3_2777_D363_9F4A)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xF8E3_2677_D363_9D97
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xF8E3_2677_D363_9D97)
         for (otherwise, mask, from) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -1494,13 +1330,9 @@ extension SIMDFloatCodegenTests {
         let mismatches = Mismatches(
             "portGatherWhereOtherwiseF32ConstantIndices before a guard page"
         )
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x413F_7534_F55D_D8AA)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x413F_7534_F55D_D8AA)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x413F_7634_F55D_DA5D)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x413F_7334_F55D_D544
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x413F_7334_F55D_D544)
         for (otherwise, mask, from) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -1533,13 +1365,9 @@ extension SIMDFloatCodegenTests {
     @Test func gatherWhereOtherwiseConstantOtherwise() {
         let mismatches = Mismatches("portGatherWhereOtherwiseF32ConstantOtherwise")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3949_F800_FD17_2C2D)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x3949_F500_FD17_2714
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x3949_F500_FD17_2714)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x3949_F600_FD17_28C7,
             inContract: true
@@ -1579,13 +1407,9 @@ extension SIMDFloatCodegenTests {
             "portGatherWhereOtherwiseF32ConstantOtherwise before a guard page"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA3C1_5A3C_FD62_13C8)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xA3C1_5D3C_FD62_18E1
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xA3C1_5D3C_FD62_18E1)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xA3C1_5C3C_FD62_172E,
             inContract: true
@@ -1622,14 +1446,14 @@ extension SIMDFloatCodegenTests {
 
     @Test func scatter() {
         let mismatches = Mismatches("portScatterF32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x74A1_AC93_2335_BF82)
+        let aInputs = Inputs.vectors(H.self, seed: 0x74A1_AC93_2335_BF82)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x74A1_AD93_2335_C135,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -1650,14 +1474,14 @@ extension SIMDFloatCodegenTests {
 
     @Test func scatterBeforeGuardPage() {
         let mismatches = Mismatches("portScatterF32 before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAE64_537E_1E8E_5283)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAE64_537E_1E8E_5283)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xAE64_527E_1E8E_50D0,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portScatterF32(a, to: destination, indices: indices)
@@ -1677,12 +1501,12 @@ extension SIMDFloatCodegenTests {
     @Test func scatterConstantA() {
         let mismatches = Mismatches("portScatterF32ConstantA")
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xBD31_A577_7F37_51D0,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for indices in indicesInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -1700,12 +1524,12 @@ extension SIMDFloatCodegenTests {
     @Test func scatterConstantABeforeGuardPage() {
         let mismatches = Mismatches("portScatterF32ConstantA before a guard page")
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x5A4A_8C45_9EC7_34BB,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for indices in indicesInputs {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portScatterF32ConstantA(to: destination, indices: indices)
@@ -1720,8 +1544,8 @@ extension SIMDFloatCodegenTests {
 
     @Test func scatterConstantIndices() {
         let mismatches = Mismatches("portScatterF32ConstantIndices")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC136_E037_D9D5_F3BD)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC136_E037_D9D5_F3BD)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -1738,8 +1562,8 @@ extension SIMDFloatCodegenTests {
 
     @Test func scatterConstantIndicesBeforeGuardPage() {
         let mismatches = Mismatches("portScatterF32ConstantIndices before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA815_5B10_6F8B_C86A)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA815_5B10_6F8B_C86A)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portScatterF32ConstantIndices(a, to: destination)
@@ -1754,14 +1578,14 @@ extension SIMDFloatCodegenTests {
 
     @Test func scatterByteOffsets() {
         let mismatches = Mismatches("portScatterByteOffsetsF32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBD7D_3904_ECEE_16E2)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBD7D_3904_ECEE_16E2)
         let byteOffsetsInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
-            count: (H.laneCount - 1) * MemoryLayout<H.Lane>.stride + 1,
+            SIMD<Int32>.self,
+            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
             seed: 0xBD7D_3A04_ECEE_1895,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, byteOffsets) in everyPair(aInputs, byteOffsetsInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -1790,14 +1614,14 @@ extension SIMDFloatCodegenTests {
 
     @Test func scatterByteOffsetsBeforeGuardPage() {
         let mismatches = Mismatches("portScatterByteOffsetsF32 before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD90F_C5C7_16F7_33A3)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD90F_C5C7_16F7_33A3)
         let byteOffsetsInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
-            count: (H.laneCount - 1) * MemoryLayout<H.Lane>.stride + 1,
+            SIMD<Int32>.self,
+            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
             seed: 0xD90F_C4C7_16F7_31F0,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, byteOffsets) in everyPair(aInputs, byteOffsetsInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portScatterByteOffsetsF32(a, to: destination, byteOffsets: byteOffsets)
@@ -1817,12 +1641,12 @@ extension SIMDFloatCodegenTests {
     @Test func scatterByteOffsetsConstantA() {
         let mismatches = Mismatches("portScatterByteOffsetsF32ConstantA")
         let byteOffsetsInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
-            count: (H.laneCount - 1) * MemoryLayout<H.Lane>.stride + 1,
+            SIMD<Int32>.self,
+            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
             seed: 0xC129_DF53_AB12_4530,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for byteOffsets in byteOffsetsInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -1846,12 +1670,12 @@ extension SIMDFloatCodegenTests {
     @Test func scatterByteOffsetsConstantABeforeGuardPage() {
         let mismatches = Mismatches("portScatterByteOffsetsF32ConstantA before a guard page")
         let byteOffsetsInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
-            count: (H.laneCount - 1) * MemoryLayout<H.Lane>.stride + 1,
+            SIMD<Int32>.self,
+            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
             seed: 0xB855_9856_1077_34DB,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for byteOffsets in byteOffsetsInputs {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portScatterByteOffsetsF32ConstantA(to: destination, byteOffsets: byteOffsets)
@@ -1869,8 +1693,8 @@ extension SIMDFloatCodegenTests {
 
     @Test func scatterByteOffsetsConstantByteOffsets() {
         let mismatches = Mismatches("portScatterByteOffsetsF32ConstantByteOffsets")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD0CC_8B7B_A76F_9672)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD0CC_8B7B_A76F_9672)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -1892,8 +1716,8 @@ extension SIMDFloatCodegenTests {
         let mismatches = Mismatches(
             "portScatterByteOffsetsF32ConstantByteOffsets before a guard page"
         )
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8ED4_BC0C_5876_65D3)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8ED4_BC0C_5876_65D3)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portScatterByteOffsetsF32ConstantByteOffsets(a, to: destination)
@@ -1908,15 +1732,15 @@ extension SIMDFloatCodegenTests {
 
     @Test func scatterFirst() {
         let mismatches = Mismatches("portScatterFirstF32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3A32_0E16_21E5_CC06)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3A32_0E16_21E5_CC06)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x3A32_0F16_21E5_CDB9,
             inContract: true
         )
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, indices, count) in mixedTriples(
             aInputs,
             indicesInputs,
@@ -1953,15 +1777,15 @@ extension SIMDFloatCodegenTests {
 
     @Test func scatterFirstBeforeGuardPage() {
         let mismatches = Mismatches("portScatterFirstF32 before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6A45_5C86_4F80_63F7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6A45_5C86_4F80_63F7)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x6A45_5B86_4F80_6244,
             inContract: true
         )
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, indices, count) in mixedTriples(
             aInputs,
             indicesInputs,
@@ -1987,13 +1811,13 @@ extension SIMDFloatCodegenTests {
     @Test func scatterFirstConstantA() {
         let mismatches = Mismatches("portScatterFirstF32ConstantA")
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x9C27_AC20_BABF_DF74,
             inContract: true
         )
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (indices, count) in everyPair(indicesInputs, countInputs) {
             let indices = poisoned(indices, firstLanes: count, with: H.laneCount)
             var portLanes = sentinel
@@ -2024,13 +1848,13 @@ extension SIMDFloatCodegenTests {
     @Test func scatterFirstConstantABeforeGuardPage() {
         let mismatches = Mismatches("portScatterFirstF32ConstantA before a guard page")
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xD113_C2D4_AEA5_57DF,
             inContract: true
         )
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (indices, count) in everyPair(indicesInputs, countInputs) {
             let indices = poisoned(indices, firstLanes: count, with: H.laneCount)
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
@@ -2054,9 +1878,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func scatterFirstConstantIndices() {
         let mismatches = Mismatches("portScatterFirstF32ConstantIndices")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB348_8B22_A94F_D0D9)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB348_8B22_A94F_D0D9)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, count) in everyPair(aInputs, countInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -2081,9 +1905,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func scatterFirstConstantIndicesBeforeGuardPage() {
         let mismatches = Mismatches("portScatterFirstF32ConstantIndices before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF733_0F71_EB85_97D6)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF733_0F71_EB85_97D6)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, count) in everyPair(aInputs, countInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portScatterFirstF32ConstantIndices(a, to: destination, count: count)
@@ -2098,14 +1922,14 @@ extension SIMDFloatCodegenTests {
 
     @Test func scatterFirstConstantCount() {
         let mismatches = Mismatches("portScatterFirstF32ConstantCount")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x25F5_7433_1D14_C64F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x25F5_7433_1D14_C64F)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x25F5_7333_1D14_C49C,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -2134,14 +1958,14 @@ extension SIMDFloatCodegenTests {
 
     @Test func scatterFirstConstantCountBeforeGuardPage() {
         let mismatches = Mismatches("portScatterFirstF32ConstantCount before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1C6F_9FD9_3CBF_1674)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1C6F_9FD9_3CBF_1674)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x1C6F_A0D9_3CBF_1827,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portScatterFirstF32ConstantCount(a, to: destination, indices: indices)
@@ -2160,14 +1984,14 @@ extension SIMDFloatCodegenTests {
 
     @Test func scatterFirstConstantCountTwo() {
         let mismatches = Mismatches("portScatterFirstF32ConstantCountTwo")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x90A9_D478_980C_6905)
+        let aInputs = Inputs.vectors(H.self, seed: 0x90A9_D478_980C_6905)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x90A9_D378_980C_6752,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -2196,14 +2020,14 @@ extension SIMDFloatCodegenTests {
 
     @Test func scatterFirstConstantCountTwoBeforeGuardPage() {
         let mismatches = Mismatches("portScatterFirstF32ConstantCountTwo before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEE85_F06D_7C7E_BD92)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEE85_F06D_7C7E_BD92)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xEE85_F16D_7C7E_BF45,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portScatterFirstF32ConstantCountTwo(a, to: destination, indices: indices)
@@ -2222,14 +2046,14 @@ extension SIMDFloatCodegenTests {
 
     @Test func scatterFirstConstantCountLaneCount() {
         let mismatches = Mismatches("portScatterFirstF32ConstantCountLaneCount")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x84D1_0339_305E_96BE)
+        let aInputs = Inputs.vectors(H.self, seed: 0x84D1_0339_305E_96BE)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x84D1_0439_305E_9871,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -2258,14 +2082,14 @@ extension SIMDFloatCodegenTests {
 
     @Test func scatterFirstConstantCountLaneCountBeforeGuardPage() {
         let mismatches = Mismatches("portScatterFirstF32ConstantCountLaneCount before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x094F_C116_7CBC_F70F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x094F_C116_7CBC_F70F)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x094F_C016_7CBC_F55C,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portScatterFirstF32ConstantCountLaneCount(
@@ -2292,14 +2116,14 @@ extension SIMDFloatCodegenTests {
 
     @Test func scatterFirstConstantCountTwiceLaneCount() {
         let mismatches = Mismatches("portScatterFirstF32ConstantCountTwiceLaneCount")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3DEB_D552_0D5D_F032)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3DEB_D552_0D5D_F032)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x3DEB_D652_0D5D_F1E5,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -2330,14 +2154,14 @@ extension SIMDFloatCodegenTests {
         let mismatches = Mismatches(
             "portScatterFirstF32ConstantCountTwiceLaneCount before a guard page"
         )
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC6F1_4443_6914_BA93)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC6F1_4443_6914_BA93)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xC6F1_4343_6914_B8E0,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portScatterFirstF32ConstantCountTwiceLaneCount(
@@ -2364,15 +2188,15 @@ extension SIMDFloatCodegenTests {
 
     @Test func scatterWhere() {
         let mismatches = Mismatches("portScatterWhereF32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDDD4_2D8F_FA14_9997)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDDD4_2D8F_FA14_9997)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xDDD4_2C8F_FA14_97E4)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xDDD4_2F8F_FA14_9CFD,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, mask, indices) in mixedTriples(
             aInputs,
             maskInputs,
@@ -2409,15 +2233,15 @@ extension SIMDFloatCodegenTests {
 
     @Test func scatterWhereBeforeGuardPage() {
         let mismatches = Mismatches("portScatterWhereF32 before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6FB5_B554_A2A0_B87C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6FB5_B554_A2A0_B87C)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6FB5_B654_A2A0_BA2F)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x6FB5_B754_A2A0_BBE2,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, mask, indices) in mixedTriples(
             aInputs,
             maskInputs,
@@ -2444,12 +2268,12 @@ extension SIMDFloatCodegenTests {
         let mismatches = Mismatches("portScatterWhereF32ConstantA")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB976_C909_55D5_D023)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xB976_CA09_55D5_D1D6,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (mask, indices) in everyPair(maskInputs, indicesInputs) {
             let indices = poisoned(indices, where: mask, with: H.laneCount)
             var portLanes = sentinel
@@ -2481,12 +2305,12 @@ extension SIMDFloatCodegenTests {
         let mismatches = Mismatches("portScatterWhereF32ConstantA before a guard page")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE09C_AB86_1988_1516)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xE09C_AA86_1988_1363,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (mask, indices) in everyPair(maskInputs, indicesInputs) {
             let indices = poisoned(indices, where: mask, with: H.laneCount)
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
@@ -2510,9 +2334,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func scatterWhereConstantIndices() {
         let mismatches = Mismatches("portScatterWhereF32ConstantIndices")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBFE3_5876_BA8A_633E)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBFE3_5876_BA8A_633E)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xBFE3_5976_BA8A_64F1)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -2541,9 +2365,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func scatterWhereConstantIndicesBeforeGuardPage() {
         let mismatches = Mismatches("portScatterWhereF32ConstantIndices before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1279_6D61_6EE3_188F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1279_6D61_6EE3_188F)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1279_6C61_6EE3_16DC)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portScatterWhereF32ConstantIndices(a, to: destination, where: mask)

@@ -5,22 +5,22 @@ public import Vectorization
 
 @inline(never)
 public func portLowerHalfOfMaskI8(_ mask: SIMD<Int8>.Mask) -> SIMD<Int8>.HalfMask {
-    SIMDInt8.lowerHalf(mask)
+    SIMD<Int8>.lowerHalf(mask)
 }
 
 @inline(never)
 public func highwayLowerHalfOfMaskI8(_ mask: SIMD<Int8>.Mask) -> SIMD<Int8>.HalfMask {
-    SIMDInt8.HalfMask(raw: HighwayReference.Nothrow.lowerHalfOfMaskI8(mask.raw))
+    SIMD<Int8>.HalfMask(raw: HighwayReference.Nothrow.lowerHalfOfMaskI8(mask.raw))
 }
 
 @inline(never)
 public func portUpperHalfOfMaskI8(_ mask: SIMD<Int8>.Mask) -> SIMD<Int8>.HalfMask {
-    SIMDInt8.upperHalf(mask)
+    SIMD<Int8>.upperHalf(mask)
 }
 
 @inline(never)
 public func highwayUpperHalfOfMaskI8(_ mask: SIMD<Int8>.Mask) -> SIMD<Int8>.HalfMask {
-    SIMDInt8.HalfMask(raw: HighwayReference.Nothrow.upperHalfOfMaskI8(mask.raw))
+    SIMD<Int8>.HalfMask(raw: HighwayReference.Nothrow.upperHalfOfMaskI8(mask.raw))
 }
 
 @inline(never)
@@ -28,7 +28,7 @@ public func portCombiningMasksI8(
     _ a: SIMD<Int8>.HalfMask,
     _ b: SIMD<Int8>.HalfMask
 ) -> SIMD<Int8>.Mask {
-    SIMDInt8.combining(a, b)
+    SIMD<Int8>.combining(a, b)
 }
 
 @inline(never)
@@ -36,5 +36,5 @@ public func highwayCombiningMasksI8(
     _ a: SIMD<Int8>.HalfMask,
     _ b: SIMD<Int8>.HalfMask
 ) -> SIMD<Int8>.Mask {
-    SIMDInt8.Mask(raw: HighwayReference.Nothrow.combiningMasksI8(a.raw, b.raw))
+    SIMD<Int8>.Mask(raw: HighwayReference.Nothrow.combiningMasksI8(a.raw, b.raw))
 }

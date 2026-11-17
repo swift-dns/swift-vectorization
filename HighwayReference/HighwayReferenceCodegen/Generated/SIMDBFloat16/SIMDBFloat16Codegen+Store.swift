@@ -213,7 +213,7 @@ extension HighwayReferenceBFloat16 {
 
 @inline(never)
 public func portStoreBF16(_ a: SIMD<BFloat16>, to: UnsafeMutablePointer<BFloat16>) {
-    unsafe SIMDBFloat16.store(a, to: to)
+    unsafe SIMD<BFloat16>.store(a, to: to)
 }
 
 @inline(never)
@@ -223,13 +223,13 @@ public func highwayStoreBF16(_ a: SIMD<BFloat16>, to: UnsafeMutablePointer<BFloa
 
 @inline(never)
 public func portStoreBF16ConstantA(to: UnsafeMutablePointer<BFloat16>) {
-    unsafe SIMDBFloat16.store(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), to: to)
+    unsafe SIMD<BFloat16>.store(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)), to: to)
 }
 
 @inline(never)
 public func highwayStoreBF16ConstantA(to: UnsafeMutablePointer<BFloat16>) {
     unsafe HighwayReference.Nothrow.storeBF16(
-        SIMDBFloat16.Vector(
+        SIMD<BFloat16>(
             raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
         ).raw,
         to
@@ -238,7 +238,7 @@ public func highwayStoreBF16ConstantA(to: UnsafeMutablePointer<BFloat16>) {
 
 @inline(never)
 public func portStoreAlignedBF16(_ a: SIMD<BFloat16>, to: UnsafeMutablePointer<BFloat16>) {
-    unsafe SIMDBFloat16.storeAligned(a, to: to)
+    unsafe SIMD<BFloat16>.storeAligned(a, to: to)
 }
 
 @inline(never)
@@ -248,13 +248,13 @@ public func highwayStoreAlignedBF16(_ a: SIMD<BFloat16>, to: UnsafeMutablePointe
 
 @inline(never)
 public func portStoreAlignedBF16ConstantA(to: UnsafeMutablePointer<BFloat16>) {
-    unsafe SIMDBFloat16.storeAligned(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), to: to)
+    unsafe SIMD<BFloat16>.storeAligned(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)), to: to)
 }
 
 @inline(never)
 public func highwayStoreAlignedBF16ConstantA(to: UnsafeMutablePointer<BFloat16>) {
     unsafe HighwayReference.Nothrow.storeAlignedBF16(
-        SIMDBFloat16.Vector(
+        SIMD<BFloat16>(
             raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
         ).raw,
         to
@@ -264,7 +264,7 @@ public func highwayStoreAlignedBF16ConstantA(to: UnsafeMutablePointer<BFloat16>)
 @inline(never)
 public func portStoreFirstBF16(_ a: SIMD<BFloat16>, to: UnsafeMutablePointer<BFloat16>, count: Int)
 {
-    unsafe SIMDBFloat16.storeFirst(a, to: to, count: count)
+    unsafe SIMD<BFloat16>.storeFirst(a, to: to, count: count)
 }
 
 @inline(never)
@@ -278,8 +278,8 @@ public func highwayStoreFirstBF16(
 
 @inline(never)
 public func portStoreFirstBF16ConstantA(to: UnsafeMutablePointer<BFloat16>, count: Int) {
-    unsafe SIMDBFloat16.storeFirst(
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+    unsafe SIMD<BFloat16>.storeFirst(
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         to: to,
         count: count
     )
@@ -288,7 +288,7 @@ public func portStoreFirstBF16ConstantA(to: UnsafeMutablePointer<BFloat16>, coun
 @inline(never)
 public func highwayStoreFirstBF16ConstantA(to: UnsafeMutablePointer<BFloat16>, count: Int) {
     unsafe HighwayReference.Nothrow.storeFirstBF16(
-        SIMDBFloat16.Vector(
+        SIMD<BFloat16>(
             raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
         ).raw,
         to,
@@ -299,7 +299,7 @@ public func highwayStoreFirstBF16ConstantA(to: UnsafeMutablePointer<BFloat16>, c
 @inline(never)
 public func portStoreFirstBF16ConstantCount(_ a: SIMD<BFloat16>, to: UnsafeMutablePointer<BFloat16>)
 {
-    unsafe SIMDBFloat16.storeFirst(a, to: to, count: 1)
+    unsafe SIMD<BFloat16>.storeFirst(a, to: to, count: 1)
 }
 
 @inline(never)
@@ -315,7 +315,7 @@ public func portStoreFirstBF16ConstantCountTwo(
     _ a: SIMD<BFloat16>,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.storeFirst(a, to: to, count: 2)
+    unsafe SIMD<BFloat16>.storeFirst(a, to: to, count: 2)
 }
 
 @inline(never)
@@ -331,7 +331,7 @@ public func portStoreFirstBF16ConstantCountLaneCount(
     _ a: SIMD<BFloat16>,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.storeFirst(a, to: to, count: SIMDBFloat16.laneCount)
+    unsafe SIMD<BFloat16>.storeFirst(a, to: to, count: SIMD<BFloat16>.laneCount)
 }
 
 @inline(never)
@@ -351,7 +351,7 @@ public func portStoreFirstBF16ConstantCountTwiceLaneCount(
     _ a: SIMD<BFloat16>,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.storeFirst(a, to: to, count: 2 * SIMDBFloat16.laneCount)
+    unsafe SIMD<BFloat16>.storeFirst(a, to: to, count: 2 * SIMD<BFloat16>.laneCount)
 }
 
 @inline(never)
@@ -372,7 +372,7 @@ public func portStoreWhereBF16(
     to: UnsafeMutablePointer<BFloat16>,
     where mask: SIMD<BFloat16>.Mask
 ) {
-    unsafe SIMDBFloat16.store(a, to: to, where: mask)
+    unsafe SIMD<BFloat16>.store(a, to: to, where: mask)
 }
 
 @inline(never)
@@ -389,7 +389,11 @@ public func portStoreWhereBF16ConstantA(
     to: UnsafeMutablePointer<BFloat16>,
     where mask: SIMD<BFloat16>.Mask
 ) {
-    unsafe SIMDBFloat16.store(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), to: to, where: mask)
+    unsafe SIMD<BFloat16>.store(
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
+        to: to,
+        where: mask
+    )
 }
 
 @inline(never)
@@ -398,7 +402,7 @@ public func highwayStoreWhereBF16ConstantA(
     where mask: SIMD<BFloat16>.Mask
 ) {
     unsafe HighwayReference.Nothrow.storeWhereBF16(
-        SIMDBFloat16.Vector(
+        SIMD<BFloat16>(
             raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
         ).raw,
         mask.raw,
@@ -412,7 +416,7 @@ public func portStoreRepeatingBF16(
     count: Int,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.storeRepeating(value, count: count, to: to)
+    unsafe SIMD<BFloat16>.storeRepeating(value, count: count, to: to)
 }
 
 @inline(never)
@@ -426,7 +430,7 @@ public func highwayStoreRepeatingBF16(
 
 @inline(never)
 public func portStoreRepeatingBF16ConstantValue(count: Int, to: UnsafeMutablePointer<BFloat16>) {
-    unsafe SIMDBFloat16.storeRepeating(BFloat16(bitPattern: 26), count: count, to: to)
+    unsafe SIMD<BFloat16>.storeRepeating(BFloat16(bitPattern: 26), count: count, to: to)
 }
 
 @inline(never)
@@ -443,7 +447,7 @@ public func portStoreRepeatingBF16ConstantCount(
     _ value: BFloat16,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.storeRepeating(value, count: 1, to: to)
+    unsafe SIMD<BFloat16>.storeRepeating(value, count: 1, to: to)
 }
 
 @inline(never)
@@ -459,7 +463,7 @@ public func portStoreRepeatingBF16ConstantCountTwo(
     _ value: BFloat16,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.storeRepeating(value, count: 2, to: to)
+    unsafe SIMD<BFloat16>.storeRepeating(value, count: 2, to: to)
 }
 
 @inline(never)
@@ -475,7 +479,7 @@ public func portStoreRepeatingBF16ConstantCountLaneCount(
     _ value: BFloat16,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.storeRepeating(value, count: SIMDBFloat16.laneCount, to: to)
+    unsafe SIMD<BFloat16>.storeRepeating(value, count: SIMD<BFloat16>.laneCount, to: to)
 }
 
 @inline(never)
@@ -495,7 +499,7 @@ public func portStoreRepeatingBF16ConstantCountTwiceLaneCount(
     _ value: BFloat16,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.storeRepeating(value, count: 2 * SIMDBFloat16.laneCount, to: to)
+    unsafe SIMD<BFloat16>.storeRepeating(value, count: 2 * SIMD<BFloat16>.laneCount, to: to)
 }
 
 @inline(never)
@@ -516,7 +520,7 @@ public func portCopyBF16(
     from: UnsafePointer<BFloat16>,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.copy(count: count, from: from, to: to)
+    unsafe SIMD<BFloat16>.copy(count: count, from: from, to: to)
 }
 
 @inline(never)
@@ -533,7 +537,7 @@ public func portCopyBF16ConstantCount(
     from: UnsafePointer<BFloat16>,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.copy(count: 1, from: from, to: to)
+    unsafe SIMD<BFloat16>.copy(count: 1, from: from, to: to)
 }
 
 @inline(never)
@@ -549,7 +553,7 @@ public func portCopyBF16ConstantCountTwo(
     from: UnsafePointer<BFloat16>,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.copy(count: 2, from: from, to: to)
+    unsafe SIMD<BFloat16>.copy(count: 2, from: from, to: to)
 }
 
 @inline(never)
@@ -565,7 +569,7 @@ public func portCopyBF16ConstantCountLaneCount(
     from: UnsafePointer<BFloat16>,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.copy(count: SIMDBFloat16.laneCount, from: from, to: to)
+    unsafe SIMD<BFloat16>.copy(count: SIMD<BFloat16>.laneCount, from: from, to: to)
 }
 
 @inline(never)
@@ -581,7 +585,7 @@ public func portCopyBF16ConstantCountTwiceLaneCount(
     from: UnsafePointer<BFloat16>,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.copy(count: 2 * SIMDBFloat16.laneCount, from: from, to: to)
+    unsafe SIMD<BFloat16>.copy(count: 2 * SIMD<BFloat16>.laneCount, from: from, to: to)
 }
 
 @inline(never)
@@ -594,7 +598,7 @@ public func highwayCopyBF16ConstantCountTwiceLaneCount(
 
 @inline(never)
 public func portStoreHalfBF16(_ a: SIMD<BFloat16>.HalfVector, to: UnsafeMutablePointer<BFloat16>) {
-    unsafe SIMDBFloat16.store(a, to: to)
+    unsafe SIMD<BFloat16>.store(a, to: to)
 }
 
 @inline(never)
@@ -608,7 +612,7 @@ public func portStoreQuarterBF16(
     _ a: SIMD<BFloat16>.QuarterVector,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe SIMDBFloat16.store(a, to: to)
+    unsafe SIMD<BFloat16>.store(a, to: to)
 }
 
 @inline(never)
@@ -622,7 +626,7 @@ public func highwayStoreQuarterBF16(
 @inline(never)
 public func portStoreBlockBF16(_ a: SIMD<BFloat16>.BlockVector, to: UnsafeMutablePointer<BFloat16>)
 {
-    unsafe SIMDBFloat16.store(a, to: to)
+    unsafe SIMD<BFloat16>.store(a, to: to)
 }
 
 @inline(never)

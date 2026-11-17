@@ -8,9 +8,9 @@ import Vectorization
 extension SIMDInt8ReferenceTests {
     @Test func tableLookupBytes() {
         let mismatches = Mismatches("tableLookupBytes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF665_66C2_DA74_45A3)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF665_66C2_DA74_45A3)
         let indicesInputs = Inputs.tableIndices(
-            H.Vector.self,
+            H.self,
             perByte: true,
             count: 16,
             seed: 0xF665_65C2_DA74_43F0,
@@ -19,7 +19,7 @@ extension SIMDInt8ReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 H.tableLookupBytes(a, at: indices),
-                H.Vector(raw: HighwayReference.tableLookupBytesI8(a.raw, indices.raw)),
+                H(raw: HighwayReference.tableLookupBytesI8(a.raw, indices.raw)),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -28,9 +28,9 @@ extension SIMDInt8ReferenceTests {
 
     @Test func tableLookupBytesUnchecked() {
         let mismatches = Mismatches("tableLookupBytes unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDFCB_2E1C_94E1_3897)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDFCB_2E1C_94E1_3897)
         let indicesInputs = Inputs.tableIndices(
-            H.Vector.self,
+            H.self,
             perByte: true,
             count: 16,
             seed: 0xDFCB_2D1C_94E1_36E4,
@@ -39,7 +39,7 @@ extension SIMDInt8ReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 unsafe H.tableLookupBytes(a, atUnchecked: indices),
-                H.Vector(raw: HighwayReference.tableLookupBytesI8(a.raw, indices.raw)),
+                H(raw: HighwayReference.tableLookupBytesI8(a.raw, indices.raw)),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -49,9 +49,9 @@ extension SIMDInt8ReferenceTests {
     @Test(.disabled(if: assertionsAreEnabled, "Assertions abort the test run on these indices"))
     func tableLookupBytesOutOfContract() {
         let mismatches = Mismatches("tableLookupBytes out of contract")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9F36_5235_64B9_E578)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9F36_5235_64B9_E578)
         let indicesInputs = Inputs.tableIndices(
-            H.Vector.self,
+            H.self,
             perByte: true,
             count: 16,
             seed: 0x9F36_5335_64B9_E72B,
@@ -60,7 +60,7 @@ extension SIMDInt8ReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 unsafe H.tableLookupBytes(a, atUnchecked: indices),
-                H.Vector(raw: HighwayReference.tableLookupBytesI8(a.raw, indices.raw)),
+                H(raw: HighwayReference.tableLookupBytesI8(a.raw, indices.raw)),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -69,9 +69,9 @@ extension SIMDInt8ReferenceTests {
 
     @Test func tableLookupBytesOrZero() {
         let mismatches = Mismatches("tableLookupBytesOrZero")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1D21_CC70_4930_F688)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1D21_CC70_4930_F688)
         let indicesInputs = Inputs.tableIndices(
-            H.Vector.self,
+            H.self,
             offset: 128,
             perByte: true,
             count: 144,
@@ -81,7 +81,7 @@ extension SIMDInt8ReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 H.tableLookupBytesOrZero(a, at: indices),
-                H.Vector(raw: HighwayReference.tableLookupBytesOrZeroI8(a.raw, indices.raw)),
+                H(raw: HighwayReference.tableLookupBytesOrZeroI8(a.raw, indices.raw)),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -90,9 +90,9 @@ extension SIMDInt8ReferenceTests {
 
     @Test func tableLookupBytesOrZeroUnchecked() {
         let mismatches = Mismatches("tableLookupBytesOrZero unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0456_0B43_2034_126E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0456_0B43_2034_126E)
         let indicesInputs = Inputs.tableIndices(
-            H.Vector.self,
+            H.self,
             offset: 128,
             perByte: true,
             count: 144,
@@ -102,7 +102,7 @@ extension SIMDInt8ReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 unsafe H.tableLookupBytesOrZero(a, atUnchecked: indices),
-                H.Vector(raw: HighwayReference.tableLookupBytesOrZeroI8(a.raw, indices.raw)),
+                H(raw: HighwayReference.tableLookupBytesOrZeroI8(a.raw, indices.raw)),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -112,9 +112,9 @@ extension SIMDInt8ReferenceTests {
     @Test(.disabled(if: assertionsAreEnabled, "Assertions abort the test run on these indices"))
     func tableLookupBytesOrZeroOutOfContract() {
         let mismatches = Mismatches("tableLookupBytesOrZero out of contract")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5F8F_37FB_17EA_2E39)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5F8F_37FB_17EA_2E39)
         let indicesInputs = Inputs.tableIndices(
-            H.Vector.self,
+            H.self,
             offset: 128,
             perByte: true,
             count: 144,
@@ -124,7 +124,7 @@ extension SIMDInt8ReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 unsafe H.tableLookupBytesOrZero(a, atUnchecked: indices),
-                H.Vector(raw: HighwayReference.tableLookupBytesOrZeroI8(a.raw, indices.raw)),
+                H(raw: HighwayReference.tableLookupBytesOrZeroI8(a.raw, indices.raw)),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -133,12 +133,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func pairwiseAddingBlocks() {
         let mismatches = Mismatches("pairwiseAddingBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x865F_DCB4_3787_354D)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x865F_DBB4_3787_339A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x865F_DCB4_3787_354D)
+        let bInputs = Inputs.vectors(H.self, seed: 0x865F_DBB4_3787_339A)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.pairwiseAddingBlocks(a, b),
-                H.Vector(raw: HighwayReference.pairwiseAddingBlocksI8(a.raw, b.raw)),
+                H(raw: HighwayReference.pairwiseAddingBlocksI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -147,12 +147,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func pairwiseSubtractingBlocks() {
         let mismatches = Mismatches("pairwiseSubtractingBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD90D_2048_4E29_85E6)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD90D_2148_4E29_8799)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD90D_2048_4E29_85E6)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD90D_2148_4E29_8799)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.pairwiseSubtractingBlocks(a, b),
-                H.Vector(raw: HighwayReference.pairwiseSubtractingBlocksI8(a.raw, b.raw)),
+                H(raw: HighwayReference.pairwiseSubtractingBlocksI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -161,12 +161,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func broadcastingInBlocks() {
         let mismatches = Mismatches("broadcastingInBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB6F6_5436_4EA0_CCDE)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB6F6_5436_4EA0_CCDE)
         let laneInputs = Array(0...15)
         for (a, lane) in everyPair(aInputs, laneInputs) {
             mismatches.check(
                 H.broadcastingInBlocks(a, lane: lane),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingInBlocksI8(
                         a.raw,
                         Int32(truncatingIfNeeded: lane)
@@ -180,12 +180,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func broadcastingInBlocksUnchecked() {
         let mismatches = Mismatches("broadcastingInBlocks unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0232_4014_574C_2A58)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0232_4014_574C_2A58)
         let laneInputs = Array(0...15)
         for (a, lane) in everyPair(aInputs, laneInputs) {
             mismatches.check(
                 unsafe H.broadcastingInBlocks(a, laneUnchecked: lane),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingInBlocksI8(
                         a.raw,
                         Int32(truncatingIfNeeded: lane)

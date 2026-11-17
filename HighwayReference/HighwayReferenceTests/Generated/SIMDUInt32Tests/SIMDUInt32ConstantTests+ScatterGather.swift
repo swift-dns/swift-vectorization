@@ -9,24 +9,20 @@ extension SIMDUInt32ConstantTests {
     @inline(__always)
     private func checkGatherFirstConstantIndices(_ value: Int32) {
         let mismatches = Mismatches("gatherFirst with indices repeating \(hex(value))")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x3C43_2033_DD8B_770D
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x3C43_2033_DD8B_770D)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
         for (from, count) in everyPair(fromInputs, countInputs) {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.gather(
                         from: source.baseAddress!,
-                        indices: SIMDInt32.repeating(value),
+                        indices: SIMD<Int32>.repeating(value),
                         count: count
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.gatherFirstU32(
                             source.baseAddress!,
-                            SIMDInt32.repeating(value).raw,
+                            SIMD<Int32>.repeating(value).raw,
                             count
                         )
                     )
@@ -52,14 +48,10 @@ extension SIMDUInt32ConstantTests {
     @inline(__always)
     private func checkGatherFirstOtherwiseConstantCount(_ count: Int) {
         let mismatches = Mismatches("gatherFirstOtherwise with count \(count)")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x7F96_3793_D405_8B93)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x7F96_3693_D405_89E0
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x7F96_3793_D405_8B93)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x7F96_3693_D405_89E0)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x7F96_3993_D405_8EF9,
             inContract: true
@@ -78,7 +70,7 @@ extension SIMDUInt32ConstantTests {
                         count: count,
                         otherwise: otherwise
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.gatherFirstOtherwiseU32(
                             otherwise.raw,
                             source.baseAddress!,
@@ -200,14 +192,10 @@ extension SIMDUInt32ConstantTests {
     @inline(__always)
     private func checkGatherFirstOtherwiseConstantCountBeforeGuardPage(_ count: Int) {
         let mismatches = Mismatches("gatherFirstOtherwise with count \(count) before a guard page")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x8A85_819A_A190_46F8)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x8A85_829A_A190_48AB
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x8A85_819A_A190_46F8)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x8A85_829A_A190_48AB)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x8A85_839A_A190_4A5E,
             inContract: true
@@ -226,7 +214,7 @@ extension SIMDUInt32ConstantTests {
                         count: count,
                         otherwise: otherwise
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.gatherFirstOtherwiseU32(
                             otherwise.raw,
                             source,
@@ -348,12 +336,8 @@ extension SIMDUInt32ConstantTests {
     @inline(__always)
     private func checkGatherFirstOtherwiseConstantIndices(_ value: Int32) {
         let mismatches = Mismatches("gatherFirstOtherwise with indices repeating \(hex(value))")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x5536_C442_5829_A765)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x5536_C342_5829_A5B2
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x5536_C442_5829_A765)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x5536_C342_5829_A5B2)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
         for (otherwise, from, count) in mixedTriples(
             otherwiseInputs,
@@ -365,15 +349,15 @@ extension SIMDUInt32ConstantTests {
                 (
                     unsafe H.gather(
                         from: source.baseAddress!,
-                        indices: SIMDInt32.repeating(value),
+                        indices: SIMD<Int32>.repeating(value),
                         count: count,
                         otherwise: otherwise
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.gatherFirstOtherwiseU32(
                             otherwise.raw,
                             source.baseAddress!,
-                            SIMDInt32.repeating(value).raw,
+                            SIMD<Int32>.repeating(value).raw,
                             count
                         )
                     )

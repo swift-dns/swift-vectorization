@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDDoubleCodegenTests {
     @Test func vectorWideningLowerFromUInt32() {
         let mismatches = Mismatches("portVectorWideningLowerU32ToF64")
-        let aInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0x885C_6FCF_AFA6_2359)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0x885C_6FCF_AFA6_2359)
         for a in aInputs {
             mismatches.check(
                 portVectorWideningLowerU32ToF64(wideningLower: a),
@@ -32,7 +32,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func vectorWideningLowerFromInt32() {
         let mismatches = Mismatches("portVectorWideningLowerI32ToF64")
-        let aInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0x6E83_F4F9_C1F1_29D2)
+        let aInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0x6E83_F4F9_C1F1_29D2)
         for a in aInputs {
             mismatches.check(
                 portVectorWideningLowerI32ToF64(wideningLower: a),
@@ -55,7 +55,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func vectorWideningLowerFromFloat() {
         let mismatches = Mismatches("portVectorWideningLowerF32ToF64")
-        let aInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0x50A1_AF3C_6A02_63E8)
+        let aInputs = Inputs.conversions(SIMD<Float>.self, seed: 0x50A1_AF3C_6A02_63E8)
         for a in aInputs {
             mismatches.check(
                 portVectorWideningLowerF32ToF64(wideningLower: a),
@@ -78,7 +78,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func vectorWideningUpperFromUInt32() {
         let mismatches = Mismatches("portVectorWideningUpperU32ToF64")
-        let aInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0x14D1_04E3_3321_DBB8)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0x14D1_04E3_3321_DBB8)
         for a in aInputs {
             mismatches.check(
                 portVectorWideningUpperU32ToF64(wideningUpper: a),
@@ -101,7 +101,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func vectorWideningUpperFromInt32() {
         let mismatches = Mismatches("portVectorWideningUpperI32ToF64")
-        let aInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xE545_F062_B3B2_3381)
+        let aInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xE545_F062_B3B2_3381)
         for a in aInputs {
             mismatches.check(
                 portVectorWideningUpperI32ToF64(wideningUpper: a),
@@ -124,7 +124,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func vectorWideningUpperFromFloat() {
         let mismatches = Mismatches("portVectorWideningUpperF32ToF64")
-        let aInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0x1F71_D353_6965_2B0F)
+        let aInputs = Inputs.conversions(SIMD<Float>.self, seed: 0x1F71_D353_6965_2B0F)
         for a in aInputs {
             mismatches.check(
                 portVectorWideningUpperF32ToF64(wideningUpper: a),
@@ -147,7 +147,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func vectorWideningEvenFromUInt32() {
         let mismatches = Mismatches("portVectorWideningEvenU32ToF64")
-        let aInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0x9CBC_AC25_3EBD_2568)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0x9CBC_AC25_3EBD_2568)
         for a in aInputs {
             mismatches.check(
                 portVectorWideningEvenU32ToF64(wideningEven: a),
@@ -170,7 +170,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func vectorWideningEvenFromInt32() {
         let mismatches = Mismatches("portVectorWideningEvenI32ToF64")
-        let aInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xB5D8_7160_1D04_8871)
+        let aInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xB5D8_7160_1D04_8871)
         for a in aInputs {
             mismatches.check(
                 portVectorWideningEvenI32ToF64(wideningEven: a),
@@ -193,7 +193,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func vectorWideningEvenFromFloat() {
         let mismatches = Mismatches("portVectorWideningEvenF32ToF64")
-        let aInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0x731C_63AD_A000_417F)
+        let aInputs = Inputs.conversions(SIMD<Float>.self, seed: 0x731C_63AD_A000_417F)
         for a in aInputs {
             mismatches.check(
                 portVectorWideningEvenF32ToF64(wideningEven: a),
@@ -216,7 +216,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func vectorWideningOddFromUInt32() {
         let mismatches = Mismatches("portVectorWideningOddU32ToF64")
-        let aInputs = Inputs.conversions(SIMDUInt32.Vector.self, seed: 0xA7D4_1B98_3CF8_3151)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0xA7D4_1B98_3CF8_3151)
         for a in aInputs {
             mismatches.check(
                 portVectorWideningOddU32ToF64(wideningOdd: a),
@@ -239,7 +239,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func vectorWideningOddFromInt32() {
         let mismatches = Mismatches("portVectorWideningOddI32ToF64")
-        let aInputs = Inputs.conversions(SIMDInt32.Vector.self, seed: 0xAAA6_32FE_DF5B_B91A)
+        let aInputs = Inputs.conversions(SIMD<Int32>.self, seed: 0xAAA6_32FE_DF5B_B91A)
         for a in aInputs {
             mismatches.check(
                 portVectorWideningOddI32ToF64(wideningOdd: a),
@@ -262,7 +262,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func vectorWideningOddFromFloat() {
         let mismatches = Mismatches("portVectorWideningOddF32ToF64")
-        let aInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0x079F_D8A2_0CAC_49D0)
+        let aInputs = Inputs.conversions(SIMD<Float>.self, seed: 0x079F_D8A2_0CAC_49D0)
         for a in aInputs {
             mismatches.check(
                 portVectorWideningOddF32ToF64(wideningOdd: a),
@@ -285,7 +285,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func vectorWideningFromHalfUInt32() {
         let mismatches = Mismatches("portVectorWideningHalfU32ToF64")
-        let aInputs = Inputs.conversions(SIMDUInt32.HalfVector.self, seed: 0x3A67_E95F_7D06_4489)
+        let aInputs = Inputs.conversions(SIMD<UInt32>.HalfVector.self, seed: 0x3A67_E95F_7D06_4489)
             .map(poisoningUpperBytes)
         for a in aInputs {
             mismatches.check(
@@ -299,7 +299,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func vectorWideningFromHalfInt32() {
         let mismatches = Mismatches("portVectorWideningHalfI32ToF64")
-        let aInputs = Inputs.conversions(SIMDInt32.HalfVector.self, seed: 0x74B6_95DC_BC14_AFC2)
+        let aInputs = Inputs.conversions(SIMD<Int32>.HalfVector.self, seed: 0x74B6_95DC_BC14_AFC2)
             .map(poisoningUpperBytes)
         for a in aInputs {
             mismatches.check(
@@ -313,7 +313,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func vectorWideningFromHalfFloat() {
         let mismatches = Mismatches("portVectorWideningHalfF32ToF64")
-        let aInputs = Inputs.conversions(SIMDFloat.HalfVector.self, seed: 0x1BC7_943F_CEEB_3F58)
+        let aInputs = Inputs.conversions(SIMD<Float>.HalfVector.self, seed: 0x1BC7_943F_CEEB_3F58)
             .map(poisoningUpperBytes)
         for a in aInputs {
             mismatches.check(
@@ -329,7 +329,7 @@ extension SIMDDoubleCodegenTests {
     @Test func vectorWideningFromQuarterFloat16() {
         let mismatches = Mismatches("portVectorWideningQuarterF16ToF64")
         let aInputs = Inputs.conversions(
-            SIMDFloat16.QuarterVector.self,
+            SIMD<Float16>.QuarterVector.self,
             seed: 0xC1AE_5C39_2D15_EB9C
         ).map(poisoningUpperBytes)
         for a in aInputs {
@@ -346,7 +346,7 @@ extension SIMDDoubleCodegenTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func vectorWideningLowerFromHalfFloat16() {
         let mismatches = Mismatches("portVectorWideningLowerHalfF16ToF64")
-        let aInputs = Inputs.conversions(SIMDFloat16.HalfVector.self, seed: 0xB409_89A5_F802_4A7C)
+        let aInputs = Inputs.conversions(SIMD<Float16>.HalfVector.self, seed: 0xB409_89A5_F802_4A7C)
             .map(poisoningUpperBytes)
         for a in aInputs {
             mismatches.check(

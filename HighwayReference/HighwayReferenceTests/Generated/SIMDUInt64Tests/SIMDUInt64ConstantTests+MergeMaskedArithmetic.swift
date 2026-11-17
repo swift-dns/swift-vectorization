@@ -7,21 +7,21 @@ import Vectorization
 
 extension SIMDUInt64ConstantTests {
     @inline(__always)
-    private func checkMinimumWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkMinimumWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches("minimumWhereOtherwise with otherwise repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x5CAD_5DCE_0237_62EE)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5CAD_5CCE_0237_613B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5CAD_5BCE_0237_5F88)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5CAD_5CCE_0237_613B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5CAD_5BCE_0237_5F88)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xBECA_8A6E_A7C3_571B)
         {
             mismatches.check(
                 H.minimum(a, b, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.minimumWhereOtherwiseU64(
                         H.repeating(value).raw,
                         mask.raw,
@@ -84,25 +84,25 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func minimumWhereOtherwiseConstantSplatMax() {
-        checkMinimumWhereOtherwiseConstantOtherwise(H.Lane.max)
+        checkMinimumWhereOtherwiseConstantOtherwise(Lane.max)
     }
 
     @inline(__always)
-    private func checkMaximumWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkMaximumWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches("maximumWhereOtherwise with otherwise repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE442_9441_064A_C824)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE442_9741_064A_CD3D)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE442_9641_064A_CB8A)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE442_9741_064A_CD3D)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE442_9641_064A_CB8A)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x7B8F_487A_B6F1_AB51)
         {
             mismatches.check(
                 H.maximum(a, b, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.maximumWhereOtherwiseU64(
                         H.repeating(value).raw,
                         mask.raw,
@@ -165,33 +165,30 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func maximumWhereOtherwiseConstantSplatMax() {
-        checkMaximumWhereOtherwiseConstantOtherwise(H.Lane.max)
+        checkMaximumWhereOtherwiseConstantOtherwise(Lane.max)
     }
 
     @inline(__always)
-    private func checkDividingWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkDividingWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches("dividingWhereOtherwise with otherwise repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x5F01_EB72_5B98_005A)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5F01_EA72_5B97_FEA7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5F01_EA72_5B97_FEA7)
         let bInputs =
-            Inputs.vectors(H.Vector.self, seed: 0x5F01_E972_5B97_FCF4)
-            + Inputs.vectors(H.Vector.self, seed: 0x9C50_E4D2_ABFD_5BB3).enumerated().map {
+            Inputs.vectors(H.self, seed: 0x5F01_E972_5B97_FCF4)
+            + Inputs.vectors(H.self, seed: 0x9C50_E4D2_ABFD_5BB3).enumerated().map {
                 index,
-                vector in
-                H.Vector(
-                    vector.simd &>> H.Vector.Simd(repeating: H.Lane(truncatingIfNeeded: index))
-                )
+                vector in H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))
             }
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x941E_DE93_1A8D_C15F)
         {
             mismatches.check(
                 H.dividing(a, b, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.dividingWhereOtherwiseU64(
                         H.repeating(value).raw,
                         mask.raw,
@@ -254,35 +251,32 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func dividingWhereOtherwiseConstantSplatMax() {
-        checkDividingWhereOtherwiseConstantOtherwise(H.Lane.max)
+        checkDividingWhereOtherwiseConstantOtherwise(Lane.max)
     }
 
     @inline(__always)
-    private func checkRemainderWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkRemainderWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "remainderWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x61E1_DA16_0D9C_404F)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x61E1_DB16_0D9C_4202)
+        let aInputs = Inputs.vectors(H.self, seed: 0x61E1_DB16_0D9C_4202)
         let bInputs =
-            Inputs.vectors(H.Vector.self, seed: 0x61E1_DC16_0D9C_43B5)
-            + Inputs.vectors(H.Vector.self, seed: 0x6AA8_59C5_8313_501E).enumerated().map {
+            Inputs.vectors(H.self, seed: 0x61E1_DC16_0D9C_43B5)
+            + Inputs.vectors(H.self, seed: 0x6AA8_59C5_8313_501E).enumerated().map {
                 index,
-                vector in
-                H.Vector(
-                    vector.simd &>> H.Vector.Simd(repeating: H.Lane(truncatingIfNeeded: index))
-                )
+                vector in H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))
             }
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x6EF3_7614_8138_4770)
         {
             mismatches.check(
                 H.remainder(a, b, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.remainderWhereOtherwiseU64(
                         H.repeating(value).raw,
                         mask.raw,
@@ -345,21 +339,21 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func remainderWhereOtherwiseConstantSplatMax() {
-        checkRemainderWhereOtherwiseConstantOtherwise(H.Lane.max)
+        checkRemainderWhereOtherwiseConstantOtherwise(Lane.max)
     }
 
     @inline(__always)
-    private func checkMultiplySubtractingWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkMultiplySubtractingWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "multiplySubtractingWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x5050_AF45_6682_663E)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5050_AE45_6682_648B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5050_AD45_6682_62D8)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x5050_B445_6682_6EBD)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5050_AE45_6682_648B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5050_AD45_6682_62D8)
+        let cInputs = Inputs.vectors(H.self, seed: 0x5050_B445_6682_6EBD)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for (mask, a, b, c) in mixedQuadruples(
@@ -371,7 +365,7 @@ extension SIMDUInt64ConstantTests {
         ) {
             mismatches.check(
                 H.multiplySubtracting(a, b, c, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.multiplySubtractingWhereOtherwiseU64(
                         H.repeating(value).raw,
                         mask.raw,
@@ -435,21 +429,21 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func multiplySubtractingWhereOtherwiseConstantSplatMax() {
-        checkMultiplySubtractingWhereOtherwiseConstantOtherwise(H.Lane.max)
+        checkMultiplySubtractingWhereOtherwiseConstantOtherwise(Lane.max)
     }
 
     @inline(__always)
-    private func checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "negatedMultiplySubtractingWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xFF7F_4927_F2D5_88BE)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFF7F_4827_F2D5_870B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xFF7F_4727_F2D5_8558)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xFF7F_4E27_F2D5_913D)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFF7F_4827_F2D5_870B)
+        let bInputs = Inputs.vectors(H.self, seed: 0xFF7F_4727_F2D5_8558)
+        let cInputs = Inputs.vectors(H.self, seed: 0xFF7F_4E27_F2D5_913D)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for (mask, a, b, c) in mixedQuadruples(
@@ -461,7 +455,7 @@ extension SIMDUInt64ConstantTests {
         ) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, b, c, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.negatedMultiplySubtractingWhereOtherwiseU64(
                         H.repeating(value).raw,
                         mask.raw,
@@ -525,6 +519,6 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatMax() {
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(H.Lane.max)
+        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(Lane.max)
     }
 }

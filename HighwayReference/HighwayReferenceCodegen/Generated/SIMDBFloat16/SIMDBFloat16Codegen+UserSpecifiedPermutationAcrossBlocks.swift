@@ -6,34 +6,34 @@ public import Vectorization
 @inline(never)
 public func portIndicesBF16(fromUnchecked vector: SIMD<BFloat16>.Indices) -> SIMD<BFloat16>.Indices
 {
-    unsafe SIMDBFloat16.indices(fromUnchecked: vector)
+    unsafe SIMD<BFloat16>.indices(fromUnchecked: vector)
 }
 
 @inline(never)
 public func highwayIndicesBF16(fromUnchecked vector: SIMD<Int16>) -> SIMD<Int16> {
-    SIMDBFloat16.Indices(raw: HighwayReference.Nothrow.indicesBF16(vector.raw))
+    SIMD<BFloat16>.Indices(raw: HighwayReference.Nothrow.indicesBF16(vector.raw))
 }
 
 @inline(never)
 public func portIndicesBF16ConstantVector() -> SIMD<BFloat16>.Indices {
-    unsafe SIMDBFloat16.indices(fromUnchecked: SIMDInt16.repeating(1))
+    unsafe SIMD<BFloat16>.indices(fromUnchecked: SIMD<Int16>.repeating(1))
 }
 
 @inline(never)
 public func highwayIndicesBF16ConstantVector() -> SIMD<Int16> {
-    SIMDBFloat16.Indices(
+    SIMD<BFloat16>.Indices(
         raw: HighwayReference.Nothrow.indicesBF16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(1)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(1)).raw
         )
     )
 }
 
 @inline(never)
 public func portLoadIndicesBF16(from: UnsafePointer<Int16>) -> SIMD<BFloat16>.Indices {
-    unsafe SIMDBFloat16.loadIndices(from: from)
+    unsafe SIMD<BFloat16>.loadIndices(from: from)
 }
 
 @inline(never)
 public func highwayLoadIndicesBF16(from: UnsafePointer<Int16>) -> SIMD<Int16> {
-    unsafe SIMDBFloat16.Indices(raw: HighwayReference.Nothrow.loadIndicesBF16(from))
+    unsafe SIMD<BFloat16>.Indices(raw: HighwayReference.Nothrow.loadIndicesBF16(from))
 }

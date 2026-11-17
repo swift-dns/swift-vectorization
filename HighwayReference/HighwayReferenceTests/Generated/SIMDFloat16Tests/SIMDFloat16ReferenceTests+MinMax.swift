@@ -9,12 +9,12 @@ import Vectorization
 extension SIMDFloat16ReferenceTests {
     @Test func minimum() {
         let mismatches = Mismatches("minimum")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x774E_9C9A_582B_D34E)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x774E_9D9A_582B_D501)
+        let aInputs = Inputs.vectors(H.self, seed: 0x774E_9C9A_582B_D34E)
+        let bInputs = Inputs.vectors(H.self, seed: 0x774E_9D9A_582B_D501)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.minimum(a, b),
-                HighwayReference.minimumF16(a.raw, b.raw),
+                H(raw: HighwayReference.minimumF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -23,12 +23,12 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func maximum() {
         let mismatches = Mismatches("maximum")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCB3F_D954_3E22_8CE8)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCB3F_DA54_3E22_8E9B)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCB3F_D954_3E22_8CE8)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCB3F_DA54_3E22_8E9B)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.maximum(a, b),
-                HighwayReference.maximumF16(a.raw, b.raw),
+                H(raw: HighwayReference.maximumF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -37,12 +37,12 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func minimumNumber() {
         let mismatches = Mismatches("minimumNumber")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE3D8_4028_55A9_7A8B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE3D8_3F28_55A9_78D8)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE3D8_4028_55A9_7A8B)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE3D8_3F28_55A9_78D8)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.minimumNumber(a, b),
-                HighwayReference.minimumNumberF16(a.raw, b.raw),
+                H(raw: HighwayReference.minimumNumberF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -51,12 +51,12 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func maximumNumber() {
         let mismatches = Mismatches("maximumNumber")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x48F9_79DC_75D4_F771)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x48F9_78DC_75D4_F5BE)
+        let aInputs = Inputs.vectors(H.self, seed: 0x48F9_79DC_75D4_F771)
+        let bInputs = Inputs.vectors(H.self, seed: 0x48F9_78DC_75D4_F5BE)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.maximumNumber(a, b),
-                HighwayReference.maximumNumberF16(a.raw, b.raw),
+                H(raw: HighwayReference.maximumNumberF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -65,12 +65,12 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func minimumMagnitude() {
         let mismatches = Mismatches("minimumMagnitude")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5F37_D533_77F6_434E)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5F37_D633_77F6_4501)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x5F37_D533_77F6_434E)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5F37_D633_77F6_4501)
+        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a.simd, b.simd) {
             mismatches.check(
                 H.minimumMagnitude(a, b),
-                HighwayReference.minimumMagnitudeF16(a.raw, b.raw),
+                H(raw: HighwayReference.minimumMagnitudeF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -79,12 +79,12 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func maximumMagnitude() {
         let mismatches = Mismatches("maximumMagnitude")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4B87_A169_61FB_1FEC)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4B87_A269_61FB_219F)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x4B87_A169_61FB_1FEC)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4B87_A269_61FB_219F)
+        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a.simd, b.simd) {
             mismatches.check(
                 H.maximumMagnitude(a, b),
-                HighwayReference.maximumMagnitudeF16(a.raw, b.raw),
+                H(raw: HighwayReference.maximumMagnitudeF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

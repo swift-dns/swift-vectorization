@@ -8,7 +8,7 @@ import Vectorization
 extension SIMDBFloat16ReferenceTests {
     @Test func extractingBlock() {
         let mismatches = Mismatches("extractingBlock")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAC84_F413_5FEF_A59A)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAC84_F413_5FEF_A59A)
         let indexInputs = Array(0...H.laneCount / 8 - 1)
         for (a, index) in everyPair(aInputs, indexInputs) {
             mismatches.check(
@@ -27,7 +27,7 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func extractingBlockUnchecked() {
         let mismatches = Mismatches("extractingBlock unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7512_1CA6_F16A_3AD4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7512_1CA6_F16A_3AD4)
         let indexInputs = Array(0...H.laneCount / 8 - 1)
         for (a, index) in everyPair(aInputs, indexInputs) {
             mismatches.check(
@@ -46,7 +46,7 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func replacingBlock() {
         let mismatches = Mismatches("replacingBlock")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x41A9_BC9E_1002_7F10)
+        let aInputs = Inputs.vectors(H.self, seed: 0x41A9_BC9E_1002_7F10)
         let indexInputs = Array(0...H.laneCount / 8 - 1)
         let bInputs = Inputs.vectors(H.BlockVector.self, seed: 0x41A9_BE9E_1002_8276).map(
             poisoningUpperBytes
@@ -59,7 +59,7 @@ extension SIMDBFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.replacingBlock(a, at: index, with: b),
-                H.Vector(
+                H(
                     raw: HighwayReference.replacingBlockBF16(
                         a.raw,
                         Int32(truncatingIfNeeded: index),
@@ -74,7 +74,7 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func replacingBlockUnchecked() {
         let mismatches = Mismatches("replacingBlock unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFBDB_D970_0DD6_8A96)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFBDB_D970_0DD6_8A96)
         let indexInputs = Array(0...H.laneCount / 8 - 1)
         let bInputs = Inputs.vectors(H.BlockVector.self, seed: 0xFBDB_D770_0DD6_8730).map(
             poisoningUpperBytes
@@ -87,7 +87,7 @@ extension SIMDBFloat16ReferenceTests {
         ) {
             mismatches.check(
                 unsafe H.replacingBlock(a, atUnchecked: index, with: b),
-                H.Vector(
+                H(
                     raw: HighwayReference.replacingBlockBF16(
                         a.raw,
                         Int32(truncatingIfNeeded: index),

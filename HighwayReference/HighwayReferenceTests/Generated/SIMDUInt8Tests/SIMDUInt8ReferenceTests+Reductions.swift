@@ -8,7 +8,7 @@ import Vectorization
 extension SIMDUInt8ReferenceTests {
     @Test func sum() {
         let mismatches = Mismatches("sum")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF530_E849_F859_1F1F)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF530_E849_F859_1F1F)
         for a in aInputs {
             mismatches.check(H.sum(a), HighwayReference.sumU8(a.raw), "a: \(describe(a))")
         }
@@ -17,7 +17,7 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func smallest() {
         let mismatches = Mismatches("smallest")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x00BE_6DDB_4F06_40D3)
+        let aInputs = Inputs.vectors(H.self, seed: 0x00BE_6DDB_4F06_40D3)
         for a in aInputs {
             mismatches.check(H.smallest(a), HighwayReference.smallestU8(a.raw), "a: \(describe(a))")
         }
@@ -26,7 +26,7 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func largest() {
         let mismatches = Mismatches("largest")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB673_6E48_4BD5_252C)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB673_6E48_4BD5_252C)
         for a in aInputs {
             mismatches.check(H.largest(a), HighwayReference.largestU8(a.raw), "a: \(describe(a))")
         }
@@ -35,11 +35,11 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func repeatingSum() {
         let mismatches = Mismatches("repeatingSum")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6D38_9F4D_125F_0116)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6D38_9F4D_125F_0116)
         for a in aInputs {
             mismatches.check(
                 H.repeatingSum(a),
-                H.Vector(raw: HighwayReference.repeatingSumU8(a.raw)),
+                H(raw: HighwayReference.repeatingSumU8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -48,11 +48,11 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func repeatingSmallest() {
         let mismatches = Mismatches("repeatingSmallest")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x972B_7A3F_79FD_3E98)
+        let aInputs = Inputs.vectors(H.self, seed: 0x972B_7A3F_79FD_3E98)
         for a in aInputs {
             mismatches.check(
                 H.repeatingSmallest(a),
-                H.Vector(raw: HighwayReference.repeatingSmallestU8(a.raw)),
+                H(raw: HighwayReference.repeatingSmallestU8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -61,11 +61,11 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func repeatingLargest() {
         let mismatches = Mismatches("repeatingLargest")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2F5A_2026_1DED_CBC1)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2F5A_2026_1DED_CBC1)
         for a in aInputs {
             mismatches.check(
                 H.repeatingLargest(a),
-                H.Vector(raw: HighwayReference.repeatingLargestU8(a.raw)),
+                H(raw: HighwayReference.repeatingLargestU8(a.raw)),
                 "a: \(describe(a))"
             )
         }

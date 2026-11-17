@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDFloatReferenceTests {
     @Test func multiplying() {
         let mismatches = Mismatches("multiplying")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA58E_5EB7_644D_E8B8)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA58E_5FB7_644D_EA6B)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA58E_5EB7_644D_E8B8)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA58E_5FB7_644D_EA6B)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplying(a, b),
-                HighwayReference.multiplyingF32(a.raw, b.raw),
+                H(raw: HighwayReference.multiplyingF32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -22,12 +22,12 @@ extension SIMDFloatReferenceTests {
 
     @Test func multiplyingRounded() {
         let mismatches = Mismatches("multiplyingRounded")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x303D_9915_45B6_8C7B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x303D_9815_45B6_8AC8)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x303D_9915_45B6_8C7B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x303D_9815_45B6_8AC8)
+        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a.simd, b.simd) {
             mismatches.check(
                 H.multiplyingRounded(a, b),
-                HighwayReference.multiplyingRoundedF32(a.raw, b.raw),
+                H(raw: HighwayReference.multiplyingRoundedF32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -36,12 +36,12 @@ extension SIMDFloatReferenceTests {
 
     @Test func multiplyingByFloorPowerOf2() {
         let mismatches = Mismatches("multiplyingByFloorPowerOf2")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7332_F48C_9F46_99D9)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7332_F38C_9F46_9826)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7332_F48C_9F46_99D9)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7332_F38C_9F46_9826)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplyingByFloorPowerOf2(a, b),
-                HighwayReference.multiplyingByFloorPowerOf2F32(a.raw, b.raw),
+                H(raw: HighwayReference.multiplyingByFloorPowerOf2F32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -50,12 +50,12 @@ extension SIMDFloatReferenceTests {
 
     @Test func multiplyingByPowerOf2FromInt32() {
         let mismatches = Mismatches("multiplyingByPowerOf2FromInt32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6CF7_300D_06F0_BB8F)
-        let bInputs = Inputs.exponents(SIMDInt32.Vector.self, seed: 0x6CF7_2F0D_06F0_B9DC)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6CF7_300D_06F0_BB8F)
+        let bInputs = Inputs.exponents(SIMD<Int32>.self, seed: 0x6CF7_2F0D_06F0_B9DC)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplyingByPowerOf2(a, b),
-                HighwayReference.multiplyingByPowerOf2I32ToF32(a.raw, b.raw),
+                H(raw: HighwayReference.multiplyingByPowerOf2I32ToF32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -64,12 +64,12 @@ extension SIMDFloatReferenceTests {
 
     @Test func rearrangedToOddPlusEven() {
         let mismatches = Mismatches("rearrangedToOddPlusEven")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3171_082C_5854_431D)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3171_072C_5854_416A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3171_082C_5854_431D)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3171_072C_5854_416A)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.rearrangedToOddPlusEven(a, b),
-                HighwayReference.rearrangedToOddPlusEvenF32(a.raw, b.raw),
+                H(raw: HighwayReference.rearrangedToOddPlusEvenF32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -78,12 +78,12 @@ extension SIMDFloatReferenceTests {
 
     @Test func multiplyPairwiseAddingFromBFloat16() {
         let mismatches = Mismatches("multiplyPairwiseAddingFromBFloat16")
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x78F4_AAAF_B46D_DC70)
-        let bInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x78F4_ABAF_B46D_DE23)
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x78F4_AAAF_B46D_DC70)
+        let bInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x78F4_ABAF_B46D_DE23)
         for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(widening: a, b) {
             mismatches.check(
                 H.multiplyPairwiseAdding(a, b),
-                HighwayReference.multiplyPairwiseAddingBF16ToF32(a.raw, b.raw),
+                H(raw: HighwayReference.multiplyPairwiseAddingBF16ToF32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -92,25 +92,27 @@ extension SIMDFloatReferenceTests {
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16() {
         let mismatches = Mismatches("multiplyAccumulatingInAnyOrderFromBFloat16")
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x202B_F322_4C31_0EAD)
-        let bInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x202B_F222_4C31_0CFA)
-        let cInputs = Inputs.accumulators(H.Vector.self, seed: 0x202B_F122_4C31_0B47)
-        let v0Inputs = Inputs.accumulators(H.Vector.self, seed: 0x202B_F022_4C31_0994)
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x202B_F322_4C31_0EAD)
+        let bInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x202B_F222_4C31_0CFA)
+        let cInputs = Inputs.accumulators(H.self, seed: 0x202B_F122_4C31_0B47)
+        let v0Inputs = Inputs.accumulators(H.self, seed: 0x202B_F022_4C31_0994)
         for (a, b, c, v0) in mixedQuadruples(
             aInputs,
             bInputs,
             cInputs,
             v0Inputs,
             seed: 0x98DC_425A_5581_567F
-        ) where !hasUnorderedNaNs(widening: a, b, accumulating: c, v0) {
+        ) where !hasUnorderedNaNs(widening: a, b, accumulating: c.simd, v0.simd) {
             var p0 = v0
             var r0 = v0
             let port = H.multiplyAccumulatingInAnyOrder(a, b, c, &p0)
-            let reference = HighwayReference.multiplyAccumulatingInAnyOrderBF16ToF32(
-                a.raw,
-                b.raw,
-                c.raw,
-                &r0.raw
+            let reference = H(
+                raw: HighwayReference.multiplyAccumulatingInAnyOrderBF16ToF32(
+                    a.raw,
+                    b.raw,
+                    c.raw,
+                    &r0.raw
+                )
             )
             mismatches.check(
                 port,

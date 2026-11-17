@@ -7,16 +7,16 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
-    private func checkVectorWideningLowerFromUInt32ConstantA(_ value: SIMDUInt32.Lane) {
+    private func checkVectorWideningLowerFromUInt32ConstantA(_ value: UInt32) {
         let mismatches = Mismatches("vectorWideningLowerFromUInt32 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt32.repeating(value),
-            SIMDUInt32.Vector(raw: HighwayReference.repeatingU32(value)),
+            SIMD<UInt32>.repeating(value),
+            SIMD<UInt32>(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningLower: SIMDUInt32.repeating(value)),
-            HighwayReference.vectorWideningLowerU32ToF64(SIMDUInt32.repeating(value).raw),
+            H.vector(wideningLower: SIMD<UInt32>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningLowerU32ToF64(SIMD<UInt32>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -71,20 +71,20 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func vectorWideningLowerFromUInt32ConstantSplatMax() {
-        checkVectorWideningLowerFromUInt32ConstantA(SIMDUInt32.Lane.max)
+        checkVectorWideningLowerFromUInt32ConstantA(UInt32.max)
     }
 
     @inline(__always)
-    private func checkVectorWideningLowerFromInt32ConstantA(_ value: SIMDInt32.Lane) {
+    private func checkVectorWideningLowerFromInt32ConstantA(_ value: Int32) {
         let mismatches = Mismatches("vectorWideningLowerFromInt32 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDInt32.repeating(value),
-            SIMDInt32.Vector(raw: HighwayReference.repeatingI32(value)),
+            SIMD<Int32>.repeating(value),
+            SIMD<Int32>(raw: HighwayReference.repeatingI32(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningLower: SIMDInt32.repeating(value)),
-            HighwayReference.vectorWideningLowerI32ToF64(SIMDInt32.repeating(value).raw),
+            H.vector(wideningLower: SIMD<Int32>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningLowerI32ToF64(SIMD<Int32>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -159,24 +159,24 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func vectorWideningLowerFromInt32ConstantSplatMax() {
-        checkVectorWideningLowerFromInt32ConstantA(SIMDInt32.Lane.max)
+        checkVectorWideningLowerFromInt32ConstantA(Int32.max)
     }
 
     @Test func vectorWideningLowerFromInt32ConstantSplatMin() {
-        checkVectorWideningLowerFromInt32ConstantA(SIMDInt32.Lane.min)
+        checkVectorWideningLowerFromInt32ConstantA(Int32.min)
     }
 
     @inline(__always)
-    private func checkVectorWideningLowerFromFloatConstantA(_ value: SIMDFloat.Lane) {
+    private func checkVectorWideningLowerFromFloatConstantA(_ value: Float) {
         let mismatches = Mismatches("vectorWideningLowerFromFloat with a repeating \(hex(value))")
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningLower: SIMDFloat.repeating(value)),
-            HighwayReference.vectorWideningLowerF32ToF64(SIMDFloat.repeating(value).raw),
+            H.vector(wideningLower: SIMD<Float>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningLowerF32ToF64(SIMD<Float>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -239,7 +239,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func vectorWideningLowerFromFloatConstantSplatPayloadNaN() {
-        checkVectorWideningLowerFromFloatConstantA(SIMDFloat.Lane(nan: 1, signaling: false))
+        checkVectorWideningLowerFromFloatConstantA(Float(nan: 1, signaling: false))
     }
 
     @Test func vectorWideningLowerFromFloatConstantSplatSignalingNaN() {
@@ -259,16 +259,16 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorWideningUpperFromUInt32ConstantA(_ value: SIMDUInt32.Lane) {
+    private func checkVectorWideningUpperFromUInt32ConstantA(_ value: UInt32) {
         let mismatches = Mismatches("vectorWideningUpperFromUInt32 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt32.repeating(value),
-            SIMDUInt32.Vector(raw: HighwayReference.repeatingU32(value)),
+            SIMD<UInt32>.repeating(value),
+            SIMD<UInt32>(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningUpper: SIMDUInt32.repeating(value)),
-            HighwayReference.vectorWideningUpperU32ToF64(SIMDUInt32.repeating(value).raw),
+            H.vector(wideningUpper: SIMD<UInt32>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningUpperU32ToF64(SIMD<UInt32>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -323,20 +323,20 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func vectorWideningUpperFromUInt32ConstantSplatMax() {
-        checkVectorWideningUpperFromUInt32ConstantA(SIMDUInt32.Lane.max)
+        checkVectorWideningUpperFromUInt32ConstantA(UInt32.max)
     }
 
     @inline(__always)
-    private func checkVectorWideningUpperFromInt32ConstantA(_ value: SIMDInt32.Lane) {
+    private func checkVectorWideningUpperFromInt32ConstantA(_ value: Int32) {
         let mismatches = Mismatches("vectorWideningUpperFromInt32 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDInt32.repeating(value),
-            SIMDInt32.Vector(raw: HighwayReference.repeatingI32(value)),
+            SIMD<Int32>.repeating(value),
+            SIMD<Int32>(raw: HighwayReference.repeatingI32(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningUpper: SIMDInt32.repeating(value)),
-            HighwayReference.vectorWideningUpperI32ToF64(SIMDInt32.repeating(value).raw),
+            H.vector(wideningUpper: SIMD<Int32>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningUpperI32ToF64(SIMD<Int32>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -411,24 +411,24 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func vectorWideningUpperFromInt32ConstantSplatMax() {
-        checkVectorWideningUpperFromInt32ConstantA(SIMDInt32.Lane.max)
+        checkVectorWideningUpperFromInt32ConstantA(Int32.max)
     }
 
     @Test func vectorWideningUpperFromInt32ConstantSplatMin() {
-        checkVectorWideningUpperFromInt32ConstantA(SIMDInt32.Lane.min)
+        checkVectorWideningUpperFromInt32ConstantA(Int32.min)
     }
 
     @inline(__always)
-    private func checkVectorWideningUpperFromFloatConstantA(_ value: SIMDFloat.Lane) {
+    private func checkVectorWideningUpperFromFloatConstantA(_ value: Float) {
         let mismatches = Mismatches("vectorWideningUpperFromFloat with a repeating \(hex(value))")
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningUpper: SIMDFloat.repeating(value)),
-            HighwayReference.vectorWideningUpperF32ToF64(SIMDFloat.repeating(value).raw),
+            H.vector(wideningUpper: SIMD<Float>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningUpperF32ToF64(SIMD<Float>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -491,7 +491,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func vectorWideningUpperFromFloatConstantSplatPayloadNaN() {
-        checkVectorWideningUpperFromFloatConstantA(SIMDFloat.Lane(nan: 1, signaling: false))
+        checkVectorWideningUpperFromFloatConstantA(Float(nan: 1, signaling: false))
     }
 
     @Test func vectorWideningUpperFromFloatConstantSplatSignalingNaN() {
@@ -511,16 +511,16 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorWideningEvenFromUInt32ConstantA(_ value: SIMDUInt32.Lane) {
+    private func checkVectorWideningEvenFromUInt32ConstantA(_ value: UInt32) {
         let mismatches = Mismatches("vectorWideningEvenFromUInt32 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt32.repeating(value),
-            SIMDUInt32.Vector(raw: HighwayReference.repeatingU32(value)),
+            SIMD<UInt32>.repeating(value),
+            SIMD<UInt32>(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningEven: SIMDUInt32.repeating(value)),
-            HighwayReference.vectorWideningEvenU32ToF64(SIMDUInt32.repeating(value).raw),
+            H.vector(wideningEven: SIMD<UInt32>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningEvenU32ToF64(SIMD<UInt32>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -575,20 +575,20 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func vectorWideningEvenFromUInt32ConstantSplatMax() {
-        checkVectorWideningEvenFromUInt32ConstantA(SIMDUInt32.Lane.max)
+        checkVectorWideningEvenFromUInt32ConstantA(UInt32.max)
     }
 
     @inline(__always)
-    private func checkVectorWideningEvenFromInt32ConstantA(_ value: SIMDInt32.Lane) {
+    private func checkVectorWideningEvenFromInt32ConstantA(_ value: Int32) {
         let mismatches = Mismatches("vectorWideningEvenFromInt32 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDInt32.repeating(value),
-            SIMDInt32.Vector(raw: HighwayReference.repeatingI32(value)),
+            SIMD<Int32>.repeating(value),
+            SIMD<Int32>(raw: HighwayReference.repeatingI32(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningEven: SIMDInt32.repeating(value)),
-            HighwayReference.vectorWideningEvenI32ToF64(SIMDInt32.repeating(value).raw),
+            H.vector(wideningEven: SIMD<Int32>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningEvenI32ToF64(SIMD<Int32>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -663,24 +663,24 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func vectorWideningEvenFromInt32ConstantSplatMax() {
-        checkVectorWideningEvenFromInt32ConstantA(SIMDInt32.Lane.max)
+        checkVectorWideningEvenFromInt32ConstantA(Int32.max)
     }
 
     @Test func vectorWideningEvenFromInt32ConstantSplatMin() {
-        checkVectorWideningEvenFromInt32ConstantA(SIMDInt32.Lane.min)
+        checkVectorWideningEvenFromInt32ConstantA(Int32.min)
     }
 
     @inline(__always)
-    private func checkVectorWideningEvenFromFloatConstantA(_ value: SIMDFloat.Lane) {
+    private func checkVectorWideningEvenFromFloatConstantA(_ value: Float) {
         let mismatches = Mismatches("vectorWideningEvenFromFloat with a repeating \(hex(value))")
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningEven: SIMDFloat.repeating(value)),
-            HighwayReference.vectorWideningEvenF32ToF64(SIMDFloat.repeating(value).raw),
+            H.vector(wideningEven: SIMD<Float>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningEvenF32ToF64(SIMD<Float>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -743,7 +743,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func vectorWideningEvenFromFloatConstantSplatPayloadNaN() {
-        checkVectorWideningEvenFromFloatConstantA(SIMDFloat.Lane(nan: 1, signaling: false))
+        checkVectorWideningEvenFromFloatConstantA(Float(nan: 1, signaling: false))
     }
 
     @Test func vectorWideningEvenFromFloatConstantSplatSignalingNaN() {
@@ -763,16 +763,16 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorWideningOddFromUInt32ConstantA(_ value: SIMDUInt32.Lane) {
+    private func checkVectorWideningOddFromUInt32ConstantA(_ value: UInt32) {
         let mismatches = Mismatches("vectorWideningOddFromUInt32 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt32.repeating(value),
-            SIMDUInt32.Vector(raw: HighwayReference.repeatingU32(value)),
+            SIMD<UInt32>.repeating(value),
+            SIMD<UInt32>(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningOdd: SIMDUInt32.repeating(value)),
-            HighwayReference.vectorWideningOddU32ToF64(SIMDUInt32.repeating(value).raw),
+            H.vector(wideningOdd: SIMD<UInt32>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningOddU32ToF64(SIMD<UInt32>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -827,20 +827,20 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func vectorWideningOddFromUInt32ConstantSplatMax() {
-        checkVectorWideningOddFromUInt32ConstantA(SIMDUInt32.Lane.max)
+        checkVectorWideningOddFromUInt32ConstantA(UInt32.max)
     }
 
     @inline(__always)
-    private func checkVectorWideningOddFromInt32ConstantA(_ value: SIMDInt32.Lane) {
+    private func checkVectorWideningOddFromInt32ConstantA(_ value: Int32) {
         let mismatches = Mismatches("vectorWideningOddFromInt32 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDInt32.repeating(value),
-            SIMDInt32.Vector(raw: HighwayReference.repeatingI32(value)),
+            SIMD<Int32>.repeating(value),
+            SIMD<Int32>(raw: HighwayReference.repeatingI32(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningOdd: SIMDInt32.repeating(value)),
-            HighwayReference.vectorWideningOddI32ToF64(SIMDInt32.repeating(value).raw),
+            H.vector(wideningOdd: SIMD<Int32>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningOddI32ToF64(SIMD<Int32>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -915,24 +915,24 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func vectorWideningOddFromInt32ConstantSplatMax() {
-        checkVectorWideningOddFromInt32ConstantA(SIMDInt32.Lane.max)
+        checkVectorWideningOddFromInt32ConstantA(Int32.max)
     }
 
     @Test func vectorWideningOddFromInt32ConstantSplatMin() {
-        checkVectorWideningOddFromInt32ConstantA(SIMDInt32.Lane.min)
+        checkVectorWideningOddFromInt32ConstantA(Int32.min)
     }
 
     @inline(__always)
-    private func checkVectorWideningOddFromFloatConstantA(_ value: SIMDFloat.Lane) {
+    private func checkVectorWideningOddFromFloatConstantA(_ value: Float) {
         let mismatches = Mismatches("vectorWideningOddFromFloat with a repeating \(hex(value))")
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningOdd: SIMDFloat.repeating(value)),
-            HighwayReference.vectorWideningOddF32ToF64(SIMDFloat.repeating(value).raw),
+            H.vector(wideningOdd: SIMD<Float>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningOddF32ToF64(SIMD<Float>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -995,7 +995,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func vectorWideningOddFromFloatConstantSplatPayloadNaN() {
-        checkVectorWideningOddFromFloatConstantA(SIMDFloat.Lane(nan: 1, signaling: false))
+        checkVectorWideningOddFromFloatConstantA(Float(nan: 1, signaling: false))
     }
 
     @Test func vectorWideningOddFromFloatConstantSplatSignalingNaN() {

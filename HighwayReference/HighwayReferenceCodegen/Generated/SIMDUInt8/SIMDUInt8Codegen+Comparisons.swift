@@ -5,24 +5,24 @@ public import Vectorization
 
 @inline(never)
 public func portEqualToU8(_ a: SIMD<UInt8>, _ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.equalTo(a, b)
+    SIMD<UInt8>.equalTo(a, b)
 }
 
 @inline(never)
 public func highwayEqualToU8(_ a: SIMD<UInt8>, _ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.Mask(raw: HighwayReference.Nothrow.equalToU8(a.raw, b.raw))
+    SIMD<UInt8>.Mask(raw: HighwayReference.Nothrow.equalToU8(a.raw, b.raw))
 }
 
 @inline(never)
 public func portEqualToU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.equalTo(SIMDUInt8.repeating(26), b)
+    SIMD<UInt8>.equalTo(SIMD<UInt8>.repeating(26), b)
 }
 
 @inline(never)
 public func highwayEqualToU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.Mask(
+    SIMD<UInt8>.Mask(
         raw: HighwayReference.Nothrow.equalToU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             b.raw
         )
     )
@@ -30,39 +30,39 @@ public func highwayEqualToU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
 
 @inline(never)
 public func portEqualToU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.equalTo(a, SIMDUInt8.repeating(26))
+    SIMD<UInt8>.equalTo(a, SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
 public func highwayEqualToU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.Mask(
+    SIMD<UInt8>.Mask(
         raw: HighwayReference.Nothrow.equalToU8(
             a.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portNotEqualToU8(_ a: SIMD<UInt8>, _ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.notEqualTo(a, b)
+    SIMD<UInt8>.notEqualTo(a, b)
 }
 
 @inline(never)
 public func highwayNotEqualToU8(_ a: SIMD<UInt8>, _ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.Mask(raw: HighwayReference.Nothrow.notEqualToU8(a.raw, b.raw))
+    SIMD<UInt8>.Mask(raw: HighwayReference.Nothrow.notEqualToU8(a.raw, b.raw))
 }
 
 @inline(never)
 public func portNotEqualToU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.notEqualTo(SIMDUInt8.repeating(26), b)
+    SIMD<UInt8>.notEqualTo(SIMD<UInt8>.repeating(26), b)
 }
 
 @inline(never)
 public func highwayNotEqualToU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.Mask(
+    SIMD<UInt8>.Mask(
         raw: HighwayReference.Nothrow.notEqualToU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             b.raw
         )
     )
@@ -70,39 +70,39 @@ public func highwayNotEqualToU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
 
 @inline(never)
 public func portNotEqualToU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.notEqualTo(a, SIMDUInt8.repeating(26))
+    SIMD<UInt8>.notEqualTo(a, SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
 public func highwayNotEqualToU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.Mask(
+    SIMD<UInt8>.Mask(
         raw: HighwayReference.Nothrow.notEqualToU8(
             a.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portLessThanU8(_ a: SIMD<UInt8>, _ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.lessThan(a, b)
+    SIMD<UInt8>.lessThan(a, b)
 }
 
 @inline(never)
 public func highwayLessThanU8(_ a: SIMD<UInt8>, _ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.Mask(raw: HighwayReference.Nothrow.lessThanU8(a.raw, b.raw))
+    SIMD<UInt8>.Mask(raw: HighwayReference.Nothrow.lessThanU8(a.raw, b.raw))
 }
 
 @inline(never)
 public func portLessThanU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.lessThan(SIMDUInt8.repeating(26), b)
+    SIMD<UInt8>.lessThan(SIMD<UInt8>.repeating(26), b)
 }
 
 @inline(never)
 public func highwayLessThanU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.Mask(
+    SIMD<UInt8>.Mask(
         raw: HighwayReference.Nothrow.lessThanU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             b.raw
         )
     )
@@ -110,39 +110,39 @@ public func highwayLessThanU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
 
 @inline(never)
 public func portLessThanU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.lessThan(a, SIMDUInt8.repeating(26))
+    SIMD<UInt8>.lessThan(a, SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
 public func highwayLessThanU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.Mask(
+    SIMD<UInt8>.Mask(
         raw: HighwayReference.Nothrow.lessThanU8(
             a.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portGreaterThanU8(_ a: SIMD<UInt8>, _ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.greaterThan(a, b)
+    SIMD<UInt8>.greaterThan(a, b)
 }
 
 @inline(never)
 public func highwayGreaterThanU8(_ a: SIMD<UInt8>, _ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.Mask(raw: HighwayReference.Nothrow.greaterThanU8(a.raw, b.raw))
+    SIMD<UInt8>.Mask(raw: HighwayReference.Nothrow.greaterThanU8(a.raw, b.raw))
 }
 
 @inline(never)
 public func portGreaterThanU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.greaterThan(SIMDUInt8.repeating(26), b)
+    SIMD<UInt8>.greaterThan(SIMD<UInt8>.repeating(26), b)
 }
 
 @inline(never)
 public func highwayGreaterThanU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.Mask(
+    SIMD<UInt8>.Mask(
         raw: HighwayReference.Nothrow.greaterThanU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             b.raw
         )
     )
@@ -150,39 +150,39 @@ public func highwayGreaterThanU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask 
 
 @inline(never)
 public func portGreaterThanU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.greaterThan(a, SIMDUInt8.repeating(26))
+    SIMD<UInt8>.greaterThan(a, SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
 public func highwayGreaterThanU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.Mask(
+    SIMD<UInt8>.Mask(
         raw: HighwayReference.Nothrow.greaterThanU8(
             a.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portLessThanOrEqualToU8(_ a: SIMD<UInt8>, _ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.lessThanOrEqualTo(a, b)
+    SIMD<UInt8>.lessThanOrEqualTo(a, b)
 }
 
 @inline(never)
 public func highwayLessThanOrEqualToU8(_ a: SIMD<UInt8>, _ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.Mask(raw: HighwayReference.Nothrow.lessThanOrEqualToU8(a.raw, b.raw))
+    SIMD<UInt8>.Mask(raw: HighwayReference.Nothrow.lessThanOrEqualToU8(a.raw, b.raw))
 }
 
 @inline(never)
 public func portLessThanOrEqualToU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.lessThanOrEqualTo(SIMDUInt8.repeating(26), b)
+    SIMD<UInt8>.lessThanOrEqualTo(SIMD<UInt8>.repeating(26), b)
 }
 
 @inline(never)
 public func highwayLessThanOrEqualToU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.Mask(
+    SIMD<UInt8>.Mask(
         raw: HighwayReference.Nothrow.lessThanOrEqualToU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             b.raw
         )
     )
@@ -190,39 +190,39 @@ public func highwayLessThanOrEqualToU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8>
 
 @inline(never)
 public func portLessThanOrEqualToU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.lessThanOrEqualTo(a, SIMDUInt8.repeating(26))
+    SIMD<UInt8>.lessThanOrEqualTo(a, SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
 public func highwayLessThanOrEqualToU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.Mask(
+    SIMD<UInt8>.Mask(
         raw: HighwayReference.Nothrow.lessThanOrEqualToU8(
             a.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portGreaterThanOrEqualToU8(_ a: SIMD<UInt8>, _ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.greaterThanOrEqualTo(a, b)
+    SIMD<UInt8>.greaterThanOrEqualTo(a, b)
 }
 
 @inline(never)
 public func highwayGreaterThanOrEqualToU8(_ a: SIMD<UInt8>, _ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.Mask(raw: HighwayReference.Nothrow.greaterThanOrEqualToU8(a.raw, b.raw))
+    SIMD<UInt8>.Mask(raw: HighwayReference.Nothrow.greaterThanOrEqualToU8(a.raw, b.raw))
 }
 
 @inline(never)
 public func portGreaterThanOrEqualToU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.greaterThanOrEqualTo(SIMDUInt8.repeating(26), b)
+    SIMD<UInt8>.greaterThanOrEqualTo(SIMD<UInt8>.repeating(26), b)
 }
 
 @inline(never)
 public func highwayGreaterThanOrEqualToU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.Mask(
+    SIMD<UInt8>.Mask(
         raw: HighwayReference.Nothrow.greaterThanOrEqualToU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             b.raw
         )
     )
@@ -230,39 +230,39 @@ public func highwayGreaterThanOrEqualToU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UIn
 
 @inline(never)
 public func portGreaterThanOrEqualToU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.greaterThanOrEqualTo(a, SIMDUInt8.repeating(26))
+    SIMD<UInt8>.greaterThanOrEqualTo(a, SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
 public func highwayGreaterThanOrEqualToU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.Mask(
+    SIMD<UInt8>.Mask(
         raw: HighwayReference.Nothrow.greaterThanOrEqualToU8(
             a.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portTestingBitU8(_ a: SIMD<UInt8>, _ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.testingBit(a, b)
+    SIMD<UInt8>.testingBit(a, b)
 }
 
 @inline(never)
 public func highwayTestingBitU8(_ a: SIMD<UInt8>, _ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.Mask(raw: HighwayReference.Nothrow.testingBitU8(a.raw, b.raw))
+    SIMD<UInt8>.Mask(raw: HighwayReference.Nothrow.testingBitU8(a.raw, b.raw))
 }
 
 @inline(never)
 public func portTestingBitU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.testingBit(SIMDUInt8.repeating(26), b)
+    SIMD<UInt8>.testingBit(SIMD<UInt8>.repeating(26), b)
 }
 
 @inline(never)
 public func highwayTestingBitU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.Mask(
+    SIMD<UInt8>.Mask(
         raw: HighwayReference.Nothrow.testingBitU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             b.raw
         )
     )
@@ -270,15 +270,15 @@ public func highwayTestingBitU8ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
 
 @inline(never)
 public func portTestingBitU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.testingBit(a, SIMDUInt8.repeating(26))
+    SIMD<UInt8>.testingBit(a, SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
 public func highwayTestingBitU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
-    SIMDUInt8.Mask(
+    SIMD<UInt8>.Mask(
         raw: HighwayReference.Nothrow.testingBitU8(
             a.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }

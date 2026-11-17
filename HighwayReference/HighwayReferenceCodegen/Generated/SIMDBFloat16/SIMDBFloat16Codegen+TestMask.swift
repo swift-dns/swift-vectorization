@@ -5,7 +5,7 @@ public import Vectorization
 
 @inline(never)
 public func portAllFalseBF16(_ mask: SIMD<BFloat16>.Mask) -> Bool {
-    SIMDBFloat16.allFalse(mask)
+    SIMD<BFloat16>.allFalse(mask)
 }
 
 @inline(never)
@@ -15,7 +15,7 @@ public func highwayAllFalseBF16(_ mask: SIMD<BFloat16>.Mask) -> Bool {
 
 @inline(never)
 public func portLastTrueIndexBF16(_ mask: SIMD<BFloat16>.Mask) -> Int {
-    SIMDBFloat16.lastTrueIndex(mask)
+    SIMD<BFloat16>.lastTrueIndex(mask)
 }
 
 @inline(never)
@@ -25,7 +25,7 @@ public func highwayLastTrueIndexBF16(_ mask: SIMD<BFloat16>.Mask) -> Int {
 
 @inline(never)
 public func portKnownLastTrueIndexBF16(_ mask: SIMD<BFloat16>.Mask) -> Int {
-    SIMDBFloat16.knownLastTrueIndex(mask)
+    SIMD<BFloat16>.knownLastTrueIndex(mask)
 }
 
 @inline(never)

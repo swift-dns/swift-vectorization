@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDBFloat16CodegenTests {
     @Test func slide1Up() {
         let mismatches = Mismatches("portSlide1UpBF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9009_D410_B20D_1B11)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9009_D410_B20D_1B11)
         for a in aInputs {
             mismatches.check(portSlide1UpBF16(a), highwaySlide1UpBF16(a), "a: \(describe(a))")
         }
@@ -24,8 +24,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func slide1UpFillingWith() {
         let mismatches = Mismatches("portSlide1UpFillingWithBF16")
-        let fillInputs = Inputs.lanes(H.Lane.self, seed: 0x38AC_8808_37B7_6D6E)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x38AC_8908_37B7_6F21)
+        let fillInputs = Inputs.lanes(Lane.self, seed: 0x38AC_8808_37B7_6D6E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x38AC_8908_37B7_6F21)
         for (fill, a) in everyPair(fillInputs, aInputs) {
             mismatches.check(
                 portSlide1UpFillingWithBF16(a, fillingWith: fill),
@@ -38,7 +38,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func slide1UpFillingWithConstantA() {
         let mismatches = Mismatches("portSlide1UpFillingWithBF16ConstantA")
-        let fillInputs = Inputs.lanes(H.Lane.self, seed: 0xE5A8_FEC2_8B3F_0B8F)
+        let fillInputs = Inputs.lanes(Lane.self, seed: 0xE5A8_FEC2_8B3F_0B8F)
         for fill in fillInputs {
             mismatches.check(
                 portSlide1UpFillingWithBF16ConstantA(fillingWith: fill),
@@ -51,7 +51,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func slide1UpFillingWithConstantFill() {
         let mismatches = Mismatches("portSlide1UpFillingWithBF16ConstantFill")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0306_5B6A_C8E4_7A80)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0306_5B6A_C8E4_7A80)
         for a in aInputs {
             mismatches.check(
                 portSlide1UpFillingWithBF16ConstantFill(a),
@@ -64,8 +64,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func slide1DownFillingWith() {
         let mismatches = Mismatches("portSlide1DownFillingWithBF16")
-        let fillInputs = Inputs.lanes(H.Lane.self, seed: 0xCC58_745E_8544_C011)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCC58_735E_8544_BE5E)
+        let fillInputs = Inputs.lanes(Lane.self, seed: 0xCC58_745E_8544_C011)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCC58_735E_8544_BE5E)
         for (fill, a) in everyPair(fillInputs, aInputs) {
             mismatches.check(
                 portSlide1DownFillingWithBF16(a, fillingWith: fill),
@@ -78,7 +78,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func slide1DownFillingWithConstantA() {
         let mismatches = Mismatches("portSlide1DownFillingWithBF16ConstantA")
-        let fillInputs = Inputs.lanes(H.Lane.self, seed: 0xED3E_25FD_1496_BC52)
+        let fillInputs = Inputs.lanes(Lane.self, seed: 0xED3E_25FD_1496_BC52)
         for fill in fillInputs {
             mismatches.check(
                 portSlide1DownFillingWithBF16ConstantA(fillingWith: fill),
@@ -91,7 +91,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func slide1DownFillingWithConstantFill() {
         let mismatches = Mismatches("portSlide1DownFillingWithBF16ConstantFill")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x84CF_E9F4_38C3_9F4F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x84CF_E9F4_38C3_9F4F)
         for a in aInputs {
             mismatches.check(
                 portSlide1DownFillingWithBF16ConstantFill(a),
@@ -110,7 +110,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func slideUpBlocksConstantBlocks() {
         let mismatches = Mismatches("portSlideUpBlocksBF16ConstantBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xABBF_9684_65E3_2C26)
+        let aInputs = Inputs.vectors(H.self, seed: 0xABBF_9684_65E3_2C26)
         for a in aInputs {
             mismatches.check(
                 portSlideUpBlocksBF16ConstantBlocks(a),
@@ -133,7 +133,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func slideDownBlocksConstantBlocks() {
         let mismatches = Mismatches("portSlideDownBlocksBF16ConstantBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0529_2C98_55B1_4C3B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0529_2C98_55B1_4C3B)
         for a in aInputs {
             mismatches.check(
                 portSlideDownBlocksBF16ConstantBlocks(a),
@@ -146,7 +146,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func combinedSlideDownLanesConstantA() {
         let mismatches = Mismatches("portCombinedSlideDownLanesBF16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5347_7E19_DB4F_02DB)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5347_7E19_DB4F_02DB)
         for b in bInputs {
             mismatches.check(
                 portCombinedSlideDownLanesBF16ConstantA(b),
@@ -159,7 +159,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func combinedSlideDownLanesConstantB() {
         let mismatches = Mismatches("portCombinedSlideDownLanesBF16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5BDC_3419_E025_09BD)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5BDC_3419_E025_09BD)
         for a in aInputs {
             mismatches.check(
                 portCombinedSlideDownLanesBF16ConstantB(a),
@@ -172,8 +172,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func combinedSlideDownLanesConstantLanes() {
         let mismatches = Mismatches("portCombinedSlideDownLanesBF16ConstantLanes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x52A1_3FEA_1BB3_B430)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x52A1_40EA_1BB3_B5E3)
+        let aInputs = Inputs.vectors(H.self, seed: 0x52A1_3FEA_1BB3_B430)
+        let bInputs = Inputs.vectors(H.self, seed: 0x52A1_40EA_1BB3_B5E3)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portCombinedSlideDownLanesBF16ConstantLanes(a, b),

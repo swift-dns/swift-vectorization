@@ -7,21 +7,27 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
-    private func checkNegatedMultiplyAddingWhereConstantA(_ value: H.Lane) {
+    private func checkNegatedMultiplyAddingWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("negatedMultiplyAddingWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6F1A_850C_FAED_6C6E)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6F1A_830C_FAED_6908)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x6F1A_840C_FAED_6ABB)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x6F1A_830C_FAED_6908)
+        let cInputs = Inputs.vectors(H.self, seed: 0x6F1A_840C_FAED_6ABB)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (mask, b, c) in mixedTriples(maskInputs, bInputs, cInputs, seed: 0x8587_2077_1906_F84A)
-        where !hasUnorderedNaNs(negating: H.repeating(value), b, adding: c) {
+        where !hasUnorderedNaNs(negating: H.repeating(value).simd, b.simd, adding: c.simd) {
             mismatches.check(
                 H.negatedMultiplyAdding(H.repeating(value), b, c, where: mask),
-                HighwayReference.negatedMultiplyAddingWhereF64(
-                    mask.raw,
-                    H.repeating(value).raw,
-                    b.raw,
-                    c.raw
+                H(
+                    raw: HighwayReference.negatedMultiplyAddingWhereF64(
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw,
+                        c.raw
+                    )
                 ),
                 "mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
             )
@@ -30,21 +36,27 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkNegatedMultiplyAddingWhereConstantB(_ value: H.Lane) {
+    private func checkNegatedMultiplyAddingWhereConstantB(_ value: Lane) {
         let mismatches = Mismatches("negatedMultiplyAddingWhere with b repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x5415_000C_EB54_39EF)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5414_FF0C_EB54_383C)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x5415_010C_EB54_3BA2)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x5414_FF0C_EB54_383C)
+        let cInputs = Inputs.vectors(H.self, seed: 0x5415_010C_EB54_3BA2)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (mask, a, c) in mixedTriples(maskInputs, aInputs, cInputs, seed: 0xA4BE_6175_6B51_DF49)
-        where !hasUnorderedNaNs(negating: a, H.repeating(value), adding: c) {
+        where !hasUnorderedNaNs(negating: a.simd, H.repeating(value).simd, adding: c.simd) {
             mismatches.check(
                 H.negatedMultiplyAdding(a, H.repeating(value), c, where: mask),
-                HighwayReference.negatedMultiplyAddingWhereF64(
-                    mask.raw,
-                    a.raw,
-                    H.repeating(value).raw,
-                    c.raw
+                H(
+                    raw: HighwayReference.negatedMultiplyAddingWhereF64(
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw,
+                        c.raw
+                    )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
             )
@@ -53,21 +65,27 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkNegatedMultiplyAddingWhereConstantC(_ value: H.Lane) {
+    private func checkNegatedMultiplyAddingWhereConstantC(_ value: Lane) {
         let mismatches = Mismatches("negatedMultiplyAddingWhere with c repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x5D83_B70C_F0E3_E644)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5D83_B80C_F0E3_E7F7)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5D83_B90C_F0E3_E9AA)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x5D83_B80C_F0E3_E7F7)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5D83_B90C_F0E3_E9AA)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xC043_5445_4AC2_0178)
-        where !hasUnorderedNaNs(negating: a, b, adding: H.repeating(value)) {
+        where !hasUnorderedNaNs(negating: a.simd, b.simd, adding: H.repeating(value).simd) {
             mismatches.check(
                 H.negatedMultiplyAdding(a, b, H.repeating(value), where: mask),
-                HighwayReference.negatedMultiplyAddingWhereF64(
-                    mask.raw,
-                    a.raw,
-                    b.raw,
-                    H.repeating(value).raw
+                H(
+                    raw: HighwayReference.negatedMultiplyAddingWhereF64(
+                        mask.raw,
+                        a.raw,
+                        b.raw,
+                        H.repeating(value).raw
+                    )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
@@ -160,9 +178,9 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func negatedMultiplyAddingWhereConstantSplatPayloadNaN() {
-        checkNegatedMultiplyAddingWhereConstantA(H.Lane(nan: 1, signaling: false))
-        checkNegatedMultiplyAddingWhereConstantB(H.Lane(nan: 1, signaling: false))
-        checkNegatedMultiplyAddingWhereConstantC(H.Lane(nan: 1, signaling: false))
+        checkNegatedMultiplyAddingWhereConstantA(Lane(nan: 1, signaling: false))
+        checkNegatedMultiplyAddingWhereConstantB(Lane(nan: 1, signaling: false))
+        checkNegatedMultiplyAddingWhereConstantC(Lane(nan: 1, signaling: false))
     }
 
     @Test func negatedMultiplyAddingWhereConstantSplatSignalingNaN() {
@@ -190,23 +208,29 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkNegatedMultiplySubtractingWhereConstantA(_ value: H.Lane) {
+    private func checkNegatedMultiplySubtractingWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches(
             "negatedMultiplySubtractingWhere with a repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3E75_895F_9995_13C3)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3E75_8B5F_9995_1729)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x3E75_8A5F_9995_1576)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x3E75_8B5F_9995_1729)
+        let cInputs = Inputs.vectors(H.self, seed: 0x3E75_8A5F_9995_1576)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (mask, b, c) in mixedTriples(maskInputs, bInputs, cInputs, seed: 0xE13B_0EF8_93D4_DEC5)
-        where !hasUnorderedNaNs(negating: H.repeating(value), b, adding: c) {
+        where !hasUnorderedNaNs(negating: H.repeating(value).simd, b.simd, adding: c.simd) {
             mismatches.check(
                 H.negatedMultiplySubtracting(H.repeating(value), b, c, where: mask),
-                HighwayReference.negatedMultiplySubtractingWhereF64(
-                    mask.raw,
-                    H.repeating(value).raw,
-                    b.raw,
-                    c.raw
+                H(
+                    raw: HighwayReference.negatedMultiplySubtractingWhereF64(
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw,
+                        c.raw
+                    )
                 ),
                 "mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
             )
@@ -215,23 +239,29 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkNegatedMultiplySubtractingWhereConstantB(_ value: H.Lane) {
+    private func checkNegatedMultiplySubtractingWhereConstantB(_ value: Lane) {
         let mismatches = Mismatches(
             "negatedMultiplySubtractingWhere with b repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x575B_0E5F_A75F_DFE2)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x575B_0F5F_A75F_E195)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x575B_0D5F_A75F_DE2F)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x575B_0F5F_A75F_E195)
+        let cInputs = Inputs.vectors(H.self, seed: 0x575B_0D5F_A75F_DE2F)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (mask, a, c) in mixedTriples(maskInputs, aInputs, cInputs, seed: 0x1F6B_4B5A_1BC9_E6A6)
-        where !hasUnorderedNaNs(negating: a, H.repeating(value), adding: c) {
+        where !hasUnorderedNaNs(negating: a.simd, H.repeating(value).simd, adding: c.simd) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, H.repeating(value), c, where: mask),
-                HighwayReference.negatedMultiplySubtractingWhereF64(
-                    mask.raw,
-                    a.raw,
-                    H.repeating(value).raw,
-                    c.raw
+                H(
+                    raw: HighwayReference.negatedMultiplySubtractingWhereF64(
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw,
+                        c.raw
+                    )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
             )
@@ -240,23 +270,29 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkNegatedMultiplySubtractingWhereConstantC(_ value: H.Lane) {
+    private func checkNegatedMultiplySubtractingWhereConstantC(_ value: Lane) {
         let mismatches = Mismatches(
             "negatedMultiplySubtractingWhere with c repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x4EC5_F75F_A289_342D)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4EC5_F65F_A289_327A)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4EC5_F55F_A289_30C7)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x4EC5_F65F_A289_327A)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4EC5_F55F_A289_30C7)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x0DDD_9C8B_6BF5_F2FF)
-        where !hasUnorderedNaNs(negating: a, b, adding: H.repeating(value)) {
+        where !hasUnorderedNaNs(negating: a.simd, b.simd, adding: H.repeating(value).simd) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, b, H.repeating(value), where: mask),
-                HighwayReference.negatedMultiplySubtractingWhereF64(
-                    mask.raw,
-                    a.raw,
-                    b.raw,
-                    H.repeating(value).raw
+                H(
+                    raw: HighwayReference.negatedMultiplySubtractingWhereF64(
+                        mask.raw,
+                        a.raw,
+                        b.raw,
+                        H.repeating(value).raw
+                    )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
@@ -451,9 +487,9 @@ extension SIMDDoubleConstantTests {
             "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
             isIntermittent: true
         ) {
-            checkNegatedMultiplySubtractingWhereConstantA(H.Lane(nan: 1, signaling: false))
-            checkNegatedMultiplySubtractingWhereConstantB(H.Lane(nan: 1, signaling: false))
-            checkNegatedMultiplySubtractingWhereConstantC(H.Lane(nan: 1, signaling: false))
+            checkNegatedMultiplySubtractingWhereConstantA(Lane(nan: 1, signaling: false))
+            checkNegatedMultiplySubtractingWhereConstantB(Lane(nan: 1, signaling: false))
+            checkNegatedMultiplySubtractingWhereConstantC(Lane(nan: 1, signaling: false))
         } when: {
             isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
         }
@@ -512,14 +548,23 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkApproximateReciprocalWhereConstantA(_ value: H.Lane) {
+    private func checkApproximateReciprocalWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("approximateReciprocalWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x10AC_00F8_131B_111B)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for mask in maskInputs {
             mismatches.check(
                 H.approximateReciprocal(H.repeating(value), where: mask),
-                HighwayReference.approximateReciprocalWhereF64(mask.raw, H.repeating(value).raw),
+                H(
+                    raw: HighwayReference.approximateReciprocalWhereF64(
+                        mask.raw,
+                        H.repeating(value).raw
+                    )
+                ),
                 "mask: \(describe(mask))"
             )
         }
@@ -583,7 +628,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func approximateReciprocalWhereConstantSplatPayloadNaN() {
-        checkApproximateReciprocalWhereConstantA(H.Lane(nan: 1, signaling: false))
+        checkApproximateReciprocalWhereConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func approximateReciprocalWhereConstantSplatSignalingNaN() {
@@ -603,18 +648,24 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkApproximateReciprocalSquareRootWhereConstantA(_ value: H.Lane) {
+    private func checkApproximateReciprocalSquareRootWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches(
             "approximateReciprocalSquareRootWhere with a repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xFF7E_16AB_F127_0370)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for mask in maskInputs {
             mismatches.check(
                 H.approximateReciprocalSquareRoot(H.repeating(value), where: mask),
-                HighwayReference.approximateReciprocalSquareRootWhereF64(
-                    mask.raw,
-                    H.repeating(value).raw
+                H(
+                    raw: HighwayReference.approximateReciprocalSquareRootWhereF64(
+                        mask.raw,
+                        H.repeating(value).raw
+                    )
                 ),
                 "mask: \(describe(mask))"
             )
@@ -679,7 +730,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func approximateReciprocalSquareRootWhereConstantSplatPayloadNaN() {
-        checkApproximateReciprocalSquareRootWhereConstantA(H.Lane(nan: 1, signaling: false))
+        checkApproximateReciprocalSquareRootWhereConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func approximateReciprocalSquareRootWhereConstantSplatSignalingNaN() {

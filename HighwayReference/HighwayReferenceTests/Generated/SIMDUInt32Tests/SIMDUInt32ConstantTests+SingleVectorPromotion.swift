@@ -7,18 +7,16 @@ import Vectorization
 
 extension SIMDUInt32ConstantTests {
     @inline(__always)
-    private func checkVectorWideningLowerFromUInt16ConstantA(_ value: SIMDUInt16.Lane) {
+    private func checkVectorWideningLowerFromUInt16ConstantA(_ value: UInt16) {
         let mismatches = Mismatches("vectorWideningLowerFromUInt16 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt16.repeating(value),
-            SIMDUInt16.Vector(raw: HighwayReference.repeatingU16(value)),
+            SIMD<UInt16>.repeating(value),
+            SIMD<UInt16>(raw: HighwayReference.repeatingU16(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningLower: SIMDUInt16.repeating(value)),
-            H.Vector(
-                raw: HighwayReference.vectorWideningLowerU16ToU32(SIMDUInt16.repeating(value).raw)
-            ),
+            H.vector(wideningLower: SIMD<UInt16>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningLowerU16ToU32(SIMD<UInt16>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -73,22 +71,20 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func vectorWideningLowerFromUInt16ConstantSplatMax() {
-        checkVectorWideningLowerFromUInt16ConstantA(SIMDUInt16.Lane.max)
+        checkVectorWideningLowerFromUInt16ConstantA(UInt16.max)
     }
 
     @inline(__always)
-    private func checkVectorWideningUpperFromUInt16ConstantA(_ value: SIMDUInt16.Lane) {
+    private func checkVectorWideningUpperFromUInt16ConstantA(_ value: UInt16) {
         let mismatches = Mismatches("vectorWideningUpperFromUInt16 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt16.repeating(value),
-            SIMDUInt16.Vector(raw: HighwayReference.repeatingU16(value)),
+            SIMD<UInt16>.repeating(value),
+            SIMD<UInt16>(raw: HighwayReference.repeatingU16(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningUpper: SIMDUInt16.repeating(value)),
-            H.Vector(
-                raw: HighwayReference.vectorWideningUpperU16ToU32(SIMDUInt16.repeating(value).raw)
-            ),
+            H.vector(wideningUpper: SIMD<UInt16>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningUpperU16ToU32(SIMD<UInt16>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -143,22 +139,20 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func vectorWideningUpperFromUInt16ConstantSplatMax() {
-        checkVectorWideningUpperFromUInt16ConstantA(SIMDUInt16.Lane.max)
+        checkVectorWideningUpperFromUInt16ConstantA(UInt16.max)
     }
 
     @inline(__always)
-    private func checkVectorWideningEvenFromUInt16ConstantA(_ value: SIMDUInt16.Lane) {
+    private func checkVectorWideningEvenFromUInt16ConstantA(_ value: UInt16) {
         let mismatches = Mismatches("vectorWideningEvenFromUInt16 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt16.repeating(value),
-            SIMDUInt16.Vector(raw: HighwayReference.repeatingU16(value)),
+            SIMD<UInt16>.repeating(value),
+            SIMD<UInt16>(raw: HighwayReference.repeatingU16(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningEven: SIMDUInt16.repeating(value)),
-            H.Vector(
-                raw: HighwayReference.vectorWideningEvenU16ToU32(SIMDUInt16.repeating(value).raw)
-            ),
+            H.vector(wideningEven: SIMD<UInt16>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningEvenU16ToU32(SIMD<UInt16>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -213,22 +207,20 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func vectorWideningEvenFromUInt16ConstantSplatMax() {
-        checkVectorWideningEvenFromUInt16ConstantA(SIMDUInt16.Lane.max)
+        checkVectorWideningEvenFromUInt16ConstantA(UInt16.max)
     }
 
     @inline(__always)
-    private func checkVectorWideningOddFromUInt16ConstantA(_ value: SIMDUInt16.Lane) {
+    private func checkVectorWideningOddFromUInt16ConstantA(_ value: UInt16) {
         let mismatches = Mismatches("vectorWideningOddFromUInt16 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt16.repeating(value),
-            SIMDUInt16.Vector(raw: HighwayReference.repeatingU16(value)),
+            SIMD<UInt16>.repeating(value),
+            SIMD<UInt16>(raw: HighwayReference.repeatingU16(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningOdd: SIMDUInt16.repeating(value)),
-            H.Vector(
-                raw: HighwayReference.vectorWideningOddU16ToU32(SIMDUInt16.repeating(value).raw)
-            ),
+            H.vector(wideningOdd: SIMD<UInt16>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningOddU16ToU32(SIMD<UInt16>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -283,6 +275,6 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func vectorWideningOddFromUInt16ConstantSplatMax() {
-        checkVectorWideningOddFromUInt16ConstantA(SIMDUInt16.Lane.max)
+        checkVectorWideningOddFromUInt16ConstantA(UInt16.max)
     }
 }

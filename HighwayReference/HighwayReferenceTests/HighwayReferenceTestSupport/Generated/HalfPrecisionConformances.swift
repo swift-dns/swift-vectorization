@@ -4,149 +4,142 @@ package import Vectorization
 
 #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
 @available(SwiftStdlib 5.3, *)
-extension SIMDFloat16.Mask: ReferenceMask {}
+extension Float16: ReferenceQuarterElement {
+    package static func vector(_ simd: SIMD<Float16>.SIMDType) -> SIMD<Float16> {
+        SIMD<Float16>(simd)
+    }
 
-@available(SwiftStdlib 5.3, *)
-extension SIMDFloat16.HalfVector: ReferenceNarrowVector {
-    package static var laneCount: Int { SIMDFloat16.laneCount / 2 }
+    package static func simd(of vector: SIMD<Float16>) -> SIMD<Float16>.SIMDType {
+        vector.simd
+    }
 
-    package init(lanes: [Float16]) {
-        self = lanes.withUnsafeBufferPointer { buffer in
-            unsafe SIMDFloat16.loadHalf(from: buffer.baseAddress!)
+    package static func mask(_ simd: SIMD<Float16>.Mask.SIMDType) -> SIMD<Float16>.Mask {
+        SIMD<Float16>.Mask(simd)
+    }
+
+    package static func simd(of mask: SIMD<Float16>.Mask) -> SIMD<Float16>.Mask.SIMDType {
+        mask.simd
+    }
+
+    package static func halfVector(lanes: [Float16]) -> SIMD<Float16>.HalfVector {
+        lanes.withUnsafeBufferPointer { buffer in
+            unsafe SIMD<Float16>.loadHalf(from: buffer.baseAddress!)
         }
     }
 
-    package var lanes: [Float16] {
-        var lanes = [Float16](repeating: Float16(bitPattern: 0), count: Self.laneCount)
+    package static func lanes(of vector: SIMD<Float16>.HalfVector) -> [Float16] {
+        var lanes = [Float16](
+            repeating: Float16(bitPattern: 0),
+            count: SIMD<Float16>.HalfVector.laneCount
+        )
         lanes.withUnsafeMutableBufferPointer { buffer in
-            unsafe SIMDFloat16.store(self, to: buffer.baseAddress!)
+            unsafe SIMD<Float16>.store(vector, to: buffer.baseAddress!)
         }
         return lanes
     }
-}
 
-@available(SwiftStdlib 5.3, *)
-extension SIMDFloat16.HalfMask: ReferenceNarrowMask {
-    package typealias Lane = Int16
-
-    package static var laneCount: Int { SIMDFloat16.laneCount / 2 }
-}
-
-@available(SwiftStdlib 5.3, *)
-extension SIMDFloat16.QuarterVector: ReferenceNarrowVector {
-    package static var laneCount: Int { SIMDFloat16.laneCount / 4 }
-
-    package init(lanes: [Float16]) {
-        self = lanes.withUnsafeBufferPointer { buffer in
-            unsafe SIMDFloat16.loadQuarter(from: buffer.baseAddress!)
+    package static func quarterVector(lanes: [Float16]) -> SIMD<Float16>.QuarterVector {
+        lanes.withUnsafeBufferPointer { buffer in
+            unsafe SIMD<Float16>.loadQuarter(from: buffer.baseAddress!)
         }
     }
 
-    package var lanes: [Float16] {
-        var lanes = [Float16](repeating: Float16(bitPattern: 0), count: Self.laneCount)
+    package static func lanes(of vector: SIMD<Float16>.QuarterVector) -> [Float16] {
+        var lanes = [Float16](
+            repeating: Float16(bitPattern: 0),
+            count: SIMD<Float16>.QuarterVector.laneCount
+        )
         lanes.withUnsafeMutableBufferPointer { buffer in
-            unsafe SIMDFloat16.store(self, to: buffer.baseAddress!)
+            unsafe SIMD<Float16>.store(vector, to: buffer.baseAddress!)
         }
         return lanes
     }
-}
 
-@available(SwiftStdlib 5.3, *)
-extension SIMDFloat16.QuarterMask: ReferenceNarrowMask {
-    package typealias Lane = Int16
-
-    package static var laneCount: Int { SIMDFloat16.laneCount / 4 }
-}
-
-@available(SwiftStdlib 5.3, *)
-extension SIMDFloat16.BlockVector: ReferenceNarrowVector {
-    package static var laneCount: Int { 16 / MemoryLayout<Float16>.stride }
-
-    package init(lanes: [Float16]) {
-        self = lanes.withUnsafeBufferPointer { buffer in
-            unsafe SIMDFloat16.loadBlock(from: buffer.baseAddress!)
+    package static func blockVector(lanes: [Float16]) -> SIMD<Float16>.BlockVector {
+        lanes.withUnsafeBufferPointer { buffer in
+            unsafe SIMD<Float16>.loadBlock(from: buffer.baseAddress!)
         }
     }
 
-    package var lanes: [Float16] {
-        var lanes = [Float16](repeating: Float16(bitPattern: 0), count: Self.laneCount)
+    package static func lanes(of vector: SIMD<Float16>.BlockVector) -> [Float16] {
+        var lanes = [Float16](
+            repeating: Float16(bitPattern: 0),
+            count: SIMD<Float16>.BlockVector.laneCount
+        )
         lanes.withUnsafeMutableBufferPointer { buffer in
-            unsafe SIMDFloat16.store(self, to: buffer.baseAddress!)
+            unsafe SIMD<Float16>.store(vector, to: buffer.baseAddress!)
         }
         return lanes
     }
 }
 #endif
 
-extension SIMDBFloat16.Vector: ReferenceVector {
-    package typealias InputLane = BFloat16
+extension BFloat16: ReferenceQuarterElement {
+    package static func simdLane(_ lane: BFloat16) -> UInt16 { lane.bitPattern }
 
-    package static func simdLane(_ lane: InputLane) -> UInt16 { lane.bitPattern }
-}
+    package static func vector(_ simd: SIMD<BFloat16>.SIMDType) -> SIMD<BFloat16> {
+        SIMD<BFloat16>(simd)
+    }
 
-extension SIMDBFloat16.Mask: ReferenceMask {}
+    package static func simd(of vector: SIMD<BFloat16>) -> SIMD<BFloat16>.SIMDType {
+        vector.simd
+    }
 
-extension SIMDBFloat16.HalfVector: ReferenceNarrowVector {
-    package static var laneCount: Int { SIMDBFloat16.laneCount / 2 }
+    package static func mask(_ simd: SIMD<BFloat16>.Mask.SIMDType) -> SIMD<BFloat16>.Mask {
+        SIMD<BFloat16>.Mask(simd)
+    }
 
-    package init(lanes: [BFloat16]) {
-        self = lanes.withUnsafeBufferPointer { buffer in
-            unsafe SIMDBFloat16.loadHalf(from: buffer.baseAddress!)
+    package static func simd(of mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16>.Mask.SIMDType {
+        mask.simd
+    }
+
+    package static func halfVector(lanes: [BFloat16]) -> SIMD<BFloat16>.HalfVector {
+        lanes.withUnsafeBufferPointer { buffer in
+            unsafe SIMD<BFloat16>.loadHalf(from: buffer.baseAddress!)
         }
     }
 
-    package var lanes: [BFloat16] {
-        var lanes = [BFloat16](repeating: BFloat16(bitPattern: 0), count: Self.laneCount)
+    package static func lanes(of vector: SIMD<BFloat16>.HalfVector) -> [BFloat16] {
+        var lanes = [BFloat16](
+            repeating: BFloat16(bitPattern: 0),
+            count: SIMD<BFloat16>.HalfVector.laneCount
+        )
         lanes.withUnsafeMutableBufferPointer { buffer in
-            unsafe SIMDBFloat16.store(self, to: buffer.baseAddress!)
+            unsafe SIMD<BFloat16>.store(vector, to: buffer.baseAddress!)
         }
         return lanes
     }
-}
 
-extension SIMDBFloat16.HalfMask: ReferenceNarrowMask {
-    package typealias Lane = Int16
-
-    package static var laneCount: Int { SIMDBFloat16.laneCount / 2 }
-}
-
-extension SIMDBFloat16.QuarterVector: ReferenceNarrowVector {
-    package static var laneCount: Int { SIMDBFloat16.laneCount / 4 }
-
-    package init(lanes: [BFloat16]) {
-        self = lanes.withUnsafeBufferPointer { buffer in
-            unsafe SIMDBFloat16.loadQuarter(from: buffer.baseAddress!)
+    package static func quarterVector(lanes: [BFloat16]) -> SIMD<BFloat16>.QuarterVector {
+        lanes.withUnsafeBufferPointer { buffer in
+            unsafe SIMD<BFloat16>.loadQuarter(from: buffer.baseAddress!)
         }
     }
 
-    package var lanes: [BFloat16] {
-        var lanes = [BFloat16](repeating: BFloat16(bitPattern: 0), count: Self.laneCount)
+    package static func lanes(of vector: SIMD<BFloat16>.QuarterVector) -> [BFloat16] {
+        var lanes = [BFloat16](
+            repeating: BFloat16(bitPattern: 0),
+            count: SIMD<BFloat16>.QuarterVector.laneCount
+        )
         lanes.withUnsafeMutableBufferPointer { buffer in
-            unsafe SIMDBFloat16.store(self, to: buffer.baseAddress!)
+            unsafe SIMD<BFloat16>.store(vector, to: buffer.baseAddress!)
         }
         return lanes
     }
-}
 
-extension SIMDBFloat16.QuarterMask: ReferenceNarrowMask {
-    package typealias Lane = Int16
-
-    package static var laneCount: Int { SIMDBFloat16.laneCount / 4 }
-}
-
-extension SIMDBFloat16.BlockVector: ReferenceNarrowVector {
-    package static var laneCount: Int { 16 / MemoryLayout<BFloat16>.stride }
-
-    package init(lanes: [BFloat16]) {
-        self = lanes.withUnsafeBufferPointer { buffer in
-            unsafe SIMDBFloat16.loadBlock(from: buffer.baseAddress!)
+    package static func blockVector(lanes: [BFloat16]) -> SIMD<BFloat16>.BlockVector {
+        lanes.withUnsafeBufferPointer { buffer in
+            unsafe SIMD<BFloat16>.loadBlock(from: buffer.baseAddress!)
         }
     }
 
-    package var lanes: [BFloat16] {
-        var lanes = [BFloat16](repeating: BFloat16(bitPattern: 0), count: Self.laneCount)
+    package static func lanes(of vector: SIMD<BFloat16>.BlockVector) -> [BFloat16] {
+        var lanes = [BFloat16](
+            repeating: BFloat16(bitPattern: 0),
+            count: SIMD<BFloat16>.BlockVector.laneCount
+        )
         lanes.withUnsafeMutableBufferPointer { buffer in
-            unsafe SIMDBFloat16.store(self, to: buffer.baseAddress!)
+            unsafe SIMD<BFloat16>.store(vector, to: buffer.baseAddress!)
         }
         return lanes
     }
