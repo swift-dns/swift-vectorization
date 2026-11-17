@@ -16,6 +16,9 @@ public protocol SIMDElement {
     associatedtype _RawBlockVector: Sendable
     associatedtype _SIMDBlockVector
     associatedtype IndexLane: SIMDElement where IndexLane.IndexLane == IndexLane
+    associatedtype UnsignedLane: SIMDUnsignedIntegerElement
+    where UnsignedLane.UnsignedLane == UnsignedLane
+    associatedtype SignedLane: SIMDSignedIntegerElement where SignedLane.SignedLane == SignedLane
 
     static var _laneCount: Int { get }
     static var _blockCount: Int { get }
@@ -563,6 +566,346 @@ public protocol SIMDElement {
         atUnchecked index: Int,
         with b: SIMD<Self>.BlockVector
     ) -> SIMD<Self>
+
+    static func _vector(bitPatternOfUInt8 a: SIMD<UInt8>) -> SIMD<Self>
+    static func _vector(bitPatternOfUInt16 a: SIMD<UInt16>) -> SIMD<Self>
+    static func _vector(bitPatternOfUInt32 a: SIMD<UInt32>) -> SIMD<Self>
+    static func _vector(bitPatternOfUInt64 a: SIMD<UInt64>) -> SIMD<Self>
+    static func _vector(bitPatternOfInt8 a: SIMD<Int8>) -> SIMD<Self>
+    static func _vector(bitPatternOfInt16 a: SIMD<Int16>) -> SIMD<Self>
+    static func _vector(bitPatternOfInt32 a: SIMD<Int32>) -> SIMD<Self>
+    static func _vector(bitPatternOfInt64 a: SIMD<Int64>) -> SIMD<Self>
+    static func _vector(bitPatternOfFloat a: SIMD<Float>) -> SIMD<Self>
+    static func _vector(bitPatternOfDouble a: SIMD<Double>) -> SIMD<Self>
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _vector(bitPatternOfFloat16 a: SIMD<Float16>) -> SIMD<Self>
+    #endif
+    static func _vector(bitPatternOfBFloat16 a: SIMD<BFloat16>) -> SIMD<Self>
+    static func _vector<Result: SIMDElement>(
+        bitPattern a: SIMD<Self>,
+        as result: Result.Type
+    ) -> SIMD<Result>
+    static func _vector(resizingOfUInt8 a: SIMD<UInt8>) -> SIMD<Self>
+    static func _vector(resizingOfHalfUInt8 a: SIMD<UInt8>.HalfVector) -> SIMD<Self>
+    static func _vector(resizingOfQuarterUInt8 a: SIMD<UInt8>.QuarterVector) -> SIMD<Self>
+    static func _vector(resizingOfEighthUInt8 a: SIMD<UInt8>.EighthVector) -> SIMD<Self>
+    static func _vector(resizingOfUInt16 a: SIMD<UInt16>) -> SIMD<Self>
+    static func _vector(resizingOfHalfUInt16 a: SIMD<UInt16>.HalfVector) -> SIMD<Self>
+    static func _vector(resizingOfQuarterUInt16 a: SIMD<UInt16>.QuarterVector) -> SIMD<Self>
+    static func _vector(resizingOfUInt32 a: SIMD<UInt32>) -> SIMD<Self>
+    static func _vector(resizingOfHalfUInt32 a: SIMD<UInt32>.HalfVector) -> SIMD<Self>
+    static func _vector(resizingOfUInt64 a: SIMD<UInt64>) -> SIMD<Self>
+    static func _vector(resizingOfHalfUInt64 a: SIMD<UInt64>.HalfVector) -> SIMD<Self>
+    static func _vector(resizingOfInt8 a: SIMD<Int8>) -> SIMD<Self>
+    static func _vector(resizingOfHalfInt8 a: SIMD<Int8>.HalfVector) -> SIMD<Self>
+    static func _vector(resizingOfQuarterInt8 a: SIMD<Int8>.QuarterVector) -> SIMD<Self>
+    static func _vector(resizingOfEighthInt8 a: SIMD<Int8>.EighthVector) -> SIMD<Self>
+    static func _vector(resizingOfInt16 a: SIMD<Int16>) -> SIMD<Self>
+    static func _vector(resizingOfHalfInt16 a: SIMD<Int16>.HalfVector) -> SIMD<Self>
+    static func _vector(resizingOfQuarterInt16 a: SIMD<Int16>.QuarterVector) -> SIMD<Self>
+    static func _vector(resizingOfInt32 a: SIMD<Int32>) -> SIMD<Self>
+    static func _vector(resizingOfHalfInt32 a: SIMD<Int32>.HalfVector) -> SIMD<Self>
+    static func _vector(resizingOfInt64 a: SIMD<Int64>) -> SIMD<Self>
+    static func _vector(resizingOfHalfInt64 a: SIMD<Int64>.HalfVector) -> SIMD<Self>
+    static func _vector(resizingOfFloat a: SIMD<Float>) -> SIMD<Self>
+    static func _vector(resizingOfHalfFloat a: SIMD<Float>.HalfVector) -> SIMD<Self>
+    static func _vector(resizingOfDouble a: SIMD<Double>) -> SIMD<Self>
+    static func _vector(resizingOfHalfDouble a: SIMD<Double>.HalfVector) -> SIMD<Self>
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _vector(resizingOfFloat16 a: SIMD<Float16>) -> SIMD<Self>
+    #endif
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _vector(resizingOfHalfFloat16 a: SIMD<Float16>.HalfVector) -> SIMD<Self>
+    #endif
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _vector(resizingOfQuarterFloat16 a: SIMD<Float16>.QuarterVector) -> SIMD<Self>
+    #endif
+    static func _vector(resizingOfBFloat16 a: SIMD<BFloat16>) -> SIMD<Self>
+    static func _vector(resizingOfHalfBFloat16 a: SIMD<BFloat16>.HalfVector) -> SIMD<Self>
+    static func _vector(resizingOfQuarterBFloat16 a: SIMD<BFloat16>.QuarterVector) -> SIMD<Self>
+    static func _vector<Result: SIMDElement>(
+        resizing a: SIMD<Self>,
+        as result: Result.Type
+    ) -> SIMD<Result>
+    static func _vector<Result: SIMDElement>(
+        resizing a: SIMD<Self>.HalfVector,
+        as result: Result.Type
+    ) -> SIMD<Result>
+    static func _vector(zeroExtendingResizingOfUInt8 a: SIMD<UInt8>) -> SIMD<Self>
+    static func _vector(zeroExtendingResizingOfHalfUInt8 a: SIMD<UInt8>.HalfVector) -> SIMD<Self>
+    static func _vector(
+        zeroExtendingResizingOfQuarterUInt8 a: SIMD<UInt8>.QuarterVector
+    ) -> SIMD<Self>
+    static func _vector(
+        zeroExtendingResizingOfEighthUInt8 a: SIMD<UInt8>.EighthVector
+    ) -> SIMD<Self>
+    static func _vector(zeroExtendingResizingOfUInt16 a: SIMD<UInt16>) -> SIMD<Self>
+    static func _vector(zeroExtendingResizingOfHalfUInt16 a: SIMD<UInt16>.HalfVector) -> SIMD<Self>
+    static func _vector(
+        zeroExtendingResizingOfQuarterUInt16 a: SIMD<UInt16>.QuarterVector
+    ) -> SIMD<Self>
+    static func _vector(zeroExtendingResizingOfUInt32 a: SIMD<UInt32>) -> SIMD<Self>
+    static func _vector(zeroExtendingResizingOfHalfUInt32 a: SIMD<UInt32>.HalfVector) -> SIMD<Self>
+    static func _vector(zeroExtendingResizingOfUInt64 a: SIMD<UInt64>) -> SIMD<Self>
+    static func _vector(zeroExtendingResizingOfHalfUInt64 a: SIMD<UInt64>.HalfVector) -> SIMD<Self>
+    static func _vector(zeroExtendingResizingOfInt8 a: SIMD<Int8>) -> SIMD<Self>
+    static func _vector(zeroExtendingResizingOfHalfInt8 a: SIMD<Int8>.HalfVector) -> SIMD<Self>
+    static func _vector(
+        zeroExtendingResizingOfQuarterInt8 a: SIMD<Int8>.QuarterVector
+    ) -> SIMD<Self>
+    static func _vector(zeroExtendingResizingOfEighthInt8 a: SIMD<Int8>.EighthVector) -> SIMD<Self>
+    static func _vector(zeroExtendingResizingOfInt16 a: SIMD<Int16>) -> SIMD<Self>
+    static func _vector(zeroExtendingResizingOfHalfInt16 a: SIMD<Int16>.HalfVector) -> SIMD<Self>
+    static func _vector(
+        zeroExtendingResizingOfQuarterInt16 a: SIMD<Int16>.QuarterVector
+    ) -> SIMD<Self>
+    static func _vector(zeroExtendingResizingOfInt32 a: SIMD<Int32>) -> SIMD<Self>
+    static func _vector(zeroExtendingResizingOfHalfInt32 a: SIMD<Int32>.HalfVector) -> SIMD<Self>
+    static func _vector(zeroExtendingResizingOfInt64 a: SIMD<Int64>) -> SIMD<Self>
+    static func _vector(zeroExtendingResizingOfHalfInt64 a: SIMD<Int64>.HalfVector) -> SIMD<Self>
+    static func _vector(zeroExtendingResizingOfFloat a: SIMD<Float>) -> SIMD<Self>
+    static func _vector(zeroExtendingResizingOfHalfFloat a: SIMD<Float>.HalfVector) -> SIMD<Self>
+    static func _vector(zeroExtendingResizingOfDouble a: SIMD<Double>) -> SIMD<Self>
+    static func _vector(zeroExtendingResizingOfHalfDouble a: SIMD<Double>.HalfVector) -> SIMD<Self>
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _vector(zeroExtendingResizingOfFloat16 a: SIMD<Float16>) -> SIMD<Self>
+    #endif
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _vector(
+        zeroExtendingResizingOfHalfFloat16 a: SIMD<Float16>.HalfVector
+    ) -> SIMD<Self>
+    #endif
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _vector(
+        zeroExtendingResizingOfQuarterFloat16 a: SIMD<Float16>.QuarterVector
+    ) -> SIMD<Self>
+    #endif
+    static func _vector(zeroExtendingResizingOfBFloat16 a: SIMD<BFloat16>) -> SIMD<Self>
+    static func _vector(
+        zeroExtendingResizingOfHalfBFloat16 a: SIMD<BFloat16>.HalfVector
+    ) -> SIMD<Self>
+    static func _vector(
+        zeroExtendingResizingOfQuarterBFloat16 a: SIMD<BFloat16>.QuarterVector
+    ) -> SIMD<Self>
+    static func _vector<Result: SIMDElement>(
+        zeroExtendingResizing a: SIMD<Self>,
+        as result: Result.Type
+    ) -> SIMD<Result>
+    static func _vector<Result: SIMDElement>(
+        zeroExtendingResizing a: SIMD<Self>.HalfVector,
+        as result: Result.Type
+    ) -> SIMD<Result>
+    static func _halfVector(resizingOfUInt8 a: SIMD<UInt8>) -> SIMD<Self>.HalfVector
+    static func _halfVector(resizingOfHalfUInt8 a: SIMD<UInt8>.HalfVector) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        resizingOfQuarterUInt8 a: SIMD<UInt8>.QuarterVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        resizingOfEighthUInt8 a: SIMD<UInt8>.EighthVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(resizingOfUInt16 a: SIMD<UInt16>) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        resizingOfHalfUInt16 a: SIMD<UInt16>.HalfVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        resizingOfQuarterUInt16 a: SIMD<UInt16>.QuarterVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(resizingOfUInt32 a: SIMD<UInt32>) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        resizingOfHalfUInt32 a: SIMD<UInt32>.HalfVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(resizingOfUInt64 a: SIMD<UInt64>) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        resizingOfHalfUInt64 a: SIMD<UInt64>.HalfVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(resizingOfInt8 a: SIMD<Int8>) -> SIMD<Self>.HalfVector
+    static func _halfVector(resizingOfHalfInt8 a: SIMD<Int8>.HalfVector) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        resizingOfQuarterInt8 a: SIMD<Int8>.QuarterVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        resizingOfEighthInt8 a: SIMD<Int8>.EighthVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(resizingOfInt16 a: SIMD<Int16>) -> SIMD<Self>.HalfVector
+    static func _halfVector(resizingOfHalfInt16 a: SIMD<Int16>.HalfVector) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        resizingOfQuarterInt16 a: SIMD<Int16>.QuarterVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(resizingOfInt32 a: SIMD<Int32>) -> SIMD<Self>.HalfVector
+    static func _halfVector(resizingOfHalfInt32 a: SIMD<Int32>.HalfVector) -> SIMD<Self>.HalfVector
+    static func _halfVector(resizingOfInt64 a: SIMD<Int64>) -> SIMD<Self>.HalfVector
+    static func _halfVector(resizingOfHalfInt64 a: SIMD<Int64>.HalfVector) -> SIMD<Self>.HalfVector
+    static func _halfVector(resizingOfFloat a: SIMD<Float>) -> SIMD<Self>.HalfVector
+    static func _halfVector(resizingOfHalfFloat a: SIMD<Float>.HalfVector) -> SIMD<Self>.HalfVector
+    static func _halfVector(resizingOfDouble a: SIMD<Double>) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        resizingOfHalfDouble a: SIMD<Double>.HalfVector
+    ) -> SIMD<Self>.HalfVector
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _halfVector(resizingOfFloat16 a: SIMD<Float16>) -> SIMD<Self>.HalfVector
+    #endif
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _halfVector(
+        resizingOfHalfFloat16 a: SIMD<Float16>.HalfVector
+    ) -> SIMD<Self>.HalfVector
+    #endif
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _halfVector(
+        resizingOfQuarterFloat16 a: SIMD<Float16>.QuarterVector
+    ) -> SIMD<Self>.HalfVector
+    #endif
+    static func _halfVector(resizingOfBFloat16 a: SIMD<BFloat16>) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        resizingOfHalfBFloat16 a: SIMD<BFloat16>.HalfVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        resizingOfQuarterBFloat16 a: SIMD<BFloat16>.QuarterVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector<Result: SIMDElement>(
+        resizing a: SIMD<Self>,
+        as result: Result.Type
+    ) -> SIMD<Result>.HalfVector
+    static func _halfVector<Result: SIMDElement>(
+        resizing a: SIMD<Self>.HalfVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.HalfVector
+    static func _halfVector(zeroExtendingResizingOfUInt8 a: SIMD<UInt8>) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        zeroExtendingResizingOfHalfUInt8 a: SIMD<UInt8>.HalfVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        zeroExtendingResizingOfQuarterUInt8 a: SIMD<UInt8>.QuarterVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        zeroExtendingResizingOfEighthUInt8 a: SIMD<UInt8>.EighthVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(zeroExtendingResizingOfUInt16 a: SIMD<UInt16>) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        zeroExtendingResizingOfHalfUInt16 a: SIMD<UInt16>.HalfVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        zeroExtendingResizingOfQuarterUInt16 a: SIMD<UInt16>.QuarterVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(zeroExtendingResizingOfUInt32 a: SIMD<UInt32>) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        zeroExtendingResizingOfHalfUInt32 a: SIMD<UInt32>.HalfVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(zeroExtendingResizingOfUInt64 a: SIMD<UInt64>) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        zeroExtendingResizingOfHalfUInt64 a: SIMD<UInt64>.HalfVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(zeroExtendingResizingOfInt8 a: SIMD<Int8>) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        zeroExtendingResizingOfHalfInt8 a: SIMD<Int8>.HalfVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        zeroExtendingResizingOfQuarterInt8 a: SIMD<Int8>.QuarterVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        zeroExtendingResizingOfEighthInt8 a: SIMD<Int8>.EighthVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(zeroExtendingResizingOfInt16 a: SIMD<Int16>) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        zeroExtendingResizingOfHalfInt16 a: SIMD<Int16>.HalfVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        zeroExtendingResizingOfQuarterInt16 a: SIMD<Int16>.QuarterVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(zeroExtendingResizingOfInt32 a: SIMD<Int32>) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        zeroExtendingResizingOfHalfInt32 a: SIMD<Int32>.HalfVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(zeroExtendingResizingOfInt64 a: SIMD<Int64>) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        zeroExtendingResizingOfHalfInt64 a: SIMD<Int64>.HalfVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(zeroExtendingResizingOfFloat a: SIMD<Float>) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        zeroExtendingResizingOfHalfFloat a: SIMD<Float>.HalfVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(zeroExtendingResizingOfDouble a: SIMD<Double>) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        zeroExtendingResizingOfHalfDouble a: SIMD<Double>.HalfVector
+    ) -> SIMD<Self>.HalfVector
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _halfVector(
+        zeroExtendingResizingOfFloat16 a: SIMD<Float16>
+    ) -> SIMD<Self>.HalfVector
+    #endif
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _halfVector(
+        zeroExtendingResizingOfHalfFloat16 a: SIMD<Float16>.HalfVector
+    ) -> SIMD<Self>.HalfVector
+    #endif
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _halfVector(
+        zeroExtendingResizingOfQuarterFloat16 a: SIMD<Float16>.QuarterVector
+    ) -> SIMD<Self>.HalfVector
+    #endif
+    static func _halfVector(
+        zeroExtendingResizingOfBFloat16 a: SIMD<BFloat16>
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        zeroExtendingResizingOfHalfBFloat16 a: SIMD<BFloat16>.HalfVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector(
+        zeroExtendingResizingOfQuarterBFloat16 a: SIMD<BFloat16>.QuarterVector
+    ) -> SIMD<Self>.HalfVector
+    static func _halfVector<Result: SIMDElement>(
+        zeroExtendingResizing a: SIMD<Self>,
+        as result: Result.Type
+    ) -> SIMD<Result>.HalfVector
+    static func _halfVector<Result: SIMDElement>(
+        zeroExtendingResizing a: SIMD<Self>.HalfVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.HalfVector
+    static func _quarterVector<Result: SIMDQuarterVectorElement>(
+        resizing a: SIMD<Self>,
+        as result: Result.Type
+    ) -> SIMD<Result>.QuarterVector
+    static func _quarterVector<Result: SIMDQuarterVectorElement>(
+        resizing a: SIMD<Self>.HalfVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.QuarterVector
+    static func _quarterVector<Result: SIMDQuarterVectorElement>(
+        zeroExtendingResizing a: SIMD<Self>,
+        as result: Result.Type
+    ) -> SIMD<Result>.QuarterVector
+    static func _quarterVector<Result: SIMDQuarterVectorElement>(
+        zeroExtendingResizing a: SIMD<Self>.HalfVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.QuarterVector
+    static func _eighthVector<Result: SIMDEighthVectorElement>(
+        resizing a: SIMD<Self>,
+        as result: Result.Type
+    ) -> SIMD<Result>.EighthVector
+    static func _eighthVector<Result: SIMDEighthVectorElement>(
+        resizing a: SIMD<Self>.HalfVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.EighthVector
+    static func _eighthVector<Result: SIMDEighthVectorElement>(
+        zeroExtendingResizing a: SIMD<Self>,
+        as result: Result.Type
+    ) -> SIMD<Result>.EighthVector
+    static func _eighthVector<Result: SIMDEighthVectorElement>(
+        zeroExtendingResizing a: SIMD<Self>.HalfVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.EighthVector
+    static func _maskToUnsigned(_ mask: SIMD<Self>.Mask) -> SIMD<UnsignedLane>.Mask
+    static func _mask(fromUnsigned mask: SIMD<UnsignedLane>.Mask) -> SIMD<Self>.Mask
 }
 
 /// The lane types that have numeric ops, which are all but `BFloat16`, and the ops only
@@ -1013,6 +1356,8 @@ public protocol SIMDNumericElement: SIMDElement {
         bitsUnchecked bits: Span<UInt8>,
         toUnchecked to: inout MutableSpan<Self>
     ) -> Int
+    static func _upperHalf(_ mask: SIMD<Self>.Mask) -> SIMD<Self>.HalfMask
+    static func _combining(_ a: SIMD<Self>.HalfMask, _ b: SIMD<Self>.HalfMask) -> SIMD<Self>.Mask
 }
 
 /// The ops that only the integer lane types have.
@@ -1093,7 +1438,7 @@ public protocol SIMDIntegerElement: SIMDNumericElement {
 }
 
 /// The ops that only the unsigned integer lane types have.
-public protocol SIMDUnsignedIntegerElement: SIMDIntegerElement {
+public protocol SIMDUnsignedIntegerElement: SIMDIntegerElement where UnsignedLane == Self {
 
     static func _nonzeroBitCount(_ a: SIMD<Self>) -> SIMD<Self>
 }
@@ -1117,7 +1462,8 @@ public protocol SIMDSignedElement: SIMDNumericElement {
 }
 
 /// The ops that only the signed integer lane types have.
-public protocol SIMDSignedIntegerElement: SIMDIntegerElement, SIMDSignedElement {
+public protocol SIMDSignedIntegerElement: SIMDIntegerElement, SIMDSignedElement
+where SignedLane == Self {
 
     static func _saturatingNegated(_ a: SIMD<Self>) -> SIMD<Self>
     static func _saturatingMagnitude(_ a: SIMD<Self>) -> SIMD<Self>
@@ -1131,7 +1477,13 @@ public protocol SIMDSignedIntegerElement: SIMDIntegerElement, SIMDSignedElement 
 }
 
 /// The ops that only the floating point lane types have.
-public protocol SIMDFloatElement: SIMDSignedElement {
+public protocol SIMDFloatElement: SIMDSignedElement
+where
+    SignedLane: SIMDFloatConvertibleElement,
+    UnsignedLane: SIMDFloatConvertibleElement,
+    SignedLane.FloatLane == Self,
+    UnsignedLane.FloatLane == Self
+{
 
     static func _copyingSign(_ a: SIMD<Self>, from b: SIMD<Self>) -> SIMD<Self>
     static func _copyingSignToMagnitude(_ a: SIMD<Self>, from b: SIMD<Self>) -> SIMD<Self>
@@ -1166,6 +1518,12 @@ public protocol SIMDFloatElement: SIMDSignedElement {
         where mask: SIMD<Self>.Mask
     ) -> SIMD<Self>
     static func _isNaN(_ a: SIMD<Self>, where mask: SIMD<Self>.Mask) -> SIMD<Self>.Mask
+
+    static func _vector(roundingToNearestOrEven a: SIMD<Self>) -> SIMD<SignedLane>
+    static func _vector(roundingUp a: SIMD<Self>) -> SIMD<SignedLane>
+    static func _vector(roundingDown a: SIMD<Self>) -> SIMD<SignedLane>
+    static func _multiplyingByPowerOf2(_ a: SIMD<Self>, _ b: SIMD<SignedLane>) -> SIMD<Self>
+    static func _biasedExponent(_ a: SIMD<Self>) -> SIMD<UnsignedLane>
 }
 
 /// The lane types that have quarter vectors, and the ops on them.
@@ -1195,6 +1553,225 @@ public protocol SIMDQuarterVectorElement: SIMDElement {
         _ a: SIMD<Self>.QuarterVector,
         toUnchecked output: inout OutputSpan<Self>
     )
+
+    static func _vector<Result: SIMDElement>(
+        resizing a: SIMD<Self>.QuarterVector,
+        as result: Result.Type
+    ) -> SIMD<Result>
+    static func _vector<Result: SIMDElement>(
+        zeroExtendingResizing a: SIMD<Self>.QuarterVector,
+        as result: Result.Type
+    ) -> SIMD<Result>
+    static func _halfVector<Result: SIMDElement>(
+        resizing a: SIMD<Self>.QuarterVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.HalfVector
+    static func _halfVector<Result: SIMDElement>(
+        zeroExtendingResizing a: SIMD<Self>.QuarterVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.HalfVector
+    static func _quarterVector(resizingOfUInt8 a: SIMD<UInt8>) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        resizingOfHalfUInt8 a: SIMD<UInt8>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        resizingOfQuarterUInt8 a: SIMD<UInt8>.QuarterVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        resizingOfEighthUInt8 a: SIMD<UInt8>.EighthVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(resizingOfUInt16 a: SIMD<UInt16>) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        resizingOfHalfUInt16 a: SIMD<UInt16>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        resizingOfQuarterUInt16 a: SIMD<UInt16>.QuarterVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(resizingOfUInt32 a: SIMD<UInt32>) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        resizingOfHalfUInt32 a: SIMD<UInt32>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(resizingOfUInt64 a: SIMD<UInt64>) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        resizingOfHalfUInt64 a: SIMD<UInt64>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(resizingOfInt8 a: SIMD<Int8>) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        resizingOfHalfInt8 a: SIMD<Int8>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        resizingOfQuarterInt8 a: SIMD<Int8>.QuarterVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        resizingOfEighthInt8 a: SIMD<Int8>.EighthVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(resizingOfInt16 a: SIMD<Int16>) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        resizingOfHalfInt16 a: SIMD<Int16>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        resizingOfQuarterInt16 a: SIMD<Int16>.QuarterVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(resizingOfInt32 a: SIMD<Int32>) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        resizingOfHalfInt32 a: SIMD<Int32>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(resizingOfInt64 a: SIMD<Int64>) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        resizingOfHalfInt64 a: SIMD<Int64>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(resizingOfFloat a: SIMD<Float>) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        resizingOfHalfFloat a: SIMD<Float>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(resizingOfDouble a: SIMD<Double>) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        resizingOfHalfDouble a: SIMD<Double>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _quarterVector(resizingOfFloat16 a: SIMD<Float16>) -> SIMD<Self>.QuarterVector
+    #endif
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _quarterVector(
+        resizingOfHalfFloat16 a: SIMD<Float16>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    #endif
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _quarterVector(
+        resizingOfQuarterFloat16 a: SIMD<Float16>.QuarterVector
+    ) -> SIMD<Self>.QuarterVector
+    #endif
+    static func _quarterVector(resizingOfBFloat16 a: SIMD<BFloat16>) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        resizingOfHalfBFloat16 a: SIMD<BFloat16>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        resizingOfQuarterBFloat16 a: SIMD<BFloat16>.QuarterVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector<Result: SIMDQuarterVectorElement>(
+        resizing a: SIMD<Self>.QuarterVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfUInt8 a: SIMD<UInt8>
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfHalfUInt8 a: SIMD<UInt8>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfQuarterUInt8 a: SIMD<UInt8>.QuarterVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfEighthUInt8 a: SIMD<UInt8>.EighthVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfUInt16 a: SIMD<UInt16>
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfHalfUInt16 a: SIMD<UInt16>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfQuarterUInt16 a: SIMD<UInt16>.QuarterVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfUInt32 a: SIMD<UInt32>
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfHalfUInt32 a: SIMD<UInt32>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfUInt64 a: SIMD<UInt64>
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfHalfUInt64 a: SIMD<UInt64>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfInt8 a: SIMD<Int8>
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfHalfInt8 a: SIMD<Int8>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfQuarterInt8 a: SIMD<Int8>.QuarterVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfEighthInt8 a: SIMD<Int8>.EighthVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfInt16 a: SIMD<Int16>
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfHalfInt16 a: SIMD<Int16>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfQuarterInt16 a: SIMD<Int16>.QuarterVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfInt32 a: SIMD<Int32>
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfHalfInt32 a: SIMD<Int32>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfInt64 a: SIMD<Int64>
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfHalfInt64 a: SIMD<Int64>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfFloat a: SIMD<Float>
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfHalfFloat a: SIMD<Float>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfDouble a: SIMD<Double>
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfHalfDouble a: SIMD<Double>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _quarterVector(
+        zeroExtendingResizingOfFloat16 a: SIMD<Float16>
+    ) -> SIMD<Self>.QuarterVector
+    #endif
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _quarterVector(
+        zeroExtendingResizingOfHalfFloat16 a: SIMD<Float16>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    #endif
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _quarterVector(
+        zeroExtendingResizingOfQuarterFloat16 a: SIMD<Float16>.QuarterVector
+    ) -> SIMD<Self>.QuarterVector
+    #endif
+    static func _quarterVector(
+        zeroExtendingResizingOfBFloat16 a: SIMD<BFloat16>
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfHalfBFloat16 a: SIMD<BFloat16>.HalfVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector(
+        zeroExtendingResizingOfQuarterBFloat16 a: SIMD<BFloat16>.QuarterVector
+    ) -> SIMD<Self>.QuarterVector
+    static func _quarterVector<Result: SIMDQuarterVectorElement>(
+        zeroExtendingResizing a: SIMD<Self>.QuarterVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.QuarterVector
+    static func _eighthVector<Result: SIMDEighthVectorElement>(
+        resizing a: SIMD<Self>.QuarterVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.EighthVector
+    static func _eighthVector<Result: SIMDEighthVectorElement>(
+        zeroExtendingResizing a: SIMD<Self>.QuarterVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.EighthVector
 }
 
 /// The lane types that have eighth vectors, and the ops on them.
@@ -1223,5 +1800,586 @@ public protocol SIMDEighthVectorElement: SIMDQuarterVectorElement {
     @unsafe static func _append(
         _ a: SIMD<Self>.EighthVector,
         toUnchecked output: inout OutputSpan<Self>
+    )
+
+    static func _vector<Result: SIMDElement>(
+        resizing a: SIMD<Self>.EighthVector,
+        as result: Result.Type
+    ) -> SIMD<Result>
+    static func _vector<Result: SIMDElement>(
+        zeroExtendingResizing a: SIMD<Self>.EighthVector,
+        as result: Result.Type
+    ) -> SIMD<Result>
+    static func _halfVector<Result: SIMDElement>(
+        resizing a: SIMD<Self>.EighthVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.HalfVector
+    static func _halfVector<Result: SIMDElement>(
+        zeroExtendingResizing a: SIMD<Self>.EighthVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.HalfVector
+    static func _quarterVector<Result: SIMDQuarterVectorElement>(
+        resizing a: SIMD<Self>.EighthVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.QuarterVector
+    static func _quarterVector<Result: SIMDQuarterVectorElement>(
+        zeroExtendingResizing a: SIMD<Self>.EighthVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.QuarterVector
+    static func _eighthVector(resizingOfUInt8 a: SIMD<UInt8>) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        resizingOfHalfUInt8 a: SIMD<UInt8>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        resizingOfQuarterUInt8 a: SIMD<UInt8>.QuarterVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        resizingOfEighthUInt8 a: SIMD<UInt8>.EighthVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(resizingOfUInt16 a: SIMD<UInt16>) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        resizingOfHalfUInt16 a: SIMD<UInt16>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        resizingOfQuarterUInt16 a: SIMD<UInt16>.QuarterVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(resizingOfUInt32 a: SIMD<UInt32>) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        resizingOfHalfUInt32 a: SIMD<UInt32>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(resizingOfUInt64 a: SIMD<UInt64>) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        resizingOfHalfUInt64 a: SIMD<UInt64>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(resizingOfInt8 a: SIMD<Int8>) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        resizingOfHalfInt8 a: SIMD<Int8>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        resizingOfQuarterInt8 a: SIMD<Int8>.QuarterVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        resizingOfEighthInt8 a: SIMD<Int8>.EighthVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(resizingOfInt16 a: SIMD<Int16>) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        resizingOfHalfInt16 a: SIMD<Int16>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        resizingOfQuarterInt16 a: SIMD<Int16>.QuarterVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(resizingOfInt32 a: SIMD<Int32>) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        resizingOfHalfInt32 a: SIMD<Int32>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(resizingOfInt64 a: SIMD<Int64>) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        resizingOfHalfInt64 a: SIMD<Int64>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(resizingOfFloat a: SIMD<Float>) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        resizingOfHalfFloat a: SIMD<Float>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(resizingOfDouble a: SIMD<Double>) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        resizingOfHalfDouble a: SIMD<Double>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _eighthVector(resizingOfFloat16 a: SIMD<Float16>) -> SIMD<Self>.EighthVector
+    #endif
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _eighthVector(
+        resizingOfHalfFloat16 a: SIMD<Float16>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    #endif
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _eighthVector(
+        resizingOfQuarterFloat16 a: SIMD<Float16>.QuarterVector
+    ) -> SIMD<Self>.EighthVector
+    #endif
+    static func _eighthVector(resizingOfBFloat16 a: SIMD<BFloat16>) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        resizingOfHalfBFloat16 a: SIMD<BFloat16>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        resizingOfQuarterBFloat16 a: SIMD<BFloat16>.QuarterVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector<Result: SIMDEighthVectorElement>(
+        resizing a: SIMD<Self>.EighthVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfUInt8 a: SIMD<UInt8>
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfHalfUInt8 a: SIMD<UInt8>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfQuarterUInt8 a: SIMD<UInt8>.QuarterVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfEighthUInt8 a: SIMD<UInt8>.EighthVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfUInt16 a: SIMD<UInt16>
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfHalfUInt16 a: SIMD<UInt16>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfQuarterUInt16 a: SIMD<UInt16>.QuarterVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfUInt32 a: SIMD<UInt32>
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfHalfUInt32 a: SIMD<UInt32>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfUInt64 a: SIMD<UInt64>
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfHalfUInt64 a: SIMD<UInt64>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(zeroExtendingResizingOfInt8 a: SIMD<Int8>) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfHalfInt8 a: SIMD<Int8>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfQuarterInt8 a: SIMD<Int8>.QuarterVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfEighthInt8 a: SIMD<Int8>.EighthVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfInt16 a: SIMD<Int16>
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfHalfInt16 a: SIMD<Int16>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfQuarterInt16 a: SIMD<Int16>.QuarterVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfInt32 a: SIMD<Int32>
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfHalfInt32 a: SIMD<Int32>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfInt64 a: SIMD<Int64>
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfHalfInt64 a: SIMD<Int64>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfFloat a: SIMD<Float>
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfHalfFloat a: SIMD<Float>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfDouble a: SIMD<Double>
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfHalfDouble a: SIMD<Double>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _eighthVector(
+        zeroExtendingResizingOfFloat16 a: SIMD<Float16>
+    ) -> SIMD<Self>.EighthVector
+    #endif
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _eighthVector(
+        zeroExtendingResizingOfHalfFloat16 a: SIMD<Float16>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    #endif
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    static func _eighthVector(
+        zeroExtendingResizingOfQuarterFloat16 a: SIMD<Float16>.QuarterVector
+    ) -> SIMD<Self>.EighthVector
+    #endif
+    static func _eighthVector(
+        zeroExtendingResizingOfBFloat16 a: SIMD<BFloat16>
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfHalfBFloat16 a: SIMD<BFloat16>.HalfVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector(
+        zeroExtendingResizingOfQuarterBFloat16 a: SIMD<BFloat16>.QuarterVector
+    ) -> SIMD<Self>.EighthVector
+    static func _eighthVector<Result: SIMDEighthVectorElement>(
+        zeroExtendingResizing a: SIMD<Self>.EighthVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.EighthVector
+}
+
+/// The lane types that have a lane type twice as wide of the same kind.
+public protocol SIMDWidenableElement: SIMDElement {
+    associatedtype WideLane: SIMDNarrowableElement where WideLane.NarrowLane == Self
+
+    static func _vector(widening a: SIMD<Self>.HalfVector) -> SIMD<WideLane>
+    static func _vector(wideningLower a: SIMD<Self>) -> SIMD<WideLane>
+    static func _vector(wideningUpper a: SIMD<Self>) -> SIMD<WideLane>
+    static func _vector(wideningEven a: SIMD<Self>) -> SIMD<WideLane>
+    static func _vector(wideningOdd a: SIMD<Self>) -> SIMD<WideLane>
+    static func _sumsOf2(_ a: SIMD<Self>) -> SIMD<WideLane>
+    static func _zippingLower(_ a: SIMD<Self>, _ b: SIMD<Self>) -> SIMD<WideLane>
+    static func _mask(
+        narrowing a: SIMD<WideLane.UnsignedLane>.Mask,
+        _ b: SIMD<WideLane.UnsignedLane>.Mask
+    ) -> SIMD<Self>.Mask
+    static func _halfMask(narrowing mask: SIMD<WideLane.UnsignedLane>.Mask) -> SIMD<Self>.HalfMask
+    static func _mask(widening mask: SIMD<Self>.HalfMask) -> SIMD<WideLane.UnsignedLane>.Mask
+}
+
+/// The lane types that have a lane type half as wide of the same kind.
+public protocol SIMDNarrowableElement: SIMDElement {
+    associatedtype NarrowLane: SIMDWidenableElement where NarrowLane.WideLane == Self
+}
+
+/// The integer lane types that have a floating point lane type of the same width.
+public protocol SIMDFloatConvertibleElement: SIMDIntegerElement {
+    associatedtype FloatLane: SIMDFloatElement
+
+    static func _vector(convertingToFloat a: SIMD<Self>) -> SIMD<FloatLane>
+    static func _vector(
+        convertingToFloat a: SIMD<Self>,
+        where mask: SIMD<FloatLane>.Mask
+    ) -> SIMD<FloatLane>
+    static func _vector(convertingFromFloat a: SIMD<FloatLane>) -> SIMD<Self>
+    static func _vector(
+        convertingFromFloat a: SIMD<FloatLane>,
+        where mask: SIMD<Self>.Mask
+    ) -> SIMD<Self>
+    static func _vector(convertingInRangeFromFloat a: SIMD<FloatLane>) -> SIMD<Self>
+}
+
+/// The integer lane types that have an integer lane type half as wide, which in turn has
+/// one twice as wide.
+public protocol SIMDWideIntegerElement: SIMDIntegerElement, SIMDNarrowableElement
+where NarrowLane: SIMDWidenableIntegerElement, UnsignedLane: SIMDWideIntegerElement {
+
+    static func _multiplyingEven(_ a: SIMD<NarrowLane>, _ b: SIMD<NarrowLane>) -> SIMD<Self>
+    static func _multiplyingOdd(_ a: SIMD<NarrowLane>, _ b: SIMD<NarrowLane>) -> SIMD<Self>
+    static func _multiplyAccumulating(
+        _ a: SIMD<NarrowLane>,
+        _ b: SIMD<NarrowLane>,
+        _ c: SIMD<Self>,
+        _ v0: inout SIMD<Self>
+    ) -> SIMD<Self>
+    static func _zippingUpper(_ a: SIMD<NarrowLane>, _ b: SIMD<NarrowLane>) -> SIMD<Self>
+    static func _halfVector(
+        clampingToSigned a: SIMD<Self>
+    ) -> SIMD<NarrowLane.SignedLane>.HalfVector
+    static func _halfVector(
+        clampingToSigned a: SIMD<Self>,
+        shiftedRightBy bits: Int
+    ) -> SIMD<NarrowLane.SignedLane>.HalfVector
+    @unsafe static func _halfVector(
+        clampingToSigned a: SIMD<Self>,
+        shiftedRightByUnchecked bits: Int
+    ) -> SIMD<NarrowLane.SignedLane>.HalfVector
+    static func _halfVector(
+        clampingToSigned a: SIMD<Self>,
+        roundingShiftedRightBy bits: Int
+    ) -> SIMD<NarrowLane.SignedLane>.HalfVector
+    @unsafe static func _halfVector(
+        clampingToSigned a: SIMD<Self>,
+        roundingShiftedRightByUnchecked bits: Int
+    ) -> SIMD<NarrowLane.SignedLane>.HalfVector
+    static func _vector(
+        clampingToSigned a: SIMD<Self>,
+        _ b: SIMD<Self>
+    ) -> SIMD<NarrowLane.SignedLane>
+    static func _vector(
+        clampingInAnyOrderToSigned a: SIMD<Self>,
+        _ b: SIMD<Self>
+    ) -> SIMD<NarrowLane.SignedLane>
+    static func _vector(
+        clampingToSigned a: SIMD<Self>,
+        _ b: SIMD<Self>,
+        shiftedRightBy bits: Int
+    ) -> SIMD<NarrowLane.SignedLane>
+    @unsafe static func _vector(
+        clampingToSigned a: SIMD<Self>,
+        _ b: SIMD<Self>,
+        shiftedRightByUnchecked bits: Int
+    ) -> SIMD<NarrowLane.SignedLane>
+    static func _vector(
+        clampingToSigned a: SIMD<Self>,
+        _ b: SIMD<Self>,
+        roundingShiftedRightBy bits: Int
+    ) -> SIMD<NarrowLane.SignedLane>
+    @unsafe static func _vector(
+        clampingToSigned a: SIMD<Self>,
+        _ b: SIMD<Self>,
+        roundingShiftedRightByUnchecked bits: Int
+    ) -> SIMD<NarrowLane.SignedLane>
+    static func _vector(
+        clampingInAnyOrderToSigned a: SIMD<Self>,
+        _ b: SIMD<Self>,
+        shiftedRightBy bits: Int
+    ) -> SIMD<NarrowLane.SignedLane>
+    @unsafe static func _vector(
+        clampingInAnyOrderToSigned a: SIMD<Self>,
+        _ b: SIMD<Self>,
+        shiftedRightByUnchecked bits: Int
+    ) -> SIMD<NarrowLane.SignedLane>
+    static func _vector(
+        clampingInAnyOrderToSigned a: SIMD<Self>,
+        _ b: SIMD<Self>,
+        roundingShiftedRightBy bits: Int
+    ) -> SIMD<NarrowLane.SignedLane>
+    @unsafe static func _vector(
+        clampingInAnyOrderToSigned a: SIMD<Self>,
+        _ b: SIMD<Self>,
+        roundingShiftedRightByUnchecked bits: Int
+    ) -> SIMD<NarrowLane.SignedLane>
+    static func _halfVector(
+        clampingToUnsigned a: SIMD<Self>
+    ) -> SIMD<NarrowLane.UnsignedLane>.HalfVector
+    static func _halfVector(
+        clampingToUnsigned a: SIMD<Self>,
+        shiftedRightBy bits: Int
+    ) -> SIMD<NarrowLane.UnsignedLane>.HalfVector
+    @unsafe static func _halfVector(
+        clampingToUnsigned a: SIMD<Self>,
+        shiftedRightByUnchecked bits: Int
+    ) -> SIMD<NarrowLane.UnsignedLane>.HalfVector
+    static func _halfVector(
+        clampingToUnsigned a: SIMD<Self>,
+        roundingShiftedRightBy bits: Int
+    ) -> SIMD<NarrowLane.UnsignedLane>.HalfVector
+    @unsafe static func _halfVector(
+        clampingToUnsigned a: SIMD<Self>,
+        roundingShiftedRightByUnchecked bits: Int
+    ) -> SIMD<NarrowLane.UnsignedLane>.HalfVector
+    static func _vector(
+        clampingToUnsigned a: SIMD<Self>,
+        _ b: SIMD<Self>
+    ) -> SIMD<NarrowLane.UnsignedLane>
+    static func _vector(
+        clampingInAnyOrderToUnsigned a: SIMD<Self>,
+        _ b: SIMD<Self>
+    ) -> SIMD<NarrowLane.UnsignedLane>
+    static func _vector(
+        clampingToUnsigned a: SIMD<Self>,
+        _ b: SIMD<Self>,
+        shiftedRightBy bits: Int
+    ) -> SIMD<NarrowLane.UnsignedLane>
+    @unsafe static func _vector(
+        clampingToUnsigned a: SIMD<Self>,
+        _ b: SIMD<Self>,
+        shiftedRightByUnchecked bits: Int
+    ) -> SIMD<NarrowLane.UnsignedLane>
+    static func _vector(
+        clampingToUnsigned a: SIMD<Self>,
+        _ b: SIMD<Self>,
+        roundingShiftedRightBy bits: Int
+    ) -> SIMD<NarrowLane.UnsignedLane>
+    @unsafe static func _vector(
+        clampingToUnsigned a: SIMD<Self>,
+        _ b: SIMD<Self>,
+        roundingShiftedRightByUnchecked bits: Int
+    ) -> SIMD<NarrowLane.UnsignedLane>
+    static func _vector(
+        clampingInAnyOrderToUnsigned a: SIMD<Self>,
+        _ b: SIMD<Self>,
+        shiftedRightBy bits: Int
+    ) -> SIMD<NarrowLane.UnsignedLane>
+    @unsafe static func _vector(
+        clampingInAnyOrderToUnsigned a: SIMD<Self>,
+        _ b: SIMD<Self>,
+        shiftedRightByUnchecked bits: Int
+    ) -> SIMD<NarrowLane.UnsignedLane>
+    static func _vector(
+        clampingInAnyOrderToUnsigned a: SIMD<Self>,
+        _ b: SIMD<Self>,
+        roundingShiftedRightBy bits: Int
+    ) -> SIMD<NarrowLane.UnsignedLane>
+    @unsafe static func _vector(
+        clampingInAnyOrderToUnsigned a: SIMD<Self>,
+        _ b: SIMD<Self>,
+        roundingShiftedRightByUnchecked bits: Int
+    ) -> SIMD<NarrowLane.UnsignedLane>
+    static func _halfVector(
+        truncatingIfNeeded a: SIMD<UnsignedLane>
+    ) -> SIMD<UnsignedLane.NarrowLane>.HalfVector
+    static func _vector(
+        truncatingIfNeeded a: SIMD<UnsignedLane>,
+        _ b: SIMD<UnsignedLane>
+    ) -> SIMD<UnsignedLane.NarrowLane>
+}
+
+/// The integer lane types that have an integer lane type twice as wide.
+public protocol SIMDWidenableIntegerElement: SIMDIntegerElement, SIMDWidenableElement
+where WideLane: SIMDWideIntegerElement {
+}
+
+/// The lane types that `gather` and `scatter` work on.
+public protocol SIMDGatherableElement: SIMDNumericElement {
+
+    static func _gather(from: UnsafePointer<Self>, indices: SIMD<SignedLane>) -> SIMD<Self>
+    @available(SwiftStdlib 5.1, *)
+    static func _gather(from span: Span<Self>, indices: SIMD<SignedLane>) -> SIMD<Self>
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func _gather(
+        fromUnchecked span: Span<Self>,
+        indices: SIMD<SignedLane>
+    ) -> SIMD<Self>
+    static func _gather(from: UnsafePointer<Self>, byteOffsets: SIMD<SignedLane>) -> SIMD<Self>
+    @available(SwiftStdlib 5.1, *)
+    static func _gather(from span: Span<Self>, byteOffsets: SIMD<SignedLane>) -> SIMD<Self>
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func _gather(
+        fromUnchecked span: Span<Self>,
+        byteOffsets: SIMD<SignedLane>
+    ) -> SIMD<Self>
+    static func _gather(
+        from: UnsafePointer<Self>,
+        indices: SIMD<SignedLane>,
+        count: Int
+    ) -> SIMD<Self>
+    @available(SwiftStdlib 5.1, *)
+    static func _gather(from span: Span<Self>, indices: SIMD<SignedLane>, count: Int) -> SIMD<Self>
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func _gather(
+        fromUnchecked span: Span<Self>,
+        indices: SIMD<SignedLane>,
+        count: Int
+    ) -> SIMD<Self>
+    static func _gather(
+        from: UnsafePointer<Self>,
+        indices: SIMD<SignedLane>,
+        count: Int,
+        otherwise: SIMD<Self>
+    ) -> SIMD<Self>
+    @available(SwiftStdlib 5.1, *)
+    static func _gather(
+        from span: Span<Self>,
+        indices: SIMD<SignedLane>,
+        count: Int,
+        otherwise: SIMD<Self>
+    ) -> SIMD<Self>
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func _gather(
+        fromUnchecked span: Span<Self>,
+        indices: SIMD<SignedLane>,
+        count: Int,
+        otherwise: SIMD<Self>
+    ) -> SIMD<Self>
+    static func _gather(
+        from: UnsafePointer<Self>,
+        indices: SIMD<SignedLane>,
+        where mask: SIMD<Self>.Mask
+    ) -> SIMD<Self>
+    @available(SwiftStdlib 5.1, *)
+    static func _gather(
+        from span: Span<Self>,
+        indices: SIMD<SignedLane>,
+        where mask: SIMD<Self>.Mask
+    ) -> SIMD<Self>
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func _gather(
+        fromUnchecked span: Span<Self>,
+        indices: SIMD<SignedLane>,
+        where mask: SIMD<Self>.Mask
+    ) -> SIMD<Self>
+    static func _gather(
+        from: UnsafePointer<Self>,
+        indices: SIMD<SignedLane>,
+        where mask: SIMD<Self>.Mask,
+        otherwise: SIMD<Self>
+    ) -> SIMD<Self>
+    @available(SwiftStdlib 5.1, *)
+    static func _gather(
+        from span: Span<Self>,
+        indices: SIMD<SignedLane>,
+        where mask: SIMD<Self>.Mask,
+        otherwise: SIMD<Self>
+    ) -> SIMD<Self>
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func _gather(
+        fromUnchecked span: Span<Self>,
+        indices: SIMD<SignedLane>,
+        where mask: SIMD<Self>.Mask,
+        otherwise: SIMD<Self>
+    ) -> SIMD<Self>
+    static func _scatter(_ a: SIMD<Self>, to: UnsafeMutablePointer<Self>, indices: SIMD<SignedLane>)
+    @available(SwiftStdlib 5.1, *)
+    static func _scatter(
+        _ a: SIMD<Self>,
+        to span: inout MutableSpan<Self>,
+        indices: SIMD<SignedLane>
+    )
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func _scatter(
+        _ a: SIMD<Self>,
+        toUnchecked span: inout MutableSpan<Self>,
+        indices: SIMD<SignedLane>
+    )
+    static func _scatter(
+        _ a: SIMD<Self>,
+        to: UnsafeMutablePointer<Self>,
+        byteOffsets: SIMD<SignedLane>
+    )
+    @available(SwiftStdlib 5.1, *)
+    static func _scatter(
+        _ a: SIMD<Self>,
+        to span: inout MutableSpan<Self>,
+        byteOffsets: SIMD<SignedLane>
+    )
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func _scatter(
+        _ a: SIMD<Self>,
+        toUnchecked span: inout MutableSpan<Self>,
+        byteOffsets: SIMD<SignedLane>
+    )
+    static func _scatter(
+        _ a: SIMD<Self>,
+        to: UnsafeMutablePointer<Self>,
+        indices: SIMD<SignedLane>,
+        count: Int
+    )
+    @available(SwiftStdlib 5.1, *)
+    static func _scatter(
+        _ a: SIMD<Self>,
+        to span: inout MutableSpan<Self>,
+        indices: SIMD<SignedLane>,
+        count: Int
+    )
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func _scatter(
+        _ a: SIMD<Self>,
+        toUnchecked span: inout MutableSpan<Self>,
+        indices: SIMD<SignedLane>,
+        count: Int
+    )
+    static func _scatter(
+        _ a: SIMD<Self>,
+        to: UnsafeMutablePointer<Self>,
+        indices: SIMD<SignedLane>,
+        where mask: SIMD<Self>.Mask
+    )
+    @available(SwiftStdlib 5.1, *)
+    static func _scatter(
+        _ a: SIMD<Self>,
+        to span: inout MutableSpan<Self>,
+        indices: SIMD<SignedLane>,
+        where mask: SIMD<Self>.Mask
+    )
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func _scatter(
+        _ a: SIMD<Self>,
+        toUnchecked span: inout MutableSpan<Self>,
+        indices: SIMD<SignedLane>,
+        where mask: SIMD<Self>.Mask
     )
 }

@@ -2,7 +2,7 @@
 
 public import CVectorizationOps
 
-extension Int8: SIMDSignedIntegerElement, SIMDEighthVectorElement {
+extension Int8: SIMDSignedIntegerElement, SIMDEighthVectorElement, SIMDWidenableIntegerElement {
     public typealias _RawVector = cvectorization_ops_raw_vector_i8
     public typealias _RawMask = cvectorization_ops_raw_mask_i8
     public typealias _SIMDVector = cvectorization_ops_vector_i8
@@ -14,6 +14,8 @@ extension Int8: SIMDSignedIntegerElement, SIMDEighthVectorElement {
     public typealias _RawBlockVector = cvectorization_ops_raw_block_i8
     public typealias _SIMDBlockVector = cvectorization_ops_block_i8
     public typealias IndexLane = Int8
+    public typealias UnsignedLane = UInt8
+    public typealias SignedLane = Int8
     public typealias _RawQuarterVector = cvectorization_ops_raw_quarter_vector_i8
     public typealias _RawQuarterMask = cvectorization_ops_raw_quarter_mask_i8
     public typealias _SIMDQuarterVector = cvectorization_ops_quarter_vector_i8
@@ -22,4 +24,5 @@ extension Int8: SIMDSignedIntegerElement, SIMDEighthVectorElement {
     public typealias _RawEighthMask = cvectorization_ops_raw_eighth_mask_i8
     public typealias _SIMDEighthVector = cvectorization_ops_eighth_vector_i8
     public typealias _SIMDEighthMask = cvectorization_ops_eighth_mask_i8
+    public typealias WideLane = Int16
 }

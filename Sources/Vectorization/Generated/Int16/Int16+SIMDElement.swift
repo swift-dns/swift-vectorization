@@ -2,7 +2,9 @@
 
 public import CVectorizationOps
 
-extension Int16: SIMDSignedIntegerElement, SIMDQuarterVectorElement {
+extension Int16: SIMDSignedIntegerElement, SIMDQuarterVectorElement, SIMDWideIntegerElement,
+    SIMDWidenableIntegerElement
+{
     public typealias _RawVector = cvectorization_ops_raw_vector_i16
     public typealias _RawMask = cvectorization_ops_raw_mask_i16
     public typealias _SIMDVector = cvectorization_ops_vector_i16
@@ -14,8 +16,19 @@ extension Int16: SIMDSignedIntegerElement, SIMDQuarterVectorElement {
     public typealias _RawBlockVector = cvectorization_ops_raw_block_i16
     public typealias _SIMDBlockVector = cvectorization_ops_block_i16
     public typealias IndexLane = Int16
+    public typealias UnsignedLane = UInt16
+    public typealias SignedLane = Int16
     public typealias _RawQuarterVector = cvectorization_ops_raw_quarter_vector_i16
     public typealias _RawQuarterMask = cvectorization_ops_raw_quarter_mask_i16
     public typealias _SIMDQuarterVector = cvectorization_ops_quarter_vector_i16
     public typealias _SIMDQuarterMask = cvectorization_ops_quarter_mask_i16
+    public typealias WideLane = Int32
+    public typealias NarrowLane = Int8
 }
+
+#if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+@available(SwiftStdlib 5.3, *)
+extension Int16: SIMDFloatConvertibleElement {
+    public typealias FloatLane = Float16
+}
+#endif

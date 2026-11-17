@@ -2,7 +2,7 @@
 
 public import CVectorizationOps
 
-extension Double: SIMDFloatElement {
+extension Double: SIMDFloatElement, SIMDNarrowableElement, SIMDGatherableElement {
     public typealias _RawVector = cvectorization_ops_vector_f64
     public typealias _RawMask = cvectorization_ops_raw_mask_f64
     public typealias _SIMDVector = cvectorization_ops_vector_f64
@@ -14,4 +14,7 @@ extension Double: SIMDFloatElement {
     public typealias _RawBlockVector = cvectorization_ops_raw_block_f64
     public typealias _SIMDBlockVector = cvectorization_ops_block_f64
     public typealias IndexLane = Int64
+    public typealias UnsignedLane = UInt64
+    public typealias SignedLane = Int64
+    public typealias NarrowLane = Float
 }

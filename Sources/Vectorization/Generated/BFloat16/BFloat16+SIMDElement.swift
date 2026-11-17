@@ -14,6 +14,8 @@ extension BFloat16: SIMDQuarterVectorElement {
     public typealias _RawBlockVector = cvectorization_ops_raw_block_bf16
     public typealias _SIMDBlockVector = cvectorization_ops_block_bf16
     public typealias IndexLane = Int16
+    public typealias UnsignedLane = UInt16
+    public typealias SignedLane = Int16
     public typealias _RawQuarterVector = cvectorization_ops_raw_quarter_vector_bf16
     public typealias _RawQuarterMask = cvectorization_ops_raw_quarter_mask_bf16
     public typealias _SIMDQuarterVector = cvectorization_ops_quarter_vector_bf16

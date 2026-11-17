@@ -47,6 +47,15 @@ private func expectHalfAndBlockOps<Lane: SIMDElement & Equatable>(
     #expect(appended { H.append(replacing, to: &$0) } == replaced, "\(H.self) replaced block")
 }
 
+private func halfMaskOps<Lane: SIMDNumericElement>(
+    _ mask: SIMD<Lane>.Mask
+) -> (upper: SIMD<Lane>.HalfMask, combined: SIMD<Lane>.Mask) {
+    typealias H = SIMD<Lane>
+
+    let upper = H.upperHalf(mask)
+    return (upper, H.combining(H.lowerHalf(mask), upper))
+}
+
 private func numericOps<Lane: SIMDNumericElement>(
     _ a: SIMD<Lane>,
     _ b: SIMD<Lane>
@@ -187,6 +196,33 @@ struct GenericOpsTests {
         )
         expectHalfAndBlockOps(
             ContiguousArray((0..<SIMD<BFloat16>.laneCount).map { BFloat16(Float($0) * 0.5) })
+        )
+    }
+
+    @Test(
+        "Half mask ops of SIMDNumericElement called through a generic lane type match the concrete ones"
+    )
+    func halfMaskOpsMatchConcreteOnes() {
+        let shorts = SIMD<Int16>.iota(0)
+        let mask = SIMD<Int16>.lessThan(shorts, SIMD<Int16>.repeating(5))
+        let generic = halfMaskOps(mask)
+        let concreteUpper = SIMD<Int16>.upperHalf(mask)
+        let concreteCombined = SIMD<Int16>.combining(SIMD<Int16>.lowerHalf(mask), concreteUpper)
+
+        #expect(SIMD<Int16>.bits(of: generic.combined) == SIMD<Int16>.bits(of: concreteCombined))
+        #expect(
+            SIMD<Int16>.bits(of: SIMD<Int16>.combining(generic.upper, generic.upper))
+                == SIMD<Int16>.bits(of: SIMD<Int16>.combining(concreteUpper, concreteUpper))
+        )
+
+        let floats = SIMD<Float>.iota(0)
+        let floatMask = SIMD<Float>.greaterThan(floats, SIMD<Float>.repeating(1))
+        let genericFloats = halfMaskOps(floatMask)
+        let floatUpper = SIMD<Float>.upperHalf(floatMask)
+        let floatCombined = SIMD<Float>.combining(SIMD<Float>.lowerHalf(floatMask), floatUpper)
+
+        #expect(
+            SIMD<Float>.bits(of: genericFloats.combined) == SIMD<Float>.bits(of: floatCombined)
         )
     }
 

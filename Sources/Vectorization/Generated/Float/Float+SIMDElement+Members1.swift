@@ -178,6 +178,16 @@ extension Float {
     }
 
     @export(implementation) @inline(always)
+    public static func _sumsOf2(_ a: SIMD<Float>) -> SIMD<Double> {
+        SIMD<Double>.sumsOf2(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _biasedExponent(_ a: SIMD<Float>) -> SIMD<UInt32> {
+        SIMD<UInt32>.biasedExponent(a)
+    }
+
+    @export(implementation) @inline(always)
     public static func _minimum(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
         SIMD<Float>.minimum(a, b)
     }
@@ -223,6 +233,11 @@ extension Float {
         _ b: SIMD<Float>
     ) -> SIMD<Float> {
         SIMD<Float>.multiplyingByFloorPowerOf2(a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _multiplyingByPowerOf2(_ a: SIMD<Float>, _ b: SIMD<Int32>) -> SIMD<Float> {
+        SIMD<Float>.multiplyingByPowerOf2(a, b)
     }
 
     @export(implementation) @inline(always)
@@ -653,8 +668,49 @@ extension Float {
     }
 
     @export(implementation) @inline(always)
+    public static func _maskToUnsigned(_ mask: SIMD<Float>.Mask) -> SIMD<UInt32>.Mask {
+        SIMD<UInt32>.mask(rebinding: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _mask(fromUnsigned mask: SIMD<UInt32>.Mask) -> SIMD<Float>.Mask {
+        SIMD<Float>.mask(rebinding: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _mask(
+        narrowing a: SIMD<UInt64>.Mask,
+        _ b: SIMD<UInt64>.Mask
+    ) -> SIMD<Float>.Mask {
+        SIMD<Float>.mask(narrowing: a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfMask(narrowing mask: SIMD<UInt64>.Mask) -> SIMD<Float>.HalfMask {
+        SIMD<Float>.halfMask(narrowing: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _mask(widening mask: SIMD<Float>.HalfMask) -> SIMD<UInt64>.Mask {
+        SIMD<UInt64>.mask(widening: mask)
+    }
+
+    @export(implementation) @inline(always)
     public static func _lowerHalf(_ mask: SIMD<Float>.Mask) -> SIMD<Float>.HalfMask {
         SIMD<Float>.lowerHalf(mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _upperHalf(_ mask: SIMD<Float>.Mask) -> SIMD<Float>.HalfMask {
+        SIMD<Float>.upperHalf(mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _combining(
+        _ a: SIMD<Float>.HalfMask,
+        _ b: SIMD<Float>.HalfMask
+    ) -> SIMD<Float>.Mask {
+        SIMD<Float>.combining(a, b)
     }
 
     @export(implementation) @inline(always)
@@ -1348,5 +1404,711 @@ extension Float {
         _ v3: inout SIMD<Float>
     ) {
         unsafe SIMD<Float>.loadInterleaved4(fromUnchecked: span, &v0, &v1, &v2, &v3)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _storeInterleaved2(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        to: UnsafeMutablePointer<Float>
+    ) {
+        unsafe SIMD<Float>.storeInterleaved2(a, b, to: to)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _storeInterleaved2(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        to span: inout MutableSpan<Float>
+    ) {
+        SIMD<Float>.storeInterleaved2(a, b, to: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _storeInterleaved2(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        toUnchecked span: inout MutableSpan<Float>
+    ) {
+        unsafe SIMD<Float>.storeInterleaved2(a, b, toUnchecked: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _appendInterleaved2(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        to output: inout OutputSpan<Float>
+    ) {
+        SIMD<Float>.appendInterleaved2(a, b, to: &output)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _appendInterleaved2(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        toUnchecked output: inout OutputSpan<Float>
+    ) {
+        unsafe SIMD<Float>.appendInterleaved2(a, b, toUnchecked: &output)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _storeInterleaved3(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        _ c: SIMD<Float>,
+        to: UnsafeMutablePointer<Float>
+    ) {
+        unsafe SIMD<Float>.storeInterleaved3(a, b, c, to: to)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _storeInterleaved3(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        _ c: SIMD<Float>,
+        to span: inout MutableSpan<Float>
+    ) {
+        SIMD<Float>.storeInterleaved3(a, b, c, to: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _storeInterleaved3(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        _ c: SIMD<Float>,
+        toUnchecked span: inout MutableSpan<Float>
+    ) {
+        unsafe SIMD<Float>.storeInterleaved3(a, b, c, toUnchecked: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _appendInterleaved3(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        _ c: SIMD<Float>,
+        to output: inout OutputSpan<Float>
+    ) {
+        SIMD<Float>.appendInterleaved3(a, b, c, to: &output)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _appendInterleaved3(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        _ c: SIMD<Float>,
+        toUnchecked output: inout OutputSpan<Float>
+    ) {
+        unsafe SIMD<Float>.appendInterleaved3(a, b, c, toUnchecked: &output)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _storeInterleaved4(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        _ c: SIMD<Float>,
+        _ d: SIMD<Float>,
+        to: UnsafeMutablePointer<Float>
+    ) {
+        unsafe SIMD<Float>.storeInterleaved4(a, b, c, d, to: to)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _storeInterleaved4(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        _ c: SIMD<Float>,
+        _ d: SIMD<Float>,
+        to span: inout MutableSpan<Float>
+    ) {
+        SIMD<Float>.storeInterleaved4(a, b, c, d, to: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _storeInterleaved4(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        _ c: SIMD<Float>,
+        _ d: SIMD<Float>,
+        toUnchecked span: inout MutableSpan<Float>
+    ) {
+        unsafe SIMD<Float>.storeInterleaved4(a, b, c, d, toUnchecked: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _appendInterleaved4(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        _ c: SIMD<Float>,
+        _ d: SIMD<Float>,
+        to output: inout OutputSpan<Float>
+    ) {
+        SIMD<Float>.appendInterleaved4(a, b, c, d, to: &output)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _appendInterleaved4(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        _ c: SIMD<Float>,
+        _ d: SIMD<Float>,
+        toUnchecked output: inout OutputSpan<Float>
+    ) {
+        unsafe SIMD<Float>.appendInterleaved4(a, b, c, d, toUnchecked: &output)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _tableLookupBytes(_ a: SIMD<Float>, at indices: SIMD<Float>) -> SIMD<Float> {
+        SIMD<Float>.tableLookupBytes(a, at: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _tableLookupBytes(
+        _ a: SIMD<Float>,
+        atUnchecked indices: SIMD<Float>
+    ) -> SIMD<Float> {
+        unsafe SIMD<Float>.tableLookupBytes(a, atUnchecked: indices)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _tableLookupBytesOrZero(
+        _ a: SIMD<Float>,
+        at indices: SIMD<Float>
+    ) -> SIMD<Float> {
+        SIMD<Float>.tableLookupBytesOrZero(a, at: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _tableLookupBytesOrZero(
+        _ a: SIMD<Float>,
+        atUnchecked indices: SIMD<Float>
+    ) -> SIMD<Float> {
+        unsafe SIMD<Float>.tableLookupBytesOrZero(a, atUnchecked: indices)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _pairwiseAddingBlocks(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
+        SIMD<Float>.pairwiseAddingBlocks(a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _pairwiseSubtractingBlocks(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float>
+    {
+        SIMD<Float>.pairwiseSubtractingBlocks(a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _broadcastingInBlocks(_ a: SIMD<Float>, lane: Int) -> SIMD<Float> {
+        SIMD<Float>.broadcastingInBlocks(a, lane: lane)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _broadcastingInBlocks(
+        _ a: SIMD<Float>,
+        laneUnchecked lane: Int
+    ) -> SIMD<Float> {
+        unsafe SIMD<Float>.broadcastingInBlocks(a, laneUnchecked: lane)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _shiftedLeftLanes(_ a: SIMD<Float>, by lanes: Int) -> SIMD<Float> {
+        SIMD<Float>.shiftedLeftLanes(a, by: lanes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _shiftedLeftLanes(_ a: SIMD<Float>, byUnchecked lanes: Int) -> SIMD<Float> {
+        unsafe SIMD<Float>.shiftedLeftLanes(a, byUnchecked: lanes)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _combinedShiftedRightBytes(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        by bytes: Int
+    ) -> SIMD<Float> {
+        SIMD<Float>.combinedShiftedRightBytes(a, b, by: bytes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _combinedShiftedRightBytes(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        byUnchecked bytes: Int
+    ) -> SIMD<Float> {
+        unsafe SIMD<Float>.combinedShiftedRightBytes(a, b, byUnchecked: bytes)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _combinedShiftedRightLanes(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        by lanes: Int
+    ) -> SIMD<Float> {
+        SIMD<Float>.combinedShiftedRightLanes(a, b, by: lanes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _combinedShiftedRightLanes(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        byUnchecked lanes: Int
+    ) -> SIMD<Float> {
+        unsafe SIMD<Float>.combinedShiftedRightLanes(a, b, byUnchecked: lanes)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _shiftedLeftBytes(_ a: SIMD<Float>, by bytes: Int) -> SIMD<Float> {
+        SIMD<Float>.shiftedLeftBytes(a, by: bytes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _shiftedLeftBytes(_ a: SIMD<Float>, byUnchecked bytes: Int) -> SIMD<Float> {
+        unsafe SIMD<Float>.shiftedLeftBytes(a, byUnchecked: bytes)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _shiftedRightBytes(_ a: SIMD<Float>, by bytes: Int) -> SIMD<Float> {
+        SIMD<Float>.shiftedRightBytes(a, by: bytes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _shiftedRightBytes(_ a: SIMD<Float>, byUnchecked bytes: Int) -> SIMD<Float> {
+        unsafe SIMD<Float>.shiftedRightBytes(a, byUnchecked: bytes)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _shiftedRightLanes(_ a: SIMD<Float>, by lanes: Int) -> SIMD<Float> {
+        SIMD<Float>.shiftedRightLanes(a, by: lanes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _shiftedRightLanes(_ a: SIMD<Float>, byUnchecked lanes: Int) -> SIMD<Float> {
+        unsafe SIMD<Float>.shiftedRightLanes(a, byUnchecked: lanes)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _reversed(_ a: SIMD<Float>) -> SIMD<Float> {
+        SIMD<Float>.reversed(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _reversedBlocks(_ a: SIMD<Float>) -> SIMD<Float> {
+        SIMD<Float>.reversedBlocks(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _reversed2(_ a: SIMD<Float>) -> SIMD<Float> {
+        SIMD<Float>.reversed2(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _reversed4(_ a: SIMD<Float>) -> SIMD<Float> {
+        SIMD<Float>.reversed4(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _reversed8(_ a: SIMD<Float>) -> SIMD<Float> {
+        SIMD<Float>.reversed8(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _byteSwapped(_ a: SIMD<Float>) -> SIMD<Float> {
+        SIMD<Float>.byteSwapped(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _indices(from vector: SIMD<Float>.Indices) -> SIMD<Float>.Indices {
+        SIMD<Float>.indices(from: vector)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _indices(fromUnchecked vector: SIMD<Float>.Indices) -> SIMD<Float>.Indices {
+        unsafe SIMD<Float>.indices(fromUnchecked: vector)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _tableLookupLanes(
+        _ a: SIMD<Float>,
+        at indices: SIMD<Float>.Indices
+    ) -> SIMD<Float> {
+        SIMD<Float>.tableLookupLanes(a, at: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _tableLookupLanes(
+        _ a: SIMD<Float>,
+        atUnchecked indices: SIMD<Float>.Indices
+    ) -> SIMD<Float> {
+        unsafe SIMD<Float>.tableLookupLanes(a, atUnchecked: indices)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _twoTablesLookupLanes(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        at indices: SIMD<Float>.Indices
+    ) -> SIMD<Float> {
+        SIMD<Float>.twoTablesLookupLanes(a, b, at: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _twoTablesLookupLanes(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        atUnchecked indices: SIMD<Float>.Indices
+    ) -> SIMD<Float> {
+        unsafe SIMD<Float>.twoTablesLookupLanes(a, b, atUnchecked: indices)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _lookup8(
+        at indices: SIMD<Float>.Indices,
+        from: UnsafePointer<Float>
+    ) -> SIMD<Float> {
+        unsafe SIMD<Float>.lookup8(at: indices, from: from)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _lookup8(
+        at indices: SIMD<Float>.Indices,
+        from span: Span<Float>
+    ) -> SIMD<Float> {
+        SIMD<Float>.lookup8(at: indices, from: span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _lookup8(
+        at indices: SIMD<Float>.Indices,
+        fromUnchecked span: Span<Float>
+    ) -> SIMD<Float> {
+        unsafe SIMD<Float>.lookup8(at: indices, fromUnchecked: span)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _lookup16(
+        at indices: SIMD<Float>.Indices,
+        from: UnsafePointer<Float>
+    ) -> SIMD<Float> {
+        unsafe SIMD<Float>.lookup16(at: indices, from: from)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _lookup16(
+        at indices: SIMD<Float>.Indices,
+        from span: Span<Float>
+    ) -> SIMD<Float> {
+        SIMD<Float>.lookup16(at: indices, from: span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _lookup16(
+        at indices: SIMD<Float>.Indices,
+        fromUnchecked span: Span<Float>
+    ) -> SIMD<Float> {
+        unsafe SIMD<Float>.lookup16(at: indices, fromUnchecked: span)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _shuffledPer4Lanes(
+        _ a: SIMD<Float>,
+        _ i3: Int,
+        _ i2: Int,
+        _ i1: Int,
+        _ i0: Int
+    ) -> SIMD<Float> {
+        SIMD<Float>.shuffledPer4Lanes(a, i3, i2, i1, i0)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _shuffledPer4Lanes(
+        _ a: SIMD<Float>,
+        unchecked i3: Int,
+        _ i2: Int,
+        _ i1: Int,
+        _ i0: Int
+    ) -> SIMD<Float> {
+        unsafe SIMD<Float>.shuffledPer4Lanes(a, unchecked: i3, i2, i1, i0)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _slide1Up(_ a: SIMD<Float>) -> SIMD<Float> {
+        SIMD<Float>.slide1Up(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _slide1Up(_ a: SIMD<Float>, fillingWith fill: Float) -> SIMD<Float> {
+        SIMD<Float>.slide1Up(a, fillingWith: fill)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _slide1Down(_ a: SIMD<Float>, fillingWith fill: Float) -> SIMD<Float> {
+        SIMD<Float>.slide1Down(a, fillingWith: fill)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _slideUpBlocks(_ a: SIMD<Float>, by blocks: Int) -> SIMD<Float> {
+        SIMD<Float>.slideUpBlocks(a, by: blocks)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _slideUpBlocks(_ a: SIMD<Float>, byUnchecked blocks: Int) -> SIMD<Float> {
+        unsafe SIMD<Float>.slideUpBlocks(a, byUnchecked: blocks)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _slideDownBlocks(_ a: SIMD<Float>, by blocks: Int) -> SIMD<Float> {
+        SIMD<Float>.slideDownBlocks(a, by: blocks)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _slideDownBlocks(_ a: SIMD<Float>, byUnchecked blocks: Int) -> SIMD<Float> {
+        unsafe SIMD<Float>.slideDownBlocks(a, byUnchecked: blocks)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _combinedSlideDownLanes(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        by lanes: Int
+    ) -> SIMD<Float> {
+        SIMD<Float>.combinedSlideDownLanes(a, b, by: lanes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _combinedSlideDownLanes(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        byUnchecked lanes: Int
+    ) -> SIMD<Float> {
+        unsafe SIMD<Float>.combinedSlideDownLanes(a, b, byUnchecked: lanes)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _slideUpLanes(_ a: SIMD<Float>, by lanes: Int) -> SIMD<Float> {
+        SIMD<Float>.slideUpLanes(a, by: lanes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _slideUpLanes(_ a: SIMD<Float>, byUnchecked lanes: Int) -> SIMD<Float> {
+        unsafe SIMD<Float>.slideUpLanes(a, byUnchecked: lanes)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _slideUpLanes(
+        _ a: SIMD<Float>,
+        by lanes: Int,
+        fillingWith fill: SIMD<Float>
+    ) -> SIMD<Float> {
+        SIMD<Float>.slideUpLanes(a, by: lanes, fillingWith: fill)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _slideUpLanes(
+        _ a: SIMD<Float>,
+        byUnchecked lanes: Int,
+        fillingWith fill: SIMD<Float>
+    ) -> SIMD<Float> {
+        unsafe SIMD<Float>.slideUpLanes(a, byUnchecked: lanes, fillingWith: fill)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _slideDownLanes(_ a: SIMD<Float>, by lanes: Int) -> SIMD<Float> {
+        SIMD<Float>.slideDownLanes(a, by: lanes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _slideDownLanes(_ a: SIMD<Float>, byUnchecked lanes: Int) -> SIMD<Float> {
+        unsafe SIMD<Float>.slideDownLanes(a, byUnchecked: lanes)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _slideDownLanes(
+        _ a: SIMD<Float>,
+        by lanes: Int,
+        fillingWith fill: SIMD<Float>
+    ) -> SIMD<Float> {
+        SIMD<Float>.slideDownLanes(a, by: lanes, fillingWith: fill)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _slideDownLanes(
+        _ a: SIMD<Float>,
+        byUnchecked lanes: Int,
+        fillingWith fill: SIMD<Float>
+    ) -> SIMD<Float> {
+        unsafe SIMD<Float>.slideDownLanes(a, byUnchecked: lanes, fillingWith: fill)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _slide1Down(_ a: SIMD<Float>) -> SIMD<Float> {
+        SIMD<Float>.slide1Down(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _sum(_ a: SIMD<Float>) -> Float {
+        SIMD<Float>.sum(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _smallest(_ a: SIMD<Float>) -> Float {
+        SIMD<Float>.smallest(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _largest(_ a: SIMD<Float>) -> Float {
+        SIMD<Float>.largest(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _repeatingSum(_ a: SIMD<Float>) -> SIMD<Float> {
+        SIMD<Float>.repeatingSum(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _repeatingSmallest(_ a: SIMD<Float>) -> SIMD<Float> {
+        SIMD<Float>.repeatingSmallest(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _repeatingLargest(_ a: SIMD<Float>) -> SIMD<Float> {
+        SIMD<Float>.repeatingLargest(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _smallestOrNaN(_ a: SIMD<Float>) -> Float {
+        SIMD<Float>.smallestOrNaN(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _largestOrNaN(_ a: SIMD<Float>) -> Float {
+        SIMD<Float>.largestOrNaN(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _minimum(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        where mask: SIMD<Float>.Mask,
+        otherwise: SIMD<Float>
+    ) -> SIMD<Float> {
+        SIMD<Float>.minimum(a, b, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _maximum(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        where mask: SIMD<Float>.Mask,
+        otherwise: SIMD<Float>
+    ) -> SIMD<Float> {
+        SIMD<Float>.maximum(a, b, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _adding(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        where mask: SIMD<Float>.Mask,
+        otherwise: SIMD<Float>
+    ) -> SIMD<Float> {
+        SIMD<Float>.adding(a, b, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _subtracting(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        where mask: SIMD<Float>.Mask,
+        otherwise: SIMD<Float>
+    ) -> SIMD<Float> {
+        SIMD<Float>.subtracting(a, b, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _multiplying(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        where mask: SIMD<Float>.Mask,
+        otherwise: SIMD<Float>
+    ) -> SIMD<Float> {
+        SIMD<Float>.multiplying(a, b, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _dividing(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        where mask: SIMD<Float>.Mask,
+        otherwise: SIMD<Float>
+    ) -> SIMD<Float> {
+        SIMD<Float>.dividing(a, b, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _multiplyAdding(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        _ c: SIMD<Float>,
+        where mask: SIMD<Float>.Mask,
+        otherwise: SIMD<Float>
+    ) -> SIMD<Float> {
+        SIMD<Float>.multiplyAdding(a, b, c, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _multiplySubtracting(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        _ c: SIMD<Float>,
+        where mask: SIMD<Float>.Mask,
+        otherwise: SIMD<Float>
+    ) -> SIMD<Float> {
+        SIMD<Float>.multiplySubtracting(a, b, c, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _negatedMultiplyAdding(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        _ c: SIMD<Float>,
+        where mask: SIMD<Float>.Mask,
+        otherwise: SIMD<Float>
+    ) -> SIMD<Float> {
+        SIMD<Float>.negatedMultiplyAdding(a, b, c, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _negatedMultiplySubtracting(
+        _ a: SIMD<Float>,
+        _ b: SIMD<Float>,
+        _ c: SIMD<Float>,
+        where mask: SIMD<Float>.Mask,
+        otherwise: SIMD<Float>
+    ) -> SIMD<Float> {
+        SIMD<Float>.negatedMultiplySubtracting(a, b, c, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _squareRoot(
+        _ a: SIMD<Float>,
+        where mask: SIMD<Float>.Mask,
+        otherwise: SIMD<Float>
+    ) -> SIMD<Float> {
+        SIMD<Float>.squareRoot(a, where: mask, otherwise: otherwise)
     }
 }

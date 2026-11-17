@@ -199,6 +199,26 @@ extension UInt64 {
     }
 
     @export(implementation) @inline(always)
+    public static func _multiplyingEven(_ a: SIMD<UInt32>, _ b: SIMD<UInt32>) -> SIMD<UInt64> {
+        SIMD<UInt64>.multiplyingEven(a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _multiplyingOdd(_ a: SIMD<UInt32>, _ b: SIMD<UInt32>) -> SIMD<UInt64> {
+        SIMD<UInt64>.multiplyingOdd(a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _multiplyAccumulating(
+        _ a: SIMD<UInt32>,
+        _ b: SIMD<UInt32>,
+        _ c: SIMD<UInt64>,
+        _ v0: inout SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.multiplyAccumulating(a, b, c, &v0)
+    }
+
+    @export(implementation) @inline(always)
     public static func _multiplyAdding(
         _ a: SIMD<UInt64>,
         _ b: SIMD<UInt64>,
@@ -624,8 +644,31 @@ extension UInt64 {
     }
 
     @export(implementation) @inline(always)
+    public static func _maskToUnsigned(_ mask: SIMD<UInt64>.Mask) -> SIMD<UInt64>.Mask {
+        mask
+    }
+
+    @export(implementation) @inline(always)
+    public static func _mask(fromUnsigned mask: SIMD<UInt64>.Mask) -> SIMD<UInt64>.Mask {
+        mask
+    }
+
+    @export(implementation) @inline(always)
     public static func _lowerHalf(_ mask: SIMD<UInt64>.Mask) -> SIMD<UInt64>.HalfMask {
         SIMD<UInt64>.lowerHalf(mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _upperHalf(_ mask: SIMD<UInt64>.Mask) -> SIMD<UInt64>.HalfMask {
+        SIMD<UInt64>.upperHalf(mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _combining(
+        _ a: SIMD<UInt64>.HalfMask,
+        _ b: SIMD<UInt64>.HalfMask
+    ) -> SIMD<UInt64>.Mask {
+        SIMD<UInt64>.combining(a, b)
     }
 
     @export(implementation) @inline(always)
@@ -1396,5 +1439,861 @@ extension UInt64 {
         toUnchecked output: inout OutputSpan<UInt64>
     ) {
         unsafe SIMD<UInt64>.appendInterleaved2(a, b, toUnchecked: &output)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _storeInterleaved3(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        _ c: SIMD<UInt64>,
+        to: UnsafeMutablePointer<UInt64>
+    ) {
+        unsafe SIMD<UInt64>.storeInterleaved3(a, b, c, to: to)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _storeInterleaved3(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        _ c: SIMD<UInt64>,
+        to span: inout MutableSpan<UInt64>
+    ) {
+        SIMD<UInt64>.storeInterleaved3(a, b, c, to: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _storeInterleaved3(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        _ c: SIMD<UInt64>,
+        toUnchecked span: inout MutableSpan<UInt64>
+    ) {
+        unsafe SIMD<UInt64>.storeInterleaved3(a, b, c, toUnchecked: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _appendInterleaved3(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        _ c: SIMD<UInt64>,
+        to output: inout OutputSpan<UInt64>
+    ) {
+        SIMD<UInt64>.appendInterleaved3(a, b, c, to: &output)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _appendInterleaved3(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        _ c: SIMD<UInt64>,
+        toUnchecked output: inout OutputSpan<UInt64>
+    ) {
+        unsafe SIMD<UInt64>.appendInterleaved3(a, b, c, toUnchecked: &output)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _storeInterleaved4(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        _ c: SIMD<UInt64>,
+        _ d: SIMD<UInt64>,
+        to: UnsafeMutablePointer<UInt64>
+    ) {
+        unsafe SIMD<UInt64>.storeInterleaved4(a, b, c, d, to: to)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _storeInterleaved4(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        _ c: SIMD<UInt64>,
+        _ d: SIMD<UInt64>,
+        to span: inout MutableSpan<UInt64>
+    ) {
+        SIMD<UInt64>.storeInterleaved4(a, b, c, d, to: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _storeInterleaved4(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        _ c: SIMD<UInt64>,
+        _ d: SIMD<UInt64>,
+        toUnchecked span: inout MutableSpan<UInt64>
+    ) {
+        unsafe SIMD<UInt64>.storeInterleaved4(a, b, c, d, toUnchecked: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _appendInterleaved4(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        _ c: SIMD<UInt64>,
+        _ d: SIMD<UInt64>,
+        to output: inout OutputSpan<UInt64>
+    ) {
+        SIMD<UInt64>.appendInterleaved4(a, b, c, d, to: &output)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _appendInterleaved4(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        _ c: SIMD<UInt64>,
+        _ d: SIMD<UInt64>,
+        toUnchecked output: inout OutputSpan<UInt64>
+    ) {
+        unsafe SIMD<UInt64>.appendInterleaved4(a, b, c, d, toUnchecked: &output)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _tableLookupBytes(
+        _ a: SIMD<UInt64>,
+        at indices: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.tableLookupBytes(a, at: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _tableLookupBytes(
+        _ a: SIMD<UInt64>,
+        atUnchecked indices: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.tableLookupBytes(a, atUnchecked: indices)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _tableLookupBytesOrZero(
+        _ a: SIMD<UInt64>,
+        at indices: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.tableLookupBytesOrZero(a, at: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _tableLookupBytesOrZero(
+        _ a: SIMD<UInt64>,
+        atUnchecked indices: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.tableLookupBytesOrZero(a, atUnchecked: indices)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _pairwiseAddingBlocks(_ a: SIMD<UInt64>, _ b: SIMD<UInt64>) -> SIMD<UInt64> {
+        SIMD<UInt64>.pairwiseAddingBlocks(a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _pairwiseSubtractingBlocks(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.pairwiseSubtractingBlocks(a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _broadcastingInBlocks(_ a: SIMD<UInt64>, lane: Int) -> SIMD<UInt64> {
+        SIMD<UInt64>.broadcastingInBlocks(a, lane: lane)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _broadcastingInBlocks(
+        _ a: SIMD<UInt64>,
+        laneUnchecked lane: Int
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.broadcastingInBlocks(a, laneUnchecked: lane)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _shiftedLeftLanes(_ a: SIMD<UInt64>, by lanes: Int) -> SIMD<UInt64> {
+        SIMD<UInt64>.shiftedLeftLanes(a, by: lanes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _shiftedLeftLanes(_ a: SIMD<UInt64>, byUnchecked lanes: Int) -> SIMD<UInt64>
+    {
+        unsafe SIMD<UInt64>.shiftedLeftLanes(a, byUnchecked: lanes)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _combinedShiftedRightBytes(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        by bytes: Int
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.combinedShiftedRightBytes(a, b, by: bytes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _combinedShiftedRightBytes(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        byUnchecked bytes: Int
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.combinedShiftedRightBytes(a, b, byUnchecked: bytes)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _combinedShiftedRightLanes(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        by lanes: Int
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.combinedShiftedRightLanes(a, b, by: lanes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _combinedShiftedRightLanes(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        byUnchecked lanes: Int
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.combinedShiftedRightLanes(a, b, byUnchecked: lanes)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _shiftedLeftBytes(_ a: SIMD<UInt64>, by bytes: Int) -> SIMD<UInt64> {
+        SIMD<UInt64>.shiftedLeftBytes(a, by: bytes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _shiftedLeftBytes(_ a: SIMD<UInt64>, byUnchecked bytes: Int) -> SIMD<UInt64>
+    {
+        unsafe SIMD<UInt64>.shiftedLeftBytes(a, byUnchecked: bytes)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _shiftedRightBytes(_ a: SIMD<UInt64>, by bytes: Int) -> SIMD<UInt64> {
+        SIMD<UInt64>.shiftedRightBytes(a, by: bytes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _shiftedRightBytes(_ a: SIMD<UInt64>, byUnchecked bytes: Int) -> SIMD<UInt64>
+    {
+        unsafe SIMD<UInt64>.shiftedRightBytes(a, byUnchecked: bytes)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _shiftedRightLanes(_ a: SIMD<UInt64>, by lanes: Int) -> SIMD<UInt64> {
+        SIMD<UInt64>.shiftedRightLanes(a, by: lanes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _shiftedRightLanes(_ a: SIMD<UInt64>, byUnchecked lanes: Int) -> SIMD<UInt64>
+    {
+        unsafe SIMD<UInt64>.shiftedRightLanes(a, byUnchecked: lanes)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _reversed(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
+        SIMD<UInt64>.reversed(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _reversedBlocks(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
+        SIMD<UInt64>.reversedBlocks(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _reversed2(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
+        SIMD<UInt64>.reversed2(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _reversed4(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
+        SIMD<UInt64>.reversed4(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _reversed8(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
+        SIMD<UInt64>.reversed8(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _bitReversed(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
+        SIMD<UInt64>.bitReversed(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _indices(from vector: SIMD<UInt64>.Indices) -> SIMD<UInt64>.Indices {
+        SIMD<UInt64>.indices(from: vector)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _indices(fromUnchecked vector: SIMD<UInt64>.Indices) -> SIMD<UInt64>.Indices
+    {
+        unsafe SIMD<UInt64>.indices(fromUnchecked: vector)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _tableLookupLanes(
+        _ a: SIMD<UInt64>,
+        at indices: SIMD<UInt64>.Indices
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.tableLookupLanes(a, at: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _tableLookupLanes(
+        _ a: SIMD<UInt64>,
+        atUnchecked indices: SIMD<UInt64>.Indices
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.tableLookupLanes(a, atUnchecked: indices)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _twoTablesLookupLanes(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        at indices: SIMD<UInt64>.Indices
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.twoTablesLookupLanes(a, b, at: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _twoTablesLookupLanes(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        atUnchecked indices: SIMD<UInt64>.Indices
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.twoTablesLookupLanes(a, b, atUnchecked: indices)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _lookup8(
+        at indices: SIMD<UInt64>.Indices,
+        from: UnsafePointer<UInt64>
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.lookup8(at: indices, from: from)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _lookup8(
+        at indices: SIMD<UInt64>.Indices,
+        from span: Span<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.lookup8(at: indices, from: span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _lookup8(
+        at indices: SIMD<UInt64>.Indices,
+        fromUnchecked span: Span<UInt64>
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.lookup8(at: indices, fromUnchecked: span)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _lookup16(
+        at indices: SIMD<UInt64>.Indices,
+        from: UnsafePointer<UInt64>
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.lookup16(at: indices, from: from)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _lookup16(
+        at indices: SIMD<UInt64>.Indices,
+        from span: Span<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.lookup16(at: indices, from: span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _lookup16(
+        at indices: SIMD<UInt64>.Indices,
+        fromUnchecked span: Span<UInt64>
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.lookup16(at: indices, fromUnchecked: span)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _shuffledPer4Lanes(
+        _ a: SIMD<UInt64>,
+        _ i3: Int,
+        _ i2: Int,
+        _ i1: Int,
+        _ i0: Int
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.shuffledPer4Lanes(a, i3, i2, i1, i0)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _shuffledPer4Lanes(
+        _ a: SIMD<UInt64>,
+        unchecked i3: Int,
+        _ i2: Int,
+        _ i1: Int,
+        _ i0: Int
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.shuffledPer4Lanes(a, unchecked: i3, i2, i1, i0)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _slide1Up(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
+        SIMD<UInt64>.slide1Up(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _slide1Up(_ a: SIMD<UInt64>, fillingWith fill: UInt64) -> SIMD<UInt64> {
+        SIMD<UInt64>.slide1Up(a, fillingWith: fill)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _slide1Down(_ a: SIMD<UInt64>, fillingWith fill: UInt64) -> SIMD<UInt64> {
+        SIMD<UInt64>.slide1Down(a, fillingWith: fill)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _slideUpBlocks(_ a: SIMD<UInt64>, by blocks: Int) -> SIMD<UInt64> {
+        SIMD<UInt64>.slideUpBlocks(a, by: blocks)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _slideUpBlocks(_ a: SIMD<UInt64>, byUnchecked blocks: Int) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.slideUpBlocks(a, byUnchecked: blocks)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _slideDownBlocks(_ a: SIMD<UInt64>, by blocks: Int) -> SIMD<UInt64> {
+        SIMD<UInt64>.slideDownBlocks(a, by: blocks)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _slideDownBlocks(_ a: SIMD<UInt64>, byUnchecked blocks: Int) -> SIMD<UInt64>
+    {
+        unsafe SIMD<UInt64>.slideDownBlocks(a, byUnchecked: blocks)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _combinedSlideDownLanes(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        by lanes: Int
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.combinedSlideDownLanes(a, b, by: lanes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _combinedSlideDownLanes(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        byUnchecked lanes: Int
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.combinedSlideDownLanes(a, b, byUnchecked: lanes)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _slideUpLanes(_ a: SIMD<UInt64>, by lanes: Int) -> SIMD<UInt64> {
+        SIMD<UInt64>.slideUpLanes(a, by: lanes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _slideUpLanes(_ a: SIMD<UInt64>, byUnchecked lanes: Int) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.slideUpLanes(a, byUnchecked: lanes)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _slideUpLanes(
+        _ a: SIMD<UInt64>,
+        by lanes: Int,
+        fillingWith fill: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.slideUpLanes(a, by: lanes, fillingWith: fill)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _slideUpLanes(
+        _ a: SIMD<UInt64>,
+        byUnchecked lanes: Int,
+        fillingWith fill: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.slideUpLanes(a, byUnchecked: lanes, fillingWith: fill)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _slideDownLanes(_ a: SIMD<UInt64>, by lanes: Int) -> SIMD<UInt64> {
+        SIMD<UInt64>.slideDownLanes(a, by: lanes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _slideDownLanes(_ a: SIMD<UInt64>, byUnchecked lanes: Int) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.slideDownLanes(a, byUnchecked: lanes)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _slideDownLanes(
+        _ a: SIMD<UInt64>,
+        by lanes: Int,
+        fillingWith fill: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.slideDownLanes(a, by: lanes, fillingWith: fill)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _slideDownLanes(
+        _ a: SIMD<UInt64>,
+        byUnchecked lanes: Int,
+        fillingWith fill: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.slideDownLanes(a, byUnchecked: lanes, fillingWith: fill)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _slide1Down(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
+        SIMD<UInt64>.slide1Down(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _sum(_ a: SIMD<UInt64>) -> UInt64 {
+        SIMD<UInt64>.sum(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _smallest(_ a: SIMD<UInt64>) -> UInt64 {
+        SIMD<UInt64>.smallest(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _largest(_ a: SIMD<UInt64>) -> UInt64 {
+        SIMD<UInt64>.largest(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _repeatingSum(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
+        SIMD<UInt64>.repeatingSum(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _repeatingSmallest(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
+        SIMD<UInt64>.repeatingSmallest(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _repeatingLargest(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
+        SIMD<UInt64>.repeatingLargest(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _minimum(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask,
+        otherwise: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.minimum(a, b, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _maximum(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask,
+        otherwise: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.maximum(a, b, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _adding(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask,
+        otherwise: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.adding(a, b, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _subtracting(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask,
+        otherwise: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.subtracting(a, b, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _multiplying(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask,
+        otherwise: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.multiplying(a, b, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _dividing(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask,
+        otherwise: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.dividing(a, b, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _multiplyAdding(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        _ c: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask,
+        otherwise: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.multiplyAdding(a, b, c, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _multiplySubtracting(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        _ c: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask,
+        otherwise: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.multiplySubtracting(a, b, c, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _negatedMultiplyAdding(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        _ c: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask,
+        otherwise: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.negatedMultiplyAdding(a, b, c, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _negatedMultiplySubtracting(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        _ c: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask,
+        otherwise: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.negatedMultiplySubtracting(a, b, c, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _remainder(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask,
+        otherwise: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.remainder(a, b, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _maximum(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.maximum(a, b, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _adding(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.adding(a, b, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _subtracting(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.subtracting(a, b, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _multiplying(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.multiplying(a, b, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _dividing(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.dividing(a, b, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _multiplyAdding(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        _ c: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.multiplyAdding(a, b, c, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _multiplySubtracting(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        _ c: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.multiplySubtracting(a, b, c, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _negatedMultiplyAdding(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        _ c: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.negatedMultiplyAdding(a, b, c, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _negatedMultiplySubtracting(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        _ c: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.negatedMultiplySubtracting(a, b, c, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _shiftedLeft(
+        _ a: SIMD<UInt64>,
+        by b: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.shiftedLeft(a, by: b, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _shiftedLeft(
+        _ a: SIMD<UInt64>,
+        by b: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask,
+        otherwise: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.shiftedLeft(a, by: b, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _shiftedRight(
+        _ a: SIMD<UInt64>,
+        by b: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.shiftedRight(a, by: b, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _shiftedRight(
+        _ a: SIMD<UInt64>,
+        by b: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask,
+        otherwise: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.shiftedRight(a, by: b, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _shiftedLeft(
+        _ a: SIMD<UInt64>,
+        by bits: Int,
+        where mask: SIMD<UInt64>.Mask
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.shiftedLeft(a, by: bits, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _shiftedLeft(
+        _ a: SIMD<UInt64>,
+        by bits: Int,
+        where mask: SIMD<UInt64>.Mask,
+        otherwise: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.shiftedLeft(a, by: bits, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _shiftedRight(
+        _ a: SIMD<UInt64>,
+        by bits: Int,
+        where mask: SIMD<UInt64>.Mask
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.shiftedRight(a, by: bits, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _shiftedRight(
+        _ a: SIMD<UInt64>,
+        by bits: Int,
+        where mask: SIMD<UInt64>.Mask,
+        otherwise: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.shiftedRight(a, by: bits, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _equalTo(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask
+    ) -> SIMD<UInt64>.Mask {
+        SIMD<UInt64>.equalTo(a, b, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _notEqualTo(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask
+    ) -> SIMD<UInt64>.Mask {
+        SIMD<UInt64>.notEqualTo(a, b, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _lessThan(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask
+    ) -> SIMD<UInt64>.Mask {
+        SIMD<UInt64>.lessThan(a, b, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _greaterThan(
+        _ a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        where mask: SIMD<UInt64>.Mask
+    ) -> SIMD<UInt64>.Mask {
+        SIMD<UInt64>.greaterThan(a, b, where: mask)
     }
 }

@@ -262,6 +262,16 @@ extension SIMD where Lane: SIMDNumericElement {
     }
 
     @_disfavoredOverload @export(implementation) @inline(always)
+    public static func upperHalf(_ mask: Mask) -> HalfMask {
+        Lane._upperHalf(mask)
+    }
+
+    @_disfavoredOverload @export(implementation) @inline(always)
+    public static func combining(_ a: HalfMask, _ b: HalfMask) -> Mask {
+        Lane._combining(a, b)
+    }
+
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func slideUpLanes(_ mask: Mask, by lanes: Int) -> Mask {
         Lane._slideUpLanes(mask, by: lanes)
     }

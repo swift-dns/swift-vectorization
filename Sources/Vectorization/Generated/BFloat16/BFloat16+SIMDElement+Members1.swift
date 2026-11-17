@@ -166,6 +166,16 @@ extension BFloat16 {
     }
 
     @export(implementation) @inline(always)
+    public static func _maskToUnsigned(_ mask: SIMD<BFloat16>.Mask) -> SIMD<UInt16>.Mask {
+        SIMD<UInt16>.mask(rebinding: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _mask(fromUnsigned mask: SIMD<UInt16>.Mask) -> SIMD<BFloat16>.Mask {
+        SIMD<BFloat16>.mask(rebinding: mask)
+    }
+
+    @export(implementation) @inline(always)
     public static func _lowerHalf(_ mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16>.HalfMask {
         SIMD<BFloat16>.lowerHalf(mask)
     }
@@ -1551,4 +1561,62 @@ extension BFloat16 {
     public static func _zeroExtending(_ a: SIMD<BFloat16>.HalfVector) -> SIMD<BFloat16> {
         SIMD<BFloat16>.zeroExtending(a)
     }
+
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfUInt8 a: SIMD<UInt8>) -> SIMD<BFloat16> {
+        SIMD<BFloat16>.vector(bitPattern: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfUInt16 a: SIMD<UInt16>) -> SIMD<BFloat16> {
+        SIMD<BFloat16>.vector(bitPattern: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfUInt32 a: SIMD<UInt32>) -> SIMD<BFloat16> {
+        SIMD<BFloat16>.vector(bitPattern: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfUInt64 a: SIMD<UInt64>) -> SIMD<BFloat16> {
+        SIMD<BFloat16>.vector(bitPattern: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfInt8 a: SIMD<Int8>) -> SIMD<BFloat16> {
+        SIMD<BFloat16>.vector(bitPattern: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfInt16 a: SIMD<Int16>) -> SIMD<BFloat16> {
+        SIMD<BFloat16>.vector(bitPattern: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfInt32 a: SIMD<Int32>) -> SIMD<BFloat16> {
+        SIMD<BFloat16>.vector(bitPattern: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfInt64 a: SIMD<Int64>) -> SIMD<BFloat16> {
+        SIMD<BFloat16>.vector(bitPattern: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfFloat a: SIMD<Float>) -> SIMD<BFloat16> {
+        SIMD<BFloat16>.vector(bitPattern: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfDouble a: SIMD<Double>) -> SIMD<BFloat16> {
+        SIMD<BFloat16>.vector(bitPattern: a)
+    }
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfFloat16 a: SIMD<Float16>) -> SIMD<BFloat16> {
+        SIMD<BFloat16>.vector(bitPattern: a)
+    }
+    #endif
 }

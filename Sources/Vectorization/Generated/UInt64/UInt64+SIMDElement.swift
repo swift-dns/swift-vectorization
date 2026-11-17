@@ -2,7 +2,9 @@
 
 public import CVectorizationOps
 
-extension UInt64: SIMDUnsignedIntegerElement {
+extension UInt64: SIMDUnsignedIntegerElement, SIMDFloatConvertibleElement, SIMDWideIntegerElement,
+    SIMDGatherableElement
+{
     public typealias _RawVector = cvectorization_ops_raw_vector_u64
     public typealias _RawMask = cvectorization_ops_raw_mask_u64
     public typealias _SIMDVector = cvectorization_ops_vector_u64
@@ -14,4 +16,8 @@ extension UInt64: SIMDUnsignedIntegerElement {
     public typealias _RawBlockVector = cvectorization_ops_raw_block_u64
     public typealias _SIMDBlockVector = cvectorization_ops_block_u64
     public typealias IndexLane = UInt64
+    public typealias UnsignedLane = UInt64
+    public typealias SignedLane = Int64
+    public typealias NarrowLane = UInt32
+    public typealias FloatLane = Double
 }

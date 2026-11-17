@@ -2,862 +2,6 @@
 
 extension UInt64 {
     @export(implementation) @inline(always)
-    public static func _storeInterleaved3(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        _ c: SIMD<UInt64>,
-        to: UnsafeMutablePointer<UInt64>
-    ) {
-        unsafe SIMD<UInt64>.storeInterleaved3(a, b, c, to: to)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
-    public static func _storeInterleaved3(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        _ c: SIMD<UInt64>,
-        to span: inout MutableSpan<UInt64>
-    ) {
-        SIMD<UInt64>.storeInterleaved3(a, b, c, to: &span)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
-    public static func _storeInterleaved3(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        _ c: SIMD<UInt64>,
-        toUnchecked span: inout MutableSpan<UInt64>
-    ) {
-        unsafe SIMD<UInt64>.storeInterleaved3(a, b, c, toUnchecked: &span)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
-    public static func _appendInterleaved3(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        _ c: SIMD<UInt64>,
-        to output: inout OutputSpan<UInt64>
-    ) {
-        SIMD<UInt64>.appendInterleaved3(a, b, c, to: &output)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
-    public static func _appendInterleaved3(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        _ c: SIMD<UInt64>,
-        toUnchecked output: inout OutputSpan<UInt64>
-    ) {
-        unsafe SIMD<UInt64>.appendInterleaved3(a, b, c, toUnchecked: &output)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _storeInterleaved4(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        _ c: SIMD<UInt64>,
-        _ d: SIMD<UInt64>,
-        to: UnsafeMutablePointer<UInt64>
-    ) {
-        unsafe SIMD<UInt64>.storeInterleaved4(a, b, c, d, to: to)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
-    public static func _storeInterleaved4(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        _ c: SIMD<UInt64>,
-        _ d: SIMD<UInt64>,
-        to span: inout MutableSpan<UInt64>
-    ) {
-        SIMD<UInt64>.storeInterleaved4(a, b, c, d, to: &span)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
-    public static func _storeInterleaved4(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        _ c: SIMD<UInt64>,
-        _ d: SIMD<UInt64>,
-        toUnchecked span: inout MutableSpan<UInt64>
-    ) {
-        unsafe SIMD<UInt64>.storeInterleaved4(a, b, c, d, toUnchecked: &span)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
-    public static func _appendInterleaved4(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        _ c: SIMD<UInt64>,
-        _ d: SIMD<UInt64>,
-        to output: inout OutputSpan<UInt64>
-    ) {
-        SIMD<UInt64>.appendInterleaved4(a, b, c, d, to: &output)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
-    public static func _appendInterleaved4(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        _ c: SIMD<UInt64>,
-        _ d: SIMD<UInt64>,
-        toUnchecked output: inout OutputSpan<UInt64>
-    ) {
-        unsafe SIMD<UInt64>.appendInterleaved4(a, b, c, d, toUnchecked: &output)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _tableLookupBytes(
-        _ a: SIMD<UInt64>,
-        at indices: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.tableLookupBytes(a, at: indices)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func _tableLookupBytes(
-        _ a: SIMD<UInt64>,
-        atUnchecked indices: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        unsafe SIMD<UInt64>.tableLookupBytes(a, atUnchecked: indices)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _tableLookupBytesOrZero(
-        _ a: SIMD<UInt64>,
-        at indices: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.tableLookupBytesOrZero(a, at: indices)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func _tableLookupBytesOrZero(
-        _ a: SIMD<UInt64>,
-        atUnchecked indices: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        unsafe SIMD<UInt64>.tableLookupBytesOrZero(a, atUnchecked: indices)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _pairwiseAddingBlocks(_ a: SIMD<UInt64>, _ b: SIMD<UInt64>) -> SIMD<UInt64> {
-        SIMD<UInt64>.pairwiseAddingBlocks(a, b)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _pairwiseSubtractingBlocks(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.pairwiseSubtractingBlocks(a, b)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _broadcastingInBlocks(_ a: SIMD<UInt64>, lane: Int) -> SIMD<UInt64> {
-        SIMD<UInt64>.broadcastingInBlocks(a, lane: lane)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func _broadcastingInBlocks(
-        _ a: SIMD<UInt64>,
-        laneUnchecked lane: Int
-    ) -> SIMD<UInt64> {
-        unsafe SIMD<UInt64>.broadcastingInBlocks(a, laneUnchecked: lane)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _shiftedLeftLanes(_ a: SIMD<UInt64>, by lanes: Int) -> SIMD<UInt64> {
-        SIMD<UInt64>.shiftedLeftLanes(a, by: lanes)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func _shiftedLeftLanes(_ a: SIMD<UInt64>, byUnchecked lanes: Int) -> SIMD<UInt64>
-    {
-        unsafe SIMD<UInt64>.shiftedLeftLanes(a, byUnchecked: lanes)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _combinedShiftedRightBytes(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        by bytes: Int
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.combinedShiftedRightBytes(a, b, by: bytes)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func _combinedShiftedRightBytes(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        byUnchecked bytes: Int
-    ) -> SIMD<UInt64> {
-        unsafe SIMD<UInt64>.combinedShiftedRightBytes(a, b, byUnchecked: bytes)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _combinedShiftedRightLanes(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        by lanes: Int
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.combinedShiftedRightLanes(a, b, by: lanes)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func _combinedShiftedRightLanes(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        byUnchecked lanes: Int
-    ) -> SIMD<UInt64> {
-        unsafe SIMD<UInt64>.combinedShiftedRightLanes(a, b, byUnchecked: lanes)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _shiftedLeftBytes(_ a: SIMD<UInt64>, by bytes: Int) -> SIMD<UInt64> {
-        SIMD<UInt64>.shiftedLeftBytes(a, by: bytes)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func _shiftedLeftBytes(_ a: SIMD<UInt64>, byUnchecked bytes: Int) -> SIMD<UInt64>
-    {
-        unsafe SIMD<UInt64>.shiftedLeftBytes(a, byUnchecked: bytes)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _shiftedRightBytes(_ a: SIMD<UInt64>, by bytes: Int) -> SIMD<UInt64> {
-        SIMD<UInt64>.shiftedRightBytes(a, by: bytes)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func _shiftedRightBytes(_ a: SIMD<UInt64>, byUnchecked bytes: Int) -> SIMD<UInt64>
-    {
-        unsafe SIMD<UInt64>.shiftedRightBytes(a, byUnchecked: bytes)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _shiftedRightLanes(_ a: SIMD<UInt64>, by lanes: Int) -> SIMD<UInt64> {
-        SIMD<UInt64>.shiftedRightLanes(a, by: lanes)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func _shiftedRightLanes(_ a: SIMD<UInt64>, byUnchecked lanes: Int) -> SIMD<UInt64>
-    {
-        unsafe SIMD<UInt64>.shiftedRightLanes(a, byUnchecked: lanes)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _reversed(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-        SIMD<UInt64>.reversed(a)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _reversedBlocks(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-        SIMD<UInt64>.reversedBlocks(a)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _reversed2(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-        SIMD<UInt64>.reversed2(a)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _reversed4(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-        SIMD<UInt64>.reversed4(a)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _reversed8(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-        SIMD<UInt64>.reversed8(a)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _bitReversed(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-        SIMD<UInt64>.bitReversed(a)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _indices(from vector: SIMD<UInt64>.Indices) -> SIMD<UInt64>.Indices {
-        SIMD<UInt64>.indices(from: vector)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func _indices(fromUnchecked vector: SIMD<UInt64>.Indices) -> SIMD<UInt64>.Indices
-    {
-        unsafe SIMD<UInt64>.indices(fromUnchecked: vector)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _tableLookupLanes(
-        _ a: SIMD<UInt64>,
-        at indices: SIMD<UInt64>.Indices
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.tableLookupLanes(a, at: indices)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func _tableLookupLanes(
-        _ a: SIMD<UInt64>,
-        atUnchecked indices: SIMD<UInt64>.Indices
-    ) -> SIMD<UInt64> {
-        unsafe SIMD<UInt64>.tableLookupLanes(a, atUnchecked: indices)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _twoTablesLookupLanes(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        at indices: SIMD<UInt64>.Indices
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.twoTablesLookupLanes(a, b, at: indices)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func _twoTablesLookupLanes(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        atUnchecked indices: SIMD<UInt64>.Indices
-    ) -> SIMD<UInt64> {
-        unsafe SIMD<UInt64>.twoTablesLookupLanes(a, b, atUnchecked: indices)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _lookup8(
-        at indices: SIMD<UInt64>.Indices,
-        from: UnsafePointer<UInt64>
-    ) -> SIMD<UInt64> {
-        unsafe SIMD<UInt64>.lookup8(at: indices, from: from)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
-    public static func _lookup8(
-        at indices: SIMD<UInt64>.Indices,
-        from span: Span<UInt64>
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.lookup8(at: indices, from: span)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
-    public static func _lookup8(
-        at indices: SIMD<UInt64>.Indices,
-        fromUnchecked span: Span<UInt64>
-    ) -> SIMD<UInt64> {
-        unsafe SIMD<UInt64>.lookup8(at: indices, fromUnchecked: span)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _lookup16(
-        at indices: SIMD<UInt64>.Indices,
-        from: UnsafePointer<UInt64>
-    ) -> SIMD<UInt64> {
-        unsafe SIMD<UInt64>.lookup16(at: indices, from: from)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
-    public static func _lookup16(
-        at indices: SIMD<UInt64>.Indices,
-        from span: Span<UInt64>
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.lookup16(at: indices, from: span)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
-    public static func _lookup16(
-        at indices: SIMD<UInt64>.Indices,
-        fromUnchecked span: Span<UInt64>
-    ) -> SIMD<UInt64> {
-        unsafe SIMD<UInt64>.lookup16(at: indices, fromUnchecked: span)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _shuffledPer4Lanes(
-        _ a: SIMD<UInt64>,
-        _ i3: Int,
-        _ i2: Int,
-        _ i1: Int,
-        _ i0: Int
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.shuffledPer4Lanes(a, i3, i2, i1, i0)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func _shuffledPer4Lanes(
-        _ a: SIMD<UInt64>,
-        unchecked i3: Int,
-        _ i2: Int,
-        _ i1: Int,
-        _ i0: Int
-    ) -> SIMD<UInt64> {
-        unsafe SIMD<UInt64>.shuffledPer4Lanes(a, unchecked: i3, i2, i1, i0)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _slide1Up(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-        SIMD<UInt64>.slide1Up(a)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _slide1Up(_ a: SIMD<UInt64>, fillingWith fill: UInt64) -> SIMD<UInt64> {
-        SIMD<UInt64>.slide1Up(a, fillingWith: fill)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _slide1Down(_ a: SIMD<UInt64>, fillingWith fill: UInt64) -> SIMD<UInt64> {
-        SIMD<UInt64>.slide1Down(a, fillingWith: fill)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _slideUpBlocks(_ a: SIMD<UInt64>, by blocks: Int) -> SIMD<UInt64> {
-        SIMD<UInt64>.slideUpBlocks(a, by: blocks)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func _slideUpBlocks(_ a: SIMD<UInt64>, byUnchecked blocks: Int) -> SIMD<UInt64> {
-        unsafe SIMD<UInt64>.slideUpBlocks(a, byUnchecked: blocks)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _slideDownBlocks(_ a: SIMD<UInt64>, by blocks: Int) -> SIMD<UInt64> {
-        SIMD<UInt64>.slideDownBlocks(a, by: blocks)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func _slideDownBlocks(_ a: SIMD<UInt64>, byUnchecked blocks: Int) -> SIMD<UInt64>
-    {
-        unsafe SIMD<UInt64>.slideDownBlocks(a, byUnchecked: blocks)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _combinedSlideDownLanes(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        by lanes: Int
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.combinedSlideDownLanes(a, b, by: lanes)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func _combinedSlideDownLanes(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        byUnchecked lanes: Int
-    ) -> SIMD<UInt64> {
-        unsafe SIMD<UInt64>.combinedSlideDownLanes(a, b, byUnchecked: lanes)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _slideUpLanes(_ a: SIMD<UInt64>, by lanes: Int) -> SIMD<UInt64> {
-        SIMD<UInt64>.slideUpLanes(a, by: lanes)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func _slideUpLanes(_ a: SIMD<UInt64>, byUnchecked lanes: Int) -> SIMD<UInt64> {
-        unsafe SIMD<UInt64>.slideUpLanes(a, byUnchecked: lanes)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _slideUpLanes(
-        _ a: SIMD<UInt64>,
-        by lanes: Int,
-        fillingWith fill: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.slideUpLanes(a, by: lanes, fillingWith: fill)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func _slideUpLanes(
-        _ a: SIMD<UInt64>,
-        byUnchecked lanes: Int,
-        fillingWith fill: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        unsafe SIMD<UInt64>.slideUpLanes(a, byUnchecked: lanes, fillingWith: fill)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _slideDownLanes(_ a: SIMD<UInt64>, by lanes: Int) -> SIMD<UInt64> {
-        SIMD<UInt64>.slideDownLanes(a, by: lanes)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func _slideDownLanes(_ a: SIMD<UInt64>, byUnchecked lanes: Int) -> SIMD<UInt64> {
-        unsafe SIMD<UInt64>.slideDownLanes(a, byUnchecked: lanes)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _slideDownLanes(
-        _ a: SIMD<UInt64>,
-        by lanes: Int,
-        fillingWith fill: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.slideDownLanes(a, by: lanes, fillingWith: fill)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func _slideDownLanes(
-        _ a: SIMD<UInt64>,
-        byUnchecked lanes: Int,
-        fillingWith fill: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        unsafe SIMD<UInt64>.slideDownLanes(a, byUnchecked: lanes, fillingWith: fill)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _slide1Down(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-        SIMD<UInt64>.slide1Down(a)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _sum(_ a: SIMD<UInt64>) -> UInt64 {
-        SIMD<UInt64>.sum(a)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _smallest(_ a: SIMD<UInt64>) -> UInt64 {
-        SIMD<UInt64>.smallest(a)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _largest(_ a: SIMD<UInt64>) -> UInt64 {
-        SIMD<UInt64>.largest(a)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _repeatingSum(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-        SIMD<UInt64>.repeatingSum(a)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _repeatingSmallest(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-        SIMD<UInt64>.repeatingSmallest(a)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _repeatingLargest(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
-        SIMD<UInt64>.repeatingLargest(a)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _minimum(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask,
-        otherwise: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.minimum(a, b, where: mask, otherwise: otherwise)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _maximum(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask,
-        otherwise: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.maximum(a, b, where: mask, otherwise: otherwise)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _adding(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask,
-        otherwise: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.adding(a, b, where: mask, otherwise: otherwise)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _subtracting(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask,
-        otherwise: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.subtracting(a, b, where: mask, otherwise: otherwise)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _multiplying(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask,
-        otherwise: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.multiplying(a, b, where: mask, otherwise: otherwise)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _dividing(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask,
-        otherwise: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.dividing(a, b, where: mask, otherwise: otherwise)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _multiplyAdding(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        _ c: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask,
-        otherwise: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.multiplyAdding(a, b, c, where: mask, otherwise: otherwise)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _multiplySubtracting(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        _ c: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask,
-        otherwise: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.multiplySubtracting(a, b, c, where: mask, otherwise: otherwise)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _negatedMultiplyAdding(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        _ c: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask,
-        otherwise: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.negatedMultiplyAdding(a, b, c, where: mask, otherwise: otherwise)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _negatedMultiplySubtracting(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        _ c: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask,
-        otherwise: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.negatedMultiplySubtracting(a, b, c, where: mask, otherwise: otherwise)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _remainder(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask,
-        otherwise: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.remainder(a, b, where: mask, otherwise: otherwise)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _maximum(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.maximum(a, b, where: mask)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _adding(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.adding(a, b, where: mask)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _subtracting(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.subtracting(a, b, where: mask)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _multiplying(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.multiplying(a, b, where: mask)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _dividing(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.dividing(a, b, where: mask)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _multiplyAdding(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        _ c: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.multiplyAdding(a, b, c, where: mask)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _multiplySubtracting(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        _ c: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.multiplySubtracting(a, b, c, where: mask)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _negatedMultiplyAdding(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        _ c: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.negatedMultiplyAdding(a, b, c, where: mask)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _negatedMultiplySubtracting(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        _ c: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.negatedMultiplySubtracting(a, b, c, where: mask)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _shiftedLeft(
-        _ a: SIMD<UInt64>,
-        by b: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.shiftedLeft(a, by: b, where: mask)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _shiftedLeft(
-        _ a: SIMD<UInt64>,
-        by b: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask,
-        otherwise: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.shiftedLeft(a, by: b, where: mask, otherwise: otherwise)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _shiftedRight(
-        _ a: SIMD<UInt64>,
-        by b: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.shiftedRight(a, by: b, where: mask)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _shiftedRight(
-        _ a: SIMD<UInt64>,
-        by b: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask,
-        otherwise: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.shiftedRight(a, by: b, where: mask, otherwise: otherwise)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _shiftedLeft(
-        _ a: SIMD<UInt64>,
-        by bits: Int,
-        where mask: SIMD<UInt64>.Mask
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.shiftedLeft(a, by: bits, where: mask)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _shiftedLeft(
-        _ a: SIMD<UInt64>,
-        by bits: Int,
-        where mask: SIMD<UInt64>.Mask,
-        otherwise: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.shiftedLeft(a, by: bits, where: mask, otherwise: otherwise)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _shiftedRight(
-        _ a: SIMD<UInt64>,
-        by bits: Int,
-        where mask: SIMD<UInt64>.Mask
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.shiftedRight(a, by: bits, where: mask)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _shiftedRight(
-        _ a: SIMD<UInt64>,
-        by bits: Int,
-        where mask: SIMD<UInt64>.Mask,
-        otherwise: SIMD<UInt64>
-    ) -> SIMD<UInt64> {
-        SIMD<UInt64>.shiftedRight(a, by: bits, where: mask, otherwise: otherwise)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _equalTo(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask
-    ) -> SIMD<UInt64>.Mask {
-        SIMD<UInt64>.equalTo(a, b, where: mask)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _notEqualTo(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask
-    ) -> SIMD<UInt64>.Mask {
-        SIMD<UInt64>.notEqualTo(a, b, where: mask)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _lessThan(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask
-    ) -> SIMD<UInt64>.Mask {
-        SIMD<UInt64>.lessThan(a, b, where: mask)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _greaterThan(
-        _ a: SIMD<UInt64>,
-        _ b: SIMD<UInt64>,
-        where mask: SIMD<UInt64>.Mask
-    ) -> SIMD<UInt64>.Mask {
-        SIMD<UInt64>.greaterThan(a, b, where: mask)
-    }
-
-    @export(implementation) @inline(always)
     public static func _lessThanOrEqualTo(
         _ a: SIMD<UInt64>,
         _ b: SIMD<UInt64>,
@@ -1043,6 +187,303 @@ extension UInt64 {
         to a: SIMD<UInt64>
     ) -> (SIMD<UInt64>, SIMD<UInt64>, SIMD<UInt64>, SIMD<UInt64>) {
         unsafe SIMD<UInt64>.set4(tuple, atUnchecked: index, to: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _gather(from: UnsafePointer<UInt64>, indices: SIMD<Int64>) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.gather(from: from, indices: indices)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _gather(from span: Span<UInt64>, indices: SIMD<Int64>) -> SIMD<UInt64> {
+        SIMD<UInt64>.gather(from: span, indices: indices)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _gather(
+        fromUnchecked span: Span<UInt64>,
+        indices: SIMD<Int64>
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.gather(fromUnchecked: span, indices: indices)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _gather(
+        from: UnsafePointer<UInt64>,
+        byteOffsets: SIMD<Int64>
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.gather(from: from, byteOffsets: byteOffsets)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _gather(from span: Span<UInt64>, byteOffsets: SIMD<Int64>) -> SIMD<UInt64> {
+        SIMD<UInt64>.gather(from: span, byteOffsets: byteOffsets)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _gather(
+        fromUnchecked span: Span<UInt64>,
+        byteOffsets: SIMD<Int64>
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.gather(fromUnchecked: span, byteOffsets: byteOffsets)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _gather(
+        from: UnsafePointer<UInt64>,
+        indices: SIMD<Int64>,
+        count: Int
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.gather(from: from, indices: indices, count: count)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _gather(
+        from span: Span<UInt64>,
+        indices: SIMD<Int64>,
+        count: Int
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.gather(from: span, indices: indices, count: count)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _gather(
+        fromUnchecked span: Span<UInt64>,
+        indices: SIMD<Int64>,
+        count: Int
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.gather(fromUnchecked: span, indices: indices, count: count)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _gather(
+        from: UnsafePointer<UInt64>,
+        indices: SIMD<Int64>,
+        count: Int,
+        otherwise: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.gather(from: from, indices: indices, count: count, otherwise: otherwise)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _gather(
+        from span: Span<UInt64>,
+        indices: SIMD<Int64>,
+        count: Int,
+        otherwise: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.gather(from: span, indices: indices, count: count, otherwise: otherwise)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _gather(
+        fromUnchecked span: Span<UInt64>,
+        indices: SIMD<Int64>,
+        count: Int,
+        otherwise: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.gather(
+            fromUnchecked: span,
+            indices: indices,
+            count: count,
+            otherwise: otherwise
+        )
+    }
+
+    @export(implementation) @inline(always)
+    public static func _gather(
+        from: UnsafePointer<UInt64>,
+        indices: SIMD<Int64>,
+        where mask: SIMD<UInt64>.Mask
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.gather(from: from, indices: indices, where: mask)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _gather(
+        from span: Span<UInt64>,
+        indices: SIMD<Int64>,
+        where mask: SIMD<UInt64>.Mask
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.gather(from: span, indices: indices, where: mask)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _gather(
+        fromUnchecked span: Span<UInt64>,
+        indices: SIMD<Int64>,
+        where mask: SIMD<UInt64>.Mask
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.gather(fromUnchecked: span, indices: indices, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _gather(
+        from: UnsafePointer<UInt64>,
+        indices: SIMD<Int64>,
+        where mask: SIMD<UInt64>.Mask,
+        otherwise: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.gather(from: from, indices: indices, where: mask, otherwise: otherwise)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _gather(
+        from span: Span<UInt64>,
+        indices: SIMD<Int64>,
+        where mask: SIMD<UInt64>.Mask,
+        otherwise: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.gather(from: span, indices: indices, where: mask, otherwise: otherwise)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _gather(
+        fromUnchecked span: Span<UInt64>,
+        indices: SIMD<Int64>,
+        where mask: SIMD<UInt64>.Mask,
+        otherwise: SIMD<UInt64>
+    ) -> SIMD<UInt64> {
+        unsafe SIMD<UInt64>.gather(
+            fromUnchecked: span,
+            indices: indices,
+            where: mask,
+            otherwise: otherwise
+        )
+    }
+
+    @export(implementation) @inline(always)
+    public static func _scatter(
+        _ a: SIMD<UInt64>,
+        to: UnsafeMutablePointer<UInt64>,
+        indices: SIMD<Int64>
+    ) {
+        unsafe SIMD<UInt64>.scatter(a, to: to, indices: indices)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _scatter(
+        _ a: SIMD<UInt64>,
+        to span: inout MutableSpan<UInt64>,
+        indices: SIMD<Int64>
+    ) {
+        SIMD<UInt64>.scatter(a, to: &span, indices: indices)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _scatter(
+        _ a: SIMD<UInt64>,
+        toUnchecked span: inout MutableSpan<UInt64>,
+        indices: SIMD<Int64>
+    ) {
+        unsafe SIMD<UInt64>.scatter(a, toUnchecked: &span, indices: indices)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _scatter(
+        _ a: SIMD<UInt64>,
+        to: UnsafeMutablePointer<UInt64>,
+        byteOffsets: SIMD<Int64>
+    ) {
+        unsafe SIMD<UInt64>.scatter(a, to: to, byteOffsets: byteOffsets)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _scatter(
+        _ a: SIMD<UInt64>,
+        to span: inout MutableSpan<UInt64>,
+        byteOffsets: SIMD<Int64>
+    ) {
+        SIMD<UInt64>.scatter(a, to: &span, byteOffsets: byteOffsets)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _scatter(
+        _ a: SIMD<UInt64>,
+        toUnchecked span: inout MutableSpan<UInt64>,
+        byteOffsets: SIMD<Int64>
+    ) {
+        unsafe SIMD<UInt64>.scatter(a, toUnchecked: &span, byteOffsets: byteOffsets)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _scatter(
+        _ a: SIMD<UInt64>,
+        to: UnsafeMutablePointer<UInt64>,
+        indices: SIMD<Int64>,
+        count: Int
+    ) {
+        unsafe SIMD<UInt64>.scatter(a, to: to, indices: indices, count: count)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _scatter(
+        _ a: SIMD<UInt64>,
+        to span: inout MutableSpan<UInt64>,
+        indices: SIMD<Int64>,
+        count: Int
+    ) {
+        SIMD<UInt64>.scatter(a, to: &span, indices: indices, count: count)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _scatter(
+        _ a: SIMD<UInt64>,
+        toUnchecked span: inout MutableSpan<UInt64>,
+        indices: SIMD<Int64>,
+        count: Int
+    ) {
+        unsafe SIMD<UInt64>.scatter(a, toUnchecked: &span, indices: indices, count: count)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _scatter(
+        _ a: SIMD<UInt64>,
+        to: UnsafeMutablePointer<UInt64>,
+        indices: SIMD<Int64>,
+        where mask: SIMD<UInt64>.Mask
+    ) {
+        unsafe SIMD<UInt64>.scatter(a, to: to, indices: indices, where: mask)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _scatter(
+        _ a: SIMD<UInt64>,
+        to span: inout MutableSpan<UInt64>,
+        indices: SIMD<Int64>,
+        where mask: SIMD<UInt64>.Mask
+    ) {
+        SIMD<UInt64>.scatter(a, to: &span, indices: indices, where: mask)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _scatter(
+        _ a: SIMD<UInt64>,
+        toUnchecked span: inout MutableSpan<UInt64>,
+        indices: SIMD<Int64>,
+        where mask: SIMD<UInt64>.Mask
+    ) {
+        unsafe SIMD<UInt64>.scatter(a, toUnchecked: &span, indices: indices, where: mask)
     }
 
     @export(implementation) @inline(always)
@@ -1422,5 +863,1330 @@ extension UInt64 {
     public static func _interleavingWholeUpper(_ a: SIMD<UInt64>, _ b: SIMD<UInt64>) -> SIMD<UInt64>
     {
         SIMD<UInt64>.interleavingWholeUpper(a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfUInt8 a: SIMD<UInt8>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(bitPattern: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfUInt16 a: SIMD<UInt16>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(bitPattern: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfUInt32 a: SIMD<UInt32>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(bitPattern: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfUInt64 a: SIMD<UInt64>) -> SIMD<UInt64> {
+        a
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfInt8 a: SIMD<Int8>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(bitPattern: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfInt16 a: SIMD<Int16>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(bitPattern: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfInt32 a: SIMD<Int32>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(bitPattern: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfInt64 a: SIMD<Int64>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(bitPattern: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfFloat a: SIMD<Float>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(bitPattern: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfDouble a: SIMD<Double>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(bitPattern: a)
+    }
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfFloat16 a: SIMD<Float16>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(bitPattern: a)
+    }
+    #endif
+
+    @export(implementation) @inline(always)
+    public static func _vector(bitPatternOfBFloat16 a: SIMD<BFloat16>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(bitPattern: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector<Result: SIMDElement>(
+        bitPattern a: SIMD<UInt64>,
+        as result: Result.Type
+    ) -> SIMD<Result> {
+        Result._vector(bitPatternOfUInt64: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfUInt8 a: SIMD<UInt8>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfHalfUInt8 a: SIMD<UInt8>.HalfVector) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfQuarterUInt8 a: SIMD<UInt8>.QuarterVector) -> SIMD<UInt64>
+    {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfEighthUInt8 a: SIMD<UInt8>.EighthVector) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfUInt16 a: SIMD<UInt16>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfHalfUInt16 a: SIMD<UInt16>.HalfVector) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        resizingOfQuarterUInt16 a: SIMD<UInt16>.QuarterVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfUInt32 a: SIMD<UInt32>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfHalfUInt32 a: SIMD<UInt32>.HalfVector) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfUInt64 a: SIMD<UInt64>) -> SIMD<UInt64> {
+        a
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfHalfUInt64 a: SIMD<UInt64>.HalfVector) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfInt8 a: SIMD<Int8>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfHalfInt8 a: SIMD<Int8>.HalfVector) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfQuarterInt8 a: SIMD<Int8>.QuarterVector) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfEighthInt8 a: SIMD<Int8>.EighthVector) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfInt16 a: SIMD<Int16>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfHalfInt16 a: SIMD<Int16>.HalfVector) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfQuarterInt16 a: SIMD<Int16>.QuarterVector) -> SIMD<UInt64>
+    {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfInt32 a: SIMD<Int32>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfHalfInt32 a: SIMD<Int32>.HalfVector) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfInt64 a: SIMD<Int64>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfHalfInt64 a: SIMD<Int64>.HalfVector) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfFloat a: SIMD<Float>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfHalfFloat a: SIMD<Float>.HalfVector) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfDouble a: SIMD<Double>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfHalfDouble a: SIMD<Double>.HalfVector) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfFloat16 a: SIMD<Float16>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfHalfFloat16 a: SIMD<Float16>.HalfVector) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    @export(implementation) @inline(always)
+    public static func _vector(
+        resizingOfQuarterFloat16 a: SIMD<Float16>.QuarterVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+    #endif
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfBFloat16 a: SIMD<BFloat16>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(resizingOfHalfBFloat16 a: SIMD<BFloat16>.HalfVector) -> SIMD<UInt64>
+    {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        resizingOfQuarterBFloat16 a: SIMD<BFloat16>.QuarterVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector<Result: SIMDElement>(
+        resizing a: SIMD<UInt64>,
+        as result: Result.Type
+    ) -> SIMD<Result> {
+        Result._vector(resizingOfUInt64: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector<Result: SIMDElement>(
+        resizing a: SIMD<UInt64>.HalfVector,
+        as result: Result.Type
+    ) -> SIMD<Result> {
+        Result._vector(resizingOfHalfUInt64: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(zeroExtendingResizingOfUInt8 a: SIMD<UInt8>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        zeroExtendingResizingOfHalfUInt8 a: SIMD<UInt8>.HalfVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        zeroExtendingResizingOfQuarterUInt8 a: SIMD<UInt8>.QuarterVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        zeroExtendingResizingOfEighthUInt8 a: SIMD<UInt8>.EighthVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(zeroExtendingResizingOfUInt16 a: SIMD<UInt16>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        zeroExtendingResizingOfHalfUInt16 a: SIMD<UInt16>.HalfVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        zeroExtendingResizingOfQuarterUInt16 a: SIMD<UInt16>.QuarterVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(zeroExtendingResizingOfUInt32 a: SIMD<UInt32>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        zeroExtendingResizingOfHalfUInt32 a: SIMD<UInt32>.HalfVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(zeroExtendingResizingOfUInt64 a: SIMD<UInt64>) -> SIMD<UInt64> {
+        a
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        zeroExtendingResizingOfHalfUInt64 a: SIMD<UInt64>.HalfVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(zeroExtendingResizingOfInt8 a: SIMD<Int8>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        zeroExtendingResizingOfHalfInt8 a: SIMD<Int8>.HalfVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        zeroExtendingResizingOfQuarterInt8 a: SIMD<Int8>.QuarterVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        zeroExtendingResizingOfEighthInt8 a: SIMD<Int8>.EighthVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(zeroExtendingResizingOfInt16 a: SIMD<Int16>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        zeroExtendingResizingOfHalfInt16 a: SIMD<Int16>.HalfVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        zeroExtendingResizingOfQuarterInt16 a: SIMD<Int16>.QuarterVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(zeroExtendingResizingOfInt32 a: SIMD<Int32>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        zeroExtendingResizingOfHalfInt32 a: SIMD<Int32>.HalfVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(zeroExtendingResizingOfInt64 a: SIMD<Int64>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        zeroExtendingResizingOfHalfInt64 a: SIMD<Int64>.HalfVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(zeroExtendingResizingOfFloat a: SIMD<Float>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        zeroExtendingResizingOfHalfFloat a: SIMD<Float>.HalfVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(zeroExtendingResizingOfDouble a: SIMD<Double>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        zeroExtendingResizingOfHalfDouble a: SIMD<Double>.HalfVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    @export(implementation) @inline(always)
+    public static func _vector(zeroExtendingResizingOfFloat16 a: SIMD<Float16>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    @export(implementation) @inline(always)
+    public static func _vector(
+        zeroExtendingResizingOfHalfFloat16 a: SIMD<Float16>.HalfVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    @export(implementation) @inline(always)
+    public static func _vector(
+        zeroExtendingResizingOfQuarterFloat16 a: SIMD<Float16>.QuarterVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+    #endif
+
+    @export(implementation) @inline(always)
+    public static func _vector(zeroExtendingResizingOfBFloat16 a: SIMD<BFloat16>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        zeroExtendingResizingOfHalfBFloat16 a: SIMD<BFloat16>.HalfVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        zeroExtendingResizingOfQuarterBFloat16 a: SIMD<BFloat16>.QuarterVector
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector<Result: SIMDElement>(
+        zeroExtendingResizing a: SIMD<UInt64>,
+        as result: Result.Type
+    ) -> SIMD<Result> {
+        Result._vector(zeroExtendingResizingOfUInt64: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector<Result: SIMDElement>(
+        zeroExtendingResizing a: SIMD<UInt64>.HalfVector,
+        as result: Result.Type
+    ) -> SIMD<Result> {
+        Result._vector(zeroExtendingResizingOfHalfUInt64: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(resizingOfUInt8 a: SIMD<UInt8>) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        resizingOfHalfUInt8 a: SIMD<UInt8>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        resizingOfQuarterUInt8 a: SIMD<UInt8>.QuarterVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        resizingOfEighthUInt8 a: SIMD<UInt8>.EighthVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(resizingOfUInt16 a: SIMD<UInt16>) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        resizingOfHalfUInt16 a: SIMD<UInt16>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        resizingOfQuarterUInt16 a: SIMD<UInt16>.QuarterVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(resizingOfUInt32 a: SIMD<UInt32>) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        resizingOfHalfUInt32 a: SIMD<UInt32>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(resizingOfUInt64 a: SIMD<UInt64>) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        resizingOfHalfUInt64 a: SIMD<UInt64>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        a
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(resizingOfInt8 a: SIMD<Int8>) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        resizingOfHalfInt8 a: SIMD<Int8>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        resizingOfQuarterInt8 a: SIMD<Int8>.QuarterVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        resizingOfEighthInt8 a: SIMD<Int8>.EighthVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(resizingOfInt16 a: SIMD<Int16>) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        resizingOfHalfInt16 a: SIMD<Int16>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        resizingOfQuarterInt16 a: SIMD<Int16>.QuarterVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(resizingOfInt32 a: SIMD<Int32>) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        resizingOfHalfInt32 a: SIMD<Int32>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(resizingOfInt64 a: SIMD<Int64>) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        resizingOfHalfInt64 a: SIMD<Int64>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(resizingOfFloat a: SIMD<Float>) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        resizingOfHalfFloat a: SIMD<Float>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(resizingOfDouble a: SIMD<Double>) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        resizingOfHalfDouble a: SIMD<Double>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    @export(implementation) @inline(always)
+    public static func _halfVector(resizingOfFloat16 a: SIMD<Float16>) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        resizingOfHalfFloat16 a: SIMD<Float16>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        resizingOfQuarterFloat16 a: SIMD<Float16>.QuarterVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+    #endif
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(resizingOfBFloat16 a: SIMD<BFloat16>) -> SIMD<UInt64>.HalfVector
+    {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        resizingOfHalfBFloat16 a: SIMD<BFloat16>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        resizingOfQuarterBFloat16 a: SIMD<BFloat16>.QuarterVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(resizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector<Result: SIMDElement>(
+        resizing a: SIMD<UInt64>,
+        as result: Result.Type
+    ) -> SIMD<Result>.HalfVector {
+        Result._halfVector(resizingOfUInt64: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector<Result: SIMDElement>(
+        resizing a: SIMD<UInt64>.HalfVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.HalfVector {
+        Result._halfVector(resizingOfHalfUInt64: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfUInt8 a: SIMD<UInt8>
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfHalfUInt8 a: SIMD<UInt8>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfQuarterUInt8 a: SIMD<UInt8>.QuarterVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfEighthUInt8 a: SIMD<UInt8>.EighthVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfUInt16 a: SIMD<UInt16>
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfHalfUInt16 a: SIMD<UInt16>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfQuarterUInt16 a: SIMD<UInt16>.QuarterVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfUInt32 a: SIMD<UInt32>
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfHalfUInt32 a: SIMD<UInt32>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfUInt64 a: SIMD<UInt64>
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfHalfUInt64 a: SIMD<UInt64>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        a
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfInt8 a: SIMD<Int8>
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfHalfInt8 a: SIMD<Int8>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfQuarterInt8 a: SIMD<Int8>.QuarterVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfEighthInt8 a: SIMD<Int8>.EighthVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfInt16 a: SIMD<Int16>
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfHalfInt16 a: SIMD<Int16>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfQuarterInt16 a: SIMD<Int16>.QuarterVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfInt32 a: SIMD<Int32>
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfHalfInt32 a: SIMD<Int32>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfInt64 a: SIMD<Int64>
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfHalfInt64 a: SIMD<Int64>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfFloat a: SIMD<Float>
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfHalfFloat a: SIMD<Float>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfDouble a: SIMD<Double>
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfHalfDouble a: SIMD<Double>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfFloat16 a: SIMD<Float16>
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfHalfFloat16 a: SIMD<Float16>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfQuarterFloat16 a: SIMD<Float16>.QuarterVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+    #endif
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfBFloat16 a: SIMD<BFloat16>
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfHalfBFloat16 a: SIMD<BFloat16>.HalfVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        zeroExtendingResizingOfQuarterBFloat16 a: SIMD<BFloat16>.QuarterVector
+    ) -> SIMD<UInt64>.HalfVector {
+        SIMD<UInt64>.halfVector(zeroExtendingResizing: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector<Result: SIMDElement>(
+        zeroExtendingResizing a: SIMD<UInt64>,
+        as result: Result.Type
+    ) -> SIMD<Result>.HalfVector {
+        Result._halfVector(zeroExtendingResizingOfUInt64: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector<Result: SIMDElement>(
+        zeroExtendingResizing a: SIMD<UInt64>.HalfVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.HalfVector {
+        Result._halfVector(zeroExtendingResizingOfHalfUInt64: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _quarterVector<Result: SIMDQuarterVectorElement>(
+        resizing a: SIMD<UInt64>,
+        as result: Result.Type
+    ) -> SIMD<Result>.QuarterVector {
+        Result._quarterVector(resizingOfUInt64: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _quarterVector<Result: SIMDQuarterVectorElement>(
+        resizing a: SIMD<UInt64>.HalfVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.QuarterVector {
+        Result._quarterVector(resizingOfHalfUInt64: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _quarterVector<Result: SIMDQuarterVectorElement>(
+        zeroExtendingResizing a: SIMD<UInt64>,
+        as result: Result.Type
+    ) -> SIMD<Result>.QuarterVector {
+        Result._quarterVector(zeroExtendingResizingOfUInt64: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _quarterVector<Result: SIMDQuarterVectorElement>(
+        zeroExtendingResizing a: SIMD<UInt64>.HalfVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.QuarterVector {
+        Result._quarterVector(zeroExtendingResizingOfHalfUInt64: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _eighthVector<Result: SIMDEighthVectorElement>(
+        resizing a: SIMD<UInt64>,
+        as result: Result.Type
+    ) -> SIMD<Result>.EighthVector {
+        Result._eighthVector(resizingOfUInt64: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _eighthVector<Result: SIMDEighthVectorElement>(
+        resizing a: SIMD<UInt64>.HalfVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.EighthVector {
+        Result._eighthVector(resizingOfHalfUInt64: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _eighthVector<Result: SIMDEighthVectorElement>(
+        zeroExtendingResizing a: SIMD<UInt64>,
+        as result: Result.Type
+    ) -> SIMD<Result>.EighthVector {
+        Result._eighthVector(zeroExtendingResizingOfUInt64: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _eighthVector<Result: SIMDEighthVectorElement>(
+        zeroExtendingResizing a: SIMD<UInt64>.HalfVector,
+        as result: Result.Type
+    ) -> SIMD<Result>.EighthVector {
+        Result._eighthVector(zeroExtendingResizingOfHalfUInt64: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(convertingToFloat a: SIMD<UInt64>) -> SIMD<Double> {
+        SIMD<Double>.vector(converting: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        convertingToFloat a: SIMD<UInt64>,
+        where mask: SIMD<Double>.Mask
+    ) -> SIMD<Double> {
+        SIMD<Double>.vector(converting: a, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(convertingFromFloat a: SIMD<Double>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(converting: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        convertingFromFloat a: SIMD<Double>,
+        where mask: SIMD<UInt64>.Mask
+    ) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(converting: a, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(convertingInRangeFromFloat a: SIMD<Double>) -> SIMD<UInt64> {
+        SIMD<UInt64>.vector(convertingInRange: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(clampingToSigned a: SIMD<UInt64>) -> SIMD<Int32>.HalfVector {
+        SIMD<Int32>.halfVector(clamping: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        clampingToSigned a: SIMD<UInt64>,
+        shiftedRightBy bits: Int
+    ) -> SIMD<Int32>.HalfVector {
+        SIMD<Int32>.halfVector(clamping: a, shiftedRightBy: bits)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _halfVector(
+        clampingToSigned a: SIMD<UInt64>,
+        shiftedRightByUnchecked bits: Int
+    ) -> SIMD<Int32>.HalfVector {
+        unsafe SIMD<Int32>.halfVector(clamping: a, shiftedRightByUnchecked: bits)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        clampingToSigned a: SIMD<UInt64>,
+        roundingShiftedRightBy bits: Int
+    ) -> SIMD<Int32>.HalfVector {
+        SIMD<Int32>.halfVector(clamping: a, roundingShiftedRightBy: bits)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _halfVector(
+        clampingToSigned a: SIMD<UInt64>,
+        roundingShiftedRightByUnchecked bits: Int
+    ) -> SIMD<Int32>.HalfVector {
+        unsafe SIMD<Int32>.halfVector(clamping: a, roundingShiftedRightByUnchecked: bits)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(clampingToUnsigned a: SIMD<UInt64>) -> SIMD<UInt32>.HalfVector {
+        SIMD<UInt32>.halfVector(clamping: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        clampingToUnsigned a: SIMD<UInt64>,
+        shiftedRightBy bits: Int
+    ) -> SIMD<UInt32>.HalfVector {
+        SIMD<UInt32>.halfVector(clamping: a, shiftedRightBy: bits)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _halfVector(
+        clampingToUnsigned a: SIMD<UInt64>,
+        shiftedRightByUnchecked bits: Int
+    ) -> SIMD<UInt32>.HalfVector {
+        unsafe SIMD<UInt32>.halfVector(clamping: a, shiftedRightByUnchecked: bits)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(
+        clampingToUnsigned a: SIMD<UInt64>,
+        roundingShiftedRightBy bits: Int
+    ) -> SIMD<UInt32>.HalfVector {
+        SIMD<UInt32>.halfVector(clamping: a, roundingShiftedRightBy: bits)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _halfVector(
+        clampingToUnsigned a: SIMD<UInt64>,
+        roundingShiftedRightByUnchecked bits: Int
+    ) -> SIMD<UInt32>.HalfVector {
+        unsafe SIMD<UInt32>.halfVector(clamping: a, roundingShiftedRightByUnchecked: bits)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _halfVector(truncatingIfNeeded a: SIMD<UInt64>) -> SIMD<UInt32>.HalfVector {
+        SIMD<UInt32>.halfVector(truncatingIfNeeded: a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(clampingToSigned a: SIMD<UInt64>, _ b: SIMD<UInt64>) -> SIMD<Int32> {
+        SIMD<Int32>.vector(clamping: a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        clampingInAnyOrderToSigned a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>
+    ) -> SIMD<Int32> {
+        SIMD<Int32>.vector(clampingInAnyOrder: a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        clampingToSigned a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        shiftedRightBy bits: Int
+    ) -> SIMD<Int32> {
+        SIMD<Int32>.vector(clamping: a, b, shiftedRightBy: bits)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _vector(
+        clampingToSigned a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        shiftedRightByUnchecked bits: Int
+    ) -> SIMD<Int32> {
+        unsafe SIMD<Int32>.vector(clamping: a, b, shiftedRightByUnchecked: bits)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        clampingToSigned a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        roundingShiftedRightBy bits: Int
+    ) -> SIMD<Int32> {
+        SIMD<Int32>.vector(clamping: a, b, roundingShiftedRightBy: bits)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _vector(
+        clampingToSigned a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        roundingShiftedRightByUnchecked bits: Int
+    ) -> SIMD<Int32> {
+        unsafe SIMD<Int32>.vector(clamping: a, b, roundingShiftedRightByUnchecked: bits)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        clampingInAnyOrderToSigned a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        shiftedRightBy bits: Int
+    ) -> SIMD<Int32> {
+        SIMD<Int32>.vector(clampingInAnyOrder: a, b, shiftedRightBy: bits)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _vector(
+        clampingInAnyOrderToSigned a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        shiftedRightByUnchecked bits: Int
+    ) -> SIMD<Int32> {
+        unsafe SIMD<Int32>.vector(clampingInAnyOrder: a, b, shiftedRightByUnchecked: bits)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        clampingInAnyOrderToSigned a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        roundingShiftedRightBy bits: Int
+    ) -> SIMD<Int32> {
+        SIMD<Int32>.vector(clampingInAnyOrder: a, b, roundingShiftedRightBy: bits)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _vector(
+        clampingInAnyOrderToSigned a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        roundingShiftedRightByUnchecked bits: Int
+    ) -> SIMD<Int32> {
+        unsafe SIMD<Int32>.vector(clampingInAnyOrder: a, b, roundingShiftedRightByUnchecked: bits)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        clampingToUnsigned a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>
+    ) -> SIMD<UInt32> {
+        SIMD<UInt32>.vector(clamping: a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        clampingInAnyOrderToUnsigned a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>
+    ) -> SIMD<UInt32> {
+        SIMD<UInt32>.vector(clampingInAnyOrder: a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        clampingToUnsigned a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        shiftedRightBy bits: Int
+    ) -> SIMD<UInt32> {
+        SIMD<UInt32>.vector(clamping: a, b, shiftedRightBy: bits)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _vector(
+        clampingToUnsigned a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        shiftedRightByUnchecked bits: Int
+    ) -> SIMD<UInt32> {
+        unsafe SIMD<UInt32>.vector(clamping: a, b, shiftedRightByUnchecked: bits)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        clampingToUnsigned a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        roundingShiftedRightBy bits: Int
+    ) -> SIMD<UInt32> {
+        SIMD<UInt32>.vector(clamping: a, b, roundingShiftedRightBy: bits)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _vector(
+        clampingToUnsigned a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        roundingShiftedRightByUnchecked bits: Int
+    ) -> SIMD<UInt32> {
+        unsafe SIMD<UInt32>.vector(clamping: a, b, roundingShiftedRightByUnchecked: bits)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        clampingInAnyOrderToUnsigned a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        shiftedRightBy bits: Int
+    ) -> SIMD<UInt32> {
+        SIMD<UInt32>.vector(clampingInAnyOrder: a, b, shiftedRightBy: bits)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _vector(
+        clampingInAnyOrderToUnsigned a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        shiftedRightByUnchecked bits: Int
+    ) -> SIMD<UInt32> {
+        unsafe SIMD<UInt32>.vector(clampingInAnyOrder: a, b, shiftedRightByUnchecked: bits)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        clampingInAnyOrderToUnsigned a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        roundingShiftedRightBy bits: Int
+    ) -> SIMD<UInt32> {
+        SIMD<UInt32>.vector(clampingInAnyOrder: a, b, roundingShiftedRightBy: bits)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _vector(
+        clampingInAnyOrderToUnsigned a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>,
+        roundingShiftedRightByUnchecked bits: Int
+    ) -> SIMD<UInt32> {
+        unsafe SIMD<UInt32>.vector(clampingInAnyOrder: a, b, roundingShiftedRightByUnchecked: bits)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _vector(
+        truncatingIfNeeded a: SIMD<UInt64>,
+        _ b: SIMD<UInt64>
+    ) -> SIMD<UInt32> {
+        SIMD<UInt32>.vector(truncatingIfNeeded: a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _zippingUpper(_ a: SIMD<UInt32>, _ b: SIMD<UInt32>) -> SIMD<UInt64> {
+        SIMD<UInt64>.zippingUpper(a, b)
     }
 }

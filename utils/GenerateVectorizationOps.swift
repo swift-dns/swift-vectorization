@@ -1057,6 +1057,28 @@ func signedElement(of element: Element) -> Element {
     return signed
 }
 
+func wideElement(of element: Element) -> Element? {
+    switch element.category {
+    case .unsignedInteger, .signedInteger:
+        return element.bits < 64 ? resizedElement(of: element, bits: element.bits * 2) : nil
+    case .float, .float16:
+        return elements.first { $0.isFloatingPoint && $0.bits == element.bits * 2 }
+    case .bfloat16:
+        return nil
+    }
+}
+
+func narrowElement(of element: Element) -> Element? {
+    elements.first { wideElement(of: $0)?.suffix == element.suffix }
+}
+
+func floatElement(of element: Element) -> Element? {
+    guard element.category == .unsignedInteger || element.category == .signedInteger,
+        element.bits >= 16
+    else { return nil }
+    return elements.first { $0.isFloatingPoint && $0.bits == element.bits }
+}
+
 func resizedElement(of element: Element, bits: Int) -> Element {
     guard
         let resized = elements.first(where: {
@@ -44711,7 +44733,9 @@ let integerElements = classicElements.filter { $0.category != .float }
 /// ancestor already requires. A half-precision conformer has an op if any op of its identifier
 /// applies to it. A protocol that carries only shape ops requires just the ops that take or return a
 /// vector or a mask of one of its shapes, not every op that happens to exist on all of its
-/// conformers. Any other protocol requires the ops whose narrow shapes are all among its own.
+/// conformers. Any other protocol requires the ops whose narrow shapes are all among its own and
+/// its ancestors'. A protocol that carries no ops only states how its conformers link to other lane
+/// types.
 struct ElementProtocol {
     let name: String
     let parents: [String]
@@ -44719,6 +44743,8 @@ struct ElementProtocol {
     let conformers: [Element]
     let shapes: [Shape]
     let carriesOnlyShapeOps: Bool
+    var constraints = ""
+    var carriesOps = true
 
     var parentProtocols: [ElementProtocol] {
         parents.compactMap { parent in elementProtocols.first { $0.name == parent } }
@@ -44777,7 +44803,8 @@ let elementProtocols = [
         documentation: "/// The ops that only the unsigned integer lane types have.",
         conformers: elements.filter { $0.category == .unsignedInteger },
         shapes: [],
-        carriesOnlyShapeOps: false
+        carriesOnlyShapeOps: false,
+        constraints: "UnsignedLane == Self"
     ),
     ElementProtocol(
         name: "SIMDSignedElement",
@@ -44795,7 +44822,8 @@ let elementProtocols = [
         documentation: "/// The ops that only the signed integer lane types have.",
         conformers: elements.filter { $0.category == .signedInteger },
         shapes: [],
-        carriesOnlyShapeOps: false
+        carriesOnlyShapeOps: false,
+        constraints: "SignedLane == Self"
     ),
     ElementProtocol(
         name: "SIMDFloatElement",
@@ -44803,7 +44831,11 @@ let elementProtocols = [
         documentation: "/// The ops that only the floating point lane types have.",
         conformers: elements.filter(\.isFloatingPoint),
         shapes: [],
-        carriesOnlyShapeOps: false
+        carriesOnlyShapeOps: false,
+        constraints: """
+            SignedLane: SIMDFloatConvertibleElement, UnsignedLane: SIMDFloatConvertibleElement, \
+            SignedLane.FloatLane == Self, UnsignedLane.FloatLane == Self
+            """
     ),
     ElementProtocol(
         name: "SIMDQuarterVectorElement",
@@ -44821,6 +44853,109 @@ let elementProtocols = [
         shapes: [.eighth],
         carriesOnlyShapeOps: true
     ),
+    ElementProtocol(
+        name: "SIMDWidenableElement",
+        parents: ["SIMDElement"],
+        documentation: "/// The lane types that have a lane type twice as wide of the same kind.",
+        conformers: elements.filter { wideElement(of: $0) != nil },
+        shapes: [],
+        carriesOnlyShapeOps: false,
+        carriesOps: false
+    ),
+    ElementProtocol(
+        name: "SIMDNarrowableElement",
+        parents: ["SIMDElement"],
+        documentation: "/// The lane types that have a lane type half as wide of the same kind.",
+        conformers: elements.filter { narrowElement(of: $0) != nil },
+        shapes: [],
+        carriesOnlyShapeOps: false,
+        carriesOps: false
+    ),
+    ElementProtocol(
+        name: "SIMDFloatConvertibleElement",
+        parents: ["SIMDIntegerElement"],
+        documentation:
+            "/// The integer lane types that have a floating point lane type of the same width.",
+        conformers: elements.filter { floatElement(of: $0) != nil },
+        shapes: [],
+        carriesOnlyShapeOps: false,
+        carriesOps: false
+    ),
+    ElementProtocol(
+        name: "SIMDWideIntegerElement",
+        parents: ["SIMDIntegerElement", "SIMDNarrowableElement"],
+        documentation: """
+            /// The integer lane types that have an integer lane type half as wide, which in turn has
+            /// one twice as wide.
+            """,
+        conformers: integerElements.filter { narrowElement(of: $0) != nil },
+        shapes: [],
+        carriesOnlyShapeOps: false,
+        constraints:
+            "NarrowLane: SIMDWidenableIntegerElement, UnsignedLane: SIMDWideIntegerElement",
+        carriesOps: false
+    ),
+    ElementProtocol(
+        name: "SIMDWidenableIntegerElement",
+        parents: ["SIMDIntegerElement", "SIMDWidenableElement"],
+        documentation: "/// The integer lane types that have an integer lane type twice as wide.",
+        conformers: integerElements.filter { wideElement(of: $0) != nil },
+        shapes: [],
+        carriesOnlyShapeOps: false,
+        constraints: "WideLane: SIMDWideIntegerElement",
+        carriesOps: false
+    ),
+    ElementProtocol(
+        name: "SIMDGatherableElement",
+        parents: ["SIMDNumericElement"],
+        documentation: "/// The lane types that `gather` and `scatter` work on.",
+        conformers: elements.filter { $0.bits >= 32 },
+        shapes: [],
+        carriesOnlyShapeOps: false,
+        carriesOps: false
+    ),
+]
+
+/// An associated type of the protocol `protocolName` that names the lane type a lane type relates
+/// to, which is `target` of that lane type, and what that lane type must conform to.
+struct ElementLink {
+    let name: String
+    let protocolName: String
+    let bound: String
+    let target: (Element) -> Element?
+}
+
+let elementLinks = [
+    ElementLink(
+        name: "UnsignedLane",
+        protocolName: "SIMDElement",
+        bound: "SIMDUnsignedIntegerElement where UnsignedLane.UnsignedLane == UnsignedLane",
+        target: { unsignedElement(of: $0) }
+    ),
+    ElementLink(
+        name: "SignedLane",
+        protocolName: "SIMDElement",
+        bound: "SIMDSignedIntegerElement where SignedLane.SignedLane == SignedLane",
+        target: { signedElement(of: $0) }
+    ),
+    ElementLink(
+        name: "WideLane",
+        protocolName: "SIMDWidenableElement",
+        bound: "SIMDNarrowableElement where WideLane.NarrowLane == Self",
+        target: { wideElement(of: $0) }
+    ),
+    ElementLink(
+        name: "NarrowLane",
+        protocolName: "SIMDNarrowableElement",
+        bound: "SIMDWidenableElement where NarrowLane.WideLane == Self",
+        target: { narrowElement(of: $0) }
+    ),
+    ElementLink(
+        name: "FloatLane",
+        protocolName: "SIMDFloatConvertibleElement",
+        bound: "SIMDFloatElement",
+        target: { floatElement(of: $0) }
+    ),
 ]
 
 func isProvided(_ op: Op, by element: Element) -> Bool {
@@ -44830,10 +44965,11 @@ func isProvided(_ op: Op, by element: Element) -> Bool {
 }
 
 func isCarried(_ op: Op, by elementProtocol: ElementProtocol) -> Bool {
-    guard op.source == nil, !takesIndexTypes(op) else { return false }
+    guard elementProtocol.carriesOps, op.source == nil, !takesIndexTypes(op) else { return false }
     let shapes = narrowShapes(of: op)
     guard elementProtocol.carriesOnlyShapeOps else {
-        return shapes.isSubset(of: elementProtocol.shapes)
+        let carried = ([elementProtocol] + elementProtocol.ancestors).flatMap(\.shapes)
+        return shapes.isSubset(of: carried)
     }
     return !shapes.isDisjoint(with: elementProtocol.shapes)
 }
@@ -44865,8 +45001,19 @@ let protocolRequirementOps: [String: [Op]] = {
     return requirements
 }()
 
-func protocolConformances(of element: Element) -> [String] {
-    let conformed = elementProtocols.filter { $0.isConformed(by: element) }
+/// The lane types that `element` links to in `elementProtocol` and that are compiled out where
+/// `element` is not, which makes the conformance compiled out there too.
+func compiledOutLinks(of elementProtocol: ElementProtocol, for element: Element) -> [Element] {
+    guard element.compilationCondition == nil else { return [] }
+    return elementLinks.filter { $0.protocolName == elementProtocol.name }
+        .compactMap { $0.target(element) }.filter { $0.compilationCondition != nil }
+}
+
+func protocolConformances(of element: Element, compiledOut: Bool = false) -> [String] {
+    let conformed = elementProtocols.filter {
+        $0.isConformed(by: element)
+            && compiledOutLinks(of: $0, for: element).isEmpty == !compiledOut
+    }
     let inherited = Set(conformed.flatMap { $0.ancestors.map(\.name) })
     return conformed.map(\.name).filter { !inherited.contains($0) }
 }
@@ -44899,7 +45046,7 @@ struct StaticRequirement {
 }
 
 func staticRequirements(of elementProtocol: ElementProtocol) -> [StaticRequirement] {
-    guard !elementProtocol.carriesOnlyShapeOps else { return [] }
+    guard elementProtocol.carriesOps, !elementProtocol.carriesOnlyShapeOps else { return [] }
     var requirements: [StaticRequirement] = []
     if elementProtocol.parents.isEmpty {
         requirements = [
@@ -44952,9 +45099,9 @@ func staticRequirementNames(of element: Element) -> Set<String> {
 /// concrete function of the same name.
 struct RequirementForm {
     let name: String
-    let parameters: String
+    var parameters: String
     let returnClause: String
-    let arguments: String
+    var arguments: String
     var hasSpanAvailability = false
     var isUnchecked = false
     var takesPointers = false
@@ -45015,8 +45162,11 @@ func outputSpanRequirementForms(_ forms: SpanForms) -> [RequirementForm] {
     ]
 }
 
-func requirementForms(of op: Op, scope: String?) -> [RequirementForm] {
-    let element = elements[0]
+func requirementForms(
+    of op: Op,
+    for element: Element = elements[0],
+    scope: String?
+) -> [RequirementForm] {
     let returnClause = op.returns == .void ? "" : " -> \(swiftReturnType(op.returns, scope: scope))"
     var forms = [
         RequirementForm(
@@ -45048,9 +45198,9 @@ func requirementForms(of op: Op, scope: String?) -> [RequirementForm] {
     return forms
 }
 
-func requirementDeclaration(_ form: RequirementForm) -> String {
+func requirementDeclaration(_ form: RequirementForm, generics: String = "") -> String {
     let availability = form.hasSpanAvailability ? "    \(spanAvailability)\n" : ""
-    let signature = "static func _\(form.name)(\(form.parameters))\(form.returnClause)"
+    let signature = "static func _\(form.name)\(generics)(\(form.parameters))\(form.returnClause)"
     return "\(availability)    \(form.unsafeAttribute)\(signature)\n"
 }
 
@@ -45070,6 +45220,9 @@ func protocolDeclaration(_ elementProtocol: ElementProtocol) -> String {
         members +=
             "    associatedtype IndexLane: SIMDElement where IndexLane.IndexLane == IndexLane\n"
     }
+    for link in elementLinks where link.protocolName == elementProtocol.name {
+        members += "    associatedtype \(link.name): \(link.bound)\n"
+    }
     let statics = staticRequirements(of: elementProtocol)
     if !statics.isEmpty {
         members += "\n"
@@ -45080,13 +45233,20 @@ func protocolDeclaration(_ elementProtocol: ElementProtocol) -> String {
     }
     if !forms.isEmpty {
         members += "\n"
-        members += forms.map(requirementDeclaration).joined()
+        members += forms.map { requirementDeclaration($0) }.joined()
+    }
+    let links = linkRequirements[elementProtocol.name] ?? []
+    if !links.isEmpty {
+        members += "\n"
+        members += links.joined()
     }
     let parents = elementProtocol.parents.joined(separator: ", ")
     let inheritance = parents.isEmpty ? "" : ": \(parents)"
+    let constraints =
+        elementProtocol.constraints.isEmpty ? "" : " where \(elementProtocol.constraints)"
     return """
         \(elementProtocol.documentation)
-        public protocol \(elementProtocol.name)\(inheritance) {
+        public protocol \(elementProtocol.name)\(inheritance)\(constraints) {
         \(members)}
         """
 }
@@ -45178,13 +45338,17 @@ func forwardingMember(
     _ form: RequirementForm,
     named name: String,
     calling callee: String,
-    disfavored: Bool
+    disfavored: Bool,
+    generics: String = "",
+    constraints: String = "",
+    body: String? = nil
 ) -> String {
     let disfavoredAttribute = disfavored ? "@_disfavoredOverload " : ""
+    let whereClause = constraints.isEmpty ? "" : " where \(constraints)"
     return """
             \(form.availability)\(form.unsafeAttribute)\(disfavoredAttribute)@export(implementation) @inline(always)
-            public static func \(name)(\(form.parameters))\(form.returnClause) {
-                \(form.callKeyword)\(callee)(\(form.arguments))
+            public static func \(name)\(generics)(\(form.parameters))\(form.returnClause)\(whereClause) {
+                \(body ?? "\(form.callKeyword)\(callee)(\(form.arguments))")
             }
         """
 }
@@ -45202,6 +45366,1223 @@ func forwardingProperty(
             \(documentation)\(disfavoredAttribute)@export(implementation) @inline(always)
             public static var \(name): \(requirement.type) { \(callee) }
         """
+}
+
+/// An op that a cross-type form generalizes, as declared on `lane`, with the lane type `source` of
+/// the operand that makes it cross-type.
+struct LinkInstance {
+    let op: Op
+    let lane: Element
+    let source: Element
+}
+
+func linkSource(of op: Op, for lane: Element) -> Element? {
+    op.source ?? (takesIndexTypes(op) ? signedElement(of: lane) : nil)
+}
+
+let opsByIdentifier = Dictionary(grouping: ops, by: \.identifier)
+
+func linkInstances(of identifiers: [String]) -> [LinkInstance] {
+    identifiers.flatMap { identifier in
+        (opsByIdentifier[identifier] ?? []).flatMap { op in
+            elements.filter { op.applies.matches($0) }.compactMap { lane in
+                linkSource(of: op, for: lane).map { LinkInstance(op: op, lane: lane, source: $0) }
+            }
+        }
+    }
+}
+
+func isSame(_ element: Element?, as other: Element) -> Bool {
+    element?.suffix == other.suffix
+}
+
+func isConformer(_ element: Element, of protocolName: String) -> Bool {
+    elementProtocols.contains { $0.name == protocolName && $0.isConformed(by: element) }
+}
+
+enum LinkAnchor {
+    case lane
+    case source
+}
+
+/// A generic type that the tests call a form through with one lane type, the other being spelled
+/// from it: `parameter` declares the lane type, `spelling` is the other one in terms of it, and
+/// `linked` is the other one for a lane type.
+struct LinkWrapper {
+    let parameter: String
+    let spelling: String
+    let linked: (Element) -> Element?
+}
+
+/// A way to call an op that has a source operand of another lane type through generic code. The
+/// generic function constrains the two lane types as `genericParameter` and `constraint` say, and
+/// forwards to a requirement of `protocolName` that the `anchor` lane type implements by calling the
+/// op it already has. `requirementLane` and `requirementSource` spell the two lane types there.
+struct LinkForm {
+    let fileName: String
+    let heading: String
+    let identifiers: [String]
+    let admits: (_ lane: Element, _ source: Element) -> Bool
+    let protocolName: String
+    let anchor: LinkAnchor
+    let requirementLane: String
+    let requirementSource: String
+    let extending: String
+    let genericParameter: String
+    let constraint: String
+    var labelSuffix = ""
+    var witnesses: ((_ lane: Element, _ source: Element) -> Bool)?
+    var anchorsSignedSibling = false
+    var convertsSourceMasks = false
+    var convertsResultMask = false
+    var sourceWrapper: LinkWrapper?
+    var laneWrapper: LinkWrapper?
+
+    var anchorSpelling: String { anchor == .lane ? "Lane" : "Source" }
+
+    var publicSource: String { genericParameter.isEmpty ? "Lane.\(requirementSource)" : "Source" }
+
+    func isWitnessed(_ instance: LinkInstance) -> Bool {
+        (witnesses ?? admits)(instance.lane, instance.source)
+    }
+
+    func anchors(of instance: LinkInstance) -> [Element] {
+        let anchor = anchor == .lane ? instance.lane : instance.source
+        return anchorsSignedSibling ? [anchor, signedElement(of: anchor)] : [anchor]
+    }
+}
+
+func isWideInteger(_ element: Element) -> Bool {
+    isConformer(element, of: "SIMDWideIntegerElement")
+}
+
+func isUnsignedWideInteger(_ element: Element) -> Bool {
+    isWideInteger(element) && element.category == .unsignedInteger
+}
+
+let clampIdentifiers = [
+    "halfVectorClamping", "halfVectorClampingShiftedRightBy",
+    "halfVectorClampingRoundingShiftedRightBy", "vectorClamping", "vectorClampingInAnyOrder",
+    "vectorClampingShiftedRightBy", "vectorClampingRoundingShiftedRightBy",
+    "vectorClampingInAnyOrderShiftedRightBy", "vectorClampingInAnyOrderRoundingShiftedRightBy",
+]
+
+let linkForms = [
+    LinkForm(
+        fileName: "Widening",
+        heading: "Source.Wide == Lane",
+        identifiers: [
+            "vectorWidening", "vectorWideningLower", "vectorWideningUpper", "vectorWideningEven",
+            "vectorWideningOdd", "sumsOf2", "zippingLower",
+        ],
+        admits: { lane, source in isSame(wideElement(of: source), as: lane) },
+        protocolName: "SIMDWidenableElement",
+        anchor: .source,
+        requirementLane: "WideLane",
+        requirementSource: "Self",
+        extending: "SIMD",
+        genericParameter: "Source: SIMDWidenableElement",
+        constraint: "Source.WideLane == Lane",
+        sourceWrapper: LinkWrapper(
+            parameter: "Source: SIMDWidenableElement",
+            spelling: "Source.WideLane",
+            linked: { wideElement(of: $0) }
+        ),
+        laneWrapper: LinkWrapper(
+            parameter: "Lane: SIMDNarrowableElement",
+            spelling: "Lane.NarrowLane",
+            linked: { narrowElement(of: $0) }
+        )
+    ),
+    LinkForm(
+        fileName: "NarrowOperands",
+        heading: "operands of Lane.Narrow",
+        identifiers: ["multiplyingEven", "multiplyingOdd", "multiplyAccumulating", "zippingUpper"],
+        admits: { lane, source in isWideInteger(lane) && isSame(narrowElement(of: lane), as: source)
+        },
+        protocolName: "SIMDWideIntegerElement",
+        anchor: .lane,
+        requirementLane: "Self",
+        requirementSource: "NarrowLane",
+        extending: "SIMD where Lane: SIMDWideIntegerElement",
+        genericParameter: "",
+        constraint: "",
+        sourceWrapper: LinkWrapper(
+            parameter: "Source: SIMDWidenableIntegerElement",
+            spelling: "Source.WideLane",
+            linked: { wideElement(of: $0) }
+        ),
+        laneWrapper: LinkWrapper(
+            parameter: "Lane: SIMDWideIntegerElement",
+            spelling: "Lane.NarrowLane",
+            linked: { narrowElement(of: $0) }
+        )
+    ),
+    LinkForm(
+        fileName: "ClampingToSigned",
+        heading: "Source.Narrow.Signed or .Unsigned == Lane",
+        identifiers: clampIdentifiers,
+        admits: { lane, source in
+            isWideInteger(source)
+                && isSame(narrowElement(of: source).map(signedElement(of:)), as: lane)
+        },
+        protocolName: "SIMDWideIntegerElement",
+        anchor: .source,
+        requirementLane: "NarrowLane.SignedLane",
+        requirementSource: "Self",
+        extending: "SIMD",
+        genericParameter: "Source: SIMDWideIntegerElement",
+        constraint: "Source.NarrowLane.SignedLane == Lane",
+        labelSuffix: "ToSigned",
+        sourceWrapper: LinkWrapper(
+            parameter: "Source: SIMDWideIntegerElement",
+            spelling: "Source.NarrowLane.SignedLane",
+            linked: { narrowElement(of: $0).map(signedElement(of:)) }
+        )
+    ),
+    LinkForm(
+        fileName: "ClampingToUnsigned",
+        heading: "Source.Narrow.Signed or .Unsigned == Lane",
+        identifiers: clampIdentifiers,
+        admits: { lane, source in
+            isWideInteger(source)
+                && isSame(narrowElement(of: source).map(unsignedElement(of:)), as: lane)
+        },
+        protocolName: "SIMDWideIntegerElement",
+        anchor: .source,
+        requirementLane: "NarrowLane.UnsignedLane",
+        requirementSource: "Self",
+        extending: "SIMD",
+        genericParameter: "Source: SIMDWideIntegerElement",
+        constraint: "Source.NarrowLane.UnsignedLane == Lane",
+        labelSuffix: "ToUnsigned",
+        sourceWrapper: LinkWrapper(
+            parameter: "Source: SIMDWideIntegerElement",
+            spelling: "Source.NarrowLane.UnsignedLane",
+            linked: { narrowElement(of: $0).map(unsignedElement(of:)) }
+        )
+    ),
+    LinkForm(
+        fileName: "ConvertingToFloat",
+        heading: "Source.Float == Lane, and source Lane.Float",
+        identifiers: ["vectorConverting", "vectorConvertingWhere"],
+        admits: { lane, source in isSame(floatElement(of: source), as: lane) },
+        protocolName: "SIMDFloatConvertibleElement",
+        anchor: .source,
+        requirementLane: "FloatLane",
+        requirementSource: "Self",
+        extending: "SIMD where Lane: SIMDFloatElement",
+        genericParameter: "Source: SIMDFloatConvertibleElement",
+        constraint: "Source.FloatLane == Lane",
+        labelSuffix: "ToFloat",
+        sourceWrapper: LinkWrapper(
+            parameter: "Source: SIMDFloatConvertibleElement",
+            spelling: "Source.FloatLane",
+            linked: { floatElement(of: $0) }
+        )
+    ),
+    LinkForm(
+        fileName: "ConvertingFromFloat",
+        heading: "Source.Float == Lane, and source Lane.Float",
+        identifiers: ["vectorConverting", "vectorConvertingWhere"],
+        admits: { lane, source in isSame(floatElement(of: lane), as: source) },
+        protocolName: "SIMDFloatConvertibleElement",
+        anchor: .lane,
+        requirementLane: "Self",
+        requirementSource: "FloatLane",
+        extending: "SIMD where Lane: SIMDFloatConvertibleElement",
+        genericParameter: "",
+        constraint: "",
+        labelSuffix: "FromFloat",
+        laneWrapper: LinkWrapper(
+            parameter: "Lane: SIMDFloatConvertibleElement",
+            spelling: "Lane.FloatLane",
+            linked: { floatElement(of: $0) }
+        )
+    ),
+    LinkForm(
+        fileName: "ConvertingFromFloat",
+        heading: "source Lane.Float",
+        identifiers: ["vectorConvertingInRange"],
+        admits: { lane, source in isSame(floatElement(of: lane), as: source) },
+        protocolName: "SIMDFloatConvertibleElement",
+        anchor: .lane,
+        requirementLane: "Self",
+        requirementSource: "FloatLane",
+        extending: "SIMD where Lane: SIMDFloatConvertibleElement",
+        genericParameter: "",
+        constraint: "",
+        labelSuffix: "FromFloat",
+        laneWrapper: LinkWrapper(
+            parameter: "Lane: SIMDFloatConvertibleElement",
+            spelling: "Lane.FloatLane",
+            linked: { floatElement(of: $0) }
+        )
+    ),
+    LinkForm(
+        fileName: "Rounding",
+        heading: "Source.Signed == Lane",
+        identifiers: [
+            "vectorRoundingToNearestOrEven", "vectorRoundingUp", "vectorRoundingDown",
+        ],
+        admits: { lane, source in
+            source.isFloatingPoint && isSame(signedElement(of: source), as: lane)
+        },
+        protocolName: "SIMDFloatElement",
+        anchor: .source,
+        requirementLane: "SignedLane",
+        requirementSource: "Self",
+        extending: "SIMD where Lane: SIMDIntegerElement",
+        genericParameter: "Source: SIMDFloatElement",
+        constraint: "Source.SignedLane == Lane",
+        sourceWrapper: LinkWrapper(
+            parameter: "Source: SIMDFloatElement",
+            spelling: "Source.SignedLane",
+            linked: { signedElement(of: $0) }
+        )
+    ),
+    LinkForm(
+        fileName: "Exponents",
+        heading: "exponents of Lane.Signed",
+        identifiers: ["multiplyingByPowerOf2"],
+        admits: { lane, source in
+            lane.isFloatingPoint && isSame(signedElement(of: lane), as: source)
+        },
+        protocolName: "SIMDFloatElement",
+        anchor: .lane,
+        requirementLane: "Self",
+        requirementSource: "SignedLane",
+        extending: "SIMD where Lane: SIMDFloatElement",
+        genericParameter: "",
+        constraint: "",
+        laneWrapper: LinkWrapper(
+            parameter: "Lane: SIMDFloatElement",
+            spelling: "Lane.SignedLane",
+            linked: { signedElement(of: $0) }
+        )
+    ),
+    LinkForm(
+        fileName: "BiasedExponent",
+        heading: "Source.Unsigned == Lane",
+        identifiers: ["biasedExponent"],
+        admits: { lane, source in
+            source.isFloatingPoint && isSame(unsignedElement(of: source), as: lane)
+        },
+        protocolName: "SIMDFloatElement",
+        anchor: .source,
+        requirementLane: "UnsignedLane",
+        requirementSource: "Self",
+        extending: "SIMD where Lane: SIMDIntegerElement",
+        genericParameter: "Source: SIMDFloatElement",
+        constraint: "Source.UnsignedLane == Lane",
+        sourceWrapper: LinkWrapper(
+            parameter: "Source: SIMDFloatElement",
+            spelling: "Source.UnsignedLane",
+            linked: { unsignedElement(of: $0) }
+        )
+    ),
+    LinkForm(
+        fileName: "Truncating",
+        heading: "unsigned Source, Source.Narrow == Lane",
+        identifiers: ["halfVectorTruncatingIfNeeded", "vectorTruncatingIfNeeded"],
+        admits: { lane, source in
+            isUnsignedWideInteger(source) && isSame(narrowElement(of: source), as: lane)
+        },
+        protocolName: "SIMDWideIntegerElement",
+        anchor: .source,
+        requirementLane: "UnsignedLane.NarrowLane",
+        requirementSource: "UnsignedLane",
+        extending: "SIMD where Lane: SIMDUnsignedIntegerElement",
+        genericParameter: "Source: SIMDUnsignedIntegerElement & SIMDWideIntegerElement",
+        constraint: "Source.NarrowLane == Lane",
+        anchorsSignedSibling: true
+    ),
+    LinkForm(
+        fileName: "MaskNarrowing",
+        heading: "source twice as wide as a widenable Lane",
+        identifiers: ["maskNarrowing", "halfMaskNarrowing"],
+        admits: { lane, source in
+            wideElement(of: lane).map {
+                isSame(unsignedElement(of: source), as: unsignedElement(of: $0))
+            } ?? false
+        },
+        protocolName: "SIMDWidenableElement",
+        anchor: .lane,
+        requirementLane: "Self",
+        requirementSource: "WideLane.UnsignedLane",
+        extending: "SIMD where Lane: SIMDWidenableElement",
+        genericParameter: "Source: SIMDElement",
+        constraint: "Source.UnsignedLane == Lane.WideLane.UnsignedLane",
+        witnesses: { lane, source in
+            wideElement(of: lane).map { isSame(unsignedElement(of: $0), as: source) } ?? false
+        },
+        convertsSourceMasks: true,
+        laneWrapper: LinkWrapper(
+            parameter: "Lane: SIMDWidenableElement",
+            spelling: "Lane.WideLane",
+            linked: { wideElement(of: $0) }
+        )
+    ),
+    LinkForm(
+        fileName: "MaskWidening",
+        heading: "widenable source half as wide as Lane",
+        identifiers: ["maskWidening"],
+        admits: { lane, source in
+            wideElement(of: source).map {
+                isSame(unsignedElement(of: lane), as: unsignedElement(of: $0))
+            } ?? false
+        },
+        protocolName: "SIMDWidenableElement",
+        anchor: .source,
+        requirementLane: "WideLane.UnsignedLane",
+        requirementSource: "Self",
+        extending: "SIMD",
+        genericParameter: "Source: SIMDWidenableElement",
+        constraint: "Lane.UnsignedLane == Source.WideLane.UnsignedLane",
+        witnesses: { lane, source in
+            wideElement(of: source).map { isSame(unsignedElement(of: $0), as: lane) } ?? false
+        },
+        convertsResultMask: true,
+        sourceWrapper: LinkWrapper(
+            parameter: "Source: SIMDWidenableElement",
+            spelling: "Source.WideLane",
+            linked: { wideElement(of: $0) }
+        )
+    ),
+    LinkForm(
+        fileName: "Gather",
+        heading: "indices of Lane.Signed",
+        identifiers: [
+            "gather", "gatherByteOffsets", "gatherFirst", "gatherFirstOtherwise", "gatherWhere",
+            "gatherWhereOtherwise", "scatter", "scatterByteOffsets", "scatterFirst", "scatterWhere",
+        ],
+        admits: { lane, source in
+            isConformer(lane, of: "SIMDGatherableElement")
+                && isSame(signedElement(of: lane), as: source)
+        },
+        protocolName: "SIMDGatherableElement",
+        anchor: .lane,
+        requirementLane: "Self",
+        requirementSource: "SignedLane",
+        extending: "SIMD where Lane: SIMDGatherableElement",
+        genericParameter: "",
+        constraint: "",
+        laneWrapper: LinkWrapper(
+            parameter: "Lane: SIMDGatherableElement",
+            spelling: "Lane.SignedLane",
+            linked: { signedElement(of: $0) }
+        )
+    ),
+]
+
+func suffixingLabel(_ text: String, with suffix: String) -> String {
+    guard !suffix.isEmpty else { return text }
+    let end = text.firstIndex { !$0.isLetter && !$0.isNumber } ?? text.endIndex
+    guard end != text.startIndex else { fatalError("\(text) has no label to add \(suffix) to") }
+    return "\(text[..<end])\(suffix)\(text[end...])"
+}
+
+extension RequirementForm {
+    func respelled(source: Element, as spelling: String) -> RequirementForm {
+        var form = self
+        form.parameters = parameters.replacingOccurrences(
+            of: "<\(source.swiftType)>",
+            with: "<\(spelling)>"
+        )
+        return form
+    }
+
+    func relabeledParameters(with suffix: String) -> RequirementForm {
+        var form = self
+        form.parameters = suffixingLabel(parameters, with: suffix)
+        return form
+    }
+
+    func relabeledArguments(with suffix: String) -> RequirementForm {
+        var form = self
+        form.arguments = suffixingLabel(arguments, with: suffix)
+        return form
+    }
+}
+
+func linkRepresentatives(of linkForm: LinkForm) -> [LinkInstance] {
+    linkForm.identifiers.map { identifier in
+        let instances = linkInstances(of: [identifier]).filter(linkForm.isWitnessed)
+        guard let representative = instances.first else {
+            fatalError("\(linkForm.heading) admits no instance of \(identifier)")
+        }
+        return representative
+    }
+}
+
+func linkRequirementForms(of linkForm: LinkForm, instance: LinkInstance) -> [RequirementForm] {
+    requirementForms(of: instance.op, for: instance.lane, scope: linkForm.requirementLane).map {
+        $0.respelled(source: instance.source, as: linkForm.requirementSource)
+            .relabeledParameters(with: linkForm.labelSuffix)
+    }
+}
+
+func linkRequirementDeclarations(of linkForm: LinkForm) -> [String] {
+    linkRepresentatives(of: linkForm).flatMap { representative in
+        let expected = linkRequirementForms(of: linkForm, instance: representative)
+        for instance in linkInstances(of: [representative.op.identifier])
+        where linkForm.isWitnessed(instance) {
+            let forms = linkRequirementForms(of: linkForm, instance: instance)
+            guard
+                forms.count == expected.count
+                    && zip(forms, expected).allSatisfy({
+                        $0.parameters == $1.parameters && $0.returnClause == $1.returnClause
+                    })
+            else {
+                fatalError(
+                    "\(linkForm.heading) spells \(instance.op.identifier) differently for \(instance.lane.swiftType) from \(instance.source.swiftType)"
+                )
+            }
+        }
+        return expected.map { requirementDeclaration($0) }
+    }
+}
+
+func linkWitnessMembers(of linkForm: LinkForm, for element: Element) -> [SectionMember] {
+    linkInstances(of: linkForm.identifiers).filter { instance in
+        linkForm.isWitnessed(instance)
+            && linkForm.anchors(of: instance).contains { isSame($0, as: element) }
+    }.map { instance in
+        let involved = element.compilationCondition == nil ? [instance.lane, instance.source] : []
+        let forms = requirementForms(
+            of: instance.op,
+            for: instance.lane,
+            scope: instance.lane.swiftType
+        )
+        return SectionMember(
+            section: instance.op.section,
+            inside: forms.map {
+                guarded(
+                    forwardingMember(
+                        $0.relabeledParameters(with: linkForm.labelSuffix),
+                        named: "_\($0.name)",
+                        calling: "\(instance.lane.vectorType).\($0.name)",
+                        disfavored: false
+                    ),
+                    involving: involved,
+                    testing: false
+                )
+            }
+        )
+    }
+}
+
+func wrappedArguments(_ arguments: String, in function: String) -> String {
+    arguments.split(separator: ", ").map { argument in
+        let parts = argument.split(separator: ":", maxSplits: 1)
+        guard parts.count == 2 else { return "\(function)(\(argument))" }
+        return "\(parts[0]): \(function)(\(parts[1].dropFirst()))"
+    }.joined(separator: ", ")
+}
+
+func linkPublicMembers(of linkForm: LinkForm) -> [SectionMember] {
+    linkRepresentatives(of: linkForm).map { representative in
+        let forms = requirementForms(of: representative.op, for: representative.lane, scope: nil)
+        return SectionMember(
+            section: representative.op.section,
+            inside: forms.map { form in
+                let spelled = form.respelled(
+                    source: representative.source,
+                    as: linkForm.publicSource
+                )
+                .relabeledArguments(with: linkForm.labelSuffix)
+                let callee = "\(linkForm.anchorSpelling)._\(form.name)"
+                let arguments =
+                    linkForm.convertsSourceMasks
+                    ? wrappedArguments(spelled.arguments, in: "Source._maskToUnsigned")
+                    : spelled.arguments
+                let call = "\(spelled.callKeyword)\(callee)(\(arguments))"
+                return forwardingMember(
+                    spelled,
+                    named: form.name,
+                    calling: callee,
+                    disfavored: true,
+                    generics: linkForm.genericParameter.isEmpty
+                        ? "" : "<\(linkForm.genericParameter)>",
+                    constraints: linkForm.constraint,
+                    body: linkForm.convertsResultMask
+                        ? fromUnsignedMask(call, to: "Lane") : call
+                )
+            }
+        )
+    }
+}
+
+func shapeProtocolName(_ shape: Shape) -> String {
+    guard let shapeProtocol = elementProtocols.first(where: { $0.shapes.contains(shape) }) else {
+        fatalError("No protocol has \(shape) shapes")
+    }
+    return shapeProtocol.name
+}
+
+func resultShape(of op: Op) -> Shape {
+    switch op.returns {
+    case .vector: return .full
+    case .narrowVector(let shape): return shape
+    default: fatalError("\(op.identifier) does not return a vector")
+    }
+}
+
+struct DispatchSource {
+    let element: Element
+    let shape: Shape
+    let op: Op
+
+    var labelSuffix: String { "Of\(shape.prefix)\(element.swiftType)" }
+}
+
+/// An op that every lane type has for a source operand of any other lane type and any shape it has.
+/// Its generic function asks the source's lane type for the op's result type, which asks the result's
+/// lane type back, as one requirement per source on the result's protocol and one on the source's.
+struct DispatchFamily {
+    let identifier: String
+    let resultShape: Shape
+    let sources: [DispatchSource]
+
+    var extending: String {
+        let name = shapeProtocolName(resultShape)
+        return name == elementProtocols[0].name ? "SIMD" : "SIMD where Lane: \(name)"
+    }
+
+    var fileName: String {
+        "AnySource\(shapeProtocolName(resultShape) == elementProtocols[0].name ? "" : resultShape.prefix)"
+    }
+
+    var sourceShapes: [Shape] {
+        sources.map(\.shape).reduce(into: []) { shapes, shape in
+            if !shapes.contains(shape) { shapes.append(shape) }
+        }
+    }
+}
+
+let dispatchIdentifiers = [
+    "vectorBitPattern", "vectorResizing", "vectorZeroExtendingResizing", "halfVectorResizing",
+    "halfVectorZeroExtendingResizing", "quarterVectorResizing",
+    "quarterVectorZeroExtendingResizing", "eighthVectorResizing",
+    "eighthVectorZeroExtendingResizing",
+]
+
+let dispatchFamilies = dispatchIdentifiers.map { identifier in
+    let familyOps = opsByIdentifier[identifier] ?? []
+    var sources: [DispatchSource] = []
+    for op in familyOps {
+        guard let element = op.source else { fatalError("\(identifier) has no source") }
+        if !sources.contains(where: {
+            isSame($0.element, as: element) && $0.shape == op.sourceShape
+        }) {
+            sources.append(DispatchSource(element: element, shape: op.sourceShape, op: op))
+        }
+    }
+    return DispatchFamily(
+        identifier: identifier,
+        resultShape: resultShape(of: familyOps[0]),
+        sources: sources
+    )
+}
+
+func dispatchLane(of source: DispatchSource) -> Element {
+    guard let lane = elements.first(where: { source.op.applies.matches($0) }) else {
+        fatalError("\(source.op.identifier) applies to no lane type")
+    }
+    return lane
+}
+
+func dispatchRequirementForm(_ source: DispatchSource, scope: String) -> RequirementForm {
+    guard
+        let form = requirementForms(of: source.op, for: dispatchLane(of: source), scope: scope)
+            .first
+    else { fatalError("\(source.op.identifier) has no form") }
+    return form
+}
+
+func guardedRequirement(_ text: String, involving involved: [Element]) -> String {
+    guard let element = involved.first(where: { $0.compilationCondition != nil }),
+        let condition = element.compilationCondition
+    else { return text }
+    return "#if \(condition)\n    \(element.swiftAvailability ?? "")\n\(text)#endif\n"
+}
+
+func dispatchRequirementDeclarations() -> [String: [String]] {
+    var declarations: [String: [String]] = [:]
+    for family in dispatchFamilies {
+        for source in family.sources {
+            var form = dispatchRequirementForm(source, scope: "Self")
+            form = form.relabeledParameters(with: source.labelSuffix)
+            declarations[shapeProtocolName(family.resultShape), default: []].append(
+                guardedRequirement(requirementDeclaration(form), involving: [source.element])
+            )
+        }
+        for shape in family.sourceShapes {
+            guard let source = family.sources.first(where: { $0.shape == shape }) else { continue }
+            var form = dispatchRequirementForm(source, scope: "Result")
+            form = form.respelled(source: source.element, as: "Self")
+            form.parameters += ", as result: Result.Type"
+            let generics = "<Result: \(shapeProtocolName(family.resultShape))>"
+            declarations[shapeProtocolName(shape), default: []].append(
+                requirementDeclaration(form, generics: generics)
+            )
+        }
+    }
+    return declarations
+}
+
+func dispatchWitnessMembers(for element: Element) -> [SectionMember] {
+    var members: [SectionMember] = []
+    for family in dispatchFamilies {
+        let instances = linkInstances(of: [family.identifier])
+        if element.supports(family.resultShape) {
+            for source in family.sources {
+                let involved = element.compilationCondition == nil ? [source.element] : []
+                let form = dispatchRequirementForm(source, scope: element.swiftType)
+                    .relabeledParameters(with: source.labelSuffix)
+                let isIdentity =
+                    isSame(element, as: source.element) && source.shape == family.resultShape
+                let exists = instances.contains {
+                    isSame($0.lane, as: element) && isSame($0.source, as: source.element)
+                        && $0.op.sourceShape == source.shape
+                }
+                guard isIdentity != exists else {
+                    fatalError(
+                        "\(family.identifier) from \(source.element.swiftType) on \(element.swiftType) is neither an op nor the identity"
+                    )
+                }
+                members.append(
+                    SectionMember(
+                        section: source.op.section,
+                        inside: [
+                            guarded(
+                                forwardingMember(
+                                    form,
+                                    named: "_\(form.name)",
+                                    calling: "\(element.vectorType).\(form.name)",
+                                    disfavored: false,
+                                    body: isIdentity ? "a" : nil
+                                ),
+                                involving: involved,
+                                testing: false
+                            )
+                        ]
+                    )
+                )
+            }
+        }
+        for shape in family.sourceShapes where element.supports(shape) {
+            guard
+                let source = family.sources.first(where: {
+                    isSame($0.element, as: element) && $0.shape == shape
+                })
+            else {
+                fatalError("\(family.identifier) has no \(shape) source of \(element.swiftType)")
+            }
+            var form = dispatchRequirementForm(source, scope: "Result")
+            form.parameters += ", as result: Result.Type"
+            let callee = "Result._\(form.name)"
+            members.append(
+                SectionMember(
+                    section: source.op.section,
+                    inside: [
+                        forwardingMember(
+                            form,
+                            named: "_\(form.name)",
+                            calling: callee,
+                            disfavored: false,
+                            generics: "<Result: \(shapeProtocolName(family.resultShape))>",
+                            body:
+                                "\(callee)(\(form.relabeledArguments(with: source.labelSuffix).arguments))"
+                        )
+                    ]
+                )
+            )
+        }
+    }
+    return members
+}
+
+func dispatchPublicMembers(of family: DispatchFamily) -> [SectionMember] {
+    family.sourceShapes.map { shape in
+        guard let source = family.sources.first(where: { $0.shape == shape }) else {
+            fatalError("\(family.identifier) has no \(shape) source")
+        }
+        let publicForm = requirementForms(of: source.op, for: dispatchLane(of: source), scope: nil)[
+            0
+        ]
+        .respelled(source: source.element, as: "Source")
+        let callee = "Source._\(publicForm.name)"
+        return SectionMember(
+            section: source.op.section,
+            inside: [
+                forwardingMember(
+                    publicForm,
+                    named: publicForm.name,
+                    calling: callee,
+                    disfavored: true,
+                    generics: "<Source: \(shapeProtocolName(shape))>",
+                    body: "\(callee)(\(publicForm.arguments), as: Lane.self)"
+                )
+            ]
+        )
+    }
+}
+
+func toUnsignedMask(_ expression: String, of lane: String) -> String {
+    "\(lane)._maskToUnsigned(\(expression))"
+}
+
+func fromUnsignedMask(_ expression: String, to lane: String) -> String {
+    "\(lane)._mask(fromUnsigned: \(expression))"
+}
+
+func rebindingRequirementDeclarations() -> [String] {
+    [
+        "    static func _maskToUnsigned(_ mask: SIMD<Self>.Mask) -> SIMD<UnsignedLane>.Mask\n",
+        "    static func _mask(fromUnsigned mask: SIMD<UnsignedLane>.Mask) -> SIMD<Self>.Mask\n",
+    ]
+}
+
+func rebindingWitnessMembers(for element: Element) -> [SectionMember] {
+    let op = rebindingOps[0]
+    let unsigned = unsignedElement(of: element)
+    let isUnsigned = isSame(unsigned, as: element)
+    let toUnsigned =
+        isUnsigned ? "mask" : "\(unsigned.vectorType).\(op.swiftName)(\(op.label): mask)"
+    let fromUnsigned =
+        isUnsigned ? "mask" : "\(element.vectorType).\(op.swiftName)(\(op.label): mask)"
+    return [
+        SectionMember(
+            section: op.section,
+            inside: [
+                """
+                    @export(implementation) @inline(always)
+                    public static func _maskToUnsigned(_ mask: \(swiftMaskType(scope: element.swiftType))) -> \(swiftMaskType(scope: unsigned.swiftType)) {
+                        \(toUnsigned)
+                    }
+                """,
+                """
+                    @export(implementation) @inline(always)
+                    public static func _mask(fromUnsigned mask: \(swiftMaskType(scope: unsigned.swiftType))) -> \(swiftMaskType(scope: element.swiftType)) {
+                        \(fromUnsigned)
+                    }
+                """,
+            ]
+        )
+    ]
+}
+
+func rebindingPublicMembers() -> [SectionMember] {
+    let op = rebindingOps[0]
+    return [
+        SectionMember(
+            section: op.section,
+            inside: [
+                """
+                    @_disfavoredOverload @export(implementation) @inline(always)
+                    public static func \(op.swiftName)<Source: SIMDElement>(\(op.label) mask: SIMD<Source>.Mask) -> Mask
+                    where Source.UnsignedLane == Lane.UnsignedLane {
+                        \(fromUnsignedMask(toUnsignedMask("mask", of: "Source"), to: "Lane"))
+                    }
+                """
+            ]
+        )
+    ]
+}
+
+let linkRequirements: [String: [String]] = {
+    var requirements = dispatchRequirementDeclarations()
+    requirements[elementProtocols[0].name, default: []] += rebindingRequirementDeclarations()
+    for linkForm in linkForms {
+        requirements[linkForm.protocolName, default: []] += linkRequirementDeclarations(
+            of: linkForm
+        )
+    }
+    return requirements
+}()
+
+func linkWitnesses(of element: Element) -> [SectionMember] {
+    dispatchWitnessMembers(for: element) + rebindingWitnessMembers(for: element)
+        + linkForms.flatMap { linkWitnessMembers(of: $0, for: element) }
+}
+
+struct LinkGroup {
+    let fileName: String
+    let extending: String
+    var members: [SectionMember]
+}
+
+func linkGroups() -> [LinkGroup] {
+    var groups: [LinkGroup] = []
+    func add(_ members: [SectionMember], fileName: String, extending: String) {
+        if let index = groups.firstIndex(where: { $0.fileName == fileName }) {
+            guard groups[index].extending == extending else {
+                fatalError("\(fileName) extends both \(groups[index].extending) and \(extending)")
+            }
+            groups[index].members += members
+        } else {
+            groups.append(LinkGroup(fileName: fileName, extending: extending, members: members))
+        }
+    }
+    for family in dispatchFamilies {
+        add(
+            dispatchPublicMembers(of: family),
+            fileName: family.fileName,
+            extending: family.extending
+        )
+    }
+    add(rebindingPublicMembers(), fileName: "SameWidth", extending: "SIMD")
+    for linkForm in linkForms {
+        add(
+            linkPublicMembers(of: linkForm),
+            fileName: linkForm.fileName,
+            extending: linkForm.extending
+        )
+    }
+    return groups
+}
+
+enum LinkVariant: String {
+    case pair = "Pair"
+    case source = "BySource"
+    case lane = "ByLane"
+}
+
+func linkVariants(of linkForm: LinkForm) -> [LinkVariant] {
+    var variants: [LinkVariant] = []
+    if !linkForm.genericParameter.isEmpty { variants.append(.pair) }
+    if linkForm.sourceWrapper != nil { variants.append(.source) }
+    if linkForm.laneWrapper != nil { variants.append(.lane) }
+    return variants
+}
+
+func isAdmitted(_ instance: LinkInstance, by linkForm: LinkForm, as variant: LinkVariant) -> Bool {
+    guard linkForm.admits(instance.lane, instance.source) else { return false }
+    switch variant {
+    case .pair: return true
+    case .source:
+        return isSame(linkForm.sourceWrapper?.linked(instance.source), as: instance.lane)
+    case .lane:
+        return isSame(linkForm.laneWrapper?.linked(instance.lane), as: instance.source)
+    }
+}
+
+func linkWrapperName(_ fileName: String, as variant: LinkVariant) -> String {
+    "Generic\(fileName)\(variant.rawValue)"
+}
+
+func linkWrapperSpelling(
+    of linkForm: LinkForm,
+    as variant: LinkVariant
+) -> (lane: String, source: String) {
+    switch variant {
+    case .pair: return ("Lane", "Source")
+    case .source: return (linkForm.sourceWrapper?.spelling ?? "", "Source")
+    case .lane: return ("Lane", linkForm.laneWrapper?.spelling ?? "")
+    }
+}
+
+func laneBound(of extending: String) -> String {
+    let prefix = "SIMD where "
+    return extending.hasPrefix(prefix)
+        ? String(extending.dropFirst(prefix.count)) : "Lane: SIMDElement"
+}
+
+func linkWrapperParameters(of linkForm: LinkForm, as variant: LinkVariant) -> String {
+    switch variant {
+    case .pair: return "\(laneBound(of: linkForm.extending)), \(linkForm.genericParameter)"
+    case .source: return linkForm.sourceWrapper?.parameter ?? ""
+    case .lane: return linkForm.laneWrapper?.parameter ?? ""
+    }
+}
+
+func wrapperMember(_ form: RequirementForm, lane: String, constraints: String = "") -> String {
+    let whereClause = constraints.isEmpty ? "" : " where \(constraints)"
+    return """
+            \(form.availability)\(form.unsafeAttribute)package static func \(form.name)(\(form.parameters))\(form.returnClause)\(whereClause) {
+                \(form.callKeyword)SIMD<\(lane)>.\(form.name)(\(form.arguments))
+            }
+        """
+}
+
+func linkWrapperMembers(of linkForm: LinkForm, as variant: LinkVariant) -> [String] {
+    let spelling = linkWrapperSpelling(of: linkForm, as: variant)
+    return linkRepresentatives(of: linkForm).flatMap { representative in
+        requirementForms(of: representative.op, for: representative.lane, scope: spelling.lane)
+            .map {
+                wrapperMember(
+                    $0.respelled(source: representative.source, as: spelling.source),
+                    lane: spelling.lane
+                )
+            }
+    }
+}
+
+func dispatchWrapperMembers() -> [String] {
+    dispatchFamilies.flatMap { family in
+        family.sourceShapes.map { shape in
+            guard let source = family.sources.first(where: { $0.shape == shape }) else {
+                fatalError("\(family.identifier) has no \(shape) source")
+            }
+            let form = requirementForms(
+                of: source.op,
+                for: dispatchLane(of: source),
+                scope: "Lane"
+            )[0].respelled(source: source.element, as: "Source")
+            var constraints: [String] = []
+            if shapeProtocolName(shape) != elementProtocols[0].name {
+                constraints.append("Source: \(shapeProtocolName(shape))")
+            }
+            if shapeProtocolName(family.resultShape) != elementProtocols[0].name {
+                constraints.append("Lane: \(shapeProtocolName(family.resultShape))")
+            }
+            return wrapperMember(
+                form,
+                lane: "Lane",
+                constraints: constraints.joined(separator: ", ")
+            )
+        }
+    }
+}
+
+func rebindingWrapperMember() -> String {
+    let op = rebindingOps[0]
+    return """
+            package static func \(op.swiftName)(\(op.label) mask: SIMD<Source>.Mask) -> SIMD<Lane>.Mask {
+                SIMD<Lane>.\(op.swiftName)(\(op.label): mask)
+            }
+        """
+}
+
+struct LinkWrapperType {
+    let name: String
+    let parameters: String
+    let constraint: String
+    var members: [String]
+}
+
+func linkWrapperTypes() -> [LinkWrapperType] {
+    var types: [LinkWrapperType] = []
+    func add(_ type: LinkWrapperType) {
+        if let index = types.firstIndex(where: { $0.name == type.name }) {
+            types[index].members += type.members
+        } else {
+            types.append(type)
+        }
+    }
+    add(
+        LinkWrapperType(
+            name: linkWrapperName("AnySource", as: .pair),
+            parameters: "Lane: SIMDElement, Source: SIMDElement",
+            constraint: "",
+            members: dispatchWrapperMembers()
+        )
+    )
+    add(
+        LinkWrapperType(
+            name: linkWrapperName("SameWidth", as: .pair),
+            parameters: "Lane: SIMDElement, Source: SIMDElement",
+            constraint: "Source.UnsignedLane == Lane.UnsignedLane",
+            members: [rebindingWrapperMember()]
+        )
+    )
+    for linkForm in linkForms {
+        for variant in linkVariants(of: linkForm) {
+            add(
+                LinkWrapperType(
+                    name: linkWrapperName(linkForm.fileName, as: variant),
+                    parameters: linkWrapperParameters(of: linkForm, as: variant),
+                    constraint: variant == .pair ? linkForm.constraint : "",
+                    members: linkWrapperMembers(of: linkForm, as: variant)
+                )
+            )
+        }
+    }
+    return types
+}
+
+func generateLinkWrappers() -> String {
+    let declarations = linkWrapperTypes().map { type in
+        let constraint = type.constraint.isEmpty ? "" : " where \(type.constraint)"
+        return """
+            package enum \(type.name)<\(type.parameters)>\(constraint) {
+            \(type.members.joined(separator: "\n\n"))
+            }
+            """
+    }
+    return """
+        \(generationNotice)
+
+        package import Vectorization
+
+        \(declarations.joined(separator: "\n\n"))
+
+        """
+}
+
+func linkTest(
+    _ instance: LinkInstance,
+    through wrapper: String,
+    suffix: String,
+    checked: Bool
+) -> String {
+    let op = instance.op
+    let element = instance.lane
+    let test = "\(op.testIdentifier)\(suffix)\(checked ? "" : "Unchecked")"
+    let inputs = referenceInputs(of: op, for: element, test: test, inContract: true)
+    let calls = referenceCalls(
+        of: op,
+        for: element,
+        pointer: referencePointer(of: op, guarded: false),
+        referencePointer: paddedPointer(of: op),
+        destination: referenceDestination(of: op, guarded: false),
+        checked: checked
+    )
+    let concreteCall = "H.\(op.swiftName)("
+    guard let range = calls.port.range(of: concreteCall) else {
+        fatalError("\(calls.port) does not call \(concreteCall)")
+    }
+    let generic = calls.port.replacingCharacters(in: range, with: "\(wrapper).\(op.swiftName)(")
+    let concrete = (0..<op.parameters.filter { $0 == .outVector }.count).reduce(calls.port) {
+        $0.replacingOccurrences(of: "&p\($1)", with: "&r\($1)")
+    }
+    let (declarations, statements) = referenceStatements(
+        of: op,
+        for: element,
+        inputs: inputs,
+        guarded: false,
+        calls: (port: generic, reference: concrete)
+    )
+    return referenceTestFunction(
+        test,
+        label: "\(op.testIdentifier) through \(wrapper)",
+        for: element,
+        inputs: inputs,
+        declarations: declarations,
+        disabling: laneCapabilityDisabling(of: op, for: element),
+        loopCondition: referenceLoopCondition(of: op, for: element, inputs: inputs),
+        statements: statements
+    )
+}
+
+func linkTestMembers(for element: Element) -> [SectionMember] {
+    func involving(_ instance: LinkInstance) -> [Element] {
+        element.compilationCondition == nil ? [instance.source] : []
+    }
+    var members: [SectionMember] = []
+    for family in dispatchFamilies {
+        let name = linkWrapperName("AnySource", as: .pair)
+        let tests = linkInstances(of: [family.identifier]).filter { isSame($0.lane, as: element) }
+            .map { instance in
+                let wrapper = "\(name)<\(element.swiftType), \(instance.source.swiftType)>"
+                return guarded(
+                    linkTest(
+                        instance,
+                        through: wrapper,
+                        suffix: "Through\(LinkVariant.pair.rawValue)",
+                        checked: true
+                    ),
+                    involving: involving(instance),
+                    testing: true
+                )
+            }
+        members.append(SectionMember(section: family.sources[0].op.section, inside: tests))
+    }
+    let rebinding = rebindingOps[0]
+    members.append(
+        SectionMember(
+            section: rebinding.section,
+            inside: rebindingSources(of: element).map { source in
+                guarded(
+                    linkRebindingTest(rebinding, from: source, to: element),
+                    involving: element.compilationCondition == nil ? [source] : [],
+                    testing: true
+                )
+            }
+        )
+    )
+    for linkForm in linkForms {
+        let instances = linkInstances(of: linkForm.identifiers).filter {
+            isSame($0.lane, as: element) && linkForm.admits($0.lane, $0.source)
+        }
+        let tests = instances.flatMap { instance in
+            linkVariants(of: linkForm).filter {
+                isAdmitted(instance, by: linkForm, as: $0)
+            }.flatMap { variant -> [String] in
+                let arguments =
+                    switch variant {
+                    case .pair: "\(element.swiftType), \(instance.source.swiftType)"
+                    case .source: instance.source.swiftType
+                    case .lane: element.swiftType
+                    }
+                let wrapper = "\(linkWrapperName(linkForm.fileName, as: variant))<\(arguments)>"
+                let hasUncheckedForm =
+                    takesIndices(instance.op) || takesLaneIndex(instance.op)
+                    || !instance.op.immediates.isEmpty
+                return (hasUncheckedForm ? [true, false] : [true]).map { checked in
+                    guarded(
+                        linkTest(
+                            instance,
+                            through: wrapper,
+                            suffix: "Through\(variant.rawValue)",
+                            checked: checked
+                        ),
+                        involving: involving(instance),
+                        testing: true
+                    )
+                }
+            }
+        }
+        members.append(
+            SectionMember(
+                section: opsByIdentifier[linkForm.identifiers[0]]?.first?.section
+                    ?? .initialization,
+                inside: tests
+            )
+        )
+    }
+    return members
+}
+
+func linkRebindingTest(_ op: RebindingOp, from source: Element, to target: Element) -> String {
+    let wrapper =
+        "\(linkWrapperName("SameWidth", as: .pair))<\(target.swiftType), \(source.swiftType)>"
+    let test =
+        "\(op.swiftName)\(uppercasedFirst(op.label))From\(source.swiftType)Through\(LinkVariant.pair.rawValue)"
+    let seed = "seed: \(referenceTestSeed(target, test, "0"))"
+    let inputs = [
+        ReferenceInput(
+            parameter: .mask,
+            name: "mask",
+            values: maskInputs("\(source.vectorType).Mask", seed: seed, nonCanonical: false)
+        )
+    ]
+    let port = "\(wrapper).\(op.swiftName)(\(op.label): mask)"
+    let concrete = portCall(op.swiftName, ["\(op.label): mask"])
+    return referenceTestFunction(
+        test,
+        label: "\(op.swiftName) \(op.label) from \(source.swiftType) through \(wrapper)",
+        for: target,
+        inputs: inputs,
+        statements:
+            "mismatches.check(\(port), \(concrete), \(referenceDescription(of: inputs)))"
+    )
+}
+
+func generateLinkTests(_ element: Element) -> String {
+    """
+    \(generationNotice)
+
+    \(referenceTestImports)
+
+    @Suite("\(element.namespace) generic cross-type ops against the concrete ones")
+    struct \(element.namespace)LinkTests {
+        typealias H = \(element.vectorType)
+        typealias Lane = \(element.swiftType)
+    }
+
+    """
 }
 
 func generateGenericMembers(of elementProtocol: ElementProtocol) -> [SectionMember] {
@@ -45266,45 +46647,72 @@ func generateElementWitnesses(_ element: Element) -> [SectionMember] {
             )
         }
     }
-    return members
+    return members + linkWitnesses(of: element)
 }
 
 func simdMaskType(of element: Element, shape: Shape) -> String {
     shape == .full ? "SIMDMask<\(element.cMask)>" : element.cMask(of: shape)
 }
 
-func generateElementConformance(_ element: Element) -> String {
+func conformanceAliases(of elementProtocol: ElementProtocol, for element: Element) -> String {
     var aliases = ""
-    for elementProtocol in elementProtocols where elementProtocol.isConformed(by: element) {
-        for shape in elementProtocol.shapes {
+    for shape in elementProtocol.shapes {
+        aliases +=
+            "    public typealias \(rawTypeName(of: shape)) = \(element.rawVectorType(of: shape))\n"
+        if shape.hasMask {
             aliases +=
-                "    public typealias \(rawTypeName(of: shape)) = \(element.rawVectorType(of: shape))\n"
-            if shape.hasMask {
-                aliases +=
-                    "    public typealias \(rawTypeName(of: shape, isMask: true)) = \(element.cRawMask(of: shape))\n"
-            }
-            aliases +=
-                "    public typealias \(simdTypeName(of: shape)) = \(element.cVector(of: shape))\n"
-            if shape.hasMask {
-                aliases +=
-                    "    public typealias \(simdTypeName(of: shape, isMask: true)) = \(simdMaskType(of: element, shape: shape))\n"
-            }
+                "    public typealias \(rawTypeName(of: shape, isMask: true)) = \(element.cRawMask(of: shape))\n"
         }
-        if elementProtocol.parents.isEmpty {
+        aliases +=
+            "    public typealias \(simdTypeName(of: shape)) = \(element.cVector(of: shape))\n"
+        if shape.hasMask {
             aliases +=
-                "    public typealias IndexLane = \(laneIndexElement(of: element).swiftType)\n"
+                "    public typealias \(simdTypeName(of: shape, isMask: true)) = \(simdMaskType(of: element, shape: shape))\n"
         }
     }
-    let conformances = protocolConformances(of: element).joined(separator: ", ")
-    return """
-        \(generationNotice)
+    if elementProtocol.parents.isEmpty {
+        aliases +=
+            "    public typealias IndexLane = \(laneIndexElement(of: element).swiftType)\n"
+    }
+    for link in elementLinks where link.protocolName == elementProtocol.name {
+        guard let target = link.target(element) else {
+            fatalError(
+                "\(element.swiftType) conforms to \(elementProtocol.name) without a \(link.name)"
+            )
+        }
+        aliases += "    public typealias \(link.name) = \(target.swiftType)\n"
+    }
+    return aliases
+}
 
-        \(elementImports)
+func generateElementConformance(_ element: Element) -> String {
+    func conformance(compiledOut: Bool) -> String {
+        let conformed = elementProtocols.filter {
+            $0.isConformed(by: element)
+                && compiledOutLinks(of: $0, for: element).isEmpty == !compiledOut
+        }
+        let aliases = conformed.map { conformanceAliases(of: $0, for: element) }.joined()
+        let names = protocolConformances(of: element, compiledOut: compiledOut)
+            .joined(separator: ", ")
+        guard compiledOut else {
+            let availability = element.swiftAvailability.map { "\($0)\n" } ?? ""
+            return "\(availability)extension \(element.swiftType): \(names) {\n\(aliases)}\n"
+        }
+        let linked = conformed.flatMap { compiledOutLinks(of: $0, for: element) }[0]
+        return """
+            #if \(linked.compilationCondition ?? "")
+            \(linked.swiftAvailability ?? "")
+            extension \(element.swiftType): \(names) {
+            \(aliases)}
+            #endif
 
-        \(element.swiftAvailability.map { "\($0)\n" } ?? "")extension \(element.swiftType): \(conformances) {
-        \(aliases)}
-
-        """
+            """
+    }
+    var output = "\(generationNotice)\n\n\(elementImports)\n\n\(conformance(compiledOut: false))"
+    if !protocolConformances(of: element, compiledOut: true).isEmpty {
+        output += "\n\(conformance(compiledOut: true))"
+    }
+    return output
 }
 
 func concreteTypeMembers(
@@ -50497,6 +51905,10 @@ try write(
     to: "\(generatedReferenceSupportRoot)/HalfPrecisionConformances.swift"
 )
 try write(
+    generateLinkWrappers(),
+    to: "\(generatedReferenceSupportRoot)/GenericLinks.swift"
+)
+try write(
     generateReferenceTargetTests(),
     to: "\(generatedReferenceTestsRoot)/HighwayTargetTests/HighwayTargetReferenceTests.swift"
 )
@@ -50511,6 +51923,16 @@ for elementProtocol in elementProtocols {
         imports: "",
         extending: elementProtocol.parents.isEmpty
             ? "SIMD" : "SIMD where Lane: \(elementProtocol.name)",
+        balancing: true
+    )
+}
+for group in linkGroups() {
+    try writeSections(
+        group.members,
+        named: "SIMD+Generic\(group.fileName)",
+        in: generatedSwiftRoot,
+        imports: "",
+        extending: group.extending,
         balancing: true
     )
 }
@@ -50598,6 +52020,22 @@ for element in elements {
         extending: constantTestsName,
         for: element,
         testing: true
+    )
+
+    let linkTestsName = "\(element.namespace)LinkTests"
+    try write(
+        conditioned(generateLinkTests(element), for: element),
+        to: "\(testsDirectory)/\(linkTestsName).swift"
+    )
+    try writeSections(
+        linkTestMembers(for: element),
+        named: linkTestsName,
+        in: testsDirectory,
+        imports: referenceTestImports,
+        extending: linkTestsName,
+        for: element,
+        testing: true,
+        balancing: true
     )
 
     let codegenDirectory = "\(generatedCodegenRoot)/\(element.namespace)"

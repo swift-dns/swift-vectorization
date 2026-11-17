@@ -2,7 +2,7 @@
 
 public import CVectorizationOps
 
-extension Float: SIMDFloatElement {
+extension Float: SIMDFloatElement, SIMDWidenableElement, SIMDGatherableElement {
     public typealias _RawVector = cvectorization_ops_vector_f32
     public typealias _RawMask = cvectorization_ops_raw_mask_f32
     public typealias _SIMDVector = cvectorization_ops_vector_f32
@@ -14,4 +14,14 @@ extension Float: SIMDFloatElement {
     public typealias _RawBlockVector = cvectorization_ops_raw_block_f32
     public typealias _SIMDBlockVector = cvectorization_ops_block_f32
     public typealias IndexLane = Int32
+    public typealias UnsignedLane = UInt32
+    public typealias SignedLane = Int32
+    public typealias WideLane = Double
 }
+
+#if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+@available(SwiftStdlib 5.3, *)
+extension Float: SIMDNarrowableElement {
+    public typealias NarrowLane = Float16
+}
+#endif
