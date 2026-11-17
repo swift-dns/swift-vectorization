@@ -1,5 +1,6 @@
 // Copyright 2020 Google LLC
 // SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BSD-3-Clause
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -186,7 +187,9 @@
 
 // NOTE: clang ~17 does not correctly handle wrapping __has_include in a macro.
 
-#if HWY_COMPILER_MSVC && defined(_MSVC_LANG) && _MSVC_LANG > __cplusplus
+#if !defined(__cplusplus)
+#define HWY_CXX_LANG 0
+#elif HWY_COMPILER_MSVC && defined(_MSVC_LANG) && _MSVC_LANG > __cplusplus
 #define HWY_CXX_LANG _MSVC_LANG
 #else
 #define HWY_CXX_LANG __cplusplus
@@ -224,7 +227,7 @@
 // Use for constexpr variables at namespace scope in headers. Constexpr is
 // separate to allow using `HWY_CXX14_CONSTEXPR` if required.
 #ifndef HWY_INLINE_VAR
-#if __cplusplus > 201402L
+#if HWY_CXX_LANG > 201402L
 // C++17: mark as COMDAT to ensure linkers de-duplicate it. See
 // https://quuxplusone.github.io/blog/2022/07/08/inline-constexpr/
 #define HWY_INLINE_VAR inline

@@ -1,5 +1,6 @@
 // Copyright 2019 Google LLC
 // SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BSD-3-Clause
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -157,5 +158,19 @@ HWY_DLLEXPORT void AlignedDeleter::DeleteAlignedArray(void* aligned_pointer,
                 header->allocated);
   }
 }
+
+// static
+HWY_DLLEXPORT void AlignedFreer::DoNothing(void* /*opaque*/,
+                                           void* /*aligned_pointer*/) {}
+
+namespace detail {
+
+HWY_DLLEXPORT void FreeAlignedMemory(void* free_fn, void* memory) {
+  FreeAlignedBytes(
+      memory, reinterpret_cast<FreePtr>(reinterpret_cast<uintptr_t>(free_fn)),
+      nullptr);
+}
+
+}  // namespace detail
 
 }  // namespace hwy
