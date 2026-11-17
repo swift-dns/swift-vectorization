@@ -16,7 +16,7 @@ extension SIMDDoubleConstantTests {
         }
         let (_, referenceLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
             destination in
-            unsafe HighwayReference.storeStreamingF64(H.repeating(value), destination)
+            unsafe HighwayReference.storeStreamingF64(H.repeating(value).raw, destination)
         }
         mismatches.check(portLanes, referenceLanes, "")
         mismatches.record()

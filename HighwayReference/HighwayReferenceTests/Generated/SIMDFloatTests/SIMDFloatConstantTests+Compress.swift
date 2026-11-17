@@ -13,7 +13,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         for mask in maskInputs {
             let port = H.compressed(H.repeating(value), where: mask)
-            let reference = HighwayReference.compressedF32(H.repeating(value), mask.raw)
+            let reference = HighwayReference.compressedF32(H.repeating(value).raw, mask.raw)
             let checkedLanes =
                 HighwayReference.compressTailIsDeterministicF32() ? H.laneCount : H.trueCount(mask)
             mismatches.check(
@@ -108,7 +108,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         for mask in maskInputs {
             let port = H.compressedNot(H.repeating(value), where: mask)
-            let reference = HighwayReference.compressedNotF32(H.repeating(value), mask.raw)
+            let reference = HighwayReference.compressedNotF32(H.repeating(value).raw, mask.raw)
             let checkedLanes =
                 HighwayReference.compressTailIsDeterministicF32()
                 ? H.laneCount : H.laneCount - H.trueCount(mask)
@@ -205,7 +205,7 @@ extension SIMDFloatConstantTests {
         for mask in maskInputs {
             mismatches.check(
                 H.partitioned(H.repeating(value), where: mask),
-                HighwayReference.partitionedF32(H.repeating(value), mask.raw),
+                HighwayReference.partitionedF32(H.repeating(value).raw, mask.raw),
                 "mask: \(describe(mask))"
             )
         }
@@ -306,7 +306,7 @@ extension SIMDFloatConstantTests {
             var referenceLanes = sentinel
             let referenceResult = referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeCompressedF32(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     mask.raw,
                     destination.baseAddress!
                 )
@@ -411,7 +411,7 @@ extension SIMDFloatConstantTests {
             var referenceLanes = sentinel
             let referenceResult = referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeCompressedBlendedF32(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     mask.raw,
                     destination.baseAddress!
                 )
@@ -513,7 +513,7 @@ extension SIMDFloatConstantTests {
                     unsafe H.compressed(H.repeating(value), bits: source.baseAddress!),
                     (bits + [UInt8](repeating: 0, count: 8)).withUnsafeBufferPointer { padded in
                         unsafe HighwayReference.compressedBitsF32(
-                            H.repeating(value),
+                            H.repeating(value).raw,
                             source.baseAddress!
                         )
                     }
@@ -634,7 +634,7 @@ extension SIMDFloatConstantTests {
                     referenceLanes.withUnsafeMutableBufferPointer { destination in
                         (bits + [UInt8](repeating: 0, count: 8)).withUnsafeBufferPointer { padded in
                             unsafe HighwayReference.storeCompressedBitsF32(
-                                H.repeating(value),
+                                H.repeating(value).raw,
                                 source.baseAddress!,
                                 destination.baseAddress!
                             )

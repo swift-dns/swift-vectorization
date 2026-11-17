@@ -15,7 +15,7 @@ extension SIMDDoubleConstantTests {
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 H.bitwiseXor(H.repeating(value), b, c),
-                HighwayReference.bitwiseXor3F64(H.repeating(value), b, c),
+                HighwayReference.bitwiseXor3F64(H.repeating(value).raw, b.raw, c.raw),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -31,7 +31,7 @@ extension SIMDDoubleConstantTests {
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 H.bitwiseXor(a, H.repeating(value), c),
-                HighwayReference.bitwiseXor3F64(a, H.repeating(value), c),
+                HighwayReference.bitwiseXor3F64(a.raw, H.repeating(value).raw, c.raw),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -47,7 +47,7 @@ extension SIMDDoubleConstantTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseXor(a, b, H.repeating(value)),
-                HighwayReference.bitwiseXor3F64(a, b, H.repeating(value)),
+                HighwayReference.bitwiseXor3F64(a.raw, b.raw, H.repeating(value).raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -177,7 +177,7 @@ extension SIMDDoubleConstantTests {
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 H.bitwiseOr(H.repeating(value), b, c),
-                HighwayReference.bitwiseOr3F64(H.repeating(value), b, c),
+                HighwayReference.bitwiseOr3F64(H.repeating(value).raw, b.raw, c.raw),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -193,7 +193,7 @@ extension SIMDDoubleConstantTests {
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 H.bitwiseOr(a, H.repeating(value), c),
-                HighwayReference.bitwiseOr3F64(a, H.repeating(value), c),
+                HighwayReference.bitwiseOr3F64(a.raw, H.repeating(value).raw, c.raw),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -209,7 +209,7 @@ extension SIMDDoubleConstantTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseOr(a, b, H.repeating(value)),
-                HighwayReference.bitwiseOr3F64(a, b, H.repeating(value)),
+                HighwayReference.bitwiseOr3F64(a.raw, b.raw, H.repeating(value).raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -339,7 +339,7 @@ extension SIMDDoubleConstantTests {
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 H.bitwiseOrAnd(H.repeating(value), b, c),
-                HighwayReference.bitwiseOrAndF64(H.repeating(value), b, c),
+                HighwayReference.bitwiseOrAndF64(H.repeating(value).raw, b.raw, c.raw),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -355,7 +355,7 @@ extension SIMDDoubleConstantTests {
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 H.bitwiseOrAnd(a, H.repeating(value), c),
-                HighwayReference.bitwiseOrAndF64(a, H.repeating(value), c),
+                HighwayReference.bitwiseOrAndF64(a.raw, H.repeating(value).raw, c.raw),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -371,7 +371,7 @@ extension SIMDDoubleConstantTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseOrAnd(a, b, H.repeating(value)),
-                HighwayReference.bitwiseOrAndF64(a, b, H.repeating(value)),
+                HighwayReference.bitwiseOrAndF64(a.raw, b.raw, H.repeating(value).raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -501,7 +501,7 @@ extension SIMDDoubleConstantTests {
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 H.bitwiseXorAndNot(H.repeating(value), b, c),
-                HighwayReference.bitwiseXorAndNotF64(H.repeating(value), b, c),
+                HighwayReference.bitwiseXorAndNotF64(H.repeating(value).raw, b.raw, c.raw),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -517,7 +517,7 @@ extension SIMDDoubleConstantTests {
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 H.bitwiseXorAndNot(a, H.repeating(value), c),
-                HighwayReference.bitwiseXorAndNotF64(a, H.repeating(value), c),
+                HighwayReference.bitwiseXorAndNotF64(a.raw, H.repeating(value).raw, c.raw),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -533,7 +533,7 @@ extension SIMDDoubleConstantTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseXorAndNot(a, b, H.repeating(value)),
-                HighwayReference.bitwiseXorAndNotF64(a, b, H.repeating(value)),
+                HighwayReference.bitwiseXorAndNotF64(a.raw, b.raw, H.repeating(value).raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -663,7 +663,7 @@ extension SIMDDoubleConstantTests {
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 H.bitwiseSelecting(H.repeating(value), b, c),
-                HighwayReference.bitwiseSelectingF64(H.repeating(value), b, c),
+                HighwayReference.bitwiseSelectingF64(H.repeating(value).raw, b.raw, c.raw),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -679,7 +679,7 @@ extension SIMDDoubleConstantTests {
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 H.bitwiseSelecting(a, H.repeating(value), c),
-                HighwayReference.bitwiseSelectingF64(a, H.repeating(value), c),
+                HighwayReference.bitwiseSelectingF64(a.raw, H.repeating(value).raw, c.raw),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -695,7 +695,7 @@ extension SIMDDoubleConstantTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseSelecting(a, b, H.repeating(value)),
-                HighwayReference.bitwiseSelectingF64(a, b, H.repeating(value)),
+                HighwayReference.bitwiseSelectingF64(a.raw, b.raw, H.repeating(value).raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -825,7 +825,7 @@ extension SIMDDoubleConstantTests {
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 H.bitwiseAnd(H.repeating(value), b, where: mask),
-                HighwayReference.bitwiseAndWhereF64(mask.raw, H.repeating(value), b),
+                HighwayReference.bitwiseAndWhereF64(mask.raw, H.repeating(value).raw, b.raw),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -841,7 +841,7 @@ extension SIMDDoubleConstantTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.bitwiseAnd(a, H.repeating(value), where: mask),
-                HighwayReference.bitwiseAndWhereF64(mask.raw, a, H.repeating(value)),
+                HighwayReference.bitwiseAndWhereF64(mask.raw, a.raw, H.repeating(value).raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -952,7 +952,7 @@ extension SIMDDoubleConstantTests {
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 H.bitwiseOr(H.repeating(value), b, where: mask),
-                HighwayReference.bitwiseOrWhereF64(mask.raw, H.repeating(value), b),
+                HighwayReference.bitwiseOrWhereF64(mask.raw, H.repeating(value).raw, b.raw),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -968,7 +968,7 @@ extension SIMDDoubleConstantTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.bitwiseOr(a, H.repeating(value), where: mask),
-                HighwayReference.bitwiseOrWhereF64(mask.raw, a, H.repeating(value)),
+                HighwayReference.bitwiseOrWhereF64(mask.raw, a.raw, H.repeating(value).raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }

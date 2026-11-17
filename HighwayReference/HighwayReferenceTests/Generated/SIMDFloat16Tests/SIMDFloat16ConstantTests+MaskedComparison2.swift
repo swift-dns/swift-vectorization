@@ -23,8 +23,8 @@ extension SIMDFloat16ConstantTests {
                 H.Mask(
                     raw: HighwayReference.greaterThanOrEqualToWhereF16(
                         mask.raw,
-                        H.repeating(value),
-                        b
+                        H.repeating(value).raw,
+                        b.raw
                     )
                 ),
                 "mask: \(describe(mask)), b: \(describe(b))"
@@ -49,8 +49,8 @@ extension SIMDFloat16ConstantTests {
                 H.Mask(
                     raw: HighwayReference.greaterThanOrEqualToWhereF16(
                         mask.raw,
-                        a,
-                        H.repeating(value)
+                        a.raw,
+                        H.repeating(value).raw
                     )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a))"

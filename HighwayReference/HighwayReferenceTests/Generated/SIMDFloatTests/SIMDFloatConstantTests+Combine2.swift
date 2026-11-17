@@ -12,7 +12,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.lowerHalf(H.repeating(value)),
-            H.HalfVector(raw: HighwayReference.lowerHalfF32(H.repeating(value))),
+            H.HalfVector(raw: HighwayReference.lowerHalfF32(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -100,7 +100,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.upperHalf(H.repeating(value)),
-            H.HalfVector(raw: HighwayReference.upperHalfF32(H.repeating(value))),
+            H.HalfVector(raw: HighwayReference.upperHalfF32(H.repeating(value).raw)),
             ""
         )
         mismatches.record()

@@ -13,7 +13,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.slideUpBlocks(a, by: blocks),
-                HighwayReference.slideUpBlocksF64(a, Int32(truncatingIfNeeded: blocks)),
+                HighwayReference.slideUpBlocksF64(a.raw, Int32(truncatingIfNeeded: blocks)),
                 "a: \(describe(a))"
             )
         }
@@ -43,7 +43,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 unsafe H.slideUpBlocks(a, byUnchecked: blocks),
-                HighwayReference.slideUpBlocksF64(a, Int32(truncatingIfNeeded: blocks)),
+                HighwayReference.slideUpBlocksF64(a.raw, Int32(truncatingIfNeeded: blocks)),
                 "a: \(describe(a))"
             )
         }
@@ -75,7 +75,7 @@ extension SIMDDoubleConstantTests {
             mismatches.check(
                 H.slideUpBlocks(H.repeating(value), by: blocks),
                 HighwayReference.slideUpBlocksF64(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: blocks)
                 ),
                 "blocks: \(blocks)"
@@ -167,7 +167,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.slideDownBlocks(a, by: blocks),
-                HighwayReference.slideDownBlocksF64(a, Int32(truncatingIfNeeded: blocks)),
+                HighwayReference.slideDownBlocksF64(a.raw, Int32(truncatingIfNeeded: blocks)),
                 "a: \(describe(a))"
             )
         }
@@ -197,7 +197,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 unsafe H.slideDownBlocks(a, byUnchecked: blocks),
-                HighwayReference.slideDownBlocksF64(a, Int32(truncatingIfNeeded: blocks)),
+                HighwayReference.slideDownBlocksF64(a.raw, Int32(truncatingIfNeeded: blocks)),
                 "a: \(describe(a))"
             )
         }
@@ -229,7 +229,7 @@ extension SIMDDoubleConstantTests {
             mismatches.check(
                 H.slideDownBlocks(H.repeating(value), by: blocks),
                 HighwayReference.slideDownBlocksF64(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: blocks)
                 ),
                 "blocks: \(blocks)"
@@ -322,7 +322,11 @@ extension SIMDDoubleConstantTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.combinedSlideDownLanes(a, b, by: lanes),
-                HighwayReference.combinedSlideDownLanesF64(a, b, Int32(truncatingIfNeeded: lanes)),
+                HighwayReference.combinedSlideDownLanesF64(
+                    a.raw,
+                    b.raw,
+                    Int32(truncatingIfNeeded: lanes)
+                ),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -365,7 +369,11 @@ extension SIMDDoubleConstantTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 unsafe H.combinedSlideDownLanes(a, b, byUnchecked: lanes),
-                HighwayReference.combinedSlideDownLanesF64(a, b, Int32(truncatingIfNeeded: lanes)),
+                HighwayReference.combinedSlideDownLanesF64(
+                    a.raw,
+                    b.raw,
+                    Int32(truncatingIfNeeded: lanes)
+                ),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -410,8 +418,8 @@ extension SIMDDoubleConstantTests {
             mismatches.check(
                 H.combinedSlideDownLanes(H.repeating(value), b, by: lanes),
                 HighwayReference.combinedSlideDownLanesF64(
-                    H.repeating(value),
-                    b,
+                    H.repeating(value).raw,
+                    b.raw,
                     Int32(truncatingIfNeeded: lanes)
                 ),
                 "b: \(describe(b)), lanes: \(lanes)"
@@ -430,8 +438,8 @@ extension SIMDDoubleConstantTests {
             mismatches.check(
                 H.combinedSlideDownLanes(a, H.repeating(value), by: lanes),
                 HighwayReference.combinedSlideDownLanesF64(
-                    a,
-                    H.repeating(value),
+                    a.raw,
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: lanes)
                 ),
                 "a: \(describe(a)), lanes: \(lanes)"

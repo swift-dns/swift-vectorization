@@ -23,7 +23,7 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.repeating(value, where: mask, otherwise: H.repeating(value)),
                 HighwayReference.repeatingWhereOtherwiseF16(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     mask.raw,
                     value.bitPattern
                 ),

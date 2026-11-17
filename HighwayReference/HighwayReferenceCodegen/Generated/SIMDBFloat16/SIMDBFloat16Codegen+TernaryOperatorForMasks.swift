@@ -5,35 +5,35 @@ public import Vectorization
 
 @inline(never)
 public func portSelectingBF16(
-    _ mask: SIMDBFloat16.Mask,
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
+    _ mask: SIMD<BFloat16>.Mask,
+    _ a: SIMD<BFloat16>,
+    _ b: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
     SIMDBFloat16.selecting(mask, a, b)
 }
 
 @inline(never)
 public func highwaySelectingBF16(
-    _ mask: SIMDBFloat16.Mask,
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
+    _ mask: SIMD<BFloat16>.Mask,
+    _ a: SIMD<BFloat16>,
+    _ b: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
     SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.selectingBF16(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portSelectingBF16ConstantA(
-    _ mask: SIMDBFloat16.Mask,
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
+    _ mask: SIMD<BFloat16>.Mask,
+    _ b: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
     SIMDBFloat16.selecting(mask, SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), b)
 }
 
 @inline(never)
 public func highwaySelectingBF16ConstantA(
-    _ mask: SIMDBFloat16.Mask,
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
+    _ mask: SIMD<BFloat16>.Mask,
+    _ b: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
     SIMDBFloat16.Vector(
         raw: HighwayReference.Nothrow.selectingBF16(
             mask.raw,
@@ -47,17 +47,17 @@ public func highwaySelectingBF16ConstantA(
 
 @inline(never)
 public func portSelectingBF16ConstantB(
-    _ mask: SIMDBFloat16.Mask,
-    _ a: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
+    _ mask: SIMD<BFloat16>.Mask,
+    _ a: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
     SIMDBFloat16.selecting(mask, a, SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwaySelectingBF16ConstantB(
-    _ mask: SIMDBFloat16.Mask,
-    _ a: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
+    _ mask: SIMD<BFloat16>.Mask,
+    _ a: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
     SIMDBFloat16.Vector(
         raw: HighwayReference.Nothrow.selectingBF16(
             mask.raw,
@@ -71,27 +71,27 @@ public func highwaySelectingBF16ConstantB(
 
 @inline(never)
 public func portSelectingOrZeroBF16(
-    _ mask: SIMDBFloat16.Mask,
-    _ a: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
+    _ mask: SIMD<BFloat16>.Mask,
+    _ a: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
     SIMDBFloat16.selectingOrZero(mask, a)
 }
 
 @inline(never)
 public func highwaySelectingOrZeroBF16(
-    _ mask: SIMDBFloat16.Mask,
-    _ a: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
+    _ mask: SIMD<BFloat16>.Mask,
+    _ a: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
     SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.selectingOrZeroBF16(mask.raw, a.raw))
 }
 
 @inline(never)
-public func portSelectingOrZeroBF16ConstantA(_ mask: SIMDBFloat16.Mask) -> SIMDBFloat16.Vector {
+public func portSelectingOrZeroBF16ConstantA(_ mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16> {
     SIMDBFloat16.selectingOrZero(mask, SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwaySelectingOrZeroBF16ConstantA(_ mask: SIMDBFloat16.Mask) -> SIMDBFloat16.Vector {
+public func highwaySelectingOrZeroBF16ConstantA(_ mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16> {
     SIMDBFloat16.Vector(
         raw: HighwayReference.Nothrow.selectingOrZeroBF16(
             mask.raw,
@@ -104,27 +104,27 @@ public func highwaySelectingOrZeroBF16ConstantA(_ mask: SIMDBFloat16.Mask) -> SI
 
 @inline(never)
 public func portZeroingSelectedBF16(
-    _ mask: SIMDBFloat16.Mask,
-    _ a: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
+    _ mask: SIMD<BFloat16>.Mask,
+    _ a: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
     SIMDBFloat16.zeroingSelected(mask, a)
 }
 
 @inline(never)
 public func highwayZeroingSelectedBF16(
-    _ mask: SIMDBFloat16.Mask,
-    _ a: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
+    _ mask: SIMD<BFloat16>.Mask,
+    _ a: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
     SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.zeroingSelectedBF16(mask.raw, a.raw))
 }
 
 @inline(never)
-public func portZeroingSelectedBF16ConstantA(_ mask: SIMDBFloat16.Mask) -> SIMDBFloat16.Vector {
+public func portZeroingSelectedBF16ConstantA(_ mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16> {
     SIMDBFloat16.zeroingSelected(mask, SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayZeroingSelectedBF16ConstantA(_ mask: SIMDBFloat16.Mask) -> SIMDBFloat16.Vector {
+public func highwayZeroingSelectedBF16ConstantA(_ mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16> {
     SIMDBFloat16.Vector(
         raw: HighwayReference.Nothrow.zeroingSelectedBF16(
             mask.raw,

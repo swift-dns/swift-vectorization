@@ -18,7 +18,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.zippingLower(SIMDFloat.repeating(value), b),
-                HighwayReference.zippingLowerF32ToF64(SIMDFloat.repeating(value), b),
+                HighwayReference.zippingLowerF32ToF64(SIMDFloat.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -37,7 +37,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.zippingLower(a, SIMDFloat.repeating(value)),
-                HighwayReference.zippingLowerF32ToF64(a, SIMDFloat.repeating(value)),
+                HighwayReference.zippingLowerF32ToF64(a.raw, SIMDFloat.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -151,7 +151,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.zippingUpper(SIMDFloat.repeating(value), b),
-                HighwayReference.zippingUpperF32ToF64(SIMDFloat.repeating(value), b),
+                HighwayReference.zippingUpperF32ToF64(SIMDFloat.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -170,7 +170,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.zippingUpper(a, SIMDFloat.repeating(value)),
-                HighwayReference.zippingUpperF32ToF64(a, SIMDFloat.repeating(value)),
+                HighwayReference.zippingUpperF32ToF64(a.raw, SIMDFloat.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }

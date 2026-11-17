@@ -12,7 +12,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.halfVector(zeroExtendingResizing: a),
-                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF32ToF32(a)),
+                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF32ToF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -30,7 +30,7 @@ extension SIMDFloatReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(zeroExtendingResizing: a))
                 ),
-                HighwayReference.resizedHalfVectorZeroExtendingResizingF32ToF32(a),
+                HighwayReference.resizedHalfVectorZeroExtendingResizingF32ToF32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -57,7 +57,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(zeroExtendingResizing: a),
-                HighwayReference.vectorZeroExtendingResizingF64ToF32(a),
+                HighwayReference.vectorZeroExtendingResizingF64ToF32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -70,7 +70,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.halfVector(zeroExtendingResizing: a),
-                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF64ToF32(a)),
+                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF64ToF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -88,7 +88,7 @@ extension SIMDFloatReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(zeroExtendingResizing: a))
                 ),
-                HighwayReference.resizedHalfVectorZeroExtendingResizingF64ToF32(a),
+                HighwayReference.resizedHalfVectorZeroExtendingResizingF64ToF32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -151,7 +151,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(zeroExtendingResizing: a),
-                HighwayReference.vectorZeroExtendingResizingF16ToF32(a),
+                HighwayReference.vectorZeroExtendingResizingF16ToF32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -166,7 +166,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.halfVector(zeroExtendingResizing: a),
-                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF16ToF32(a)),
+                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF16ToF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -186,7 +186,7 @@ extension SIMDFloatReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(zeroExtendingResizing: a))
                 ),
-                HighwayReference.resizedHalfVectorZeroExtendingResizingF16ToF32(a),
+                HighwayReference.resizedHalfVectorZeroExtendingResizingF16ToF32(a.raw),
                 "a: \(describe(a))"
             )
         }

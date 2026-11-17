@@ -6,7 +6,7 @@ public import Vectorization
 extension HighwayReferenceUInt32 {
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
-    public static func storeStreaming(_ a: Vector, to span: inout MutableSpan<Lane>) {
+    public static func storeStreaming(_ a: SIMD, to span: inout MutableSpan<Lane>) {
         precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         precondition(
             span.withUnsafeBufferPointer {
@@ -19,7 +19,7 @@ extension HighwayReferenceUInt32 {
 
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
-    public static func storeStreaming(_ a: Vector, toUnchecked span: inout MutableSpan<Lane>) {
+    public static func storeStreaming(_ a: SIMD, toUnchecked span: inout MutableSpan<Lane>) {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         assert(
             span.withUnsafeBufferPointer {
@@ -38,18 +38,17 @@ extension HighwayReferenceUInt32 {
 }
 
 @inline(never)
-public func portStoreStreamingU32(_ a: SIMDUInt32.Vector, to: UnsafeMutablePointer<SIMDUInt32.Lane>)
-{
+public func portStoreStreamingU32(_ a: SIMD<UInt32>, to: UnsafeMutablePointer<UInt32>) {
     unsafe SIMDUInt32.storeStreaming(a, to: to)
 }
 
 @inline(never)
-public func highwayStoreStreamingU32(_ a: SIMDUInt32.Vector, to: UnsafeMutablePointer<UInt32>) {
+public func highwayStoreStreamingU32(_ a: SIMD<UInt32>, to: UnsafeMutablePointer<UInt32>) {
     unsafe HighwayReference.Nothrow.storeStreamingU32(a.raw, to)
 }
 
 @inline(never)
-public func portStoreStreamingU32ConstantA(to: UnsafeMutablePointer<SIMDUInt32.Lane>) {
+public func portStoreStreamingU32ConstantA(to: UnsafeMutablePointer<UInt32>) {
     unsafe SIMDUInt32.storeStreaming(SIMDUInt32.repeating(26), to: to)
 }
 

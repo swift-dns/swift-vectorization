@@ -4,17 +4,17 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portFirstLaneI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Lane {
+public func portFirstLaneI64(_ a: SIMD<Int64>) -> Int64 {
     SIMDInt64.firstLane(a)
 }
 
 @inline(never)
-public func highwayFirstLaneI64(_ a: SIMDInt64.Vector) -> Int64 {
+public func highwayFirstLaneI64(_ a: SIMD<Int64>) -> Int64 {
     HighwayReference.Nothrow.firstLaneI64(a.raw)
 }
 
 @inline(never)
-public func portFirstLaneI64ConstantA() -> SIMDInt64.Lane {
+public func portFirstLaneI64ConstantA() -> Int64 {
     SIMDInt64.firstLane(SIMDInt64.repeating(26))
 }
 
@@ -26,17 +26,17 @@ public func highwayFirstLaneI64ConstantA() -> Int64 {
 }
 
 @inline(never)
-public func portLaneI64(_ a: SIMDInt64.Vector, atUnchecked index: Int) -> SIMDInt64.Lane {
+public func portLaneI64(_ a: SIMD<Int64>, atUnchecked index: Int) -> Int64 {
     unsafe SIMDInt64.lane(a, atUnchecked: index)
 }
 
 @inline(never)
-public func highwayLaneI64(_ a: SIMDInt64.Vector, atUnchecked index: Int) -> Int64 {
+public func highwayLaneI64(_ a: SIMD<Int64>, atUnchecked index: Int) -> Int64 {
     HighwayReference.Nothrow.laneI64(a.raw, index)
 }
 
 @inline(never)
-public func portLaneI64ConstantA(atUnchecked index: Int) -> SIMDInt64.Lane {
+public func portLaneI64ConstantA(atUnchecked index: Int) -> Int64 {
     unsafe SIMDInt64.lane(SIMDInt64.repeating(26), atUnchecked: index)
 }
 
@@ -49,38 +49,36 @@ public func highwayLaneI64ConstantA(atUnchecked index: Int) -> Int64 {
 }
 
 @inline(never)
-public func portLaneI64ConstantIndex(_ a: SIMDInt64.Vector) -> SIMDInt64.Lane {
+public func portLaneI64ConstantIndex(_ a: SIMD<Int64>) -> Int64 {
     unsafe SIMDInt64.lane(a, atUnchecked: 1)
 }
 
 @inline(never)
-public func highwayLaneI64ConstantIndex(_ a: SIMDInt64.Vector) -> Int64 {
+public func highwayLaneI64ConstantIndex(_ a: SIMD<Int64>) -> Int64 {
     HighwayReference.Nothrow.laneI64(a.raw, 1)
 }
 
 @inline(never)
 public func portReplacingLaneI64(
-    _ a: SIMDInt64.Vector,
+    _ a: SIMD<Int64>,
     atUnchecked index: Int,
-    with value: SIMDInt64.Lane
-) -> SIMDInt64.Vector {
+    with value: Int64
+) -> SIMD<Int64> {
     unsafe SIMDInt64.replacingLane(a, atUnchecked: index, with: value)
 }
 
 @inline(never)
 public func highwayReplacingLaneI64(
-    _ a: SIMDInt64.Vector,
+    _ a: SIMD<Int64>,
     atUnchecked index: Int,
     with value: Int64
-) -> SIMDInt64.Vector {
+) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.replacingLaneI64(a.raw, index, value))
 }
 
 @inline(never)
-public func portReplacingLaneI64ConstantA(
-    atUnchecked index: Int,
-    with value: SIMDInt64.Lane
-) -> SIMDInt64.Vector {
+public func portReplacingLaneI64ConstantA(atUnchecked index: Int, with value: Int64) -> SIMD<Int64>
+{
     unsafe SIMDInt64.replacingLane(SIMDInt64.repeating(26), atUnchecked: index, with: value)
 }
 
@@ -88,7 +86,7 @@ public func portReplacingLaneI64ConstantA(
 public func highwayReplacingLaneI64ConstantA(
     atUnchecked index: Int,
     with value: Int64
-) -> SIMDInt64.Vector {
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.replacingLaneI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -99,33 +97,28 @@ public func highwayReplacingLaneI64ConstantA(
 }
 
 @inline(never)
-public func portReplacingLaneI64ConstantIndex(
-    _ a: SIMDInt64.Vector,
-    with value: SIMDInt64.Lane
-) -> SIMDInt64.Vector {
+public func portReplacingLaneI64ConstantIndex(_ a: SIMD<Int64>, with value: Int64) -> SIMD<Int64> {
     unsafe SIMDInt64.replacingLane(a, atUnchecked: 1, with: value)
 }
 
 @inline(never)
-public func highwayReplacingLaneI64ConstantIndex(
-    _ a: SIMDInt64.Vector,
-    with value: Int64
-) -> SIMDInt64.Vector {
+public func highwayReplacingLaneI64ConstantIndex(_ a: SIMD<Int64>, with value: Int64) -> SIMD<Int64>
+{
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.replacingLaneI64(a.raw, 1, value))
 }
 
 @inline(never)
 public func portReplacingLaneI64ConstantValue(
-    _ a: SIMDInt64.Vector,
+    _ a: SIMD<Int64>,
     atUnchecked index: Int
-) -> SIMDInt64.Vector {
+) -> SIMD<Int64> {
     unsafe SIMDInt64.replacingLane(a, atUnchecked: index, with: 26)
 }
 
 @inline(never)
 public func highwayReplacingLaneI64ConstantValue(
-    _ a: SIMDInt64.Vector,
+    _ a: SIMD<Int64>,
     atUnchecked index: Int
-) -> SIMDInt64.Vector {
+) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.replacingLaneI64(a.raw, index, 26))
 }

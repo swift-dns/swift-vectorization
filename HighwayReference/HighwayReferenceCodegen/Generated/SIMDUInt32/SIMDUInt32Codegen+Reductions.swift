@@ -4,17 +4,17 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portSumU32(_ a: SIMDUInt32.Vector) -> SIMDUInt32.Lane {
+public func portSumU32(_ a: SIMD<UInt32>) -> UInt32 {
     SIMDUInt32.sum(a)
 }
 
 @inline(never)
-public func highwaySumU32(_ a: SIMDUInt32.Vector) -> UInt32 {
+public func highwaySumU32(_ a: SIMD<UInt32>) -> UInt32 {
     HighwayReference.Nothrow.sumU32(a.raw)
 }
 
 @inline(never)
-public func portSumU32ConstantA() -> SIMDUInt32.Lane {
+public func portSumU32ConstantA() -> UInt32 {
     SIMDUInt32.sum(SIMDUInt32.repeating(26))
 }
 
@@ -26,17 +26,17 @@ public func highwaySumU32ConstantA() -> UInt32 {
 }
 
 @inline(never)
-public func portSmallestU32(_ a: SIMDUInt32.Vector) -> SIMDUInt32.Lane {
+public func portSmallestU32(_ a: SIMD<UInt32>) -> UInt32 {
     SIMDUInt32.smallest(a)
 }
 
 @inline(never)
-public func highwaySmallestU32(_ a: SIMDUInt32.Vector) -> UInt32 {
+public func highwaySmallestU32(_ a: SIMD<UInt32>) -> UInt32 {
     HighwayReference.Nothrow.smallestU32(a.raw)
 }
 
 @inline(never)
-public func portSmallestU32ConstantA() -> SIMDUInt32.Lane {
+public func portSmallestU32ConstantA() -> UInt32 {
     SIMDUInt32.smallest(SIMDUInt32.repeating(26))
 }
 
@@ -48,17 +48,17 @@ public func highwaySmallestU32ConstantA() -> UInt32 {
 }
 
 @inline(never)
-public func portLargestU32(_ a: SIMDUInt32.Vector) -> SIMDUInt32.Lane {
+public func portLargestU32(_ a: SIMD<UInt32>) -> UInt32 {
     SIMDUInt32.largest(a)
 }
 
 @inline(never)
-public func highwayLargestU32(_ a: SIMDUInt32.Vector) -> UInt32 {
+public func highwayLargestU32(_ a: SIMD<UInt32>) -> UInt32 {
     HighwayReference.Nothrow.largestU32(a.raw)
 }
 
 @inline(never)
-public func portLargestU32ConstantA() -> SIMDUInt32.Lane {
+public func portLargestU32ConstantA() -> UInt32 {
     SIMDUInt32.largest(SIMDUInt32.repeating(26))
 }
 
@@ -70,22 +70,22 @@ public func highwayLargestU32ConstantA() -> UInt32 {
 }
 
 @inline(never)
-public func portRepeatingSumU32(_ a: SIMDUInt32.Vector) -> SIMDUInt32.Vector {
+public func portRepeatingSumU32(_ a: SIMD<UInt32>) -> SIMD<UInt32> {
     SIMDUInt32.repeatingSum(a)
 }
 
 @inline(never)
-public func highwayRepeatingSumU32(_ a: SIMDUInt32.Vector) -> SIMDUInt32.Vector {
+public func highwayRepeatingSumU32(_ a: SIMD<UInt32>) -> SIMD<UInt32> {
     SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingSumU32(a.raw))
 }
 
 @inline(never)
-public func portRepeatingSumU32ConstantA() -> SIMDUInt32.Vector {
+public func portRepeatingSumU32ConstantA() -> SIMD<UInt32> {
     SIMDUInt32.repeatingSum(SIMDUInt32.repeating(26))
 }
 
 @inline(never)
-public func highwayRepeatingSumU32ConstantA() -> SIMDUInt32.Vector {
+public func highwayRepeatingSumU32ConstantA() -> SIMD<UInt32> {
     SIMDUInt32.Vector(
         raw: HighwayReference.Nothrow.repeatingSumU32(
             SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
@@ -94,22 +94,22 @@ public func highwayRepeatingSumU32ConstantA() -> SIMDUInt32.Vector {
 }
 
 @inline(never)
-public func portRepeatingSmallestU32(_ a: SIMDUInt32.Vector) -> SIMDUInt32.Vector {
+public func portRepeatingSmallestU32(_ a: SIMD<UInt32>) -> SIMD<UInt32> {
     SIMDUInt32.repeatingSmallest(a)
 }
 
 @inline(never)
-public func highwayRepeatingSmallestU32(_ a: SIMDUInt32.Vector) -> SIMDUInt32.Vector {
+public func highwayRepeatingSmallestU32(_ a: SIMD<UInt32>) -> SIMD<UInt32> {
     SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingSmallestU32(a.raw))
 }
 
 @inline(never)
-public func portRepeatingSmallestU32ConstantA() -> SIMDUInt32.Vector {
+public func portRepeatingSmallestU32ConstantA() -> SIMD<UInt32> {
     SIMDUInt32.repeatingSmallest(SIMDUInt32.repeating(26))
 }
 
 @inline(never)
-public func highwayRepeatingSmallestU32ConstantA() -> SIMDUInt32.Vector {
+public func highwayRepeatingSmallestU32ConstantA() -> SIMD<UInt32> {
     SIMDUInt32.Vector(
         raw: HighwayReference.Nothrow.repeatingSmallestU32(
             SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
@@ -118,22 +118,22 @@ public func highwayRepeatingSmallestU32ConstantA() -> SIMDUInt32.Vector {
 }
 
 @inline(never)
-public func portRepeatingLargestU32(_ a: SIMDUInt32.Vector) -> SIMDUInt32.Vector {
+public func portRepeatingLargestU32(_ a: SIMD<UInt32>) -> SIMD<UInt32> {
     SIMDUInt32.repeatingLargest(a)
 }
 
 @inline(never)
-public func highwayRepeatingLargestU32(_ a: SIMDUInt32.Vector) -> SIMDUInt32.Vector {
+public func highwayRepeatingLargestU32(_ a: SIMD<UInt32>) -> SIMD<UInt32> {
     SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingLargestU32(a.raw))
 }
 
 @inline(never)
-public func portRepeatingLargestU32ConstantA() -> SIMDUInt32.Vector {
+public func portRepeatingLargestU32ConstantA() -> SIMD<UInt32> {
     SIMDUInt32.repeatingLargest(SIMDUInt32.repeating(26))
 }
 
 @inline(never)
-public func highwayRepeatingLargestU32ConstantA() -> SIMDUInt32.Vector {
+public func highwayRepeatingLargestU32ConstantA() -> SIMD<UInt32> {
     SIMDUInt32.Vector(
         raw: HighwayReference.Nothrow.repeatingLargestU32(
             SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw

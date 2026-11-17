@@ -92,7 +92,11 @@ extension SIMDFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.repeating(value, where: mask, otherwise: otherwise),
-                HighwayReference.repeatingWhereOtherwiseF16(otherwise, mask.raw, value.bitPattern),
+                HighwayReference.repeatingWhereOtherwiseF16(
+                    otherwise.raw,
+                    mask.raw,
+                    value.bitPattern
+                ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), value: \(hex(value))"
             )
         }
@@ -112,7 +116,11 @@ extension SIMDFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.repeating(value, where: mask, otherwise: otherwise),
-                HighwayReference.repeatingWhereOtherwiseF16(otherwise, mask.raw, value.bitPattern),
+                HighwayReference.repeatingWhereOtherwiseF16(
+                    otherwise.raw,
+                    mask.raw,
+                    value.bitPattern
+                ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), value: \(hex(value))"
             )
         }

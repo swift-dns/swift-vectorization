@@ -5,174 +5,174 @@ public import Vectorization
 
 @inline(never)
 public func portSelectingF64(
-    _ mask: SIMDDouble.Mask,
-    _ a: SIMDDouble.Vector,
-    _ b: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
+    _ mask: SIMD<Double>.Mask,
+    _ a: SIMD<Double>,
+    _ b: SIMD<Double>
+) -> SIMD<Double> {
     SIMDDouble.selecting(mask, a, b)
 }
 
 @inline(never)
 public func highwaySelectingF64(
-    _ mask: SIMDDouble.Mask,
-    _ a: SIMDDouble.Vector,
-    _ b: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.selectingF64(mask.raw, a, b)
+    _ mask: SIMD<Double>.Mask,
+    _ a: SIMD<Double>,
+    _ b: SIMD<Double>
+) -> SIMD<Double> {
+    HighwayReference.Nothrow.selectingF64(mask.raw, a.raw, b.raw)
 }
 
 @inline(never)
-public func portSelectingF64ConstantA(
-    _ mask: SIMDDouble.Mask,
-    _ b: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
+public func portSelectingF64ConstantA(_ mask: SIMD<Double>.Mask, _ b: SIMD<Double>) -> SIMD<Double>
+{
     SIMDDouble.selecting(mask, SIMDDouble.repeating(1.5), b)
 }
 
 @inline(never)
 public func highwaySelectingF64ConstantA(
-    _ mask: SIMDDouble.Mask,
-    _ b: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.selectingF64(mask.raw, HighwayReference.Nothrow.repeatingF64(1.5), b)
+    _ mask: SIMD<Double>.Mask,
+    _ b: SIMD<Double>
+) -> SIMD<Double> {
+    HighwayReference.Nothrow.selectingF64(
+        mask.raw,
+        HighwayReference.Nothrow.repeatingF64(1.5).raw,
+        b.raw
+    )
 }
 
 @inline(never)
-public func portSelectingF64ConstantB(
-    _ mask: SIMDDouble.Mask,
-    _ a: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
+public func portSelectingF64ConstantB(_ mask: SIMD<Double>.Mask, _ a: SIMD<Double>) -> SIMD<Double>
+{
     SIMDDouble.selecting(mask, a, SIMDDouble.repeating(1.5))
 }
 
 @inline(never)
 public func highwaySelectingF64ConstantB(
-    _ mask: SIMDDouble.Mask,
-    _ a: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.selectingF64(mask.raw, a, HighwayReference.Nothrow.repeatingF64(1.5))
-}
-
-@inline(never)
-public func portSelectingOrZeroF64(
-    _ mask: SIMDDouble.Mask,
-    _ a: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    SIMDDouble.selectingOrZero(mask, a)
-}
-
-@inline(never)
-public func highwaySelectingOrZeroF64(
-    _ mask: SIMDDouble.Mask,
-    _ a: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.selectingOrZeroF64(mask.raw, a)
-}
-
-@inline(never)
-public func portSelectingOrZeroF64ConstantA(_ mask: SIMDDouble.Mask) -> SIMDDouble.Vector {
-    SIMDDouble.selectingOrZero(mask, SIMDDouble.repeating(1.5))
-}
-
-@inline(never)
-public func highwaySelectingOrZeroF64ConstantA(_ mask: SIMDDouble.Mask) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.selectingOrZeroF64(
+    _ mask: SIMD<Double>.Mask,
+    _ a: SIMD<Double>
+) -> SIMD<Double> {
+    HighwayReference.Nothrow.selectingF64(
         mask.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5)
+        a.raw,
+        HighwayReference.Nothrow.repeatingF64(1.5).raw
     )
 }
 
 @inline(never)
-public func portZeroingSelectedF64(
-    _ mask: SIMDDouble.Mask,
-    _ a: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
+public func portSelectingOrZeroF64(_ mask: SIMD<Double>.Mask, _ a: SIMD<Double>) -> SIMD<Double> {
+    SIMDDouble.selectingOrZero(mask, a)
+}
+
+@inline(never)
+public func highwaySelectingOrZeroF64(_ mask: SIMD<Double>.Mask, _ a: SIMD<Double>) -> SIMD<Double>
+{
+    HighwayReference.Nothrow.selectingOrZeroF64(mask.raw, a.raw)
+}
+
+@inline(never)
+public func portSelectingOrZeroF64ConstantA(_ mask: SIMD<Double>.Mask) -> SIMD<Double> {
+    SIMDDouble.selectingOrZero(mask, SIMDDouble.repeating(1.5))
+}
+
+@inline(never)
+public func highwaySelectingOrZeroF64ConstantA(_ mask: SIMD<Double>.Mask) -> SIMD<Double> {
+    HighwayReference.Nothrow.selectingOrZeroF64(
+        mask.raw,
+        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    )
+}
+
+@inline(never)
+public func portZeroingSelectedF64(_ mask: SIMD<Double>.Mask, _ a: SIMD<Double>) -> SIMD<Double> {
     SIMDDouble.zeroingSelected(mask, a)
 }
 
 @inline(never)
-public func highwayZeroingSelectedF64(
-    _ mask: SIMDDouble.Mask,
-    _ a: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.zeroingSelectedF64(mask.raw, a)
+public func highwayZeroingSelectedF64(_ mask: SIMD<Double>.Mask, _ a: SIMD<Double>) -> SIMD<Double>
+{
+    HighwayReference.Nothrow.zeroingSelectedF64(mask.raw, a.raw)
 }
 
 @inline(never)
-public func portZeroingSelectedF64ConstantA(_ mask: SIMDDouble.Mask) -> SIMDDouble.Vector {
+public func portZeroingSelectedF64ConstantA(_ mask: SIMD<Double>.Mask) -> SIMD<Double> {
     SIMDDouble.zeroingSelected(mask, SIMDDouble.repeating(1.5))
 }
 
 @inline(never)
-public func highwayZeroingSelectedF64ConstantA(_ mask: SIMDDouble.Mask) -> SIMDDouble.Vector {
+public func highwayZeroingSelectedF64ConstantA(_ mask: SIMD<Double>.Mask) -> SIMD<Double> {
     HighwayReference.Nothrow.zeroingSelectedF64(
         mask.raw,
-        HighwayReference.Nothrow.repeatingF64(1.5)
+        HighwayReference.Nothrow.repeatingF64(1.5).raw
     )
 }
 
 @inline(never)
 public func portSelectingByVectorF64(
-    _ a: SIMDDouble.Vector,
-    _ b: SIMDDouble.Vector,
-    _ c: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
+    _ a: SIMD<Double>,
+    _ b: SIMD<Double>,
+    _ c: SIMD<Double>
+) -> SIMD<Double> {
     SIMDDouble.selecting(a, b, c)
 }
 
 @inline(never)
 public func highwaySelectingByVectorF64(
-    _ a: SIMDDouble.Vector,
-    _ b: SIMDDouble.Vector,
-    _ c: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.selectingByVectorF64(a, b, c)
+    _ a: SIMD<Double>,
+    _ b: SIMD<Double>,
+    _ c: SIMD<Double>
+) -> SIMD<Double> {
+    HighwayReference.Nothrow.selectingByVectorF64(a.raw, b.raw, c.raw)
 }
 
 @inline(never)
-public func portSelectingByVectorF64ConstantA(
-    _ b: SIMDDouble.Vector,
-    _ c: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
+public func portSelectingByVectorF64ConstantA(_ b: SIMD<Double>, _ c: SIMD<Double>) -> SIMD<Double>
+{
     SIMDDouble.selecting(SIMDDouble.repeating(1.5), b, c)
 }
 
 @inline(never)
 public func highwaySelectingByVectorF64ConstantA(
-    _ b: SIMDDouble.Vector,
-    _ c: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.selectingByVectorF64(HighwayReference.Nothrow.repeatingF64(1.5), b, c)
+    _ b: SIMD<Double>,
+    _ c: SIMD<Double>
+) -> SIMD<Double> {
+    HighwayReference.Nothrow.selectingByVectorF64(
+        HighwayReference.Nothrow.repeatingF64(1.5).raw,
+        b.raw,
+        c.raw
+    )
 }
 
 @inline(never)
-public func portSelectingByVectorF64ConstantB(
-    _ a: SIMDDouble.Vector,
-    _ c: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
+public func portSelectingByVectorF64ConstantB(_ a: SIMD<Double>, _ c: SIMD<Double>) -> SIMD<Double>
+{
     SIMDDouble.selecting(a, SIMDDouble.repeating(1.5), c)
 }
 
 @inline(never)
 public func highwaySelectingByVectorF64ConstantB(
-    _ a: SIMDDouble.Vector,
-    _ c: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.selectingByVectorF64(a, HighwayReference.Nothrow.repeatingF64(1.5), c)
+    _ a: SIMD<Double>,
+    _ c: SIMD<Double>
+) -> SIMD<Double> {
+    HighwayReference.Nothrow.selectingByVectorF64(
+        a.raw,
+        HighwayReference.Nothrow.repeatingF64(1.5).raw,
+        c.raw
+    )
 }
 
 @inline(never)
-public func portSelectingByVectorF64ConstantC(
-    _ a: SIMDDouble.Vector,
-    _ b: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
+public func portSelectingByVectorF64ConstantC(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double>
+{
     SIMDDouble.selecting(a, b, SIMDDouble.repeating(1.5))
 }
 
 @inline(never)
 public func highwaySelectingByVectorF64ConstantC(
-    _ a: SIMDDouble.Vector,
-    _ b: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.selectingByVectorF64(a, b, HighwayReference.Nothrow.repeatingF64(1.5))
+    _ a: SIMD<Double>,
+    _ b: SIMD<Double>
+) -> SIMD<Double> {
+    HighwayReference.Nothrow.selectingByVectorF64(
+        a.raw,
+        b.raw,
+        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    )
 }

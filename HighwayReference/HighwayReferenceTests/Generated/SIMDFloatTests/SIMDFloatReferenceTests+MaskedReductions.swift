@@ -13,7 +13,7 @@ extension SIMDFloatReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) where !hasUnorderedNaNs(lanesOf: a) {
             mismatches.check(
                 H.sum(a, where: mask),
-                HighwayReference.sumWhereF32(mask.raw, a),
+                HighwayReference.sumWhereF32(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -27,7 +27,7 @@ extension SIMDFloatReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) where !hasUnorderedNaNs(lanesOf: a) {
             mismatches.check(
                 H.sum(a, where: mask),
-                HighwayReference.sumWhereF32(mask.raw, a),
+                HighwayReference.sumWhereF32(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -41,7 +41,7 @@ extension SIMDFloatReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.smallest(a, where: mask),
-                HighwayReference.smallestWhereF32(mask.raw, a),
+                HighwayReference.smallestWhereF32(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -55,7 +55,7 @@ extension SIMDFloatReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.smallest(a, where: mask),
-                HighwayReference.smallestWhereF32(mask.raw, a),
+                HighwayReference.smallestWhereF32(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -69,7 +69,7 @@ extension SIMDFloatReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.largest(a, where: mask),
-                HighwayReference.largestWhereF32(mask.raw, a),
+                HighwayReference.largestWhereF32(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -83,7 +83,7 @@ extension SIMDFloatReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.largest(a, where: mask),
-                HighwayReference.largestWhereF32(mask.raw, a),
+                HighwayReference.largestWhereF32(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }

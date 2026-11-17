@@ -19,7 +19,7 @@ extension SIMDDoubleConstantTests {
         for indices in indicesInputs {
             mismatches.check(
                 H.tableLookupLanes(H.repeating(value), at: indices),
-                HighwayReference.tableLookupLanesF64(H.repeating(value), indices.raw),
+                HighwayReference.tableLookupLanesF64(H.repeating(value).raw, indices.raw),
                 "indices: \(describe(indices))"
             )
         }
@@ -116,7 +116,11 @@ extension SIMDDoubleConstantTests {
         for (b, indices) in everyPair(bInputs, indicesInputs) {
             mismatches.check(
                 H.twoTablesLookupLanes(H.repeating(value), b, at: indices),
-                HighwayReference.twoTablesLookupLanesF64(H.repeating(value), b, indices.raw),
+                HighwayReference.twoTablesLookupLanesF64(
+                    H.repeating(value).raw,
+                    b.raw,
+                    indices.raw
+                ),
                 "b: \(describe(b)), indices: \(describe(indices))"
             )
         }
@@ -137,7 +141,11 @@ extension SIMDDoubleConstantTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 H.twoTablesLookupLanes(a, H.repeating(value), at: indices),
-                HighwayReference.twoTablesLookupLanesF64(a, H.repeating(value), indices.raw),
+                HighwayReference.twoTablesLookupLanesF64(
+                    a.raw,
+                    H.repeating(value).raw,
+                    indices.raw
+                ),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }

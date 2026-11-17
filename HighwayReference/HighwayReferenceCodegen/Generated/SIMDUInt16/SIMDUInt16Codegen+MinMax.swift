@@ -4,22 +4,22 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portMinimumU16(_ a: SIMDUInt16.Vector, _ b: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func portMinimumU16(_ a: SIMD<UInt16>, _ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.minimum(a, b)
 }
 
 @inline(never)
-public func highwayMinimumU16(_ a: SIMDUInt16.Vector, _ b: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func highwayMinimumU16(_ a: SIMD<UInt16>, _ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.Vector(raw: HighwayReference.Nothrow.minimumU16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMinimumU16ConstantA(_ b: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func portMinimumU16ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.minimum(SIMDUInt16.repeating(26), b)
 }
 
 @inline(never)
-public func highwayMinimumU16ConstantA(_ b: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func highwayMinimumU16ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.Vector(
         raw: HighwayReference.Nothrow.minimumU16(
             SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
@@ -29,12 +29,12 @@ public func highwayMinimumU16ConstantA(_ b: SIMDUInt16.Vector) -> SIMDUInt16.Vec
 }
 
 @inline(never)
-public func portMinimumU16ConstantB(_ a: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func portMinimumU16ConstantB(_ a: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.minimum(a, SIMDUInt16.repeating(26))
 }
 
 @inline(never)
-public func highwayMinimumU16ConstantB(_ a: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func highwayMinimumU16ConstantB(_ a: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.Vector(
         raw: HighwayReference.Nothrow.minimumU16(
             a.raw,
@@ -44,22 +44,22 @@ public func highwayMinimumU16ConstantB(_ a: SIMDUInt16.Vector) -> SIMDUInt16.Vec
 }
 
 @inline(never)
-public func portMaximumU16(_ a: SIMDUInt16.Vector, _ b: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func portMaximumU16(_ a: SIMD<UInt16>, _ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.maximum(a, b)
 }
 
 @inline(never)
-public func highwayMaximumU16(_ a: SIMDUInt16.Vector, _ b: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func highwayMaximumU16(_ a: SIMD<UInt16>, _ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.Vector(raw: HighwayReference.Nothrow.maximumU16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMaximumU16ConstantA(_ b: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func portMaximumU16ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.maximum(SIMDUInt16.repeating(26), b)
 }
 
 @inline(never)
-public func highwayMaximumU16ConstantA(_ b: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func highwayMaximumU16ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.Vector(
         raw: HighwayReference.Nothrow.maximumU16(
             SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
@@ -69,12 +69,12 @@ public func highwayMaximumU16ConstantA(_ b: SIMDUInt16.Vector) -> SIMDUInt16.Vec
 }
 
 @inline(never)
-public func portMaximumU16ConstantB(_ a: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func portMaximumU16ConstantB(_ a: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.maximum(a, SIMDUInt16.repeating(26))
 }
 
 @inline(never)
-public func highwayMaximumU16ConstantB(_ a: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func highwayMaximumU16ConstantB(_ a: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.Vector(
         raw: HighwayReference.Nothrow.maximumU16(
             a.raw,
@@ -84,28 +84,22 @@ public func highwayMaximumU16ConstantB(_ a: SIMDUInt16.Vector) -> SIMDUInt16.Vec
 }
 
 @inline(never)
-public func portMinimumNumberU16(
-    _ a: SIMDUInt16.Vector,
-    _ b: SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
+public func portMinimumNumberU16(_ a: SIMD<UInt16>, _ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.minimumNumber(a, b)
 }
 
 @inline(never)
-public func highwayMinimumNumberU16(
-    _ a: SIMDUInt16.Vector,
-    _ b: SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
+public func highwayMinimumNumberU16(_ a: SIMD<UInt16>, _ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.Vector(raw: HighwayReference.Nothrow.minimumNumberU16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMinimumNumberU16ConstantA(_ b: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func portMinimumNumberU16ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.minimumNumber(SIMDUInt16.repeating(26), b)
 }
 
 @inline(never)
-public func highwayMinimumNumberU16ConstantA(_ b: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func highwayMinimumNumberU16ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.Vector(
         raw: HighwayReference.Nothrow.minimumNumberU16(
             SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
@@ -115,12 +109,12 @@ public func highwayMinimumNumberU16ConstantA(_ b: SIMDUInt16.Vector) -> SIMDUInt
 }
 
 @inline(never)
-public func portMinimumNumberU16ConstantB(_ a: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func portMinimumNumberU16ConstantB(_ a: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.minimumNumber(a, SIMDUInt16.repeating(26))
 }
 
 @inline(never)
-public func highwayMinimumNumberU16ConstantB(_ a: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func highwayMinimumNumberU16ConstantB(_ a: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.Vector(
         raw: HighwayReference.Nothrow.minimumNumberU16(
             a.raw,
@@ -130,28 +124,22 @@ public func highwayMinimumNumberU16ConstantB(_ a: SIMDUInt16.Vector) -> SIMDUInt
 }
 
 @inline(never)
-public func portMaximumNumberU16(
-    _ a: SIMDUInt16.Vector,
-    _ b: SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
+public func portMaximumNumberU16(_ a: SIMD<UInt16>, _ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.maximumNumber(a, b)
 }
 
 @inline(never)
-public func highwayMaximumNumberU16(
-    _ a: SIMDUInt16.Vector,
-    _ b: SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
+public func highwayMaximumNumberU16(_ a: SIMD<UInt16>, _ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.Vector(raw: HighwayReference.Nothrow.maximumNumberU16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMaximumNumberU16ConstantA(_ b: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func portMaximumNumberU16ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.maximumNumber(SIMDUInt16.repeating(26), b)
 }
 
 @inline(never)
-public func highwayMaximumNumberU16ConstantA(_ b: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func highwayMaximumNumberU16ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.Vector(
         raw: HighwayReference.Nothrow.maximumNumberU16(
             SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
@@ -161,12 +149,12 @@ public func highwayMaximumNumberU16ConstantA(_ b: SIMDUInt16.Vector) -> SIMDUInt
 }
 
 @inline(never)
-public func portMaximumNumberU16ConstantB(_ a: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func portMaximumNumberU16ConstantB(_ a: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.maximumNumber(a, SIMDUInt16.repeating(26))
 }
 
 @inline(never)
-public func highwayMaximumNumberU16ConstantB(_ a: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func highwayMaximumNumberU16ConstantB(_ a: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.Vector(
         raw: HighwayReference.Nothrow.maximumNumberU16(
             a.raw,
@@ -176,28 +164,22 @@ public func highwayMaximumNumberU16ConstantB(_ a: SIMDUInt16.Vector) -> SIMDUInt
 }
 
 @inline(never)
-public func portMinimumMagnitudeU16(
-    _ a: SIMDUInt16.Vector,
-    _ b: SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
+public func portMinimumMagnitudeU16(_ a: SIMD<UInt16>, _ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.minimumMagnitude(a, b)
 }
 
 @inline(never)
-public func highwayMinimumMagnitudeU16(
-    _ a: SIMDUInt16.Vector,
-    _ b: SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
+public func highwayMinimumMagnitudeU16(_ a: SIMD<UInt16>, _ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.Vector(raw: HighwayReference.Nothrow.minimumMagnitudeU16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMinimumMagnitudeU16ConstantA(_ b: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func portMinimumMagnitudeU16ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.minimumMagnitude(SIMDUInt16.repeating(26), b)
 }
 
 @inline(never)
-public func highwayMinimumMagnitudeU16ConstantA(_ b: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func highwayMinimumMagnitudeU16ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.Vector(
         raw: HighwayReference.Nothrow.minimumMagnitudeU16(
             SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
@@ -207,12 +189,12 @@ public func highwayMinimumMagnitudeU16ConstantA(_ b: SIMDUInt16.Vector) -> SIMDU
 }
 
 @inline(never)
-public func portMinimumMagnitudeU16ConstantB(_ a: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func portMinimumMagnitudeU16ConstantB(_ a: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.minimumMagnitude(a, SIMDUInt16.repeating(26))
 }
 
 @inline(never)
-public func highwayMinimumMagnitudeU16ConstantB(_ a: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func highwayMinimumMagnitudeU16ConstantB(_ a: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.Vector(
         raw: HighwayReference.Nothrow.minimumMagnitudeU16(
             a.raw,
@@ -222,28 +204,22 @@ public func highwayMinimumMagnitudeU16ConstantB(_ a: SIMDUInt16.Vector) -> SIMDU
 }
 
 @inline(never)
-public func portMaximumMagnitudeU16(
-    _ a: SIMDUInt16.Vector,
-    _ b: SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
+public func portMaximumMagnitudeU16(_ a: SIMD<UInt16>, _ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.maximumMagnitude(a, b)
 }
 
 @inline(never)
-public func highwayMaximumMagnitudeU16(
-    _ a: SIMDUInt16.Vector,
-    _ b: SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
+public func highwayMaximumMagnitudeU16(_ a: SIMD<UInt16>, _ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.Vector(raw: HighwayReference.Nothrow.maximumMagnitudeU16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMaximumMagnitudeU16ConstantA(_ b: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func portMaximumMagnitudeU16ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.maximumMagnitude(SIMDUInt16.repeating(26), b)
 }
 
 @inline(never)
-public func highwayMaximumMagnitudeU16ConstantA(_ b: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func highwayMaximumMagnitudeU16ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.Vector(
         raw: HighwayReference.Nothrow.maximumMagnitudeU16(
             SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
@@ -253,12 +229,12 @@ public func highwayMaximumMagnitudeU16ConstantA(_ b: SIMDUInt16.Vector) -> SIMDU
 }
 
 @inline(never)
-public func portMaximumMagnitudeU16ConstantB(_ a: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func portMaximumMagnitudeU16ConstantB(_ a: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.maximumMagnitude(a, SIMDUInt16.repeating(26))
 }
 
 @inline(never)
-public func highwayMaximumMagnitudeU16ConstantB(_ a: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
+public func highwayMaximumMagnitudeU16ConstantB(_ a: SIMD<UInt16>) -> SIMD<UInt16> {
     SIMDUInt16.Vector(
         raw: HighwayReference.Nothrow.maximumMagnitudeU16(
             a.raw,

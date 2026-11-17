@@ -29,7 +29,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningLower: a),
-                HighwayReference.vectorWideningLowerF16ToF32(a),
+                HighwayReference.vectorWideningLowerF16ToF32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -44,7 +44,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningUpper: a),
-                HighwayReference.vectorWideningUpperF16ToF32(a),
+                HighwayReference.vectorWideningUpperF16ToF32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -59,7 +59,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningEven: a),
-                HighwayReference.vectorWideningEvenF16ToF32(a),
+                HighwayReference.vectorWideningEvenF16ToF32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -74,7 +74,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningOdd: a),
-                HighwayReference.vectorWideningOddF16ToF32(a),
+                HighwayReference.vectorWideningOddF16ToF32(a.raw),
                 "a: \(describe(a))"
             )
         }

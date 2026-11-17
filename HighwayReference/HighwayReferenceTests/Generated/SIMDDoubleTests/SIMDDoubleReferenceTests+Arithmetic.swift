@@ -13,7 +13,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.adding(a, b),
-                HighwayReference.addingF64(a, b),
+                HighwayReference.addingF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -27,7 +27,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.subtracting(a, b),
-                HighwayReference.subtractingF64(a, b),
+                HighwayReference.subtractingF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -42,7 +42,7 @@ extension SIMDDoubleReferenceTests {
         {
             mismatches.check(
                 H.addingSubtracting(a, b),
-                HighwayReference.addingSubtractingF64(a, b),
+                HighwayReference.addingSubtractingF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -56,7 +56,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.dividing(a, b),
-                HighwayReference.dividingF64(a, b),
+                HighwayReference.dividingF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -72,7 +72,7 @@ extension SIMDDoubleReferenceTests {
         where !hasUnorderedNaNs(a, b, c) {
             mismatches.check(
                 H.clamped(a, between: b, and: c),
-                HighwayReference.clampedF64(a, b, c),
+                HighwayReference.clampedF64(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -86,7 +86,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.absoluteDifference(a, b),
-                HighwayReference.absoluteDifferenceF64(a, b),
+                HighwayReference.absoluteDifferenceF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -97,7 +97,7 @@ extension SIMDDoubleReferenceTests {
         let mismatches = Mismatches("negated")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA922_CB2A_2EC9_E739)
         for a in aInputs {
-            mismatches.check(H.negated(a), HighwayReference.negatedF64(a), "a: \(describe(a))")
+            mismatches.check(H.negated(a), HighwayReference.negatedF64(a.raw), "a: \(describe(a))")
         }
         mismatches.record()
     }
@@ -106,7 +106,11 @@ extension SIMDDoubleReferenceTests {
         let mismatches = Mismatches("magnitude")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x88F3_3EE3_4F91_691D)
         for a in aInputs {
-            mismatches.check(H.magnitude(a), HighwayReference.magnitudeF64(a), "a: \(describe(a))")
+            mismatches.check(
+                H.magnitude(a),
+                HighwayReference.magnitudeF64(a.raw),
+                "a: \(describe(a))"
+            )
         }
         mismatches.record()
     }
@@ -117,7 +121,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.squareRoot(a),
-                HighwayReference.squareRootF64(a),
+                HighwayReference.squareRootF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -130,7 +134,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.approximateReciprocalSquareRoot(a),
-                HighwayReference.approximateReciprocalSquareRootF64(a),
+                HighwayReference.approximateReciprocalSquareRootF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -143,7 +147,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.approximateReciprocal(a),
-                HighwayReference.approximateReciprocalF64(a),
+                HighwayReference.approximateReciprocalF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -154,7 +158,11 @@ extension SIMDDoubleReferenceTests {
         let mismatches = Mismatches("exponent")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x04F7_9DDA_00BB_31FC)
         for a in aInputs {
-            mismatches.check(H.exponent(a), HighwayReference.exponentF64(a), "a: \(describe(a))")
+            mismatches.check(
+                H.exponent(a),
+                HighwayReference.exponentF64(a.raw),
+                "a: \(describe(a))"
+            )
         }
         mismatches.record()
     }
@@ -163,7 +171,11 @@ extension SIMDDoubleReferenceTests {
         let mismatches = Mismatches("mantissa")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA38D_B48C_7891_5783)
         for a in aInputs {
-            mismatches.check(H.mantissa(a), HighwayReference.mantissaF64(a), "a: \(describe(a))")
+            mismatches.check(
+                H.mantissa(a),
+                HighwayReference.mantissaF64(a.raw),
+                "a: \(describe(a))"
+            )
         }
         mismatches.record()
     }
@@ -175,7 +187,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(adjacentLanesOf: a, b) {
             mismatches.check(
                 H.pairwiseAdding(a, b),
-                HighwayReference.pairwiseAddingF64(a, b),
+                HighwayReference.pairwiseAddingF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -189,7 +201,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.pairwiseSubtracting(a, b),
-                HighwayReference.pairwiseSubtractingF64(a, b),
+                HighwayReference.pairwiseSubtractingF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -200,7 +212,11 @@ extension SIMDDoubleReferenceTests {
         let mismatches = Mismatches("sumsOf2FromFloat")
         let aInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0x39D9_6843_D1EE_4C1A)
         for a in aInputs where !hasUnorderedNaNs(adjacentLanesOf: a) {
-            mismatches.check(H.sumsOf2(a), HighwayReference.sumsOf2F32ToF64(a), "a: \(describe(a))")
+            mismatches.check(
+                H.sumsOf2(a),
+                HighwayReference.sumsOf2F32ToF64(a.raw),
+                "a: \(describe(a))"
+            )
         }
         mismatches.record()
     }
@@ -210,7 +226,11 @@ extension SIMDDoubleReferenceTests {
         let mismatches = Mismatches("sumsOf4FromFloat16")
         let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0x432A_0DBC_573C_A8BF)
         for a in aInputs where !hasUnorderedNaNs(adjacentQuadsOf: a) {
-            mismatches.check(H.sumsOf4(a), HighwayReference.sumsOf4F16ToF64(a), "a: \(describe(a))")
+            mismatches.check(
+                H.sumsOf4(a),
+                HighwayReference.sumsOf4F16ToF64(a.raw),
+                "a: \(describe(a))"
+            )
         }
         mismatches.record()
     }

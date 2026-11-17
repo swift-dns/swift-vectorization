@@ -400,7 +400,7 @@ extension SIMDFloatReferenceTests {
                 (
                     unsafe H.load(from: source.baseAddress!, where: mask, otherwise: otherwise),
                     unsafe HighwayReference.loadWhereOtherwiseF32(
-                        otherwise,
+                        otherwise.raw,
                         mask.raw,
                         source.baseAddress!
                     )
@@ -433,7 +433,7 @@ extension SIMDFloatReferenceTests {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
                     unsafe H.load(from: source, where: mask, otherwise: otherwise),
-                    unsafe HighwayReference.loadWhereOtherwiseF32(otherwise, mask.raw, source)
+                    unsafe HighwayReference.loadWhereOtherwiseF32(otherwise.raw, mask.raw, source)
                 )
             }.result
             mismatches.check(
@@ -473,7 +473,7 @@ extension SIMDFloatReferenceTests {
             ) { source in
                 (
                     unsafe H.load(from: source, where: mask, otherwise: otherwise),
-                    unsafe HighwayReference.loadWhereOtherwiseF32(otherwise, mask.raw, source)
+                    unsafe HighwayReference.loadWhereOtherwiseF32(otherwise.raw, mask.raw, source)
                 )
             }.result
             mismatches.check(
@@ -504,7 +504,7 @@ extension SIMDFloatReferenceTests {
                 (
                     unsafe H.load(from: source.baseAddress!, where: mask, otherwise: otherwise),
                     unsafe HighwayReference.loadWhereOtherwiseF32(
-                        otherwise,
+                        otherwise.raw,
                         mask.raw,
                         source.baseAddress!
                     )
@@ -578,7 +578,7 @@ extension SIMDFloatReferenceTests {
                         otherwise: otherwise
                     ),
                     unsafe HighwayReference.loadFirstOtherwiseF32(
-                        otherwise,
+                        otherwise.raw,
                         source.baseAddress!,
                         count
                     )
@@ -612,7 +612,7 @@ extension SIMDFloatReferenceTests {
                 source in
                 (
                     unsafe H.loadFirst(from: source, count: count, otherwise: otherwise),
-                    unsafe HighwayReference.loadFirstOtherwiseF32(otherwise, source, count)
+                    unsafe HighwayReference.loadFirstOtherwiseF32(otherwise.raw, source, count)
                 )
             }.result
             mismatches.check(
@@ -636,7 +636,7 @@ extension SIMDFloatReferenceTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadingUpperHalf(a, from: source.baseAddress!),
-                    unsafe HighwayReference.loadingUpperHalfF32(source.baseAddress!, a)
+                    unsafe HighwayReference.loadingUpperHalfF32(source.baseAddress!, a.raw)
                 )
             }
             mismatches.check(
@@ -660,7 +660,7 @@ extension SIMDFloatReferenceTests {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
                     unsafe H.loadingUpperHalf(a, from: source),
-                    unsafe HighwayReference.loadingUpperHalfF32(source, a)
+                    unsafe HighwayReference.loadingUpperHalfF32(source, a.raw)
                 )
             }.result
             mismatches.check(

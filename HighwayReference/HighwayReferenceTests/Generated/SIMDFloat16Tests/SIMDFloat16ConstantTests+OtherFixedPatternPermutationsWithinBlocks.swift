@@ -19,7 +19,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.oddEven(H.repeating(value), b),
-                HighwayReference.oddEvenF16(H.repeating(value), b),
+                HighwayReference.oddEvenF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -38,7 +38,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.oddEven(a, H.repeating(value)),
-                HighwayReference.oddEvenF16(a, H.repeating(value)),
+                HighwayReference.oddEvenF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -150,7 +150,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.duplicatingEven(H.repeating(value)),
-            HighwayReference.duplicatingEvenF16(H.repeating(value)),
+            HighwayReference.duplicatingEvenF16(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -242,7 +242,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.duplicatingOdd(H.repeating(value)),
-            HighwayReference.duplicatingOddF16(H.repeating(value)),
+            HighwayReference.duplicatingOddF16(H.repeating(value).raw),
             ""
         )
         mismatches.record()

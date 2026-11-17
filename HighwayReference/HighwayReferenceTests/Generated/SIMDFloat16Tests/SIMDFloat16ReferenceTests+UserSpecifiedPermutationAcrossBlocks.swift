@@ -19,7 +19,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 H.tableLookupLanes(a, at: indices),
-                HighwayReference.tableLookupLanesF16(a, indices.raw),
+                HighwayReference.tableLookupLanesF16(a.raw, indices.raw),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -38,7 +38,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 unsafe H.tableLookupLanes(a, atUnchecked: indices),
-                HighwayReference.tableLookupLanesF16(a, indices.raw),
+                HighwayReference.tableLookupLanesF16(a.raw, indices.raw),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -64,7 +64,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 unsafe H.tableLookupLanes(a, atUnchecked: indices),
-                HighwayReference.tableLookupLanesF16(a, indices.raw),
+                HighwayReference.tableLookupLanesF16(a.raw, indices.raw),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -89,7 +89,7 @@ extension SIMDFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.twoTablesLookupLanes(a, b, at: indices),
-                HighwayReference.twoTablesLookupLanesF16(a, b, indices.raw),
+                HighwayReference.twoTablesLookupLanesF16(a.raw, b.raw, indices.raw),
                 "a: \(describe(a)), b: \(describe(b)), indices: \(describe(indices))"
             )
         }
@@ -114,7 +114,7 @@ extension SIMDFloat16ReferenceTests {
         ) {
             mismatches.check(
                 unsafe H.twoTablesLookupLanes(a, b, atUnchecked: indices),
-                HighwayReference.twoTablesLookupLanesF16(a, b, indices.raw),
+                HighwayReference.twoTablesLookupLanesF16(a.raw, b.raw, indices.raw),
                 "a: \(describe(a)), b: \(describe(b)), indices: \(describe(indices))"
             )
         }
@@ -140,7 +140,7 @@ extension SIMDFloat16ReferenceTests {
         ) {
             mismatches.check(
                 unsafe H.twoTablesLookupLanes(a, b, atUnchecked: indices),
-                HighwayReference.twoTablesLookupLanesF16(a, b, indices.raw),
+                HighwayReference.twoTablesLookupLanesF16(a.raw, b.raw, indices.raw),
                 "a: \(describe(a)), b: \(describe(b)), indices: \(describe(indices))"
             )
         }
@@ -375,7 +375,7 @@ extension SIMDFloat16ReferenceTests {
             mismatches.check(
                 H.shuffledPer4Lanes(a, i3, i2, i1, i0),
                 HighwayReference.shuffledPer4LanesF16(
-                    a,
+                    a.raw,
                     Int32(truncatingIfNeeded: i3),
                     Int32(truncatingIfNeeded: i2),
                     Int32(truncatingIfNeeded: i1),
@@ -405,7 +405,7 @@ extension SIMDFloat16ReferenceTests {
             mismatches.check(
                 unsafe H.shuffledPer4Lanes(a, unchecked: i3, i2, i1, i0),
                 HighwayReference.shuffledPer4LanesF16(
-                    a,
+                    a.raw,
                     Int32(truncatingIfNeeded: i3),
                     Int32(truncatingIfNeeded: i2),
                     Int32(truncatingIfNeeded: i1),

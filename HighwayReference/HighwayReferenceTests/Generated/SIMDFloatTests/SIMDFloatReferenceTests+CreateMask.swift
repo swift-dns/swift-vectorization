@@ -25,7 +25,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.mask(from: a),
-                H.Mask(raw: HighwayReference.maskFromVectorF32(a)),
+                H.Mask(raw: HighwayReference.maskFromVectorF32(a.raw)),
                 "a: \(describe(a))"
             )
         }

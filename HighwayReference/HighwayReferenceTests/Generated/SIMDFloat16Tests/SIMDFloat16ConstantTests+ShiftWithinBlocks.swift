@@ -20,7 +20,7 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.shiftedLeftBytes(H.repeating(value), by: bytes),
                 HighwayReference.shiftedLeftBytesF16(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: bytes)
                 ),
                 "bytes: \(bytes)"
@@ -118,7 +118,7 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.shiftedRightBytes(H.repeating(value), by: bytes),
                 HighwayReference.shiftedRightBytesF16(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: bytes)
                 ),
                 "bytes: \(bytes)"
@@ -216,7 +216,7 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.shiftedLeftLanes(H.repeating(value), by: lanes),
                 HighwayReference.shiftedLeftLanesF16(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: lanes)
                 ),
                 "lanes: \(lanes)"
@@ -314,7 +314,7 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.shiftedRightLanes(H.repeating(value), by: lanes),
                 HighwayReference.shiftedRightLanesF16(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: lanes)
                 ),
                 "lanes: \(lanes)"
@@ -413,8 +413,8 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.combinedShiftedRightBytes(H.repeating(value), b, by: bytes),
                 HighwayReference.combinedShiftedRightBytesF16(
-                    H.repeating(value),
-                    b,
+                    H.repeating(value).raw,
+                    b.raw,
                     Int32(truncatingIfNeeded: bytes)
                 ),
                 "b: \(describe(b)), bytes: \(bytes)"
@@ -437,8 +437,8 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.combinedShiftedRightBytes(a, H.repeating(value), by: bytes),
                 HighwayReference.combinedShiftedRightBytesF16(
-                    a,
-                    H.repeating(value),
+                    a.raw,
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: bytes)
                 ),
                 "a: \(describe(a)), bytes: \(bytes)"
@@ -556,8 +556,8 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.combinedShiftedRightLanes(H.repeating(value), b, by: lanes),
                 HighwayReference.combinedShiftedRightLanesF16(
-                    H.repeating(value),
-                    b,
+                    H.repeating(value).raw,
+                    b.raw,
                     Int32(truncatingIfNeeded: lanes)
                 ),
                 "b: \(describe(b)), lanes: \(lanes)"
@@ -580,8 +580,8 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.combinedShiftedRightLanes(a, H.repeating(value), by: lanes),
                 HighwayReference.combinedShiftedRightLanesF16(
-                    a,
-                    H.repeating(value),
+                    a.raw,
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: lanes)
                 ),
                 "a: \(describe(a)), lanes: \(lanes)"

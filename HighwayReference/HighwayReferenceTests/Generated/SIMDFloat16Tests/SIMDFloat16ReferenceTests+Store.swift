@@ -18,7 +18,7 @@ extension SIMDFloat16ReferenceTests {
             }
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeF16(a, destination.baseAddress!)
+                unsafe HighwayReference.storeF16(a.raw, destination.baseAddress!)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
@@ -34,7 +34,7 @@ extension SIMDFloat16ReferenceTests {
                 unsafe H.store(a, to: destination)
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.storeF16(a, destination)
+                unsafe HighwayReference.storeF16(a.raw, destination)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
@@ -89,7 +89,7 @@ extension SIMDFloat16ReferenceTests {
                 destination in unsafe H.storeAligned(a, to: destination)
             }
             let (_, referenceLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
-                destination in unsafe HighwayReference.storeAlignedF16(a, destination)
+                destination in unsafe HighwayReference.storeAlignedF16(a.raw, destination)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
@@ -105,7 +105,7 @@ extension SIMDFloat16ReferenceTests {
                 unsafe H.storeAligned(a, to: destination)
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.storeAlignedF16(a, destination)
+                unsafe HighwayReference.storeAlignedF16(a.raw, destination)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
@@ -179,7 +179,7 @@ extension SIMDFloat16ReferenceTests {
             }
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeFirstF16(a, destination.baseAddress!, count)
+                unsafe HighwayReference.storeFirstF16(a.raw, destination.baseAddress!, count)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), count: \(count)")
         }
@@ -196,7 +196,7 @@ extension SIMDFloat16ReferenceTests {
                 destination in unsafe H.storeFirst(a, to: destination, count: count)
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(count))) {
-                destination in unsafe HighwayReference.storeFirstF16(a, destination, count)
+                destination in unsafe HighwayReference.storeFirstF16(a.raw, destination, count)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), count: \(count)")
         }
@@ -231,7 +231,7 @@ extension SIMDFloat16ReferenceTests {
             }
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeWhereF16(a, mask.raw, destination.baseAddress!)
+                unsafe HighwayReference.storeWhereF16(a.raw, mask.raw, destination.baseAddress!)
             }
             mismatches.check(
                 portLanes,
@@ -252,7 +252,7 @@ extension SIMDFloat16ReferenceTests {
                 unsafe H.store(a, to: destination, where: mask)
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.storeWhereF16(a, mask.raw, destination)
+                unsafe HighwayReference.storeWhereF16(a.raw, mask.raw, destination)
             }
             mismatches.check(
                 portLanes,
@@ -282,7 +282,7 @@ extension SIMDFloat16ReferenceTests {
             ) { destination in unsafe H.store(a, to: destination, where: mask) }
             let (_, referenceLanes) = unsafe withGuardedLanes(
                 Array(sentinel.prefix(lanesThroughLastTrue(of: mask)))
-            ) { destination in unsafe HighwayReference.storeWhereF16(a, mask.raw, destination) }
+            ) { destination in unsafe HighwayReference.storeWhereF16(a.raw, mask.raw, destination) }
             mismatches.check(
                 portLanes,
                 referenceLanes,
@@ -304,7 +304,7 @@ extension SIMDFloat16ReferenceTests {
             }
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeWhereF16(a, mask.raw, destination.baseAddress!)
+                unsafe HighwayReference.storeWhereF16(a.raw, mask.raw, destination.baseAddress!)
             }
             mismatches.check(
                 portLanes,

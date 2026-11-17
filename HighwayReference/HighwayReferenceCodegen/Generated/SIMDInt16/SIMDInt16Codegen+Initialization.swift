@@ -4,114 +4,110 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portZeroI16() -> SIMDInt16.Vector {
+public func portZeroI16() -> SIMD<Int16> {
     SIMDInt16.zero()
 }
 
 @inline(never)
-public func highwayZeroI16() -> SIMDInt16.Vector {
+public func highwayZeroI16() -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.zeroI16())
 }
 
 @inline(never)
-public func portRepeatingI16(_ value: SIMDInt16.Lane) -> SIMDInt16.Vector {
+public func portRepeatingI16(_ value: Int16) -> SIMD<Int16> {
     SIMDInt16.repeating(value)
 }
 
 @inline(never)
-public func highwayRepeatingI16(_ value: Int16) -> SIMDInt16.Vector {
+public func highwayRepeatingI16(_ value: Int16) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(value))
 }
 
 @inline(never)
-public func portRepeatingI16ConstantValue() -> SIMDInt16.Vector {
+public func portRepeatingI16ConstantValue() -> SIMD<Int16> {
     SIMDInt16.repeating(26)
 }
 
 @inline(never)
-public func highwayRepeatingI16ConstantValue() -> SIMDInt16.Vector {
+public func highwayRepeatingI16ConstantValue() -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26))
 }
 
 @inline(never)
-public func portIotaI16(_ value: SIMDInt16.Lane) -> SIMDInt16.Vector {
+public func portIotaI16(_ value: Int16) -> SIMD<Int16> {
     SIMDInt16.iota(value)
 }
 
 @inline(never)
-public func highwayIotaI16(_ value: Int16) -> SIMDInt16.Vector {
+public func highwayIotaI16(_ value: Int16) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.iotaI16(value))
 }
 
 @inline(never)
-public func portIotaI16ConstantValue() -> SIMDInt16.Vector {
+public func portIotaI16ConstantValue() -> SIMD<Int16> {
     SIMDInt16.iota(26)
 }
 
 @inline(never)
-public func highwayIotaI16ConstantValue() -> SIMDInt16.Vector {
+public func highwayIotaI16ConstantValue() -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.iotaI16(26))
 }
 
 @inline(never)
-public func portSignBitI16() -> SIMDInt16.Vector {
+public func portSignBitI16() -> SIMD<Int16> {
     SIMDInt16.signBit()
 }
 
 @inline(never)
-public func highwaySignBitI16() -> SIMDInt16.Vector {
+public func highwaySignBitI16() -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.signBitI16())
 }
 
 @inline(never)
-public func portUnspecifiedI16() -> SIMDInt16.Vector {
+public func portUnspecifiedI16() -> SIMD<Int16> {
     SIMDInt16.unspecified()
 }
 
 @inline(never)
-public func highwayUnspecifiedI16() -> SIMDInt16.Vector {
+public func highwayUnspecifiedI16() -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.unspecifiedI16())
 }
 
 @inline(never)
-public func portRepeatingWhereI16(
-    _ value: SIMDInt16.Lane,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+public func portRepeatingWhereI16(_ value: Int16, where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
     SIMDInt16.repeating(value, where: mask)
 }
 
 @inline(never)
-public func highwayRepeatingWhereI16(_ value: Int16, where mask: SIMDInt16.Mask) -> SIMDInt16.Vector
-{
+public func highwayRepeatingWhereI16(_ value: Int16, where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingWhereI16(mask.raw, value))
 }
 
 @inline(never)
-public func portRepeatingWhereI16ConstantValue(where mask: SIMDInt16.Mask) -> SIMDInt16.Vector {
+public func portRepeatingWhereI16ConstantValue(where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
     SIMDInt16.repeating(26, where: mask)
 }
 
 @inline(never)
-public func highwayRepeatingWhereI16ConstantValue(where mask: SIMDInt16.Mask) -> SIMDInt16.Vector {
+public func highwayRepeatingWhereI16ConstantValue(where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingWhereI16(mask.raw, 26))
 }
 
 @inline(never)
 public func portRepeatingWhereOtherwiseI16(
-    _ value: SIMDInt16.Lane,
-    where mask: SIMDInt16.Mask,
-    otherwise: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    _ value: Int16,
+    where mask: SIMD<Int16>.Mask,
+    otherwise: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.repeating(value, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayRepeatingWhereOtherwiseI16(
     _ value: Int16,
-    where mask: SIMDInt16.Mask,
-    otherwise: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    where mask: SIMD<Int16>.Mask,
+    otherwise: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.repeatingWhereOtherwiseI16(otherwise.raw, mask.raw, value)
     )
@@ -119,17 +115,17 @@ public func highwayRepeatingWhereOtherwiseI16(
 
 @inline(never)
 public func portRepeatingWhereOtherwiseI16ConstantValue(
-    where mask: SIMDInt16.Mask,
-    otherwise: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    where mask: SIMD<Int16>.Mask,
+    otherwise: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.repeating(26, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayRepeatingWhereOtherwiseI16ConstantValue(
-    where mask: SIMDInt16.Mask,
-    otherwise: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    where mask: SIMD<Int16>.Mask,
+    otherwise: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.repeatingWhereOtherwiseI16(otherwise.raw, mask.raw, 26)
     )
@@ -137,17 +133,17 @@ public func highwayRepeatingWhereOtherwiseI16ConstantValue(
 
 @inline(never)
 public func portRepeatingWhereOtherwiseI16ConstantOtherwise(
-    _ value: SIMDInt16.Lane,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+    _ value: Int16,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16> {
     SIMDInt16.repeating(value, where: mask, otherwise: SIMDInt16.repeating(26))
 }
 
 @inline(never)
 public func highwayRepeatingWhereOtherwiseI16ConstantOtherwise(
     _ value: Int16,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.repeatingWhereOtherwiseI16(
             SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
@@ -167,7 +163,7 @@ public func portRepeatingBlockI16(
     _ v5: SIMDInt16.Lane,
     _ v6: SIMDInt16.Lane,
     _ v7: SIMDInt16.Lane
-) -> SIMDInt16.Vector {
+) -> SIMD<Int16> {
     SIMDInt16.repeatingBlock(v0, v1, v2, v3, v4, v5, v6, v7)
 }
 
@@ -181,7 +177,7 @@ public func highwayRepeatingBlockI16(
     _ v5: Int16,
     _ v6: Int16,
     _ v7: Int16
-) -> SIMDInt16.Vector {
+) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.repeatingBlockI16(v0, v1, v2, v3, v4, v5, v6, v7)
     )

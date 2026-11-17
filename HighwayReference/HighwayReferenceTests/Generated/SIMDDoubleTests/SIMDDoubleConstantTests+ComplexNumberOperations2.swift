@@ -21,9 +21,9 @@ extension SIMDDoubleConstantTests {
                 H.multiplyAddingComplexConjugate(H.repeating(value), b, c, where: mask),
                 HighwayReference.multiplyAddingComplexConjugateWhereF64(
                     mask.raw,
-                    H.repeating(value),
-                    b,
-                    c
+                    H.repeating(value).raw,
+                    b.raw,
+                    c.raw
                 ),
                 "mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
             )
@@ -46,9 +46,9 @@ extension SIMDDoubleConstantTests {
                 H.multiplyAddingComplexConjugate(a, H.repeating(value), c, where: mask),
                 HighwayReference.multiplyAddingComplexConjugateWhereF64(
                     mask.raw,
-                    a,
-                    H.repeating(value),
-                    c
+                    a.raw,
+                    H.repeating(value).raw,
+                    c.raw
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
             )
@@ -71,9 +71,9 @@ extension SIMDDoubleConstantTests {
                 H.multiplyAddingComplexConjugate(a, b, H.repeating(value), where: mask),
                 HighwayReference.multiplyAddingComplexConjugateWhereF64(
                     mask.raw,
-                    a,
-                    b,
-                    H.repeating(value)
+                    a.raw,
+                    b.raw,
+                    H.repeating(value).raw
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )

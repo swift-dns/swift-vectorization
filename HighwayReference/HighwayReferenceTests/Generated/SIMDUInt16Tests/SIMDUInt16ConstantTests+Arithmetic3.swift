@@ -18,7 +18,9 @@ extension SIMDUInt16ConstantTests {
         )
         mismatches.check(
             H.biasedExponent(SIMDFloat16.repeating(value)),
-            H.Vector(raw: HighwayReference.biasedExponentF16ToU16(SIMDFloat16.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.biasedExponentF16ToU16(SIMDFloat16.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()

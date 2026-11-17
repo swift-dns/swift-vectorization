@@ -4,32 +4,30 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portIsNaNWhereF64(
-    _ a: SIMDDouble.Vector,
-    where mask: SIMDDouble.Mask
-) -> SIMDDouble.Mask {
+public func portIsNaNWhereF64(_ a: SIMD<Double>, where mask: SIMD<Double>.Mask) -> SIMD<Double>.Mask
+{
     SIMDDouble.isNaN(a, where: mask)
 }
 
 @inline(never)
 public func highwayIsNaNWhereF64(
-    _ a: SIMDDouble.Vector,
-    where mask: SIMDDouble.Mask
-) -> SIMDDouble.Mask {
-    SIMDDouble.Mask(raw: HighwayReference.Nothrow.isNaNWhereF64(mask.raw, a))
+    _ a: SIMD<Double>,
+    where mask: SIMD<Double>.Mask
+) -> SIMD<Double>.Mask {
+    SIMDDouble.Mask(raw: HighwayReference.Nothrow.isNaNWhereF64(mask.raw, a.raw))
 }
 
 @inline(never)
-public func portIsNaNWhereF64ConstantA(where mask: SIMDDouble.Mask) -> SIMDDouble.Mask {
+public func portIsNaNWhereF64ConstantA(where mask: SIMD<Double>.Mask) -> SIMD<Double>.Mask {
     SIMDDouble.isNaN(SIMDDouble.repeating(1.5), where: mask)
 }
 
 @inline(never)
-public func highwayIsNaNWhereF64ConstantA(where mask: SIMDDouble.Mask) -> SIMDDouble.Mask {
+public func highwayIsNaNWhereF64ConstantA(where mask: SIMD<Double>.Mask) -> SIMD<Double>.Mask {
     SIMDDouble.Mask(
         raw: HighwayReference.Nothrow.isNaNWhereF64(
             mask.raw,
-            HighwayReference.Nothrow.repeatingF64(1.5)
+            HighwayReference.Nothrow.repeatingF64(1.5).raw
         )
     )
 }

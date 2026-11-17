@@ -5,35 +5,35 @@ public import Vectorization
 
 @inline(never)
 public func portEqualToWhereI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.equalTo(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayEqualToWhereI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.Mask(raw: HighwayReference.Nothrow.equalToWhereI16(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portEqualToWhereI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.equalTo(SIMDInt16.repeating(26), b, where: mask)
 }
 
 @inline(never)
 public func highwayEqualToWhereI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.Mask(
         raw: HighwayReference.Nothrow.equalToWhereI16(
             mask.raw,
@@ -45,17 +45,17 @@ public func highwayEqualToWhereI16ConstantA(
 
 @inline(never)
 public func portEqualToWhereI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.equalTo(a, SIMDInt16.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayEqualToWhereI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.Mask(
         raw: HighwayReference.Nothrow.equalToWhereI16(
             mask.raw,
@@ -67,35 +67,35 @@ public func highwayEqualToWhereI16ConstantB(
 
 @inline(never)
 public func portNotEqualToWhereI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.notEqualTo(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayNotEqualToWhereI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.Mask(raw: HighwayReference.Nothrow.notEqualToWhereI16(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portNotEqualToWhereI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.notEqualTo(SIMDInt16.repeating(26), b, where: mask)
 }
 
 @inline(never)
 public func highwayNotEqualToWhereI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.Mask(
         raw: HighwayReference.Nothrow.notEqualToWhereI16(
             mask.raw,
@@ -107,17 +107,17 @@ public func highwayNotEqualToWhereI16ConstantA(
 
 @inline(never)
 public func portNotEqualToWhereI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.notEqualTo(a, SIMDInt16.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayNotEqualToWhereI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.Mask(
         raw: HighwayReference.Nothrow.notEqualToWhereI16(
             mask.raw,
@@ -129,35 +129,35 @@ public func highwayNotEqualToWhereI16ConstantB(
 
 @inline(never)
 public func portLessThanWhereI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.lessThan(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayLessThanWhereI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.Mask(raw: HighwayReference.Nothrow.lessThanWhereI16(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portLessThanWhereI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.lessThan(SIMDInt16.repeating(26), b, where: mask)
 }
 
 @inline(never)
 public func highwayLessThanWhereI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.Mask(
         raw: HighwayReference.Nothrow.lessThanWhereI16(
             mask.raw,
@@ -169,17 +169,17 @@ public func highwayLessThanWhereI16ConstantA(
 
 @inline(never)
 public func portLessThanWhereI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.lessThan(a, SIMDInt16.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayLessThanWhereI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.Mask(
         raw: HighwayReference.Nothrow.lessThanWhereI16(
             mask.raw,
@@ -191,35 +191,35 @@ public func highwayLessThanWhereI16ConstantB(
 
 @inline(never)
 public func portGreaterThanWhereI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.greaterThan(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayGreaterThanWhereI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.Mask(raw: HighwayReference.Nothrow.greaterThanWhereI16(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portGreaterThanWhereI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.greaterThan(SIMDInt16.repeating(26), b, where: mask)
 }
 
 @inline(never)
 public func highwayGreaterThanWhereI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.Mask(
         raw: HighwayReference.Nothrow.greaterThanWhereI16(
             mask.raw,
@@ -231,17 +231,17 @@ public func highwayGreaterThanWhereI16ConstantA(
 
 @inline(never)
 public func portGreaterThanWhereI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.greaterThan(a, SIMDInt16.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayGreaterThanWhereI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.Mask(
         raw: HighwayReference.Nothrow.greaterThanWhereI16(
             mask.raw,
@@ -253,35 +253,35 @@ public func highwayGreaterThanWhereI16ConstantB(
 
 @inline(never)
 public func portLessThanOrEqualToWhereI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.lessThanOrEqualTo(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayLessThanOrEqualToWhereI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.Mask(raw: HighwayReference.Nothrow.lessThanOrEqualToWhereI16(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portLessThanOrEqualToWhereI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.lessThanOrEqualTo(SIMDInt16.repeating(26), b, where: mask)
 }
 
 @inline(never)
 public func highwayLessThanOrEqualToWhereI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.Mask(
         raw: HighwayReference.Nothrow.lessThanOrEqualToWhereI16(
             mask.raw,
@@ -293,17 +293,17 @@ public func highwayLessThanOrEqualToWhereI16ConstantA(
 
 @inline(never)
 public func portLessThanOrEqualToWhereI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.lessThanOrEqualTo(a, SIMDInt16.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayLessThanOrEqualToWhereI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.Mask(
         raw: HighwayReference.Nothrow.lessThanOrEqualToWhereI16(
             mask.raw,
@@ -315,19 +315,19 @@ public func highwayLessThanOrEqualToWhereI16ConstantB(
 
 @inline(never)
 public func portGreaterThanOrEqualToWhereI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.greaterThanOrEqualTo(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayGreaterThanOrEqualToWhereI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.Mask(
         raw: HighwayReference.Nothrow.greaterThanOrEqualToWhereI16(mask.raw, a.raw, b.raw)
     )
@@ -335,17 +335,17 @@ public func highwayGreaterThanOrEqualToWhereI16(
 
 @inline(never)
 public func portGreaterThanOrEqualToWhereI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.greaterThanOrEqualTo(SIMDInt16.repeating(26), b, where: mask)
 }
 
 @inline(never)
 public func highwayGreaterThanOrEqualToWhereI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.Mask(
         raw: HighwayReference.Nothrow.greaterThanOrEqualToWhereI16(
             mask.raw,
@@ -357,17 +357,17 @@ public func highwayGreaterThanOrEqualToWhereI16ConstantA(
 
 @inline(never)
 public func portGreaterThanOrEqualToWhereI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.greaterThanOrEqualTo(a, SIMDInt16.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayGreaterThanOrEqualToWhereI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Mask {
+    _ a: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16>.Mask {
     SIMDInt16.Mask(
         raw: HighwayReference.Nothrow.greaterThanOrEqualToWhereI16(
             mask.raw,

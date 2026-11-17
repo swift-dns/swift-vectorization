@@ -16,7 +16,7 @@ extension SIMDDoubleConstantTests {
         where !hasUnorderedNaNs(multiplying: H.repeating(value), b, adding: c) {
             mismatches.check(
                 H.multiplyAdding(H.repeating(value), b, c),
-                HighwayReference.multiplyAddingF64(H.repeating(value), b, c),
+                HighwayReference.multiplyAddingF64(H.repeating(value).raw, b.raw, c.raw),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -33,7 +33,7 @@ extension SIMDDoubleConstantTests {
         where !hasUnorderedNaNs(multiplying: a, H.repeating(value), adding: c) {
             mismatches.check(
                 H.multiplyAdding(a, H.repeating(value), c),
-                HighwayReference.multiplyAddingF64(a, H.repeating(value), c),
+                HighwayReference.multiplyAddingF64(a.raw, H.repeating(value).raw, c.raw),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -50,7 +50,7 @@ extension SIMDDoubleConstantTests {
         where !hasUnorderedNaNs(multiplying: a, b, adding: H.repeating(value)) {
             mismatches.check(
                 H.multiplyAdding(a, b, H.repeating(value)),
-                HighwayReference.multiplyAddingF64(a, b, H.repeating(value)),
+                HighwayReference.multiplyAddingF64(a.raw, b.raw, H.repeating(value).raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -181,7 +181,7 @@ extension SIMDDoubleConstantTests {
         where !hasUnorderedNaNs(negating: H.repeating(value), b, adding: c) {
             mismatches.check(
                 H.negatedMultiplyAdding(H.repeating(value), b, c),
-                HighwayReference.negatedMultiplyAddingF64(H.repeating(value), b, c),
+                HighwayReference.negatedMultiplyAddingF64(H.repeating(value).raw, b.raw, c.raw),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -198,7 +198,7 @@ extension SIMDDoubleConstantTests {
         where !hasUnorderedNaNs(negating: a, H.repeating(value), adding: c) {
             mismatches.check(
                 H.negatedMultiplyAdding(a, H.repeating(value), c),
-                HighwayReference.negatedMultiplyAddingF64(a, H.repeating(value), c),
+                HighwayReference.negatedMultiplyAddingF64(a.raw, H.repeating(value).raw, c.raw),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -215,7 +215,7 @@ extension SIMDDoubleConstantTests {
         where !hasUnorderedNaNs(negating: a, b, adding: H.repeating(value)) {
             mismatches.check(
                 H.negatedMultiplyAdding(a, b, H.repeating(value)),
-                HighwayReference.negatedMultiplyAddingF64(a, b, H.repeating(value)),
+                HighwayReference.negatedMultiplyAddingF64(a.raw, b.raw, H.repeating(value).raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -346,7 +346,7 @@ extension SIMDDoubleConstantTests {
         where !hasUnorderedNaNs(multiplying: H.repeating(value), b, adding: c) {
             mismatches.check(
                 H.multiplySubtracting(H.repeating(value), b, c),
-                HighwayReference.multiplySubtractingF64(H.repeating(value), b, c),
+                HighwayReference.multiplySubtractingF64(H.repeating(value).raw, b.raw, c.raw),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -363,7 +363,7 @@ extension SIMDDoubleConstantTests {
         where !hasUnorderedNaNs(multiplying: a, H.repeating(value), adding: c) {
             mismatches.check(
                 H.multiplySubtracting(a, H.repeating(value), c),
-                HighwayReference.multiplySubtractingF64(a, H.repeating(value), c),
+                HighwayReference.multiplySubtractingF64(a.raw, H.repeating(value).raw, c.raw),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -380,7 +380,7 @@ extension SIMDDoubleConstantTests {
         where !hasUnorderedNaNs(multiplying: a, b, adding: H.repeating(value)) {
             mismatches.check(
                 H.multiplySubtracting(a, b, H.repeating(value)),
-                HighwayReference.multiplySubtractingF64(a, b, H.repeating(value)),
+                HighwayReference.multiplySubtractingF64(a.raw, b.raw, H.repeating(value).raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -511,7 +511,11 @@ extension SIMDDoubleConstantTests {
         where !hasUnorderedNaNs(negating: H.repeating(value), b, adding: c) {
             mismatches.check(
                 H.negatedMultiplySubtracting(H.repeating(value), b, c),
-                HighwayReference.negatedMultiplySubtractingF64(H.repeating(value), b, c),
+                HighwayReference.negatedMultiplySubtractingF64(
+                    H.repeating(value).raw,
+                    b.raw,
+                    c.raw
+                ),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -528,7 +532,11 @@ extension SIMDDoubleConstantTests {
         where !hasUnorderedNaNs(negating: a, H.repeating(value), adding: c) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, H.repeating(value), c),
-                HighwayReference.negatedMultiplySubtractingF64(a, H.repeating(value), c),
+                HighwayReference.negatedMultiplySubtractingF64(
+                    a.raw,
+                    H.repeating(value).raw,
+                    c.raw
+                ),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -545,7 +553,11 @@ extension SIMDDoubleConstantTests {
         where !hasUnorderedNaNs(negating: a, b, adding: H.repeating(value)) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, b, H.repeating(value)),
-                HighwayReference.negatedMultiplySubtractingF64(a, b, H.repeating(value)),
+                HighwayReference.negatedMultiplySubtractingF64(
+                    a.raw,
+                    b.raw,
+                    H.repeating(value).raw
+                ),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -676,7 +688,7 @@ extension SIMDDoubleConstantTests {
         where !hasUnorderedNaNs(multiplying: H.repeating(value), b, adding: c) {
             mismatches.check(
                 H.multiplyAddingSubtracting(H.repeating(value), b, c),
-                HighwayReference.multiplyAddingSubtractingF64(H.repeating(value), b, c),
+                HighwayReference.multiplyAddingSubtractingF64(H.repeating(value).raw, b.raw, c.raw),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -693,7 +705,7 @@ extension SIMDDoubleConstantTests {
         where !hasUnorderedNaNs(multiplying: a, H.repeating(value), adding: c) {
             mismatches.check(
                 H.multiplyAddingSubtracting(a, H.repeating(value), c),
-                HighwayReference.multiplyAddingSubtractingF64(a, H.repeating(value), c),
+                HighwayReference.multiplyAddingSubtractingF64(a.raw, H.repeating(value).raw, c.raw),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -710,7 +722,7 @@ extension SIMDDoubleConstantTests {
         where !hasUnorderedNaNs(multiplying: a, b, adding: H.repeating(value)) {
             mismatches.check(
                 H.multiplyAddingSubtracting(a, b, H.repeating(value)),
-                HighwayReference.multiplyAddingSubtractingF64(a, b, H.repeating(value)),
+                HighwayReference.multiplyAddingSubtractingF64(a.raw, b.raw, H.repeating(value).raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

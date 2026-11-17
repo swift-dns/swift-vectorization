@@ -19,7 +19,10 @@ extension SIMDBFloat16ConstantTests {
             mismatches.check(
                 H.vector(converting: SIMDFloat.repeating(value), b),
                 H.Vector(
-                    raw: HighwayReference.vectorConvertingF32ToBF16(SIMDFloat.repeating(value), b)
+                    raw: HighwayReference.vectorConvertingF32ToBF16(
+                        SIMDFloat.repeating(value).raw,
+                        b.raw
+                    )
                 ),
                 "b: \(describe(b))"
             )
@@ -40,7 +43,10 @@ extension SIMDBFloat16ConstantTests {
             mismatches.check(
                 H.vector(converting: a, SIMDFloat.repeating(value)),
                 H.Vector(
-                    raw: HighwayReference.vectorConvertingF32ToBF16(a, SIMDFloat.repeating(value))
+                    raw: HighwayReference.vectorConvertingF32ToBF16(
+                        a.raw,
+                        SIMDFloat.repeating(value).raw
+                    )
                 ),
                 "a: \(describe(a))"
             )
@@ -159,8 +165,8 @@ extension SIMDBFloat16ConstantTests {
                 H.vector(convertingInAnyOrder: SIMDFloat.repeating(value), b),
                 H.Vector(
                     raw: HighwayReference.vectorConvertingInAnyOrderF32ToBF16(
-                        SIMDFloat.repeating(value),
-                        b
+                        SIMDFloat.repeating(value).raw,
+                        b.raw
                     )
                 ),
                 "b: \(describe(b))"
@@ -185,8 +191,8 @@ extension SIMDBFloat16ConstantTests {
                 H.vector(convertingInAnyOrder: a, SIMDFloat.repeating(value)),
                 H.Vector(
                     raw: HighwayReference.vectorConvertingInAnyOrderF32ToBF16(
-                        a,
-                        SIMDFloat.repeating(value)
+                        a.raw,
+                        SIMDFloat.repeating(value).raw
                     )
                 ),
                 "a: \(describe(a))"

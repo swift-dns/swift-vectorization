@@ -10,7 +10,7 @@ extension SIMDDoubleReferenceTests {
         let mismatches = Mismatches("sum")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3439_5FFA_9FDF_1520)
         for a in aInputs {
-            mismatches.check(H.sum(a), HighwayReference.sumF64(a), "a: \(describe(a))")
+            mismatches.check(H.sum(a), HighwayReference.sumF64(a.raw), "a: \(describe(a))")
         }
         mismatches.record()
     }
@@ -19,7 +19,11 @@ extension SIMDDoubleReferenceTests {
         let mismatches = Mismatches("smallest")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9B04_A295_459C_2CBA)
         for a in aInputs {
-            mismatches.check(H.smallest(a), HighwayReference.smallestF64(a), "a: \(describe(a))")
+            mismatches.check(
+                H.smallest(a),
+                HighwayReference.smallestF64(a.raw),
+                "a: \(describe(a))"
+            )
         }
         mismatches.record()
     }
@@ -30,7 +34,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.smallestOrNaN(a),
-                HighwayReference.smallestOrNaNF64(a),
+                HighwayReference.smallestOrNaNF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -41,7 +45,7 @@ extension SIMDDoubleReferenceTests {
         let mismatches = Mismatches("largest")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x889C_7097_1BB0_8273)
         for a in aInputs {
-            mismatches.check(H.largest(a), HighwayReference.largestF64(a), "a: \(describe(a))")
+            mismatches.check(H.largest(a), HighwayReference.largestF64(a.raw), "a: \(describe(a))")
         }
         mismatches.record()
     }
@@ -52,7 +56,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.largestOrNaN(a),
-                HighwayReference.largestOrNaNF64(a),
+                HighwayReference.largestOrNaNF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -65,7 +69,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.repeatingSum(a),
-                HighwayReference.repeatingSumF64(a),
+                HighwayReference.repeatingSumF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -78,7 +82,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.repeatingSmallest(a),
-                HighwayReference.repeatingSmallestF64(a),
+                HighwayReference.repeatingSmallestF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -91,7 +95,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.repeatingLargest(a),
-                HighwayReference.repeatingLargestF64(a),
+                HighwayReference.repeatingLargestF64(a.raw),
                 "a: \(describe(a))"
             )
         }

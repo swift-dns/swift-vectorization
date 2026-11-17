@@ -13,7 +13,7 @@ extension SIMDBFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.vector(converting: a, b),
-                H.Vector(raw: HighwayReference.vectorConvertingF32ToBF16(a, b)),
+                H.Vector(raw: HighwayReference.vectorConvertingF32ToBF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -27,7 +27,7 @@ extension SIMDBFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.vector(convertingInAnyOrder: a, b),
-                H.Vector(raw: HighwayReference.vectorConvertingInAnyOrderF32ToBF16(a, b)),
+                H.Vector(raw: HighwayReference.vectorConvertingInAnyOrderF32ToBF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

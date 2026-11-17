@@ -19,7 +19,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.selectingIfNegativeOrZero(H.repeating(value), b),
-                HighwayReference.selectingIfNegativeOrZeroF16(H.repeating(value), b),
+                HighwayReference.selectingIfNegativeOrZeroF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -38,7 +38,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.selectingIfNegativeOrZero(a, H.repeating(value)),
-                HighwayReference.selectingIfNegativeOrZeroF16(a, H.repeating(value)),
+                HighwayReference.selectingIfNegativeOrZeroF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -152,7 +152,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.zeroingIfNegative(H.repeating(value), b),
-                HighwayReference.zeroingIfNegativeF16(H.repeating(value), b),
+                HighwayReference.zeroingIfNegativeF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -171,7 +171,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.zeroingIfNegative(a, H.repeating(value)),
-                HighwayReference.zeroingIfNegativeF16(a, H.repeating(value)),
+                HighwayReference.zeroingIfNegativeF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -285,7 +285,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.negatingIfNegative(H.repeating(value), b),
-                HighwayReference.negatingIfNegativeF16(H.repeating(value), b),
+                HighwayReference.negatingIfNegativeF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -304,7 +304,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.negatingIfNegative(a, H.repeating(value)),
-                HighwayReference.negatingIfNegativeF16(a, H.repeating(value)),
+                HighwayReference.negatingIfNegativeF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }

@@ -13,7 +13,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.equalTo(a, b),
-                H.Mask(raw: HighwayReference.equalToF32(a, b)),
+                H.Mask(raw: HighwayReference.equalToF32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -27,7 +27,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.notEqualTo(a, b),
-                H.Mask(raw: HighwayReference.notEqualToF32(a, b)),
+                H.Mask(raw: HighwayReference.notEqualToF32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -41,7 +41,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.lessThan(a, b),
-                H.Mask(raw: HighwayReference.lessThanF32(a, b)),
+                H.Mask(raw: HighwayReference.lessThanF32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -55,7 +55,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.greaterThan(a, b),
-                H.Mask(raw: HighwayReference.greaterThanF32(a, b)),
+                H.Mask(raw: HighwayReference.greaterThanF32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -69,7 +69,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.lessThanOrEqualTo(a, b),
-                H.Mask(raw: HighwayReference.lessThanOrEqualToF32(a, b)),
+                H.Mask(raw: HighwayReference.lessThanOrEqualToF32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -83,7 +83,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.greaterThanOrEqualTo(a, b),
-                H.Mask(raw: HighwayReference.greaterThanOrEqualToF32(a, b)),
+                H.Mask(raw: HighwayReference.greaterThanOrEqualToF32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -96,7 +96,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.isNegative(a),
-                H.Mask(raw: HighwayReference.isNegativeF32(a)),
+                H.Mask(raw: HighwayReference.isNegativeF32(a.raw)),
                 "a: \(describe(a))"
             )
         }

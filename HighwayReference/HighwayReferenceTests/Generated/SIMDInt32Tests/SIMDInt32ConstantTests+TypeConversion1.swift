@@ -510,7 +510,9 @@ extension SIMDInt32ConstantTests {
         )
         mismatches.check(
             H.vector(bitPattern: SIMDFloat.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorBitPatternF32ToI32(SIMDFloat.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorBitPatternF32ToI32(SIMDFloat.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()
@@ -602,7 +604,9 @@ extension SIMDInt32ConstantTests {
         )
         mismatches.check(
             H.vector(bitPattern: SIMDDouble.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorBitPatternF64ToI32(SIMDDouble.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorBitPatternF64ToI32(SIMDDouble.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()
@@ -695,7 +699,9 @@ extension SIMDInt32ConstantTests {
         )
         mismatches.check(
             H.vector(bitPattern: SIMDFloat16.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorBitPatternF16ToI32(SIMDFloat16.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorBitPatternF16ToI32(SIMDFloat16.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()
@@ -920,7 +926,9 @@ extension SIMDInt32ConstantTests {
         )
         mismatches.check(
             H.vector(converting: SIMDFloat.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorConvertingF32ToI32(SIMDFloat.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorConvertingF32ToI32(SIMDFloat.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()
@@ -1015,7 +1023,9 @@ extension SIMDInt32ConstantTests {
         mismatches.check(
             H.vector(convertingInRange: SIMDFloat.repeating(value)),
             H.Vector(
-                raw: HighwayReference.vectorConvertingInRangeF32ToI32(SIMDFloat.repeating(value))
+                raw: HighwayReference.vectorConvertingInRangeF32ToI32(
+                    SIMDFloat.repeating(value).raw
+                )
             ),
             ""
         )

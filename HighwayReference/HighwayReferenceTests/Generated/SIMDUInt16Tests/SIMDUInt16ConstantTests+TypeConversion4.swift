@@ -217,7 +217,7 @@ extension SIMDUInt16ConstantTests {
             H.vector(zeroExtendingResizing: SIMDFloat.repeating(value)),
             H.Vector(
                 raw: HighwayReference.vectorZeroExtendingResizingF32ToU16(
-                    SIMDFloat.repeating(value)
+                    SIMDFloat.repeating(value).raw
                 )
             ),
             ""
@@ -315,7 +315,7 @@ extension SIMDUInt16ConstantTests {
             H.halfVector(zeroExtendingResizing: SIMDFloat.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorZeroExtendingResizingF32ToU16(
-                    SIMDFloat.repeating(value)
+                    SIMDFloat.repeating(value).raw
                 )
             ),
             ""
@@ -416,7 +416,7 @@ extension SIMDUInt16ConstantTests {
             H.quarterVector(zeroExtendingResizing: SIMDFloat.repeating(value)),
             H.QuarterVector(
                 raw: HighwayReference.quarterVectorZeroExtendingResizingF32ToU16(
-                    SIMDFloat.repeating(value)
+                    SIMDFloat.repeating(value).raw
                 )
             ),
             ""
@@ -516,7 +516,7 @@ extension SIMDUInt16ConstantTests {
             H.vector(zeroExtendingResizing: SIMDDouble.repeating(value)),
             H.Vector(
                 raw: HighwayReference.vectorZeroExtendingResizingF64ToU16(
-                    SIMDDouble.repeating(value)
+                    SIMDDouble.repeating(value).raw
                 )
             ),
             ""
@@ -616,7 +616,7 @@ extension SIMDUInt16ConstantTests {
             H.halfVector(zeroExtendingResizing: SIMDDouble.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorZeroExtendingResizingF64ToU16(
-                    SIMDDouble.repeating(value)
+                    SIMDDouble.repeating(value).raw
                 )
             ),
             ""
@@ -718,7 +718,7 @@ extension SIMDUInt16ConstantTests {
             H.quarterVector(zeroExtendingResizing: SIMDDouble.repeating(value)),
             H.QuarterVector(
                 raw: HighwayReference.quarterVectorZeroExtendingResizingF64ToU16(
-                    SIMDDouble.repeating(value)
+                    SIMDDouble.repeating(value).raw
                 )
             ),
             ""
@@ -819,7 +819,7 @@ extension SIMDUInt16ConstantTests {
             H.vector(zeroExtendingResizing: SIMDFloat16.repeating(value)),
             H.Vector(
                 raw: HighwayReference.vectorZeroExtendingResizingF16ToU16(
-                    SIMDFloat16.repeating(value)
+                    SIMDFloat16.repeating(value).raw
                 )
             ),
             ""
@@ -960,7 +960,7 @@ extension SIMDUInt16ConstantTests {
             H.halfVector(zeroExtendingResizing: SIMDFloat16.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorZeroExtendingResizingF16ToU16(
-                    SIMDFloat16.repeating(value)
+                    SIMDFloat16.repeating(value).raw
                 )
             ),
             ""

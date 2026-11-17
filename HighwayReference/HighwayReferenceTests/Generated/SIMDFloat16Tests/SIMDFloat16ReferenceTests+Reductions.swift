@@ -14,7 +14,7 @@ extension SIMDFloat16ReferenceTests {
         where HighwayReference.hasNativeFloat16Arithmetic() || !hasUnorderedNaNs(lanesOf: a) {
             mismatches.check(
                 H.sum(a),
-                Float16(bitPattern: HighwayReference.sumF16(a)),
+                Float16(bitPattern: HighwayReference.sumF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -27,7 +27,7 @@ extension SIMDFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.smallest(a),
-                Float16(bitPattern: HighwayReference.smallestF16(a)),
+                Float16(bitPattern: HighwayReference.smallestF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -40,7 +40,7 @@ extension SIMDFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.largest(a),
-                Float16(bitPattern: HighwayReference.largestF16(a)),
+                Float16(bitPattern: HighwayReference.largestF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -53,7 +53,7 @@ extension SIMDFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.smallestOrNaN(a),
-                Float16(bitPattern: HighwayReference.smallestOrNaNF16(a)),
+                Float16(bitPattern: HighwayReference.smallestOrNaNF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -66,7 +66,7 @@ extension SIMDFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.largestOrNaN(a),
-                Float16(bitPattern: HighwayReference.largestOrNaNF16(a)),
+                Float16(bitPattern: HighwayReference.largestOrNaNF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -80,7 +80,7 @@ extension SIMDFloat16ReferenceTests {
         where HighwayReference.hasNativeFloat16Arithmetic() || !hasUnorderedNaNs(lanesOf: a) {
             mismatches.check(
                 H.repeatingSum(a),
-                HighwayReference.repeatingSumF16(a),
+                HighwayReference.repeatingSumF16(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -93,7 +93,7 @@ extension SIMDFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.repeatingSmallest(a),
-                HighwayReference.repeatingSmallestF16(a),
+                HighwayReference.repeatingSmallestF16(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -106,7 +106,7 @@ extension SIMDFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.repeatingLargest(a),
-                HighwayReference.repeatingLargestF16(a),
+                HighwayReference.repeatingLargestF16(a.raw),
                 "a: \(describe(a))"
             )
         }

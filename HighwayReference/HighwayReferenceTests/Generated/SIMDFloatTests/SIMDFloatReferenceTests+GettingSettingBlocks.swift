@@ -14,7 +14,10 @@ extension SIMDFloatReferenceTests {
             mismatches.check(
                 H.block(a, at: index),
                 H.BlockVector(
-                    raw: HighwayReference.extractingBlockF32(a, Int32(truncatingIfNeeded: index))
+                    raw: HighwayReference.extractingBlockF32(
+                        a.raw,
+                        Int32(truncatingIfNeeded: index)
+                    )
                 ),
                 "a: \(describe(a)), index: \(index)"
             )
@@ -30,7 +33,10 @@ extension SIMDFloatReferenceTests {
             mismatches.check(
                 unsafe H.block(a, atUnchecked: index),
                 H.BlockVector(
-                    raw: HighwayReference.extractingBlockF32(a, Int32(truncatingIfNeeded: index))
+                    raw: HighwayReference.extractingBlockF32(
+                        a.raw,
+                        Int32(truncatingIfNeeded: index)
+                    )
                 ),
                 "a: \(describe(a)), index: \(index)"
             )
@@ -53,7 +59,7 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.replacingBlock(a, at: index, with: b),
-                HighwayReference.replacingBlockF32(a, Int32(truncatingIfNeeded: index), b.raw),
+                HighwayReference.replacingBlockF32(a.raw, Int32(truncatingIfNeeded: index), b.raw),
                 "a: \(describe(a)), index: \(index), b: \(describe(b))"
             )
         }
@@ -75,7 +81,7 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 unsafe H.replacingBlock(a, atUnchecked: index, with: b),
-                HighwayReference.replacingBlockF32(a, Int32(truncatingIfNeeded: index), b.raw),
+                HighwayReference.replacingBlockF32(a.raw, Int32(truncatingIfNeeded: index), b.raw),
                 "a: \(describe(a)), index: \(index), b: \(describe(b))"
             )
         }

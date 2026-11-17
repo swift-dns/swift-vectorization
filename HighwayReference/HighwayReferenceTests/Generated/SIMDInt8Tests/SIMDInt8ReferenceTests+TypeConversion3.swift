@@ -11,7 +11,9 @@ extension SIMDInt8ReferenceTests {
         let aInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0x30FD_CB82_4FC1_0AF4)
         for a in aInputs {
             let port = H.quarterVector(resizing: a)
-            let reference = H.QuarterVector(raw: HighwayReference.quarterVectorResizingF32ToI8(a))
+            let reference = H.QuarterVector(
+                raw: HighwayReference.quarterVectorResizingF32ToI8(a.raw)
+            )
             let definedBytes = SIMDFloat.laneCount * MemoryLayout<SIMDFloat.Lane>.stride
             let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
@@ -44,7 +46,7 @@ extension SIMDInt8ReferenceTests {
                     H.firstLanes(count: H.laneCount / 4),
                     H.vector(resizing: H.quarterVector(resizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedQuarterVectorResizingF32ToI8(a)),
+                H.Vector(raw: HighwayReference.resizedQuarterVectorResizingF32ToI8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -56,7 +58,7 @@ extension SIMDInt8ReferenceTests {
         let aInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0xF9DE_F4E6_023A_4499)
         for a in aInputs {
             let port = H.eighthVector(resizing: a)
-            let reference = H.EighthVector(raw: HighwayReference.eighthVectorResizingF32ToI8(a))
+            let reference = H.EighthVector(raw: HighwayReference.eighthVectorResizingF32ToI8(a.raw))
             let definedBytes = SIMDFloat.laneCount * MemoryLayout<SIMDFloat.Lane>.stride
             let grownBytes = H.EighthVector.laneCount * MemoryLayout<H.Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
@@ -89,7 +91,7 @@ extension SIMDInt8ReferenceTests {
                     H.firstLanes(count: H.laneCount / 8),
                     H.vector(resizing: H.eighthVector(resizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedEighthVectorResizingF32ToI8(a)),
+                H.Vector(raw: HighwayReference.resizedEighthVectorResizingF32ToI8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -274,7 +276,7 @@ extension SIMDInt8ReferenceTests {
         let aInputs = Inputs.conversions(SIMDDouble.Vector.self, seed: 0x00B4_7758_27EA_C4EF)
         for a in aInputs {
             let port = H.vector(resizing: a)
-            let reference = H.Vector(raw: HighwayReference.vectorResizingF64ToI8(a))
+            let reference = H.Vector(raw: HighwayReference.vectorResizingF64ToI8(a.raw))
             let definedBytes = SIMDDouble.laneCount * MemoryLayout<SIMDDouble.Lane>.stride
             let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
@@ -301,7 +303,7 @@ extension SIMDInt8ReferenceTests {
         let aInputs = Inputs.conversions(SIMDDouble.Vector.self, seed: 0x7A05_584B_4EDB_3C72)
         for a in aInputs {
             let port = H.halfVector(resizing: a)
-            let reference = H.HalfVector(raw: HighwayReference.halfVectorResizingF64ToI8(a))
+            let reference = H.HalfVector(raw: HighwayReference.halfVectorResizingF64ToI8(a.raw))
             let definedBytes = SIMDDouble.laneCount * MemoryLayout<SIMDDouble.Lane>.stride
             let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
@@ -334,7 +336,7 @@ extension SIMDInt8ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(resizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorResizingF64ToI8(a)),
+                H.Vector(raw: HighwayReference.resizedHalfVectorResizingF64ToI8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -346,7 +348,9 @@ extension SIMDInt8ReferenceTests {
         let aInputs = Inputs.conversions(SIMDDouble.Vector.self, seed: 0x7B9E_4B58_7F5F_EE15)
         for a in aInputs {
             let port = H.quarterVector(resizing: a)
-            let reference = H.QuarterVector(raw: HighwayReference.quarterVectorResizingF64ToI8(a))
+            let reference = H.QuarterVector(
+                raw: HighwayReference.quarterVectorResizingF64ToI8(a.raw)
+            )
             let definedBytes = SIMDDouble.laneCount * MemoryLayout<SIMDDouble.Lane>.stride
             let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
@@ -379,7 +383,7 @@ extension SIMDInt8ReferenceTests {
                     H.firstLanes(count: H.laneCount / 4),
                     H.vector(resizing: H.quarterVector(resizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedQuarterVectorResizingF64ToI8(a)),
+                H.Vector(raw: HighwayReference.resizedQuarterVectorResizingF64ToI8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -391,7 +395,7 @@ extension SIMDInt8ReferenceTests {
         let aInputs = Inputs.conversions(SIMDDouble.Vector.self, seed: 0xDFCB_A89C_0D1C_AF0E)
         for a in aInputs {
             let port = H.eighthVector(resizing: a)
-            let reference = H.EighthVector(raw: HighwayReference.eighthVectorResizingF64ToI8(a))
+            let reference = H.EighthVector(raw: HighwayReference.eighthVectorResizingF64ToI8(a.raw))
             let definedBytes = SIMDDouble.laneCount * MemoryLayout<SIMDDouble.Lane>.stride
             let grownBytes = H.EighthVector.laneCount * MemoryLayout<H.Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
@@ -424,7 +428,7 @@ extension SIMDInt8ReferenceTests {
                     H.firstLanes(count: H.laneCount / 8),
                     H.vector(resizing: H.eighthVector(resizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedEighthVectorResizingF64ToI8(a)),
+                H.Vector(raw: HighwayReference.resizedEighthVectorResizingF64ToI8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -614,7 +618,7 @@ extension SIMDInt8ReferenceTests {
         let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0xD0AF_C3DD_0D8E_E849)
         for a in aInputs {
             let port = H.vector(resizing: a)
-            let reference = H.Vector(raw: HighwayReference.vectorResizingF16ToI8(a))
+            let reference = H.Vector(raw: HighwayReference.vectorResizingF16ToI8(a.raw))
             let definedBytes = SIMDFloat16.laneCount * MemoryLayout<SIMDFloat16.Lane>.stride
             let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
@@ -643,7 +647,7 @@ extension SIMDInt8ReferenceTests {
         let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0x662B_7777_010C_42DA)
         for a in aInputs {
             let port = H.halfVector(resizing: a)
-            let reference = H.HalfVector(raw: HighwayReference.halfVectorResizingF16ToI8(a))
+            let reference = H.HalfVector(raw: HighwayReference.halfVectorResizingF16ToI8(a.raw))
             let definedBytes = SIMDFloat16.laneCount * MemoryLayout<SIMDFloat16.Lane>.stride
             let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
@@ -678,7 +682,7 @@ extension SIMDInt8ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(resizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorResizingF16ToI8(a)),
+                H.Vector(raw: HighwayReference.resizedHalfVectorResizingF16ToI8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -692,7 +696,9 @@ extension SIMDInt8ReferenceTests {
         let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0xE7F4_ACCF_1A11_824F)
         for a in aInputs {
             let port = H.quarterVector(resizing: a)
-            let reference = H.QuarterVector(raw: HighwayReference.quarterVectorResizingF16ToI8(a))
+            let reference = H.QuarterVector(
+                raw: HighwayReference.quarterVectorResizingF16ToI8(a.raw)
+            )
             let definedBytes = SIMDFloat16.laneCount * MemoryLayout<SIMDFloat16.Lane>.stride
             let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
@@ -727,7 +733,7 @@ extension SIMDInt8ReferenceTests {
                     H.firstLanes(count: H.laneCount / 4),
                     H.vector(resizing: H.quarterVector(resizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedQuarterVectorResizingF16ToI8(a)),
+                H.Vector(raw: HighwayReference.resizedQuarterVectorResizingF16ToI8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -741,7 +747,7 @@ extension SIMDInt8ReferenceTests {
         let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0x69C5_583F_3CA0_0E0E)
         for a in aInputs {
             let port = H.eighthVector(resizing: a)
-            let reference = H.EighthVector(raw: HighwayReference.eighthVectorResizingF16ToI8(a))
+            let reference = H.EighthVector(raw: HighwayReference.eighthVectorResizingF16ToI8(a.raw))
             let definedBytes = SIMDFloat16.laneCount * MemoryLayout<SIMDFloat16.Lane>.stride
             let grownBytes = H.EighthVector.laneCount * MemoryLayout<H.Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
@@ -776,7 +782,7 @@ extension SIMDInt8ReferenceTests {
                     H.firstLanes(count: H.laneCount / 8),
                     H.vector(resizing: H.eighthVector(resizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedEighthVectorResizingF16ToI8(a)),
+                H.Vector(raw: HighwayReference.resizedEighthVectorResizingF16ToI8(a.raw)),
                 "a: \(describe(a))"
             )
         }

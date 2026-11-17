@@ -14,7 +14,7 @@ extension SIMDDoubleConstantTests {
         for mask in maskInputs where !hasUnorderedNaNs(lanesOf: H.repeating(value)) {
             mismatches.check(
                 H.sum(H.repeating(value), where: mask),
-                HighwayReference.sumWhereF64(mask.raw, H.repeating(value)),
+                HighwayReference.sumWhereF64(mask.raw, H.repeating(value).raw),
                 "mask: \(describe(mask))"
             )
         }
@@ -105,7 +105,7 @@ extension SIMDDoubleConstantTests {
         for mask in maskInputs {
             mismatches.check(
                 H.smallest(H.repeating(value), where: mask),
-                HighwayReference.smallestWhereF64(mask.raw, H.repeating(value)),
+                HighwayReference.smallestWhereF64(mask.raw, H.repeating(value).raw),
                 "mask: \(describe(mask))"
             )
         }
@@ -196,7 +196,7 @@ extension SIMDDoubleConstantTests {
         for mask in maskInputs {
             mismatches.check(
                 H.largest(H.repeating(value), where: mask),
-                HighwayReference.largestWhereF64(mask.raw, H.repeating(value)),
+                HighwayReference.largestWhereF64(mask.raw, H.repeating(value).raw),
                 "mask: \(describe(mask))"
             )
         }

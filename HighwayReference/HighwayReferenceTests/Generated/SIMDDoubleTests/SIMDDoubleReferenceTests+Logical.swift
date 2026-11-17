@@ -13,7 +13,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.copyingSign(a, from: b),
-                HighwayReference.copyingSignF64(a, b),
+                HighwayReference.copyingSignF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -27,7 +27,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.copyingSignToMagnitude(a, from: b),
-                HighwayReference.copyingSignToMagnitudeF64(a, b),
+                HighwayReference.copyingSignToMagnitudeF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -41,7 +41,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseAnd(a, b),
-                HighwayReference.bitwiseAndF64(a, b),
+                HighwayReference.bitwiseAndF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -55,7 +55,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseOr(a, b),
-                HighwayReference.bitwiseOrF64(a, b),
+                HighwayReference.bitwiseOrF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -69,7 +69,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseXor(a, b),
-                HighwayReference.bitwiseXorF64(a, b),
+                HighwayReference.bitwiseXorF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -83,7 +83,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseAndNot(a, b),
-                HighwayReference.bitwiseAndNotF64(a, b),
+                HighwayReference.bitwiseAndNotF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -98,7 +98,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x77CA_D94D_E227_AB3E) {
             mismatches.check(
                 H.bitwiseAndXor(a, b, c),
-                HighwayReference.bitwiseAndXorF64(a, b, c),
+                HighwayReference.bitwiseAndXorF64(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -113,7 +113,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x70C0_C227_3268_0BA6) {
             mismatches.check(
                 H.bitwiseXor(a, b, c),
-                HighwayReference.bitwiseXor3F64(a, b, c),
+                HighwayReference.bitwiseXor3F64(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -128,7 +128,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xC18F_8116_0139_C534) {
             mismatches.check(
                 H.bitwiseOr(a, b, c),
-                HighwayReference.bitwiseOr3F64(a, b, c),
+                HighwayReference.bitwiseOr3F64(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -143,7 +143,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xACA5_2BC8_1FFB_C3E4) {
             mismatches.check(
                 H.bitwiseOrAnd(a, b, c),
-                HighwayReference.bitwiseOrAndF64(a, b, c),
+                HighwayReference.bitwiseOrAndF64(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -158,7 +158,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xA86F_FB54_0FA5_50B7) {
             mismatches.check(
                 H.bitwiseXorAndNot(a, b, c),
-                HighwayReference.bitwiseXorAndNotF64(a, b, c),
+                HighwayReference.bitwiseXorAndNotF64(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -173,7 +173,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xFC31_6120_5DE8_E10A) {
             mismatches.check(
                 H.bitwiseSelecting(a, b, c),
-                HighwayReference.bitwiseSelectingF64(a, b, c),
+                HighwayReference.bitwiseSelectingF64(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -189,7 +189,7 @@ extension SIMDDoubleReferenceTests {
         {
             mismatches.check(
                 H.bitwiseAnd(a, b, where: mask),
-                HighwayReference.bitwiseAndWhereF64(mask.raw, a, b),
+                HighwayReference.bitwiseAndWhereF64(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -205,7 +205,7 @@ extension SIMDDoubleReferenceTests {
         {
             mismatches.check(
                 H.bitwiseAnd(a, b, where: mask),
-                HighwayReference.bitwiseAndWhereF64(mask.raw, a, b),
+                HighwayReference.bitwiseAndWhereF64(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -221,7 +221,7 @@ extension SIMDDoubleReferenceTests {
         {
             mismatches.check(
                 H.bitwiseOr(a, b, where: mask),
-                HighwayReference.bitwiseOrWhereF64(mask.raw, a, b),
+                HighwayReference.bitwiseOrWhereF64(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -237,7 +237,7 @@ extension SIMDDoubleReferenceTests {
         {
             mismatches.check(
                 H.bitwiseOr(a, b, where: mask),
-                HighwayReference.bitwiseOrWhereF64(mask.raw, a, b),
+                HighwayReference.bitwiseOrWhereF64(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -253,7 +253,7 @@ extension SIMDDoubleReferenceTests {
         {
             mismatches.check(
                 H.bitwiseXor(a, b, where: mask),
-                HighwayReference.bitwiseXorWhereF64(mask.raw, a, b),
+                HighwayReference.bitwiseXorWhereF64(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -269,7 +269,7 @@ extension SIMDDoubleReferenceTests {
         {
             mismatches.check(
                 H.bitwiseXor(a, b, where: mask),
-                HighwayReference.bitwiseXorWhereF64(mask.raw, a, b),
+                HighwayReference.bitwiseXorWhereF64(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -291,7 +291,7 @@ extension SIMDDoubleReferenceTests {
         ) {
             mismatches.check(
                 H.bitwiseAnd(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseAndWhereOtherwiseF64(otherwise, mask.raw, a, b),
+                HighwayReference.bitwiseAndWhereOtherwiseF64(otherwise.raw, mask.raw, a.raw, b.raw),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -313,7 +313,7 @@ extension SIMDDoubleReferenceTests {
         ) {
             mismatches.check(
                 H.bitwiseAnd(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseAndWhereOtherwiseF64(otherwise, mask.raw, a, b),
+                HighwayReference.bitwiseAndWhereOtherwiseF64(otherwise.raw, mask.raw, a.raw, b.raw),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -335,7 +335,7 @@ extension SIMDDoubleReferenceTests {
         ) {
             mismatches.check(
                 H.bitwiseOr(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseOrWhereOtherwiseF64(otherwise, mask.raw, a, b),
+                HighwayReference.bitwiseOrWhereOtherwiseF64(otherwise.raw, mask.raw, a.raw, b.raw),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -357,7 +357,7 @@ extension SIMDDoubleReferenceTests {
         ) {
             mismatches.check(
                 H.bitwiseOr(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseOrWhereOtherwiseF64(otherwise, mask.raw, a, b),
+                HighwayReference.bitwiseOrWhereOtherwiseF64(otherwise.raw, mask.raw, a.raw, b.raw),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -379,7 +379,7 @@ extension SIMDDoubleReferenceTests {
         ) {
             mismatches.check(
                 H.bitwiseXor(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseXorWhereOtherwiseF64(otherwise, mask.raw, a, b),
+                HighwayReference.bitwiseXorWhereOtherwiseF64(otherwise.raw, mask.raw, a.raw, b.raw),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -401,7 +401,7 @@ extension SIMDDoubleReferenceTests {
         ) {
             mismatches.check(
                 H.bitwiseXor(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseXorWhereOtherwiseF64(otherwise, mask.raw, a, b),
+                HighwayReference.bitwiseXorWhereOtherwiseF64(otherwise.raw, mask.raw, a.raw, b.raw),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -414,7 +414,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.allBitsSet(a),
-                HighwayReference.allBitsSetF64(a),
+                HighwayReference.allBitsSetF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -427,7 +427,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.allBitsClear(a),
-                HighwayReference.allBitsClearF64(a),
+                HighwayReference.allBitsClearF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -440,7 +440,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.zeroingNegative(a),
-                HighwayReference.zeroingNegativeF64(a),
+                HighwayReference.zeroingNegativeF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -455,7 +455,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xF39F_05C8_5059_F38D) {
             mismatches.check(
                 H.selectingIfNegative(a, b, c),
-                HighwayReference.selectingIfNegativeF64(a, b, c),
+                HighwayReference.selectingIfNegativeF64(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -469,7 +469,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.selectingIfNegativeOrZero(a, b),
-                HighwayReference.selectingIfNegativeOrZeroF64(a, b),
+                HighwayReference.selectingIfNegativeOrZeroF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -483,7 +483,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.zeroingIfNegative(a, b),
-                HighwayReference.zeroingIfNegativeF64(a, b),
+                HighwayReference.zeroingIfNegativeF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -497,7 +497,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.negatingIfNegative(a, b),
-                HighwayReference.negatingIfNegativeF64(a, b),
+                HighwayReference.negatingIfNegativeF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

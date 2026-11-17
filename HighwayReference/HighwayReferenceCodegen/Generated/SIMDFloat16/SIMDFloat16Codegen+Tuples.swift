@@ -5,140 +5,132 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portCreate2F16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector) {
+public func portCreate2F16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> (SIMD<Float16>, SIMD<Float16>)
+{
     SIMDFloat16.create2(a, b)
 }
 
 @inline(never)
 public func highwayCreate2F16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector) {
-    { tuple in (tuple.v0, tuple.v1) }(HighwayReference.Nothrow.create2F16(a, b))
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>) {
+    { tuple in (tuple.v0, tuple.v1) }(HighwayReference.Nothrow.create2F16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portCreate2F16ConstantA(
-    _ b: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector) {
+public func portCreate2F16ConstantA(_ b: SIMD<Float16>) -> (SIMD<Float16>, SIMD<Float16>) {
     SIMDFloat16.create2(SIMDFloat16.repeating(Float16(bitPattern: 26)), b)
 }
 
 @inline(never)
-public func highwayCreate2F16ConstantA(
-    _ b: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector) {
+public func highwayCreate2F16ConstantA(_ b: SIMD<Float16>) -> (SIMD<Float16>, SIMD<Float16>) {
     { tuple in (tuple.v0, tuple.v1) }(
         HighwayReference.Nothrow.create2F16(
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-            b
+            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
+            b.raw
         )
     )
 }
 
 @inline(never)
-public func portCreate2F16ConstantB(
-    _ a: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector) {
+public func portCreate2F16ConstantB(_ a: SIMD<Float16>) -> (SIMD<Float16>, SIMD<Float16>) {
     SIMDFloat16.create2(a, SIMDFloat16.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayCreate2F16ConstantB(
-    _ a: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector) {
+public func highwayCreate2F16ConstantB(_ a: SIMD<Float16>) -> (SIMD<Float16>, SIMD<Float16>) {
     { tuple in (tuple.v0, tuple.v1) }(
         HighwayReference.Nothrow.create2F16(
-            a,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            a.raw,
+            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
         )
     )
 }
 
 @inline(never)
 public func portGet2F16(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector),
+    _ tuple: (SIMD<Float16>, SIMD<Float16>),
     atUnchecked index: Int
-) -> SIMDFloat16.Vector {
+) -> SIMD<Float16> {
     unsafe SIMDFloat16.get2(tuple, atUnchecked: index)
 }
 
 @inline(never)
 public func highwayGet2F16(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector),
+    _ tuple: (SIMD<Float16>, SIMD<Float16>),
     atUnchecked index: Int
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.get2F16(cvectorization_ops_tuple2_f16(v0: tuple.0, v1: tuple.1), index)
+) -> SIMD<Float16> {
+    HighwayReference.Nothrow.get2F16(
+        cvectorization_ops_tuple2_f16(v0: tuple.0.raw, v1: tuple.1.raw),
+        index
+    )
 }
 
 @inline(never)
-public func portGet2F16ConstantIndex(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector)
-) -> SIMDFloat16.Vector {
+public func portGet2F16ConstantIndex(_ tuple: (SIMD<Float16>, SIMD<Float16>)) -> SIMD<Float16> {
     unsafe SIMDFloat16.get2(tuple, atUnchecked: 1)
 }
 
 @inline(never)
-public func highwayGet2F16ConstantIndex(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector)
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.get2F16(cvectorization_ops_tuple2_f16(v0: tuple.0, v1: tuple.1), 1)
+public func highwayGet2F16ConstantIndex(_ tuple: (SIMD<Float16>, SIMD<Float16>)) -> SIMD<Float16> {
+    HighwayReference.Nothrow.get2F16(
+        cvectorization_ops_tuple2_f16(v0: tuple.0.raw, v1: tuple.1.raw),
+        1
+    )
 }
 
 @inline(never)
 public func portSet2F16(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector),
+    _ tuple: (SIMD<Float16>, SIMD<Float16>),
     atUnchecked index: Int,
-    to a: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    to a: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>) {
     unsafe SIMDFloat16.set2(tuple, atUnchecked: index, to: a)
 }
 
 @inline(never)
 public func highwaySet2F16(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector),
+    _ tuple: (SIMD<Float16>, SIMD<Float16>),
     atUnchecked index: Int,
-    to a: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    to a: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>) {
     { tuple in (tuple.v0, tuple.v1) }(
         HighwayReference.Nothrow.set2F16(
-            cvectorization_ops_tuple2_f16(v0: tuple.0, v1: tuple.1),
+            cvectorization_ops_tuple2_f16(v0: tuple.0.raw, v1: tuple.1.raw),
             index,
-            a
+            a.raw
         )
     )
 }
 
 @inline(never)
 public func portSet2F16ConstantIndex(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector),
-    to a: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ tuple: (SIMD<Float16>, SIMD<Float16>),
+    to a: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>) {
     unsafe SIMDFloat16.set2(tuple, atUnchecked: 1, to: a)
 }
 
 @inline(never)
 public func highwaySet2F16ConstantIndex(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector),
-    to a: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ tuple: (SIMD<Float16>, SIMD<Float16>),
+    to a: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>) {
     { tuple in (tuple.v0, tuple.v1) }(
         HighwayReference.Nothrow.set2F16(
-            cvectorization_ops_tuple2_f16(v0: tuple.0, v1: tuple.1),
+            cvectorization_ops_tuple2_f16(v0: tuple.0.raw, v1: tuple.1.raw),
             1,
-            a
+            a.raw
         )
     )
 }
 
 @inline(never)
 public func portSet2F16ConstantA(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector),
+    _ tuple: (SIMD<Float16>, SIMD<Float16>),
     atUnchecked index: Int
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector) {
+) -> (SIMD<Float16>, SIMD<Float16>) {
     unsafe SIMDFloat16.set2(
         tuple,
         atUnchecked: index,
@@ -148,189 +140,191 @@ public func portSet2F16ConstantA(
 
 @inline(never)
 public func highwaySet2F16ConstantA(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector),
+    _ tuple: (SIMD<Float16>, SIMD<Float16>),
     atUnchecked index: Int
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector) {
+) -> (SIMD<Float16>, SIMD<Float16>) {
     { tuple in (tuple.v0, tuple.v1) }(
         HighwayReference.Nothrow.set2F16(
-            cvectorization_ops_tuple2_f16(v0: tuple.0, v1: tuple.1),
+            cvectorization_ops_tuple2_f16(v0: tuple.0.raw, v1: tuple.1.raw),
             index,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
         )
     )
 }
 
 @inline(never)
 public func portCreate3F16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     SIMDFloat16.create3(a, b, c)
 }
 
 @inline(never)
 public func highwayCreate3F16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
-    { tuple in (tuple.v0, tuple.v1, tuple.v2) }(HighwayReference.Nothrow.create3F16(a, b, c))
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
+    { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
+        HighwayReference.Nothrow.create3F16(a.raw, b.raw, c.raw)
+    )
 }
 
 @inline(never)
 public func portCreate3F16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     SIMDFloat16.create3(SIMDFloat16.repeating(Float16(bitPattern: 26)), b, c)
 }
 
 @inline(never)
 public func highwayCreate3F16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
         HighwayReference.Nothrow.create3F16(
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-            b,
-            c
+            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
+            b.raw,
+            c.raw
         )
     )
 }
 
 @inline(never)
 public func portCreate3F16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     SIMDFloat16.create3(a, SIMDFloat16.repeating(Float16(bitPattern: 26)), c)
 }
 
 @inline(never)
 public func highwayCreate3F16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
         HighwayReference.Nothrow.create3F16(
-            a,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-            c
+            a.raw,
+            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
+            c.raw
         )
     )
 }
 
 @inline(never)
 public func portCreate3F16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     SIMDFloat16.create3(a, b, SIMDFloat16.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayCreate3F16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
         HighwayReference.Nothrow.create3F16(
-            a,
-            b,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            a.raw,
+            b.raw,
+            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
         )
     )
 }
 
 @inline(never)
 public func portGet3F16(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector),
+    _ tuple: (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>),
     atUnchecked index: Int
-) -> SIMDFloat16.Vector {
+) -> SIMD<Float16> {
     unsafe SIMDFloat16.get3(tuple, atUnchecked: index)
 }
 
 @inline(never)
 public func highwayGet3F16(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector),
+    _ tuple: (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>),
     atUnchecked index: Int
-) -> SIMDFloat16.Vector {
+) -> SIMD<Float16> {
     HighwayReference.Nothrow.get3F16(
-        cvectorization_ops_tuple3_f16(v0: tuple.0, v1: tuple.1, v2: tuple.2),
+        cvectorization_ops_tuple3_f16(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
         index
     )
 }
 
 @inline(never)
 public func portGet3F16ConstantIndex(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector)
-) -> SIMDFloat16.Vector {
+    _ tuple: (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>)
+) -> SIMD<Float16> {
     unsafe SIMDFloat16.get3(tuple, atUnchecked: 1)
 }
 
 @inline(never)
 public func highwayGet3F16ConstantIndex(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector)
-) -> SIMDFloat16.Vector {
+    _ tuple: (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>)
+) -> SIMD<Float16> {
     HighwayReference.Nothrow.get3F16(
-        cvectorization_ops_tuple3_f16(v0: tuple.0, v1: tuple.1, v2: tuple.2),
+        cvectorization_ops_tuple3_f16(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
         1
     )
 }
 
 @inline(never)
 public func portSet3F16(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector),
+    _ tuple: (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>),
     atUnchecked index: Int,
-    to a: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    to a: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     unsafe SIMDFloat16.set3(tuple, atUnchecked: index, to: a)
 }
 
 @inline(never)
 public func highwaySet3F16(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector),
+    _ tuple: (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>),
     atUnchecked index: Int,
-    to a: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    to a: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
         HighwayReference.Nothrow.set3F16(
-            cvectorization_ops_tuple3_f16(v0: tuple.0, v1: tuple.1, v2: tuple.2),
+            cvectorization_ops_tuple3_f16(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
             index,
-            a
+            a.raw
         )
     )
 }
 
 @inline(never)
 public func portSet3F16ConstantIndex(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector),
-    to a: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ tuple: (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>),
+    to a: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     unsafe SIMDFloat16.set3(tuple, atUnchecked: 1, to: a)
 }
 
 @inline(never)
 public func highwaySet3F16ConstantIndex(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector),
-    to a: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ tuple: (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>),
+    to a: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
         HighwayReference.Nothrow.set3F16(
-            cvectorization_ops_tuple3_f16(v0: tuple.0, v1: tuple.1, v2: tuple.2),
+            cvectorization_ops_tuple3_f16(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
             1,
-            a
+            a.raw
         )
     )
 }
 
 @inline(never)
 public func portSet3F16ConstantA(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector),
+    _ tuple: (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>),
     atUnchecked index: Int
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     unsafe SIMDFloat16.set3(
         tuple,
         atUnchecked: index,
@@ -340,227 +334,247 @@ public func portSet3F16ConstantA(
 
 @inline(never)
 public func highwaySet3F16ConstantA(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector),
+    _ tuple: (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>),
     atUnchecked index: Int
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
         HighwayReference.Nothrow.set3F16(
-            cvectorization_ops_tuple3_f16(v0: tuple.0, v1: tuple.1, v2: tuple.2),
+            cvectorization_ops_tuple3_f16(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
             index,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
         )
     )
 }
 
 @inline(never)
 public func portCreate4F16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    _ d: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    _ d: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     SIMDFloat16.create4(a, b, c, d)
 }
 
 @inline(never)
 public func highwayCreate4F16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    _ d: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    _ d: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
-        HighwayReference.Nothrow.create4F16(a, b, c, d)
+        HighwayReference.Nothrow.create4F16(a.raw, b.raw, c.raw, d.raw)
     )
 }
 
 @inline(never)
 public func portCreate4F16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    _ d: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    _ d: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     SIMDFloat16.create4(SIMDFloat16.repeating(Float16(bitPattern: 26)), b, c, d)
 }
 
 @inline(never)
 public func highwayCreate4F16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    _ d: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    _ d: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
         HighwayReference.Nothrow.create4F16(
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-            b,
-            c,
-            d
+            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
+            b.raw,
+            c.raw,
+            d.raw
         )
     )
 }
 
 @inline(never)
 public func portCreate4F16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    _ d: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    _ d: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     SIMDFloat16.create4(a, SIMDFloat16.repeating(Float16(bitPattern: 26)), c, d)
 }
 
 @inline(never)
 public func highwayCreate4F16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    _ d: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    _ d: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
         HighwayReference.Nothrow.create4F16(
-            a,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-            c,
-            d
+            a.raw,
+            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
+            c.raw,
+            d.raw
         )
     )
 }
 
 @inline(never)
 public func portCreate4F16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ d: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ d: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     SIMDFloat16.create4(a, b, SIMDFloat16.repeating(Float16(bitPattern: 26)), d)
 }
 
 @inline(never)
 public func highwayCreate4F16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ d: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ d: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
         HighwayReference.Nothrow.create4F16(
-            a,
-            b,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-            d
+            a.raw,
+            b.raw,
+            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
+            d.raw
         )
     )
 }
 
 @inline(never)
 public func portCreate4F16ConstantD(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     SIMDFloat16.create4(a, b, c, SIMDFloat16.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayCreate4F16ConstantD(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
         HighwayReference.Nothrow.create4F16(
-            a,
-            b,
-            c,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            a.raw,
+            b.raw,
+            c.raw,
+            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
         )
     )
 }
 
 @inline(never)
 public func portGet4F16(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector),
+    _ tuple: (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>),
     atUnchecked index: Int
-) -> SIMDFloat16.Vector {
+) -> SIMD<Float16> {
     unsafe SIMDFloat16.get4(tuple, atUnchecked: index)
 }
 
 @inline(never)
 public func highwayGet4F16(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector),
+    _ tuple: (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>),
     atUnchecked index: Int
-) -> SIMDFloat16.Vector {
+) -> SIMD<Float16> {
     HighwayReference.Nothrow.get4F16(
-        cvectorization_ops_tuple4_f16(v0: tuple.0, v1: tuple.1, v2: tuple.2, v3: tuple.3),
+        cvectorization_ops_tuple4_f16(
+            v0: tuple.0.raw,
+            v1: tuple.1.raw,
+            v2: tuple.2.raw,
+            v3: tuple.3.raw
+        ),
         index
     )
 }
 
 @inline(never)
 public func portGet4F16ConstantIndex(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector)
-) -> SIMDFloat16.Vector {
+    _ tuple: (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>)
+) -> SIMD<Float16> {
     unsafe SIMDFloat16.get4(tuple, atUnchecked: 1)
 }
 
 @inline(never)
 public func highwayGet4F16ConstantIndex(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector)
-) -> SIMDFloat16.Vector {
+    _ tuple: (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>)
+) -> SIMD<Float16> {
     HighwayReference.Nothrow.get4F16(
-        cvectorization_ops_tuple4_f16(v0: tuple.0, v1: tuple.1, v2: tuple.2, v3: tuple.3),
+        cvectorization_ops_tuple4_f16(
+            v0: tuple.0.raw,
+            v1: tuple.1.raw,
+            v2: tuple.2.raw,
+            v3: tuple.3.raw
+        ),
         1
     )
 }
 
 @inline(never)
 public func portSet4F16(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector),
+    _ tuple: (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>),
     atUnchecked index: Int,
-    to a: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    to a: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     unsafe SIMDFloat16.set4(tuple, atUnchecked: index, to: a)
 }
 
 @inline(never)
 public func highwaySet4F16(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector),
+    _ tuple: (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>),
     atUnchecked index: Int,
-    to a: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    to a: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
         HighwayReference.Nothrow.set4F16(
-            cvectorization_ops_tuple4_f16(v0: tuple.0, v1: tuple.1, v2: tuple.2, v3: tuple.3),
+            cvectorization_ops_tuple4_f16(
+                v0: tuple.0.raw,
+                v1: tuple.1.raw,
+                v2: tuple.2.raw,
+                v3: tuple.3.raw
+            ),
             index,
-            a
+            a.raw
         )
     )
 }
 
 @inline(never)
 public func portSet4F16ConstantIndex(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector),
-    to a: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ tuple: (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>),
+    to a: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     unsafe SIMDFloat16.set4(tuple, atUnchecked: 1, to: a)
 }
 
 @inline(never)
 public func highwaySet4F16ConstantIndex(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector),
-    to a: SIMDFloat16.Vector
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+    _ tuple: (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>),
+    to a: SIMD<Float16>
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
         HighwayReference.Nothrow.set4F16(
-            cvectorization_ops_tuple4_f16(v0: tuple.0, v1: tuple.1, v2: tuple.2, v3: tuple.3),
+            cvectorization_ops_tuple4_f16(
+                v0: tuple.0.raw,
+                v1: tuple.1.raw,
+                v2: tuple.2.raw,
+                v3: tuple.3.raw
+            ),
             1,
-            a
+            a.raw
         )
     )
 }
 
 @inline(never)
 public func portSet4F16ConstantA(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector),
+    _ tuple: (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>),
     atUnchecked index: Int
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     unsafe SIMDFloat16.set4(
         tuple,
         atUnchecked: index,
@@ -570,14 +584,19 @@ public func portSet4F16ConstantA(
 
 @inline(never)
 public func highwaySet4F16ConstantA(
-    _ tuple: (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector),
+    _ tuple: (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>),
     atUnchecked index: Int
-) -> (SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector, SIMDFloat16.Vector) {
+) -> (SIMD<Float16>, SIMD<Float16>, SIMD<Float16>, SIMD<Float16>) {
     { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
         HighwayReference.Nothrow.set4F16(
-            cvectorization_ops_tuple4_f16(v0: tuple.0, v1: tuple.1, v2: tuple.2, v3: tuple.3),
+            cvectorization_ops_tuple4_f16(
+                v0: tuple.0.raw,
+                v1: tuple.1.raw,
+                v2: tuple.2.raw,
+                v3: tuple.3.raw
+            ),
             index,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
         )
     )
 }

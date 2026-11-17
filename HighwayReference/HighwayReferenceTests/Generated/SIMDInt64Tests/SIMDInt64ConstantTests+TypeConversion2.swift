@@ -23,7 +23,7 @@ extension SIMDInt64ConstantTests {
                 H.Vector(
                     raw: HighwayReference.vectorConvertingWhereF64ToI64(
                         mask.raw,
-                        SIMDDouble.repeating(value)
+                        SIMDDouble.repeating(value).raw
                     )
                 ),
                 "mask: \(describe(mask))"
@@ -122,7 +122,7 @@ extension SIMDInt64ConstantTests {
             H.vector(roundingToNearestOrEven: SIMDDouble.repeating(value)),
             H.Vector(
                 raw: HighwayReference.vectorRoundingToNearestOrEvenF64ToI64(
-                    SIMDDouble.repeating(value)
+                    SIMDDouble.repeating(value).raw
                 )
             ),
             ""
@@ -218,7 +218,9 @@ extension SIMDInt64ConstantTests {
         )
         mismatches.check(
             H.vector(roundingUp: SIMDDouble.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorRoundingUpF64ToI64(SIMDDouble.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorRoundingUpF64ToI64(SIMDDouble.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()
@@ -310,7 +312,9 @@ extension SIMDInt64ConstantTests {
         )
         mismatches.check(
             H.vector(roundingDown: SIMDDouble.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorRoundingDownF64ToI64(SIMDDouble.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorRoundingDownF64ToI64(SIMDDouble.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()
@@ -666,7 +670,7 @@ extension SIMDInt64ConstantTests {
         )
         let port = H.vector(resizing: SIMDFloat.repeating(value))
         let reference = H.Vector(
-            raw: HighwayReference.vectorResizingF32ToI64(SIMDFloat.repeating(value))
+            raw: HighwayReference.vectorResizingF32ToI64(SIMDFloat.repeating(value).raw)
         )
         let definedBytes = SIMDFloat.laneCount * MemoryLayout<SIMDFloat.Lane>.stride
         let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
@@ -770,7 +774,7 @@ extension SIMDInt64ConstantTests {
         )
         let port = H.halfVector(resizing: SIMDFloat.repeating(value))
         let reference = H.HalfVector(
-            raw: HighwayReference.halfVectorResizingF32ToI64(SIMDFloat.repeating(value))
+            raw: HighwayReference.halfVectorResizingF32ToI64(SIMDFloat.repeating(value).raw)
         )
         let definedBytes = SIMDFloat.laneCount * MemoryLayout<SIMDFloat.Lane>.stride
         let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
@@ -874,7 +878,7 @@ extension SIMDInt64ConstantTests {
         )
         let port = H.vector(resizing: SIMDDouble.repeating(value))
         let reference = H.Vector(
-            raw: HighwayReference.vectorResizingF64ToI64(SIMDDouble.repeating(value))
+            raw: HighwayReference.vectorResizingF64ToI64(SIMDDouble.repeating(value).raw)
         )
         let definedBytes = SIMDDouble.laneCount * MemoryLayout<SIMDDouble.Lane>.stride
         let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
@@ -978,7 +982,7 @@ extension SIMDInt64ConstantTests {
         )
         let port = H.halfVector(resizing: SIMDDouble.repeating(value))
         let reference = H.HalfVector(
-            raw: HighwayReference.halfVectorResizingF64ToI64(SIMDDouble.repeating(value))
+            raw: HighwayReference.halfVectorResizingF64ToI64(SIMDDouble.repeating(value).raw)
         )
         let definedBytes = SIMDDouble.laneCount * MemoryLayout<SIMDDouble.Lane>.stride
         let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride

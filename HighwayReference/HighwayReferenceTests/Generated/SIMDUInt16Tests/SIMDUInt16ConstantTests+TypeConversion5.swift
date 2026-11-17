@@ -23,7 +23,7 @@ extension SIMDUInt16ConstantTests {
             H.quarterVector(zeroExtendingResizing: SIMDFloat16.repeating(value)),
             H.QuarterVector(
                 raw: HighwayReference.quarterVectorZeroExtendingResizingF16ToU16(
-                    SIMDFloat16.repeating(value)
+                    SIMDFloat16.repeating(value).raw
                 )
             ),
             ""
@@ -533,7 +533,9 @@ extension SIMDUInt16ConstantTests {
         )
         mismatches.check(
             H.vector(converting: SIMDFloat16.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorConvertingF16ToU16(SIMDFloat16.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorConvertingF16ToU16(SIMDFloat16.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()
@@ -668,7 +670,9 @@ extension SIMDUInt16ConstantTests {
         mismatches.check(
             H.vector(convertingInRange: SIMDFloat16.repeating(value)),
             H.Vector(
-                raw: HighwayReference.vectorConvertingInRangeF16ToU16(SIMDFloat16.repeating(value))
+                raw: HighwayReference.vectorConvertingInRangeF16ToU16(
+                    SIMDFloat16.repeating(value).raw
+                )
             ),
             ""
         )
@@ -808,7 +812,7 @@ extension SIMDUInt16ConstantTests {
                 H.Vector(
                     raw: HighwayReference.vectorConvertingWhereF16ToU16(
                         mask.raw,
-                        SIMDFloat16.repeating(value)
+                        SIMDFloat16.repeating(value).raw
                     )
                 ),
                 "mask: \(describe(mask))"

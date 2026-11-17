@@ -13,7 +13,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingLowerLower(a, b),
-                HighwayReference.concatenatingLowerLowerF32(a, b),
+                HighwayReference.concatenatingLowerLowerF32(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -27,7 +27,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingUpperUpper(a, b),
-                HighwayReference.concatenatingUpperUpperF32(a, b),
+                HighwayReference.concatenatingUpperUpperF32(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -41,7 +41,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingLowerUpper(a, b),
-                HighwayReference.concatenatingLowerUpperF32(a, b),
+                HighwayReference.concatenatingLowerUpperF32(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -55,7 +55,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingUpperLower(a, b),
-                HighwayReference.concatenatingUpperLowerF32(a, b),
+                HighwayReference.concatenatingUpperLowerF32(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -69,7 +69,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingOdd(a, b),
-                HighwayReference.concatenatingOddF32(a, b),
+                HighwayReference.concatenatingOddF32(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -83,7 +83,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingEven(a, b),
-                HighwayReference.concatenatingEvenF32(a, b),
+                HighwayReference.concatenatingEvenF32(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -97,7 +97,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingWholeLower(a, b),
-                HighwayReference.interleavingWholeLowerF32(a, b),
+                HighwayReference.interleavingWholeLowerF32(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -111,7 +111,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingWholeUpper(a, b),
-                HighwayReference.interleavingWholeUpperF32(a, b),
+                HighwayReference.interleavingWholeUpperF32(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -124,7 +124,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.lowerHalf(a),
-                H.HalfVector(raw: HighwayReference.lowerHalfF32(a)),
+                H.HalfVector(raw: HighwayReference.lowerHalfF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -140,7 +140,7 @@ extension SIMDFloatReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.lowerHalf(a))
                 ),
-                HighwayReference.resizedLowerHalfF32(a),
+                HighwayReference.resizedLowerHalfF32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -153,7 +153,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.upperHalf(a),
-                H.HalfVector(raw: HighwayReference.upperHalfF32(a)),
+                H.HalfVector(raw: HighwayReference.upperHalfF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -169,7 +169,7 @@ extension SIMDFloatReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.upperHalf(a))
                 ),
-                HighwayReference.resizedUpperHalfF32(a),
+                HighwayReference.resizedUpperHalfF32(a.raw),
                 "a: \(describe(a))"
             )
         }

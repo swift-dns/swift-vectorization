@@ -12,7 +12,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.roundedToNearestOrEven(a),
-                HighwayReference.roundedToNearestOrEvenF32(a),
+                HighwayReference.roundedToNearestOrEvenF32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -25,7 +25,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.roundedTowardZero(a),
-                HighwayReference.roundedTowardZeroF32(a),
+                HighwayReference.roundedTowardZeroF32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -36,7 +36,11 @@ extension SIMDFloatReferenceTests {
         let mismatches = Mismatches("roundedUp")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD657_8134_8E59_1A8C)
         for a in aInputs {
-            mismatches.check(H.roundedUp(a), HighwayReference.roundedUpF32(a), "a: \(describe(a))")
+            mismatches.check(
+                H.roundedUp(a),
+                HighwayReference.roundedUpF32(a.raw),
+                "a: \(describe(a))"
+            )
         }
         mismatches.record()
     }
@@ -47,7 +51,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.roundedDown(a),
-                HighwayReference.roundedDownF32(a),
+                HighwayReference.roundedDownF32(a.raw),
                 "a: \(describe(a))"
             )
         }

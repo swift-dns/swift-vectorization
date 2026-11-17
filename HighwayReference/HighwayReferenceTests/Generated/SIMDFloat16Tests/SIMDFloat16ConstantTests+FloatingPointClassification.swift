@@ -17,7 +17,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.isNaN(H.repeating(value)),
-            H.Mask(raw: HighwayReference.isNaNF16(H.repeating(value))),
+            H.Mask(raw: HighwayReference.isNaNF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -111,7 +111,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.isEitherNaN(H.repeating(value), b),
-                H.Mask(raw: HighwayReference.isEitherNaNF16(H.repeating(value), b)),
+                H.Mask(raw: HighwayReference.isEitherNaNF16(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -130,7 +130,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.isEitherNaN(a, H.repeating(value)),
-                H.Mask(raw: HighwayReference.isEitherNaNF16(a, H.repeating(value))),
+                H.Mask(raw: HighwayReference.isEitherNaNF16(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -242,7 +242,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.isInfinite(H.repeating(value)),
-            H.Mask(raw: HighwayReference.isInfiniteF16(H.repeating(value))),
+            H.Mask(raw: HighwayReference.isInfiniteF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -334,7 +334,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.isFinite(H.repeating(value)),
-            H.Mask(raw: HighwayReference.isFiniteF16(H.repeating(value))),
+            H.Mask(raw: HighwayReference.isFiniteF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()

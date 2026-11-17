@@ -117,7 +117,7 @@ extension SIMDFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(bitPattern: a),
-                HighwayReference.vectorBitPatternF32ToF16(a),
+                HighwayReference.vectorBitPatternF32ToF16(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -130,7 +130,7 @@ extension SIMDFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(bitPattern: a),
-                HighwayReference.vectorBitPatternF64ToF16(a),
+                HighwayReference.vectorBitPatternF64ToF16(a.raw),
                 "a: \(describe(a))"
             )
         }

@@ -21,7 +21,7 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(multiplying: H.repeating(value), b, adding: c) {
             mismatches.check(
                 H.multiplyAdding(H.repeating(value), b, c),
-                HighwayReference.multiplyAddingF16(H.repeating(value), b, c),
+                HighwayReference.multiplyAddingF16(H.repeating(value).raw, b.raw, c.raw),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -42,7 +42,7 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(multiplying: a, H.repeating(value), adding: c) {
             mismatches.check(
                 H.multiplyAdding(a, H.repeating(value), c),
-                HighwayReference.multiplyAddingF16(a, H.repeating(value), c),
+                HighwayReference.multiplyAddingF16(a.raw, H.repeating(value).raw, c.raw),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -63,7 +63,7 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(multiplying: a, b, adding: H.repeating(value)) {
             mismatches.check(
                 H.multiplyAdding(a, b, H.repeating(value)),
-                HighwayReference.multiplyAddingF16(a, b, H.repeating(value)),
+                HighwayReference.multiplyAddingF16(a.raw, b.raw, H.repeating(value).raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -198,7 +198,7 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(negating: H.repeating(value), b, adding: c) {
             mismatches.check(
                 H.negatedMultiplyAdding(H.repeating(value), b, c),
-                HighwayReference.negatedMultiplyAddingF16(H.repeating(value), b, c),
+                HighwayReference.negatedMultiplyAddingF16(H.repeating(value).raw, b.raw, c.raw),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -219,7 +219,7 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(negating: a, H.repeating(value), adding: c) {
             mismatches.check(
                 H.negatedMultiplyAdding(a, H.repeating(value), c),
-                HighwayReference.negatedMultiplyAddingF16(a, H.repeating(value), c),
+                HighwayReference.negatedMultiplyAddingF16(a.raw, H.repeating(value).raw, c.raw),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -240,7 +240,7 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(negating: a, b, adding: H.repeating(value)) {
             mismatches.check(
                 H.negatedMultiplyAdding(a, b, H.repeating(value)),
-                HighwayReference.negatedMultiplyAddingF16(a, b, H.repeating(value)),
+                HighwayReference.negatedMultiplyAddingF16(a.raw, b.raw, H.repeating(value).raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -375,7 +375,7 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(multiplying: H.repeating(value), b, adding: c) {
             mismatches.check(
                 H.multiplySubtracting(H.repeating(value), b, c),
-                HighwayReference.multiplySubtractingF16(H.repeating(value), b, c),
+                HighwayReference.multiplySubtractingF16(H.repeating(value).raw, b.raw, c.raw),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -396,7 +396,7 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(multiplying: a, H.repeating(value), adding: c) {
             mismatches.check(
                 H.multiplySubtracting(a, H.repeating(value), c),
-                HighwayReference.multiplySubtractingF16(a, H.repeating(value), c),
+                HighwayReference.multiplySubtractingF16(a.raw, H.repeating(value).raw, c.raw),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -417,7 +417,7 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(multiplying: a, b, adding: H.repeating(value)) {
             mismatches.check(
                 H.multiplySubtracting(a, b, H.repeating(value)),
-                HighwayReference.multiplySubtractingF16(a, b, H.repeating(value)),
+                HighwayReference.multiplySubtractingF16(a.raw, b.raw, H.repeating(value).raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -558,7 +558,11 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(negating: H.repeating(value), b, adding: c) {
             mismatches.check(
                 H.negatedMultiplySubtracting(H.repeating(value), b, c),
-                HighwayReference.negatedMultiplySubtractingF16(H.repeating(value), b, c),
+                HighwayReference.negatedMultiplySubtractingF16(
+                    H.repeating(value).raw,
+                    b.raw,
+                    c.raw
+                ),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -579,7 +583,11 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(negating: a, H.repeating(value), adding: c) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, H.repeating(value), c),
-                HighwayReference.negatedMultiplySubtractingF16(a, H.repeating(value), c),
+                HighwayReference.negatedMultiplySubtractingF16(
+                    a.raw,
+                    H.repeating(value).raw,
+                    c.raw
+                ),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -600,7 +608,11 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(negating: a, b, adding: H.repeating(value)) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, b, H.repeating(value)),
-                HighwayReference.negatedMultiplySubtractingF16(a, b, H.repeating(value)),
+                HighwayReference.negatedMultiplySubtractingF16(
+                    a.raw,
+                    b.raw,
+                    H.repeating(value).raw
+                ),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -735,7 +747,7 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(multiplying: H.repeating(value), b, adding: c) {
             mismatches.check(
                 H.multiplyAddingSubtracting(H.repeating(value), b, c),
-                HighwayReference.multiplyAddingSubtractingF16(H.repeating(value), b, c),
+                HighwayReference.multiplyAddingSubtractingF16(H.repeating(value).raw, b.raw, c.raw),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -756,7 +768,7 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(multiplying: a, H.repeating(value), adding: c) {
             mismatches.check(
                 H.multiplyAddingSubtracting(a, H.repeating(value), c),
-                HighwayReference.multiplyAddingSubtractingF16(a, H.repeating(value), c),
+                HighwayReference.multiplyAddingSubtractingF16(a.raw, H.repeating(value).raw, c.raw),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -777,7 +789,7 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(multiplying: a, b, adding: H.repeating(value)) {
             mismatches.check(
                 H.multiplyAddingSubtracting(a, b, H.repeating(value)),
-                HighwayReference.multiplyAddingSubtractingF16(a, b, H.repeating(value)),
+                HighwayReference.multiplyAddingSubtractingF16(a.raw, b.raw, H.repeating(value).raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -912,7 +924,7 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(multiplying: H.repeating(value), b, adding: c) {
             mismatches.check(
                 H.multiplySubtractingAdding(H.repeating(value), b, c),
-                HighwayReference.multiplySubtractingAddingF16(H.repeating(value), b, c),
+                HighwayReference.multiplySubtractingAddingF16(H.repeating(value).raw, b.raw, c.raw),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -933,7 +945,7 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(multiplying: a, H.repeating(value), adding: c) {
             mismatches.check(
                 H.multiplySubtractingAdding(a, H.repeating(value), c),
-                HighwayReference.multiplySubtractingAddingF16(a, H.repeating(value), c),
+                HighwayReference.multiplySubtractingAddingF16(a.raw, H.repeating(value).raw, c.raw),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -954,7 +966,7 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(multiplying: a, b, adding: H.repeating(value)) {
             mismatches.check(
                 H.multiplySubtractingAdding(a, b, H.repeating(value)),
-                HighwayReference.multiplySubtractingAddingF16(a, b, H.repeating(value)),
+                HighwayReference.multiplySubtractingAddingF16(a.raw, b.raw, H.repeating(value).raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

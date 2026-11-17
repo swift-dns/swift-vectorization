@@ -13,7 +13,7 @@ extension SIMDFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.isNegative(a),
-                H.Mask(raw: HighwayReference.isNegativeF16(a)),
+                H.Mask(raw: HighwayReference.isNegativeF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -27,7 +27,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.equalTo(a, b),
-                H.Mask(raw: HighwayReference.equalToF16(a, b)),
+                H.Mask(raw: HighwayReference.equalToF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -41,7 +41,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.notEqualTo(a, b),
-                H.Mask(raw: HighwayReference.notEqualToF16(a, b)),
+                H.Mask(raw: HighwayReference.notEqualToF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -55,7 +55,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.lessThan(a, b),
-                H.Mask(raw: HighwayReference.lessThanF16(a, b)),
+                H.Mask(raw: HighwayReference.lessThanF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -69,7 +69,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.greaterThan(a, b),
-                H.Mask(raw: HighwayReference.greaterThanF16(a, b)),
+                H.Mask(raw: HighwayReference.greaterThanF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -83,7 +83,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.lessThanOrEqualTo(a, b),
-                H.Mask(raw: HighwayReference.lessThanOrEqualToF16(a, b)),
+                H.Mask(raw: HighwayReference.lessThanOrEqualToF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -97,7 +97,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.greaterThanOrEqualTo(a, b),
-                H.Mask(raw: HighwayReference.greaterThanOrEqualToF16(a, b)),
+                H.Mask(raw: HighwayReference.greaterThanOrEqualToF16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

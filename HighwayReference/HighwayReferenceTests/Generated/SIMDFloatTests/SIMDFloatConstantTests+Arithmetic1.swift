@@ -14,7 +14,7 @@ extension SIMDFloatConstantTests {
         for b in bInputs where !hasUnorderedNaNs(H.repeating(value), b) {
             mismatches.check(
                 H.adding(H.repeating(value), b),
-                HighwayReference.addingF32(H.repeating(value), b),
+                HighwayReference.addingF32(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -29,7 +29,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs where !hasUnorderedNaNs(a, H.repeating(value)) {
             mismatches.check(
                 H.adding(a, H.repeating(value)),
-                HighwayReference.addingF32(a, H.repeating(value)),
+                HighwayReference.addingF32(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -139,7 +139,7 @@ extension SIMDFloatConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.subtracting(H.repeating(value), b),
-                HighwayReference.subtractingF32(H.repeating(value), b),
+                HighwayReference.subtractingF32(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -154,7 +154,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.subtracting(a, H.repeating(value)),
-                HighwayReference.subtractingF32(a, H.repeating(value)),
+                HighwayReference.subtractingF32(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -264,7 +264,7 @@ extension SIMDFloatConstantTests {
         for b in bInputs where !hasUnorderedNaNs(alternatingNegation: H.repeating(value), b) {
             mismatches.check(
                 H.addingSubtracting(H.repeating(value), b),
-                HighwayReference.addingSubtractingF32(H.repeating(value), b),
+                HighwayReference.addingSubtractingF32(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -279,7 +279,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs where !hasUnorderedNaNs(alternatingNegation: a, H.repeating(value)) {
             mismatches.check(
                 H.addingSubtracting(a, H.repeating(value)),
-                HighwayReference.addingSubtractingF32(a, H.repeating(value)),
+                HighwayReference.addingSubtractingF32(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -389,7 +389,7 @@ extension SIMDFloatConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.dividing(H.repeating(value), b),
-                HighwayReference.dividingF32(H.repeating(value), b),
+                HighwayReference.dividingF32(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -404,7 +404,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.dividing(a, H.repeating(value)),
-                HighwayReference.dividingF32(a, H.repeating(value)),
+                HighwayReference.dividingF32(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -516,7 +516,7 @@ extension SIMDFloatConstantTests {
         {
             mismatches.check(
                 H.clamped(H.repeating(value), between: b, and: c),
-                HighwayReference.clampedF32(H.repeating(value), b, c),
+                HighwayReference.clampedF32(H.repeating(value).raw, b.raw, c.raw),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -533,7 +533,7 @@ extension SIMDFloatConstantTests {
         {
             mismatches.check(
                 H.clamped(a, between: H.repeating(value), and: c),
-                HighwayReference.clampedF32(a, H.repeating(value), c),
+                HighwayReference.clampedF32(a.raw, H.repeating(value).raw, c.raw),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -550,7 +550,7 @@ extension SIMDFloatConstantTests {
         {
             mismatches.check(
                 H.clamped(a, between: b, and: H.repeating(value)),
-                HighwayReference.clampedF32(a, b, H.repeating(value)),
+                HighwayReference.clampedF32(a.raw, b.raw, H.repeating(value).raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -679,7 +679,7 @@ extension SIMDFloatConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.absoluteDifference(H.repeating(value), b),
-                HighwayReference.absoluteDifferenceF32(H.repeating(value), b),
+                HighwayReference.absoluteDifferenceF32(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -694,7 +694,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.absoluteDifference(a, H.repeating(value)),
-                HighwayReference.absoluteDifferenceF32(a, H.repeating(value)),
+                HighwayReference.absoluteDifferenceF32(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -802,7 +802,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.negated(H.repeating(value)),
-            HighwayReference.negatedF32(H.repeating(value)),
+            HighwayReference.negatedF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -890,7 +890,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.magnitude(H.repeating(value)),
-            HighwayReference.magnitudeF32(H.repeating(value)),
+            HighwayReference.magnitudeF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -978,7 +978,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.squareRoot(H.repeating(value)),
-            HighwayReference.squareRootF32(H.repeating(value)),
+            HighwayReference.squareRootF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()

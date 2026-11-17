@@ -550,7 +550,7 @@ extension SIMDUInt8ConstantTests {
         )
         mismatches.check(
             H.vector(bitPattern: SIMDFloat.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorBitPatternF32ToU8(SIMDFloat.repeating(value))),
+            H.Vector(raw: HighwayReference.vectorBitPatternF32ToU8(SIMDFloat.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -642,7 +642,9 @@ extension SIMDUInt8ConstantTests {
         )
         mismatches.check(
             H.vector(bitPattern: SIMDDouble.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorBitPatternF64ToU8(SIMDDouble.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorBitPatternF64ToU8(SIMDDouble.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()
@@ -735,7 +737,9 @@ extension SIMDUInt8ConstantTests {
         )
         mismatches.check(
             H.vector(bitPattern: SIMDFloat16.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorBitPatternF16ToU8(SIMDFloat16.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorBitPatternF16ToU8(SIMDFloat16.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()

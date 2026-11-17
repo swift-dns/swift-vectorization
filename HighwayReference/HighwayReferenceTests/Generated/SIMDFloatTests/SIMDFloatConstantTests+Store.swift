@@ -17,7 +17,7 @@ extension SIMDFloatConstantTests {
         }
         var referenceLanes = sentinel
         referenceLanes.withUnsafeMutableBufferPointer { destination in
-            unsafe HighwayReference.storeF32(H.repeating(value), destination.baseAddress!)
+            unsafe HighwayReference.storeF32(H.repeating(value).raw, destination.baseAddress!)
         }
         mismatches.check(portLanes, referenceLanes, "")
         mismatches.record()
@@ -108,7 +108,8 @@ extension SIMDFloatConstantTests {
             destination in unsafe H.storeAligned(H.repeating(value), to: destination)
         }
         let (_, referenceLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
-            destination in unsafe HighwayReference.storeAlignedF32(H.repeating(value), destination)
+            destination in
+            unsafe HighwayReference.storeAlignedF32(H.repeating(value).raw, destination)
         }
         mismatches.check(portLanes, referenceLanes, "")
         mismatches.record()
@@ -202,7 +203,7 @@ extension SIMDFloatConstantTests {
             }
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeFirstF32(a, destination.baseAddress!, count)
+                unsafe HighwayReference.storeFirstF32(a.raw, destination.baseAddress!, count)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
@@ -319,7 +320,7 @@ extension SIMDFloatConstantTests {
                 destination in unsafe H.storeFirst(a, to: destination, count: count)
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(count))) {
-                destination in unsafe HighwayReference.storeFirstF32(a, destination, count)
+                destination in unsafe HighwayReference.storeFirstF32(a.raw, destination, count)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
@@ -440,7 +441,7 @@ extension SIMDFloatConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeFirstF32(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     destination.baseAddress!,
                     count
                 )
@@ -540,7 +541,7 @@ extension SIMDFloatConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeWhereF32(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     mask.raw,
                     destination.baseAddress!
                 )

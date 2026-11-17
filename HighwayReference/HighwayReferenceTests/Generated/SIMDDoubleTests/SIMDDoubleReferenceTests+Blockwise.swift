@@ -19,7 +19,7 @@ extension SIMDDoubleReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 H.tableLookupBytes(a, at: indices),
-                HighwayReference.tableLookupBytesF64(a, indices),
+                HighwayReference.tableLookupBytesF64(a.raw, indices.raw),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -39,7 +39,7 @@ extension SIMDDoubleReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 unsafe H.tableLookupBytes(a, atUnchecked: indices),
-                HighwayReference.tableLookupBytesF64(a, indices),
+                HighwayReference.tableLookupBytesF64(a.raw, indices.raw),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -60,7 +60,7 @@ extension SIMDDoubleReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 unsafe H.tableLookupBytes(a, atUnchecked: indices),
-                HighwayReference.tableLookupBytesF64(a, indices),
+                HighwayReference.tableLookupBytesF64(a.raw, indices.raw),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -81,7 +81,7 @@ extension SIMDDoubleReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 H.tableLookupBytesOrZero(a, at: indices),
-                HighwayReference.tableLookupBytesOrZeroF64(a, indices),
+                HighwayReference.tableLookupBytesOrZeroF64(a.raw, indices.raw),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -102,7 +102,7 @@ extension SIMDDoubleReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 unsafe H.tableLookupBytesOrZero(a, atUnchecked: indices),
-                HighwayReference.tableLookupBytesOrZeroF64(a, indices),
+                HighwayReference.tableLookupBytesOrZeroF64(a.raw, indices.raw),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -124,7 +124,7 @@ extension SIMDDoubleReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 unsafe H.tableLookupBytesOrZero(a, atUnchecked: indices),
-                HighwayReference.tableLookupBytesOrZeroF64(a, indices),
+                HighwayReference.tableLookupBytesOrZeroF64(a.raw, indices.raw),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -138,7 +138,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(adjacentLanesOf: a, b) {
             mismatches.check(
                 H.pairwiseAddingBlocks(a, b),
-                HighwayReference.pairwiseAddingBlocksF64(a, b),
+                HighwayReference.pairwiseAddingBlocksF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -152,7 +152,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.pairwiseSubtractingBlocks(a, b),
-                HighwayReference.pairwiseSubtractingBlocksF64(a, b),
+                HighwayReference.pairwiseSubtractingBlocksF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -166,7 +166,7 @@ extension SIMDDoubleReferenceTests {
         for (a, lane) in everyPair(aInputs, laneInputs) {
             mismatches.check(
                 H.broadcastingInBlocks(a, lane: lane),
-                HighwayReference.broadcastingInBlocksF64(a, Int32(truncatingIfNeeded: lane)),
+                HighwayReference.broadcastingInBlocksF64(a.raw, Int32(truncatingIfNeeded: lane)),
                 "a: \(describe(a)), lane: \(lane)"
             )
         }
@@ -180,7 +180,7 @@ extension SIMDDoubleReferenceTests {
         for (a, lane) in everyPair(aInputs, laneInputs) {
             mismatches.check(
                 unsafe H.broadcastingInBlocks(a, laneUnchecked: lane),
-                HighwayReference.broadcastingInBlocksF64(a, Int32(truncatingIfNeeded: lane)),
+                HighwayReference.broadcastingInBlocksF64(a.raw, Int32(truncatingIfNeeded: lane)),
                 "a: \(describe(a)), lane: \(lane)"
             )
         }

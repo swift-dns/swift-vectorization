@@ -12,7 +12,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.roundedToNearestOrEven(a),
-                HighwayReference.roundedToNearestOrEvenF64(a),
+                HighwayReference.roundedToNearestOrEvenF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -25,7 +25,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.roundedTowardZero(a),
-                HighwayReference.roundedTowardZeroF64(a),
+                HighwayReference.roundedTowardZeroF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -36,7 +36,11 @@ extension SIMDDoubleReferenceTests {
         let mismatches = Mismatches("roundedUp")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD252_A296_62DA_F11F)
         for a in aInputs {
-            mismatches.check(H.roundedUp(a), HighwayReference.roundedUpF64(a), "a: \(describe(a))")
+            mismatches.check(
+                H.roundedUp(a),
+                HighwayReference.roundedUpF64(a.raw),
+                "a: \(describe(a))"
+            )
         }
         mismatches.record()
     }
@@ -47,7 +51,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.roundedDown(a),
-                HighwayReference.roundedDownF64(a),
+                HighwayReference.roundedDownF64(a.raw),
                 "a: \(describe(a))"
             )
         }

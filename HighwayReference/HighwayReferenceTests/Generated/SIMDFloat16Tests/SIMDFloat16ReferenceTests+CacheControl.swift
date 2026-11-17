@@ -16,7 +16,7 @@ extension SIMDFloat16ReferenceTests {
                 destination in unsafe H.storeStreaming(a, to: destination)
             }
             let (_, referenceLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
-                destination in unsafe HighwayReference.storeStreamingF16(a, destination)
+                destination in unsafe HighwayReference.storeStreamingF16(a.raw, destination)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
@@ -32,7 +32,7 @@ extension SIMDFloat16ReferenceTests {
                 unsafe H.storeStreaming(a, to: destination)
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.storeStreamingF16(a, destination)
+                unsafe HighwayReference.storeStreamingF16(a.raw, destination)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }

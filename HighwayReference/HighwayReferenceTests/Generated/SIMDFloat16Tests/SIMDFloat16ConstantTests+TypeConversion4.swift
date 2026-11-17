@@ -19,7 +19,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.vector(zeroExtendingResizing: SIMDDouble.repeating(value)),
-            HighwayReference.vectorZeroExtendingResizingF64ToF16(SIMDDouble.repeating(value)),
+            HighwayReference.vectorZeroExtendingResizingF64ToF16(SIMDDouble.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -117,7 +117,7 @@ extension SIMDFloat16ConstantTests {
             H.halfVector(zeroExtendingResizing: SIMDDouble.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorZeroExtendingResizingF64ToF16(
-                    SIMDDouble.repeating(value)
+                    SIMDDouble.repeating(value).raw
                 )
             ),
             ""
@@ -219,7 +219,7 @@ extension SIMDFloat16ConstantTests {
             H.quarterVector(zeroExtendingResizing: SIMDDouble.repeating(value)),
             H.QuarterVector(
                 raw: HighwayReference.quarterVectorZeroExtendingResizingF64ToF16(
-                    SIMDDouble.repeating(value)
+                    SIMDDouble.repeating(value).raw
                 )
             ),
             ""
@@ -318,7 +318,9 @@ extension SIMDFloat16ConstantTests {
         mismatches.check(
             H.halfVector(zeroExtendingResizing: H.repeating(value)),
             H.HalfVector(
-                raw: HighwayReference.halfVectorZeroExtendingResizingF16ToF16(H.repeating(value))
+                raw: HighwayReference.halfVectorZeroExtendingResizingF16ToF16(
+                    H.repeating(value).raw
+                )
             ),
             ""
         )
@@ -414,7 +416,9 @@ extension SIMDFloat16ConstantTests {
         mismatches.check(
             H.quarterVector(zeroExtendingResizing: H.repeating(value)),
             H.QuarterVector(
-                raw: HighwayReference.quarterVectorZeroExtendingResizingF16ToF16(H.repeating(value))
+                raw: HighwayReference.quarterVectorZeroExtendingResizingF16ToF16(
+                    H.repeating(value).raw
+                )
             ),
             ""
         )

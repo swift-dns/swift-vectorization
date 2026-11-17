@@ -88,7 +88,7 @@ extension SIMDUInt32ReferenceTests {
         let aInputs = Inputs.conversions(SIMDDouble.Vector.self, seed: 0x6668_AAF5_DA29_7C10)
         for a in aInputs {
             let port = H.vector(resizing: a)
-            let reference = H.Vector(raw: HighwayReference.vectorResizingF64ToU32(a))
+            let reference = H.Vector(raw: HighwayReference.vectorResizingF64ToU32(a.raw))
             let definedBytes = SIMDDouble.laneCount * MemoryLayout<SIMDDouble.Lane>.stride
             let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
@@ -115,7 +115,7 @@ extension SIMDUInt32ReferenceTests {
         let aInputs = Inputs.conversions(SIMDDouble.Vector.self, seed: 0x4024_7FDD_4A6F_0529)
         for a in aInputs {
             let port = H.halfVector(resizing: a)
-            let reference = H.HalfVector(raw: HighwayReference.halfVectorResizingF64ToU32(a))
+            let reference = H.HalfVector(raw: HighwayReference.halfVectorResizingF64ToU32(a.raw))
             let definedBytes = SIMDDouble.laneCount * MemoryLayout<SIMDDouble.Lane>.stride
             let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
@@ -148,7 +148,7 @@ extension SIMDUInt32ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(resizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorResizingF64ToU32(a)),
+                H.Vector(raw: HighwayReference.resizedHalfVectorResizingF64ToU32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -240,7 +240,7 @@ extension SIMDUInt32ReferenceTests {
         let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0x895C_C6E1_539E_9CD0)
         for a in aInputs {
             let port = H.vector(resizing: a)
-            let reference = H.Vector(raw: HighwayReference.vectorResizingF16ToU32(a))
+            let reference = H.Vector(raw: HighwayReference.vectorResizingF16ToU32(a.raw))
             let definedBytes = SIMDFloat16.laneCount * MemoryLayout<SIMDFloat16.Lane>.stride
             let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
@@ -269,7 +269,7 @@ extension SIMDUInt32ReferenceTests {
         let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0x2E8A_21DC_9C5A_1C4B)
         for a in aInputs {
             let port = H.halfVector(resizing: a)
-            let reference = H.HalfVector(raw: HighwayReference.halfVectorResizingF16ToU32(a))
+            let reference = H.HalfVector(raw: HighwayReference.halfVectorResizingF16ToU32(a.raw))
             let definedBytes = SIMDFloat16.laneCount * MemoryLayout<SIMDFloat16.Lane>.stride
             let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
@@ -304,7 +304,7 @@ extension SIMDUInt32ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(resizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorResizingF16ToU32(a)),
+                H.Vector(raw: HighwayReference.resizedHalfVectorResizingF16ToU32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -1773,7 +1773,7 @@ extension SIMDUInt32ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(zeroExtendingResizing: a),
-                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF32ToU32(a)),
+                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF32ToU32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -1786,7 +1786,7 @@ extension SIMDUInt32ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.halfVector(zeroExtendingResizing: a),
-                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF32ToU32(a)),
+                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF32ToU32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -1804,7 +1804,9 @@ extension SIMDUInt32ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(zeroExtendingResizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF32ToU32(a)),
+                H.Vector(
+                    raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF32ToU32(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -1868,7 +1870,7 @@ extension SIMDUInt32ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(zeroExtendingResizing: a),
-                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF64ToU32(a)),
+                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF64ToU32(a.raw)),
                 "a: \(describe(a))"
             )
         }

@@ -625,7 +625,7 @@ extension SIMDUInt32ConstantTests {
         )
         mismatches.check(
             H.biasedExponent(SIMDFloat.repeating(value)),
-            H.Vector(raw: HighwayReference.biasedExponentF32ToU32(SIMDFloat.repeating(value))),
+            H.Vector(raw: HighwayReference.biasedExponentF32ToU32(SIMDFloat.repeating(value).raw)),
             ""
         )
         mismatches.record()

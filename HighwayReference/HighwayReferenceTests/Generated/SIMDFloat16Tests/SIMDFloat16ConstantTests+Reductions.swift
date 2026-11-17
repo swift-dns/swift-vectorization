@@ -17,7 +17,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.sum(H.repeating(value)),
-            Float16(bitPattern: HighwayReference.sumF16(H.repeating(value))),
+            Float16(bitPattern: HighwayReference.sumF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -109,7 +109,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.smallest(H.repeating(value)),
-            Float16(bitPattern: HighwayReference.smallestF16(H.repeating(value))),
+            Float16(bitPattern: HighwayReference.smallestF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -201,7 +201,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.largest(H.repeating(value)),
-            Float16(bitPattern: HighwayReference.largestF16(H.repeating(value))),
+            Float16(bitPattern: HighwayReference.largestF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -293,7 +293,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.smallestOrNaN(H.repeating(value)),
-            Float16(bitPattern: HighwayReference.smallestOrNaNF16(H.repeating(value))),
+            Float16(bitPattern: HighwayReference.smallestOrNaNF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -385,7 +385,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.largestOrNaN(H.repeating(value)),
-            Float16(bitPattern: HighwayReference.largestOrNaNF16(H.repeating(value))),
+            Float16(bitPattern: HighwayReference.largestOrNaNF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -477,7 +477,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.repeatingSum(H.repeating(value)),
-            HighwayReference.repeatingSumF16(H.repeating(value)),
+            HighwayReference.repeatingSumF16(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -569,7 +569,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.repeatingSmallest(H.repeating(value)),
-            HighwayReference.repeatingSmallestF16(H.repeating(value)),
+            HighwayReference.repeatingSmallestF16(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -661,7 +661,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.repeatingLargest(H.repeating(value)),
-            HighwayReference.repeatingLargestF16(H.repeating(value)),
+            HighwayReference.repeatingLargestF16(H.repeating(value).raw),
             ""
         )
         mismatches.record()

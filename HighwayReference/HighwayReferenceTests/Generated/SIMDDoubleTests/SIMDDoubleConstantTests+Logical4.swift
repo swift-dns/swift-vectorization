@@ -14,7 +14,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.selectingIfNegativeOrZero(H.repeating(value), b),
-                HighwayReference.selectingIfNegativeOrZeroF64(H.repeating(value), b),
+                HighwayReference.selectingIfNegativeOrZeroF64(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -29,7 +29,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.selectingIfNegativeOrZero(a, H.repeating(value)),
-                HighwayReference.selectingIfNegativeOrZeroF64(a, H.repeating(value)),
+                HighwayReference.selectingIfNegativeOrZeroF64(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -139,7 +139,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.zeroingIfNegative(H.repeating(value), b),
-                HighwayReference.zeroingIfNegativeF64(H.repeating(value), b),
+                HighwayReference.zeroingIfNegativeF64(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -154,7 +154,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.zeroingIfNegative(a, H.repeating(value)),
-                HighwayReference.zeroingIfNegativeF64(a, H.repeating(value)),
+                HighwayReference.zeroingIfNegativeF64(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -264,7 +264,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.negatingIfNegative(H.repeating(value), b),
-                HighwayReference.negatingIfNegativeF64(H.repeating(value), b),
+                HighwayReference.negatingIfNegativeF64(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -279,7 +279,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.negatingIfNegative(a, H.repeating(value)),
-                HighwayReference.negatingIfNegativeF64(a, H.repeating(value)),
+                HighwayReference.negatingIfNegativeF64(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }

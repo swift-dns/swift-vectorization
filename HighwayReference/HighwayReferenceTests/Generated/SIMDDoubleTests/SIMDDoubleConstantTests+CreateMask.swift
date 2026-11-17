@@ -87,7 +87,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.mask(from: H.repeating(value)),
-            H.Mask(raw: HighwayReference.maskFromVectorF64(H.repeating(value))),
+            H.Mask(raw: HighwayReference.maskFromVectorF64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()

@@ -4,422 +4,406 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portSlideUpLanesF32(_ a: SIMDFloat.Vector, byUnchecked lanes: Int) -> SIMDFloat.Vector {
+public func portSlideUpLanesF32(_ a: SIMD<Float>, byUnchecked lanes: Int) -> SIMD<Float> {
     unsafe SIMDFloat.slideUpLanes(a, byUnchecked: lanes)
 }
 
 @inline(never)
-public func highwaySlideUpLanesF32(
-    _ a: SIMDFloat.Vector,
-    byUnchecked lanes: Int
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.slideUpLanesF32(a, lanes)
+public func highwaySlideUpLanesF32(_ a: SIMD<Float>, byUnchecked lanes: Int) -> SIMD<Float> {
+    HighwayReference.Nothrow.slideUpLanesF32(a.raw, lanes)
 }
 
 @inline(never)
-public func portSlideUpLanesF32ConstantA(byUnchecked lanes: Int) -> SIMDFloat.Vector {
+public func portSlideUpLanesF32ConstantA(byUnchecked lanes: Int) -> SIMD<Float> {
     unsafe SIMDFloat.slideUpLanes(SIMDFloat.repeating(1.5), byUnchecked: lanes)
 }
 
 @inline(never)
-public func highwaySlideUpLanesF32ConstantA(byUnchecked lanes: Int) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.slideUpLanesF32(HighwayReference.Nothrow.repeatingF32(1.5), lanes)
+public func highwaySlideUpLanesF32ConstantA(byUnchecked lanes: Int) -> SIMD<Float> {
+    HighwayReference.Nothrow.slideUpLanesF32(HighwayReference.Nothrow.repeatingF32(1.5).raw, lanes)
 }
 
 @inline(never)
-public func portSlideUpLanesF32ConstantLanes(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portSlideUpLanesF32ConstantLanes(_ a: SIMD<Float>) -> SIMD<Float> {
     unsafe SIMDFloat.slideUpLanes(a, byUnchecked: 1)
 }
 
 @inline(never)
-public func highwaySlideUpLanesF32ConstantLanes(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.slideUpLanesF32(a, 1)
+public func highwaySlideUpLanesF32ConstantLanes(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.slideUpLanesF32(a.raw, 1)
 }
 
 @inline(never)
 public func portSlideUpLanesFillingWithF32(
-    _ a: SIMDFloat.Vector,
+    _ a: SIMD<Float>,
     byUnchecked lanes: Int,
-    fillingWith fill: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    fillingWith fill: SIMD<Float>
+) -> SIMD<Float> {
     unsafe SIMDFloat.slideUpLanes(a, byUnchecked: lanes, fillingWith: fill)
 }
 
 @inline(never)
 public func highwaySlideUpLanesFillingWithF32(
-    _ a: SIMDFloat.Vector,
+    _ a: SIMD<Float>,
     byUnchecked lanes: Int,
-    fillingWith fill: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.slideUpLanesFillingWithF32(fill, a, lanes)
+    fillingWith fill: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.slideUpLanesFillingWithF32(fill.raw, a.raw, lanes)
 }
 
 @inline(never)
 public func portSlideUpLanesFillingWithF32ConstantA(
     byUnchecked lanes: Int,
-    fillingWith fill: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    fillingWith fill: SIMD<Float>
+) -> SIMD<Float> {
     unsafe SIMDFloat.slideUpLanes(SIMDFloat.repeating(1.5), byUnchecked: lanes, fillingWith: fill)
 }
 
 @inline(never)
 public func highwaySlideUpLanesFillingWithF32ConstantA(
     byUnchecked lanes: Int,
-    fillingWith fill: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    fillingWith fill: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.slideUpLanesFillingWithF32(
-        fill,
-        HighwayReference.Nothrow.repeatingF32(1.5),
+        fill.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
         lanes
     )
 }
 
 @inline(never)
 public func portSlideUpLanesFillingWithF32ConstantLanes(
-    _ a: SIMDFloat.Vector,
-    fillingWith fill: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    fillingWith fill: SIMD<Float>
+) -> SIMD<Float> {
     unsafe SIMDFloat.slideUpLanes(a, byUnchecked: 1, fillingWith: fill)
 }
 
 @inline(never)
 public func highwaySlideUpLanesFillingWithF32ConstantLanes(
-    _ a: SIMDFloat.Vector,
-    fillingWith fill: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.slideUpLanesFillingWithF32(fill, a, 1)
+    _ a: SIMD<Float>,
+    fillingWith fill: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.slideUpLanesFillingWithF32(fill.raw, a.raw, 1)
 }
 
 @inline(never)
 public func portSlideUpLanesFillingWithF32ConstantFill(
-    _ a: SIMDFloat.Vector,
+    _ a: SIMD<Float>,
     byUnchecked lanes: Int
-) -> SIMDFloat.Vector {
+) -> SIMD<Float> {
     unsafe SIMDFloat.slideUpLanes(a, byUnchecked: lanes, fillingWith: SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
 public func highwaySlideUpLanesFillingWithF32ConstantFill(
-    _ a: SIMDFloat.Vector,
+    _ a: SIMD<Float>,
     byUnchecked lanes: Int
-) -> SIMDFloat.Vector {
+) -> SIMD<Float> {
     HighwayReference.Nothrow.slideUpLanesFillingWithF32(
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        a,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        a.raw,
         lanes
     )
 }
 
 @inline(never)
-public func portSlideDownLanesF32(_ a: SIMDFloat.Vector, byUnchecked lanes: Int) -> SIMDFloat.Vector
-{
+public func portSlideDownLanesF32(_ a: SIMD<Float>, byUnchecked lanes: Int) -> SIMD<Float> {
     unsafe SIMDFloat.slideDownLanes(a, byUnchecked: lanes)
 }
 
 @inline(never)
-public func highwaySlideDownLanesF32(
-    _ a: SIMDFloat.Vector,
-    byUnchecked lanes: Int
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.slideDownLanesF32(a, lanes)
+public func highwaySlideDownLanesF32(_ a: SIMD<Float>, byUnchecked lanes: Int) -> SIMD<Float> {
+    HighwayReference.Nothrow.slideDownLanesF32(a.raw, lanes)
 }
 
 @inline(never)
-public func portSlideDownLanesF32ConstantA(byUnchecked lanes: Int) -> SIMDFloat.Vector {
+public func portSlideDownLanesF32ConstantA(byUnchecked lanes: Int) -> SIMD<Float> {
     unsafe SIMDFloat.slideDownLanes(SIMDFloat.repeating(1.5), byUnchecked: lanes)
 }
 
 @inline(never)
-public func highwaySlideDownLanesF32ConstantA(byUnchecked lanes: Int) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.slideDownLanesF32(HighwayReference.Nothrow.repeatingF32(1.5), lanes)
+public func highwaySlideDownLanesF32ConstantA(byUnchecked lanes: Int) -> SIMD<Float> {
+    HighwayReference.Nothrow.slideDownLanesF32(
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        lanes
+    )
 }
 
 @inline(never)
-public func portSlideDownLanesF32ConstantLanes(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portSlideDownLanesF32ConstantLanes(_ a: SIMD<Float>) -> SIMD<Float> {
     unsafe SIMDFloat.slideDownLanes(a, byUnchecked: 1)
 }
 
 @inline(never)
-public func highwaySlideDownLanesF32ConstantLanes(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.slideDownLanesF32(a, 1)
+public func highwaySlideDownLanesF32ConstantLanes(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.slideDownLanesF32(a.raw, 1)
 }
 
 @inline(never)
 public func portSlideDownLanesFillingWithF32(
-    _ a: SIMDFloat.Vector,
+    _ a: SIMD<Float>,
     byUnchecked lanes: Int,
-    fillingWith fill: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    fillingWith fill: SIMD<Float>
+) -> SIMD<Float> {
     unsafe SIMDFloat.slideDownLanes(a, byUnchecked: lanes, fillingWith: fill)
 }
 
 @inline(never)
 public func highwaySlideDownLanesFillingWithF32(
-    _ a: SIMDFloat.Vector,
+    _ a: SIMD<Float>,
     byUnchecked lanes: Int,
-    fillingWith fill: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.slideDownLanesFillingWithF32(fill, a, lanes)
+    fillingWith fill: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.slideDownLanesFillingWithF32(fill.raw, a.raw, lanes)
 }
 
 @inline(never)
 public func portSlideDownLanesFillingWithF32ConstantA(
     byUnchecked lanes: Int,
-    fillingWith fill: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    fillingWith fill: SIMD<Float>
+) -> SIMD<Float> {
     unsafe SIMDFloat.slideDownLanes(SIMDFloat.repeating(1.5), byUnchecked: lanes, fillingWith: fill)
 }
 
 @inline(never)
 public func highwaySlideDownLanesFillingWithF32ConstantA(
     byUnchecked lanes: Int,
-    fillingWith fill: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    fillingWith fill: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.slideDownLanesFillingWithF32(
-        fill,
-        HighwayReference.Nothrow.repeatingF32(1.5),
+        fill.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
         lanes
     )
 }
 
 @inline(never)
 public func portSlideDownLanesFillingWithF32ConstantLanes(
-    _ a: SIMDFloat.Vector,
-    fillingWith fill: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    fillingWith fill: SIMD<Float>
+) -> SIMD<Float> {
     unsafe SIMDFloat.slideDownLanes(a, byUnchecked: 1, fillingWith: fill)
 }
 
 @inline(never)
 public func highwaySlideDownLanesFillingWithF32ConstantLanes(
-    _ a: SIMDFloat.Vector,
-    fillingWith fill: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.slideDownLanesFillingWithF32(fill, a, 1)
+    _ a: SIMD<Float>,
+    fillingWith fill: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.slideDownLanesFillingWithF32(fill.raw, a.raw, 1)
 }
 
 @inline(never)
 public func portSlideDownLanesFillingWithF32ConstantFill(
-    _ a: SIMDFloat.Vector,
+    _ a: SIMD<Float>,
     byUnchecked lanes: Int
-) -> SIMDFloat.Vector {
+) -> SIMD<Float> {
     unsafe SIMDFloat.slideDownLanes(a, byUnchecked: lanes, fillingWith: SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
 public func highwaySlideDownLanesFillingWithF32ConstantFill(
-    _ a: SIMDFloat.Vector,
+    _ a: SIMD<Float>,
     byUnchecked lanes: Int
-) -> SIMDFloat.Vector {
+) -> SIMD<Float> {
     HighwayReference.Nothrow.slideDownLanesFillingWithF32(
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        a,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        a.raw,
         lanes
     )
 }
 
 @inline(never)
-public func portSlide1UpF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portSlide1UpF32(_ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.slide1Up(a)
 }
 
 @inline(never)
-public func highwaySlide1UpF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.slide1UpF32(a)
+public func highwaySlide1UpF32(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.slide1UpF32(a.raw)
 }
 
 @inline(never)
-public func portSlide1UpF32ConstantA() -> SIMDFloat.Vector {
+public func portSlide1UpF32ConstantA() -> SIMD<Float> {
     SIMDFloat.slide1Up(SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwaySlide1UpF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.slide1UpF32(HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwaySlide1UpF32ConstantA() -> SIMD<Float> {
+    HighwayReference.Nothrow.slide1UpF32(HighwayReference.Nothrow.repeatingF32(1.5).raw)
 }
 
 @inline(never)
-public func portSlide1UpFillingWithF32(
-    _ a: SIMDFloat.Vector,
-    fillingWith fill: SIMDFloat.Lane
-) -> SIMDFloat.Vector {
+public func portSlide1UpFillingWithF32(_ a: SIMD<Float>, fillingWith fill: Float) -> SIMD<Float> {
     SIMDFloat.slide1Up(a, fillingWith: fill)
 }
 
 @inline(never)
-public func highwaySlide1UpFillingWithF32(
-    _ a: SIMDFloat.Vector,
-    fillingWith fill: Float
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.slide1UpFillingWithF32(fill, a)
+public func highwaySlide1UpFillingWithF32(_ a: SIMD<Float>, fillingWith fill: Float) -> SIMD<Float>
+{
+    HighwayReference.Nothrow.slide1UpFillingWithF32(fill, a.raw)
 }
 
 @inline(never)
-public func portSlide1UpFillingWithF32ConstantA(
-    fillingWith fill: SIMDFloat.Lane
-) -> SIMDFloat.Vector {
+public func portSlide1UpFillingWithF32ConstantA(fillingWith fill: Float) -> SIMD<Float> {
     SIMDFloat.slide1Up(SIMDFloat.repeating(1.5), fillingWith: fill)
 }
 
 @inline(never)
-public func highwaySlide1UpFillingWithF32ConstantA(fillingWith fill: Float) -> SIMDFloat.Vector {
+public func highwaySlide1UpFillingWithF32ConstantA(fillingWith fill: Float) -> SIMD<Float> {
     HighwayReference.Nothrow.slide1UpFillingWithF32(
         fill,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
     )
 }
 
 @inline(never)
-public func portSlide1UpFillingWithF32ConstantFill(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portSlide1UpFillingWithF32ConstantFill(_ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.slide1Up(a, fillingWith: 1.5)
 }
 
 @inline(never)
-public func highwaySlide1UpFillingWithF32ConstantFill(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.slide1UpFillingWithF32(1.5, a)
+public func highwaySlide1UpFillingWithF32ConstantFill(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.slide1UpFillingWithF32(1.5, a.raw)
 }
 
 @inline(never)
-public func portSlide1DownF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portSlide1DownF32(_ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.slide1Down(a)
 }
 
 @inline(never)
-public func highwaySlide1DownF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.slide1DownF32(a)
+public func highwaySlide1DownF32(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.slide1DownF32(a.raw)
 }
 
 @inline(never)
-public func portSlide1DownF32ConstantA() -> SIMDFloat.Vector {
+public func portSlide1DownF32ConstantA() -> SIMD<Float> {
     SIMDFloat.slide1Down(SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwaySlide1DownF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.slide1DownF32(HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwaySlide1DownF32ConstantA() -> SIMD<Float> {
+    HighwayReference.Nothrow.slide1DownF32(HighwayReference.Nothrow.repeatingF32(1.5).raw)
 }
 
 @inline(never)
-public func portSlide1DownFillingWithF32(
-    _ a: SIMDFloat.Vector,
-    fillingWith fill: SIMDFloat.Lane
-) -> SIMDFloat.Vector {
+public func portSlide1DownFillingWithF32(_ a: SIMD<Float>, fillingWith fill: Float) -> SIMD<Float> {
     SIMDFloat.slide1Down(a, fillingWith: fill)
 }
 
 @inline(never)
 public func highwaySlide1DownFillingWithF32(
-    _ a: SIMDFloat.Vector,
+    _ a: SIMD<Float>,
     fillingWith fill: Float
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.slide1DownFillingWithF32(fill, a)
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.slide1DownFillingWithF32(fill, a.raw)
 }
 
 @inline(never)
-public func portSlide1DownFillingWithF32ConstantA(
-    fillingWith fill: SIMDFloat.Lane
-) -> SIMDFloat.Vector {
+public func portSlide1DownFillingWithF32ConstantA(fillingWith fill: Float) -> SIMD<Float> {
     SIMDFloat.slide1Down(SIMDFloat.repeating(1.5), fillingWith: fill)
 }
 
 @inline(never)
-public func highwaySlide1DownFillingWithF32ConstantA(fillingWith fill: Float) -> SIMDFloat.Vector {
+public func highwaySlide1DownFillingWithF32ConstantA(fillingWith fill: Float) -> SIMD<Float> {
     HighwayReference.Nothrow.slide1DownFillingWithF32(
         fill,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
     )
 }
 
 @inline(never)
-public func portSlide1DownFillingWithF32ConstantFill(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portSlide1DownFillingWithF32ConstantFill(_ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.slide1Down(a, fillingWith: 1.5)
 }
 
 @inline(never)
-public func highwaySlide1DownFillingWithF32ConstantFill(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.slide1DownFillingWithF32(1.5, a)
+public func highwaySlide1DownFillingWithF32ConstantFill(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.slide1DownFillingWithF32(1.5, a.raw)
 }
 
 @inline(never)
-public func portSlideUpBlocksF32ConstantA() -> SIMDFloat.Vector {
+public func portSlideUpBlocksF32ConstantA() -> SIMD<Float> {
     unsafe SIMDFloat.slideUpBlocks(SIMDFloat.repeating(1.5), byUnchecked: 0)
 }
 
 @inline(never)
-public func highwaySlideUpBlocksF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.slideUpBlocksF32(HighwayReference.Nothrow.repeatingF32(1.5), 0)
+public func highwaySlideUpBlocksF32ConstantA() -> SIMD<Float> {
+    HighwayReference.Nothrow.slideUpBlocksF32(HighwayReference.Nothrow.repeatingF32(1.5).raw, 0)
 }
 
 @inline(never)
-public func portSlideUpBlocksF32ConstantBlocks(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portSlideUpBlocksF32ConstantBlocks(_ a: SIMD<Float>) -> SIMD<Float> {
     unsafe SIMDFloat.slideUpBlocks(a, byUnchecked: 0)
 }
 
 @inline(never)
-public func highwaySlideUpBlocksF32ConstantBlocks(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.slideUpBlocksF32(a, 0)
+public func highwaySlideUpBlocksF32ConstantBlocks(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.slideUpBlocksF32(a.raw, 0)
 }
 
 @inline(never)
-public func portSlideDownBlocksF32ConstantA() -> SIMDFloat.Vector {
+public func portSlideDownBlocksF32ConstantA() -> SIMD<Float> {
     unsafe SIMDFloat.slideDownBlocks(SIMDFloat.repeating(1.5), byUnchecked: 0)
 }
 
 @inline(never)
-public func highwaySlideDownBlocksF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.slideDownBlocksF32(HighwayReference.Nothrow.repeatingF32(1.5), 0)
+public func highwaySlideDownBlocksF32ConstantA() -> SIMD<Float> {
+    HighwayReference.Nothrow.slideDownBlocksF32(HighwayReference.Nothrow.repeatingF32(1.5).raw, 0)
 }
 
 @inline(never)
-public func portSlideDownBlocksF32ConstantBlocks(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portSlideDownBlocksF32ConstantBlocks(_ a: SIMD<Float>) -> SIMD<Float> {
     unsafe SIMDFloat.slideDownBlocks(a, byUnchecked: 0)
 }
 
 @inline(never)
-public func highwaySlideDownBlocksF32ConstantBlocks(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.slideDownBlocksF32(a, 0)
+public func highwaySlideDownBlocksF32ConstantBlocks(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.slideDownBlocksF32(a.raw, 0)
 }
 
 @inline(never)
-public func portCombinedSlideDownLanesF32ConstantA(_ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portCombinedSlideDownLanesF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
     unsafe SIMDFloat.combinedSlideDownLanes(SIMDFloat.repeating(1.5), b, byUnchecked: 1)
 }
 
 @inline(never)
-public func highwayCombinedSlideDownLanesF32ConstantA(_ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func highwayCombinedSlideDownLanesF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
     HighwayReference.Nothrow.combinedSlideDownLanesF32(
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        b,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw,
         1
     )
 }
 
 @inline(never)
-public func portCombinedSlideDownLanesF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portCombinedSlideDownLanesF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
     unsafe SIMDFloat.combinedSlideDownLanes(a, SIMDFloat.repeating(1.5), byUnchecked: 1)
 }
 
 @inline(never)
-public func highwayCombinedSlideDownLanesF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func highwayCombinedSlideDownLanesF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
     HighwayReference.Nothrow.combinedSlideDownLanesF32(
-        a,
-        HighwayReference.Nothrow.repeatingF32(1.5),
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
         1
     )
 }
 
 @inline(never)
 public func portCombinedSlideDownLanesF32ConstantLanes(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>
+) -> SIMD<Float> {
     unsafe SIMDFloat.combinedSlideDownLanes(a, b, byUnchecked: 1)
 }
 
 @inline(never)
 public func highwayCombinedSlideDownLanesF32ConstantLanes(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.combinedSlideDownLanesF32(a, b, 1)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.combinedSlideDownLanesF32(a.raw, b.raw, 1)
 }

@@ -13,7 +13,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.oddEven(a, b),
-                HighwayReference.oddEvenF32(a, b),
+                HighwayReference.oddEvenF32(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -26,7 +26,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.duplicatingEven(a),
-                HighwayReference.duplicatingEvenF32(a),
+                HighwayReference.duplicatingEvenF32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -39,7 +39,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.duplicatingOdd(a),
-                HighwayReference.duplicatingOddF32(a),
+                HighwayReference.duplicatingOddF32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -52,7 +52,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.shuffled1032(a),
-                HighwayReference.shuffled1032F32(a),
+                HighwayReference.shuffled1032F32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -65,7 +65,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.shuffled0321(a),
-                HighwayReference.shuffled0321F32(a),
+                HighwayReference.shuffled0321F32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -78,7 +78,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.shuffled2103(a),
-                HighwayReference.shuffled2103F32(a),
+                HighwayReference.shuffled2103F32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -91,7 +91,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.shuffled2301(a),
-                HighwayReference.shuffled2301F32(a),
+                HighwayReference.shuffled2301F32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -104,7 +104,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.shuffled0123(a),
-                HighwayReference.shuffled0123F32(a),
+                HighwayReference.shuffled0123F32(a.raw),
                 "a: \(describe(a))"
             )
         }

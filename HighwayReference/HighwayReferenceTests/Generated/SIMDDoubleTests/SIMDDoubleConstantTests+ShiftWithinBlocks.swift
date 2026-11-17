@@ -15,7 +15,7 @@ extension SIMDDoubleConstantTests {
             mismatches.check(
                 H.shiftedLeftBytes(H.repeating(value), by: bytes),
                 HighwayReference.shiftedLeftBytesF64(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: bytes)
                 ),
                 "bytes: \(bytes)"
@@ -109,7 +109,7 @@ extension SIMDDoubleConstantTests {
             mismatches.check(
                 H.shiftedRightBytes(H.repeating(value), by: bytes),
                 HighwayReference.shiftedRightBytesF64(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: bytes)
                 ),
                 "bytes: \(bytes)"
@@ -201,7 +201,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.shiftedLeftLanes(a, by: lanes),
-                HighwayReference.shiftedLeftLanesF64(a, Int32(truncatingIfNeeded: lanes)),
+                HighwayReference.shiftedLeftLanesF64(a.raw, Int32(truncatingIfNeeded: lanes)),
                 "a: \(describe(a))"
             )
         }
@@ -227,7 +227,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 unsafe H.shiftedLeftLanes(a, byUnchecked: lanes),
-                HighwayReference.shiftedLeftLanesF64(a, Int32(truncatingIfNeeded: lanes)),
+                HighwayReference.shiftedLeftLanesF64(a.raw, Int32(truncatingIfNeeded: lanes)),
                 "a: \(describe(a))"
             )
         }
@@ -255,7 +255,7 @@ extension SIMDDoubleConstantTests {
             mismatches.check(
                 H.shiftedLeftLanes(H.repeating(value), by: lanes),
                 HighwayReference.shiftedLeftLanesF64(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: lanes)
                 ),
                 "lanes: \(lanes)"
@@ -347,7 +347,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.shiftedRightLanes(a, by: lanes),
-                HighwayReference.shiftedRightLanesF64(a, Int32(truncatingIfNeeded: lanes)),
+                HighwayReference.shiftedRightLanesF64(a.raw, Int32(truncatingIfNeeded: lanes)),
                 "a: \(describe(a))"
             )
         }
@@ -373,7 +373,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 unsafe H.shiftedRightLanes(a, byUnchecked: lanes),
-                HighwayReference.shiftedRightLanesF64(a, Int32(truncatingIfNeeded: lanes)),
+                HighwayReference.shiftedRightLanesF64(a.raw, Int32(truncatingIfNeeded: lanes)),
                 "a: \(describe(a))"
             )
         }
@@ -401,7 +401,7 @@ extension SIMDDoubleConstantTests {
             mismatches.check(
                 H.shiftedRightLanes(H.repeating(value), by: lanes),
                 HighwayReference.shiftedRightLanesF64(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: lanes)
                 ),
                 "lanes: \(lanes)"
@@ -496,8 +496,8 @@ extension SIMDDoubleConstantTests {
             mismatches.check(
                 H.combinedShiftedRightBytes(H.repeating(value), b, by: bytes),
                 HighwayReference.combinedShiftedRightBytesF64(
-                    H.repeating(value),
-                    b,
+                    H.repeating(value).raw,
+                    b.raw,
                     Int32(truncatingIfNeeded: bytes)
                 ),
                 "b: \(describe(b)), bytes: \(bytes)"
@@ -516,8 +516,8 @@ extension SIMDDoubleConstantTests {
             mismatches.check(
                 H.combinedShiftedRightBytes(a, H.repeating(value), by: bytes),
                 HighwayReference.combinedShiftedRightBytesF64(
-                    a,
-                    H.repeating(value),
+                    a.raw,
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: bytes)
                 ),
                 "a: \(describe(a)), bytes: \(bytes)"
@@ -630,8 +630,8 @@ extension SIMDDoubleConstantTests {
             mismatches.check(
                 H.combinedShiftedRightLanes(a, b, by: lanes),
                 HighwayReference.combinedShiftedRightLanesF64(
-                    a,
-                    b,
+                    a.raw,
+                    b.raw,
                     Int32(truncatingIfNeeded: lanes)
                 ),
                 "a: \(describe(a)), b: \(describe(b))"
@@ -653,8 +653,8 @@ extension SIMDDoubleConstantTests {
             mismatches.check(
                 unsafe H.combinedShiftedRightLanes(a, b, byUnchecked: lanes),
                 HighwayReference.combinedShiftedRightLanesF64(
-                    a,
-                    b,
+                    a.raw,
+                    b.raw,
                     Int32(truncatingIfNeeded: lanes)
                 ),
                 "a: \(describe(a)), b: \(describe(b))"
@@ -677,8 +677,8 @@ extension SIMDDoubleConstantTests {
             mismatches.check(
                 H.combinedShiftedRightLanes(H.repeating(value), b, by: lanes),
                 HighwayReference.combinedShiftedRightLanesF64(
-                    H.repeating(value),
-                    b,
+                    H.repeating(value).raw,
+                    b.raw,
                     Int32(truncatingIfNeeded: lanes)
                 ),
                 "b: \(describe(b)), lanes: \(lanes)"
@@ -697,8 +697,8 @@ extension SIMDDoubleConstantTests {
             mismatches.check(
                 H.combinedShiftedRightLanes(a, H.repeating(value), by: lanes),
                 HighwayReference.combinedShiftedRightLanesF64(
-                    a,
-                    H.repeating(value),
+                    a.raw,
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: lanes)
                 ),
                 "a: \(describe(a)), lanes: \(lanes)"

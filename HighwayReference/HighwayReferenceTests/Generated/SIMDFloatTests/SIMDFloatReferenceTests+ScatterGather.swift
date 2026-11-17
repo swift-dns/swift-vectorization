@@ -341,7 +341,7 @@ extension SIMDFloatReferenceTests {
                         otherwise: otherwise
                     ),
                     unsafe HighwayReference.gatherFirstOtherwiseF32(
-                        otherwise,
+                        otherwise.raw,
                         source.baseAddress!,
                         indices.raw,
                         count
@@ -389,7 +389,7 @@ extension SIMDFloatReferenceTests {
                         otherwise: otherwise
                     ),
                     unsafe HighwayReference.gatherFirstOtherwiseF32(
-                        otherwise,
+                        otherwise.raw,
                         source,
                         indices.raw,
                         count
@@ -649,7 +649,7 @@ extension SIMDFloatReferenceTests {
                         otherwise: otherwise
                     ),
                     unsafe HighwayReference.gatherWhereOtherwiseF32(
-                        otherwise,
+                        otherwise.raw,
                         mask.raw,
                         source.baseAddress!,
                         indices.raw
@@ -697,7 +697,7 @@ extension SIMDFloatReferenceTests {
                         otherwise: otherwise
                     ),
                     unsafe HighwayReference.gatherWhereOtherwiseF32(
-                        otherwise,
+                        otherwise.raw,
                         mask.raw,
                         source,
                         indices.raw
@@ -745,7 +745,7 @@ extension SIMDFloatReferenceTests {
                         otherwise: otherwise
                     ),
                     unsafe HighwayReference.gatherWhereOtherwiseF32(
-                        otherwise,
+                        otherwise.raw,
                         mask.raw,
                         source.baseAddress!,
                         indices.raw
@@ -832,7 +832,7 @@ extension SIMDFloatReferenceTests {
             }
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.scatterF32(a, destination.baseAddress!, indices.raw)
+                unsafe HighwayReference.scatterF32(a.raw, destination.baseAddress!, indices.raw)
             }
             mismatches.check(
                 portLanes,
@@ -858,7 +858,7 @@ extension SIMDFloatReferenceTests {
                 unsafe H.scatter(a, to: destination, indices: indices)
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.scatterF32(a, destination, indices.raw)
+                unsafe HighwayReference.scatterF32(a.raw, destination, indices.raw)
             }
             mismatches.check(
                 portLanes,
@@ -921,7 +921,7 @@ extension SIMDFloatReferenceTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.scatterByteOffsetsF32(
-                    a,
+                    a.raw,
                     destination.baseAddress!,
                     byteOffsets.raw
                 )
@@ -950,7 +950,7 @@ extension SIMDFloatReferenceTests {
                 unsafe H.scatter(a, to: destination, byteOffsets: byteOffsets)
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.scatterByteOffsetsF32(a, destination, byteOffsets.raw)
+                unsafe HighwayReference.scatterByteOffsetsF32(a.raw, destination, byteOffsets.raw)
             }
             mismatches.check(
                 portLanes,
@@ -1020,7 +1020,7 @@ extension SIMDFloatReferenceTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.scatterFirstF32(
-                    a,
+                    a.raw,
                     destination.baseAddress!,
                     indices.raw,
                     count
@@ -1057,7 +1057,7 @@ extension SIMDFloatReferenceTests {
                 unsafe H.scatter(a, to: destination, indices: indices, count: count)
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.scatterFirstF32(a, destination, indices.raw, count)
+                unsafe HighwayReference.scatterFirstF32(a.raw, destination, indices.raw, count)
             }
             mismatches.check(
                 portLanes,
@@ -1134,7 +1134,7 @@ extension SIMDFloatReferenceTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.scatterWhereF32(
-                    a,
+                    a.raw,
                     mask.raw,
                     destination.baseAddress!,
                     indices.raw
@@ -1171,7 +1171,7 @@ extension SIMDFloatReferenceTests {
                 unsafe H.scatter(a, to: destination, indices: indices, where: mask)
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.scatterWhereF32(a, mask.raw, destination, indices.raw)
+                unsafe HighwayReference.scatterWhereF32(a.raw, mask.raw, destination, indices.raw)
             }
             mismatches.check(
                 portLanes,
@@ -1207,7 +1207,7 @@ extension SIMDFloatReferenceTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.scatterWhereF32(
-                    a,
+                    a.raw,
                     mask.raw,
                     destination.baseAddress!,
                     indices.raw

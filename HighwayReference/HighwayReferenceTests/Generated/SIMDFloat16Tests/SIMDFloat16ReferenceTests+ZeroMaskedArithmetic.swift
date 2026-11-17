@@ -14,7 +14,7 @@ extension SIMDFloat16ReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.squareRoot(a, where: mask),
-                HighwayReference.squareRootWhereF16(mask.raw, a),
+                HighwayReference.squareRootWhereF16(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -28,7 +28,7 @@ extension SIMDFloat16ReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.squareRoot(a, where: mask),
-                HighwayReference.squareRootWhereF16(mask.raw, a),
+                HighwayReference.squareRootWhereF16(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -44,7 +44,7 @@ extension SIMDFloat16ReferenceTests {
         where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.adding(a, b, where: mask),
-                HighwayReference.addingWhereF16(mask.raw, a, b),
+                HighwayReference.addingWhereF16(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -60,7 +60,7 @@ extension SIMDFloat16ReferenceTests {
         where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.adding(a, b, where: mask),
-                HighwayReference.addingWhereF16(mask.raw, a, b),
+                HighwayReference.addingWhereF16(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -76,7 +76,7 @@ extension SIMDFloat16ReferenceTests {
         {
             mismatches.check(
                 H.subtracting(a, b, where: mask),
-                HighwayReference.subtractingWhereF16(mask.raw, a, b),
+                HighwayReference.subtractingWhereF16(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -92,7 +92,7 @@ extension SIMDFloat16ReferenceTests {
         {
             mismatches.check(
                 H.subtracting(a, b, where: mask),
-                HighwayReference.subtractingWhereF16(mask.raw, a, b),
+                HighwayReference.subtractingWhereF16(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -108,7 +108,7 @@ extension SIMDFloat16ReferenceTests {
         where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.multiplying(a, b, where: mask),
-                HighwayReference.multiplyingWhereF16(mask.raw, a, b),
+                HighwayReference.multiplyingWhereF16(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -124,7 +124,7 @@ extension SIMDFloat16ReferenceTests {
         where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.multiplying(a, b, where: mask),
-                HighwayReference.multiplyingWhereF16(mask.raw, a, b),
+                HighwayReference.multiplyingWhereF16(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -140,7 +140,7 @@ extension SIMDFloat16ReferenceTests {
         {
             mismatches.check(
                 H.dividing(a, b, where: mask),
-                HighwayReference.dividingWhereF16(mask.raw, a, b),
+                HighwayReference.dividingWhereF16(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -156,7 +156,7 @@ extension SIMDFloat16ReferenceTests {
         {
             mismatches.check(
                 H.dividing(a, b, where: mask),
-                HighwayReference.dividingWhereF16(mask.raw, a, b),
+                HighwayReference.dividingWhereF16(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -172,7 +172,7 @@ extension SIMDFloat16ReferenceTests {
         where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.maximum(a, b, where: mask),
-                HighwayReference.maximumWhereF16(mask.raw, a, b),
+                HighwayReference.maximumWhereF16(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -188,7 +188,7 @@ extension SIMDFloat16ReferenceTests {
         where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.maximum(a, b, where: mask),
-                HighwayReference.maximumWhereF16(mask.raw, a, b),
+                HighwayReference.maximumWhereF16(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -210,7 +210,7 @@ extension SIMDFloat16ReferenceTests {
         ) where !hasUnorderedNaNs(multiplying: a, b, adding: c) {
             mismatches.check(
                 H.multiplyAdding(a, b, c, where: mask),
-                HighwayReference.multiplyAddingWhereF16(mask.raw, a, b, c),
+                HighwayReference.multiplyAddingWhereF16(mask.raw, a.raw, b.raw, c.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -232,7 +232,7 @@ extension SIMDFloat16ReferenceTests {
         ) where !hasUnorderedNaNs(multiplying: a, b, adding: c) {
             mismatches.check(
                 H.multiplyAdding(a, b, c, where: mask),
-                HighwayReference.multiplyAddingWhereF16(mask.raw, a, b, c),
+                HighwayReference.multiplyAddingWhereF16(mask.raw, a.raw, b.raw, c.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -254,7 +254,7 @@ extension SIMDFloat16ReferenceTests {
         ) where !hasUnorderedNaNs(multiplying: a, b, adding: c) {
             mismatches.check(
                 H.multiplySubtracting(a, b, c, where: mask),
-                HighwayReference.multiplySubtractingWhereF16(mask.raw, a, b, c),
+                HighwayReference.multiplySubtractingWhereF16(mask.raw, a.raw, b.raw, c.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -276,7 +276,7 @@ extension SIMDFloat16ReferenceTests {
         ) where !hasUnorderedNaNs(multiplying: a, b, adding: c) {
             mismatches.check(
                 H.multiplySubtracting(a, b, c, where: mask),
-                HighwayReference.multiplySubtractingWhereF16(mask.raw, a, b, c),
+                HighwayReference.multiplySubtractingWhereF16(mask.raw, a.raw, b.raw, c.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -298,7 +298,7 @@ extension SIMDFloat16ReferenceTests {
         ) where !hasUnorderedNaNs(negating: a, b, adding: c) {
             mismatches.check(
                 H.negatedMultiplyAdding(a, b, c, where: mask),
-                HighwayReference.negatedMultiplyAddingWhereF16(mask.raw, a, b, c),
+                HighwayReference.negatedMultiplyAddingWhereF16(mask.raw, a.raw, b.raw, c.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -320,7 +320,7 @@ extension SIMDFloat16ReferenceTests {
         ) where !hasUnorderedNaNs(negating: a, b, adding: c) {
             mismatches.check(
                 H.negatedMultiplyAdding(a, b, c, where: mask),
-                HighwayReference.negatedMultiplyAddingWhereF16(mask.raw, a, b, c),
+                HighwayReference.negatedMultiplyAddingWhereF16(mask.raw, a.raw, b.raw, c.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -342,7 +342,7 @@ extension SIMDFloat16ReferenceTests {
         ) where !hasUnorderedNaNs(negating: a, b, adding: c) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, b, c, where: mask),
-                HighwayReference.negatedMultiplySubtractingWhereF16(mask.raw, a, b, c),
+                HighwayReference.negatedMultiplySubtractingWhereF16(mask.raw, a.raw, b.raw, c.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -366,7 +366,7 @@ extension SIMDFloat16ReferenceTests {
         ) where !hasUnorderedNaNs(negating: a, b, adding: c) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, b, c, where: mask),
-                HighwayReference.negatedMultiplySubtractingWhereF16(mask.raw, a, b, c),
+                HighwayReference.negatedMultiplySubtractingWhereF16(mask.raw, a.raw, b.raw, c.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -380,7 +380,7 @@ extension SIMDFloat16ReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.approximateReciprocal(a, where: mask),
-                HighwayReference.approximateReciprocalWhereF16(mask.raw, a),
+                HighwayReference.approximateReciprocalWhereF16(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -394,7 +394,7 @@ extension SIMDFloat16ReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.approximateReciprocal(a, where: mask),
-                HighwayReference.approximateReciprocalWhereF16(mask.raw, a),
+                HighwayReference.approximateReciprocalWhereF16(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -408,7 +408,7 @@ extension SIMDFloat16ReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.approximateReciprocalSquareRoot(a, where: mask),
-                HighwayReference.approximateReciprocalSquareRootWhereF16(mask.raw, a),
+                HighwayReference.approximateReciprocalSquareRootWhereF16(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -424,7 +424,7 @@ extension SIMDFloat16ReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.approximateReciprocalSquareRoot(a, where: mask),
-                HighwayReference.approximateReciprocalSquareRootWhereF16(mask.raw, a),
+                HighwayReference.approximateReciprocalSquareRootWhereF16(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }

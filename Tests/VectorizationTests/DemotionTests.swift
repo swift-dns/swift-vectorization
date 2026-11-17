@@ -25,35 +25,39 @@ struct DemotionTests {
         return Result(clamping: value)
     }
 
-    func verify<Source: SIMDElement, Result: SIMDElement, Narrow>(
+    func verify<
+        Source: SIMDElement & FixedWidthInteger,
+        Result: SIMDElement & FixedWidthInteger,
+        Narrow
+    >(
         _ source: Source.Type,
         _ result: Result.Type,
-        store: (Narrow, inout MutableSpan<Result.Lane>) -> Void,
-        plain: (Source.Vector) -> Narrow,
-        shifted: (Source.Vector, Int) -> Narrow,
-        rounded: (Source.Vector, Int) -> Narrow
-    ) where Source.Lane: FixedWidthInteger, Result.Lane: FixedWidthInteger {
-        let edges = Self.edges(Source.Lane.self)
+        store: (Narrow, inout MutableSpan<Result>) -> Void,
+        plain: (SIMD<Source>) -> Narrow,
+        shifted: (SIMD<Source>, Int) -> Narrow,
+        rounded: (SIMD<Source>, Int) -> Narrow
+    ) {
+        let edges = Self.edges(Source.self)
         let shifts = Set([
-            0, 1, 2, Result.Lane.bitWidth - 1, Result.Lane.bitWidth, Result.Lane.bitWidth + 1,
-            Source.Lane.bitWidth - 1,
-        ]).filter { $0 < Source.Lane.bitWidth }
-        func lanes(_ narrow: Narrow) -> [Result.Lane] {
-            var output = ContiguousArray<Result.Lane>(repeating: 0, count: Source.laneCount)
+            0, 1, 2, Result.bitWidth - 1, Result.bitWidth, Result.bitWidth + 1,
+            Source.bitWidth - 1,
+        ]).filter { $0 < Source.bitWidth }
+        func lanes(_ narrow: Narrow) -> [Result] {
+            var output = ContiguousArray<Result>(repeating: 0, count: SIMD<Source>.laneCount)
             var destination = output.mutableSpan
             store(narrow, &destination)
             return Array(output)
         }
         for start in edges.indices {
             let input = ContiguousArray(
-                (0..<Source.laneCount).map { edges[(start + $0) % edges.count] }
+                (0..<SIMD<Source>.laneCount).map { edges[(start + $0) % edges.count] }
             )
-            let vector = Source.load(from: input.span)
-            let name = "\(Source.Lane.self) to \(Result.Lane.self)"
+            let vector = SIMD<Source>.load(from: input.span)
+            let name = "\(Source.self) to \(Result.self)"
             #expect(
                 lanes(plain(vector))
                     == input.map {
-                        Self.demoted($0, to: Result.Lane.self, shiftedRightBy: 0, rounding: false)
+                        Self.demoted($0, to: Result.self, shiftedRightBy: 0, rounding: false)
                     },
                 "\(name)"
             )
@@ -63,7 +67,7 @@ struct DemotionTests {
                     let want = input.map {
                         Self.demoted(
                             $0,
-                            to: Result.Lane.self,
+                            to: Result.self,
                             shiftedRightBy: shift,
                             rounding: isRounding
                         )
@@ -77,108 +81,108 @@ struct DemotionTests {
     @Test("Demoting to half the lane width saturates, with and without a shift")
     func half() {
         verify(
-            SIMDUInt16.self,
-            SIMDInt8.self,
-            store: { SIMDInt8.store($0, to: &$1) },
-            plain: { SIMDInt8.halfVector(clamping: $0) },
-            shifted: { SIMDInt8.halfVector(clamping: $0, shiftedRightBy: $1) },
-            rounded: { SIMDInt8.halfVector(clamping: $0, roundingShiftedRightBy: $1) }
+            UInt16.self,
+            Int8.self,
+            store: { SIMD<Int8>.store($0, to: &$1) },
+            plain: { SIMD<Int8>.halfVector(clamping: $0) },
+            shifted: { SIMD<Int8>.halfVector(clamping: $0, shiftedRightBy: $1) },
+            rounded: { SIMD<Int8>.halfVector(clamping: $0, roundingShiftedRightBy: $1) }
         )
         verify(
-            SIMDInt16.self,
-            SIMDUInt8.self,
-            store: { SIMDUInt8.store($0, to: &$1) },
-            plain: { SIMDUInt8.halfVector(clamping: $0) },
-            shifted: { SIMDUInt8.halfVector(clamping: $0, shiftedRightBy: $1) },
-            rounded: { SIMDUInt8.halfVector(clamping: $0, roundingShiftedRightBy: $1) }
+            Int16.self,
+            UInt8.self,
+            store: { SIMD<UInt8>.store($0, to: &$1) },
+            plain: { SIMD<UInt8>.halfVector(clamping: $0) },
+            shifted: { SIMD<UInt8>.halfVector(clamping: $0, shiftedRightBy: $1) },
+            rounded: { SIMD<UInt8>.halfVector(clamping: $0, roundingShiftedRightBy: $1) }
         )
         verify(
-            SIMDInt32.self,
-            SIMDUInt16.self,
-            store: { SIMDUInt16.store($0, to: &$1) },
-            plain: { SIMDUInt16.halfVector(clamping: $0) },
-            shifted: { SIMDUInt16.halfVector(clamping: $0, shiftedRightBy: $1) },
-            rounded: { SIMDUInt16.halfVector(clamping: $0, roundingShiftedRightBy: $1) }
+            Int32.self,
+            UInt16.self,
+            store: { SIMD<UInt16>.store($0, to: &$1) },
+            plain: { SIMD<UInt16>.halfVector(clamping: $0) },
+            shifted: { SIMD<UInt16>.halfVector(clamping: $0, shiftedRightBy: $1) },
+            rounded: { SIMD<UInt16>.halfVector(clamping: $0, roundingShiftedRightBy: $1) }
         )
         verify(
-            SIMDUInt64.self,
-            SIMDInt32.self,
-            store: { SIMDInt32.store($0, to: &$1) },
-            plain: { SIMDInt32.halfVector(clamping: $0) },
-            shifted: { SIMDInt32.halfVector(clamping: $0, shiftedRightBy: $1) },
-            rounded: { SIMDInt32.halfVector(clamping: $0, roundingShiftedRightBy: $1) }
+            UInt64.self,
+            Int32.self,
+            store: { SIMD<Int32>.store($0, to: &$1) },
+            plain: { SIMD<Int32>.halfVector(clamping: $0) },
+            shifted: { SIMD<Int32>.halfVector(clamping: $0, shiftedRightBy: $1) },
+            rounded: { SIMD<Int32>.halfVector(clamping: $0, roundingShiftedRightBy: $1) }
         )
         verify(
-            SIMDInt64.self,
-            SIMDUInt32.self,
-            store: { SIMDUInt32.store($0, to: &$1) },
-            plain: { SIMDUInt32.halfVector(clamping: $0) },
-            shifted: { SIMDUInt32.halfVector(clamping: $0, shiftedRightBy: $1) },
-            rounded: { SIMDUInt32.halfVector(clamping: $0, roundingShiftedRightBy: $1) }
+            Int64.self,
+            UInt32.self,
+            store: { SIMD<UInt32>.store($0, to: &$1) },
+            plain: { SIMD<UInt32>.halfVector(clamping: $0) },
+            shifted: { SIMD<UInt32>.halfVector(clamping: $0, shiftedRightBy: $1) },
+            rounded: { SIMD<UInt32>.halfVector(clamping: $0, roundingShiftedRightBy: $1) }
         )
     }
 
     @Test("Demoting to a quarter of the lane width saturates, with and without a shift")
     func quarter() {
         verify(
-            SIMDUInt32.self,
-            SIMDInt8.self,
-            store: { SIMDInt8.store($0, to: &$1) },
-            plain: { SIMDInt8.quarterVector(clamping: $0) },
-            shifted: { SIMDInt8.quarterVector(clamping: $0, shiftedRightBy: $1) },
-            rounded: { SIMDInt8.quarterVector(clamping: $0, roundingShiftedRightBy: $1) }
+            UInt32.self,
+            Int8.self,
+            store: { SIMD<Int8>.store($0, to: &$1) },
+            plain: { SIMD<Int8>.quarterVector(clamping: $0) },
+            shifted: { SIMD<Int8>.quarterVector(clamping: $0, shiftedRightBy: $1) },
+            rounded: { SIMD<Int8>.quarterVector(clamping: $0, roundingShiftedRightBy: $1) }
         )
         verify(
-            SIMDInt32.self,
-            SIMDUInt8.self,
-            store: { SIMDUInt8.store($0, to: &$1) },
-            plain: { SIMDUInt8.quarterVector(clamping: $0) },
-            shifted: { SIMDUInt8.quarterVector(clamping: $0, shiftedRightBy: $1) },
-            rounded: { SIMDUInt8.quarterVector(clamping: $0, roundingShiftedRightBy: $1) }
+            Int32.self,
+            UInt8.self,
+            store: { SIMD<UInt8>.store($0, to: &$1) },
+            plain: { SIMD<UInt8>.quarterVector(clamping: $0) },
+            shifted: { SIMD<UInt8>.quarterVector(clamping: $0, shiftedRightBy: $1) },
+            rounded: { SIMD<UInt8>.quarterVector(clamping: $0, roundingShiftedRightBy: $1) }
         )
         verify(
-            SIMDInt64.self,
-            SIMDUInt16.self,
-            store: { SIMDUInt16.store($0, to: &$1) },
-            plain: { SIMDUInt16.quarterVector(clamping: $0) },
-            shifted: { SIMDUInt16.quarterVector(clamping: $0, shiftedRightBy: $1) },
-            rounded: { SIMDUInt16.quarterVector(clamping: $0, roundingShiftedRightBy: $1) }
+            Int64.self,
+            UInt16.self,
+            store: { SIMD<UInt16>.store($0, to: &$1) },
+            plain: { SIMD<UInt16>.quarterVector(clamping: $0) },
+            shifted: { SIMD<UInt16>.quarterVector(clamping: $0, shiftedRightBy: $1) },
+            rounded: { SIMD<UInt16>.quarterVector(clamping: $0, roundingShiftedRightBy: $1) }
         )
         verify(
-            SIMDUInt64.self,
-            SIMDInt16.self,
-            store: { SIMDInt16.store($0, to: &$1) },
-            plain: { SIMDInt16.quarterVector(clamping: $0) },
-            shifted: { SIMDInt16.quarterVector(clamping: $0, shiftedRightBy: $1) },
-            rounded: { SIMDInt16.quarterVector(clamping: $0, roundingShiftedRightBy: $1) }
+            UInt64.self,
+            Int16.self,
+            store: { SIMD<Int16>.store($0, to: &$1) },
+            plain: { SIMD<Int16>.quarterVector(clamping: $0) },
+            shifted: { SIMD<Int16>.quarterVector(clamping: $0, shiftedRightBy: $1) },
+            rounded: { SIMD<Int16>.quarterVector(clamping: $0, roundingShiftedRightBy: $1) }
         )
     }
 
     @Test("Demoting to an eighth of the lane width saturates, with and without a shift")
     func eighth() {
         verify(
-            SIMDUInt64.self,
-            SIMDInt8.self,
-            store: { SIMDInt8.store($0, to: &$1) },
-            plain: { SIMDInt8.eighthVector(clamping: $0) },
-            shifted: { SIMDInt8.eighthVector(clamping: $0, shiftedRightBy: $1) },
-            rounded: { SIMDInt8.eighthVector(clamping: $0, roundingShiftedRightBy: $1) }
+            UInt64.self,
+            Int8.self,
+            store: { SIMD<Int8>.store($0, to: &$1) },
+            plain: { SIMD<Int8>.eighthVector(clamping: $0) },
+            shifted: { SIMD<Int8>.eighthVector(clamping: $0, shiftedRightBy: $1) },
+            rounded: { SIMD<Int8>.eighthVector(clamping: $0, roundingShiftedRightBy: $1) }
         )
         verify(
-            SIMDInt64.self,
-            SIMDUInt8.self,
-            store: { SIMDUInt8.store($0, to: &$1) },
-            plain: { SIMDUInt8.eighthVector(clamping: $0) },
-            shifted: { SIMDUInt8.eighthVector(clamping: $0, shiftedRightBy: $1) },
-            rounded: { SIMDUInt8.eighthVector(clamping: $0, roundingShiftedRightBy: $1) }
+            Int64.self,
+            UInt8.self,
+            store: { SIMD<UInt8>.store($0, to: &$1) },
+            plain: { SIMD<UInt8>.eighthVector(clamping: $0) },
+            shifted: { SIMD<UInt8>.eighthVector(clamping: $0, shiftedRightBy: $1) },
+            rounded: { SIMD<UInt8>.eighthVector(clamping: $0, roundingShiftedRightBy: $1) }
         )
         verify(
-            SIMDInt64.self,
-            SIMDInt8.self,
-            store: { SIMDInt8.store($0, to: &$1) },
-            plain: { SIMDInt8.eighthVector(clamping: $0) },
-            shifted: { SIMDInt8.eighthVector(clamping: $0, shiftedRightBy: $1) },
-            rounded: { SIMDInt8.eighthVector(clamping: $0, roundingShiftedRightBy: $1) }
+            Int64.self,
+            Int8.self,
+            store: { SIMD<Int8>.store($0, to: &$1) },
+            plain: { SIMD<Int8>.eighthVector(clamping: $0) },
+            shifted: { SIMD<Int8>.eighthVector(clamping: $0, shiftedRightBy: $1) },
+            rounded: { SIMD<Int8>.eighthVector(clamping: $0, roundingShiftedRightBy: $1) }
         )
     }
 
@@ -186,13 +190,13 @@ struct DemotionTests {
     @Test("Checked shifting demotions trap on a shift of a whole lane or more")
     func checkedShiftTraps() async {
         await #expect(processExitsWith: .failure) {
-            _ = SIMDInt8.halfVector(clamping: SIMDInt16.zero(), shiftedRightBy: 16)
+            _ = SIMD<Int8>.halfVector(clamping: SIMD<Int16>.zero(), shiftedRightBy: 16)
         }
         await #expect(processExitsWith: .failure) {
-            _ = SIMDInt8.quarterVector(clamping: SIMDInt32.zero(), roundingShiftedRightBy: -1)
+            _ = SIMD<Int8>.quarterVector(clamping: SIMD<Int32>.zero(), roundingShiftedRightBy: -1)
         }
         await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt8.eighthVector(clamping: SIMDUInt64.zero(), shiftedRightBy: 64)
+            _ = SIMD<UInt8>.eighthVector(clamping: SIMD<UInt64>.zero(), shiftedRightBy: 64)
         }
     }
     #endif

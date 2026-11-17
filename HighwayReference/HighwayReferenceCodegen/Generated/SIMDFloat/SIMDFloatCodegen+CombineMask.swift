@@ -4,37 +4,37 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portLowerHalfOfMaskF32(_ mask: SIMDFloat.Mask) -> SIMDFloat.HalfMask {
+public func portLowerHalfOfMaskF32(_ mask: SIMD<Float>.Mask) -> SIMD<Float>.HalfMask {
     SIMDFloat.lowerHalf(mask)
 }
 
 @inline(never)
-public func highwayLowerHalfOfMaskF32(_ mask: SIMDFloat.Mask) -> SIMDFloat.HalfMask {
+public func highwayLowerHalfOfMaskF32(_ mask: SIMD<Float>.Mask) -> SIMD<Float>.HalfMask {
     SIMDFloat.HalfMask(raw: HighwayReference.Nothrow.lowerHalfOfMaskF32(mask.raw))
 }
 
 @inline(never)
-public func portUpperHalfOfMaskF32(_ mask: SIMDFloat.Mask) -> SIMDFloat.HalfMask {
+public func portUpperHalfOfMaskF32(_ mask: SIMD<Float>.Mask) -> SIMD<Float>.HalfMask {
     SIMDFloat.upperHalf(mask)
 }
 
 @inline(never)
-public func highwayUpperHalfOfMaskF32(_ mask: SIMDFloat.Mask) -> SIMDFloat.HalfMask {
+public func highwayUpperHalfOfMaskF32(_ mask: SIMD<Float>.Mask) -> SIMD<Float>.HalfMask {
     SIMDFloat.HalfMask(raw: HighwayReference.Nothrow.upperHalfOfMaskF32(mask.raw))
 }
 
 @inline(never)
 public func portCombiningMasksF32(
-    _ a: SIMDFloat.HalfMask,
-    _ b: SIMDFloat.HalfMask
-) -> SIMDFloat.Mask {
+    _ a: SIMD<Float>.HalfMask,
+    _ b: SIMD<Float>.HalfMask
+) -> SIMD<Float>.Mask {
     SIMDFloat.combining(a, b)
 }
 
 @inline(never)
 public func highwayCombiningMasksF32(
-    _ a: SIMDFloat.HalfMask,
-    _ b: SIMDFloat.HalfMask
-) -> SIMDFloat.Mask {
+    _ a: SIMD<Float>.HalfMask,
+    _ b: SIMD<Float>.HalfMask
+) -> SIMD<Float>.Mask {
     SIMDFloat.Mask(raw: HighwayReference.Nothrow.combiningMasksF32(a.raw, b.raw))
 }

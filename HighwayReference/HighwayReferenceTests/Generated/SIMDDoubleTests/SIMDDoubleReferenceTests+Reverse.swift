@@ -10,7 +10,11 @@ extension SIMDDoubleReferenceTests {
         let mismatches = Mismatches("reversed")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x80D8_560F_4F7E_DC7D)
         for a in aInputs {
-            mismatches.check(H.reversed(a), HighwayReference.reversedF64(a), "a: \(describe(a))")
+            mismatches.check(
+                H.reversed(a),
+                HighwayReference.reversedF64(a.raw),
+                "a: \(describe(a))"
+            )
         }
         mismatches.record()
     }
@@ -21,7 +25,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.byteSwapped(a),
-                HighwayReference.byteSwappedF64(a),
+                HighwayReference.byteSwappedF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -34,7 +38,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.reversedBlocks(a),
-                HighwayReference.reversedBlocksF64(a),
+                HighwayReference.reversedBlocksF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -45,7 +49,11 @@ extension SIMDDoubleReferenceTests {
         let mismatches = Mismatches("reversed2")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1417_8404_72AC_FA4F)
         for a in aInputs {
-            mismatches.check(H.reversed2(a), HighwayReference.reversed2F64(a), "a: \(describe(a))")
+            mismatches.check(
+                H.reversed2(a),
+                HighwayReference.reversed2F64(a.raw),
+                "a: \(describe(a))"
+            )
         }
         mismatches.record()
     }
@@ -55,7 +63,11 @@ extension SIMDDoubleReferenceTests {
         let mismatches = Mismatches("reversed4")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4729_0E04_8F58_2EAD)
         for a in aInputs {
-            mismatches.check(H.reversed4(a), HighwayReference.reversed4F64(a), "a: \(describe(a))")
+            mismatches.check(
+                H.reversed4(a),
+                HighwayReference.reversed4F64(a.raw),
+                "a: \(describe(a))"
+            )
         }
         mismatches.record()
     }
@@ -65,7 +77,11 @@ extension SIMDDoubleReferenceTests {
         let mismatches = Mismatches("reversed8")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE02C_1A04_5548_5891)
         for a in aInputs {
-            mismatches.check(H.reversed8(a), HighwayReference.reversed8F64(a), "a: \(describe(a))")
+            mismatches.check(
+                H.reversed8(a),
+                HighwayReference.reversed8F64(a.raw),
+                "a: \(describe(a))"
+            )
         }
         mismatches.record()
     }

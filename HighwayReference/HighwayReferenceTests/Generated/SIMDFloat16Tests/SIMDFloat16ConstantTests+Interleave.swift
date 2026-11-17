@@ -19,7 +19,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.interleavingLower(H.repeating(value), b),
-                HighwayReference.interleavingLowerF16(H.repeating(value), b),
+                HighwayReference.interleavingLowerF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -38,7 +38,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.interleavingLower(a, H.repeating(value)),
-                HighwayReference.interleavingLowerF16(a, H.repeating(value)),
+                HighwayReference.interleavingLowerF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -152,7 +152,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.interleavingUpper(H.repeating(value), b),
-                HighwayReference.interleavingUpperF16(H.repeating(value), b),
+                HighwayReference.interleavingUpperF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -171,7 +171,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.interleavingUpper(a, H.repeating(value)),
-                HighwayReference.interleavingUpperF16(a, H.repeating(value)),
+                HighwayReference.interleavingUpperF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -285,7 +285,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.interleavingEven(H.repeating(value), b),
-                HighwayReference.interleavingEvenF16(H.repeating(value), b),
+                HighwayReference.interleavingEvenF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -304,7 +304,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.interleavingEven(a, H.repeating(value)),
-                HighwayReference.interleavingEvenF16(a, H.repeating(value)),
+                HighwayReference.interleavingEvenF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -418,7 +418,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.interleavingOdd(H.repeating(value), b),
-                HighwayReference.interleavingOddF16(H.repeating(value), b),
+                HighwayReference.interleavingOddF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -437,7 +437,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.interleavingOdd(a, H.repeating(value)),
-                HighwayReference.interleavingOddF16(a, H.repeating(value)),
+                HighwayReference.interleavingOddF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }

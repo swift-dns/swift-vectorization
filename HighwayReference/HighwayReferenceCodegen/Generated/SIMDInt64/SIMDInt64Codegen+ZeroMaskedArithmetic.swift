@@ -5,35 +5,35 @@ public import Vectorization
 
 @inline(never)
 public func portMaximumWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.maximum(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayMaximumWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.maximumWhereI64(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portMaximumWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.maximum(SIMDInt64.repeating(26), b, where: mask)
 }
 
 @inline(never)
 public func highwayMaximumWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.maximumWhereI64(
             mask.raw,
@@ -45,17 +45,17 @@ public func highwayMaximumWhereI64ConstantA(
 
 @inline(never)
 public func portMaximumWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.maximum(a, SIMDInt64.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayMaximumWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.maximumWhereI64(
             mask.raw,
@@ -67,35 +67,35 @@ public func highwayMaximumWhereI64ConstantB(
 
 @inline(never)
 public func portAddingWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.adding(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayAddingWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.addingWhereI64(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portAddingWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.adding(SIMDInt64.repeating(26), b, where: mask)
 }
 
 @inline(never)
 public func highwayAddingWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.addingWhereI64(
             mask.raw,
@@ -107,17 +107,17 @@ public func highwayAddingWhereI64ConstantA(
 
 @inline(never)
 public func portAddingWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.adding(a, SIMDInt64.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayAddingWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.addingWhereI64(
             mask.raw,
@@ -129,35 +129,35 @@ public func highwayAddingWhereI64ConstantB(
 
 @inline(never)
 public func portSubtractingWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.subtracting(a, b, where: mask)
 }
 
 @inline(never)
 public func highwaySubtractingWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.subtractingWhereI64(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portSubtractingWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.subtracting(SIMDInt64.repeating(26), b, where: mask)
 }
 
 @inline(never)
 public func highwaySubtractingWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.subtractingWhereI64(
             mask.raw,
@@ -169,17 +169,17 @@ public func highwaySubtractingWhereI64ConstantA(
 
 @inline(never)
 public func portSubtractingWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.subtracting(a, SIMDInt64.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwaySubtractingWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.subtractingWhereI64(
             mask.raw,
@@ -191,35 +191,35 @@ public func highwaySubtractingWhereI64ConstantB(
 
 @inline(never)
 public func portMultiplyingWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.multiplying(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyingWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.multiplyingWhereI64(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portMultiplyingWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.multiplying(SIMDInt64.repeating(26), b, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyingWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyingWhereI64(
             mask.raw,
@@ -231,17 +231,17 @@ public func highwayMultiplyingWhereI64ConstantA(
 
 @inline(never)
 public func portMultiplyingWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.multiplying(a, SIMDInt64.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyingWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyingWhereI64(
             mask.raw,
@@ -253,35 +253,35 @@ public func highwayMultiplyingWhereI64ConstantB(
 
 @inline(never)
 public func portDividingWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.dividing(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayDividingWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.dividingWhereI64(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portDividingWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.dividing(SIMDInt64.repeating(26), b, where: mask)
 }
 
 @inline(never)
 public func highwayDividingWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.dividingWhereI64(
             mask.raw,
@@ -293,17 +293,17 @@ public func highwayDividingWhereI64ConstantA(
 
 @inline(never)
 public func portDividingWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.dividing(a, SIMDInt64.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayDividingWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.dividingWhereI64(
             mask.raw,
@@ -314,28 +314,23 @@ public func highwayDividingWhereI64ConstantB(
 }
 
 @inline(never)
-public func portMagnitudeWhereI64(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+public func portMagnitudeWhereI64(_ a: SIMD<Int64>, where mask: SIMD<Int64>.Mask) -> SIMD<Int64> {
     SIMDInt64.magnitude(a, where: mask)
 }
 
 @inline(never)
-public func highwayMagnitudeWhereI64(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+public func highwayMagnitudeWhereI64(_ a: SIMD<Int64>, where mask: SIMD<Int64>.Mask) -> SIMD<Int64>
+{
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.magnitudeWhereI64(mask.raw, a.raw))
 }
 
 @inline(never)
-public func portMagnitudeWhereI64ConstantA(where mask: SIMDInt64.Mask) -> SIMDInt64.Vector {
+public func portMagnitudeWhereI64ConstantA(where mask: SIMD<Int64>.Mask) -> SIMD<Int64> {
     SIMDInt64.magnitude(SIMDInt64.repeating(26), where: mask)
 }
 
 @inline(never)
-public func highwayMagnitudeWhereI64ConstantA(where mask: SIMDInt64.Mask) -> SIMDInt64.Vector {
+public func highwayMagnitudeWhereI64ConstantA(where mask: SIMD<Int64>.Mask) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.magnitudeWhereI64(
             mask.raw,
@@ -346,21 +341,21 @@ public func highwayMagnitudeWhereI64ConstantA(where mask: SIMDInt64.Mask) -> SIM
 
 @inline(never)
 public func portMultiplyAddingWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.multiplyAdding(a, b, c, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyAddingWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingWhereI64(mask.raw, a.raw, b.raw, c.raw)
     )
@@ -368,19 +363,19 @@ public func highwayMultiplyAddingWhereI64(
 
 @inline(never)
 public func portMultiplyAddingWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.multiplyAdding(SIMDInt64.repeating(26), b, c, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyAddingWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingWhereI64(
             mask.raw,
@@ -393,19 +388,19 @@ public func highwayMultiplyAddingWhereI64ConstantA(
 
 @inline(never)
 public func portMultiplyAddingWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.multiplyAdding(a, SIMDInt64.repeating(26), c, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyAddingWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingWhereI64(
             mask.raw,
@@ -418,19 +413,19 @@ public func highwayMultiplyAddingWhereI64ConstantB(
 
 @inline(never)
 public func portMultiplyAddingWhereI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.multiplyAdding(a, b, SIMDInt64.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyAddingWhereI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingWhereI64(
             mask.raw,
@@ -443,21 +438,21 @@ public func highwayMultiplyAddingWhereI64ConstantC(
 
 @inline(never)
 public func portMultiplySubtractingWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.multiplySubtracting(a, b, c, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplySubtractingWhereI64(mask.raw, a.raw, b.raw, c.raw)
     )
@@ -465,19 +460,19 @@ public func highwayMultiplySubtractingWhereI64(
 
 @inline(never)
 public func portMultiplySubtractingWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.multiplySubtracting(SIMDInt64.repeating(26), b, c, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplySubtractingWhereI64(
             mask.raw,
@@ -490,19 +485,19 @@ public func highwayMultiplySubtractingWhereI64ConstantA(
 
 @inline(never)
 public func portMultiplySubtractingWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.multiplySubtracting(a, SIMDInt64.repeating(26), c, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplySubtractingWhereI64(
             mask.raw,
@@ -515,19 +510,19 @@ public func highwayMultiplySubtractingWhereI64ConstantB(
 
 @inline(never)
 public func portMultiplySubtractingWhereI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.multiplySubtracting(a, b, SIMDInt64.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingWhereI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplySubtractingWhereI64(
             mask.raw,
@@ -540,21 +535,21 @@ public func highwayMultiplySubtractingWhereI64ConstantC(
 
 @inline(never)
 public func portNegatedMultiplyAddingWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.negatedMultiplyAdding(a, b, c, where: mask)
 }
 
 @inline(never)
 public func highwayNegatedMultiplyAddingWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereI64(mask.raw, a.raw, b.raw, c.raw)
     )
@@ -562,19 +557,19 @@ public func highwayNegatedMultiplyAddingWhereI64(
 
 @inline(never)
 public func portNegatedMultiplyAddingWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.negatedMultiplyAdding(SIMDInt64.repeating(26), b, c, where: mask)
 }
 
 @inline(never)
 public func highwayNegatedMultiplyAddingWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereI64(
             mask.raw,
@@ -587,19 +582,19 @@ public func highwayNegatedMultiplyAddingWhereI64ConstantA(
 
 @inline(never)
 public func portNegatedMultiplyAddingWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.negatedMultiplyAdding(a, SIMDInt64.repeating(26), c, where: mask)
 }
 
 @inline(never)
 public func highwayNegatedMultiplyAddingWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereI64(
             mask.raw,
@@ -612,19 +607,19 @@ public func highwayNegatedMultiplyAddingWhereI64ConstantB(
 
 @inline(never)
 public func portNegatedMultiplyAddingWhereI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.negatedMultiplyAdding(a, b, SIMDInt64.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayNegatedMultiplyAddingWhereI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereI64(
             mask.raw,
@@ -637,21 +632,21 @@ public func highwayNegatedMultiplyAddingWhereI64ConstantC(
 
 @inline(never)
 public func portNegatedMultiplySubtractingWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.negatedMultiplySubtracting(a, b, c, where: mask)
 }
 
 @inline(never)
 public func highwayNegatedMultiplySubtractingWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereI64(
             mask.raw,
@@ -664,19 +659,19 @@ public func highwayNegatedMultiplySubtractingWhereI64(
 
 @inline(never)
 public func portNegatedMultiplySubtractingWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.negatedMultiplySubtracting(SIMDInt64.repeating(26), b, c, where: mask)
 }
 
 @inline(never)
 public func highwayNegatedMultiplySubtractingWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereI64(
             mask.raw,
@@ -689,19 +684,19 @@ public func highwayNegatedMultiplySubtractingWhereI64ConstantA(
 
 @inline(never)
 public func portNegatedMultiplySubtractingWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.negatedMultiplySubtracting(a, SIMDInt64.repeating(26), c, where: mask)
 }
 
 @inline(never)
 public func highwayNegatedMultiplySubtractingWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereI64(
             mask.raw,
@@ -714,19 +709,19 @@ public func highwayNegatedMultiplySubtractingWhereI64ConstantB(
 
 @inline(never)
 public func portNegatedMultiplySubtractingWhereI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.negatedMultiplySubtracting(a, b, SIMDInt64.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayNegatedMultiplySubtractingWhereI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereI64(
             mask.raw,

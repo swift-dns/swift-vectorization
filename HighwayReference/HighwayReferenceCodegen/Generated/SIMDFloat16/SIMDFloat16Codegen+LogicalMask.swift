@@ -5,120 +5,132 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portBitwiseNotMaskF16(_ mask: SIMDFloat16.Mask) -> SIMDFloat16.Mask {
+public func portBitwiseNotMaskF16(_ mask: SIMD<Float16>.Mask) -> SIMD<Float16>.Mask {
     SIMDFloat16.bitwiseNot(mask)
 }
 
 @inline(never)
-public func highwayBitwiseNotMaskF16(_ mask: SIMDFloat16.Mask) -> SIMDFloat16.Mask {
+public func highwayBitwiseNotMaskF16(_ mask: SIMD<Float16>.Mask) -> SIMD<Float16>.Mask {
     SIMDFloat16.Mask(raw: HighwayReference.Nothrow.bitwiseNotMaskF16(mask.raw))
 }
 
 @inline(never)
-public func portBitwiseAndMaskF16(_ a: SIMDFloat16.Mask, _ b: SIMDFloat16.Mask) -> SIMDFloat16.Mask
-{
+public func portBitwiseAndMaskF16(
+    _ a: SIMD<Float16>.Mask,
+    _ b: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
     SIMDFloat16.bitwiseAnd(a, b)
 }
 
 @inline(never)
 public func highwayBitwiseAndMaskF16(
-    _ a: SIMDFloat16.Mask,
-    _ b: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
+    _ a: SIMD<Float16>.Mask,
+    _ b: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
     SIMDFloat16.Mask(raw: HighwayReference.Nothrow.bitwiseAndMaskF16(a.raw, b.raw))
 }
 
 @inline(never)
 public func portBitwiseAndNotMaskF16(
-    _ a: SIMDFloat16.Mask,
-    _ b: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
+    _ a: SIMD<Float16>.Mask,
+    _ b: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
     SIMDFloat16.bitwiseAndNot(a, b)
 }
 
 @inline(never)
 public func highwayBitwiseAndNotMaskF16(
-    _ a: SIMDFloat16.Mask,
-    _ b: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
+    _ a: SIMD<Float16>.Mask,
+    _ b: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
     SIMDFloat16.Mask(raw: HighwayReference.Nothrow.bitwiseAndNotMaskF16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portBitwiseOrMaskF16(_ a: SIMDFloat16.Mask, _ b: SIMDFloat16.Mask) -> SIMDFloat16.Mask {
+public func portBitwiseOrMaskF16(
+    _ a: SIMD<Float16>.Mask,
+    _ b: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
     SIMDFloat16.bitwiseOr(a, b)
 }
 
 @inline(never)
 public func highwayBitwiseOrMaskF16(
-    _ a: SIMDFloat16.Mask,
-    _ b: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
+    _ a: SIMD<Float16>.Mask,
+    _ b: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
     SIMDFloat16.Mask(raw: HighwayReference.Nothrow.bitwiseOrMaskF16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portBitwiseXorMaskF16(_ a: SIMDFloat16.Mask, _ b: SIMDFloat16.Mask) -> SIMDFloat16.Mask
-{
+public func portBitwiseXorMaskF16(
+    _ a: SIMD<Float16>.Mask,
+    _ b: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
     SIMDFloat16.bitwiseXor(a, b)
 }
 
 @inline(never)
 public func highwayBitwiseXorMaskF16(
-    _ a: SIMDFloat16.Mask,
-    _ b: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
+    _ a: SIMD<Float16>.Mask,
+    _ b: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
     SIMDFloat16.Mask(raw: HighwayReference.Nothrow.bitwiseXorMaskF16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portNeitherTrueF16(_ a: SIMDFloat16.Mask, _ b: SIMDFloat16.Mask) -> SIMDFloat16.Mask {
+public func portNeitherTrueF16(
+    _ a: SIMD<Float16>.Mask,
+    _ b: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
     SIMDFloat16.neitherTrue(a, b)
 }
 
 @inline(never)
-public func highwayNeitherTrueF16(_ a: SIMDFloat16.Mask, _ b: SIMDFloat16.Mask) -> SIMDFloat16.Mask
-{
+public func highwayNeitherTrueF16(
+    _ a: SIMD<Float16>.Mask,
+    _ b: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
     SIMDFloat16.Mask(raw: HighwayReference.Nothrow.neitherTrueF16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portOnlyFirstTrueF16(_ mask: SIMDFloat16.Mask) -> SIMDFloat16.Mask {
+public func portOnlyFirstTrueF16(_ mask: SIMD<Float16>.Mask) -> SIMD<Float16>.Mask {
     SIMDFloat16.onlyFirstTrue(mask)
 }
 
 @inline(never)
-public func highwayOnlyFirstTrueF16(_ mask: SIMDFloat16.Mask) -> SIMDFloat16.Mask {
+public func highwayOnlyFirstTrueF16(_ mask: SIMD<Float16>.Mask) -> SIMD<Float16>.Mask {
     SIMDFloat16.Mask(raw: HighwayReference.Nothrow.onlyFirstTrueF16(mask.raw))
 }
 
 @inline(never)
-public func portBeforeFirstTrueF16(_ mask: SIMDFloat16.Mask) -> SIMDFloat16.Mask {
+public func portBeforeFirstTrueF16(_ mask: SIMD<Float16>.Mask) -> SIMD<Float16>.Mask {
     SIMDFloat16.beforeFirstTrue(mask)
 }
 
 @inline(never)
-public func highwayBeforeFirstTrueF16(_ mask: SIMDFloat16.Mask) -> SIMDFloat16.Mask {
+public func highwayBeforeFirstTrueF16(_ mask: SIMD<Float16>.Mask) -> SIMD<Float16>.Mask {
     SIMDFloat16.Mask(raw: HighwayReference.Nothrow.beforeFirstTrueF16(mask.raw))
 }
 
 @inline(never)
-public func portAtOrBeforeFirstTrueF16(_ mask: SIMDFloat16.Mask) -> SIMDFloat16.Mask {
+public func portAtOrBeforeFirstTrueF16(_ mask: SIMD<Float16>.Mask) -> SIMD<Float16>.Mask {
     SIMDFloat16.atOrBeforeFirstTrue(mask)
 }
 
 @inline(never)
-public func highwayAtOrBeforeFirstTrueF16(_ mask: SIMDFloat16.Mask) -> SIMDFloat16.Mask {
+public func highwayAtOrBeforeFirstTrueF16(_ mask: SIMD<Float16>.Mask) -> SIMD<Float16>.Mask {
     SIMDFloat16.Mask(raw: HighwayReference.Nothrow.atOrBeforeFirstTrueF16(mask.raw))
 }
 
 @inline(never)
-public func portAtOrAfterFirstTrueF16(_ mask: SIMDFloat16.Mask) -> SIMDFloat16.Mask {
+public func portAtOrAfterFirstTrueF16(_ mask: SIMD<Float16>.Mask) -> SIMD<Float16>.Mask {
     SIMDFloat16.atOrAfterFirstTrue(mask)
 }
 
 @inline(never)
-public func highwayAtOrAfterFirstTrueF16(_ mask: SIMDFloat16.Mask) -> SIMDFloat16.Mask {
+public func highwayAtOrAfterFirstTrueF16(_ mask: SIMD<Float16>.Mask) -> SIMD<Float16>.Mask {
     SIMDFloat16.Mask(raw: HighwayReference.Nothrow.atOrAfterFirstTrueF16(mask.raw))
 }
 #endif

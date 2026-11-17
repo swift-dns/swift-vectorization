@@ -4,30 +4,25 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portCarrylessMultiplyingLowerU64(
-    _ a: SIMDUInt64.Vector,
-    _ b: SIMDUInt64.Vector
-) -> SIMDUInt64.Vector {
+public func portCarrylessMultiplyingLowerU64(_ a: SIMD<UInt64>, _ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.carrylessMultiplyingLower(a, b)
 }
 
 @inline(never)
 public func highwayCarrylessMultiplyingLowerU64(
-    _ a: SIMDUInt64.Vector,
-    _ b: SIMDUInt64.Vector
-) -> SIMDUInt64.Vector {
+    _ a: SIMD<UInt64>,
+    _ b: SIMD<UInt64>
+) -> SIMD<UInt64> {
     SIMDUInt64.Vector(raw: HighwayReference.Nothrow.carrylessMultiplyingLowerU64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portCarrylessMultiplyingLowerU64ConstantA(_ b: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func portCarrylessMultiplyingLowerU64ConstantA(_ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.carrylessMultiplyingLower(SIMDUInt64.repeating(26), b)
 }
 
 @inline(never)
-public func highwayCarrylessMultiplyingLowerU64ConstantA(
-    _ b: SIMDUInt64.Vector
-) -> SIMDUInt64.Vector {
+public func highwayCarrylessMultiplyingLowerU64ConstantA(_ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.Vector(
         raw: HighwayReference.Nothrow.carrylessMultiplyingLowerU64(
             SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
@@ -37,14 +32,12 @@ public func highwayCarrylessMultiplyingLowerU64ConstantA(
 }
 
 @inline(never)
-public func portCarrylessMultiplyingLowerU64ConstantB(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func portCarrylessMultiplyingLowerU64ConstantB(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.carrylessMultiplyingLower(a, SIMDUInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayCarrylessMultiplyingLowerU64ConstantB(
-    _ a: SIMDUInt64.Vector
-) -> SIMDUInt64.Vector {
+public func highwayCarrylessMultiplyingLowerU64ConstantB(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.Vector(
         raw: HighwayReference.Nothrow.carrylessMultiplyingLowerU64(
             a.raw,
@@ -54,30 +47,25 @@ public func highwayCarrylessMultiplyingLowerU64ConstantB(
 }
 
 @inline(never)
-public func portCarrylessMultiplyingUpperU64(
-    _ a: SIMDUInt64.Vector,
-    _ b: SIMDUInt64.Vector
-) -> SIMDUInt64.Vector {
+public func portCarrylessMultiplyingUpperU64(_ a: SIMD<UInt64>, _ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.carrylessMultiplyingUpper(a, b)
 }
 
 @inline(never)
 public func highwayCarrylessMultiplyingUpperU64(
-    _ a: SIMDUInt64.Vector,
-    _ b: SIMDUInt64.Vector
-) -> SIMDUInt64.Vector {
+    _ a: SIMD<UInt64>,
+    _ b: SIMD<UInt64>
+) -> SIMD<UInt64> {
     SIMDUInt64.Vector(raw: HighwayReference.Nothrow.carrylessMultiplyingUpperU64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portCarrylessMultiplyingUpperU64ConstantA(_ b: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func portCarrylessMultiplyingUpperU64ConstantA(_ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.carrylessMultiplyingUpper(SIMDUInt64.repeating(26), b)
 }
 
 @inline(never)
-public func highwayCarrylessMultiplyingUpperU64ConstantA(
-    _ b: SIMDUInt64.Vector
-) -> SIMDUInt64.Vector {
+public func highwayCarrylessMultiplyingUpperU64ConstantA(_ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.Vector(
         raw: HighwayReference.Nothrow.carrylessMultiplyingUpperU64(
             SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
@@ -87,14 +75,12 @@ public func highwayCarrylessMultiplyingUpperU64ConstantA(
 }
 
 @inline(never)
-public func portCarrylessMultiplyingUpperU64ConstantB(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func portCarrylessMultiplyingUpperU64ConstantB(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.carrylessMultiplyingUpper(a, SIMDUInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayCarrylessMultiplyingUpperU64ConstantB(
-    _ a: SIMDUInt64.Vector
-) -> SIMDUInt64.Vector {
+public func highwayCarrylessMultiplyingUpperU64ConstantB(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.Vector(
         raw: HighwayReference.Nothrow.carrylessMultiplyingUpperU64(
             a.raw,

@@ -22,7 +22,12 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.maximum(a, b, where: mask, otherwise: H.repeating(value)),
-                HighwayReference.maximumWhereOtherwiseF16(H.repeating(value), mask.raw, a, b),
+                HighwayReference.maximumWhereOtherwiseF16(
+                    H.repeating(value).raw,
+                    mask.raw,
+                    a.raw,
+                    b.raw
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -49,10 +54,10 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.maximum(H.repeating(value), b, where: mask, otherwise: otherwise),
                 HighwayReference.maximumWhereOtherwiseF16(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    H.repeating(value),
-                    b
+                    H.repeating(value).raw,
+                    b.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b))"
             )
@@ -80,10 +85,10 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.maximum(a, H.repeating(value), where: mask, otherwise: otherwise),
                 HighwayReference.maximumWhereOtherwiseF16(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    H.repeating(value)
+                    a.raw,
+                    H.repeating(value).raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
             )
@@ -235,11 +240,11 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.multiplyAdding(a, b, c, where: mask, otherwise: H.repeating(value)),
                 HighwayReference.multiplyAddingWhereOtherwiseF16(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     mask.raw,
-                    a,
-                    b,
-                    c
+                    a.raw,
+                    b.raw,
+                    c.raw
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
@@ -269,11 +274,11 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.multiplyAdding(H.repeating(value), b, c, where: mask, otherwise: otherwise),
                 HighwayReference.multiplyAddingWhereOtherwiseF16(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    H.repeating(value),
-                    b,
-                    c
+                    H.repeating(value).raw,
+                    b.raw,
+                    c.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
             )
@@ -303,11 +308,11 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.multiplyAdding(a, H.repeating(value), c, where: mask, otherwise: otherwise),
                 HighwayReference.multiplyAddingWhereOtherwiseF16(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    H.repeating(value),
-                    c
+                    a.raw,
+                    H.repeating(value).raw,
+                    c.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
             )
@@ -337,11 +342,11 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.multiplyAdding(a, b, H.repeating(value), where: mask, otherwise: otherwise),
                 HighwayReference.multiplyAddingWhereOtherwiseF16(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    b,
-                    H.repeating(value)
+                    a.raw,
+                    b.raw,
+                    H.repeating(value).raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
@@ -506,11 +511,11 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.multiplySubtracting(a, b, c, where: mask, otherwise: H.repeating(value)),
                 HighwayReference.multiplySubtractingWhereOtherwiseF16(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     mask.raw,
-                    a,
-                    b,
-                    c
+                    a.raw,
+                    b.raw,
+                    c.raw
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
@@ -542,11 +547,11 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.multiplySubtracting(H.repeating(value), b, c, where: mask, otherwise: otherwise),
                 HighwayReference.multiplySubtractingWhereOtherwiseF16(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    H.repeating(value),
-                    b,
-                    c
+                    H.repeating(value).raw,
+                    b.raw,
+                    c.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
             )
@@ -578,11 +583,11 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.multiplySubtracting(a, H.repeating(value), c, where: mask, otherwise: otherwise),
                 HighwayReference.multiplySubtractingWhereOtherwiseF16(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    H.repeating(value),
-                    c
+                    a.raw,
+                    H.repeating(value).raw,
+                    c.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
             )
@@ -614,11 +619,11 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.multiplySubtracting(a, b, H.repeating(value), where: mask, otherwise: otherwise),
                 HighwayReference.multiplySubtractingWhereOtherwiseF16(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    b,
-                    H.repeating(value)
+                    a.raw,
+                    b.raw,
+                    H.repeating(value).raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
@@ -789,11 +794,11 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.negatedMultiplyAdding(a, b, c, where: mask, otherwise: H.repeating(value)),
                 HighwayReference.negatedMultiplyAddingWhereOtherwiseF16(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     mask.raw,
-                    a,
-                    b,
-                    c
+                    a.raw,
+                    b.raw,
+                    c.raw
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
@@ -831,11 +836,11 @@ extension SIMDFloat16ConstantTests {
                     otherwise: otherwise
                 ),
                 HighwayReference.negatedMultiplyAddingWhereOtherwiseF16(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    H.repeating(value),
-                    b,
-                    c
+                    H.repeating(value).raw,
+                    b.raw,
+                    c.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
             )
@@ -873,11 +878,11 @@ extension SIMDFloat16ConstantTests {
                     otherwise: otherwise
                 ),
                 HighwayReference.negatedMultiplyAddingWhereOtherwiseF16(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    H.repeating(value),
-                    c
+                    a.raw,
+                    H.repeating(value).raw,
+                    c.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
             )
@@ -915,11 +920,11 @@ extension SIMDFloat16ConstantTests {
                     otherwise: otherwise
                 ),
                 HighwayReference.negatedMultiplyAddingWhereOtherwiseF16(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    b,
-                    H.repeating(value)
+                    a.raw,
+                    b.raw,
+                    H.repeating(value).raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
@@ -1084,11 +1089,11 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, b, c, where: mask, otherwise: H.repeating(value)),
                 HighwayReference.negatedMultiplySubtractingWhereOtherwiseF16(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     mask.raw,
-                    a,
-                    b,
-                    c
+                    a.raw,
+                    b.raw,
+                    c.raw
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
@@ -1126,11 +1131,11 @@ extension SIMDFloat16ConstantTests {
                     otherwise: otherwise
                 ),
                 HighwayReference.negatedMultiplySubtractingWhereOtherwiseF16(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    H.repeating(value),
-                    b,
-                    c
+                    H.repeating(value).raw,
+                    b.raw,
+                    c.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
             )
@@ -1168,11 +1173,11 @@ extension SIMDFloat16ConstantTests {
                     otherwise: otherwise
                 ),
                 HighwayReference.negatedMultiplySubtractingWhereOtherwiseF16(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    H.repeating(value),
-                    c
+                    a.raw,
+                    H.repeating(value).raw,
+                    c.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
             )
@@ -1210,11 +1215,11 @@ extension SIMDFloat16ConstantTests {
                     otherwise: otherwise
                 ),
                 HighwayReference.negatedMultiplySubtractingWhereOtherwiseF16(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    b,
-                    H.repeating(value)
+                    a.raw,
+                    b.raw,
+                    H.repeating(value).raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )

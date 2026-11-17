@@ -21,7 +21,7 @@ extension SIMDInt64ConstantTests {
             H.vector(zeroExtendingResizing: SIMDFloat16.repeating(value)),
             H.Vector(
                 raw: HighwayReference.vectorZeroExtendingResizingF16ToI64(
-                    SIMDFloat16.repeating(value)
+                    SIMDFloat16.repeating(value).raw
                 )
             ),
             ""
@@ -162,7 +162,7 @@ extension SIMDInt64ConstantTests {
             H.halfVector(zeroExtendingResizing: SIMDFloat16.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorZeroExtendingResizingF16ToI64(
-                    SIMDFloat16.repeating(value)
+                    SIMDFloat16.repeating(value).raw
                 )
             ),
             ""

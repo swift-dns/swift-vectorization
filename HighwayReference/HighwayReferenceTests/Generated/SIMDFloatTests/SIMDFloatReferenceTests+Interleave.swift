@@ -13,7 +13,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingLower(a, b),
-                HighwayReference.interleavingLowerF32(a, b),
+                HighwayReference.interleavingLowerF32(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -27,7 +27,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingUpper(a, b),
-                HighwayReference.interleavingUpperF32(a, b),
+                HighwayReference.interleavingUpperF32(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -41,7 +41,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingEven(a, b),
-                HighwayReference.interleavingEvenF32(a, b),
+                HighwayReference.interleavingEvenF32(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -55,7 +55,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingOdd(a, b),
-                HighwayReference.interleavingOddF32(a, b),
+                HighwayReference.interleavingOddF32(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

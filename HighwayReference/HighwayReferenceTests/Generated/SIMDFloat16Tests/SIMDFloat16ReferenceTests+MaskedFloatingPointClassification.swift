@@ -14,7 +14,7 @@ extension SIMDFloat16ReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.isNaN(a, where: mask),
-                H.Mask(raw: HighwayReference.isNaNWhereF16(mask.raw, a)),
+                H.Mask(raw: HighwayReference.isNaNWhereF16(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -28,7 +28,7 @@ extension SIMDFloat16ReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.isNaN(a, where: mask),
-                H.Mask(raw: HighwayReference.isNaNWhereF16(mask.raw, a)),
+                H.Mask(raw: HighwayReference.isNaNWhereF16(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }

@@ -14,7 +14,7 @@ extension SIMDFloatConstantTests {
         for b in bInputs where !hasUnorderedNaNs(H.repeating(value), b) {
             mismatches.check(
                 H.multiplying(H.repeating(value), b),
-                HighwayReference.multiplyingF32(H.repeating(value), b),
+                HighwayReference.multiplyingF32(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -29,7 +29,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs where !hasUnorderedNaNs(a, H.repeating(value)) {
             mismatches.check(
                 H.multiplying(a, H.repeating(value)),
-                HighwayReference.multiplyingF32(a, H.repeating(value)),
+                HighwayReference.multiplyingF32(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -139,7 +139,7 @@ extension SIMDFloatConstantTests {
         for b in bInputs where !hasUnorderedNaNs(H.repeating(value), b) {
             mismatches.check(
                 H.multiplyingRounded(H.repeating(value), b),
-                HighwayReference.multiplyingRoundedF32(H.repeating(value), b),
+                HighwayReference.multiplyingRoundedF32(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -154,7 +154,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs where !hasUnorderedNaNs(a, H.repeating(value)) {
             mismatches.check(
                 H.multiplyingRounded(a, H.repeating(value)),
-                HighwayReference.multiplyingRoundedF32(a, H.repeating(value)),
+                HighwayReference.multiplyingRoundedF32(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -264,7 +264,7 @@ extension SIMDFloatConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.multiplyingByFloorPowerOf2(H.repeating(value), b),
-                HighwayReference.multiplyingByFloorPowerOf2F32(H.repeating(value), b),
+                HighwayReference.multiplyingByFloorPowerOf2F32(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -279,7 +279,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.multiplyingByFloorPowerOf2(a, H.repeating(value)),
-                HighwayReference.multiplyingByFloorPowerOf2F32(a, H.repeating(value)),
+                HighwayReference.multiplyingByFloorPowerOf2F32(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -389,7 +389,7 @@ extension SIMDFloatConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.multiplyingByPowerOf2(H.repeating(value), b),
-                HighwayReference.multiplyingByPowerOf2I32ToF32(H.repeating(value), b.raw),
+                HighwayReference.multiplyingByPowerOf2I32ToF32(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -408,7 +408,10 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.multiplyingByPowerOf2(a, SIMDInt32.repeating(value)),
-                HighwayReference.multiplyingByPowerOf2I32ToF32(a, SIMDInt32.repeating(value).raw),
+                HighwayReference.multiplyingByPowerOf2I32ToF32(
+                    a.raw,
+                    SIMDInt32.repeating(value).raw
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -580,7 +583,7 @@ extension SIMDFloatConstantTests {
         for b in bInputs where !hasUnorderedNaNs(H.repeating(value), b) {
             mismatches.check(
                 H.rearrangedToOddPlusEven(H.repeating(value), b),
-                HighwayReference.rearrangedToOddPlusEvenF32(H.repeating(value), b),
+                HighwayReference.rearrangedToOddPlusEvenF32(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -595,7 +598,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs where !hasUnorderedNaNs(a, H.repeating(value)) {
             mismatches.check(
                 H.rearrangedToOddPlusEven(a, H.repeating(value)),
-                HighwayReference.rearrangedToOddPlusEvenF32(a, H.repeating(value)),
+                HighwayReference.rearrangedToOddPlusEvenF32(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -871,8 +874,8 @@ extension SIMDFloatConstantTests {
             let reference = HighwayReference.multiplyAccumulatingInAnyOrderBF16ToF32(
                 SIMDBFloat16.repeating(value).raw,
                 b.raw,
-                c,
-                &r0
+                c.raw,
+                &r0.raw
             )
             mismatches.check(
                 port,
@@ -913,8 +916,8 @@ extension SIMDFloatConstantTests {
             let reference = HighwayReference.multiplyAccumulatingInAnyOrderBF16ToF32(
                 a.raw,
                 SIMDBFloat16.repeating(value).raw,
-                c,
-                &r0
+                c.raw,
+                &r0.raw
             )
             mismatches.check(
                 port,
@@ -947,8 +950,8 @@ extension SIMDFloatConstantTests {
             let reference = HighwayReference.multiplyAccumulatingInAnyOrderBF16ToF32(
                 a.raw,
                 b.raw,
-                H.repeating(value),
-                &r0
+                H.repeating(value).raw,
+                &r0.raw
             )
             mismatches.check(
                 port,

@@ -202,7 +202,7 @@ extension SIMDDoubleConstantTests {
                         otherwise: H.repeating(value)
                     ),
                     unsafe HighwayReference.loadWhereOtherwiseF64(
-                        H.repeating(value),
+                        H.repeating(value).raw,
                         mask.raw,
                         source.baseAddress!
                     )
@@ -311,7 +311,7 @@ extension SIMDDoubleConstantTests {
                         otherwise: otherwise
                     ),
                     unsafe HighwayReference.loadFirstOtherwiseF64(
-                        otherwise,
+                        otherwise.raw,
                         source.baseAddress!,
                         count
                     )
@@ -408,7 +408,7 @@ extension SIMDDoubleConstantTests {
                 source in
                 (
                     unsafe H.loadFirst(from: source, count: count, otherwise: otherwise),
-                    unsafe HighwayReference.loadFirstOtherwiseF64(otherwise, source, count)
+                    unsafe HighwayReference.loadFirstOtherwiseF64(otherwise.raw, source, count)
                 )
             }.result
             mismatches.check(
@@ -507,7 +507,7 @@ extension SIMDDoubleConstantTests {
                         otherwise: H.repeating(value)
                     ),
                     unsafe HighwayReference.loadFirstOtherwiseF64(
-                        H.repeating(value),
+                        H.repeating(value).raw,
                         source.baseAddress!,
                         count
                     )
@@ -613,7 +613,7 @@ extension SIMDDoubleConstantTests {
                     unsafe H.loadingUpperHalf(H.repeating(value), from: source.baseAddress!),
                     unsafe HighwayReference.loadingUpperHalfF64(
                         source.baseAddress!,
-                        H.repeating(value)
+                        H.repeating(value).raw
                     )
                 )
             }

@@ -86,7 +86,9 @@ extension SIMDUInt64ConstantTests {
         )
         mismatches.check(
             H.vector(wideningLower: SIMDFloat.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorWideningLowerF32ToU64(SIMDFloat.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorWideningLowerF32ToU64(SIMDFloat.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()
@@ -248,7 +250,9 @@ extension SIMDUInt64ConstantTests {
         )
         mismatches.check(
             H.vector(wideningUpper: SIMDFloat.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorWideningUpperF32ToU64(SIMDFloat.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorWideningUpperF32ToU64(SIMDFloat.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()
@@ -343,7 +347,9 @@ extension SIMDUInt64ConstantTests {
         mismatches.check(
             H.vector(wideningLowerInRange: SIMDFloat.repeating(value)),
             H.Vector(
-                raw: HighwayReference.vectorWideningLowerInRangeF32ToU64(SIMDFloat.repeating(value))
+                raw: HighwayReference.vectorWideningLowerInRangeF32ToU64(
+                    SIMDFloat.repeating(value).raw
+                )
             ),
             ""
         )
@@ -439,7 +445,9 @@ extension SIMDUInt64ConstantTests {
         mismatches.check(
             H.vector(wideningUpperInRange: SIMDFloat.repeating(value)),
             H.Vector(
-                raw: HighwayReference.vectorWideningUpperInRangeF32ToU64(SIMDFloat.repeating(value))
+                raw: HighwayReference.vectorWideningUpperInRangeF32ToU64(
+                    SIMDFloat.repeating(value).raw
+                )
             ),
             ""
         )
@@ -602,7 +610,9 @@ extension SIMDUInt64ConstantTests {
         )
         mismatches.check(
             H.vector(wideningEven: SIMDFloat.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorWideningEvenF32ToU64(SIMDFloat.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorWideningEvenF32ToU64(SIMDFloat.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()
@@ -764,7 +774,9 @@ extension SIMDUInt64ConstantTests {
         )
         mismatches.check(
             H.vector(wideningOdd: SIMDFloat.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorWideningOddF32ToU64(SIMDFloat.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorWideningOddF32ToU64(SIMDFloat.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()
@@ -859,7 +871,9 @@ extension SIMDUInt64ConstantTests {
         mismatches.check(
             H.vector(wideningEvenInRange: SIMDFloat.repeating(value)),
             H.Vector(
-                raw: HighwayReference.vectorWideningEvenInRangeF32ToU64(SIMDFloat.repeating(value))
+                raw: HighwayReference.vectorWideningEvenInRangeF32ToU64(
+                    SIMDFloat.repeating(value).raw
+                )
             ),
             ""
         )
@@ -955,7 +969,9 @@ extension SIMDUInt64ConstantTests {
         mismatches.check(
             H.vector(wideningOddInRange: SIMDFloat.repeating(value)),
             H.Vector(
-                raw: HighwayReference.vectorWideningOddInRangeF32ToU64(SIMDFloat.repeating(value))
+                raw: HighwayReference.vectorWideningOddInRangeF32ToU64(
+                    SIMDFloat.repeating(value).raw
+                )
             ),
             ""
         )

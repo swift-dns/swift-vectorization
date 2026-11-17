@@ -15,7 +15,7 @@ extension SIMDFloatConstantTests {
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 H.bitwiseXor(H.repeating(value), b, where: mask),
-                HighwayReference.bitwiseXorWhereF32(mask.raw, H.repeating(value), b),
+                HighwayReference.bitwiseXorWhereF32(mask.raw, H.repeating(value).raw, b.raw),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -31,7 +31,7 @@ extension SIMDFloatConstantTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.bitwiseXor(a, H.repeating(value), where: mask),
-                HighwayReference.bitwiseXorWhereF32(mask.raw, a, H.repeating(value)),
+                HighwayReference.bitwiseXorWhereF32(mask.raw, a.raw, H.repeating(value).raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -146,7 +146,12 @@ extension SIMDFloatConstantTests {
         {
             mismatches.check(
                 H.bitwiseAnd(a, b, where: mask, otherwise: H.repeating(value)),
-                HighwayReference.bitwiseAndWhereOtherwiseF32(H.repeating(value), mask.raw, a, b),
+                HighwayReference.bitwiseAndWhereOtherwiseF32(
+                    H.repeating(value).raw,
+                    mask.raw,
+                    a.raw,
+                    b.raw
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -169,10 +174,10 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.bitwiseAnd(H.repeating(value), b, where: mask, otherwise: otherwise),
                 HighwayReference.bitwiseAndWhereOtherwiseF32(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    H.repeating(value),
-                    b
+                    H.repeating(value).raw,
+                    b.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b))"
             )
@@ -196,10 +201,10 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.bitwiseAnd(a, H.repeating(value), where: mask, otherwise: otherwise),
                 HighwayReference.bitwiseAndWhereOtherwiseF32(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    H.repeating(value)
+                    a.raw,
+                    H.repeating(value).raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
             )
@@ -334,7 +339,12 @@ extension SIMDFloatConstantTests {
         {
             mismatches.check(
                 H.bitwiseOr(a, b, where: mask, otherwise: H.repeating(value)),
-                HighwayReference.bitwiseOrWhereOtherwiseF32(H.repeating(value), mask.raw, a, b),
+                HighwayReference.bitwiseOrWhereOtherwiseF32(
+                    H.repeating(value).raw,
+                    mask.raw,
+                    a.raw,
+                    b.raw
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -357,10 +367,10 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.bitwiseOr(H.repeating(value), b, where: mask, otherwise: otherwise),
                 HighwayReference.bitwiseOrWhereOtherwiseF32(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    H.repeating(value),
-                    b
+                    H.repeating(value).raw,
+                    b.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b))"
             )
@@ -384,10 +394,10 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.bitwiseOr(a, H.repeating(value), where: mask, otherwise: otherwise),
                 HighwayReference.bitwiseOrWhereOtherwiseF32(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    H.repeating(value)
+                    a.raw,
+                    H.repeating(value).raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
             )
@@ -522,7 +532,12 @@ extension SIMDFloatConstantTests {
         {
             mismatches.check(
                 H.bitwiseXor(a, b, where: mask, otherwise: H.repeating(value)),
-                HighwayReference.bitwiseXorWhereOtherwiseF32(H.repeating(value), mask.raw, a, b),
+                HighwayReference.bitwiseXorWhereOtherwiseF32(
+                    H.repeating(value).raw,
+                    mask.raw,
+                    a.raw,
+                    b.raw
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -545,10 +560,10 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.bitwiseXor(H.repeating(value), b, where: mask, otherwise: otherwise),
                 HighwayReference.bitwiseXorWhereOtherwiseF32(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    H.repeating(value),
-                    b
+                    H.repeating(value).raw,
+                    b.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b))"
             )
@@ -572,10 +587,10 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.bitwiseXor(a, H.repeating(value), where: mask, otherwise: otherwise),
                 HighwayReference.bitwiseXorWhereOtherwiseF32(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    H.repeating(value)
+                    a.raw,
+                    H.repeating(value).raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
             )
@@ -703,7 +718,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.allBitsSet(H.repeating(value)),
-            HighwayReference.allBitsSetF32(H.repeating(value)),
+            HighwayReference.allBitsSetF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -791,7 +806,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.allBitsClear(H.repeating(value)),
-            HighwayReference.allBitsClearF32(H.repeating(value)),
+            HighwayReference.allBitsClearF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -879,7 +894,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.zeroingNegative(H.repeating(value)),
-            HighwayReference.zeroingNegativeF32(H.repeating(value)),
+            HighwayReference.zeroingNegativeF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -970,7 +985,7 @@ extension SIMDFloatConstantTests {
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 H.selectingIfNegative(H.repeating(value), b, c),
-                HighwayReference.selectingIfNegativeF32(H.repeating(value), b, c),
+                HighwayReference.selectingIfNegativeF32(H.repeating(value).raw, b.raw, c.raw),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -986,7 +1001,7 @@ extension SIMDFloatConstantTests {
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 H.selectingIfNegative(a, H.repeating(value), c),
-                HighwayReference.selectingIfNegativeF32(a, H.repeating(value), c),
+                HighwayReference.selectingIfNegativeF32(a.raw, H.repeating(value).raw, c.raw),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -1002,7 +1017,7 @@ extension SIMDFloatConstantTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.selectingIfNegative(a, b, H.repeating(value)),
-                HighwayReference.selectingIfNegativeF32(a, b, H.repeating(value)),
+                HighwayReference.selectingIfNegativeF32(a.raw, b.raw, H.repeating(value).raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

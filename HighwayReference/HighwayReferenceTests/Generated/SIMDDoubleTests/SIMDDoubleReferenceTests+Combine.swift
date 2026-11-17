@@ -13,7 +13,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingLowerLower(a, b),
-                HighwayReference.concatenatingLowerLowerF64(a, b),
+                HighwayReference.concatenatingLowerLowerF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -27,7 +27,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingUpperUpper(a, b),
-                HighwayReference.concatenatingUpperUpperF64(a, b),
+                HighwayReference.concatenatingUpperUpperF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -41,7 +41,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingLowerUpper(a, b),
-                HighwayReference.concatenatingLowerUpperF64(a, b),
+                HighwayReference.concatenatingLowerUpperF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -55,7 +55,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingUpperLower(a, b),
-                HighwayReference.concatenatingUpperLowerF64(a, b),
+                HighwayReference.concatenatingUpperLowerF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -69,7 +69,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingOdd(a, b),
-                HighwayReference.concatenatingOddF64(a, b),
+                HighwayReference.concatenatingOddF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -83,7 +83,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingEven(a, b),
-                HighwayReference.concatenatingEvenF64(a, b),
+                HighwayReference.concatenatingEvenF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -97,7 +97,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingWholeLower(a, b),
-                HighwayReference.interleavingWholeLowerF64(a, b),
+                HighwayReference.interleavingWholeLowerF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -111,7 +111,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingWholeUpper(a, b),
-                HighwayReference.interleavingWholeUpperF64(a, b),
+                HighwayReference.interleavingWholeUpperF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -124,7 +124,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.lowerHalf(a),
-                H.HalfVector(raw: HighwayReference.lowerHalfF64(a)),
+                H.HalfVector(raw: HighwayReference.lowerHalfF64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -140,7 +140,7 @@ extension SIMDDoubleReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.lowerHalf(a))
                 ),
-                HighwayReference.resizedLowerHalfF64(a),
+                HighwayReference.resizedLowerHalfF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -153,7 +153,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.upperHalf(a),
-                H.HalfVector(raw: HighwayReference.upperHalfF64(a)),
+                H.HalfVector(raw: HighwayReference.upperHalfF64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -169,7 +169,7 @@ extension SIMDDoubleReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.upperHalf(a))
                 ),
-                HighwayReference.resizedUpperHalfF64(a),
+                HighwayReference.resizedUpperHalfF64(a.raw),
                 "a: \(describe(a))"
             )
         }

@@ -156,7 +156,7 @@ extension SIMDUInt64ConstantTests {
         )
         mismatches.check(
             H.biasedExponent(SIMDDouble.repeating(value)),
-            H.Vector(raw: HighwayReference.biasedExponentF64ToU64(SIMDDouble.repeating(value))),
+            H.Vector(raw: HighwayReference.biasedExponentF64ToU64(SIMDDouble.repeating(value).raw)),
             ""
         )
         mismatches.record()

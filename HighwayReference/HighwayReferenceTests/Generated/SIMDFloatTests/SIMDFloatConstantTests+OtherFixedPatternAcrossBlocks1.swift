@@ -14,7 +14,7 @@ extension SIMDFloatConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.oddEvenBlocks(H.repeating(value), b),
-                HighwayReference.oddEvenBlocksF32(H.repeating(value), b),
+                HighwayReference.oddEvenBlocksF32(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -29,7 +29,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.oddEvenBlocks(a, H.repeating(value)),
-                HighwayReference.oddEvenBlocksF32(a, H.repeating(value)),
+                HighwayReference.oddEvenBlocksF32(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -137,7 +137,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.swappingAdjacentBlocks(H.repeating(value)),
-            HighwayReference.swappingAdjacentBlocksF32(H.repeating(value)),
+            HighwayReference.swappingAdjacentBlocksF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -227,7 +227,7 @@ extension SIMDFloatConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.interleavingEvenBlocks(H.repeating(value), b),
-                HighwayReference.interleavingEvenBlocksF32(H.repeating(value), b),
+                HighwayReference.interleavingEvenBlocksF32(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -242,7 +242,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.interleavingEvenBlocks(a, H.repeating(value)),
-                HighwayReference.interleavingEvenBlocksF32(a, H.repeating(value)),
+                HighwayReference.interleavingEvenBlocksF32(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -352,7 +352,7 @@ extension SIMDFloatConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.interleavingOddBlocks(H.repeating(value), b),
-                HighwayReference.interleavingOddBlocksF32(H.repeating(value), b),
+                HighwayReference.interleavingOddBlocksF32(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -367,7 +367,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.interleavingOddBlocks(a, H.repeating(value)),
-                HighwayReference.interleavingOddBlocksF32(a, H.repeating(value)),
+                HighwayReference.interleavingOddBlocksF32(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -477,7 +477,7 @@ extension SIMDFloatConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.interleavingLowerBlocks(H.repeating(value), b),
-                HighwayReference.interleavingLowerBlocksF32(H.repeating(value), b),
+                HighwayReference.interleavingLowerBlocksF32(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -492,7 +492,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.interleavingLowerBlocks(a, H.repeating(value)),
-                HighwayReference.interleavingLowerBlocksF32(a, H.repeating(value)),
+                HighwayReference.interleavingLowerBlocksF32(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -602,7 +602,7 @@ extension SIMDFloatConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.interleavingUpperBlocks(H.repeating(value), b),
-                HighwayReference.interleavingUpperBlocksF32(H.repeating(value), b),
+                HighwayReference.interleavingUpperBlocksF32(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -617,7 +617,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.interleavingUpperBlocks(a, H.repeating(value)),
-                HighwayReference.interleavingUpperBlocksF32(a, H.repeating(value)),
+                HighwayReference.interleavingUpperBlocksF32(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -726,7 +726,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.broadcasting(a, lane: lane),
-                HighwayReference.broadcastingLaneF32(a, Int32(truncatingIfNeeded: lane)),
+                HighwayReference.broadcastingLaneF32(a.raw, Int32(truncatingIfNeeded: lane)),
                 "a: \(describe(a))"
             )
         }
@@ -804,7 +804,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 unsafe H.broadcasting(a, laneUnchecked: lane),
-                HighwayReference.broadcastingLaneF32(a, Int32(truncatingIfNeeded: lane)),
+                HighwayReference.broadcastingLaneF32(a.raw, Int32(truncatingIfNeeded: lane)),
                 "a: \(describe(a))"
             )
         }
@@ -884,7 +884,7 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.broadcasting(H.repeating(value), lane: lane),
                 HighwayReference.broadcastingLaneF32(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: lane)
                 ),
                 "lane: \(lane)"

@@ -15,7 +15,9 @@ extension SIMDFloatConstantTests {
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 H.equalTo(H.repeating(value), b, where: mask),
-                H.Mask(raw: HighwayReference.equalToWhereF32(mask.raw, H.repeating(value), b)),
+                H.Mask(
+                    raw: HighwayReference.equalToWhereF32(mask.raw, H.repeating(value).raw, b.raw)
+                ),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -31,7 +33,9 @@ extension SIMDFloatConstantTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.equalTo(a, H.repeating(value), where: mask),
-                H.Mask(raw: HighwayReference.equalToWhereF32(mask.raw, a, H.repeating(value))),
+                H.Mask(
+                    raw: HighwayReference.equalToWhereF32(mask.raw, a.raw, H.repeating(value).raw)
+                ),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -142,7 +146,13 @@ extension SIMDFloatConstantTests {
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 H.notEqualTo(H.repeating(value), b, where: mask),
-                H.Mask(raw: HighwayReference.notEqualToWhereF32(mask.raw, H.repeating(value), b)),
+                H.Mask(
+                    raw: HighwayReference.notEqualToWhereF32(
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw
+                    )
+                ),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -158,7 +168,13 @@ extension SIMDFloatConstantTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.notEqualTo(a, H.repeating(value), where: mask),
-                H.Mask(raw: HighwayReference.notEqualToWhereF32(mask.raw, a, H.repeating(value))),
+                H.Mask(
+                    raw: HighwayReference.notEqualToWhereF32(
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw
+                    )
+                ),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -269,7 +285,9 @@ extension SIMDFloatConstantTests {
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 H.lessThan(H.repeating(value), b, where: mask),
-                H.Mask(raw: HighwayReference.lessThanWhereF32(mask.raw, H.repeating(value), b)),
+                H.Mask(
+                    raw: HighwayReference.lessThanWhereF32(mask.raw, H.repeating(value).raw, b.raw)
+                ),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -285,7 +303,9 @@ extension SIMDFloatConstantTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.lessThan(a, H.repeating(value), where: mask),
-                H.Mask(raw: HighwayReference.lessThanWhereF32(mask.raw, a, H.repeating(value))),
+                H.Mask(
+                    raw: HighwayReference.lessThanWhereF32(mask.raw, a.raw, H.repeating(value).raw)
+                ),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -396,7 +416,13 @@ extension SIMDFloatConstantTests {
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 H.greaterThan(H.repeating(value), b, where: mask),
-                H.Mask(raw: HighwayReference.greaterThanWhereF32(mask.raw, H.repeating(value), b)),
+                H.Mask(
+                    raw: HighwayReference.greaterThanWhereF32(
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw
+                    )
+                ),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -412,7 +438,13 @@ extension SIMDFloatConstantTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.greaterThan(a, H.repeating(value), where: mask),
-                H.Mask(raw: HighwayReference.greaterThanWhereF32(mask.raw, a, H.repeating(value))),
+                H.Mask(
+                    raw: HighwayReference.greaterThanWhereF32(
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw
+                    )
+                ),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -524,7 +556,11 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.lessThanOrEqualTo(H.repeating(value), b, where: mask),
                 H.Mask(
-                    raw: HighwayReference.lessThanOrEqualToWhereF32(mask.raw, H.repeating(value), b)
+                    raw: HighwayReference.lessThanOrEqualToWhereF32(
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw
+                    )
                 ),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
@@ -542,7 +578,11 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.lessThanOrEqualTo(a, H.repeating(value), where: mask),
                 H.Mask(
-                    raw: HighwayReference.lessThanOrEqualToWhereF32(mask.raw, a, H.repeating(value))
+                    raw: HighwayReference.lessThanOrEqualToWhereF32(
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw
+                    )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
@@ -657,8 +697,8 @@ extension SIMDFloatConstantTests {
                 H.Mask(
                     raw: HighwayReference.greaterThanOrEqualToWhereF32(
                         mask.raw,
-                        H.repeating(value),
-                        b
+                        H.repeating(value).raw,
+                        b.raw
                     )
                 ),
                 "mask: \(describe(mask)), b: \(describe(b))"
@@ -679,8 +719,8 @@ extension SIMDFloatConstantTests {
                 H.Mask(
                     raw: HighwayReference.greaterThanOrEqualToWhereF32(
                         mask.raw,
-                        a,
-                        H.repeating(value)
+                        a.raw,
+                        H.repeating(value).raw
                     )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a))"

@@ -21,7 +21,7 @@ extension SIMDInt32ConstantTests {
                 H.Vector(
                     raw: HighwayReference.vectorConvertingWhereF32ToI32(
                         mask.raw,
-                        SIMDFloat.repeating(value)
+                        SIMDFloat.repeating(value).raw
                     )
                 ),
                 "mask: \(describe(mask))"
@@ -120,7 +120,7 @@ extension SIMDInt32ConstantTests {
             H.vector(roundingToNearestOrEven: SIMDFloat.repeating(value)),
             H.Vector(
                 raw: HighwayReference.vectorRoundingToNearestOrEvenF32ToI32(
-                    SIMDFloat.repeating(value)
+                    SIMDFloat.repeating(value).raw
                 )
             ),
             ""
@@ -216,7 +216,9 @@ extension SIMDInt32ConstantTests {
         )
         mismatches.check(
             H.vector(roundingUp: SIMDFloat.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorRoundingUpF32ToI32(SIMDFloat.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorRoundingUpF32ToI32(SIMDFloat.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()
@@ -308,7 +310,9 @@ extension SIMDInt32ConstantTests {
         )
         mismatches.check(
             H.vector(roundingDown: SIMDFloat.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorRoundingDownF32ToI32(SIMDFloat.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorRoundingDownF32ToI32(SIMDFloat.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()
@@ -405,7 +409,7 @@ extension SIMDInt32ConstantTests {
             H.halfVector(roundingToNearestOrEven: SIMDDouble.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorRoundingToNearestOrEvenF64ToI32(
-                    SIMDDouble.repeating(value)
+                    SIMDDouble.repeating(value).raw
                 )
             ),
             ""
@@ -869,7 +873,7 @@ extension SIMDInt32ConstantTests {
         )
         let port = H.vector(resizing: SIMDFloat.repeating(value))
         let reference = H.Vector(
-            raw: HighwayReference.vectorResizingF32ToI32(SIMDFloat.repeating(value))
+            raw: HighwayReference.vectorResizingF32ToI32(SIMDFloat.repeating(value).raw)
         )
         let definedBytes = SIMDFloat.laneCount * MemoryLayout<SIMDFloat.Lane>.stride
         let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
@@ -973,7 +977,7 @@ extension SIMDInt32ConstantTests {
         )
         let port = H.halfVector(resizing: SIMDFloat.repeating(value))
         let reference = H.HalfVector(
-            raw: HighwayReference.halfVectorResizingF32ToI32(SIMDFloat.repeating(value))
+            raw: HighwayReference.halfVectorResizingF32ToI32(SIMDFloat.repeating(value).raw)
         )
         let definedBytes = SIMDFloat.laneCount * MemoryLayout<SIMDFloat.Lane>.stride
         let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride

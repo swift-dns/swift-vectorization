@@ -13,7 +13,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes),
-                HighwayReference.slideUpLanesF32(a, lanes),
+                HighwayReference.slideUpLanesF32(a.raw, lanes),
                 "a: \(describe(a))"
             )
         }
@@ -92,7 +92,7 @@ extension SIMDFloatConstantTests {
         for lanes in lanesInputs {
             mismatches.check(
                 H.slideUpLanes(H.repeating(value), by: lanes),
-                HighwayReference.slideUpLanesF32(H.repeating(value), lanes),
+                HighwayReference.slideUpLanesF32(H.repeating(value).raw, lanes),
                 "lanes: \(lanes)"
             )
         }
@@ -183,7 +183,7 @@ extension SIMDFloatConstantTests {
         for (fill, a) in everyPair(fillInputs, aInputs) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes, fillingWith: fill),
-                HighwayReference.slideUpLanesFillingWithF32(fill, a, lanes),
+                HighwayReference.slideUpLanesFillingWithF32(fill.raw, a.raw, lanes),
                 "fill: \(describe(fill)), a: \(describe(a))"
             )
         }
@@ -263,7 +263,7 @@ extension SIMDFloatConstantTests {
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes, fillingWith: H.repeating(value)),
-                HighwayReference.slideUpLanesFillingWithF32(H.repeating(value), a, lanes),
+                HighwayReference.slideUpLanesFillingWithF32(H.repeating(value).raw, a.raw, lanes),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -279,7 +279,11 @@ extension SIMDFloatConstantTests {
         for (fill, lanes) in everyPair(fillInputs, lanesInputs) {
             mismatches.check(
                 H.slideUpLanes(H.repeating(value), by: lanes, fillingWith: fill),
-                HighwayReference.slideUpLanesFillingWithF32(fill, H.repeating(value), lanes),
+                HighwayReference.slideUpLanesFillingWithF32(
+                    fill.raw,
+                    H.repeating(value).raw,
+                    lanes
+                ),
                 "fill: \(describe(fill)), lanes: \(lanes)"
             )
         }
@@ -388,7 +392,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes),
-                HighwayReference.slideDownLanesF32(a, lanes),
+                HighwayReference.slideDownLanesF32(a.raw, lanes),
                 "a: \(describe(a))"
             )
         }
@@ -467,7 +471,7 @@ extension SIMDFloatConstantTests {
         for lanes in lanesInputs {
             mismatches.check(
                 H.slideDownLanes(H.repeating(value), by: lanes),
-                HighwayReference.slideDownLanesF32(H.repeating(value), lanes),
+                HighwayReference.slideDownLanesF32(H.repeating(value).raw, lanes),
                 "lanes: \(lanes)"
             )
         }
@@ -558,7 +562,7 @@ extension SIMDFloatConstantTests {
         for (fill, a) in everyPair(fillInputs, aInputs) {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes, fillingWith: fill),
-                HighwayReference.slideDownLanesFillingWithF32(fill, a, lanes),
+                HighwayReference.slideDownLanesFillingWithF32(fill.raw, a.raw, lanes),
                 "fill: \(describe(fill)), a: \(describe(a))"
             )
         }
@@ -638,7 +642,7 @@ extension SIMDFloatConstantTests {
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes, fillingWith: H.repeating(value)),
-                HighwayReference.slideDownLanesFillingWithF32(H.repeating(value), a, lanes),
+                HighwayReference.slideDownLanesFillingWithF32(H.repeating(value).raw, a.raw, lanes),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -654,7 +658,11 @@ extension SIMDFloatConstantTests {
         for (fill, lanes) in everyPair(fillInputs, lanesInputs) {
             mismatches.check(
                 H.slideDownLanes(H.repeating(value), by: lanes, fillingWith: fill),
-                HighwayReference.slideDownLanesFillingWithF32(fill, H.repeating(value), lanes),
+                HighwayReference.slideDownLanesFillingWithF32(
+                    fill.raw,
+                    H.repeating(value).raw,
+                    lanes
+                ),
                 "fill: \(describe(fill)), lanes: \(lanes)"
             )
         }
@@ -762,7 +770,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.slide1Up(H.repeating(value)),
-            HighwayReference.slide1UpF32(H.repeating(value)),
+            HighwayReference.slide1UpF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -852,7 +860,7 @@ extension SIMDFloatConstantTests {
         for fill in fillInputs {
             mismatches.check(
                 H.slide1Up(H.repeating(value), fillingWith: fill),
-                HighwayReference.slide1UpFillingWithF32(fill, H.repeating(value)),
+                HighwayReference.slide1UpFillingWithF32(fill, H.repeating(value).raw),
                 "fill: \(hex(fill))"
             )
         }
@@ -941,7 +949,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.slide1Down(H.repeating(value)),
-            HighwayReference.slide1DownF32(H.repeating(value)),
+            HighwayReference.slide1DownF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()

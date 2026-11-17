@@ -4,11 +4,11 @@ import Vectorization
 
 @Suite("Memory ops")
 struct MemoryOpsTests {
-    typealias H = SIMDInt32
+    typealias H = SIMD<Int32>
 
     var lanes: Int { H.laneCount }
 
-    func stored(_ vector: H.Vector) -> [Int32] {
+    func stored(_ vector: H) -> [Int32] {
         var output = ContiguousArray<Int32>(repeating: -1, count: lanes)
         var destination = output.mutableSpan
         H.store(vector, to: &destination)
@@ -72,9 +72,9 @@ struct MemoryOpsTests {
         let limits32 = [
             (0, 1), (4, 1), (Int.max, 1), (0, 4), (1, 4), (4, 4), (1 << 29, 4), ((1 << 29) + 1, 4),
             (Int.max, 4),
-        ].map { UInt64(UInt(bitPattern: SIMDInt32.indexLimit(count: $0.0, stride: $0.1))) }
+        ].map { UInt64(UInt(bitPattern: SIMD<Int32>.indexLimit(count: $0.0, stride: $0.1))) }
         let limits64 = [(0, 1), (4, 1), (Int.max, 1), (4, 8), ((1 << 28) + 1, 8), (1 << 29, 8)]
-            .map { UInt64(UInt(bitPattern: SIMDInt64.indexLimit(count: $0.0, stride: $0.1))) }
+            .map { UInt64(UInt(bitPattern: SIMD<Int64>.indexLimit(count: $0.0, stride: $0.1))) }
 
         let expected32: [UInt64] = [
             0, 4, Swift.min(UInt64(Int.max), 1 << 31), 0, 1, 13, (1 << 31) - 3, 1 << 31, 1 << 31,
@@ -105,14 +105,14 @@ struct MemoryOpsTests {
         "The index checks of masked gathers and scatters reject an index outside the span in a used lane"
     )
     func maskedIndexChecksOfNonCanonicalMasks() {
-        typealias U = SIMDUInt32
-        typealias D = SIMDDouble
+        typealias U = SIMD<UInt32>
+        typealias D = SIMD<Double>
         let scattersBySignBit = SIMDTarget.targetName.hasPrefix("AVX3")
         let gathersBySignBit = scattersBySignBit || SIMDTarget.targetName == "AVX2"
-        let indices32 = SIMDInt32.load(
+        let indices32 = SIMD<Int32>.load(
             from: ContiguousArray((0..<U.laneCount).map { $0 == U.laneCount - 1 ? 64 : 0 }).span
         )
-        let indices64 = SIMDInt64.load(
+        let indices64 = SIMD<Int64>.load(
             from: ContiguousArray((0..<D.laneCount).map { $0 == D.laneCount - 1 ? 64 : 0 }).span
         )
 
@@ -185,11 +185,11 @@ struct MemoryOpsTests {
 
     @Test("A truncating store keeps the low bits of the lanes")
     func truncatingStore() {
-        var output = ContiguousArray<UInt8>(repeating: 0, count: SIMDUInt32.laneCount)
+        var output = ContiguousArray<UInt8>(repeating: 0, count: SIMD<UInt32>.laneCount)
         var destination = output.mutableSpan
-        SIMDUInt32.storeTruncating(SIMDUInt32.repeating(0x1234_56AB), to: &destination)
+        SIMD<UInt32>.storeTruncating(SIMD<UInt32>.repeating(0x1234_56AB), to: &destination)
 
-        #expect(Array(output) == [UInt8](repeating: 0xAB, count: SIMDUInt32.laneCount))
+        #expect(Array(output) == [UInt8](repeating: 0xAB, count: SIMD<UInt32>.laneCount))
     }
 
     @Test("Indices loaded from memory select lanes")

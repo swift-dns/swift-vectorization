@@ -4,28 +4,22 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portOddEvenBlocksU64(
-    _ a: SIMDUInt64.Vector,
-    _ b: SIMDUInt64.Vector
-) -> SIMDUInt64.Vector {
+public func portOddEvenBlocksU64(_ a: SIMD<UInt64>, _ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.oddEvenBlocks(a, b)
 }
 
 @inline(never)
-public func highwayOddEvenBlocksU64(
-    _ a: SIMDUInt64.Vector,
-    _ b: SIMDUInt64.Vector
-) -> SIMDUInt64.Vector {
+public func highwayOddEvenBlocksU64(_ a: SIMD<UInt64>, _ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.Vector(raw: HighwayReference.Nothrow.oddEvenBlocksU64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portOddEvenBlocksU64ConstantA(_ b: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func portOddEvenBlocksU64ConstantA(_ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.oddEvenBlocks(SIMDUInt64.repeating(26), b)
 }
 
 @inline(never)
-public func highwayOddEvenBlocksU64ConstantA(_ b: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func highwayOddEvenBlocksU64ConstantA(_ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.Vector(
         raw: HighwayReference.Nothrow.oddEvenBlocksU64(
             SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
@@ -35,12 +29,12 @@ public func highwayOddEvenBlocksU64ConstantA(_ b: SIMDUInt64.Vector) -> SIMDUInt
 }
 
 @inline(never)
-public func portOddEvenBlocksU64ConstantB(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func portOddEvenBlocksU64ConstantB(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.oddEvenBlocks(a, SIMDUInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayOddEvenBlocksU64ConstantB(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func highwayOddEvenBlocksU64ConstantB(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.Vector(
         raw: HighwayReference.Nothrow.oddEvenBlocksU64(
             a.raw,
@@ -50,22 +44,22 @@ public func highwayOddEvenBlocksU64ConstantB(_ a: SIMDUInt64.Vector) -> SIMDUInt
 }
 
 @inline(never)
-public func portSwappingAdjacentBlocksU64(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func portSwappingAdjacentBlocksU64(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.swappingAdjacentBlocks(a)
 }
 
 @inline(never)
-public func highwaySwappingAdjacentBlocksU64(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func highwaySwappingAdjacentBlocksU64(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.Vector(raw: HighwayReference.Nothrow.swappingAdjacentBlocksU64(a.raw))
 }
 
 @inline(never)
-public func portSwappingAdjacentBlocksU64ConstantA() -> SIMDUInt64.Vector {
+public func portSwappingAdjacentBlocksU64ConstantA() -> SIMD<UInt64> {
     SIMDUInt64.swappingAdjacentBlocks(SIMDUInt64.repeating(26))
 }
 
 @inline(never)
-public func highwaySwappingAdjacentBlocksU64ConstantA() -> SIMDUInt64.Vector {
+public func highwaySwappingAdjacentBlocksU64ConstantA() -> SIMD<UInt64> {
     SIMDUInt64.Vector(
         raw: HighwayReference.Nothrow.swappingAdjacentBlocksU64(
             SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
@@ -74,28 +68,22 @@ public func highwaySwappingAdjacentBlocksU64ConstantA() -> SIMDUInt64.Vector {
 }
 
 @inline(never)
-public func portInterleavingEvenBlocksU64(
-    _ a: SIMDUInt64.Vector,
-    _ b: SIMDUInt64.Vector
-) -> SIMDUInt64.Vector {
+public func portInterleavingEvenBlocksU64(_ a: SIMD<UInt64>, _ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.interleavingEvenBlocks(a, b)
 }
 
 @inline(never)
-public func highwayInterleavingEvenBlocksU64(
-    _ a: SIMDUInt64.Vector,
-    _ b: SIMDUInt64.Vector
-) -> SIMDUInt64.Vector {
+public func highwayInterleavingEvenBlocksU64(_ a: SIMD<UInt64>, _ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.Vector(raw: HighwayReference.Nothrow.interleavingEvenBlocksU64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portInterleavingEvenBlocksU64ConstantA(_ b: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func portInterleavingEvenBlocksU64ConstantA(_ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.interleavingEvenBlocks(SIMDUInt64.repeating(26), b)
 }
 
 @inline(never)
-public func highwayInterleavingEvenBlocksU64ConstantA(_ b: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func highwayInterleavingEvenBlocksU64ConstantA(_ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.Vector(
         raw: HighwayReference.Nothrow.interleavingEvenBlocksU64(
             SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
@@ -105,12 +93,12 @@ public func highwayInterleavingEvenBlocksU64ConstantA(_ b: SIMDUInt64.Vector) ->
 }
 
 @inline(never)
-public func portInterleavingEvenBlocksU64ConstantB(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func portInterleavingEvenBlocksU64ConstantB(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.interleavingEvenBlocks(a, SIMDUInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayInterleavingEvenBlocksU64ConstantB(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func highwayInterleavingEvenBlocksU64ConstantB(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.Vector(
         raw: HighwayReference.Nothrow.interleavingEvenBlocksU64(
             a.raw,
@@ -120,28 +108,22 @@ public func highwayInterleavingEvenBlocksU64ConstantB(_ a: SIMDUInt64.Vector) ->
 }
 
 @inline(never)
-public func portInterleavingOddBlocksU64(
-    _ a: SIMDUInt64.Vector,
-    _ b: SIMDUInt64.Vector
-) -> SIMDUInt64.Vector {
+public func portInterleavingOddBlocksU64(_ a: SIMD<UInt64>, _ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.interleavingOddBlocks(a, b)
 }
 
 @inline(never)
-public func highwayInterleavingOddBlocksU64(
-    _ a: SIMDUInt64.Vector,
-    _ b: SIMDUInt64.Vector
-) -> SIMDUInt64.Vector {
+public func highwayInterleavingOddBlocksU64(_ a: SIMD<UInt64>, _ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.Vector(raw: HighwayReference.Nothrow.interleavingOddBlocksU64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portInterleavingOddBlocksU64ConstantA(_ b: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func portInterleavingOddBlocksU64ConstantA(_ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.interleavingOddBlocks(SIMDUInt64.repeating(26), b)
 }
 
 @inline(never)
-public func highwayInterleavingOddBlocksU64ConstantA(_ b: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func highwayInterleavingOddBlocksU64ConstantA(_ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.Vector(
         raw: HighwayReference.Nothrow.interleavingOddBlocksU64(
             SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
@@ -151,12 +133,12 @@ public func highwayInterleavingOddBlocksU64ConstantA(_ b: SIMDUInt64.Vector) -> 
 }
 
 @inline(never)
-public func portInterleavingOddBlocksU64ConstantB(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func portInterleavingOddBlocksU64ConstantB(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.interleavingOddBlocks(a, SIMDUInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayInterleavingOddBlocksU64ConstantB(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func highwayInterleavingOddBlocksU64ConstantB(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.Vector(
         raw: HighwayReference.Nothrow.interleavingOddBlocksU64(
             a.raw,
@@ -166,29 +148,23 @@ public func highwayInterleavingOddBlocksU64ConstantB(_ a: SIMDUInt64.Vector) -> 
 }
 
 @inline(never)
-public func portInterleavingLowerBlocksU64(
-    _ a: SIMDUInt64.Vector,
-    _ b: SIMDUInt64.Vector
-) -> SIMDUInt64.Vector {
+public func portInterleavingLowerBlocksU64(_ a: SIMD<UInt64>, _ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.interleavingLowerBlocks(a, b)
 }
 
 @inline(never)
-public func highwayInterleavingLowerBlocksU64(
-    _ a: SIMDUInt64.Vector,
-    _ b: SIMDUInt64.Vector
-) -> SIMDUInt64.Vector {
+public func highwayInterleavingLowerBlocksU64(_ a: SIMD<UInt64>, _ b: SIMD<UInt64>) -> SIMD<UInt64>
+{
     SIMDUInt64.Vector(raw: HighwayReference.Nothrow.interleavingLowerBlocksU64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portInterleavingLowerBlocksU64ConstantA(_ b: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func portInterleavingLowerBlocksU64ConstantA(_ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.interleavingLowerBlocks(SIMDUInt64.repeating(26), b)
 }
 
 @inline(never)
-public func highwayInterleavingLowerBlocksU64ConstantA(_ b: SIMDUInt64.Vector) -> SIMDUInt64.Vector
-{
+public func highwayInterleavingLowerBlocksU64ConstantA(_ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.Vector(
         raw: HighwayReference.Nothrow.interleavingLowerBlocksU64(
             SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
@@ -198,13 +174,12 @@ public func highwayInterleavingLowerBlocksU64ConstantA(_ b: SIMDUInt64.Vector) -
 }
 
 @inline(never)
-public func portInterleavingLowerBlocksU64ConstantB(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func portInterleavingLowerBlocksU64ConstantB(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.interleavingLowerBlocks(a, SIMDUInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayInterleavingLowerBlocksU64ConstantB(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector
-{
+public func highwayInterleavingLowerBlocksU64ConstantB(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.Vector(
         raw: HighwayReference.Nothrow.interleavingLowerBlocksU64(
             a.raw,
@@ -214,29 +189,23 @@ public func highwayInterleavingLowerBlocksU64ConstantB(_ a: SIMDUInt64.Vector) -
 }
 
 @inline(never)
-public func portInterleavingUpperBlocksU64(
-    _ a: SIMDUInt64.Vector,
-    _ b: SIMDUInt64.Vector
-) -> SIMDUInt64.Vector {
+public func portInterleavingUpperBlocksU64(_ a: SIMD<UInt64>, _ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.interleavingUpperBlocks(a, b)
 }
 
 @inline(never)
-public func highwayInterleavingUpperBlocksU64(
-    _ a: SIMDUInt64.Vector,
-    _ b: SIMDUInt64.Vector
-) -> SIMDUInt64.Vector {
+public func highwayInterleavingUpperBlocksU64(_ a: SIMD<UInt64>, _ b: SIMD<UInt64>) -> SIMD<UInt64>
+{
     SIMDUInt64.Vector(raw: HighwayReference.Nothrow.interleavingUpperBlocksU64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portInterleavingUpperBlocksU64ConstantA(_ b: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func portInterleavingUpperBlocksU64ConstantA(_ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.interleavingUpperBlocks(SIMDUInt64.repeating(26), b)
 }
 
 @inline(never)
-public func highwayInterleavingUpperBlocksU64ConstantA(_ b: SIMDUInt64.Vector) -> SIMDUInt64.Vector
-{
+public func highwayInterleavingUpperBlocksU64ConstantA(_ b: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.Vector(
         raw: HighwayReference.Nothrow.interleavingUpperBlocksU64(
             SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
@@ -246,13 +215,12 @@ public func highwayInterleavingUpperBlocksU64ConstantA(_ b: SIMDUInt64.Vector) -
 }
 
 @inline(never)
-public func portInterleavingUpperBlocksU64ConstantB(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func portInterleavingUpperBlocksU64ConstantB(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.interleavingUpperBlocks(a, SIMDUInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayInterleavingUpperBlocksU64ConstantB(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector
-{
+public func highwayInterleavingUpperBlocksU64ConstantB(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.Vector(
         raw: HighwayReference.Nothrow.interleavingUpperBlocksU64(
             a.raw,
@@ -262,12 +230,12 @@ public func highwayInterleavingUpperBlocksU64ConstantB(_ a: SIMDUInt64.Vector) -
 }
 
 @inline(never)
-public func portBroadcastingLaneU64ConstantA() -> SIMDUInt64.Vector {
+public func portBroadcastingLaneU64ConstantA() -> SIMD<UInt64> {
     unsafe SIMDUInt64.broadcasting(SIMDUInt64.repeating(26), laneUnchecked: 1)
 }
 
 @inline(never)
-public func highwayBroadcastingLaneU64ConstantA() -> SIMDUInt64.Vector {
+public func highwayBroadcastingLaneU64ConstantA() -> SIMD<UInt64> {
     SIMDUInt64.Vector(
         raw: HighwayReference.Nothrow.broadcastingLaneU64(
             SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
@@ -277,22 +245,22 @@ public func highwayBroadcastingLaneU64ConstantA() -> SIMDUInt64.Vector {
 }
 
 @inline(never)
-public func portBroadcastingLaneU64ConstantLane(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func portBroadcastingLaneU64ConstantLane(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
     unsafe SIMDUInt64.broadcasting(a, laneUnchecked: 1)
 }
 
 @inline(never)
-public func highwayBroadcastingLaneU64ConstantLane(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func highwayBroadcastingLaneU64ConstantLane(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.Vector(raw: HighwayReference.Nothrow.broadcastingLaneU64(a.raw, 1))
 }
 
 @inline(never)
-public func portBroadcastingBlockU64ConstantA() -> SIMDUInt64.Vector {
+public func portBroadcastingBlockU64ConstantA() -> SIMD<UInt64> {
     unsafe SIMDUInt64.broadcasting(SIMDUInt64.repeating(26), blockUnchecked: 0)
 }
 
 @inline(never)
-public func highwayBroadcastingBlockU64ConstantA() -> SIMDUInt64.Vector {
+public func highwayBroadcastingBlockU64ConstantA() -> SIMD<UInt64> {
     SIMDUInt64.Vector(
         raw: HighwayReference.Nothrow.broadcastingBlockU64(
             SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
@@ -302,11 +270,11 @@ public func highwayBroadcastingBlockU64ConstantA() -> SIMDUInt64.Vector {
 }
 
 @inline(never)
-public func portBroadcastingBlockU64ConstantBlock(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func portBroadcastingBlockU64ConstantBlock(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
     unsafe SIMDUInt64.broadcasting(a, blockUnchecked: 0)
 }
 
 @inline(never)
-public func highwayBroadcastingBlockU64ConstantBlock(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+public func highwayBroadcastingBlockU64ConstantBlock(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
     SIMDUInt64.Vector(raw: HighwayReference.Nothrow.broadcastingBlockU64(a.raw, 0))
 }

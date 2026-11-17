@@ -17,7 +17,7 @@ extension SIMDFloatConstantTests {
         )
         mismatches.check(
             H.vector(wideningLower: SIMDFloat16.repeating(value)),
-            HighwayReference.vectorWideningLowerF16ToF32(SIMDFloat16.repeating(value)),
+            HighwayReference.vectorWideningLowerF16ToF32(SIMDFloat16.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -149,7 +149,7 @@ extension SIMDFloatConstantTests {
         )
         mismatches.check(
             H.vector(wideningUpper: SIMDFloat16.repeating(value)),
-            HighwayReference.vectorWideningUpperF16ToF32(SIMDFloat16.repeating(value)),
+            HighwayReference.vectorWideningUpperF16ToF32(SIMDFloat16.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -281,7 +281,7 @@ extension SIMDFloatConstantTests {
         )
         mismatches.check(
             H.vector(wideningEven: SIMDFloat16.repeating(value)),
-            HighwayReference.vectorWideningEvenF16ToF32(SIMDFloat16.repeating(value)),
+            HighwayReference.vectorWideningEvenF16ToF32(SIMDFloat16.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -413,7 +413,7 @@ extension SIMDFloatConstantTests {
         )
         mismatches.check(
             H.vector(wideningOdd: SIMDFloat16.repeating(value)),
-            HighwayReference.vectorWideningOddF16ToF32(SIMDFloat16.repeating(value)),
+            HighwayReference.vectorWideningOddF16ToF32(SIMDFloat16.repeating(value).raw),
             ""
         )
         mismatches.record()

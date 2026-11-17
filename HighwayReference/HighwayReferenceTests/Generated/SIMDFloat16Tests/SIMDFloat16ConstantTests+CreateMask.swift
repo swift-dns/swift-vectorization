@@ -17,7 +17,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.mask(from: H.repeating(value)),
-            H.Mask(raw: HighwayReference.maskFromVectorF16(H.repeating(value))),
+            H.Mask(raw: HighwayReference.maskFromVectorF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()

@@ -5,105 +5,99 @@ public import Vectorization
 
 @inline(never)
 public func portVectorConvertingF32ToBF16(
-    converting a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDBFloat16.Vector {
+    converting a: SIMD<Float>,
+    _ b: SIMD<Float>
+) -> SIMD<BFloat16> {
     SIMDBFloat16.vector(converting: a, b)
 }
 
 @inline(never)
 public func highwayVectorConvertingF32ToBF16(
-    converting a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.vectorConvertingF32ToBF16(a, b))
+    converting a: SIMD<Float>,
+    _ b: SIMD<Float>
+) -> SIMD<BFloat16> {
+    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.vectorConvertingF32ToBF16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portVectorConvertingF32ToBF16ConstantA(_ b: SIMDFloat.Vector) -> SIMDBFloat16.Vector {
+public func portVectorConvertingF32ToBF16ConstantA(_ b: SIMD<Float>) -> SIMD<BFloat16> {
     SIMDBFloat16.vector(converting: SIMDFloat.repeating(1.5), b)
 }
 
 @inline(never)
-public func highwayVectorConvertingF32ToBF16ConstantA(_ b: SIMDFloat.Vector) -> SIMDBFloat16.Vector
-{
+public func highwayVectorConvertingF32ToBF16ConstantA(_ b: SIMD<Float>) -> SIMD<BFloat16> {
     SIMDBFloat16.Vector(
         raw: HighwayReference.Nothrow.vectorConvertingF32ToBF16(
-            HighwayReference.Nothrow.repeatingF32(1.5),
-            b
+            HighwayReference.Nothrow.repeatingF32(1.5).raw,
+            b.raw
         )
     )
 }
 
 @inline(never)
-public func portVectorConvertingF32ToBF16ConstantB(
-    converting a: SIMDFloat.Vector
-) -> SIMDBFloat16.Vector {
+public func portVectorConvertingF32ToBF16ConstantB(converting a: SIMD<Float>) -> SIMD<BFloat16> {
     SIMDBFloat16.vector(converting: a, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayVectorConvertingF32ToBF16ConstantB(
-    converting a: SIMDFloat.Vector
-) -> SIMDBFloat16.Vector {
+public func highwayVectorConvertingF32ToBF16ConstantB(converting a: SIMD<Float>) -> SIMD<BFloat16> {
     SIMDBFloat16.Vector(
         raw: HighwayReference.Nothrow.vectorConvertingF32ToBF16(
-            a,
-            HighwayReference.Nothrow.repeatingF32(1.5)
+            a.raw,
+            HighwayReference.Nothrow.repeatingF32(1.5).raw
         )
     )
 }
 
 @inline(never)
 public func portVectorConvertingInAnyOrderF32ToBF16(
-    convertingInAnyOrder a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDBFloat16.Vector {
+    convertingInAnyOrder a: SIMD<Float>,
+    _ b: SIMD<Float>
+) -> SIMD<BFloat16> {
     SIMDBFloat16.vector(convertingInAnyOrder: a, b)
 }
 
 @inline(never)
 public func highwayVectorConvertingInAnyOrderF32ToBF16(
-    convertingInAnyOrder a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.vectorConvertingInAnyOrderF32ToBF16(a, b))
+    convertingInAnyOrder a: SIMD<Float>,
+    _ b: SIMD<Float>
+) -> SIMD<BFloat16> {
+    SIMDBFloat16.Vector(
+        raw: HighwayReference.Nothrow.vectorConvertingInAnyOrderF32ToBF16(a.raw, b.raw)
+    )
 }
 
 @inline(never)
-public func portVectorConvertingInAnyOrderF32ToBF16ConstantA(
-    _ b: SIMDFloat.Vector
-) -> SIMDBFloat16.Vector {
+public func portVectorConvertingInAnyOrderF32ToBF16ConstantA(_ b: SIMD<Float>) -> SIMD<BFloat16> {
     SIMDBFloat16.vector(convertingInAnyOrder: SIMDFloat.repeating(1.5), b)
 }
 
 @inline(never)
-public func highwayVectorConvertingInAnyOrderF32ToBF16ConstantA(
-    _ b: SIMDFloat.Vector
-) -> SIMDBFloat16.Vector {
+public func highwayVectorConvertingInAnyOrderF32ToBF16ConstantA(_ b: SIMD<Float>) -> SIMD<BFloat16>
+{
     SIMDBFloat16.Vector(
         raw: HighwayReference.Nothrow.vectorConvertingInAnyOrderF32ToBF16(
-            HighwayReference.Nothrow.repeatingF32(1.5),
-            b
+            HighwayReference.Nothrow.repeatingF32(1.5).raw,
+            b.raw
         )
     )
 }
 
 @inline(never)
 public func portVectorConvertingInAnyOrderF32ToBF16ConstantB(
-    convertingInAnyOrder a: SIMDFloat.Vector
-) -> SIMDBFloat16.Vector {
+    convertingInAnyOrder a: SIMD<Float>
+) -> SIMD<BFloat16> {
     SIMDBFloat16.vector(convertingInAnyOrder: a, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
 public func highwayVectorConvertingInAnyOrderF32ToBF16ConstantB(
-    convertingInAnyOrder a: SIMDFloat.Vector
-) -> SIMDBFloat16.Vector {
+    convertingInAnyOrder a: SIMD<Float>
+) -> SIMD<BFloat16> {
     SIMDBFloat16.Vector(
         raw: HighwayReference.Nothrow.vectorConvertingInAnyOrderF32ToBF16(
-            a,
-            HighwayReference.Nothrow.repeatingF32(1.5)
+            a.raw,
+            HighwayReference.Nothrow.repeatingF32(1.5).raw
         )
     )
 }

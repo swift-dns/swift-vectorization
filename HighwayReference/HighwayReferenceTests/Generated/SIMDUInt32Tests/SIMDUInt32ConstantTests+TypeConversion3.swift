@@ -17,7 +17,7 @@ extension SIMDUInt32ConstantTests {
         )
         let port = H.halfVector(resizing: SIMDFloat16.repeating(value))
         let reference = H.HalfVector(
-            raw: HighwayReference.halfVectorResizingF16ToU32(SIMDFloat16.repeating(value))
+            raw: HighwayReference.halfVectorResizingF16ToU32(SIMDFloat16.repeating(value).raw)
         )
         let definedBytes = SIMDFloat16.laneCount * MemoryLayout<SIMDFloat16.Lane>.stride
         let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
@@ -716,7 +716,7 @@ extension SIMDUInt32ConstantTests {
             H.vector(zeroExtendingResizing: SIMDFloat.repeating(value)),
             H.Vector(
                 raw: HighwayReference.vectorZeroExtendingResizingF32ToU32(
-                    SIMDFloat.repeating(value)
+                    SIMDFloat.repeating(value).raw
                 )
             ),
             ""
@@ -814,7 +814,7 @@ extension SIMDUInt32ConstantTests {
             H.halfVector(zeroExtendingResizing: SIMDFloat.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorZeroExtendingResizingF32ToU32(
-                    SIMDFloat.repeating(value)
+                    SIMDFloat.repeating(value).raw
                 )
             ),
             ""
@@ -914,7 +914,7 @@ extension SIMDUInt32ConstantTests {
             H.vector(zeroExtendingResizing: SIMDDouble.repeating(value)),
             H.Vector(
                 raw: HighwayReference.vectorZeroExtendingResizingF64ToU32(
-                    SIMDDouble.repeating(value)
+                    SIMDDouble.repeating(value).raw
                 )
             ),
             ""
@@ -1014,7 +1014,7 @@ extension SIMDUInt32ConstantTests {
             H.halfVector(zeroExtendingResizing: SIMDDouble.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorZeroExtendingResizingF64ToU32(
-                    SIMDDouble.repeating(value)
+                    SIMDDouble.repeating(value).raw
                 )
             ),
             ""

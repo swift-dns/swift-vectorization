@@ -1027,7 +1027,9 @@ extension SIMDUInt8ConstantTests {
         mismatches.check(
             H.vector(zeroExtendingResizing: SIMDFloat.repeating(value)),
             H.Vector(
-                raw: HighwayReference.vectorZeroExtendingResizingF32ToU8(SIMDFloat.repeating(value))
+                raw: HighwayReference.vectorZeroExtendingResizingF32ToU8(
+                    SIMDFloat.repeating(value).raw
+                )
             ),
             ""
         )

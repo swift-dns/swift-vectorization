@@ -19,7 +19,7 @@ extension SIMDFloat16ConstantTests {
         for mask in maskInputs {
             mismatches.check(
                 H.expanded(H.repeating(value), where: mask),
-                HighwayReference.expandedF16(H.repeating(value), mask.raw),
+                HighwayReference.expandedF16(H.repeating(value).raw, mask.raw),
                 "mask: \(describe(mask))"
             )
         }
@@ -127,7 +127,7 @@ extension SIMDFloat16ConstantTests {
                         otherwise: H.repeating(value)
                     ),
                     unsafe HighwayReference.loadExpandedWhereOtherwiseF16(
-                        H.repeating(value),
+                        H.repeating(value).raw,
                         mask.raw,
                         source.baseAddress!
                     )

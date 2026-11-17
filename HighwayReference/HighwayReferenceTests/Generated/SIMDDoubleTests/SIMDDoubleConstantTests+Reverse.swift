@@ -12,7 +12,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.reversed(H.repeating(value)),
-            HighwayReference.reversedF64(H.repeating(value)),
+            HighwayReference.reversedF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -100,7 +100,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.byteSwapped(H.repeating(value)),
-            HighwayReference.byteSwappedF64(H.repeating(value)),
+            HighwayReference.byteSwappedF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -188,7 +188,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.reversedBlocks(H.repeating(value)),
-            HighwayReference.reversedBlocksF64(H.repeating(value)),
+            HighwayReference.reversedBlocksF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -276,7 +276,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.reversed2(H.repeating(value)),
-            HighwayReference.reversed2F64(H.repeating(value)),
+            HighwayReference.reversed2F64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -364,7 +364,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.reversed4(H.repeating(value)),
-            HighwayReference.reversed4F64(H.repeating(value)),
+            HighwayReference.reversed4F64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -471,7 +471,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.reversed8(H.repeating(value)),
-            HighwayReference.reversed8F64(H.repeating(value)),
+            HighwayReference.reversed8F64(H.repeating(value).raw),
             ""
         )
         mismatches.record()

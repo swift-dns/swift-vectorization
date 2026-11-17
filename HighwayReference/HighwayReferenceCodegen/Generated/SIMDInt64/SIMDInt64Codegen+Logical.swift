@@ -4,22 +4,22 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portBitwiseAndI64(_ a: SIMDInt64.Vector, _ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portBitwiseAndI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseAnd(a, b)
 }
 
 @inline(never)
-public func highwayBitwiseAndI64(_ a: SIMDInt64.Vector, _ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayBitwiseAndI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.bitwiseAndI64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portBitwiseAndI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portBitwiseAndI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseAnd(SIMDInt64.repeating(26), b)
 }
 
 @inline(never)
-public func highwayBitwiseAndI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayBitwiseAndI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseAndI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -29,12 +29,12 @@ public func highwayBitwiseAndI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Ve
 }
 
 @inline(never)
-public func portBitwiseAndI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portBitwiseAndI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseAnd(a, SIMDInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayBitwiseAndI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayBitwiseAndI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseAndI64(
             a.raw,
@@ -44,22 +44,22 @@ public func highwayBitwiseAndI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Ve
 }
 
 @inline(never)
-public func portBitwiseOrI64(_ a: SIMDInt64.Vector, _ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portBitwiseOrI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseOr(a, b)
 }
 
 @inline(never)
-public func highwayBitwiseOrI64(_ a: SIMDInt64.Vector, _ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayBitwiseOrI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.bitwiseOrI64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portBitwiseOrI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portBitwiseOrI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseOr(SIMDInt64.repeating(26), b)
 }
 
 @inline(never)
-public func highwayBitwiseOrI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayBitwiseOrI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseOrI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -69,12 +69,12 @@ public func highwayBitwiseOrI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Vec
 }
 
 @inline(never)
-public func portBitwiseOrI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portBitwiseOrI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseOr(a, SIMDInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayBitwiseOrI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayBitwiseOrI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseOrI64(
             a.raw,
@@ -84,22 +84,22 @@ public func highwayBitwiseOrI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vec
 }
 
 @inline(never)
-public func portBitwiseXorI64(_ a: SIMDInt64.Vector, _ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portBitwiseXorI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseXor(a, b)
 }
 
 @inline(never)
-public func highwayBitwiseXorI64(_ a: SIMDInt64.Vector, _ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayBitwiseXorI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.bitwiseXorI64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portBitwiseXorI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portBitwiseXorI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseXor(SIMDInt64.repeating(26), b)
 }
 
 @inline(never)
-public func highwayBitwiseXorI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayBitwiseXorI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseXorI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -109,12 +109,12 @@ public func highwayBitwiseXorI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Ve
 }
 
 @inline(never)
-public func portBitwiseXorI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portBitwiseXorI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseXor(a, SIMDInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayBitwiseXorI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayBitwiseXorI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseXorI64(
             a.raw,
@@ -124,22 +124,22 @@ public func highwayBitwiseXorI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Ve
 }
 
 @inline(never)
-public func portBitwiseNotI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portBitwiseNotI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseNot(a)
 }
 
 @inline(never)
-public func highwayBitwiseNotI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayBitwiseNotI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.bitwiseNotI64(a.raw))
 }
 
 @inline(never)
-public func portBitwiseNotI64ConstantA() -> SIMDInt64.Vector {
+public func portBitwiseNotI64ConstantA() -> SIMD<Int64> {
     SIMDInt64.bitwiseNot(SIMDInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayBitwiseNotI64ConstantA() -> SIMDInt64.Vector {
+public func highwayBitwiseNotI64ConstantA() -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseNotI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
@@ -148,25 +148,22 @@ public func highwayBitwiseNotI64ConstantA() -> SIMDInt64.Vector {
 }
 
 @inline(never)
-public func portBitwiseAndNotI64(_ a: SIMDInt64.Vector, _ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portBitwiseAndNotI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseAndNot(a, b)
 }
 
 @inline(never)
-public func highwayBitwiseAndNotI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayBitwiseAndNotI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.bitwiseAndNotI64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portBitwiseAndNotI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portBitwiseAndNotI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseAndNot(SIMDInt64.repeating(26), b)
 }
 
 @inline(never)
-public func highwayBitwiseAndNotI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayBitwiseAndNotI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseAndNotI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -176,12 +173,12 @@ public func highwayBitwiseAndNotI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64
 }
 
 @inline(never)
-public func portBitwiseAndNotI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portBitwiseAndNotI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseAndNot(a, SIMDInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayBitwiseAndNotI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayBitwiseAndNotI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseAndNotI64(
             a.raw,
@@ -192,35 +189,29 @@ public func highwayBitwiseAndNotI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64
 
 @inline(never)
 public func portBitwiseAndXorI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseAndXor(a, b, c)
 }
 
 @inline(never)
 public func highwayBitwiseAndXorI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.bitwiseAndXorI64(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
-public func portBitwiseAndXorI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portBitwiseAndXorI64ConstantA(_ b: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseAndXor(SIMDInt64.repeating(26), b, c)
 }
 
 @inline(never)
-public func highwayBitwiseAndXorI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayBitwiseAndXorI64ConstantA(_ b: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseAndXorI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -231,18 +222,12 @@ public func highwayBitwiseAndXorI64ConstantA(
 }
 
 @inline(never)
-public func portBitwiseAndXorI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portBitwiseAndXorI64ConstantB(_ a: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseAndXor(a, SIMDInt64.repeating(26), c)
 }
 
 @inline(never)
-public func highwayBitwiseAndXorI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayBitwiseAndXorI64ConstantB(_ a: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseAndXorI64(
             a.raw,
@@ -253,18 +238,12 @@ public func highwayBitwiseAndXorI64ConstantB(
 }
 
 @inline(never)
-public func portBitwiseAndXorI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portBitwiseAndXorI64ConstantC(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseAndXor(a, b, SIMDInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayBitwiseAndXorI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayBitwiseAndXorI64ConstantC(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseAndXorI64(
             a.raw,
@@ -275,36 +254,27 @@ public func highwayBitwiseAndXorI64ConstantC(
 }
 
 @inline(never)
-public func portBitwiseXor3I64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portBitwiseXor3I64(_ a: SIMD<Int64>, _ b: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64>
+{
     SIMDInt64.bitwiseXor(a, b, c)
 }
 
 @inline(never)
 public func highwayBitwiseXor3I64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.bitwiseXor3I64(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
-public func portBitwiseXor3I64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portBitwiseXor3I64ConstantA(_ b: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseXor(SIMDInt64.repeating(26), b, c)
 }
 
 @inline(never)
-public func highwayBitwiseXor3I64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayBitwiseXor3I64ConstantA(_ b: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseXor3I64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -315,18 +285,12 @@ public func highwayBitwiseXor3I64ConstantA(
 }
 
 @inline(never)
-public func portBitwiseXor3I64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portBitwiseXor3I64ConstantB(_ a: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseXor(a, SIMDInt64.repeating(26), c)
 }
 
 @inline(never)
-public func highwayBitwiseXor3I64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayBitwiseXor3I64ConstantB(_ a: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseXor3I64(
             a.raw,
@@ -337,18 +301,12 @@ public func highwayBitwiseXor3I64ConstantB(
 }
 
 @inline(never)
-public func portBitwiseXor3I64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portBitwiseXor3I64ConstantC(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseXor(a, b, SIMDInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayBitwiseXor3I64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayBitwiseXor3I64ConstantC(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseXor3I64(
             a.raw,
@@ -359,36 +317,26 @@ public func highwayBitwiseXor3I64ConstantC(
 }
 
 @inline(never)
-public func portBitwiseOr3I64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portBitwiseOr3I64(_ a: SIMD<Int64>, _ b: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseOr(a, b, c)
 }
 
 @inline(never)
 public func highwayBitwiseOr3I64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.bitwiseOr3I64(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
-public func portBitwiseOr3I64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portBitwiseOr3I64ConstantA(_ b: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseOr(SIMDInt64.repeating(26), b, c)
 }
 
 @inline(never)
-public func highwayBitwiseOr3I64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayBitwiseOr3I64ConstantA(_ b: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseOr3I64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -399,18 +347,12 @@ public func highwayBitwiseOr3I64ConstantA(
 }
 
 @inline(never)
-public func portBitwiseOr3I64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portBitwiseOr3I64ConstantB(_ a: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseOr(a, SIMDInt64.repeating(26), c)
 }
 
 @inline(never)
-public func highwayBitwiseOr3I64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayBitwiseOr3I64ConstantB(_ a: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseOr3I64(
             a.raw,
@@ -421,18 +363,12 @@ public func highwayBitwiseOr3I64ConstantB(
 }
 
 @inline(never)
-public func portBitwiseOr3I64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portBitwiseOr3I64ConstantC(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseOr(a, b, SIMDInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayBitwiseOr3I64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayBitwiseOr3I64ConstantC(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseOr3I64(
             a.raw,
@@ -443,36 +379,27 @@ public func highwayBitwiseOr3I64ConstantC(
 }
 
 @inline(never)
-public func portBitwiseOrAndI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portBitwiseOrAndI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64>
+{
     SIMDInt64.bitwiseOrAnd(a, b, c)
 }
 
 @inline(never)
 public func highwayBitwiseOrAndI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.bitwiseOrAndI64(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
-public func portBitwiseOrAndI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portBitwiseOrAndI64ConstantA(_ b: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseOrAnd(SIMDInt64.repeating(26), b, c)
 }
 
 @inline(never)
-public func highwayBitwiseOrAndI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayBitwiseOrAndI64ConstantA(_ b: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseOrAndI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -483,18 +410,12 @@ public func highwayBitwiseOrAndI64ConstantA(
 }
 
 @inline(never)
-public func portBitwiseOrAndI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portBitwiseOrAndI64ConstantB(_ a: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseOrAnd(a, SIMDInt64.repeating(26), c)
 }
 
 @inline(never)
-public func highwayBitwiseOrAndI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayBitwiseOrAndI64ConstantB(_ a: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseOrAndI64(
             a.raw,
@@ -505,18 +426,12 @@ public func highwayBitwiseOrAndI64ConstantB(
 }
 
 @inline(never)
-public func portBitwiseOrAndI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portBitwiseOrAndI64ConstantC(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseOrAnd(a, b, SIMDInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayBitwiseOrAndI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayBitwiseOrAndI64ConstantC(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseOrAndI64(
             a.raw,
@@ -528,35 +443,29 @@ public func highwayBitwiseOrAndI64ConstantC(
 
 @inline(never)
 public func portBitwiseXorAndNotI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseXorAndNot(a, b, c)
 }
 
 @inline(never)
 public func highwayBitwiseXorAndNotI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.bitwiseXorAndNotI64(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
-public func portBitwiseXorAndNotI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portBitwiseXorAndNotI64ConstantA(_ b: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseXorAndNot(SIMDInt64.repeating(26), b, c)
 }
 
 @inline(never)
-public func highwayBitwiseXorAndNotI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayBitwiseXorAndNotI64ConstantA(_ b: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseXorAndNotI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -567,18 +476,12 @@ public func highwayBitwiseXorAndNotI64ConstantA(
 }
 
 @inline(never)
-public func portBitwiseXorAndNotI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portBitwiseXorAndNotI64ConstantB(_ a: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseXorAndNot(a, SIMDInt64.repeating(26), c)
 }
 
 @inline(never)
-public func highwayBitwiseXorAndNotI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayBitwiseXorAndNotI64ConstantB(_ a: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseXorAndNotI64(
             a.raw,
@@ -589,18 +492,12 @@ public func highwayBitwiseXorAndNotI64ConstantB(
 }
 
 @inline(never)
-public func portBitwiseXorAndNotI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portBitwiseXorAndNotI64ConstantC(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseXorAndNot(a, b, SIMDInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayBitwiseXorAndNotI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayBitwiseXorAndNotI64ConstantC(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseXorAndNotI64(
             a.raw,
@@ -612,35 +509,29 @@ public func highwayBitwiseXorAndNotI64ConstantC(
 
 @inline(never)
 public func portBitwiseSelectingI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseSelecting(a, b, c)
 }
 
 @inline(never)
 public func highwayBitwiseSelectingI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.bitwiseSelectingI64(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
-public func portBitwiseSelectingI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portBitwiseSelectingI64ConstantA(_ b: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseSelecting(SIMDInt64.repeating(26), b, c)
 }
 
 @inline(never)
-public func highwayBitwiseSelectingI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayBitwiseSelectingI64ConstantA(_ b: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseSelectingI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -651,18 +542,12 @@ public func highwayBitwiseSelectingI64ConstantA(
 }
 
 @inline(never)
-public func portBitwiseSelectingI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portBitwiseSelectingI64ConstantB(_ a: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseSelecting(a, SIMDInt64.repeating(26), c)
 }
 
 @inline(never)
-public func highwayBitwiseSelectingI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayBitwiseSelectingI64ConstantB(_ a: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseSelectingI64(
             a.raw,
@@ -673,18 +558,12 @@ public func highwayBitwiseSelectingI64ConstantB(
 }
 
 @inline(never)
-public func portBitwiseSelectingI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portBitwiseSelectingI64ConstantC(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.bitwiseSelecting(a, b, SIMDInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayBitwiseSelectingI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayBitwiseSelectingI64ConstantC(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseSelectingI64(
             a.raw,
@@ -695,22 +574,22 @@ public func highwayBitwiseSelectingI64ConstantC(
 }
 
 @inline(never)
-public func portBroadcastingSignBitI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portBroadcastingSignBitI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.broadcastingSignBit(a)
 }
 
 @inline(never)
-public func highwayBroadcastingSignBitI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayBroadcastingSignBitI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.broadcastingSignBitI64(a.raw))
 }
 
 @inline(never)
-public func portBroadcastingSignBitI64ConstantA() -> SIMDInt64.Vector {
+public func portBroadcastingSignBitI64ConstantA() -> SIMD<Int64> {
     SIMDInt64.broadcastingSignBit(SIMDInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayBroadcastingSignBitI64ConstantA() -> SIMDInt64.Vector {
+public func highwayBroadcastingSignBitI64ConstantA() -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.broadcastingSignBitI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
@@ -720,35 +599,35 @@ public func highwayBroadcastingSignBitI64ConstantA() -> SIMDInt64.Vector {
 
 @inline(never)
 public func portBitwiseAndWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseAnd(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayBitwiseAndWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.bitwiseAndWhereI64(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portBitwiseAndWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseAnd(SIMDInt64.repeating(26), b, where: mask)
 }
 
 @inline(never)
 public func highwayBitwiseAndWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseAndWhereI64(
             mask.raw,
@@ -760,17 +639,17 @@ public func highwayBitwiseAndWhereI64ConstantA(
 
 @inline(never)
 public func portBitwiseAndWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseAnd(a, SIMDInt64.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayBitwiseAndWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseAndWhereI64(
             mask.raw,
@@ -782,35 +661,35 @@ public func highwayBitwiseAndWhereI64ConstantB(
 
 @inline(never)
 public func portBitwiseOrWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseOr(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayBitwiseOrWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.bitwiseOrWhereI64(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portBitwiseOrWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseOr(SIMDInt64.repeating(26), b, where: mask)
 }
 
 @inline(never)
 public func highwayBitwiseOrWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseOrWhereI64(
             mask.raw,
@@ -822,17 +701,17 @@ public func highwayBitwiseOrWhereI64ConstantA(
 
 @inline(never)
 public func portBitwiseOrWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseOr(a, SIMDInt64.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayBitwiseOrWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseOrWhereI64(
             mask.raw,
@@ -844,35 +723,35 @@ public func highwayBitwiseOrWhereI64ConstantB(
 
 @inline(never)
 public func portBitwiseXorWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseXor(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayBitwiseXorWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.bitwiseXorWhereI64(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portBitwiseXorWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseXor(SIMDInt64.repeating(26), b, where: mask)
 }
 
 @inline(never)
 public func highwayBitwiseXorWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseXorWhereI64(
             mask.raw,
@@ -884,17 +763,17 @@ public func highwayBitwiseXorWhereI64ConstantA(
 
 @inline(never)
 public func portBitwiseXorWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseXor(a, SIMDInt64.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayBitwiseXorWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseXorWhereI64(
             mask.raw,
@@ -906,21 +785,21 @@ public func highwayBitwiseXorWhereI64ConstantB(
 
 @inline(never)
 public func portBitwiseAndWhereOtherwiseI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseAnd(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayBitwiseAndWhereOtherwiseI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseAndWhereOtherwiseI64(
             otherwise.raw,
@@ -933,19 +812,19 @@ public func highwayBitwiseAndWhereOtherwiseI64(
 
 @inline(never)
 public func portBitwiseAndWhereOtherwiseI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseAnd(SIMDInt64.repeating(26), b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayBitwiseAndWhereOtherwiseI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseAndWhereOtherwiseI64(
             otherwise.raw,
@@ -958,19 +837,19 @@ public func highwayBitwiseAndWhereOtherwiseI64ConstantA(
 
 @inline(never)
 public func portBitwiseAndWhereOtherwiseI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseAnd(a, SIMDInt64.repeating(26), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayBitwiseAndWhereOtherwiseI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseAndWhereOtherwiseI64(
             otherwise.raw,
@@ -983,19 +862,19 @@ public func highwayBitwiseAndWhereOtherwiseI64ConstantB(
 
 @inline(never)
 public func portBitwiseAndWhereOtherwiseI64ConstantOtherwise(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseAnd(a, b, where: mask, otherwise: SIMDInt64.repeating(26))
 }
 
 @inline(never)
 public func highwayBitwiseAndWhereOtherwiseI64ConstantOtherwise(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseAndWhereOtherwiseI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -1008,21 +887,21 @@ public func highwayBitwiseAndWhereOtherwiseI64ConstantOtherwise(
 
 @inline(never)
 public func portBitwiseOrWhereOtherwiseI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseOr(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayBitwiseOrWhereOtherwiseI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseOrWhereOtherwiseI64(
             otherwise.raw,
@@ -1035,19 +914,19 @@ public func highwayBitwiseOrWhereOtherwiseI64(
 
 @inline(never)
 public func portBitwiseOrWhereOtherwiseI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseOr(SIMDInt64.repeating(26), b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayBitwiseOrWhereOtherwiseI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseOrWhereOtherwiseI64(
             otherwise.raw,
@@ -1060,19 +939,19 @@ public func highwayBitwiseOrWhereOtherwiseI64ConstantA(
 
 @inline(never)
 public func portBitwiseOrWhereOtherwiseI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseOr(a, SIMDInt64.repeating(26), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayBitwiseOrWhereOtherwiseI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseOrWhereOtherwiseI64(
             otherwise.raw,
@@ -1085,19 +964,19 @@ public func highwayBitwiseOrWhereOtherwiseI64ConstantB(
 
 @inline(never)
 public func portBitwiseOrWhereOtherwiseI64ConstantOtherwise(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseOr(a, b, where: mask, otherwise: SIMDInt64.repeating(26))
 }
 
 @inline(never)
 public func highwayBitwiseOrWhereOtherwiseI64ConstantOtherwise(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseOrWhereOtherwiseI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -1110,21 +989,21 @@ public func highwayBitwiseOrWhereOtherwiseI64ConstantOtherwise(
 
 @inline(never)
 public func portBitwiseXorWhereOtherwiseI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseXor(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayBitwiseXorWhereOtherwiseI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseXorWhereOtherwiseI64(
             otherwise.raw,
@@ -1137,19 +1016,19 @@ public func highwayBitwiseXorWhereOtherwiseI64(
 
 @inline(never)
 public func portBitwiseXorWhereOtherwiseI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseXor(SIMDInt64.repeating(26), b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayBitwiseXorWhereOtherwiseI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseXorWhereOtherwiseI64(
             otherwise.raw,
@@ -1162,19 +1041,19 @@ public func highwayBitwiseXorWhereOtherwiseI64ConstantA(
 
 @inline(never)
 public func portBitwiseXorWhereOtherwiseI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseXor(a, SIMDInt64.repeating(26), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayBitwiseXorWhereOtherwiseI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseXorWhereOtherwiseI64(
             otherwise.raw,
@@ -1187,19 +1066,19 @@ public func highwayBitwiseXorWhereOtherwiseI64ConstantB(
 
 @inline(never)
 public func portBitwiseXorWhereOtherwiseI64ConstantOtherwise(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.bitwiseXor(a, b, where: mask, otherwise: SIMDInt64.repeating(26))
 }
 
 @inline(never)
 public func highwayBitwiseXorWhereOtherwiseI64ConstantOtherwise(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.bitwiseXorWhereOtherwiseI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -1211,12 +1090,12 @@ public func highwayBitwiseXorWhereOtherwiseI64ConstantOtherwise(
 }
 
 @inline(never)
-public func portAllBitsSetI64(_ a: SIMDInt64.Vector) -> Bool {
+public func portAllBitsSetI64(_ a: SIMD<Int64>) -> Bool {
     SIMDInt64.allBitsSet(a)
 }
 
 @inline(never)
-public func highwayAllBitsSetI64(_ a: SIMDInt64.Vector) -> Bool {
+public func highwayAllBitsSetI64(_ a: SIMD<Int64>) -> Bool {
     HighwayReference.Nothrow.allBitsSetI64(a.raw)
 }
 
@@ -1233,12 +1112,12 @@ public func highwayAllBitsSetI64ConstantA() -> Bool {
 }
 
 @inline(never)
-public func portAllBitsClearI64(_ a: SIMDInt64.Vector) -> Bool {
+public func portAllBitsClearI64(_ a: SIMD<Int64>) -> Bool {
     SIMDInt64.allBitsClear(a)
 }
 
 @inline(never)
-public func highwayAllBitsClearI64(_ a: SIMDInt64.Vector) -> Bool {
+public func highwayAllBitsClearI64(_ a: SIMD<Int64>) -> Bool {
     HighwayReference.Nothrow.allBitsClearI64(a.raw)
 }
 
@@ -1255,22 +1134,22 @@ public func highwayAllBitsClearI64ConstantA() -> Bool {
 }
 
 @inline(never)
-public func portLeadingZeroBitCountI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portLeadingZeroBitCountI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.leadingZeroBitCount(a)
 }
 
 @inline(never)
-public func highwayLeadingZeroBitCountI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayLeadingZeroBitCountI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.leadingZeroBitCountI64(a.raw))
 }
 
 @inline(never)
-public func portLeadingZeroBitCountI64ConstantA() -> SIMDInt64.Vector {
+public func portLeadingZeroBitCountI64ConstantA() -> SIMD<Int64> {
     SIMDInt64.leadingZeroBitCount(SIMDInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayLeadingZeroBitCountI64ConstantA() -> SIMDInt64.Vector {
+public func highwayLeadingZeroBitCountI64ConstantA() -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.leadingZeroBitCountI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
@@ -1279,22 +1158,22 @@ public func highwayLeadingZeroBitCountI64ConstantA() -> SIMDInt64.Vector {
 }
 
 @inline(never)
-public func portTrailingZeroBitCountI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portTrailingZeroBitCountI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.trailingZeroBitCount(a)
 }
 
 @inline(never)
-public func highwayTrailingZeroBitCountI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayTrailingZeroBitCountI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.trailingZeroBitCountI64(a.raw))
 }
 
 @inline(never)
-public func portTrailingZeroBitCountI64ConstantA() -> SIMDInt64.Vector {
+public func portTrailingZeroBitCountI64ConstantA() -> SIMD<Int64> {
     SIMDInt64.trailingZeroBitCount(SIMDInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayTrailingZeroBitCountI64ConstantA() -> SIMDInt64.Vector {
+public func highwayTrailingZeroBitCountI64ConstantA() -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.trailingZeroBitCountI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
@@ -1303,22 +1182,22 @@ public func highwayTrailingZeroBitCountI64ConstantA() -> SIMDInt64.Vector {
 }
 
 @inline(never)
-public func portHighestSetBitIndexI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portHighestSetBitIndexI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.highestSetBitIndex(a)
 }
 
 @inline(never)
-public func highwayHighestSetBitIndexI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayHighestSetBitIndexI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.highestSetBitIndexI64(a.raw))
 }
 
 @inline(never)
-public func portHighestSetBitIndexI64ConstantA() -> SIMDInt64.Vector {
+public func portHighestSetBitIndexI64ConstantA() -> SIMD<Int64> {
     SIMDInt64.highestSetBitIndex(SIMDInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayHighestSetBitIndexI64ConstantA() -> SIMDInt64.Vector {
+public func highwayHighestSetBitIndexI64ConstantA() -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.highestSetBitIndexI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
@@ -1327,22 +1206,22 @@ public func highwayHighestSetBitIndexI64ConstantA() -> SIMDInt64.Vector {
 }
 
 @inline(never)
-public func portZeroingNegativeI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portZeroingNegativeI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.zeroingNegative(a)
 }
 
 @inline(never)
-public func highwayZeroingNegativeI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayZeroingNegativeI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.zeroingNegativeI64(a.raw))
 }
 
 @inline(never)
-public func portZeroingNegativeI64ConstantA() -> SIMDInt64.Vector {
+public func portZeroingNegativeI64ConstantA() -> SIMD<Int64> {
     SIMDInt64.zeroingNegative(SIMDInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayZeroingNegativeI64ConstantA() -> SIMDInt64.Vector {
+public func highwayZeroingNegativeI64ConstantA() -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.zeroingNegativeI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
@@ -1352,35 +1231,32 @@ public func highwayZeroingNegativeI64ConstantA() -> SIMDInt64.Vector {
 
 @inline(never)
 public func portSelectingIfNegativeI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.selectingIfNegative(a, b, c)
 }
 
 @inline(never)
 public func highwaySelectingIfNegativeI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.selectingIfNegativeI64(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
-public func portSelectingIfNegativeI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portSelectingIfNegativeI64ConstantA(_ b: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.selectingIfNegative(SIMDInt64.repeating(26), b, c)
 }
 
 @inline(never)
 public func highwaySelectingIfNegativeI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.selectingIfNegativeI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -1391,18 +1267,15 @@ public func highwaySelectingIfNegativeI64ConstantA(
 }
 
 @inline(never)
-public func portSelectingIfNegativeI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portSelectingIfNegativeI64ConstantB(_ a: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.selectingIfNegative(a, SIMDInt64.repeating(26), c)
 }
 
 @inline(never)
 public func highwaySelectingIfNegativeI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.selectingIfNegativeI64(
             a.raw,
@@ -1413,18 +1286,15 @@ public func highwaySelectingIfNegativeI64ConstantB(
 }
 
 @inline(never)
-public func portSelectingIfNegativeI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portSelectingIfNegativeI64ConstantC(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.selectingIfNegative(a, b, SIMDInt64.repeating(26))
 }
 
 @inline(never)
 public func highwaySelectingIfNegativeI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.selectingIfNegativeI64(
             a.raw,
@@ -1435,29 +1305,22 @@ public func highwaySelectingIfNegativeI64ConstantC(
 }
 
 @inline(never)
-public func portSelectingIfNegativeOrZeroI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portSelectingIfNegativeOrZeroI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.selectingIfNegativeOrZero(a, b)
 }
 
 @inline(never)
-public func highwaySelectingIfNegativeOrZeroI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwaySelectingIfNegativeOrZeroI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.selectingIfNegativeOrZeroI64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portSelectingIfNegativeOrZeroI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portSelectingIfNegativeOrZeroI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.selectingIfNegativeOrZero(SIMDInt64.repeating(26), b)
 }
 
 @inline(never)
-public func highwaySelectingIfNegativeOrZeroI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Vector
-{
+public func highwaySelectingIfNegativeOrZeroI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.selectingIfNegativeOrZeroI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -1467,13 +1330,12 @@ public func highwaySelectingIfNegativeOrZeroI64ConstantA(_ b: SIMDInt64.Vector) 
 }
 
 @inline(never)
-public func portSelectingIfNegativeOrZeroI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portSelectingIfNegativeOrZeroI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.selectingIfNegativeOrZero(a, SIMDInt64.repeating(26))
 }
 
 @inline(never)
-public func highwaySelectingIfNegativeOrZeroI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector
-{
+public func highwaySelectingIfNegativeOrZeroI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.selectingIfNegativeOrZeroI64(
             a.raw,
@@ -1483,28 +1345,22 @@ public func highwaySelectingIfNegativeOrZeroI64ConstantB(_ a: SIMDInt64.Vector) 
 }
 
 @inline(never)
-public func portZeroingIfNegativeI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portZeroingIfNegativeI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.zeroingIfNegative(a, b)
 }
 
 @inline(never)
-public func highwayZeroingIfNegativeI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayZeroingIfNegativeI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.zeroingIfNegativeI64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portZeroingIfNegativeI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portZeroingIfNegativeI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.zeroingIfNegative(SIMDInt64.repeating(26), b)
 }
 
 @inline(never)
-public func highwayZeroingIfNegativeI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayZeroingIfNegativeI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.zeroingIfNegativeI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -1514,12 +1370,12 @@ public func highwayZeroingIfNegativeI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDI
 }
 
 @inline(never)
-public func portZeroingIfNegativeI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portZeroingIfNegativeI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.zeroingIfNegative(a, SIMDInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayZeroingIfNegativeI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayZeroingIfNegativeI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.zeroingIfNegativeI64(
             a.raw,
@@ -1529,28 +1385,22 @@ public func highwayZeroingIfNegativeI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDI
 }
 
 @inline(never)
-public func portNegatingIfNegativeI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portNegatingIfNegativeI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.negatingIfNegative(a, b)
 }
 
 @inline(never)
-public func highwayNegatingIfNegativeI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayNegatingIfNegativeI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.negatingIfNegativeI64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portNegatingIfNegativeI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portNegatingIfNegativeI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.negatingIfNegative(SIMDInt64.repeating(26), b)
 }
 
 @inline(never)
-public func highwayNegatingIfNegativeI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayNegatingIfNegativeI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.negatingIfNegativeI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -1560,12 +1410,12 @@ public func highwayNegatingIfNegativeI64ConstantA(_ b: SIMDInt64.Vector) -> SIMD
 }
 
 @inline(never)
-public func portNegatingIfNegativeI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portNegatingIfNegativeI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.negatingIfNegative(a, SIMDInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayNegatingIfNegativeI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayNegatingIfNegativeI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.negatingIfNegativeI64(
             a.raw,
@@ -1576,30 +1426,28 @@ public func highwayNegatingIfNegativeI64ConstantB(_ a: SIMDInt64.Vector) -> SIMD
 
 @inline(never)
 public func portLeadingZeroBitCountWhereI64(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.leadingZeroBitCount(a, where: mask)
 }
 
 @inline(never)
 public func highwayLeadingZeroBitCountWhereI64(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.leadingZeroBitCountWhereI64(mask.raw, a.raw))
 }
 
 @inline(never)
-public func portLeadingZeroBitCountWhereI64ConstantA(where mask: SIMDInt64.Mask) -> SIMDInt64.Vector
-{
+public func portLeadingZeroBitCountWhereI64ConstantA(where mask: SIMD<Int64>.Mask) -> SIMD<Int64> {
     SIMDInt64.leadingZeroBitCount(SIMDInt64.repeating(26), where: mask)
 }
 
 @inline(never)
-public func highwayLeadingZeroBitCountWhereI64ConstantA(
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+public func highwayLeadingZeroBitCountWhereI64ConstantA(where mask: SIMD<Int64>.Mask) -> SIMD<Int64>
+{
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.leadingZeroBitCountWhereI64(
             mask.raw,

@@ -15,7 +15,7 @@ extension SIMDFloatReferenceTests {
         {
             mismatches.check(
                 H.equalTo(a, b, where: mask),
-                H.Mask(raw: HighwayReference.equalToWhereF32(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.equalToWhereF32(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -31,7 +31,7 @@ extension SIMDFloatReferenceTests {
         {
             mismatches.check(
                 H.equalTo(a, b, where: mask),
-                H.Mask(raw: HighwayReference.equalToWhereF32(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.equalToWhereF32(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -47,7 +47,7 @@ extension SIMDFloatReferenceTests {
         {
             mismatches.check(
                 H.notEqualTo(a, b, where: mask),
-                H.Mask(raw: HighwayReference.notEqualToWhereF32(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.notEqualToWhereF32(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -63,7 +63,7 @@ extension SIMDFloatReferenceTests {
         {
             mismatches.check(
                 H.notEqualTo(a, b, where: mask),
-                H.Mask(raw: HighwayReference.notEqualToWhereF32(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.notEqualToWhereF32(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -79,7 +79,7 @@ extension SIMDFloatReferenceTests {
         {
             mismatches.check(
                 H.lessThan(a, b, where: mask),
-                H.Mask(raw: HighwayReference.lessThanWhereF32(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.lessThanWhereF32(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -95,7 +95,7 @@ extension SIMDFloatReferenceTests {
         {
             mismatches.check(
                 H.lessThan(a, b, where: mask),
-                H.Mask(raw: HighwayReference.lessThanWhereF32(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.lessThanWhereF32(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -111,7 +111,7 @@ extension SIMDFloatReferenceTests {
         {
             mismatches.check(
                 H.greaterThan(a, b, where: mask),
-                H.Mask(raw: HighwayReference.greaterThanWhereF32(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.greaterThanWhereF32(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -127,7 +127,7 @@ extension SIMDFloatReferenceTests {
         {
             mismatches.check(
                 H.greaterThan(a, b, where: mask),
-                H.Mask(raw: HighwayReference.greaterThanWhereF32(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.greaterThanWhereF32(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -143,7 +143,7 @@ extension SIMDFloatReferenceTests {
         {
             mismatches.check(
                 H.lessThanOrEqualTo(a, b, where: mask),
-                H.Mask(raw: HighwayReference.lessThanOrEqualToWhereF32(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.lessThanOrEqualToWhereF32(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -159,7 +159,7 @@ extension SIMDFloatReferenceTests {
         {
             mismatches.check(
                 H.lessThanOrEqualTo(a, b, where: mask),
-                H.Mask(raw: HighwayReference.lessThanOrEqualToWhereF32(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.lessThanOrEqualToWhereF32(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -175,7 +175,7 @@ extension SIMDFloatReferenceTests {
         {
             mismatches.check(
                 H.greaterThanOrEqualTo(a, b, where: mask),
-                H.Mask(raw: HighwayReference.greaterThanOrEqualToWhereF32(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.greaterThanOrEqualToWhereF32(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -191,7 +191,7 @@ extension SIMDFloatReferenceTests {
         {
             mismatches.check(
                 H.greaterThanOrEqualTo(a, b, where: mask),
-                H.Mask(raw: HighwayReference.greaterThanOrEqualToWhereF32(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.greaterThanOrEqualToWhereF32(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }

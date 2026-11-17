@@ -99,7 +99,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.mask(from: H.repeating(value)),
-            H.Mask(raw: HighwayReference.maskFromVectorF32(H.repeating(value))),
+            H.Mask(raw: HighwayReference.maskFromVectorF32(H.repeating(value).raw)),
             ""
         )
         mismatches.record()

@@ -11,7 +11,7 @@ extension SIMDFloat16ReferenceTests {
         let mismatches = Mismatches("negated")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x786F_749E_6190_B8F4)
         for a in aInputs {
-            mismatches.check(H.negated(a), HighwayReference.negatedF16(a), "a: \(describe(a))")
+            mismatches.check(H.negated(a), HighwayReference.negatedF16(a.raw), "a: \(describe(a))")
         }
         mismatches.record()
     }
@@ -20,7 +20,11 @@ extension SIMDFloat16ReferenceTests {
         let mismatches = Mismatches("magnitude")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2C3A_B4B3_2802_EFA4)
         for a in aInputs {
-            mismatches.check(H.magnitude(a), HighwayReference.magnitudeF16(a), "a: \(describe(a))")
+            mismatches.check(
+                H.magnitude(a),
+                HighwayReference.magnitudeF16(a.raw),
+                "a: \(describe(a))"
+            )
         }
         mismatches.record()
     }
@@ -33,7 +37,7 @@ extension SIMDFloat16ReferenceTests {
         where HighwayReference.hasNativeFloat16Arithmetic() || !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.adding(a, b),
-                HighwayReference.addingF16(a, b),
+                HighwayReference.addingF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -47,7 +51,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.subtracting(a, b),
-                HighwayReference.subtractingF16(a, b),
+                HighwayReference.subtractingF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -61,7 +65,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.dividing(a, b),
-                HighwayReference.dividingF16(a, b),
+                HighwayReference.dividingF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -74,7 +78,7 @@ extension SIMDFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.squareRoot(a),
-                HighwayReference.squareRootF16(a),
+                HighwayReference.squareRootF16(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -88,7 +92,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.absoluteDifference(a, b),
-                HighwayReference.absoluteDifferenceF16(a, b),
+                HighwayReference.absoluteDifferenceF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -103,7 +107,7 @@ extension SIMDFloat16ReferenceTests {
         {
             mismatches.check(
                 H.addingSubtracting(a, b),
-                HighwayReference.addingSubtractingF16(a, b),
+                HighwayReference.addingSubtractingF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -119,7 +123,7 @@ extension SIMDFloat16ReferenceTests {
         where !hasUnorderedNaNs(a, b, c) {
             mismatches.check(
                 H.clamped(a, between: b, and: c),
-                HighwayReference.clampedF16(a, b, c),
+                HighwayReference.clampedF16(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -132,7 +136,7 @@ extension SIMDFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.approximateReciprocal(a),
-                HighwayReference.approximateReciprocalF16(a),
+                HighwayReference.approximateReciprocalF16(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -145,7 +149,7 @@ extension SIMDFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.approximateReciprocalSquareRoot(a),
-                HighwayReference.approximateReciprocalSquareRootF16(a),
+                HighwayReference.approximateReciprocalSquareRootF16(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -159,7 +163,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(adjacentLanesOf: a, b) {
             mismatches.check(
                 H.pairwiseAdding(a, b),
-                HighwayReference.pairwiseAddingF16(a, b),
+                HighwayReference.pairwiseAddingF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -173,7 +177,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.pairwiseSubtracting(a, b),
-                HighwayReference.pairwiseSubtractingF16(a, b),
+                HighwayReference.pairwiseSubtractingF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -184,7 +188,11 @@ extension SIMDFloat16ReferenceTests {
         let mismatches = Mismatches("exponent")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xABDB_8F27_0612_CBAB)
         for a in aInputs {
-            mismatches.check(H.exponent(a), HighwayReference.exponentF16(a), "a: \(describe(a))")
+            mismatches.check(
+                H.exponent(a),
+                HighwayReference.exponentF16(a.raw),
+                "a: \(describe(a))"
+            )
         }
         mismatches.record()
     }

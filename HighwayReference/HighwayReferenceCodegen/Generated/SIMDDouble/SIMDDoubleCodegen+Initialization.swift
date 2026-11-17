@@ -4,183 +4,176 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portZeroF64() -> SIMDDouble.Vector {
+public func portZeroF64() -> SIMD<Double> {
     SIMDDouble.zero()
 }
 
 @inline(never)
-public func highwayZeroF64() -> SIMDDouble.Vector {
+public func highwayZeroF64() -> SIMD<Double> {
     HighwayReference.Nothrow.zeroF64()
 }
 
 @inline(never)
-public func portRepeatingF64(_ value: SIMDDouble.Lane) -> SIMDDouble.Vector {
+public func portRepeatingF64(_ value: Double) -> SIMD<Double> {
     SIMDDouble.repeating(value)
 }
 
 @inline(never)
-public func highwayRepeatingF64(_ value: Double) -> SIMDDouble.Vector {
+public func highwayRepeatingF64(_ value: Double) -> SIMD<Double> {
     HighwayReference.Nothrow.repeatingF64(value)
 }
 
 @inline(never)
-public func portRepeatingF64ConstantValue() -> SIMDDouble.Vector {
+public func portRepeatingF64ConstantValue() -> SIMD<Double> {
     SIMDDouble.repeating(1.5)
 }
 
 @inline(never)
-public func highwayRepeatingF64ConstantValue() -> SIMDDouble.Vector {
+public func highwayRepeatingF64ConstantValue() -> SIMD<Double> {
     HighwayReference.Nothrow.repeatingF64(1.5)
 }
 
 @inline(never)
-public func portIotaF64(_ value: SIMDDouble.Lane) -> SIMDDouble.Vector {
+public func portIotaF64(_ value: Double) -> SIMD<Double> {
     SIMDDouble.iota(value)
 }
 
 @inline(never)
-public func highwayIotaF64(_ value: Double) -> SIMDDouble.Vector {
+public func highwayIotaF64(_ value: Double) -> SIMD<Double> {
     HighwayReference.Nothrow.iotaF64(value)
 }
 
 @inline(never)
-public func portIotaF64ConstantValue() -> SIMDDouble.Vector {
+public func portIotaF64ConstantValue() -> SIMD<Double> {
     SIMDDouble.iota(1.5)
 }
 
 @inline(never)
-public func highwayIotaF64ConstantValue() -> SIMDDouble.Vector {
+public func highwayIotaF64ConstantValue() -> SIMD<Double> {
     HighwayReference.Nothrow.iotaF64(1.5)
 }
 
 @inline(never)
-public func portSignBitF64() -> SIMDDouble.Vector {
+public func portSignBitF64() -> SIMD<Double> {
     SIMDDouble.signBit()
 }
 
 @inline(never)
-public func highwaySignBitF64() -> SIMDDouble.Vector {
+public func highwaySignBitF64() -> SIMD<Double> {
     HighwayReference.Nothrow.signBitF64()
 }
 
 @inline(never)
-public func portNanF64() -> SIMDDouble.Vector {
+public func portNanF64() -> SIMD<Double> {
     SIMDDouble.nan()
 }
 
 @inline(never)
-public func highwayNanF64() -> SIMDDouble.Vector {
+public func highwayNanF64() -> SIMD<Double> {
     HighwayReference.Nothrow.nanF64()
 }
 
 @inline(never)
-public func portInfinityF64() -> SIMDDouble.Vector {
+public func portInfinityF64() -> SIMD<Double> {
     SIMDDouble.infinity()
 }
 
 @inline(never)
-public func highwayInfinityF64() -> SIMDDouble.Vector {
+public func highwayInfinityF64() -> SIMD<Double> {
     HighwayReference.Nothrow.infinityF64()
 }
 
 @inline(never)
-public func portUnspecifiedF64() -> SIMDDouble.Vector {
+public func portUnspecifiedF64() -> SIMD<Double> {
     SIMDDouble.unspecified()
 }
 
 @inline(never)
-public func highwayUnspecifiedF64() -> SIMDDouble.Vector {
+public func highwayUnspecifiedF64() -> SIMD<Double> {
     HighwayReference.Nothrow.unspecifiedF64()
 }
 
 @inline(never)
-public func portRepeatingWhereF64(
-    _ value: SIMDDouble.Lane,
-    where mask: SIMDDouble.Mask
-) -> SIMDDouble.Vector {
+public func portRepeatingWhereF64(_ value: Double, where mask: SIMD<Double>.Mask) -> SIMD<Double> {
     SIMDDouble.repeating(value, where: mask)
 }
 
 @inline(never)
-public func highwayRepeatingWhereF64(
-    _ value: Double,
-    where mask: SIMDDouble.Mask
-) -> SIMDDouble.Vector {
+public func highwayRepeatingWhereF64(_ value: Double, where mask: SIMD<Double>.Mask) -> SIMD<Double>
+{
     HighwayReference.Nothrow.repeatingWhereF64(mask.raw, value)
 }
 
 @inline(never)
-public func portRepeatingWhereF64ConstantValue(where mask: SIMDDouble.Mask) -> SIMDDouble.Vector {
+public func portRepeatingWhereF64ConstantValue(where mask: SIMD<Double>.Mask) -> SIMD<Double> {
     SIMDDouble.repeating(1.5, where: mask)
 }
 
 @inline(never)
-public func highwayRepeatingWhereF64ConstantValue(where mask: SIMDDouble.Mask) -> SIMDDouble.Vector
-{
+public func highwayRepeatingWhereF64ConstantValue(where mask: SIMD<Double>.Mask) -> SIMD<Double> {
     HighwayReference.Nothrow.repeatingWhereF64(mask.raw, 1.5)
 }
 
 @inline(never)
 public func portRepeatingWhereOtherwiseF64(
-    _ value: SIMDDouble.Lane,
-    where mask: SIMDDouble.Mask,
-    otherwise: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
+    _ value: Double,
+    where mask: SIMD<Double>.Mask,
+    otherwise: SIMD<Double>
+) -> SIMD<Double> {
     SIMDDouble.repeating(value, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayRepeatingWhereOtherwiseF64(
     _ value: Double,
-    where mask: SIMDDouble.Mask,
-    otherwise: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.repeatingWhereOtherwiseF64(otherwise, mask.raw, value)
+    where mask: SIMD<Double>.Mask,
+    otherwise: SIMD<Double>
+) -> SIMD<Double> {
+    HighwayReference.Nothrow.repeatingWhereOtherwiseF64(otherwise.raw, mask.raw, value)
 }
 
 @inline(never)
 public func portRepeatingWhereOtherwiseF64ConstantValue(
-    where mask: SIMDDouble.Mask,
-    otherwise: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
+    where mask: SIMD<Double>.Mask,
+    otherwise: SIMD<Double>
+) -> SIMD<Double> {
     SIMDDouble.repeating(1.5, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayRepeatingWhereOtherwiseF64ConstantValue(
-    where mask: SIMDDouble.Mask,
-    otherwise: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.repeatingWhereOtherwiseF64(otherwise, mask.raw, 1.5)
+    where mask: SIMD<Double>.Mask,
+    otherwise: SIMD<Double>
+) -> SIMD<Double> {
+    HighwayReference.Nothrow.repeatingWhereOtherwiseF64(otherwise.raw, mask.raw, 1.5)
 }
 
 @inline(never)
 public func portRepeatingWhereOtherwiseF64ConstantOtherwise(
-    _ value: SIMDDouble.Lane,
-    where mask: SIMDDouble.Mask
-) -> SIMDDouble.Vector {
+    _ value: Double,
+    where mask: SIMD<Double>.Mask
+) -> SIMD<Double> {
     SIMDDouble.repeating(value, where: mask, otherwise: SIMDDouble.repeating(1.5))
 }
 
 @inline(never)
 public func highwayRepeatingWhereOtherwiseF64ConstantOtherwise(
     _ value: Double,
-    where mask: SIMDDouble.Mask
-) -> SIMDDouble.Vector {
+    where mask: SIMD<Double>.Mask
+) -> SIMD<Double> {
     HighwayReference.Nothrow.repeatingWhereOtherwiseF64(
-        HighwayReference.Nothrow.repeatingF64(1.5),
+        HighwayReference.Nothrow.repeatingF64(1.5).raw,
         mask.raw,
         value
     )
 }
 
 @inline(never)
-public func portRepeatingBlockF64(_ v0: SIMDDouble.Lane, _ v1: SIMDDouble.Lane) -> SIMDDouble.Vector
-{
+public func portRepeatingBlockF64(_ v0: SIMDDouble.Lane, _ v1: SIMDDouble.Lane) -> SIMD<Double> {
     SIMDDouble.repeatingBlock(v0, v1)
 }
 
 @inline(never)
-public func highwayRepeatingBlockF64(_ v0: Double, _ v1: Double) -> SIMDDouble.Vector {
+public func highwayRepeatingBlockF64(_ v0: Double, _ v1: Double) -> SIMD<Double> {
     HighwayReference.Nothrow.repeatingBlockF64(v0, v1)
 }

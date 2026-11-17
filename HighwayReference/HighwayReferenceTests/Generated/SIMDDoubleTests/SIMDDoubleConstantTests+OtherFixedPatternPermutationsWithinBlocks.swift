@@ -14,7 +14,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.oddEven(H.repeating(value), b),
-                HighwayReference.oddEvenF64(H.repeating(value), b),
+                HighwayReference.oddEvenF64(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -29,7 +29,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.oddEven(a, H.repeating(value)),
-                HighwayReference.oddEvenF64(a, H.repeating(value)),
+                HighwayReference.oddEvenF64(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -137,7 +137,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.duplicatingEven(H.repeating(value)),
-            HighwayReference.duplicatingEvenF64(H.repeating(value)),
+            HighwayReference.duplicatingEvenF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -225,7 +225,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.duplicatingOdd(H.repeating(value)),
-            HighwayReference.duplicatingOddF64(H.repeating(value)),
+            HighwayReference.duplicatingOddF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -313,7 +313,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.shuffled01(H.repeating(value)),
-            HighwayReference.shuffled01F64(H.repeating(value)),
+            HighwayReference.shuffled01F64(H.repeating(value).raw),
             ""
         )
         mismatches.record()

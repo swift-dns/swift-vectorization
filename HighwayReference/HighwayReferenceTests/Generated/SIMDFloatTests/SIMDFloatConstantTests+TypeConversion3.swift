@@ -281,7 +281,9 @@ extension SIMDFloatConstantTests {
         mismatches.check(
             H.halfVector(zeroExtendingResizing: H.repeating(value)),
             H.HalfVector(
-                raw: HighwayReference.halfVectorZeroExtendingResizingF32ToF32(H.repeating(value))
+                raw: HighwayReference.halfVectorZeroExtendingResizingF32ToF32(
+                    H.repeating(value).raw
+                )
             ),
             ""
         )
@@ -376,7 +378,7 @@ extension SIMDFloatConstantTests {
         )
         mismatches.check(
             H.vector(zeroExtendingResizing: SIMDDouble.repeating(value)),
-            HighwayReference.vectorZeroExtendingResizingF64ToF32(SIMDDouble.repeating(value)),
+            HighwayReference.vectorZeroExtendingResizingF64ToF32(SIMDDouble.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -474,7 +476,7 @@ extension SIMDFloatConstantTests {
             H.halfVector(zeroExtendingResizing: SIMDDouble.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorZeroExtendingResizingF64ToF32(
-                    SIMDDouble.repeating(value)
+                    SIMDDouble.repeating(value).raw
                 )
             ),
             ""
@@ -573,7 +575,7 @@ extension SIMDFloatConstantTests {
         )
         mismatches.check(
             H.vector(zeroExtendingResizing: SIMDFloat16.repeating(value)),
-            HighwayReference.vectorZeroExtendingResizingF16ToF32(SIMDFloat16.repeating(value)),
+            HighwayReference.vectorZeroExtendingResizingF16ToF32(SIMDFloat16.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -712,7 +714,7 @@ extension SIMDFloatConstantTests {
             H.halfVector(zeroExtendingResizing: SIMDFloat16.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorZeroExtendingResizingF16ToF32(
-                    SIMDFloat16.repeating(value)
+                    SIMDFloat16.repeating(value).raw
                 )
             ),
             ""

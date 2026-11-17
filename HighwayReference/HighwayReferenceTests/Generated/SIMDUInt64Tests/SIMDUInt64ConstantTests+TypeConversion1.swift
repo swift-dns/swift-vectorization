@@ -534,7 +534,9 @@ extension SIMDUInt64ConstantTests {
         )
         mismatches.check(
             H.vector(bitPattern: SIMDFloat.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorBitPatternF32ToU64(SIMDFloat.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorBitPatternF32ToU64(SIMDFloat.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()
@@ -626,7 +628,9 @@ extension SIMDUInt64ConstantTests {
         )
         mismatches.check(
             H.vector(bitPattern: SIMDDouble.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorBitPatternF64ToU64(SIMDDouble.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorBitPatternF64ToU64(SIMDDouble.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()
@@ -719,7 +723,9 @@ extension SIMDUInt64ConstantTests {
         )
         mismatches.check(
             H.vector(bitPattern: SIMDFloat16.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorBitPatternF16ToU64(SIMDFloat16.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorBitPatternF16ToU64(SIMDFloat16.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()
@@ -944,7 +950,9 @@ extension SIMDUInt64ConstantTests {
         )
         mismatches.check(
             H.vector(converting: SIMDDouble.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorConvertingF64ToU64(SIMDDouble.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorConvertingF64ToU64(SIMDDouble.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()
@@ -1039,7 +1047,9 @@ extension SIMDUInt64ConstantTests {
         mismatches.check(
             H.vector(convertingInRange: SIMDDouble.repeating(value)),
             H.Vector(
-                raw: HighwayReference.vectorConvertingInRangeF64ToU64(SIMDDouble.repeating(value))
+                raw: HighwayReference.vectorConvertingInRangeF64ToU64(
+                    SIMDDouble.repeating(value).raw
+                )
             ),
             ""
         )

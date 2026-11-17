@@ -13,7 +13,7 @@ extension SIMDFloatReferenceTests {
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes),
-                HighwayReference.slideUpLanesF32(a, lanes),
+                HighwayReference.slideUpLanesF32(a.raw, lanes),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -27,7 +27,7 @@ extension SIMDFloatReferenceTests {
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes),
-                HighwayReference.slideUpLanesF32(a, lanes),
+                HighwayReference.slideUpLanesF32(a.raw, lanes),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -47,7 +47,7 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes, fillingWith: fill),
-                HighwayReference.slideUpLanesFillingWithF32(fill, a, lanes),
+                HighwayReference.slideUpLanesFillingWithF32(fill.raw, a.raw, lanes),
                 "fill: \(describe(fill)), a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -67,7 +67,7 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes, fillingWith: fill),
-                HighwayReference.slideUpLanesFillingWithF32(fill, a, lanes),
+                HighwayReference.slideUpLanesFillingWithF32(fill.raw, a.raw, lanes),
                 "fill: \(describe(fill)), a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -81,7 +81,7 @@ extension SIMDFloatReferenceTests {
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes),
-                HighwayReference.slideDownLanesF32(a, lanes),
+                HighwayReference.slideDownLanesF32(a.raw, lanes),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -95,7 +95,7 @@ extension SIMDFloatReferenceTests {
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes),
-                HighwayReference.slideDownLanesF32(a, lanes),
+                HighwayReference.slideDownLanesF32(a.raw, lanes),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -115,7 +115,7 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes, fillingWith: fill),
-                HighwayReference.slideDownLanesFillingWithF32(fill, a, lanes),
+                HighwayReference.slideDownLanesFillingWithF32(fill.raw, a.raw, lanes),
                 "fill: \(describe(fill)), a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -135,7 +135,7 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes, fillingWith: fill),
-                HighwayReference.slideDownLanesFillingWithF32(fill, a, lanes),
+                HighwayReference.slideDownLanesFillingWithF32(fill.raw, a.raw, lanes),
                 "fill: \(describe(fill)), a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -146,7 +146,11 @@ extension SIMDFloatReferenceTests {
         let mismatches = Mismatches("slide1Up")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA78A_4C88_C25F_AC3B)
         for a in aInputs {
-            mismatches.check(H.slide1Up(a), HighwayReference.slide1UpF32(a), "a: \(describe(a))")
+            mismatches.check(
+                H.slide1Up(a),
+                HighwayReference.slide1UpF32(a.raw),
+                "a: \(describe(a))"
+            )
         }
         mismatches.record()
     }
@@ -158,7 +162,7 @@ extension SIMDFloatReferenceTests {
         for (fill, a) in everyPair(fillInputs, aInputs) {
             mismatches.check(
                 H.slide1Up(a, fillingWith: fill),
-                HighwayReference.slide1UpFillingWithF32(fill, a),
+                HighwayReference.slide1UpFillingWithF32(fill, a.raw),
                 "fill: \(hex(fill)), a: \(describe(a))"
             )
         }
@@ -171,7 +175,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.slide1Down(a),
-                HighwayReference.slide1DownF32(a),
+                HighwayReference.slide1DownF32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -185,7 +189,7 @@ extension SIMDFloatReferenceTests {
         for (fill, a) in everyPair(fillInputs, aInputs) {
             mismatches.check(
                 H.slide1Down(a, fillingWith: fill),
-                HighwayReference.slide1DownFillingWithF32(fill, a),
+                HighwayReference.slide1DownFillingWithF32(fill, a.raw),
                 "fill: \(hex(fill)), a: \(describe(a))"
             )
         }
@@ -199,7 +203,7 @@ extension SIMDFloatReferenceTests {
         for (a, blocks) in everyPair(aInputs, blocksInputs) {
             mismatches.check(
                 H.slideUpBlocks(a, by: blocks),
-                HighwayReference.slideUpBlocksF32(a, Int32(truncatingIfNeeded: blocks)),
+                HighwayReference.slideUpBlocksF32(a.raw, Int32(truncatingIfNeeded: blocks)),
                 "a: \(describe(a)), blocks: \(blocks)"
             )
         }
@@ -213,7 +217,7 @@ extension SIMDFloatReferenceTests {
         for (a, blocks) in everyPair(aInputs, blocksInputs) {
             mismatches.check(
                 unsafe H.slideUpBlocks(a, byUnchecked: blocks),
-                HighwayReference.slideUpBlocksF32(a, Int32(truncatingIfNeeded: blocks)),
+                HighwayReference.slideUpBlocksF32(a.raw, Int32(truncatingIfNeeded: blocks)),
                 "a: \(describe(a)), blocks: \(blocks)"
             )
         }
@@ -227,7 +231,7 @@ extension SIMDFloatReferenceTests {
         for (a, blocks) in everyPair(aInputs, blocksInputs) {
             mismatches.check(
                 H.slideDownBlocks(a, by: blocks),
-                HighwayReference.slideDownBlocksF32(a, Int32(truncatingIfNeeded: blocks)),
+                HighwayReference.slideDownBlocksF32(a.raw, Int32(truncatingIfNeeded: blocks)),
                 "a: \(describe(a)), blocks: \(blocks)"
             )
         }
@@ -241,7 +245,7 @@ extension SIMDFloatReferenceTests {
         for (a, blocks) in everyPair(aInputs, blocksInputs) {
             mismatches.check(
                 unsafe H.slideDownBlocks(a, byUnchecked: blocks),
-                HighwayReference.slideDownBlocksF32(a, Int32(truncatingIfNeeded: blocks)),
+                HighwayReference.slideDownBlocksF32(a.raw, Int32(truncatingIfNeeded: blocks)),
                 "a: \(describe(a)), blocks: \(blocks)"
             )
         }
@@ -261,7 +265,11 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.combinedSlideDownLanes(a, b, by: lanes),
-                HighwayReference.combinedSlideDownLanesF32(a, b, Int32(truncatingIfNeeded: lanes)),
+                HighwayReference.combinedSlideDownLanesF32(
+                    a.raw,
+                    b.raw,
+                    Int32(truncatingIfNeeded: lanes)
+                ),
                 "a: \(describe(a)), b: \(describe(b)), lanes: \(lanes)"
             )
         }
@@ -281,7 +289,11 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 unsafe H.combinedSlideDownLanes(a, b, byUnchecked: lanes),
-                HighwayReference.combinedSlideDownLanesF32(a, b, Int32(truncatingIfNeeded: lanes)),
+                HighwayReference.combinedSlideDownLanesF32(
+                    a.raw,
+                    b.raw,
+                    Int32(truncatingIfNeeded: lanes)
+                ),
                 "a: \(describe(a)), b: \(describe(b)), lanes: \(lanes)"
             )
         }

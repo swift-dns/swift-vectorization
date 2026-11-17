@@ -17,7 +17,7 @@ extension SIMDUInt16ConstantTests {
         )
         let port = H.vector(resizing: SIMDFloat16.repeating(value))
         let reference = H.Vector(
-            raw: HighwayReference.vectorResizingF16ToU16(SIMDFloat16.repeating(value))
+            raw: HighwayReference.vectorResizingF16ToU16(SIMDFloat16.repeating(value).raw)
         )
         let definedBytes = SIMDFloat16.laneCount * MemoryLayout<SIMDFloat16.Lane>.stride
         let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
@@ -161,7 +161,7 @@ extension SIMDUInt16ConstantTests {
         )
         let port = H.halfVector(resizing: SIMDFloat16.repeating(value))
         let reference = H.HalfVector(
-            raw: HighwayReference.halfVectorResizingF16ToU16(SIMDFloat16.repeating(value))
+            raw: HighwayReference.halfVectorResizingF16ToU16(SIMDFloat16.repeating(value).raw)
         )
         let definedBytes = SIMDFloat16.laneCount * MemoryLayout<SIMDFloat16.Lane>.stride
         let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
@@ -307,7 +307,7 @@ extension SIMDUInt16ConstantTests {
         )
         let port = H.quarterVector(resizing: SIMDFloat16.repeating(value))
         let reference = H.QuarterVector(
-            raw: HighwayReference.quarterVectorResizingF16ToU16(SIMDFloat16.repeating(value))
+            raw: HighwayReference.quarterVectorResizingF16ToU16(SIMDFloat16.repeating(value).raw)
         )
         let definedBytes = SIMDFloat16.laneCount * MemoryLayout<SIMDFloat16.Lane>.stride
         let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride

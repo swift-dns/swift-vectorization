@@ -13,7 +13,7 @@ extension SIMDFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.complexConjugate(a),
-                HighwayReference.complexConjugateF16(a),
+                HighwayReference.complexConjugateF16(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -27,7 +27,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(complexLanesOf: a, b) {
             mismatches.check(
                 H.multiplyingComplex(a, b),
-                HighwayReference.multiplyingComplexF16(a, b),
+                HighwayReference.multiplyingComplexF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -41,7 +41,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(complexLanesOf: a, b) {
             mismatches.check(
                 H.multiplyingComplexConjugate(a, b),
-                HighwayReference.multiplyingComplexConjugateF16(a, b),
+                HighwayReference.multiplyingComplexConjugateF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -57,7 +57,7 @@ extension SIMDFloat16ReferenceTests {
         where !hasUnorderedNaNs(complexLanesOf: a, b, c) {
             mismatches.check(
                 H.multiplyAddingComplex(a, b, c),
-                HighwayReference.multiplyAddingComplexF16(a, b, c),
+                HighwayReference.multiplyAddingComplexF16(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -73,7 +73,7 @@ extension SIMDFloat16ReferenceTests {
         where !hasUnorderedNaNs(complexLanesOf: a, b, c) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, b, c),
-                HighwayReference.multiplyAddingComplexConjugateF16(a, b, c),
+                HighwayReference.multiplyAddingComplexConjugateF16(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -95,7 +95,12 @@ extension SIMDFloat16ReferenceTests {
         ) where !hasUnorderedNaNs(complexLanesOf: a, b) {
             mismatches.check(
                 H.multiplyingComplex(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.multiplyingComplexWhereOtherwiseF16(otherwise, mask.raw, a, b),
+                HighwayReference.multiplyingComplexWhereOtherwiseF16(
+                    otherwise.raw,
+                    mask.raw,
+                    a.raw,
+                    b.raw
+                ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -119,7 +124,12 @@ extension SIMDFloat16ReferenceTests {
         ) where !hasUnorderedNaNs(complexLanesOf: a, b) {
             mismatches.check(
                 H.multiplyingComplex(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.multiplyingComplexWhereOtherwiseF16(otherwise, mask.raw, a, b),
+                HighwayReference.multiplyingComplexWhereOtherwiseF16(
+                    otherwise.raw,
+                    mask.raw,
+                    a.raw,
+                    b.raw
+                ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -135,7 +145,7 @@ extension SIMDFloat16ReferenceTests {
         where !hasUnorderedNaNs(complexLanesOf: a, b) {
             mismatches.check(
                 H.multiplyingComplexConjugate(a, b, where: mask),
-                HighwayReference.multiplyingComplexConjugateWhereF16(mask.raw, a, b),
+                HighwayReference.multiplyingComplexConjugateWhereF16(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -153,7 +163,7 @@ extension SIMDFloat16ReferenceTests {
         where !hasUnorderedNaNs(complexLanesOf: a, b) {
             mismatches.check(
                 H.multiplyingComplexConjugate(a, b, where: mask),
-                HighwayReference.multiplyingComplexConjugateWhereF16(mask.raw, a, b),
+                HighwayReference.multiplyingComplexConjugateWhereF16(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -175,7 +185,12 @@ extension SIMDFloat16ReferenceTests {
         ) where !hasUnorderedNaNs(complexLanesOf: a, b, c) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, b, c, where: mask),
-                HighwayReference.multiplyAddingComplexConjugateWhereF16(mask.raw, a, b, c),
+                HighwayReference.multiplyAddingComplexConjugateWhereF16(
+                    mask.raw,
+                    a.raw,
+                    b.raw,
+                    c.raw
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -199,7 +214,12 @@ extension SIMDFloat16ReferenceTests {
         ) where !hasUnorderedNaNs(complexLanesOf: a, b, c) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, b, c, where: mask),
-                HighwayReference.multiplyAddingComplexConjugateWhereF16(mask.raw, a, b, c),
+                HighwayReference.multiplyAddingComplexConjugateWhereF16(
+                    mask.raw,
+                    a.raw,
+                    b.raw,
+                    c.raw
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }

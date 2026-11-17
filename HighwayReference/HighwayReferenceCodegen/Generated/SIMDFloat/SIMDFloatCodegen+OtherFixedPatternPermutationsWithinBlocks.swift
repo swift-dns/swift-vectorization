@@ -4,171 +4,171 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portOddEvenF32(_ a: SIMDFloat.Vector, _ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portOddEvenF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.oddEven(a, b)
 }
 
 @inline(never)
-public func highwayOddEvenF32(_ a: SIMDFloat.Vector, _ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.oddEvenF32(a, b)
+public func highwayOddEvenF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.oddEvenF32(a.raw, b.raw)
 }
 
 @inline(never)
-public func portOddEvenF32ConstantA(_ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portOddEvenF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.oddEven(SIMDFloat.repeating(1.5), b)
 }
 
 @inline(never)
-public func highwayOddEvenF32ConstantA(_ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.oddEvenF32(HighwayReference.Nothrow.repeatingF32(1.5), b)
+public func highwayOddEvenF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.oddEvenF32(HighwayReference.Nothrow.repeatingF32(1.5).raw, b.raw)
 }
 
 @inline(never)
-public func portOddEvenF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portOddEvenF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.oddEven(a, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayOddEvenF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.oddEvenF32(a, HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayOddEvenF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.oddEvenF32(a.raw, HighwayReference.Nothrow.repeatingF32(1.5).raw)
 }
 
 @inline(never)
-public func portDuplicatingEvenF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portDuplicatingEvenF32(_ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.duplicatingEven(a)
 }
 
 @inline(never)
-public func highwayDuplicatingEvenF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.duplicatingEvenF32(a)
+public func highwayDuplicatingEvenF32(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.duplicatingEvenF32(a.raw)
 }
 
 @inline(never)
-public func portDuplicatingEvenF32ConstantA() -> SIMDFloat.Vector {
+public func portDuplicatingEvenF32ConstantA() -> SIMD<Float> {
     SIMDFloat.duplicatingEven(SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayDuplicatingEvenF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.duplicatingEvenF32(HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayDuplicatingEvenF32ConstantA() -> SIMD<Float> {
+    HighwayReference.Nothrow.duplicatingEvenF32(HighwayReference.Nothrow.repeatingF32(1.5).raw)
 }
 
 @inline(never)
-public func portDuplicatingOddF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portDuplicatingOddF32(_ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.duplicatingOdd(a)
 }
 
 @inline(never)
-public func highwayDuplicatingOddF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.duplicatingOddF32(a)
+public func highwayDuplicatingOddF32(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.duplicatingOddF32(a.raw)
 }
 
 @inline(never)
-public func portDuplicatingOddF32ConstantA() -> SIMDFloat.Vector {
+public func portDuplicatingOddF32ConstantA() -> SIMD<Float> {
     SIMDFloat.duplicatingOdd(SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayDuplicatingOddF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.duplicatingOddF32(HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayDuplicatingOddF32ConstantA() -> SIMD<Float> {
+    HighwayReference.Nothrow.duplicatingOddF32(HighwayReference.Nothrow.repeatingF32(1.5).raw)
 }
 
 @inline(never)
-public func portShuffled1032F32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portShuffled1032F32(_ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.shuffled1032(a)
 }
 
 @inline(never)
-public func highwayShuffled1032F32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.shuffled1032F32(a)
+public func highwayShuffled1032F32(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.shuffled1032F32(a.raw)
 }
 
 @inline(never)
-public func portShuffled1032F32ConstantA() -> SIMDFloat.Vector {
+public func portShuffled1032F32ConstantA() -> SIMD<Float> {
     SIMDFloat.shuffled1032(SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayShuffled1032F32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.shuffled1032F32(HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayShuffled1032F32ConstantA() -> SIMD<Float> {
+    HighwayReference.Nothrow.shuffled1032F32(HighwayReference.Nothrow.repeatingF32(1.5).raw)
 }
 
 @inline(never)
-public func portShuffled0321F32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portShuffled0321F32(_ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.shuffled0321(a)
 }
 
 @inline(never)
-public func highwayShuffled0321F32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.shuffled0321F32(a)
+public func highwayShuffled0321F32(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.shuffled0321F32(a.raw)
 }
 
 @inline(never)
-public func portShuffled0321F32ConstantA() -> SIMDFloat.Vector {
+public func portShuffled0321F32ConstantA() -> SIMD<Float> {
     SIMDFloat.shuffled0321(SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayShuffled0321F32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.shuffled0321F32(HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayShuffled0321F32ConstantA() -> SIMD<Float> {
+    HighwayReference.Nothrow.shuffled0321F32(HighwayReference.Nothrow.repeatingF32(1.5).raw)
 }
 
 @inline(never)
-public func portShuffled2103F32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portShuffled2103F32(_ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.shuffled2103(a)
 }
 
 @inline(never)
-public func highwayShuffled2103F32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.shuffled2103F32(a)
+public func highwayShuffled2103F32(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.shuffled2103F32(a.raw)
 }
 
 @inline(never)
-public func portShuffled2103F32ConstantA() -> SIMDFloat.Vector {
+public func portShuffled2103F32ConstantA() -> SIMD<Float> {
     SIMDFloat.shuffled2103(SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayShuffled2103F32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.shuffled2103F32(HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayShuffled2103F32ConstantA() -> SIMD<Float> {
+    HighwayReference.Nothrow.shuffled2103F32(HighwayReference.Nothrow.repeatingF32(1.5).raw)
 }
 
 @inline(never)
-public func portShuffled2301F32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portShuffled2301F32(_ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.shuffled2301(a)
 }
 
 @inline(never)
-public func highwayShuffled2301F32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.shuffled2301F32(a)
+public func highwayShuffled2301F32(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.shuffled2301F32(a.raw)
 }
 
 @inline(never)
-public func portShuffled2301F32ConstantA() -> SIMDFloat.Vector {
+public func portShuffled2301F32ConstantA() -> SIMD<Float> {
     SIMDFloat.shuffled2301(SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayShuffled2301F32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.shuffled2301F32(HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayShuffled2301F32ConstantA() -> SIMD<Float> {
+    HighwayReference.Nothrow.shuffled2301F32(HighwayReference.Nothrow.repeatingF32(1.5).raw)
 }
 
 @inline(never)
-public func portShuffled0123F32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portShuffled0123F32(_ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.shuffled0123(a)
 }
 
 @inline(never)
-public func highwayShuffled0123F32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.shuffled0123F32(a)
+public func highwayShuffled0123F32(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.shuffled0123F32(a.raw)
 }
 
 @inline(never)
-public func portShuffled0123F32ConstantA() -> SIMDFloat.Vector {
+public func portShuffled0123F32ConstantA() -> SIMD<Float> {
     SIMDFloat.shuffled0123(SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayShuffled0123F32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.shuffled0123F32(HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayShuffled0123F32ConstantA() -> SIMD<Float> {
+    HighwayReference.Nothrow.shuffled0123F32(HighwayReference.Nothrow.repeatingF32(1.5).raw)
 }

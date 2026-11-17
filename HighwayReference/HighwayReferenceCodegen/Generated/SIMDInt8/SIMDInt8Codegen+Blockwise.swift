@@ -4,31 +4,25 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portTableLookupBytesI8(
-    _ a: SIMDInt8.Vector,
-    atUnchecked indices: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
+public func portTableLookupBytesI8(_ a: SIMD<Int8>, atUnchecked indices: SIMD<Int8>) -> SIMD<Int8> {
     unsafe SIMDInt8.tableLookupBytes(a, atUnchecked: indices)
 }
 
 @inline(never)
 public func highwayTableLookupBytesI8(
-    _ a: SIMDInt8.Vector,
-    atUnchecked indices: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
+    _ a: SIMD<Int8>,
+    atUnchecked indices: SIMD<Int8>
+) -> SIMD<Int8> {
     SIMDInt8.Vector(raw: HighwayReference.Nothrow.tableLookupBytesI8(a.raw, indices.raw))
 }
 
 @inline(never)
-public func portTableLookupBytesI8ConstantA(atUnchecked indices: SIMDInt8.Vector) -> SIMDInt8.Vector
-{
+public func portTableLookupBytesI8ConstantA(atUnchecked indices: SIMD<Int8>) -> SIMD<Int8> {
     unsafe SIMDInt8.tableLookupBytes(SIMDInt8.repeating(26), atUnchecked: indices)
 }
 
 @inline(never)
-public func highwayTableLookupBytesI8ConstantA(
-    atUnchecked indices: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
+public func highwayTableLookupBytesI8ConstantA(atUnchecked indices: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.tableLookupBytesI8(
             SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
@@ -38,12 +32,12 @@ public func highwayTableLookupBytesI8ConstantA(
 }
 
 @inline(never)
-public func portTableLookupBytesI8ConstantIndices(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portTableLookupBytesI8ConstantIndices(_ a: SIMD<Int8>) -> SIMD<Int8> {
     unsafe SIMDInt8.tableLookupBytes(a, atUnchecked: SIMDInt8.repeating(3))
 }
 
 @inline(never)
-public func highwayTableLookupBytesI8ConstantIndices(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayTableLookupBytesI8ConstantIndices(_ a: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.tableLookupBytesI8(
             a.raw,
@@ -54,31 +48,28 @@ public func highwayTableLookupBytesI8ConstantIndices(_ a: SIMDInt8.Vector) -> SI
 
 @inline(never)
 public func portTableLookupBytesOrZeroI8(
-    _ a: SIMDInt8.Vector,
-    atUnchecked indices: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
+    _ a: SIMD<Int8>,
+    atUnchecked indices: SIMD<Int8>
+) -> SIMD<Int8> {
     unsafe SIMDInt8.tableLookupBytesOrZero(a, atUnchecked: indices)
 }
 
 @inline(never)
 public func highwayTableLookupBytesOrZeroI8(
-    _ a: SIMDInt8.Vector,
-    atUnchecked indices: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
+    _ a: SIMD<Int8>,
+    atUnchecked indices: SIMD<Int8>
+) -> SIMD<Int8> {
     SIMDInt8.Vector(raw: HighwayReference.Nothrow.tableLookupBytesOrZeroI8(a.raw, indices.raw))
 }
 
 @inline(never)
-public func portTableLookupBytesOrZeroI8ConstantA(
-    atUnchecked indices: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
+public func portTableLookupBytesOrZeroI8ConstantA(atUnchecked indices: SIMD<Int8>) -> SIMD<Int8> {
     unsafe SIMDInt8.tableLookupBytesOrZero(SIMDInt8.repeating(26), atUnchecked: indices)
 }
 
 @inline(never)
-public func highwayTableLookupBytesOrZeroI8ConstantA(
-    atUnchecked indices: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
+public func highwayTableLookupBytesOrZeroI8ConstantA(atUnchecked indices: SIMD<Int8>) -> SIMD<Int8>
+{
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.tableLookupBytesOrZeroI8(
             SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
@@ -88,13 +79,12 @@ public func highwayTableLookupBytesOrZeroI8ConstantA(
 }
 
 @inline(never)
-public func portTableLookupBytesOrZeroI8ConstantIndices(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portTableLookupBytesOrZeroI8ConstantIndices(_ a: SIMD<Int8>) -> SIMD<Int8> {
     unsafe SIMDInt8.tableLookupBytesOrZero(a, atUnchecked: SIMDInt8.repeating(3))
 }
 
 @inline(never)
-public func highwayTableLookupBytesOrZeroI8ConstantIndices(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector
-{
+public func highwayTableLookupBytesOrZeroI8ConstantIndices(_ a: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.tableLookupBytesOrZeroI8(
             a.raw,
@@ -104,28 +94,22 @@ public func highwayTableLookupBytesOrZeroI8ConstantIndices(_ a: SIMDInt8.Vector)
 }
 
 @inline(never)
-public func portPairwiseAddingBlocksI8(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
+public func portPairwiseAddingBlocksI8(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.pairwiseAddingBlocks(a, b)
 }
 
 @inline(never)
-public func highwayPairwiseAddingBlocksI8(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
+public func highwayPairwiseAddingBlocksI8(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(raw: HighwayReference.Nothrow.pairwiseAddingBlocksI8(a.raw, b.raw))
 }
 
 @inline(never)
-public func portPairwiseAddingBlocksI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portPairwiseAddingBlocksI8ConstantA(_ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.pairwiseAddingBlocks(SIMDInt8.repeating(26), b)
 }
 
 @inline(never)
-public func highwayPairwiseAddingBlocksI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayPairwiseAddingBlocksI8ConstantA(_ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.pairwiseAddingBlocksI8(
             SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
@@ -135,12 +119,12 @@ public func highwayPairwiseAddingBlocksI8ConstantA(_ b: SIMDInt8.Vector) -> SIMD
 }
 
 @inline(never)
-public func portPairwiseAddingBlocksI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portPairwiseAddingBlocksI8ConstantB(_ a: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.pairwiseAddingBlocks(a, SIMDInt8.repeating(26))
 }
 
 @inline(never)
-public func highwayPairwiseAddingBlocksI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayPairwiseAddingBlocksI8ConstantB(_ a: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.pairwiseAddingBlocksI8(
             a.raw,
@@ -150,28 +134,22 @@ public func highwayPairwiseAddingBlocksI8ConstantB(_ a: SIMDInt8.Vector) -> SIMD
 }
 
 @inline(never)
-public func portPairwiseSubtractingBlocksI8(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
+public func portPairwiseSubtractingBlocksI8(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.pairwiseSubtractingBlocks(a, b)
 }
 
 @inline(never)
-public func highwayPairwiseSubtractingBlocksI8(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
+public func highwayPairwiseSubtractingBlocksI8(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(raw: HighwayReference.Nothrow.pairwiseSubtractingBlocksI8(a.raw, b.raw))
 }
 
 @inline(never)
-public func portPairwiseSubtractingBlocksI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portPairwiseSubtractingBlocksI8ConstantA(_ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.pairwiseSubtractingBlocks(SIMDInt8.repeating(26), b)
 }
 
 @inline(never)
-public func highwayPairwiseSubtractingBlocksI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayPairwiseSubtractingBlocksI8ConstantA(_ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.pairwiseSubtractingBlocksI8(
             SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
@@ -181,12 +159,12 @@ public func highwayPairwiseSubtractingBlocksI8ConstantA(_ b: SIMDInt8.Vector) ->
 }
 
 @inline(never)
-public func portPairwiseSubtractingBlocksI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portPairwiseSubtractingBlocksI8ConstantB(_ a: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.pairwiseSubtractingBlocks(a, SIMDInt8.repeating(26))
 }
 
 @inline(never)
-public func highwayPairwiseSubtractingBlocksI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayPairwiseSubtractingBlocksI8ConstantB(_ a: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.pairwiseSubtractingBlocksI8(
             a.raw,
@@ -196,12 +174,12 @@ public func highwayPairwiseSubtractingBlocksI8ConstantB(_ a: SIMDInt8.Vector) ->
 }
 
 @inline(never)
-public func portBroadcastingInBlocksI8ConstantA() -> SIMDInt8.Vector {
+public func portBroadcastingInBlocksI8ConstantA() -> SIMD<Int8> {
     unsafe SIMDInt8.broadcastingInBlocks(SIMDInt8.repeating(26), laneUnchecked: 1)
 }
 
 @inline(never)
-public func highwayBroadcastingInBlocksI8ConstantA() -> SIMDInt8.Vector {
+public func highwayBroadcastingInBlocksI8ConstantA() -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.broadcastingInBlocksI8(
             SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
@@ -211,11 +189,11 @@ public func highwayBroadcastingInBlocksI8ConstantA() -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func portBroadcastingInBlocksI8ConstantLane(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portBroadcastingInBlocksI8ConstantLane(_ a: SIMD<Int8>) -> SIMD<Int8> {
     unsafe SIMDInt8.broadcastingInBlocks(a, laneUnchecked: 1)
 }
 
 @inline(never)
-public func highwayBroadcastingInBlocksI8ConstantLane(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayBroadcastingInBlocksI8ConstantLane(_ a: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(raw: HighwayReference.Nothrow.broadcastingInBlocksI8(a.raw, 1))
 }

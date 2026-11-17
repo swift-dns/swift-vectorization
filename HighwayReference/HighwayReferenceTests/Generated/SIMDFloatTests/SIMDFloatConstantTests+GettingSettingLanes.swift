@@ -12,7 +12,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.firstLane(H.repeating(value)),
-            HighwayReference.firstLaneF32(H.repeating(value)),
+            HighwayReference.firstLaneF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -101,7 +101,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.lane(a, at: index),
-                HighwayReference.laneF32(a, index),
+                HighwayReference.laneF32(a.raw, index),
                 "a: \(describe(a))"
             )
         }
@@ -180,7 +180,7 @@ extension SIMDFloatConstantTests {
         for index in indexInputs {
             mismatches.check(
                 H.lane(H.repeating(value), at: index),
-                HighwayReference.laneF32(H.repeating(value), index),
+                HighwayReference.laneF32(H.repeating(value).raw, index),
                 "index: \(index)"
             )
         }
@@ -272,7 +272,7 @@ extension SIMDFloatConstantTests {
         for (index, value) in everyPair(indexInputs, valueInputs) {
             mismatches.check(
                 H.replacingLane(H.repeating(value), at: index, with: value),
-                HighwayReference.replacingLaneF32(H.repeating(value), index, value),
+                HighwayReference.replacingLaneF32(H.repeating(value).raw, index, value),
                 "index: \(index), value: \(hex(value))"
             )
         }

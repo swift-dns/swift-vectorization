@@ -10,7 +10,11 @@ extension SIMDDoubleConstantTests {
     private func checkSumConstantA(_ value: H.Lane) {
         let mismatches = Mismatches("sum with a repeating \(hex(value))")
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
-        mismatches.check(H.sum(H.repeating(value)), HighwayReference.sumF64(H.repeating(value)), "")
+        mismatches.check(
+            H.sum(H.repeating(value)),
+            HighwayReference.sumF64(H.repeating(value).raw),
+            ""
+        )
         mismatches.record()
     }
 
@@ -96,7 +100,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.smallest(H.repeating(value)),
-            HighwayReference.smallestF64(H.repeating(value)),
+            HighwayReference.smallestF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -184,7 +188,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.smallestOrNaN(H.repeating(value)),
-            HighwayReference.smallestOrNaNF64(H.repeating(value)),
+            HighwayReference.smallestOrNaNF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -272,7 +276,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.largest(H.repeating(value)),
-            HighwayReference.largestF64(H.repeating(value)),
+            HighwayReference.largestF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -360,7 +364,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.largestOrNaN(H.repeating(value)),
-            HighwayReference.largestOrNaNF64(H.repeating(value)),
+            HighwayReference.largestOrNaNF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -448,7 +452,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.repeatingSum(H.repeating(value)),
-            HighwayReference.repeatingSumF64(H.repeating(value)),
+            HighwayReference.repeatingSumF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -536,7 +540,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.repeatingSmallest(H.repeating(value)),
-            HighwayReference.repeatingSmallestF64(H.repeating(value)),
+            HighwayReference.repeatingSmallestF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -624,7 +628,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.repeatingLargest(H.repeating(value)),
-            HighwayReference.repeatingLargestF64(H.repeating(value)),
+            HighwayReference.repeatingLargestF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()

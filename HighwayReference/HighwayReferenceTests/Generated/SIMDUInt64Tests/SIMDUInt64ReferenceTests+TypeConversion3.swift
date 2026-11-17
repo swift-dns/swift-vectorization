@@ -12,7 +12,7 @@ extension SIMDUInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.halfVector(zeroExtendingResizing: a),
-                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF64ToU64(a)),
+                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF64ToU64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -30,7 +30,9 @@ extension SIMDUInt64ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(zeroExtendingResizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF64ToU64(a)),
+                H.Vector(
+                    raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF64ToU64(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -95,7 +97,7 @@ extension SIMDUInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(zeroExtendingResizing: a),
-                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF16ToU64(a)),
+                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF16ToU64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -110,7 +112,7 @@ extension SIMDUInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.halfVector(zeroExtendingResizing: a),
-                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF16ToU64(a)),
+                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF16ToU64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -130,7 +132,9 @@ extension SIMDUInt64ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(zeroExtendingResizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF16ToU64(a)),
+                H.Vector(
+                    raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF16ToU64(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }

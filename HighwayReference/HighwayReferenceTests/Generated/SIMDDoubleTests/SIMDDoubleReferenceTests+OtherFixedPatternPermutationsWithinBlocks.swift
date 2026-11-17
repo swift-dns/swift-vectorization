@@ -13,7 +13,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.oddEven(a, b),
-                HighwayReference.oddEvenF64(a, b),
+                HighwayReference.oddEvenF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -26,7 +26,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.duplicatingEven(a),
-                HighwayReference.duplicatingEvenF64(a),
+                HighwayReference.duplicatingEvenF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -39,7 +39,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.duplicatingOdd(a),
-                HighwayReference.duplicatingOddF64(a),
+                HighwayReference.duplicatingOddF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -52,7 +52,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.shuffled01(a),
-                HighwayReference.shuffled01F64(a),
+                HighwayReference.shuffled01F64(a.raw),
                 "a: \(describe(a))"
             )
         }

@@ -417,7 +417,7 @@ extension SIMDUInt8ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(zeroExtendingResizing: a),
-                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF32ToU8(a)),
+                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF32ToU8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -430,7 +430,7 @@ extension SIMDUInt8ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.halfVector(zeroExtendingResizing: a),
-                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF32ToU8(a)),
+                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF32ToU8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -448,7 +448,9 @@ extension SIMDUInt8ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(zeroExtendingResizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF32ToU8(a)),
+                H.Vector(
+                    raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF32ToU8(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -461,7 +463,9 @@ extension SIMDUInt8ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.quarterVector(zeroExtendingResizing: a),
-                H.QuarterVector(raw: HighwayReference.quarterVectorZeroExtendingResizingF32ToU8(a)),
+                H.QuarterVector(
+                    raw: HighwayReference.quarterVectorZeroExtendingResizingF32ToU8(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -479,7 +483,9 @@ extension SIMDUInt8ReferenceTests {
                     H.firstLanes(count: H.laneCount / 4),
                     H.vector(resizing: H.quarterVector(zeroExtendingResizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedQuarterVectorZeroExtendingResizingF32ToU8(a)),
+                H.Vector(
+                    raw: HighwayReference.resizedQuarterVectorZeroExtendingResizingF32ToU8(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -492,7 +498,9 @@ extension SIMDUInt8ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.eighthVector(zeroExtendingResizing: a),
-                H.EighthVector(raw: HighwayReference.eighthVectorZeroExtendingResizingF32ToU8(a)),
+                H.EighthVector(
+                    raw: HighwayReference.eighthVectorZeroExtendingResizingF32ToU8(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -510,7 +518,9 @@ extension SIMDUInt8ReferenceTests {
                     H.firstLanes(count: H.laneCount / 8),
                     H.vector(resizing: H.eighthVector(zeroExtendingResizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedEighthVectorZeroExtendingResizingF32ToU8(a)),
+                H.Vector(
+                    raw: HighwayReference.resizedEighthVectorZeroExtendingResizingF32ToU8(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -650,7 +660,7 @@ extension SIMDUInt8ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(zeroExtendingResizing: a),
-                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF64ToU8(a)),
+                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF64ToU8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -663,7 +673,7 @@ extension SIMDUInt8ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.halfVector(zeroExtendingResizing: a),
-                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF64ToU8(a)),
+                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF64ToU8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -681,7 +691,9 @@ extension SIMDUInt8ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(zeroExtendingResizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF64ToU8(a)),
+                H.Vector(
+                    raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF64ToU8(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -694,7 +706,9 @@ extension SIMDUInt8ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.quarterVector(zeroExtendingResizing: a),
-                H.QuarterVector(raw: HighwayReference.quarterVectorZeroExtendingResizingF64ToU8(a)),
+                H.QuarterVector(
+                    raw: HighwayReference.quarterVectorZeroExtendingResizingF64ToU8(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -712,7 +726,9 @@ extension SIMDUInt8ReferenceTests {
                     H.firstLanes(count: H.laneCount / 4),
                     H.vector(resizing: H.quarterVector(zeroExtendingResizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedQuarterVectorZeroExtendingResizingF64ToU8(a)),
+                H.Vector(
+                    raw: HighwayReference.resizedQuarterVectorZeroExtendingResizingF64ToU8(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -725,7 +741,9 @@ extension SIMDUInt8ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.eighthVector(zeroExtendingResizing: a),
-                H.EighthVector(raw: HighwayReference.eighthVectorZeroExtendingResizingF64ToU8(a)),
+                H.EighthVector(
+                    raw: HighwayReference.eighthVectorZeroExtendingResizingF64ToU8(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -743,7 +761,9 @@ extension SIMDUInt8ReferenceTests {
                     H.firstLanes(count: H.laneCount / 8),
                     H.vector(resizing: H.eighthVector(zeroExtendingResizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedEighthVectorZeroExtendingResizingF64ToU8(a)),
+                H.Vector(
+                    raw: HighwayReference.resizedEighthVectorZeroExtendingResizingF64ToU8(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -884,7 +904,7 @@ extension SIMDUInt8ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(zeroExtendingResizing: a),
-                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF16ToU8(a)),
+                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF16ToU8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -899,7 +919,7 @@ extension SIMDUInt8ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.halfVector(zeroExtendingResizing: a),
-                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF16ToU8(a)),
+                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF16ToU8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -919,7 +939,9 @@ extension SIMDUInt8ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(zeroExtendingResizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF16ToU8(a)),
+                H.Vector(
+                    raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF16ToU8(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -934,7 +956,9 @@ extension SIMDUInt8ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.quarterVector(zeroExtendingResizing: a),
-                H.QuarterVector(raw: HighwayReference.quarterVectorZeroExtendingResizingF16ToU8(a)),
+                H.QuarterVector(
+                    raw: HighwayReference.quarterVectorZeroExtendingResizingF16ToU8(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -954,7 +978,9 @@ extension SIMDUInt8ReferenceTests {
                     H.firstLanes(count: H.laneCount / 4),
                     H.vector(resizing: H.quarterVector(zeroExtendingResizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedQuarterVectorZeroExtendingResizingF16ToU8(a)),
+                H.Vector(
+                    raw: HighwayReference.resizedQuarterVectorZeroExtendingResizingF16ToU8(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -969,7 +995,9 @@ extension SIMDUInt8ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.eighthVector(zeroExtendingResizing: a),
-                H.EighthVector(raw: HighwayReference.eighthVectorZeroExtendingResizingF16ToU8(a)),
+                H.EighthVector(
+                    raw: HighwayReference.eighthVectorZeroExtendingResizingF16ToU8(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -989,7 +1017,9 @@ extension SIMDUInt8ReferenceTests {
                     H.firstLanes(count: H.laneCount / 8),
                     H.vector(resizing: H.eighthVector(zeroExtendingResizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedEighthVectorZeroExtendingResizingF16ToU8(a)),
+                H.Vector(
+                    raw: HighwayReference.resizedEighthVectorZeroExtendingResizingF16ToU8(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }

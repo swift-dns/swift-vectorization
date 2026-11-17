@@ -4,12 +4,12 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portNoneAboveU32(_ v: SIMDUInt32.Vector) -> Bool {
+public func portNoneAboveU32(_ v: SIMD<UInt32>) -> Bool {
     SIMDUInt32.allFalse(SIMDUInt32.greaterThan(v, SIMDUInt32.repeating(26)))
 }
 
 @inline(never)
-public func highwayNoneAboveU32(_ v: SIMDUInt32.Vector) -> Bool {
+public func highwayNoneAboveU32(_ v: SIMD<UInt32>) -> Bool {
     HighwayReference.Nothrow.allFalseU32(
         SIMDUInt32.Mask(
             raw: HighwayReference.Nothrow.greaterThanU32(
@@ -22,10 +22,10 @@ public func highwayNoneAboveU32(_ v: SIMDUInt32.Vector) -> Bool {
 
 @inline(never)
 public func portSmallestAtLeastU32(
-    from: UnsafePointer<SIMDUInt32.Lane>,
+    from: UnsafePointer<UInt32>,
     count: Int,
-    atLeast n: SIMDUInt32.Lane
-) -> SIMDUInt32.Lane {
+    atLeast n: UInt32
+) -> UInt32 {
     let identity = SIMDUInt32.repeating(.max)
     let threshold = SIMDUInt32.repeating(n)
     var accumulator = identity
@@ -106,10 +106,7 @@ public func highwaySmallestAtLeastU32(
 
 @available(SwiftStdlib 5.1, *)
 @inline(never)
-public func portSmallestAtLeastSpanU32(
-    atLeast n: SIMDUInt32.Lane,
-    in values: Span<SIMDUInt32.Lane>
-) -> SIMDUInt32.Lane {
+public func portSmallestAtLeastSpanU32(atLeast n: UInt32, in values: Span<UInt32>) -> UInt32 {
     let laneCount = SIMDUInt32.laneCount
     let identity = SIMDUInt32.repeating(.max)
     let threshold = SIMDUInt32.repeating(n)
@@ -193,7 +190,7 @@ public func highwaySmallestAtLeastSpanU32(atLeast n: UInt32, in values: Span<UIn
 
 @available(SwiftStdlib 5.1, *)
 @inline(never)
-public func portSumWideningSpanU32(_ bytes: Span<UInt8>) -> SIMDUInt32.Lane {
+public func portSumWideningSpanU32(_ bytes: Span<UInt8>) -> UInt32 {
     let laneCount = SIMDUInt32.laneCount
     var total = SIMDUInt32.zero()
     var remainingBytesSpan = bytes
@@ -241,13 +238,10 @@ public func highwaySumWideningSpanU32(_ bytes: Span<UInt8>) -> UInt32 {
 
 @available(SwiftStdlib 5.1, *)
 @inline(never)
-public func portSumAboveSpanU32(
-    above t: SIMDUInt32.Lane,
-    in values: Span<SIMDUInt32.Lane>
-) -> SIMDUInt32.Lane {
+public func portSumAboveSpanU32(above t: UInt32, in values: Span<UInt32>) -> UInt32 {
     let laneCount = SIMDUInt32.laneCount
     let threshold = SIMDUInt32.repeating(t)
-    var total: SIMDUInt32.Lane = 0
+    var total: UInt32 = 0
     var remainingValuesSpan = values
     while remainingValuesSpan.count >= laneCount {
         let loaded = SIMDUInt32.load(from: remainingValuesSpan)
@@ -284,9 +278,9 @@ public func highwaySumAboveSpanU32(above t: UInt32, in values: Span<UInt32>) -> 
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portCountEqualAboveSpanU32(
-    above t: SIMDUInt32.Lane,
-    in values: Span<SIMDUInt32.Lane>,
-    matching others: Span<SIMDUInt32.Lane>
+    above t: UInt32,
+    in values: Span<UInt32>,
+    matching others: Span<UInt32>
 ) -> Int {
     let laneCount = SIMDUInt32.laneCount
     let threshold = SIMDUInt32.repeating(t)
@@ -347,9 +341,9 @@ public func highwayCountEqualAboveSpanU32(
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portClampAboveSpanU32(
-    atMost t: SIMDUInt32.Lane,
-    in values: Span<SIMDUInt32.Lane>,
-    into output: inout MutableSpan<SIMDUInt32.Lane>
+    atMost t: UInt32,
+    in values: Span<UInt32>,
+    into output: inout MutableSpan<UInt32>
 ) -> Int {
     let laneCount = SIMDUInt32.laneCount
     let limit = SIMDUInt32.repeating(t)
@@ -413,9 +407,9 @@ public func highwayClampAboveSpanU32(
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portSelectBelowSpanU32(
-    below t: SIMDUInt32.Lane,
-    in values: Span<SIMDUInt32.Lane>,
-    into output: inout MutableSpan<SIMDUInt32.Lane>
+    below t: UInt32,
+    in values: Span<UInt32>,
+    into output: inout MutableSpan<UInt32>
 ) -> Int {
     let laneCount = SIMDUInt32.laneCount
     let threshold = SIMDUInt32.repeating(t)

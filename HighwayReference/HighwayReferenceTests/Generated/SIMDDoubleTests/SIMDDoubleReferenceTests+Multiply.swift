@@ -13,7 +13,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplying(a, b),
-                HighwayReference.multiplyingF64(a, b),
+                HighwayReference.multiplyingF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -27,7 +27,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.multiplyingRounded(a, b),
-                HighwayReference.multiplyingRoundedF64(a, b),
+                HighwayReference.multiplyingRoundedF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -41,7 +41,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplyingByFloorPowerOf2(a, b),
-                HighwayReference.multiplyingByFloorPowerOf2F64(a, b),
+                HighwayReference.multiplyingByFloorPowerOf2F64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -55,7 +55,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplyingByPowerOf2(a, b),
-                HighwayReference.multiplyingByPowerOf2I64ToF64(a, b.raw),
+                HighwayReference.multiplyingByPowerOf2I64ToF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

@@ -20,7 +20,7 @@ extension SIMDFloatReferenceTests {
             var r1 = HighwayReference.zeroF32()
             from.withUnsafeBufferPointer { source in
                 unsafe H.loadInterleaved2(from: source.baseAddress!, &p0, &p1)
-                unsafe HighwayReference.loadInterleaved2F32(source.baseAddress!, &r0, &r1)
+                unsafe HighwayReference.loadInterleaved2F32(source.baseAddress!, &r0.raw, &r1.raw)
             }
             mismatches.check(p0, r0, "from: \(describe(from)), v0")
             mismatches.check(p1, r1, "from: \(describe(from)), v1")
@@ -42,7 +42,7 @@ extension SIMDFloatReferenceTests {
             var r1 = HighwayReference.zeroF32()
             _ = unsafe withGuardedLanes(from) { source in
                 unsafe H.loadInterleaved2(from: source, &p0, &p1)
-                unsafe HighwayReference.loadInterleaved2F32(source, &r0, &r1)
+                unsafe HighwayReference.loadInterleaved2F32(source, &r0.raw, &r1.raw)
             }
             mismatches.check(p0, r0, "from: \(describe(from)), v0")
             mismatches.check(p1, r1, "from: \(describe(from)), v1")
@@ -94,7 +94,12 @@ extension SIMDFloatReferenceTests {
             var r2 = HighwayReference.zeroF32()
             from.withUnsafeBufferPointer { source in
                 unsafe H.loadInterleaved3(from: source.baseAddress!, &p0, &p1, &p2)
-                unsafe HighwayReference.loadInterleaved3F32(source.baseAddress!, &r0, &r1, &r2)
+                unsafe HighwayReference.loadInterleaved3F32(
+                    source.baseAddress!,
+                    &r0.raw,
+                    &r1.raw,
+                    &r2.raw
+                )
             }
             mismatches.check(p0, r0, "from: \(describe(from)), v0")
             mismatches.check(p1, r1, "from: \(describe(from)), v1")
@@ -119,7 +124,7 @@ extension SIMDFloatReferenceTests {
             var r2 = HighwayReference.zeroF32()
             _ = unsafe withGuardedLanes(from) { source in
                 unsafe H.loadInterleaved3(from: source, &p0, &p1, &p2)
-                unsafe HighwayReference.loadInterleaved3F32(source, &r0, &r1, &r2)
+                unsafe HighwayReference.loadInterleaved3F32(source, &r0.raw, &r1.raw, &r2.raw)
             }
             mismatches.check(p0, r0, "from: \(describe(from)), v0")
             mismatches.check(p1, r1, "from: \(describe(from)), v1")
@@ -177,7 +182,13 @@ extension SIMDFloatReferenceTests {
             var r3 = HighwayReference.zeroF32()
             from.withUnsafeBufferPointer { source in
                 unsafe H.loadInterleaved4(from: source.baseAddress!, &p0, &p1, &p2, &p3)
-                unsafe HighwayReference.loadInterleaved4F32(source.baseAddress!, &r0, &r1, &r2, &r3)
+                unsafe HighwayReference.loadInterleaved4F32(
+                    source.baseAddress!,
+                    &r0.raw,
+                    &r1.raw,
+                    &r2.raw,
+                    &r3.raw
+                )
             }
             mismatches.check(p0, r0, "from: \(describe(from)), v0")
             mismatches.check(p1, r1, "from: \(describe(from)), v1")
@@ -205,7 +216,13 @@ extension SIMDFloatReferenceTests {
             var r3 = HighwayReference.zeroF32()
             _ = unsafe withGuardedLanes(from) { source in
                 unsafe H.loadInterleaved4(from: source, &p0, &p1, &p2, &p3)
-                unsafe HighwayReference.loadInterleaved4F32(source, &r0, &r1, &r2, &r3)
+                unsafe HighwayReference.loadInterleaved4F32(
+                    source,
+                    &r0.raw,
+                    &r1.raw,
+                    &r2.raw,
+                    &r3.raw
+                )
             }
             mismatches.check(p0, r0, "from: \(describe(from)), v0")
             mismatches.check(p1, r1, "from: \(describe(from)), v1")
@@ -261,7 +278,7 @@ extension SIMDFloatReferenceTests {
             }
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeInterleaved2F32(a, b, destination.baseAddress!)
+                unsafe HighwayReference.storeInterleaved2F32(a.raw, b.raw, destination.baseAddress!)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), b: \(describe(b))")
         }
@@ -278,7 +295,7 @@ extension SIMDFloatReferenceTests {
                 unsafe H.storeInterleaved2(a, b, to: destination)
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.storeInterleaved2F32(a, b, destination)
+                unsafe HighwayReference.storeInterleaved2F32(a.raw, b.raw, destination)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), b: \(describe(b))")
         }
@@ -339,7 +356,12 @@ extension SIMDFloatReferenceTests {
             }
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeInterleaved3F32(a, b, c, destination.baseAddress!)
+                unsafe HighwayReference.storeInterleaved3F32(
+                    a.raw,
+                    b.raw,
+                    c.raw,
+                    destination.baseAddress!
+                )
             }
             mismatches.check(
                 portLanes,
@@ -361,7 +383,7 @@ extension SIMDFloatReferenceTests {
                 unsafe H.storeInterleaved3(a, b, c, to: destination)
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.storeInterleaved3F32(a, b, c, destination)
+                unsafe HighwayReference.storeInterleaved3F32(a.raw, b.raw, c.raw, destination)
             }
             mismatches.check(
                 portLanes,
@@ -443,7 +465,13 @@ extension SIMDFloatReferenceTests {
             }
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeInterleaved4F32(a, b, c, d, destination.baseAddress!)
+                unsafe HighwayReference.storeInterleaved4F32(
+                    a.raw,
+                    b.raw,
+                    c.raw,
+                    d.raw,
+                    destination.baseAddress!
+                )
             }
             mismatches.check(
                 portLanes,
@@ -472,7 +500,13 @@ extension SIMDFloatReferenceTests {
                 unsafe H.storeInterleaved4(a, b, c, d, to: destination)
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.storeInterleaved4F32(a, b, c, d, destination)
+                unsafe HighwayReference.storeInterleaved4F32(
+                    a.raw,
+                    b.raw,
+                    c.raw,
+                    d.raw,
+                    destination
+                )
             }
             mismatches.check(
                 portLanes,

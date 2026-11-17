@@ -12,7 +12,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.isNaN(H.repeating(value)),
-            H.Mask(raw: HighwayReference.isNaNF64(H.repeating(value))),
+            H.Mask(raw: HighwayReference.isNaNF64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -102,7 +102,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.isEitherNaN(H.repeating(value), b),
-                H.Mask(raw: HighwayReference.isEitherNaNF64(H.repeating(value), b)),
+                H.Mask(raw: HighwayReference.isEitherNaNF64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -117,7 +117,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.isEitherNaN(a, H.repeating(value)),
-                H.Mask(raw: HighwayReference.isEitherNaNF64(a, H.repeating(value))),
+                H.Mask(raw: HighwayReference.isEitherNaNF64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -225,7 +225,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.isInfinite(H.repeating(value)),
-            H.Mask(raw: HighwayReference.isInfiniteF64(H.repeating(value))),
+            H.Mask(raw: HighwayReference.isInfiniteF64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -313,7 +313,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.isFinite(H.repeating(value)),
-            H.Mask(raw: HighwayReference.isFiniteF64(H.repeating(value))),
+            H.Mask(raw: HighwayReference.isFiniteF64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()

@@ -923,7 +923,9 @@ extension SIMDInt8ConstantTests {
         mismatches.check(
             H.vector(zeroExtendingResizing: SIMDFloat.repeating(value)),
             H.Vector(
-                raw: HighwayReference.vectorZeroExtendingResizingF32ToI8(SIMDFloat.repeating(value))
+                raw: HighwayReference.vectorZeroExtendingResizingF32ToI8(
+                    SIMDFloat.repeating(value).raw
+                )
             ),
             ""
         )
@@ -1020,7 +1022,7 @@ extension SIMDInt8ConstantTests {
             H.halfVector(zeroExtendingResizing: SIMDFloat.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorZeroExtendingResizingF32ToI8(
-                    SIMDFloat.repeating(value)
+                    SIMDFloat.repeating(value).raw
                 )
             ),
             ""

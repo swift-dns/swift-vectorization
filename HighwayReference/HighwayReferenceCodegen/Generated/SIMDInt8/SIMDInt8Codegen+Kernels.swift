@@ -4,7 +4,7 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portMaskedLowercaseI8(_ v: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portMaskedLowercaseI8(_ v: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.bitwiseOr(
         v,
         SIMDInt8.selectingOrZero(
@@ -18,7 +18,7 @@ public func portMaskedLowercaseI8(_ v: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayMaskedLowercaseI8(_ v: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayMaskedLowercaseI8(_ v: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.bitwiseOrI8(
             v.raw,
@@ -44,12 +44,12 @@ public func highwayMaskedLowercaseI8(_ v: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func portNoneAboveI8(_ v: SIMDInt8.Vector) -> Bool {
+public func portNoneAboveI8(_ v: SIMD<Int8>) -> Bool {
     SIMDInt8.allFalse(SIMDInt8.greaterThan(v, SIMDInt8.repeating(26)))
 }
 
 @inline(never)
-public func highwayNoneAboveI8(_ v: SIMDInt8.Vector) -> Bool {
+public func highwayNoneAboveI8(_ v: SIMD<Int8>) -> Bool {
     HighwayReference.Nothrow.allFalseI8(
         SIMDInt8.Mask(
             raw: HighwayReference.Nothrow.greaterThanI8(
@@ -62,13 +62,10 @@ public func highwayNoneAboveI8(_ v: SIMDInt8.Vector) -> Bool {
 
 @available(SwiftStdlib 5.1, *)
 @inline(never)
-public func portSumAboveSpanI8(
-    above t: SIMDInt8.Lane,
-    in values: Span<SIMDInt8.Lane>
-) -> SIMDInt8.Lane {
+public func portSumAboveSpanI8(above t: Int8, in values: Span<Int8>) -> Int8 {
     let laneCount = SIMDInt8.laneCount
     let threshold = SIMDInt8.repeating(t)
-    var total: SIMDInt8.Lane = 0
+    var total: Int8 = 0
     var remainingValuesSpan = values
     while remainingValuesSpan.count >= laneCount {
         let loaded = SIMDInt8.load(from: remainingValuesSpan)
@@ -105,9 +102,9 @@ public func highwaySumAboveSpanI8(above t: Int8, in values: Span<Int8>) -> Int8 
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portCountEqualAboveSpanI8(
-    above t: SIMDInt8.Lane,
-    in values: Span<SIMDInt8.Lane>,
-    matching others: Span<SIMDInt8.Lane>
+    above t: Int8,
+    in values: Span<Int8>,
+    matching others: Span<Int8>
 ) -> Int {
     let laneCount = SIMDInt8.laneCount
     let threshold = SIMDInt8.repeating(t)
@@ -168,9 +165,9 @@ public func highwayCountEqualAboveSpanI8(
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portClampAboveSpanI8(
-    atMost t: SIMDInt8.Lane,
-    in values: Span<SIMDInt8.Lane>,
-    into output: inout MutableSpan<SIMDInt8.Lane>
+    atMost t: Int8,
+    in values: Span<Int8>,
+    into output: inout MutableSpan<Int8>
 ) -> Int {
     let laneCount = SIMDInt8.laneCount
     let limit = SIMDInt8.repeating(t)
@@ -230,9 +227,9 @@ public func highwayClampAboveSpanI8(
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portSelectBelowSpanI8(
-    below t: SIMDInt8.Lane,
-    in values: Span<SIMDInt8.Lane>,
-    into output: inout MutableSpan<SIMDInt8.Lane>
+    below t: Int8,
+    in values: Span<Int8>,
+    into output: inout MutableSpan<Int8>
 ) -> Int {
     let laneCount = SIMDInt8.laneCount
     let threshold = SIMDInt8.repeating(t)

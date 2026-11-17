@@ -4,30 +4,24 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portCreate2I8(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector) {
+public func portCreate2I8(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> (SIMD<Int8>, SIMD<Int8>) {
     SIMDInt8.create2(a, b)
 }
 
 @inline(never)
-public func highwayCreate2I8(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector) {
+public func highwayCreate2I8(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> (SIMD<Int8>, SIMD<Int8>) {
     { tuple in (SIMDInt8.Vector(raw: tuple.v0), SIMDInt8.Vector(raw: tuple.v1)) }(
         HighwayReference.Nothrow.create2I8(a.raw, b.raw)
     )
 }
 
 @inline(never)
-public func portCreate2I8ConstantA(_ b: SIMDInt8.Vector) -> (SIMDInt8.Vector, SIMDInt8.Vector) {
+public func portCreate2I8ConstantA(_ b: SIMD<Int8>) -> (SIMD<Int8>, SIMD<Int8>) {
     SIMDInt8.create2(SIMDInt8.repeating(26), b)
 }
 
 @inline(never)
-public func highwayCreate2I8ConstantA(_ b: SIMDInt8.Vector) -> (SIMDInt8.Vector, SIMDInt8.Vector) {
+public func highwayCreate2I8ConstantA(_ b: SIMD<Int8>) -> (SIMD<Int8>, SIMD<Int8>) {
     { tuple in (SIMDInt8.Vector(raw: tuple.v0), SIMDInt8.Vector(raw: tuple.v1)) }(
         HighwayReference.Nothrow.create2I8(
             SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
@@ -37,12 +31,12 @@ public func highwayCreate2I8ConstantA(_ b: SIMDInt8.Vector) -> (SIMDInt8.Vector,
 }
 
 @inline(never)
-public func portCreate2I8ConstantB(_ a: SIMDInt8.Vector) -> (SIMDInt8.Vector, SIMDInt8.Vector) {
+public func portCreate2I8ConstantB(_ a: SIMD<Int8>) -> (SIMD<Int8>, SIMD<Int8>) {
     SIMDInt8.create2(a, SIMDInt8.repeating(26))
 }
 
 @inline(never)
-public func highwayCreate2I8ConstantB(_ a: SIMDInt8.Vector) -> (SIMDInt8.Vector, SIMDInt8.Vector) {
+public func highwayCreate2I8ConstantB(_ a: SIMD<Int8>) -> (SIMD<Int8>, SIMD<Int8>) {
     { tuple in (SIMDInt8.Vector(raw: tuple.v0), SIMDInt8.Vector(raw: tuple.v1)) }(
         HighwayReference.Nothrow.create2I8(
             a.raw,
@@ -52,18 +46,12 @@ public func highwayCreate2I8ConstantB(_ a: SIMDInt8.Vector) -> (SIMDInt8.Vector,
 }
 
 @inline(never)
-public func portGet2I8(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector),
-    atUnchecked index: Int
-) -> SIMDInt8.Vector {
+public func portGet2I8(_ tuple: (SIMD<Int8>, SIMD<Int8>), atUnchecked index: Int) -> SIMD<Int8> {
     unsafe SIMDInt8.get2(tuple, atUnchecked: index)
 }
 
 @inline(never)
-public func highwayGet2I8(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector),
-    atUnchecked index: Int
-) -> SIMDInt8.Vector {
+public func highwayGet2I8(_ tuple: (SIMD<Int8>, SIMD<Int8>), atUnchecked index: Int) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.get2I8(
             cvectorization_ops_tuple2_i8(v0: tuple.0.raw, v1: tuple.1.raw),
@@ -73,15 +61,12 @@ public func highwayGet2I8(
 }
 
 @inline(never)
-public func portGet2I8ConstantIndex(_ tuple: (SIMDInt8.Vector, SIMDInt8.Vector)) -> SIMDInt8.Vector
-{
+public func portGet2I8ConstantIndex(_ tuple: (SIMD<Int8>, SIMD<Int8>)) -> SIMD<Int8> {
     unsafe SIMDInt8.get2(tuple, atUnchecked: 1)
 }
 
 @inline(never)
-public func highwayGet2I8ConstantIndex(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector)
-) -> SIMDInt8.Vector {
+public func highwayGet2I8ConstantIndex(_ tuple: (SIMD<Int8>, SIMD<Int8>)) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.get2I8(
             cvectorization_ops_tuple2_i8(v0: tuple.0.raw, v1: tuple.1.raw),
@@ -92,19 +77,19 @@ public func highwayGet2I8ConstantIndex(
 
 @inline(never)
 public func portSet2I8(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector),
+    _ tuple: (SIMD<Int8>, SIMD<Int8>),
     atUnchecked index: Int,
-    to a: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector) {
+    to a: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>) {
     unsafe SIMDInt8.set2(tuple, atUnchecked: index, to: a)
 }
 
 @inline(never)
 public func highwaySet2I8(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector),
+    _ tuple: (SIMD<Int8>, SIMD<Int8>),
     atUnchecked index: Int,
-    to a: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector) {
+    to a: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>) {
     { tuple in (SIMDInt8.Vector(raw: tuple.v0), SIMDInt8.Vector(raw: tuple.v1)) }(
         HighwayReference.Nothrow.set2I8(
             cvectorization_ops_tuple2_i8(v0: tuple.0.raw, v1: tuple.1.raw),
@@ -116,17 +101,17 @@ public func highwaySet2I8(
 
 @inline(never)
 public func portSet2I8ConstantIndex(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector),
-    to a: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ tuple: (SIMD<Int8>, SIMD<Int8>),
+    to a: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>) {
     unsafe SIMDInt8.set2(tuple, atUnchecked: 1, to: a)
 }
 
 @inline(never)
 public func highwaySet2I8ConstantIndex(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector),
-    to a: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ tuple: (SIMD<Int8>, SIMD<Int8>),
+    to a: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>) {
     { tuple in (SIMDInt8.Vector(raw: tuple.v0), SIMDInt8.Vector(raw: tuple.v1)) }(
         HighwayReference.Nothrow.set2I8(
             cvectorization_ops_tuple2_i8(v0: tuple.0.raw, v1: tuple.1.raw),
@@ -138,17 +123,17 @@ public func highwaySet2I8ConstantIndex(
 
 @inline(never)
 public func portSet2I8ConstantA(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector),
+    _ tuple: (SIMD<Int8>, SIMD<Int8>),
     atUnchecked index: Int
-) -> (SIMDInt8.Vector, SIMDInt8.Vector) {
+) -> (SIMD<Int8>, SIMD<Int8>) {
     unsafe SIMDInt8.set2(tuple, atUnchecked: index, to: SIMDInt8.repeating(26))
 }
 
 @inline(never)
 public func highwaySet2I8ConstantA(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector),
+    _ tuple: (SIMD<Int8>, SIMD<Int8>),
     atUnchecked index: Int
-) -> (SIMDInt8.Vector, SIMDInt8.Vector) {
+) -> (SIMD<Int8>, SIMD<Int8>) {
     { tuple in (SIMDInt8.Vector(raw: tuple.v0), SIMDInt8.Vector(raw: tuple.v1)) }(
         HighwayReference.Nothrow.set2I8(
             cvectorization_ops_tuple2_i8(v0: tuple.0.raw, v1: tuple.1.raw),
@@ -160,19 +145,19 @@ public func highwaySet2I8ConstantA(
 
 @inline(never)
 public func portCreate3I8(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ a: SIMD<Int8>,
+    _ b: SIMD<Int8>,
+    _ c: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     SIMDInt8.create3(a, b, c)
 }
 
 @inline(never)
 public func highwayCreate3I8(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ a: SIMD<Int8>,
+    _ b: SIMD<Int8>,
+    _ c: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     { tuple in
         (
             SIMDInt8.Vector(raw: tuple.v0), SIMDInt8.Vector(raw: tuple.v1),
@@ -183,17 +168,17 @@ public func highwayCreate3I8(
 
 @inline(never)
 public func portCreate3I8ConstantA(
-    _ b: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ b: SIMD<Int8>,
+    _ c: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     SIMDInt8.create3(SIMDInt8.repeating(26), b, c)
 }
 
 @inline(never)
 public func highwayCreate3I8ConstantA(
-    _ b: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ b: SIMD<Int8>,
+    _ c: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     { tuple in
         (
             SIMDInt8.Vector(raw: tuple.v0), SIMDInt8.Vector(raw: tuple.v1),
@@ -210,17 +195,17 @@ public func highwayCreate3I8ConstantA(
 
 @inline(never)
 public func portCreate3I8ConstantB(
-    _ a: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ a: SIMD<Int8>,
+    _ c: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     SIMDInt8.create3(a, SIMDInt8.repeating(26), c)
 }
 
 @inline(never)
 public func highwayCreate3I8ConstantB(
-    _ a: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ a: SIMD<Int8>,
+    _ c: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     { tuple in
         (
             SIMDInt8.Vector(raw: tuple.v0), SIMDInt8.Vector(raw: tuple.v1),
@@ -237,17 +222,17 @@ public func highwayCreate3I8ConstantB(
 
 @inline(never)
 public func portCreate3I8ConstantC(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ a: SIMD<Int8>,
+    _ b: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     SIMDInt8.create3(a, b, SIMDInt8.repeating(26))
 }
 
 @inline(never)
 public func highwayCreate3I8ConstantC(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ a: SIMD<Int8>,
+    _ b: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     { tuple in
         (
             SIMDInt8.Vector(raw: tuple.v0), SIMDInt8.Vector(raw: tuple.v1),
@@ -264,17 +249,17 @@ public func highwayCreate3I8ConstantC(
 
 @inline(never)
 public func portGet3I8(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector),
+    _ tuple: (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>),
     atUnchecked index: Int
-) -> SIMDInt8.Vector {
+) -> SIMD<Int8> {
     unsafe SIMDInt8.get3(tuple, atUnchecked: index)
 }
 
 @inline(never)
 public func highwayGet3I8(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector),
+    _ tuple: (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>),
     atUnchecked index: Int
-) -> SIMDInt8.Vector {
+) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.get3I8(
             cvectorization_ops_tuple3_i8(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
@@ -284,16 +269,13 @@ public func highwayGet3I8(
 }
 
 @inline(never)
-public func portGet3I8ConstantIndex(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector)
-) -> SIMDInt8.Vector {
+public func portGet3I8ConstantIndex(_ tuple: (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>)) -> SIMD<Int8> {
     unsafe SIMDInt8.get3(tuple, atUnchecked: 1)
 }
 
 @inline(never)
-public func highwayGet3I8ConstantIndex(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector)
-) -> SIMDInt8.Vector {
+public func highwayGet3I8ConstantIndex(_ tuple: (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>)) -> SIMD<Int8>
+{
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.get3I8(
             cvectorization_ops_tuple3_i8(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
@@ -304,19 +286,19 @@ public func highwayGet3I8ConstantIndex(
 
 @inline(never)
 public func portSet3I8(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector),
+    _ tuple: (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>),
     atUnchecked index: Int,
-    to a: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    to a: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     unsafe SIMDInt8.set3(tuple, atUnchecked: index, to: a)
 }
 
 @inline(never)
 public func highwaySet3I8(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector),
+    _ tuple: (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>),
     atUnchecked index: Int,
-    to a: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    to a: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     { tuple in
         (
             SIMDInt8.Vector(raw: tuple.v0), SIMDInt8.Vector(raw: tuple.v1),
@@ -333,17 +315,17 @@ public func highwaySet3I8(
 
 @inline(never)
 public func portSet3I8ConstantIndex(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector),
-    to a: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ tuple: (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>),
+    to a: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     unsafe SIMDInt8.set3(tuple, atUnchecked: 1, to: a)
 }
 
 @inline(never)
 public func highwaySet3I8ConstantIndex(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector),
-    to a: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ tuple: (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>),
+    to a: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     { tuple in
         (
             SIMDInt8.Vector(raw: tuple.v0), SIMDInt8.Vector(raw: tuple.v1),
@@ -360,17 +342,17 @@ public func highwaySet3I8ConstantIndex(
 
 @inline(never)
 public func portSet3I8ConstantA(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector),
+    _ tuple: (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>),
     atUnchecked index: Int
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     unsafe SIMDInt8.set3(tuple, atUnchecked: index, to: SIMDInt8.repeating(26))
 }
 
 @inline(never)
 public func highwaySet3I8ConstantA(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector),
+    _ tuple: (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>),
     atUnchecked index: Int
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     { tuple in
         (
             SIMDInt8.Vector(raw: tuple.v0), SIMDInt8.Vector(raw: tuple.v1),
@@ -387,21 +369,21 @@ public func highwaySet3I8ConstantA(
 
 @inline(never)
 public func portCreate4I8(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector,
-    _ d: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ a: SIMD<Int8>,
+    _ b: SIMD<Int8>,
+    _ c: SIMD<Int8>,
+    _ d: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     SIMDInt8.create4(a, b, c, d)
 }
 
 @inline(never)
 public func highwayCreate4I8(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector,
-    _ d: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ a: SIMD<Int8>,
+    _ b: SIMD<Int8>,
+    _ c: SIMD<Int8>,
+    _ d: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     { tuple in
         (
             SIMDInt8.Vector(raw: tuple.v0), SIMDInt8.Vector(raw: tuple.v1),
@@ -412,19 +394,19 @@ public func highwayCreate4I8(
 
 @inline(never)
 public func portCreate4I8ConstantA(
-    _ b: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector,
-    _ d: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ b: SIMD<Int8>,
+    _ c: SIMD<Int8>,
+    _ d: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     SIMDInt8.create4(SIMDInt8.repeating(26), b, c, d)
 }
 
 @inline(never)
 public func highwayCreate4I8ConstantA(
-    _ b: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector,
-    _ d: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ b: SIMD<Int8>,
+    _ c: SIMD<Int8>,
+    _ d: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     { tuple in
         (
             SIMDInt8.Vector(raw: tuple.v0), SIMDInt8.Vector(raw: tuple.v1),
@@ -442,19 +424,19 @@ public func highwayCreate4I8ConstantA(
 
 @inline(never)
 public func portCreate4I8ConstantB(
-    _ a: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector,
-    _ d: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ a: SIMD<Int8>,
+    _ c: SIMD<Int8>,
+    _ d: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     SIMDInt8.create4(a, SIMDInt8.repeating(26), c, d)
 }
 
 @inline(never)
 public func highwayCreate4I8ConstantB(
-    _ a: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector,
-    _ d: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ a: SIMD<Int8>,
+    _ c: SIMD<Int8>,
+    _ d: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     { tuple in
         (
             SIMDInt8.Vector(raw: tuple.v0), SIMDInt8.Vector(raw: tuple.v1),
@@ -472,19 +454,19 @@ public func highwayCreate4I8ConstantB(
 
 @inline(never)
 public func portCreate4I8ConstantC(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector,
-    _ d: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ a: SIMD<Int8>,
+    _ b: SIMD<Int8>,
+    _ d: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     SIMDInt8.create4(a, b, SIMDInt8.repeating(26), d)
 }
 
 @inline(never)
 public func highwayCreate4I8ConstantC(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector,
-    _ d: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ a: SIMD<Int8>,
+    _ b: SIMD<Int8>,
+    _ d: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     { tuple in
         (
             SIMDInt8.Vector(raw: tuple.v0), SIMDInt8.Vector(raw: tuple.v1),
@@ -502,19 +484,19 @@ public func highwayCreate4I8ConstantC(
 
 @inline(never)
 public func portCreate4I8ConstantD(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ a: SIMD<Int8>,
+    _ b: SIMD<Int8>,
+    _ c: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     SIMDInt8.create4(a, b, c, SIMDInt8.repeating(26))
 }
 
 @inline(never)
 public func highwayCreate4I8ConstantD(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ a: SIMD<Int8>,
+    _ b: SIMD<Int8>,
+    _ c: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     { tuple in
         (
             SIMDInt8.Vector(raw: tuple.v0), SIMDInt8.Vector(raw: tuple.v1),
@@ -532,17 +514,17 @@ public func highwayCreate4I8ConstantD(
 
 @inline(never)
 public func portGet4I8(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector),
+    _ tuple: (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>),
     atUnchecked index: Int
-) -> SIMDInt8.Vector {
+) -> SIMD<Int8> {
     unsafe SIMDInt8.get4(tuple, atUnchecked: index)
 }
 
 @inline(never)
 public func highwayGet4I8(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector),
+    _ tuple: (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>),
     atUnchecked index: Int
-) -> SIMDInt8.Vector {
+) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.get4I8(
             cvectorization_ops_tuple4_i8(
@@ -558,15 +540,15 @@ public func highwayGet4I8(
 
 @inline(never)
 public func portGet4I8ConstantIndex(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector)
-) -> SIMDInt8.Vector {
+    _ tuple: (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>)
+) -> SIMD<Int8> {
     unsafe SIMDInt8.get4(tuple, atUnchecked: 1)
 }
 
 @inline(never)
 public func highwayGet4I8ConstantIndex(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector)
-) -> SIMDInt8.Vector {
+    _ tuple: (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>)
+) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.get4I8(
             cvectorization_ops_tuple4_i8(
@@ -582,19 +564,19 @@ public func highwayGet4I8ConstantIndex(
 
 @inline(never)
 public func portSet4I8(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector),
+    _ tuple: (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>),
     atUnchecked index: Int,
-    to a: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    to a: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     unsafe SIMDInt8.set4(tuple, atUnchecked: index, to: a)
 }
 
 @inline(never)
 public func highwaySet4I8(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector),
+    _ tuple: (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>),
     atUnchecked index: Int,
-    to a: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    to a: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     { tuple in
         (
             SIMDInt8.Vector(raw: tuple.v0), SIMDInt8.Vector(raw: tuple.v1),
@@ -616,17 +598,17 @@ public func highwaySet4I8(
 
 @inline(never)
 public func portSet4I8ConstantIndex(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector),
-    to a: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ tuple: (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>),
+    to a: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     unsafe SIMDInt8.set4(tuple, atUnchecked: 1, to: a)
 }
 
 @inline(never)
 public func highwaySet4I8ConstantIndex(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector),
-    to a: SIMDInt8.Vector
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+    _ tuple: (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>),
+    to a: SIMD<Int8>
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     { tuple in
         (
             SIMDInt8.Vector(raw: tuple.v0), SIMDInt8.Vector(raw: tuple.v1),
@@ -648,17 +630,17 @@ public func highwaySet4I8ConstantIndex(
 
 @inline(never)
 public func portSet4I8ConstantA(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector),
+    _ tuple: (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>),
     atUnchecked index: Int
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     unsafe SIMDInt8.set4(tuple, atUnchecked: index, to: SIMDInt8.repeating(26))
 }
 
 @inline(never)
 public func highwaySet4I8ConstantA(
-    _ tuple: (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector),
+    _ tuple: (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>),
     atUnchecked index: Int
-) -> (SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector, SIMDInt8.Vector) {
+) -> (SIMD<Int8>, SIMD<Int8>, SIMD<Int8>, SIMD<Int8>) {
     { tuple in
         (
             SIMDInt8.Vector(raw: tuple.v0), SIMDInt8.Vector(raw: tuple.v1),

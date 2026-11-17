@@ -19,7 +19,7 @@ extension SIMDFloat16ConstantTests {
         for mask in maskInputs where !hasUnorderedNaNs(lanesOf: H.repeating(value)) {
             mismatches.check(
                 H.sum(H.repeating(value), where: mask),
-                Float16(bitPattern: HighwayReference.sumWhereF16(mask.raw, H.repeating(value))),
+                Float16(bitPattern: HighwayReference.sumWhereF16(mask.raw, H.repeating(value).raw)),
                 "mask: \(describe(mask))"
             )
         }
@@ -115,7 +115,7 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.smallest(H.repeating(value), where: mask),
                 Float16(
-                    bitPattern: HighwayReference.smallestWhereF16(mask.raw, H.repeating(value))
+                    bitPattern: HighwayReference.smallestWhereF16(mask.raw, H.repeating(value).raw)
                 ),
                 "mask: \(describe(mask))"
             )
@@ -211,7 +211,9 @@ extension SIMDFloat16ConstantTests {
         for mask in maskInputs {
             mismatches.check(
                 H.largest(H.repeating(value), where: mask),
-                Float16(bitPattern: HighwayReference.largestWhereF16(mask.raw, H.repeating(value))),
+                Float16(
+                    bitPattern: HighwayReference.largestWhereF16(mask.raw, H.repeating(value).raw)
+                ),
                 "mask: \(describe(mask))"
             )
         }

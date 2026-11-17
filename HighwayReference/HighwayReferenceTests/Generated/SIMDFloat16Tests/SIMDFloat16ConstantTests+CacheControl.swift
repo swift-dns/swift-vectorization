@@ -21,7 +21,7 @@ extension SIMDFloat16ConstantTests {
         }
         let (_, referenceLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
             destination in
-            unsafe HighwayReference.storeStreamingF16(H.repeating(value), destination)
+            unsafe HighwayReference.storeStreamingF16(H.repeating(value).raw, destination)
         }
         mismatches.check(portLanes, referenceLanes, "")
         mismatches.record()

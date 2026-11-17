@@ -19,7 +19,7 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.squareRoot(a, where: mask, otherwise: otherwise),
-                HighwayReference.squareRootWhereOtherwiseF32(otherwise, mask.raw, a),
+                HighwayReference.squareRootWhereOtherwiseF32(otherwise.raw, mask.raw, a.raw),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -39,7 +39,7 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.squareRoot(a, where: mask, otherwise: otherwise),
-                HighwayReference.squareRootWhereOtherwiseF32(otherwise, mask.raw, a),
+                HighwayReference.squareRootWhereOtherwiseF32(otherwise.raw, mask.raw, a.raw),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -61,7 +61,7 @@ extension SIMDFloatReferenceTests {
         ) where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.minimum(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.minimumWhereOtherwiseF32(otherwise, mask.raw, a, b),
+                HighwayReference.minimumWhereOtherwiseF32(otherwise.raw, mask.raw, a.raw, b.raw),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -83,7 +83,7 @@ extension SIMDFloatReferenceTests {
         ) where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.minimum(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.minimumWhereOtherwiseF32(otherwise, mask.raw, a, b),
+                HighwayReference.minimumWhereOtherwiseF32(otherwise.raw, mask.raw, a.raw, b.raw),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -105,7 +105,7 @@ extension SIMDFloatReferenceTests {
         ) where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.maximum(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.maximumWhereOtherwiseF32(otherwise, mask.raw, a, b),
+                HighwayReference.maximumWhereOtherwiseF32(otherwise.raw, mask.raw, a.raw, b.raw),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -127,7 +127,7 @@ extension SIMDFloatReferenceTests {
         ) where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.maximum(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.maximumWhereOtherwiseF32(otherwise, mask.raw, a, b),
+                HighwayReference.maximumWhereOtherwiseF32(otherwise.raw, mask.raw, a.raw, b.raw),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -149,7 +149,7 @@ extension SIMDFloatReferenceTests {
         ) where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.adding(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.addingWhereOtherwiseF32(otherwise, mask.raw, a, b),
+                HighwayReference.addingWhereOtherwiseF32(otherwise.raw, mask.raw, a.raw, b.raw),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -171,7 +171,7 @@ extension SIMDFloatReferenceTests {
         ) where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.adding(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.addingWhereOtherwiseF32(otherwise, mask.raw, a, b),
+                HighwayReference.addingWhereOtherwiseF32(otherwise.raw, mask.raw, a.raw, b.raw),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -193,7 +193,12 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.subtracting(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.subtractingWhereOtherwiseF32(otherwise, mask.raw, a, b),
+                HighwayReference.subtractingWhereOtherwiseF32(
+                    otherwise.raw,
+                    mask.raw,
+                    a.raw,
+                    b.raw
+                ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -215,7 +220,12 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.subtracting(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.subtractingWhereOtherwiseF32(otherwise, mask.raw, a, b),
+                HighwayReference.subtractingWhereOtherwiseF32(
+                    otherwise.raw,
+                    mask.raw,
+                    a.raw,
+                    b.raw
+                ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -237,7 +247,12 @@ extension SIMDFloatReferenceTests {
         ) where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.multiplying(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.multiplyingWhereOtherwiseF32(otherwise, mask.raw, a, b),
+                HighwayReference.multiplyingWhereOtherwiseF32(
+                    otherwise.raw,
+                    mask.raw,
+                    a.raw,
+                    b.raw
+                ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -259,7 +274,12 @@ extension SIMDFloatReferenceTests {
         ) where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.multiplying(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.multiplyingWhereOtherwiseF32(otherwise, mask.raw, a, b),
+                HighwayReference.multiplyingWhereOtherwiseF32(
+                    otherwise.raw,
+                    mask.raw,
+                    a.raw,
+                    b.raw
+                ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -281,7 +301,7 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.dividing(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.dividingWhereOtherwiseF32(otherwise, mask.raw, a, b),
+                HighwayReference.dividingWhereOtherwiseF32(otherwise.raw, mask.raw, a.raw, b.raw),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -303,7 +323,7 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.dividing(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.dividingWhereOtherwiseF32(otherwise, mask.raw, a, b),
+                HighwayReference.dividingWhereOtherwiseF32(otherwise.raw, mask.raw, a.raw, b.raw),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -327,7 +347,13 @@ extension SIMDFloatReferenceTests {
         ) where !hasUnorderedNaNs(multiplying: a, b, adding: c) {
             mismatches.check(
                 H.multiplyAdding(a, b, c, where: mask, otherwise: otherwise),
-                HighwayReference.multiplyAddingWhereOtherwiseF32(otherwise, mask.raw, a, b, c),
+                HighwayReference.multiplyAddingWhereOtherwiseF32(
+                    otherwise.raw,
+                    mask.raw,
+                    a.raw,
+                    b.raw,
+                    c.raw
+                ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -353,7 +379,13 @@ extension SIMDFloatReferenceTests {
         ) where !hasUnorderedNaNs(multiplying: a, b, adding: c) {
             mismatches.check(
                 H.multiplyAdding(a, b, c, where: mask, otherwise: otherwise),
-                HighwayReference.multiplyAddingWhereOtherwiseF32(otherwise, mask.raw, a, b, c),
+                HighwayReference.multiplyAddingWhereOtherwiseF32(
+                    otherwise.raw,
+                    mask.raw,
+                    a.raw,
+                    b.raw,
+                    c.raw
+                ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -377,7 +409,13 @@ extension SIMDFloatReferenceTests {
         ) where !hasUnorderedNaNs(multiplying: a, b, adding: c) {
             mismatches.check(
                 H.multiplySubtracting(a, b, c, where: mask, otherwise: otherwise),
-                HighwayReference.multiplySubtractingWhereOtherwiseF32(otherwise, mask.raw, a, b, c),
+                HighwayReference.multiplySubtractingWhereOtherwiseF32(
+                    otherwise.raw,
+                    mask.raw,
+                    a.raw,
+                    b.raw,
+                    c.raw
+                ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -403,7 +441,13 @@ extension SIMDFloatReferenceTests {
         ) where !hasUnorderedNaNs(multiplying: a, b, adding: c) {
             mismatches.check(
                 H.multiplySubtracting(a, b, c, where: mask, otherwise: otherwise),
-                HighwayReference.multiplySubtractingWhereOtherwiseF32(otherwise, mask.raw, a, b, c),
+                HighwayReference.multiplySubtractingWhereOtherwiseF32(
+                    otherwise.raw,
+                    mask.raw,
+                    a.raw,
+                    b.raw,
+                    c.raw
+                ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -428,11 +472,11 @@ extension SIMDFloatReferenceTests {
             mismatches.check(
                 H.negatedMultiplyAdding(a, b, c, where: mask, otherwise: otherwise),
                 HighwayReference.negatedMultiplyAddingWhereOtherwiseF32(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    b,
-                    c
+                    a.raw,
+                    b.raw,
+                    c.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
@@ -460,11 +504,11 @@ extension SIMDFloatReferenceTests {
             mismatches.check(
                 H.negatedMultiplyAdding(a, b, c, where: mask, otherwise: otherwise),
                 HighwayReference.negatedMultiplyAddingWhereOtherwiseF32(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    b,
-                    c
+                    a.raw,
+                    b.raw,
+                    c.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
@@ -490,11 +534,11 @@ extension SIMDFloatReferenceTests {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, b, c, where: mask, otherwise: otherwise),
                 HighwayReference.negatedMultiplySubtractingWhereOtherwiseF32(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    b,
-                    c
+                    a.raw,
+                    b.raw,
+                    c.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
@@ -522,11 +566,11 @@ extension SIMDFloatReferenceTests {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, b, c, where: mask, otherwise: otherwise),
                 HighwayReference.negatedMultiplySubtractingWhereOtherwiseF32(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    b,
-                    c
+                    a.raw,
+                    b.raw,
+                    c.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )

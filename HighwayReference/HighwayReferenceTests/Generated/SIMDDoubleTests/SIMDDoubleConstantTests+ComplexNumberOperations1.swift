@@ -12,7 +12,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.complexConjugate(H.repeating(value)),
-            HighwayReference.complexConjugateF64(H.repeating(value)),
+            HighwayReference.complexConjugateF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -102,7 +102,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs where !hasUnorderedNaNs(complexLanesOf: H.repeating(value), b) {
             mismatches.check(
                 H.multiplyingComplex(H.repeating(value), b),
-                HighwayReference.multiplyingComplexF64(H.repeating(value), b),
+                HighwayReference.multiplyingComplexF64(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -117,7 +117,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs where !hasUnorderedNaNs(complexLanesOf: a, H.repeating(value)) {
             mismatches.check(
                 H.multiplyingComplex(a, H.repeating(value)),
-                HighwayReference.multiplyingComplexF64(a, H.repeating(value)),
+                HighwayReference.multiplyingComplexF64(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -227,7 +227,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs where !hasUnorderedNaNs(complexLanesOf: H.repeating(value), b) {
             mismatches.check(
                 H.multiplyingComplexConjugate(H.repeating(value), b),
-                HighwayReference.multiplyingComplexConjugateF64(H.repeating(value), b),
+                HighwayReference.multiplyingComplexConjugateF64(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -242,7 +242,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs where !hasUnorderedNaNs(complexLanesOf: a, H.repeating(value)) {
             mismatches.check(
                 H.multiplyingComplexConjugate(a, H.repeating(value)),
-                HighwayReference.multiplyingComplexConjugateF64(a, H.repeating(value)),
+                HighwayReference.multiplyingComplexConjugateF64(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -354,7 +354,7 @@ extension SIMDDoubleConstantTests {
         where !hasUnorderedNaNs(complexLanesOf: H.repeating(value), b, c) {
             mismatches.check(
                 H.multiplyAddingComplex(H.repeating(value), b, c),
-                HighwayReference.multiplyAddingComplexF64(H.repeating(value), b, c),
+                HighwayReference.multiplyAddingComplexF64(H.repeating(value).raw, b.raw, c.raw),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -371,7 +371,7 @@ extension SIMDDoubleConstantTests {
         where !hasUnorderedNaNs(complexLanesOf: a, H.repeating(value), c) {
             mismatches.check(
                 H.multiplyAddingComplex(a, H.repeating(value), c),
-                HighwayReference.multiplyAddingComplexF64(a, H.repeating(value), c),
+                HighwayReference.multiplyAddingComplexF64(a.raw, H.repeating(value).raw, c.raw),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -388,7 +388,7 @@ extension SIMDDoubleConstantTests {
         where !hasUnorderedNaNs(complexLanesOf: a, b, H.repeating(value)) {
             mismatches.check(
                 H.multiplyAddingComplex(a, b, H.repeating(value)),
-                HighwayReference.multiplyAddingComplexF64(a, b, H.repeating(value)),
+                HighwayReference.multiplyAddingComplexF64(a.raw, b.raw, H.repeating(value).raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -519,7 +519,11 @@ extension SIMDDoubleConstantTests {
         where !hasUnorderedNaNs(complexLanesOf: H.repeating(value), b, c) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(H.repeating(value), b, c),
-                HighwayReference.multiplyAddingComplexConjugateF64(H.repeating(value), b, c),
+                HighwayReference.multiplyAddingComplexConjugateF64(
+                    H.repeating(value).raw,
+                    b.raw,
+                    c.raw
+                ),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -536,7 +540,11 @@ extension SIMDDoubleConstantTests {
         where !hasUnorderedNaNs(complexLanesOf: a, H.repeating(value), c) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, H.repeating(value), c),
-                HighwayReference.multiplyAddingComplexConjugateF64(a, H.repeating(value), c),
+                HighwayReference.multiplyAddingComplexConjugateF64(
+                    a.raw,
+                    H.repeating(value).raw,
+                    c.raw
+                ),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -553,7 +561,11 @@ extension SIMDDoubleConstantTests {
         where !hasUnorderedNaNs(complexLanesOf: a, b, H.repeating(value)) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, b, H.repeating(value)),
-                HighwayReference.multiplyAddingComplexConjugateF64(a, b, H.repeating(value)),
+                HighwayReference.multiplyAddingComplexConjugateF64(
+                    a.raw,
+                    b.raw,
+                    H.repeating(value).raw
+                ),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -688,10 +700,10 @@ extension SIMDDoubleConstantTests {
             mismatches.check(
                 H.multiplyingComplex(a, b, where: mask, otherwise: H.repeating(value)),
                 HighwayReference.multiplyingComplexWhereOtherwiseF64(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     mask.raw,
-                    a,
-                    b
+                    a.raw,
+                    b.raw
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
@@ -717,10 +729,10 @@ extension SIMDDoubleConstantTests {
             mismatches.check(
                 H.multiplyingComplex(H.repeating(value), b, where: mask, otherwise: otherwise),
                 HighwayReference.multiplyingComplexWhereOtherwiseF64(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    H.repeating(value),
-                    b
+                    H.repeating(value).raw,
+                    b.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b))"
             )
@@ -746,10 +758,10 @@ extension SIMDDoubleConstantTests {
             mismatches.check(
                 H.multiplyingComplex(a, H.repeating(value), where: mask, otherwise: otherwise),
                 HighwayReference.multiplyingComplexWhereOtherwiseF64(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    H.repeating(value)
+                    a.raw,
+                    H.repeating(value).raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
             )
@@ -885,8 +897,8 @@ extension SIMDDoubleConstantTests {
                 H.multiplyingComplexConjugate(H.repeating(value), b, where: mask),
                 HighwayReference.multiplyingComplexConjugateWhereF64(
                     mask.raw,
-                    H.repeating(value),
-                    b
+                    H.repeating(value).raw,
+                    b.raw
                 ),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
@@ -908,8 +920,8 @@ extension SIMDDoubleConstantTests {
                 H.multiplyingComplexConjugate(a, H.repeating(value), where: mask),
                 HighwayReference.multiplyingComplexConjugateWhereF64(
                     mask.raw,
-                    a,
-                    H.repeating(value)
+                    a.raw,
+                    H.repeating(value).raw
                 ),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )

@@ -24,7 +24,7 @@ extension SIMDFloat16ConstantTests {
         for indices in indicesInputs {
             mismatches.check(
                 H.tableLookupLanes(H.repeating(value), at: indices),
-                HighwayReference.tableLookupLanesF16(H.repeating(value), indices.raw),
+                HighwayReference.tableLookupLanesF16(H.repeating(value).raw, indices.raw),
                 "indices: \(describe(indices))"
             )
         }
@@ -125,7 +125,11 @@ extension SIMDFloat16ConstantTests {
         for (b, indices) in everyPair(bInputs, indicesInputs) {
             mismatches.check(
                 H.twoTablesLookupLanes(H.repeating(value), b, at: indices),
-                HighwayReference.twoTablesLookupLanesF16(H.repeating(value), b, indices.raw),
+                HighwayReference.twoTablesLookupLanesF16(
+                    H.repeating(value).raw,
+                    b.raw,
+                    indices.raw
+                ),
                 "b: \(describe(b)), indices: \(describe(indices))"
             )
         }
@@ -150,7 +154,11 @@ extension SIMDFloat16ConstantTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 H.twoTablesLookupLanes(a, H.repeating(value), at: indices),
-                HighwayReference.twoTablesLookupLanesF16(a, H.repeating(value), indices.raw),
+                HighwayReference.twoTablesLookupLanesF16(
+                    a.raw,
+                    H.repeating(value).raw,
+                    indices.raw
+                ),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -274,7 +282,7 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.shuffledPer4Lanes(H.repeating(value), i3, i2, i1, i0),
                 HighwayReference.shuffledPer4LanesF16(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: i3),
                     Int32(truncatingIfNeeded: i2),
                     Int32(truncatingIfNeeded: i1),

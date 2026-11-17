@@ -15,7 +15,7 @@ extension SIMDDoubleReferenceTests {
         {
             mismatches.check(
                 H.selecting(mask, a, b),
-                HighwayReference.selectingF64(mask.raw, a, b),
+                HighwayReference.selectingF64(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -31,7 +31,7 @@ extension SIMDDoubleReferenceTests {
         {
             mismatches.check(
                 H.selecting(mask, a, b),
-                HighwayReference.selectingF64(mask.raw, a, b),
+                HighwayReference.selectingF64(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -45,7 +45,7 @@ extension SIMDDoubleReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.selectingOrZero(mask, a),
-                HighwayReference.selectingOrZeroF64(mask.raw, a),
+                HighwayReference.selectingOrZeroF64(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -59,7 +59,7 @@ extension SIMDDoubleReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.selectingOrZero(mask, a),
-                HighwayReference.selectingOrZeroF64(mask.raw, a),
+                HighwayReference.selectingOrZeroF64(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -73,7 +73,7 @@ extension SIMDDoubleReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.zeroingSelected(mask, a),
-                HighwayReference.zeroingSelectedF64(mask.raw, a),
+                HighwayReference.zeroingSelectedF64(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -87,7 +87,7 @@ extension SIMDDoubleReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.zeroingSelected(mask, a),
-                HighwayReference.zeroingSelectedF64(mask.raw, a),
+                HighwayReference.zeroingSelectedF64(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -102,7 +102,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x9439_9516_7849_38F3) {
             mismatches.check(
                 H.selecting(a, b, c),
-                HighwayReference.selectingByVectorF64(a, b, c),
+                HighwayReference.selectingByVectorF64(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }

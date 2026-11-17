@@ -17,7 +17,7 @@ extension SIMDInt64ConstantTests {
         )
         let port = H.vector(resizing: SIMDFloat16.repeating(value))
         let reference = H.Vector(
-            raw: HighwayReference.vectorResizingF16ToI64(SIMDFloat16.repeating(value))
+            raw: HighwayReference.vectorResizingF16ToI64(SIMDFloat16.repeating(value).raw)
         )
         let definedBytes = SIMDFloat16.laneCount * MemoryLayout<SIMDFloat16.Lane>.stride
         let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
@@ -161,7 +161,7 @@ extension SIMDInt64ConstantTests {
         )
         let port = H.halfVector(resizing: SIMDFloat16.repeating(value))
         let reference = H.HalfVector(
-            raw: HighwayReference.halfVectorResizingF16ToI64(SIMDFloat16.repeating(value))
+            raw: HighwayReference.halfVectorResizingF16ToI64(SIMDFloat16.repeating(value).raw)
         )
         let definedBytes = SIMDFloat16.laneCount * MemoryLayout<SIMDFloat16.Lane>.stride
         let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
@@ -762,7 +762,7 @@ extension SIMDInt64ConstantTests {
             H.vector(zeroExtendingResizing: SIMDFloat.repeating(value)),
             H.Vector(
                 raw: HighwayReference.vectorZeroExtendingResizingF32ToI64(
-                    SIMDFloat.repeating(value)
+                    SIMDFloat.repeating(value).raw
                 )
             ),
             ""
@@ -860,7 +860,7 @@ extension SIMDInt64ConstantTests {
             H.halfVector(zeroExtendingResizing: SIMDFloat.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorZeroExtendingResizingF32ToI64(
-                    SIMDFloat.repeating(value)
+                    SIMDFloat.repeating(value).raw
                 )
             ),
             ""
@@ -960,7 +960,7 @@ extension SIMDInt64ConstantTests {
             H.vector(zeroExtendingResizing: SIMDDouble.repeating(value)),
             H.Vector(
                 raw: HighwayReference.vectorZeroExtendingResizingF64ToI64(
-                    SIMDDouble.repeating(value)
+                    SIMDDouble.repeating(value).raw
                 )
             ),
             ""
@@ -1060,7 +1060,7 @@ extension SIMDInt64ConstantTests {
             H.halfVector(zeroExtendingResizing: SIMDDouble.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorZeroExtendingResizingF64ToI64(
-                    SIMDDouble.repeating(value)
+                    SIMDDouble.repeating(value).raw
                 )
             ),
             ""

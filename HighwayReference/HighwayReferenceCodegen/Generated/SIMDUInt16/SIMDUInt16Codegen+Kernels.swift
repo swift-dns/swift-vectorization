@@ -4,12 +4,12 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portNoneAboveU16(_ v: SIMDUInt16.Vector) -> Bool {
+public func portNoneAboveU16(_ v: SIMD<UInt16>) -> Bool {
     SIMDUInt16.allFalse(SIMDUInt16.greaterThan(v, SIMDUInt16.repeating(26)))
 }
 
 @inline(never)
-public func highwayNoneAboveU16(_ v: SIMDUInt16.Vector) -> Bool {
+public func highwayNoneAboveU16(_ v: SIMD<UInt16>) -> Bool {
     HighwayReference.Nothrow.allFalseU16(
         SIMDUInt16.Mask(
             raw: HighwayReference.Nothrow.greaterThanU16(
@@ -22,13 +22,10 @@ public func highwayNoneAboveU16(_ v: SIMDUInt16.Vector) -> Bool {
 
 @available(SwiftStdlib 5.1, *)
 @inline(never)
-public func portSumAboveSpanU16(
-    above t: SIMDUInt16.Lane,
-    in values: Span<SIMDUInt16.Lane>
-) -> SIMDUInt16.Lane {
+public func portSumAboveSpanU16(above t: UInt16, in values: Span<UInt16>) -> UInt16 {
     let laneCount = SIMDUInt16.laneCount
     let threshold = SIMDUInt16.repeating(t)
-    var total: SIMDUInt16.Lane = 0
+    var total: UInt16 = 0
     var remainingValuesSpan = values
     while remainingValuesSpan.count >= laneCount {
         let loaded = SIMDUInt16.load(from: remainingValuesSpan)
@@ -65,9 +62,9 @@ public func highwaySumAboveSpanU16(above t: UInt16, in values: Span<UInt16>) -> 
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portCountEqualAboveSpanU16(
-    above t: SIMDUInt16.Lane,
-    in values: Span<SIMDUInt16.Lane>,
-    matching others: Span<SIMDUInt16.Lane>
+    above t: UInt16,
+    in values: Span<UInt16>,
+    matching others: Span<UInt16>
 ) -> Int {
     let laneCount = SIMDUInt16.laneCount
     let threshold = SIMDUInt16.repeating(t)
@@ -128,9 +125,9 @@ public func highwayCountEqualAboveSpanU16(
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portClampAboveSpanU16(
-    atMost t: SIMDUInt16.Lane,
-    in values: Span<SIMDUInt16.Lane>,
-    into output: inout MutableSpan<SIMDUInt16.Lane>
+    atMost t: UInt16,
+    in values: Span<UInt16>,
+    into output: inout MutableSpan<UInt16>
 ) -> Int {
     let laneCount = SIMDUInt16.laneCount
     let limit = SIMDUInt16.repeating(t)
@@ -194,9 +191,9 @@ public func highwayClampAboveSpanU16(
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portSelectBelowSpanU16(
-    below t: SIMDUInt16.Lane,
-    in values: Span<SIMDUInt16.Lane>,
-    into output: inout MutableSpan<SIMDUInt16.Lane>
+    below t: UInt16,
+    in values: Span<UInt16>,
+    into output: inout MutableSpan<UInt16>
 ) -> Int {
     let laneCount = SIMDUInt16.laneCount
     let threshold = SIMDUInt16.repeating(t)

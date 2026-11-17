@@ -4,22 +4,22 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portMinimumI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portMinimumI8(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.minimum(a, b)
 }
 
 @inline(never)
-public func highwayMinimumI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayMinimumI8(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(raw: HighwayReference.Nothrow.minimumI8(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMinimumI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portMinimumI8ConstantA(_ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.minimum(SIMDInt8.repeating(26), b)
 }
 
 @inline(never)
-public func highwayMinimumI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayMinimumI8ConstantA(_ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.minimumI8(
             SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
@@ -29,12 +29,12 @@ public func highwayMinimumI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func portMinimumI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portMinimumI8ConstantB(_ a: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.minimum(a, SIMDInt8.repeating(26))
 }
 
 @inline(never)
-public func highwayMinimumI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayMinimumI8ConstantB(_ a: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.minimumI8(
             a.raw,
@@ -44,22 +44,22 @@ public func highwayMinimumI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func portMaximumI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portMaximumI8(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.maximum(a, b)
 }
 
 @inline(never)
-public func highwayMaximumI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayMaximumI8(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(raw: HighwayReference.Nothrow.maximumI8(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMaximumI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portMaximumI8ConstantA(_ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.maximum(SIMDInt8.repeating(26), b)
 }
 
 @inline(never)
-public func highwayMaximumI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayMaximumI8ConstantA(_ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.maximumI8(
             SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
@@ -69,12 +69,12 @@ public func highwayMaximumI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func portMaximumI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portMaximumI8ConstantB(_ a: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.maximum(a, SIMDInt8.repeating(26))
 }
 
 @inline(never)
-public func highwayMaximumI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayMaximumI8ConstantB(_ a: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.maximumI8(
             a.raw,
@@ -84,22 +84,22 @@ public func highwayMaximumI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func portMinimumNumberI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portMinimumNumberI8(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.minimumNumber(a, b)
 }
 
 @inline(never)
-public func highwayMinimumNumberI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayMinimumNumberI8(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(raw: HighwayReference.Nothrow.minimumNumberI8(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMinimumNumberI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portMinimumNumberI8ConstantA(_ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.minimumNumber(SIMDInt8.repeating(26), b)
 }
 
 @inline(never)
-public func highwayMinimumNumberI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayMinimumNumberI8ConstantA(_ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.minimumNumberI8(
             SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
@@ -109,12 +109,12 @@ public func highwayMinimumNumberI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Ve
 }
 
 @inline(never)
-public func portMinimumNumberI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portMinimumNumberI8ConstantB(_ a: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.minimumNumber(a, SIMDInt8.repeating(26))
 }
 
 @inline(never)
-public func highwayMinimumNumberI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayMinimumNumberI8ConstantB(_ a: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.minimumNumberI8(
             a.raw,
@@ -124,22 +124,22 @@ public func highwayMinimumNumberI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Ve
 }
 
 @inline(never)
-public func portMaximumNumberI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portMaximumNumberI8(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.maximumNumber(a, b)
 }
 
 @inline(never)
-public func highwayMaximumNumberI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayMaximumNumberI8(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(raw: HighwayReference.Nothrow.maximumNumberI8(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMaximumNumberI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portMaximumNumberI8ConstantA(_ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.maximumNumber(SIMDInt8.repeating(26), b)
 }
 
 @inline(never)
-public func highwayMaximumNumberI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayMaximumNumberI8ConstantA(_ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.maximumNumberI8(
             SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
@@ -149,12 +149,12 @@ public func highwayMaximumNumberI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Ve
 }
 
 @inline(never)
-public func portMaximumNumberI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portMaximumNumberI8ConstantB(_ a: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.maximumNumber(a, SIMDInt8.repeating(26))
 }
 
 @inline(never)
-public func highwayMaximumNumberI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayMaximumNumberI8ConstantB(_ a: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.maximumNumberI8(
             a.raw,
@@ -164,23 +164,22 @@ public func highwayMaximumNumberI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Ve
 }
 
 @inline(never)
-public func portMinimumMagnitudeI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portMinimumMagnitudeI8(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.minimumMagnitude(a, b)
 }
 
 @inline(never)
-public func highwayMinimumMagnitudeI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Vector
-{
+public func highwayMinimumMagnitudeI8(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(raw: HighwayReference.Nothrow.minimumMagnitudeI8(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMinimumMagnitudeI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portMinimumMagnitudeI8ConstantA(_ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.minimumMagnitude(SIMDInt8.repeating(26), b)
 }
 
 @inline(never)
-public func highwayMinimumMagnitudeI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayMinimumMagnitudeI8ConstantA(_ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.minimumMagnitudeI8(
             SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
@@ -190,12 +189,12 @@ public func highwayMinimumMagnitudeI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8
 }
 
 @inline(never)
-public func portMinimumMagnitudeI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portMinimumMagnitudeI8ConstantB(_ a: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.minimumMagnitude(a, SIMDInt8.repeating(26))
 }
 
 @inline(never)
-public func highwayMinimumMagnitudeI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayMinimumMagnitudeI8ConstantB(_ a: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.minimumMagnitudeI8(
             a.raw,
@@ -205,23 +204,22 @@ public func highwayMinimumMagnitudeI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8
 }
 
 @inline(never)
-public func portMaximumMagnitudeI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portMaximumMagnitudeI8(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.maximumMagnitude(a, b)
 }
 
 @inline(never)
-public func highwayMaximumMagnitudeI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Vector
-{
+public func highwayMaximumMagnitudeI8(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(raw: HighwayReference.Nothrow.maximumMagnitudeI8(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMaximumMagnitudeI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portMaximumMagnitudeI8ConstantA(_ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.maximumMagnitude(SIMDInt8.repeating(26), b)
 }
 
 @inline(never)
-public func highwayMaximumMagnitudeI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayMaximumMagnitudeI8ConstantA(_ b: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.maximumMagnitudeI8(
             SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
@@ -231,12 +229,12 @@ public func highwayMaximumMagnitudeI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8
 }
 
 @inline(never)
-public func portMaximumMagnitudeI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func portMaximumMagnitudeI8ConstantB(_ a: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.maximumMagnitude(a, SIMDInt8.repeating(26))
 }
 
 @inline(never)
-public func highwayMaximumMagnitudeI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+public func highwayMaximumMagnitudeI8ConstantB(_ a: SIMD<Int8>) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.maximumMagnitudeI8(
             a.raw,

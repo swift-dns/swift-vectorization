@@ -14,7 +14,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.minimum(a, b),
-                HighwayReference.minimumF16(a, b),
+                HighwayReference.minimumF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -28,7 +28,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.maximum(a, b),
-                HighwayReference.maximumF16(a, b),
+                HighwayReference.maximumF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -42,7 +42,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.minimumNumber(a, b),
-                HighwayReference.minimumNumberF16(a, b),
+                HighwayReference.minimumNumberF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -56,7 +56,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.maximumNumber(a, b),
-                HighwayReference.maximumNumberF16(a, b),
+                HighwayReference.maximumNumberF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -70,7 +70,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.minimumMagnitude(a, b),
-                HighwayReference.minimumMagnitudeF16(a, b),
+                HighwayReference.minimumMagnitudeF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -84,7 +84,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.maximumMagnitude(a, b),
-                HighwayReference.maximumMagnitudeF16(a, b),
+                HighwayReference.maximumMagnitudeF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

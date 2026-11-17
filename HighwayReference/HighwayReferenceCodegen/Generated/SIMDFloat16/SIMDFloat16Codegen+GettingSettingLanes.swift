@@ -5,17 +5,17 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portFirstLaneF16(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Lane {
+public func portFirstLaneF16(_ a: SIMD<Float16>) -> Float16 {
     SIMDFloat16.firstLane(a)
 }
 
 @inline(never)
-public func highwayFirstLaneF16(_ a: SIMDFloat16.Vector) -> Float16 {
-    Float16(bitPattern: HighwayReference.Nothrow.firstLaneF16(a))
+public func highwayFirstLaneF16(_ a: SIMD<Float16>) -> Float16 {
+    Float16(bitPattern: HighwayReference.Nothrow.firstLaneF16(a.raw))
 }
 
 @inline(never)
-public func portFirstLaneF16ConstantA() -> SIMDFloat16.Lane {
+public func portFirstLaneF16ConstantA() -> Float16 {
     SIMDFloat16.firstLane(SIMDFloat16.repeating(Float16(bitPattern: 26)))
 }
 
@@ -23,23 +23,23 @@ public func portFirstLaneF16ConstantA() -> SIMDFloat16.Lane {
 public func highwayFirstLaneF16ConstantA() -> Float16 {
     Float16(
         bitPattern: HighwayReference.Nothrow.firstLaneF16(
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
         )
     )
 }
 
 @inline(never)
-public func portLaneF16(_ a: SIMDFloat16.Vector, atUnchecked index: Int) -> SIMDFloat16.Lane {
+public func portLaneF16(_ a: SIMD<Float16>, atUnchecked index: Int) -> Float16 {
     unsafe SIMDFloat16.lane(a, atUnchecked: index)
 }
 
 @inline(never)
-public func highwayLaneF16(_ a: SIMDFloat16.Vector, atUnchecked index: Int) -> Float16 {
-    Float16(bitPattern: HighwayReference.Nothrow.laneF16(a, index))
+public func highwayLaneF16(_ a: SIMD<Float16>, atUnchecked index: Int) -> Float16 {
+    Float16(bitPattern: HighwayReference.Nothrow.laneF16(a.raw, index))
 }
 
 @inline(never)
-public func portLaneF16ConstantA(atUnchecked index: Int) -> SIMDFloat16.Lane {
+public func portLaneF16ConstantA(atUnchecked index: Int) -> Float16 {
     unsafe SIMDFloat16.lane(SIMDFloat16.repeating(Float16(bitPattern: 26)), atUnchecked: index)
 }
 
@@ -47,45 +47,45 @@ public func portLaneF16ConstantA(atUnchecked index: Int) -> SIMDFloat16.Lane {
 public func highwayLaneF16ConstantA(atUnchecked index: Int) -> Float16 {
     Float16(
         bitPattern: HighwayReference.Nothrow.laneF16(
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
+            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
             index
         )
     )
 }
 
 @inline(never)
-public func portLaneF16ConstantIndex(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Lane {
+public func portLaneF16ConstantIndex(_ a: SIMD<Float16>) -> Float16 {
     unsafe SIMDFloat16.lane(a, atUnchecked: 1)
 }
 
 @inline(never)
-public func highwayLaneF16ConstantIndex(_ a: SIMDFloat16.Vector) -> Float16 {
-    Float16(bitPattern: HighwayReference.Nothrow.laneF16(a, 1))
+public func highwayLaneF16ConstantIndex(_ a: SIMD<Float16>) -> Float16 {
+    Float16(bitPattern: HighwayReference.Nothrow.laneF16(a.raw, 1))
 }
 
 @inline(never)
 public func portReplacingLaneF16(
-    _ a: SIMDFloat16.Vector,
+    _ a: SIMD<Float16>,
     atUnchecked index: Int,
-    with value: SIMDFloat16.Lane
-) -> SIMDFloat16.Vector {
+    with value: Float16
+) -> SIMD<Float16> {
     unsafe SIMDFloat16.replacingLane(a, atUnchecked: index, with: value)
 }
 
 @inline(never)
 public func highwayReplacingLaneF16(
-    _ a: SIMDFloat16.Vector,
+    _ a: SIMD<Float16>,
     atUnchecked index: Int,
     with value: Float16
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.replacingLaneF16(a, index, value.bitPattern)
+) -> SIMD<Float16> {
+    HighwayReference.Nothrow.replacingLaneF16(a.raw, index, value.bitPattern)
 }
 
 @inline(never)
 public func portReplacingLaneF16ConstantA(
     atUnchecked index: Int,
-    with value: SIMDFloat16.Lane
-) -> SIMDFloat16.Vector {
+    with value: Float16
+) -> SIMD<Float16> {
     unsafe SIMDFloat16.replacingLane(
         SIMDFloat16.repeating(Float16(bitPattern: 26)),
         atUnchecked: index,
@@ -97,9 +97,9 @@ public func portReplacingLaneF16ConstantA(
 public func highwayReplacingLaneF16ConstantA(
     atUnchecked index: Int,
     with value: Float16
-) -> SIMDFloat16.Vector {
+) -> SIMD<Float16> {
     HighwayReference.Nothrow.replacingLaneF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
         index,
         value.bitPattern
     )
@@ -107,33 +107,33 @@ public func highwayReplacingLaneF16ConstantA(
 
 @inline(never)
 public func portReplacingLaneF16ConstantIndex(
-    _ a: SIMDFloat16.Vector,
-    with value: SIMDFloat16.Lane
-) -> SIMDFloat16.Vector {
+    _ a: SIMD<Float16>,
+    with value: Float16
+) -> SIMD<Float16> {
     unsafe SIMDFloat16.replacingLane(a, atUnchecked: 1, with: value)
 }
 
 @inline(never)
 public func highwayReplacingLaneF16ConstantIndex(
-    _ a: SIMDFloat16.Vector,
+    _ a: SIMD<Float16>,
     with value: Float16
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.replacingLaneF16(a, 1, value.bitPattern)
+) -> SIMD<Float16> {
+    HighwayReference.Nothrow.replacingLaneF16(a.raw, 1, value.bitPattern)
 }
 
 @inline(never)
 public func portReplacingLaneF16ConstantValue(
-    _ a: SIMDFloat16.Vector,
+    _ a: SIMD<Float16>,
     atUnchecked index: Int
-) -> SIMDFloat16.Vector {
+) -> SIMD<Float16> {
     unsafe SIMDFloat16.replacingLane(a, atUnchecked: index, with: Float16(bitPattern: 26))
 }
 
 @inline(never)
 public func highwayReplacingLaneF16ConstantValue(
-    _ a: SIMDFloat16.Vector,
+    _ a: SIMD<Float16>,
     atUnchecked index: Int
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.replacingLaneF16(a, index, Float16(bitPattern: 26).bitPattern)
+) -> SIMD<Float16> {
+    HighwayReference.Nothrow.replacingLaneF16(a.raw, index, Float16(bitPattern: 26).bitPattern)
 }
 #endif

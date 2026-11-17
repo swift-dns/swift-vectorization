@@ -14,7 +14,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             let port = H.create2(H.repeating(value), b)
             let reference = { tuple in (tuple.v0, tuple.v1) }(
-                HighwayReference.create2F64(H.repeating(value), b)
+                HighwayReference.create2F64(H.repeating(value).raw, b.raw)
             )
             mismatches.check(port.0, reference.0, "b: \(describe(b))")
             mismatches.check(port.1, reference.1, "b: \(describe(b))")
@@ -30,7 +30,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             let port = H.create2(a, H.repeating(value))
             let reference = { tuple in (tuple.v0, tuple.v1) }(
-                HighwayReference.create2F64(a, H.repeating(value))
+                HighwayReference.create2F64(a.raw, H.repeating(value).raw)
             )
             mismatches.check(port.0, reference.0, "a: \(describe(a))")
             mismatches.check(port.1, reference.1, "a: \(describe(a))")
@@ -145,9 +145,9 @@ extension SIMDDoubleConstantTests {
             let port = H.set2(tuple, at: index, to: H.repeating(value))
             let reference = { tuple in (tuple.v0, tuple.v1) }(
                 HighwayReference.set2F64(
-                    cvectorization_ops_tuple2_f64(v0: tuple.0, v1: tuple.1),
+                    cvectorization_ops_tuple2_f64(v0: tuple.0.raw, v1: tuple.1.raw),
                     index,
-                    H.repeating(value)
+                    H.repeating(value).raw
                 )
             )
             mismatches.check(
@@ -249,7 +249,7 @@ extension SIMDDoubleConstantTests {
         for (b, c) in everyPair(bInputs, cInputs) {
             let port = H.create3(H.repeating(value), b, c)
             let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
-                HighwayReference.create3F64(H.repeating(value), b, c)
+                HighwayReference.create3F64(H.repeating(value).raw, b.raw, c.raw)
             )
             mismatches.check(port.0, reference.0, "b: \(describe(b)), c: \(describe(c))")
             mismatches.check(port.1, reference.1, "b: \(describe(b)), c: \(describe(c))")
@@ -267,7 +267,7 @@ extension SIMDDoubleConstantTests {
         for (a, c) in everyPair(aInputs, cInputs) {
             let port = H.create3(a, H.repeating(value), c)
             let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
-                HighwayReference.create3F64(a, H.repeating(value), c)
+                HighwayReference.create3F64(a.raw, H.repeating(value).raw, c.raw)
             )
             mismatches.check(port.0, reference.0, "a: \(describe(a)), c: \(describe(c))")
             mismatches.check(port.1, reference.1, "a: \(describe(a)), c: \(describe(c))")
@@ -285,7 +285,7 @@ extension SIMDDoubleConstantTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             let port = H.create3(a, b, H.repeating(value))
             let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
-                HighwayReference.create3F64(a, b, H.repeating(value))
+                HighwayReference.create3F64(a.raw, b.raw, H.repeating(value).raw)
             )
             mismatches.check(port.0, reference.0, "a: \(describe(a)), b: \(describe(b))")
             mismatches.check(port.1, reference.1, "a: \(describe(a)), b: \(describe(b))")
@@ -420,9 +420,13 @@ extension SIMDDoubleConstantTests {
             let port = H.set3(tuple, at: index, to: H.repeating(value))
             let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
                 HighwayReference.set3F64(
-                    cvectorization_ops_tuple3_f64(v0: tuple.0, v1: tuple.1, v2: tuple.2),
+                    cvectorization_ops_tuple3_f64(
+                        v0: tuple.0.raw,
+                        v1: tuple.1.raw,
+                        v2: tuple.2.raw
+                    ),
                     index,
-                    H.repeating(value)
+                    H.repeating(value).raw
                 )
             )
             mismatches.check(
@@ -530,7 +534,7 @@ extension SIMDDoubleConstantTests {
         for (b, c, d) in mixedTriples(bInputs, cInputs, dInputs, seed: 0xB69C_3687_F449_3D08) {
             let port = H.create4(H.repeating(value), b, c, d)
             let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
-                HighwayReference.create4F64(H.repeating(value), b, c, d)
+                HighwayReference.create4F64(H.repeating(value).raw, b.raw, c.raw, d.raw)
             )
             mismatches.check(
                 port.0,
@@ -566,7 +570,7 @@ extension SIMDDoubleConstantTests {
         for (a, c, d) in mixedTriples(aInputs, cInputs, dInputs, seed: 0xA012_0FB0_1348_4183) {
             let port = H.create4(a, H.repeating(value), c, d)
             let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
-                HighwayReference.create4F64(a, H.repeating(value), c, d)
+                HighwayReference.create4F64(a.raw, H.repeating(value).raw, c.raw, d.raw)
             )
             mismatches.check(
                 port.0,
@@ -602,7 +606,7 @@ extension SIMDDoubleConstantTests {
         for (a, b, d) in mixedTriples(aInputs, bInputs, dInputs, seed: 0x7229_8D63_FDFA_505A) {
             let port = H.create4(a, b, H.repeating(value), d)
             let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
-                HighwayReference.create4F64(a, b, H.repeating(value), d)
+                HighwayReference.create4F64(a.raw, b.raw, H.repeating(value).raw, d.raw)
             )
             mismatches.check(
                 port.0,
@@ -638,7 +642,7 @@ extension SIMDDoubleConstantTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x5494_E3BA_BF04_2F35) {
             let port = H.create4(a, b, c, H.repeating(value))
             let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
-                HighwayReference.create4F64(a, b, c, H.repeating(value))
+                HighwayReference.create4F64(a.raw, b.raw, c.raw, H.repeating(value).raw)
             )
             mismatches.check(
                 port.0,
@@ -810,13 +814,13 @@ extension SIMDDoubleConstantTests {
             let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
                 HighwayReference.set4F64(
                     cvectorization_ops_tuple4_f64(
-                        v0: tuple.0,
-                        v1: tuple.1,
-                        v2: tuple.2,
-                        v3: tuple.3
+                        v0: tuple.0.raw,
+                        v1: tuple.1.raw,
+                        v2: tuple.2.raw,
+                        v3: tuple.3.raw
                     ),
                     index,
-                    H.repeating(value)
+                    H.repeating(value).raw
                 )
             )
             mismatches.check(

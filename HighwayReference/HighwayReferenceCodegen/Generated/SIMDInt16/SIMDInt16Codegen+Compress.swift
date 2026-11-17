@@ -7,7 +7,7 @@ extension HighwayReferenceInt16 {
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
     public static func storeCompressed(
-        _ a: Vector,
+        _ a: SIMD,
         where mask: Mask,
         to span: inout MutableSpan<Lane>
     ) -> Int {
@@ -18,7 +18,7 @@ extension HighwayReferenceInt16 {
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
     public static func storeCompressed(
-        _ a: Vector,
+        _ a: SIMD,
         where mask: Mask,
         toUnchecked span: inout MutableSpan<Lane>
     ) -> Int {
@@ -35,7 +35,7 @@ extension HighwayReferenceInt16 {
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
     public static func storeCompressedBlended(
-        _ a: Vector,
+        _ a: SIMD,
         where mask: Mask,
         to span: inout MutableSpan<Lane>
     ) -> Int {
@@ -46,7 +46,7 @@ extension HighwayReferenceInt16 {
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
     public static func storeCompressedBlended(
-        _ a: Vector,
+        _ a: SIMD,
         where mask: Mask,
         toUnchecked span: inout MutableSpan<Lane>
     ) -> Int {
@@ -62,14 +62,14 @@ extension HighwayReferenceInt16 {
 
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
-    public static func compressed(_ a: Vector, bits span: Span<UInt8>) -> Vector {
+    public static func compressed(_ a: SIMD, bits span: Span<UInt8>) -> SIMD {
         precondition(span.count >= (laneCount + 7) / 8, "Span has fewer bytes than a mask has bits")
         return unsafe compressed(a, bitsUnchecked: span)
     }
 
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
-    public static func compressed(_ a: Vector, bitsUnchecked span: Span<UInt8>) -> Vector {
+    public static func compressed(_ a: SIMD, bitsUnchecked span: Span<UInt8>) -> SIMD {
         assert(span.count >= (laneCount + 7) / 8, "Span has fewer bytes than a mask has bits")
         return span.withUnsafeBufferPointer {
             unsafe SIMDInt16.Vector(
@@ -84,7 +84,7 @@ extension HighwayReferenceInt16 {
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
     public static func storeCompressed(
-        _ a: Vector,
+        _ a: SIMD,
         bits: Span<UInt8>,
         to: inout MutableSpan<Lane>
     ) -> Int {
@@ -96,7 +96,7 @@ extension HighwayReferenceInt16 {
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
     public static func storeCompressed(
-        _ a: Vector,
+        _ a: SIMD,
         bitsUnchecked bits: Span<UInt8>,
         toUnchecked to: inout MutableSpan<Lane>
     ) -> Int {
@@ -116,26 +116,22 @@ extension HighwayReferenceInt16 {
 }
 
 @inline(never)
-public func portCompressedI16(_ a: SIMDInt16.Vector, where mask: SIMDInt16.Mask) -> SIMDInt16.Vector
-{
+public func portCompressedI16(_ a: SIMD<Int16>, where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
     SIMDInt16.compressed(a, where: mask)
 }
 
 @inline(never)
-public func highwayCompressedI16(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+public func highwayCompressedI16(_ a: SIMD<Int16>, where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.compressedI16(a.raw, mask.raw))
 }
 
 @inline(never)
-public func portCompressedI16ConstantA(where mask: SIMDInt16.Mask) -> SIMDInt16.Vector {
+public func portCompressedI16ConstantA(where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
     SIMDInt16.compressed(SIMDInt16.repeating(26), where: mask)
 }
 
 @inline(never)
-public func highwayCompressedI16ConstantA(where mask: SIMDInt16.Mask) -> SIMDInt16.Vector {
+public func highwayCompressedI16ConstantA(where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.compressedI16(
             SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
@@ -145,28 +141,22 @@ public func highwayCompressedI16ConstantA(where mask: SIMDInt16.Mask) -> SIMDInt
 }
 
 @inline(never)
-public func portCompressedNotI16(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+public func portCompressedNotI16(_ a: SIMD<Int16>, where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
     SIMDInt16.compressedNot(a, where: mask)
 }
 
 @inline(never)
-public func highwayCompressedNotI16(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+public func highwayCompressedNotI16(_ a: SIMD<Int16>, where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.compressedNotI16(a.raw, mask.raw))
 }
 
 @inline(never)
-public func portCompressedNotI16ConstantA(where mask: SIMDInt16.Mask) -> SIMDInt16.Vector {
+public func portCompressedNotI16ConstantA(where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
     SIMDInt16.compressedNot(SIMDInt16.repeating(26), where: mask)
 }
 
 @inline(never)
-public func highwayCompressedNotI16ConstantA(where mask: SIMDInt16.Mask) -> SIMDInt16.Vector {
+public func highwayCompressedNotI16ConstantA(where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.compressedNotI16(
             SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
@@ -176,28 +166,22 @@ public func highwayCompressedNotI16ConstantA(where mask: SIMDInt16.Mask) -> SIMD
 }
 
 @inline(never)
-public func portPartitionedI16(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+public func portPartitionedI16(_ a: SIMD<Int16>, where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
     SIMDInt16.partitioned(a, where: mask)
 }
 
 @inline(never)
-public func highwayPartitionedI16(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+public func highwayPartitionedI16(_ a: SIMD<Int16>, where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.partitionedI16(a.raw, mask.raw))
 }
 
 @inline(never)
-public func portPartitionedI16ConstantA(where mask: SIMDInt16.Mask) -> SIMDInt16.Vector {
+public func portPartitionedI16ConstantA(where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
     SIMDInt16.partitioned(SIMDInt16.repeating(26), where: mask)
 }
 
 @inline(never)
-public func highwayPartitionedI16ConstantA(where mask: SIMDInt16.Mask) -> SIMDInt16.Vector {
+public func highwayPartitionedI16ConstantA(where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.partitionedI16(
             SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
@@ -208,17 +192,17 @@ public func highwayPartitionedI16ConstantA(where mask: SIMDInt16.Mask) -> SIMDIn
 
 @inline(never)
 public func portStoreCompressedI16(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask,
-    to: UnsafeMutablePointer<SIMDInt16.Lane>
+    _ a: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask,
+    to: UnsafeMutablePointer<Int16>
 ) -> Int {
     unsafe SIMDInt16.storeCompressed(a, where: mask, to: to)
 }
 
 @inline(never)
 public func highwayStoreCompressedI16(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask,
+    _ a: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask,
     to: UnsafeMutablePointer<Int16>
 ) -> Int {
     unsafe HighwayReference.Nothrow.storeCompressedI16(a.raw, mask.raw, to)
@@ -226,15 +210,15 @@ public func highwayStoreCompressedI16(
 
 @inline(never)
 public func portStoreCompressedI16ConstantA(
-    where mask: SIMDInt16.Mask,
-    to: UnsafeMutablePointer<SIMDInt16.Lane>
+    where mask: SIMD<Int16>.Mask,
+    to: UnsafeMutablePointer<Int16>
 ) -> Int {
     unsafe SIMDInt16.storeCompressed(SIMDInt16.repeating(26), where: mask, to: to)
 }
 
 @inline(never)
 public func highwayStoreCompressedI16ConstantA(
-    where mask: SIMDInt16.Mask,
+    where mask: SIMD<Int16>.Mask,
     to: UnsafeMutablePointer<Int16>
 ) -> Int {
     unsafe HighwayReference.Nothrow.storeCompressedI16(
@@ -246,17 +230,17 @@ public func highwayStoreCompressedI16ConstantA(
 
 @inline(never)
 public func portStoreCompressedBlendedI16(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask,
-    to: UnsafeMutablePointer<SIMDInt16.Lane>
+    _ a: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask,
+    to: UnsafeMutablePointer<Int16>
 ) -> Int {
     unsafe SIMDInt16.storeCompressedBlended(a, where: mask, to: to)
 }
 
 @inline(never)
 public func highwayStoreCompressedBlendedI16(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask,
+    _ a: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask,
     to: UnsafeMutablePointer<Int16>
 ) -> Int {
     unsafe HighwayReference.Nothrow.storeCompressedBlendedI16(a.raw, mask.raw, to)
@@ -264,15 +248,15 @@ public func highwayStoreCompressedBlendedI16(
 
 @inline(never)
 public func portStoreCompressedBlendedI16ConstantA(
-    where mask: SIMDInt16.Mask,
-    to: UnsafeMutablePointer<SIMDInt16.Lane>
+    where mask: SIMD<Int16>.Mask,
+    to: UnsafeMutablePointer<Int16>
 ) -> Int {
     unsafe SIMDInt16.storeCompressedBlended(SIMDInt16.repeating(26), where: mask, to: to)
 }
 
 @inline(never)
 public func highwayStoreCompressedBlendedI16ConstantA(
-    where mask: SIMDInt16.Mask,
+    where mask: SIMD<Int16>.Mask,
     to: UnsafeMutablePointer<Int16>
 ) -> Int {
     unsafe HighwayReference.Nothrow.storeCompressedBlendedI16(
@@ -283,28 +267,22 @@ public func highwayStoreCompressedBlendedI16ConstantA(
 }
 
 @inline(never)
-public func portCompressedBitsI16(
-    _ a: SIMDInt16.Vector,
-    bits: UnsafePointer<UInt8>
-) -> SIMDInt16.Vector {
+public func portCompressedBitsI16(_ a: SIMD<Int16>, bits: UnsafePointer<UInt8>) -> SIMD<Int16> {
     unsafe SIMDInt16.compressed(a, bits: bits)
 }
 
 @inline(never)
-public func highwayCompressedBitsI16(
-    _ a: SIMDInt16.Vector,
-    bits: UnsafePointer<UInt8>
-) -> SIMDInt16.Vector {
+public func highwayCompressedBitsI16(_ a: SIMD<Int16>, bits: UnsafePointer<UInt8>) -> SIMD<Int16> {
     unsafe SIMDInt16.Vector(raw: HighwayReference.Nothrow.compressedBitsI16(a.raw, bits))
 }
 
 @inline(never)
-public func portCompressedBitsI16ConstantA(bits: UnsafePointer<UInt8>) -> SIMDInt16.Vector {
+public func portCompressedBitsI16ConstantA(bits: UnsafePointer<UInt8>) -> SIMD<Int16> {
     unsafe SIMDInt16.compressed(SIMDInt16.repeating(26), bits: bits)
 }
 
 @inline(never)
-public func highwayCompressedBitsI16ConstantA(bits: UnsafePointer<UInt8>) -> SIMDInt16.Vector {
+public func highwayCompressedBitsI16ConstantA(bits: UnsafePointer<UInt8>) -> SIMD<Int16> {
     unsafe SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.compressedBitsI16(
             SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
@@ -315,16 +293,16 @@ public func highwayCompressedBitsI16ConstantA(bits: UnsafePointer<UInt8>) -> SIM
 
 @inline(never)
 public func portStoreCompressedBitsI16(
-    _ a: SIMDInt16.Vector,
+    _ a: SIMD<Int16>,
     bits: UnsafePointer<UInt8>,
-    to: UnsafeMutablePointer<SIMDInt16.Lane>
+    to: UnsafeMutablePointer<Int16>
 ) -> Int {
     unsafe SIMDInt16.storeCompressed(a, bits: bits, to: to)
 }
 
 @inline(never)
 public func highwayStoreCompressedBitsI16(
-    _ a: SIMDInt16.Vector,
+    _ a: SIMD<Int16>,
     bits: UnsafePointer<UInt8>,
     to: UnsafeMutablePointer<Int16>
 ) -> Int {
@@ -334,7 +312,7 @@ public func highwayStoreCompressedBitsI16(
 @inline(never)
 public func portStoreCompressedBitsI16ConstantA(
     bits: UnsafePointer<UInt8>,
-    to: UnsafeMutablePointer<SIMDInt16.Lane>
+    to: UnsafeMutablePointer<Int16>
 ) -> Int {
     unsafe SIMDInt16.storeCompressed(SIMDInt16.repeating(26), bits: bits, to: to)
 }

@@ -4,71 +4,71 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portAllTrueF32(_ mask: SIMDFloat.Mask) -> Bool {
+public func portAllTrueF32(_ mask: SIMD<Float>.Mask) -> Bool {
     SIMDFloat.allTrue(mask)
 }
 
 @inline(never)
-public func highwayAllTrueF32(_ mask: SIMDFloat.Mask) -> Bool {
+public func highwayAllTrueF32(_ mask: SIMD<Float>.Mask) -> Bool {
     HighwayReference.Nothrow.allTrueF32(mask.raw)
 }
 
 @inline(never)
-public func portAllFalseF32(_ mask: SIMDFloat.Mask) -> Bool {
+public func portAllFalseF32(_ mask: SIMD<Float>.Mask) -> Bool {
     SIMDFloat.allFalse(mask)
 }
 
 @inline(never)
-public func highwayAllFalseF32(_ mask: SIMDFloat.Mask) -> Bool {
+public func highwayAllFalseF32(_ mask: SIMD<Float>.Mask) -> Bool {
     HighwayReference.Nothrow.allFalseF32(mask.raw)
 }
 
 @inline(never)
-public func portTrueCountF32(_ mask: SIMDFloat.Mask) -> Int {
+public func portTrueCountF32(_ mask: SIMD<Float>.Mask) -> Int {
     SIMDFloat.trueCount(mask)
 }
 
 @inline(never)
-public func highwayTrueCountF32(_ mask: SIMDFloat.Mask) -> Int {
+public func highwayTrueCountF32(_ mask: SIMD<Float>.Mask) -> Int {
     HighwayReference.Nothrow.trueCountF32(mask.raw)
 }
 
 @inline(never)
-public func portFirstTrueIndexF32(_ mask: SIMDFloat.Mask) -> Int {
+public func portFirstTrueIndexF32(_ mask: SIMD<Float>.Mask) -> Int {
     SIMDFloat.firstTrueIndex(mask)
 }
 
 @inline(never)
-public func highwayFirstTrueIndexF32(_ mask: SIMDFloat.Mask) -> Int {
+public func highwayFirstTrueIndexF32(_ mask: SIMD<Float>.Mask) -> Int {
     HighwayReference.Nothrow.firstTrueIndexF32(mask.raw)
 }
 
 @inline(never)
-public func portLastTrueIndexF32(_ mask: SIMDFloat.Mask) -> Int {
+public func portLastTrueIndexF32(_ mask: SIMD<Float>.Mask) -> Int {
     SIMDFloat.lastTrueIndex(mask)
 }
 
 @inline(never)
-public func highwayLastTrueIndexF32(_ mask: SIMDFloat.Mask) -> Int {
+public func highwayLastTrueIndexF32(_ mask: SIMD<Float>.Mask) -> Int {
     HighwayReference.Nothrow.lastTrueIndexF32(mask.raw)
 }
 
 @inline(never)
-public func portKnownFirstTrueIndexF32(_ mask: SIMDFloat.Mask) -> Int {
+public func portKnownFirstTrueIndexF32(_ mask: SIMD<Float>.Mask) -> Int {
     SIMDFloat.knownFirstTrueIndex(mask)
 }
 
 @inline(never)
-public func highwayKnownFirstTrueIndexF32(_ mask: SIMDFloat.Mask) -> Int {
+public func highwayKnownFirstTrueIndexF32(_ mask: SIMD<Float>.Mask) -> Int {
     HighwayReference.Nothrow.knownFirstTrueIndexF32(mask.raw)
 }
 
 @inline(never)
-public func portKnownLastTrueIndexF32(_ mask: SIMDFloat.Mask) -> Int {
+public func portKnownLastTrueIndexF32(_ mask: SIMD<Float>.Mask) -> Int {
     SIMDFloat.knownLastTrueIndex(mask)
 }
 
 @inline(never)
-public func highwayKnownLastTrueIndexF32(_ mask: SIMDFloat.Mask) -> Int {
+public func highwayKnownLastTrueIndexF32(_ mask: SIMD<Float>.Mask) -> Int {
     HighwayReference.Nothrow.knownLastTrueIndexF32(mask.raw)
 }

@@ -4,22 +4,22 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portSumWhereI8(_ a: SIMDInt8.Vector, where mask: SIMDInt8.Mask) -> SIMDInt8.Lane {
+public func portSumWhereI8(_ a: SIMD<Int8>, where mask: SIMD<Int8>.Mask) -> Int8 {
     SIMDInt8.sum(a, where: mask)
 }
 
 @inline(never)
-public func highwaySumWhereI8(_ a: SIMDInt8.Vector, where mask: SIMDInt8.Mask) -> Int8 {
+public func highwaySumWhereI8(_ a: SIMD<Int8>, where mask: SIMD<Int8>.Mask) -> Int8 {
     HighwayReference.Nothrow.sumWhereI8(mask.raw, a.raw)
 }
 
 @inline(never)
-public func portSumWhereI8ConstantA(where mask: SIMDInt8.Mask) -> SIMDInt8.Lane {
+public func portSumWhereI8ConstantA(where mask: SIMD<Int8>.Mask) -> Int8 {
     SIMDInt8.sum(SIMDInt8.repeating(26), where: mask)
 }
 
 @inline(never)
-public func highwaySumWhereI8ConstantA(where mask: SIMDInt8.Mask) -> Int8 {
+public func highwaySumWhereI8ConstantA(where mask: SIMD<Int8>.Mask) -> Int8 {
     HighwayReference.Nothrow.sumWhereI8(
         mask.raw,
         SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
@@ -27,22 +27,22 @@ public func highwaySumWhereI8ConstantA(where mask: SIMDInt8.Mask) -> Int8 {
 }
 
 @inline(never)
-public func portSmallestWhereI8(_ a: SIMDInt8.Vector, where mask: SIMDInt8.Mask) -> SIMDInt8.Lane {
+public func portSmallestWhereI8(_ a: SIMD<Int8>, where mask: SIMD<Int8>.Mask) -> Int8 {
     SIMDInt8.smallest(a, where: mask)
 }
 
 @inline(never)
-public func highwaySmallestWhereI8(_ a: SIMDInt8.Vector, where mask: SIMDInt8.Mask) -> Int8 {
+public func highwaySmallestWhereI8(_ a: SIMD<Int8>, where mask: SIMD<Int8>.Mask) -> Int8 {
     HighwayReference.Nothrow.smallestWhereI8(mask.raw, a.raw)
 }
 
 @inline(never)
-public func portSmallestWhereI8ConstantA(where mask: SIMDInt8.Mask) -> SIMDInt8.Lane {
+public func portSmallestWhereI8ConstantA(where mask: SIMD<Int8>.Mask) -> Int8 {
     SIMDInt8.smallest(SIMDInt8.repeating(26), where: mask)
 }
 
 @inline(never)
-public func highwaySmallestWhereI8ConstantA(where mask: SIMDInt8.Mask) -> Int8 {
+public func highwaySmallestWhereI8ConstantA(where mask: SIMD<Int8>.Mask) -> Int8 {
     HighwayReference.Nothrow.smallestWhereI8(
         mask.raw,
         SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
@@ -50,22 +50,22 @@ public func highwaySmallestWhereI8ConstantA(where mask: SIMDInt8.Mask) -> Int8 {
 }
 
 @inline(never)
-public func portLargestWhereI8(_ a: SIMDInt8.Vector, where mask: SIMDInt8.Mask) -> SIMDInt8.Lane {
+public func portLargestWhereI8(_ a: SIMD<Int8>, where mask: SIMD<Int8>.Mask) -> Int8 {
     SIMDInt8.largest(a, where: mask)
 }
 
 @inline(never)
-public func highwayLargestWhereI8(_ a: SIMDInt8.Vector, where mask: SIMDInt8.Mask) -> Int8 {
+public func highwayLargestWhereI8(_ a: SIMD<Int8>, where mask: SIMD<Int8>.Mask) -> Int8 {
     HighwayReference.Nothrow.largestWhereI8(mask.raw, a.raw)
 }
 
 @inline(never)
-public func portLargestWhereI8ConstantA(where mask: SIMDInt8.Mask) -> SIMDInt8.Lane {
+public func portLargestWhereI8ConstantA(where mask: SIMD<Int8>.Mask) -> Int8 {
     SIMDInt8.largest(SIMDInt8.repeating(26), where: mask)
 }
 
 @inline(never)
-public func highwayLargestWhereI8ConstantA(where mask: SIMDInt8.Mask) -> Int8 {
+public func highwayLargestWhereI8ConstantA(where mask: SIMD<Int8>.Mask) -> Int8 {
     HighwayReference.Nothrow.largestWhereI8(
         mask.raw,
         SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw

@@ -14,7 +14,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs where !hasUnorderedNaNs(H.repeating(value), b) {
             mismatches.check(
                 H.adding(H.repeating(value), b),
-                HighwayReference.addingF64(H.repeating(value), b),
+                HighwayReference.addingF64(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -29,7 +29,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs where !hasUnorderedNaNs(a, H.repeating(value)) {
             mismatches.check(
                 H.adding(a, H.repeating(value)),
-                HighwayReference.addingF64(a, H.repeating(value)),
+                HighwayReference.addingF64(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -139,7 +139,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.subtracting(H.repeating(value), b),
-                HighwayReference.subtractingF64(H.repeating(value), b),
+                HighwayReference.subtractingF64(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -154,7 +154,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.subtracting(a, H.repeating(value)),
-                HighwayReference.subtractingF64(a, H.repeating(value)),
+                HighwayReference.subtractingF64(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -264,7 +264,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs where !hasUnorderedNaNs(alternatingNegation: H.repeating(value), b) {
             mismatches.check(
                 H.addingSubtracting(H.repeating(value), b),
-                HighwayReference.addingSubtractingF64(H.repeating(value), b),
+                HighwayReference.addingSubtractingF64(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -279,7 +279,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs where !hasUnorderedNaNs(alternatingNegation: a, H.repeating(value)) {
             mismatches.check(
                 H.addingSubtracting(a, H.repeating(value)),
-                HighwayReference.addingSubtractingF64(a, H.repeating(value)),
+                HighwayReference.addingSubtractingF64(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -389,7 +389,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.dividing(H.repeating(value), b),
-                HighwayReference.dividingF64(H.repeating(value), b),
+                HighwayReference.dividingF64(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -404,7 +404,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.dividing(a, H.repeating(value)),
-                HighwayReference.dividingF64(a, H.repeating(value)),
+                HighwayReference.dividingF64(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -516,7 +516,7 @@ extension SIMDDoubleConstantTests {
         {
             mismatches.check(
                 H.clamped(H.repeating(value), between: b, and: c),
-                HighwayReference.clampedF64(H.repeating(value), b, c),
+                HighwayReference.clampedF64(H.repeating(value).raw, b.raw, c.raw),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -533,7 +533,7 @@ extension SIMDDoubleConstantTests {
         {
             mismatches.check(
                 H.clamped(a, between: H.repeating(value), and: c),
-                HighwayReference.clampedF64(a, H.repeating(value), c),
+                HighwayReference.clampedF64(a.raw, H.repeating(value).raw, c.raw),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -550,7 +550,7 @@ extension SIMDDoubleConstantTests {
         {
             mismatches.check(
                 H.clamped(a, between: b, and: H.repeating(value)),
-                HighwayReference.clampedF64(a, b, H.repeating(value)),
+                HighwayReference.clampedF64(a.raw, b.raw, H.repeating(value).raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -679,7 +679,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.absoluteDifference(H.repeating(value), b),
-                HighwayReference.absoluteDifferenceF64(H.repeating(value), b),
+                HighwayReference.absoluteDifferenceF64(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -694,7 +694,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.absoluteDifference(a, H.repeating(value)),
-                HighwayReference.absoluteDifferenceF64(a, H.repeating(value)),
+                HighwayReference.absoluteDifferenceF64(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -802,7 +802,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.negated(H.repeating(value)),
-            HighwayReference.negatedF64(H.repeating(value)),
+            HighwayReference.negatedF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -890,7 +890,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.magnitude(H.repeating(value)),
-            HighwayReference.magnitudeF64(H.repeating(value)),
+            HighwayReference.magnitudeF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -978,7 +978,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.squareRoot(H.repeating(value)),
-            HighwayReference.squareRootF64(H.repeating(value)),
+            HighwayReference.squareRootF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()

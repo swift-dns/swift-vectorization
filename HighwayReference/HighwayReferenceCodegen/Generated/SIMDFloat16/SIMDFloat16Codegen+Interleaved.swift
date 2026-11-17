@@ -7,11 +7,7 @@ public import Vectorization
 @available(SwiftStdlib 5.3, *)
 extension HighwayReferenceFloat16 {
     @export(implementation) @inline(always)
-    public static func loadInterleaved2(
-        from span: Span<Lane>,
-        _ v0: inout Vector,
-        _ v1: inout Vector
-    ) {
+    public static func loadInterleaved2(from span: Span<Lane>, _ v0: inout SIMD, _ v1: inout SIMD) {
         precondition(
             span.count >= 2 * laneCount,
             "Span has fewer elements than 2 vectors have lanes"
@@ -22,15 +18,15 @@ extension HighwayReferenceFloat16 {
     @unsafe @export(implementation) @inline(always)
     public static func loadInterleaved2(
         fromUnchecked span: Span<Lane>,
-        _ v0: inout Vector,
-        _ v1: inout Vector
+        _ v0: inout SIMD,
+        _ v1: inout SIMD
     ) {
         assert(span.count >= 2 * laneCount, "Span has fewer elements than 2 vectors have lanes")
         span.withUnsafeBufferPointer {
             unsafe HighwayReference.Nothrow.loadInterleaved2F16(
                 $0.baseAddress.unsafelyUnwrapped,
-                &v0,
-                &v1
+                &v0.raw,
+                &v1.raw
             )
         }
     }
@@ -38,9 +34,9 @@ extension HighwayReferenceFloat16 {
     @export(implementation) @inline(always)
     public static func loadInterleaved3(
         from span: Span<Lane>,
-        _ v0: inout Vector,
-        _ v1: inout Vector,
-        _ v2: inout Vector
+        _ v0: inout SIMD,
+        _ v1: inout SIMD,
+        _ v2: inout SIMD
     ) {
         precondition(
             span.count >= 3 * laneCount,
@@ -52,17 +48,17 @@ extension HighwayReferenceFloat16 {
     @unsafe @export(implementation) @inline(always)
     public static func loadInterleaved3(
         fromUnchecked span: Span<Lane>,
-        _ v0: inout Vector,
-        _ v1: inout Vector,
-        _ v2: inout Vector
+        _ v0: inout SIMD,
+        _ v1: inout SIMD,
+        _ v2: inout SIMD
     ) {
         assert(span.count >= 3 * laneCount, "Span has fewer elements than 3 vectors have lanes")
         span.withUnsafeBufferPointer {
             unsafe HighwayReference.Nothrow.loadInterleaved3F16(
                 $0.baseAddress.unsafelyUnwrapped,
-                &v0,
-                &v1,
-                &v2
+                &v0.raw,
+                &v1.raw,
+                &v2.raw
             )
         }
     }
@@ -70,10 +66,10 @@ extension HighwayReferenceFloat16 {
     @export(implementation) @inline(always)
     public static func loadInterleaved4(
         from span: Span<Lane>,
-        _ v0: inout Vector,
-        _ v1: inout Vector,
-        _ v2: inout Vector,
-        _ v3: inout Vector
+        _ v0: inout SIMD,
+        _ v1: inout SIMD,
+        _ v2: inout SIMD,
+        _ v3: inout SIMD
     ) {
         precondition(
             span.count >= 4 * laneCount,
@@ -85,26 +81,25 @@ extension HighwayReferenceFloat16 {
     @unsafe @export(implementation) @inline(always)
     public static func loadInterleaved4(
         fromUnchecked span: Span<Lane>,
-        _ v0: inout Vector,
-        _ v1: inout Vector,
-        _ v2: inout Vector,
-        _ v3: inout Vector
+        _ v0: inout SIMD,
+        _ v1: inout SIMD,
+        _ v2: inout SIMD,
+        _ v3: inout SIMD
     ) {
         assert(span.count >= 4 * laneCount, "Span has fewer elements than 4 vectors have lanes")
         span.withUnsafeBufferPointer {
             unsafe HighwayReference.Nothrow.loadInterleaved4F16(
                 $0.baseAddress.unsafelyUnwrapped,
-                &v0,
-                &v1,
-                &v2,
-                &v3
+                &v0.raw,
+                &v1.raw,
+                &v2.raw,
+                &v3.raw
             )
         }
     }
 
     @export(implementation) @inline(always)
-    public static func storeInterleaved2(_ a: Vector, _ b: Vector, to span: inout MutableSpan<Lane>)
-    {
+    public static func storeInterleaved2(_ a: SIMD, _ b: SIMD, to span: inout MutableSpan<Lane>) {
         precondition(
             span.count >= 2 * laneCount,
             "Span has fewer elements than 2 vectors have lanes"
@@ -114,26 +109,22 @@ extension HighwayReferenceFloat16 {
 
     @unsafe @export(implementation) @inline(always)
     public static func storeInterleaved2(
-        _ a: Vector,
-        _ b: Vector,
+        _ a: SIMD,
+        _ b: SIMD,
         toUnchecked span: inout MutableSpan<Lane>
     ) {
         assert(span.count >= 2 * laneCount, "Span has fewer elements than 2 vectors have lanes")
         span.withUnsafeMutableBufferPointer {
             unsafe HighwayReference.Nothrow.storeInterleaved2F16(
-                a,
-                b,
+                a.raw,
+                b.raw,
                 $0.baseAddress.unsafelyUnwrapped
             )
         }
     }
 
     @export(implementation) @inline(always)
-    public static func appendInterleaved2(
-        _ a: Vector,
-        _ b: Vector,
-        to output: inout OutputSpan<Lane>
-    ) {
+    public static func appendInterleaved2(_ a: SIMD, _ b: SIMD, to output: inout OutputSpan<Lane>) {
         precondition(
             output.freeCapacity >= 2 * laneCount,
             "OutputSpan has less free capacity than 2 vectors have lanes"
@@ -143,8 +134,8 @@ extension HighwayReferenceFloat16 {
 
     @unsafe @export(implementation) @inline(always)
     public static func appendInterleaved2(
-        _ a: Vector,
-        _ b: Vector,
+        _ a: SIMD,
+        _ b: SIMD,
         toUnchecked output: inout OutputSpan<Lane>
     ) {
         assert(
@@ -153,8 +144,8 @@ extension HighwayReferenceFloat16 {
         )
         unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
             unsafe HighwayReference.Nothrow.storeInterleaved2F16(
-                a,
-                b,
+                a.raw,
+                b.raw,
                 buffer.baseAddress.unsafelyUnwrapped + initializedCount
             )
             initializedCount &+= 2 * laneCount
@@ -163,9 +154,9 @@ extension HighwayReferenceFloat16 {
 
     @export(implementation) @inline(always)
     public static func storeInterleaved3(
-        _ a: Vector,
-        _ b: Vector,
-        _ c: Vector,
+        _ a: SIMD,
+        _ b: SIMD,
+        _ c: SIMD,
         to span: inout MutableSpan<Lane>
     ) {
         precondition(
@@ -177,17 +168,17 @@ extension HighwayReferenceFloat16 {
 
     @unsafe @export(implementation) @inline(always)
     public static func storeInterleaved3(
-        _ a: Vector,
-        _ b: Vector,
-        _ c: Vector,
+        _ a: SIMD,
+        _ b: SIMD,
+        _ c: SIMD,
         toUnchecked span: inout MutableSpan<Lane>
     ) {
         assert(span.count >= 3 * laneCount, "Span has fewer elements than 3 vectors have lanes")
         span.withUnsafeMutableBufferPointer {
             unsafe HighwayReference.Nothrow.storeInterleaved3F16(
-                a,
-                b,
-                c,
+                a.raw,
+                b.raw,
+                c.raw,
                 $0.baseAddress.unsafelyUnwrapped
             )
         }
@@ -195,9 +186,9 @@ extension HighwayReferenceFloat16 {
 
     @export(implementation) @inline(always)
     public static func appendInterleaved3(
-        _ a: Vector,
-        _ b: Vector,
-        _ c: Vector,
+        _ a: SIMD,
+        _ b: SIMD,
+        _ c: SIMD,
         to output: inout OutputSpan<Lane>
     ) {
         precondition(
@@ -209,9 +200,9 @@ extension HighwayReferenceFloat16 {
 
     @unsafe @export(implementation) @inline(always)
     public static func appendInterleaved3(
-        _ a: Vector,
-        _ b: Vector,
-        _ c: Vector,
+        _ a: SIMD,
+        _ b: SIMD,
+        _ c: SIMD,
         toUnchecked output: inout OutputSpan<Lane>
     ) {
         assert(
@@ -220,9 +211,9 @@ extension HighwayReferenceFloat16 {
         )
         unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
             unsafe HighwayReference.Nothrow.storeInterleaved3F16(
-                a,
-                b,
-                c,
+                a.raw,
+                b.raw,
+                c.raw,
                 buffer.baseAddress.unsafelyUnwrapped + initializedCount
             )
             initializedCount &+= 3 * laneCount
@@ -231,10 +222,10 @@ extension HighwayReferenceFloat16 {
 
     @export(implementation) @inline(always)
     public static func storeInterleaved4(
-        _ a: Vector,
-        _ b: Vector,
-        _ c: Vector,
-        _ d: Vector,
+        _ a: SIMD,
+        _ b: SIMD,
+        _ c: SIMD,
+        _ d: SIMD,
         to span: inout MutableSpan<Lane>
     ) {
         precondition(
@@ -246,19 +237,19 @@ extension HighwayReferenceFloat16 {
 
     @unsafe @export(implementation) @inline(always)
     public static func storeInterleaved4(
-        _ a: Vector,
-        _ b: Vector,
-        _ c: Vector,
-        _ d: Vector,
+        _ a: SIMD,
+        _ b: SIMD,
+        _ c: SIMD,
+        _ d: SIMD,
         toUnchecked span: inout MutableSpan<Lane>
     ) {
         assert(span.count >= 4 * laneCount, "Span has fewer elements than 4 vectors have lanes")
         span.withUnsafeMutableBufferPointer {
             unsafe HighwayReference.Nothrow.storeInterleaved4F16(
-                a,
-                b,
-                c,
-                d,
+                a.raw,
+                b.raw,
+                c.raw,
+                d.raw,
                 $0.baseAddress.unsafelyUnwrapped
             )
         }
@@ -266,10 +257,10 @@ extension HighwayReferenceFloat16 {
 
     @export(implementation) @inline(always)
     public static func appendInterleaved4(
-        _ a: Vector,
-        _ b: Vector,
-        _ c: Vector,
-        _ d: Vector,
+        _ a: SIMD,
+        _ b: SIMD,
+        _ c: SIMD,
+        _ d: SIMD,
         to output: inout OutputSpan<Lane>
     ) {
         precondition(
@@ -281,10 +272,10 @@ extension HighwayReferenceFloat16 {
 
     @unsafe @export(implementation) @inline(always)
     public static func appendInterleaved4(
-        _ a: Vector,
-        _ b: Vector,
-        _ c: Vector,
-        _ d: Vector,
+        _ a: SIMD,
+        _ b: SIMD,
+        _ c: SIMD,
+        _ d: SIMD,
         toUnchecked output: inout OutputSpan<Lane>
     ) {
         assert(
@@ -293,10 +284,10 @@ extension HighwayReferenceFloat16 {
         )
         unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
             unsafe HighwayReference.Nothrow.storeInterleaved4F16(
-                a,
-                b,
-                c,
-                d,
+                a.raw,
+                b.raw,
+                c.raw,
+                d.raw,
                 buffer.baseAddress.unsafelyUnwrapped + initializedCount
             )
             initializedCount &+= 4 * laneCount
@@ -307,9 +298,9 @@ extension HighwayReferenceFloat16 {
 
 @inline(never)
 public func portLoadInterleaved2F16(
-    from: UnsafePointer<SIMDFloat16.Lane>,
-    _ v0: inout SIMDFloat16.Vector,
-    _ v1: inout SIMDFloat16.Vector
+    from: UnsafePointer<Float16>,
+    _ v0: inout SIMD<Float16>,
+    _ v1: inout SIMD<Float16>
 ) {
     unsafe SIMDFloat16.loadInterleaved2(from: from, &v0, &v1)
 }
@@ -317,18 +308,18 @@ public func portLoadInterleaved2F16(
 @inline(never)
 public func highwayLoadInterleaved2F16(
     from: UnsafePointer<Float16>,
-    _ v0: inout SIMDFloat16.Vector,
-    _ v1: inout SIMDFloat16.Vector
+    _ v0: inout SIMD<Float16>,
+    _ v1: inout SIMD<Float16>
 ) {
-    unsafe HighwayReference.Nothrow.loadInterleaved2F16(from, &v0, &v1)
+    unsafe HighwayReference.Nothrow.loadInterleaved2F16(from, &v0.raw, &v1.raw)
 }
 
 @inline(never)
 public func portLoadInterleaved3F16(
-    from: UnsafePointer<SIMDFloat16.Lane>,
-    _ v0: inout SIMDFloat16.Vector,
-    _ v1: inout SIMDFloat16.Vector,
-    _ v2: inout SIMDFloat16.Vector
+    from: UnsafePointer<Float16>,
+    _ v0: inout SIMD<Float16>,
+    _ v1: inout SIMD<Float16>,
+    _ v2: inout SIMD<Float16>
 ) {
     unsafe SIMDFloat16.loadInterleaved3(from: from, &v0, &v1, &v2)
 }
@@ -336,20 +327,20 @@ public func portLoadInterleaved3F16(
 @inline(never)
 public func highwayLoadInterleaved3F16(
     from: UnsafePointer<Float16>,
-    _ v0: inout SIMDFloat16.Vector,
-    _ v1: inout SIMDFloat16.Vector,
-    _ v2: inout SIMDFloat16.Vector
+    _ v0: inout SIMD<Float16>,
+    _ v1: inout SIMD<Float16>,
+    _ v2: inout SIMD<Float16>
 ) {
-    unsafe HighwayReference.Nothrow.loadInterleaved3F16(from, &v0, &v1, &v2)
+    unsafe HighwayReference.Nothrow.loadInterleaved3F16(from, &v0.raw, &v1.raw, &v2.raw)
 }
 
 @inline(never)
 public func portLoadInterleaved4F16(
-    from: UnsafePointer<SIMDFloat16.Lane>,
-    _ v0: inout SIMDFloat16.Vector,
-    _ v1: inout SIMDFloat16.Vector,
-    _ v2: inout SIMDFloat16.Vector,
-    _ v3: inout SIMDFloat16.Vector
+    from: UnsafePointer<Float16>,
+    _ v0: inout SIMD<Float16>,
+    _ v1: inout SIMD<Float16>,
+    _ v2: inout SIMD<Float16>,
+    _ v3: inout SIMD<Float16>
 ) {
     unsafe SIMDFloat16.loadInterleaved4(from: from, &v0, &v1, &v2, &v3)
 }
@@ -357,97 +348,93 @@ public func portLoadInterleaved4F16(
 @inline(never)
 public func highwayLoadInterleaved4F16(
     from: UnsafePointer<Float16>,
-    _ v0: inout SIMDFloat16.Vector,
-    _ v1: inout SIMDFloat16.Vector,
-    _ v2: inout SIMDFloat16.Vector,
-    _ v3: inout SIMDFloat16.Vector
+    _ v0: inout SIMD<Float16>,
+    _ v1: inout SIMD<Float16>,
+    _ v2: inout SIMD<Float16>,
+    _ v3: inout SIMD<Float16>
 ) {
-    unsafe HighwayReference.Nothrow.loadInterleaved4F16(from, &v0, &v1, &v2, &v3)
+    unsafe HighwayReference.Nothrow.loadInterleaved4F16(from, &v0.raw, &v1.raw, &v2.raw, &v3.raw)
 }
 
 @inline(never)
 public func portStoreInterleaved2F16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    to: UnsafeMutablePointer<SIMDFloat16.Lane>
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    to: UnsafeMutablePointer<Float16>
 ) {
     unsafe SIMDFloat16.storeInterleaved2(a, b, to: to)
 }
 
 @inline(never)
 public func highwayStoreInterleaved2F16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
     to: UnsafeMutablePointer<Float16>
 ) {
-    unsafe HighwayReference.Nothrow.storeInterleaved2F16(a, b, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved2F16(a.raw, b.raw, to)
 }
 
 @inline(never)
-public func portStoreInterleaved2F16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    to: UnsafeMutablePointer<SIMDFloat16.Lane>
-) {
+public func portStoreInterleaved2F16ConstantA(_ b: SIMD<Float16>, to: UnsafeMutablePointer<Float16>)
+{
     unsafe SIMDFloat16.storeInterleaved2(SIMDFloat16.repeating(Float16(bitPattern: 26)), b, to: to)
 }
 
 @inline(never)
 public func highwayStoreInterleaved2F16ConstantA(
-    _ b: SIMDFloat16.Vector,
+    _ b: SIMD<Float16>,
     to: UnsafeMutablePointer<Float16>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved2F16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
+        b.raw,
         to
     )
 }
 
 @inline(never)
-public func portStoreInterleaved2F16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    to: UnsafeMutablePointer<SIMDFloat16.Lane>
-) {
+public func portStoreInterleaved2F16ConstantB(_ a: SIMD<Float16>, to: UnsafeMutablePointer<Float16>)
+{
     unsafe SIMDFloat16.storeInterleaved2(a, SIMDFloat16.repeating(Float16(bitPattern: 26)), to: to)
 }
 
 @inline(never)
 public func highwayStoreInterleaved2F16ConstantB(
-    _ a: SIMDFloat16.Vector,
+    _ a: SIMD<Float16>,
     to: UnsafeMutablePointer<Float16>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved2F16(
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
+        a.raw,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
         to
     )
 }
 
 @inline(never)
 public func portStoreInterleaved3F16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    to: UnsafeMutablePointer<SIMDFloat16.Lane>
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    to: UnsafeMutablePointer<Float16>
 ) {
     unsafe SIMDFloat16.storeInterleaved3(a, b, c, to: to)
 }
 
 @inline(never)
 public func highwayStoreInterleaved3F16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
     to: UnsafeMutablePointer<Float16>
 ) {
-    unsafe HighwayReference.Nothrow.storeInterleaved3F16(a, b, c, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved3F16(a.raw, b.raw, c.raw, to)
 }
 
 @inline(never)
 public func portStoreInterleaved3F16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    to: UnsafeMutablePointer<SIMDFloat16.Lane>
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    to: UnsafeMutablePointer<Float16>
 ) {
     unsafe SIMDFloat16.storeInterleaved3(
         SIMDFloat16.repeating(Float16(bitPattern: 26)),
@@ -459,23 +446,23 @@ public func portStoreInterleaved3F16ConstantA(
 
 @inline(never)
 public func highwayStoreInterleaved3F16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
     to: UnsafeMutablePointer<Float16>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved3F16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b,
-        c,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
+        b.raw,
+        c.raw,
         to
     )
 }
 
 @inline(never)
 public func portStoreInterleaved3F16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    to: UnsafeMutablePointer<SIMDFloat16.Lane>
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    to: UnsafeMutablePointer<Float16>
 ) {
     unsafe SIMDFloat16.storeInterleaved3(
         a,
@@ -487,23 +474,23 @@ public func portStoreInterleaved3F16ConstantB(
 
 @inline(never)
 public func highwayStoreInterleaved3F16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>,
     to: UnsafeMutablePointer<Float16>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved3F16(
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        c,
+        a.raw,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
+        c.raw,
         to
     )
 }
 
 @inline(never)
 public func portStoreInterleaved3F16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    to: UnsafeMutablePointer<SIMDFloat16.Lane>
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    to: UnsafeMutablePointer<Float16>
 ) {
     unsafe SIMDFloat16.storeInterleaved3(
         a,
@@ -515,46 +502,46 @@ public func portStoreInterleaved3F16ConstantC(
 
 @inline(never)
 public func highwayStoreInterleaved3F16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
     to: UnsafeMutablePointer<Float16>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved3F16(
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
+        a.raw,
+        b.raw,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
         to
     )
 }
 
 @inline(never)
 public func portStoreInterleaved4F16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    _ d: SIMDFloat16.Vector,
-    to: UnsafeMutablePointer<SIMDFloat16.Lane>
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    _ d: SIMD<Float16>,
+    to: UnsafeMutablePointer<Float16>
 ) {
     unsafe SIMDFloat16.storeInterleaved4(a, b, c, d, to: to)
 }
 
 @inline(never)
 public func highwayStoreInterleaved4F16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    _ d: SIMDFloat16.Vector,
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    _ d: SIMD<Float16>,
     to: UnsafeMutablePointer<Float16>
 ) {
-    unsafe HighwayReference.Nothrow.storeInterleaved4F16(a, b, c, d, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved4F16(a.raw, b.raw, c.raw, d.raw, to)
 }
 
 @inline(never)
 public func portStoreInterleaved4F16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    _ d: SIMDFloat16.Vector,
-    to: UnsafeMutablePointer<SIMDFloat16.Lane>
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    _ d: SIMD<Float16>,
+    to: UnsafeMutablePointer<Float16>
 ) {
     unsafe SIMDFloat16.storeInterleaved4(
         SIMDFloat16.repeating(Float16(bitPattern: 26)),
@@ -567,26 +554,26 @@ public func portStoreInterleaved4F16ConstantA(
 
 @inline(never)
 public func highwayStoreInterleaved4F16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    _ d: SIMDFloat16.Vector,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    _ d: SIMD<Float16>,
     to: UnsafeMutablePointer<Float16>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved4F16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b,
-        c,
-        d,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
+        b.raw,
+        c.raw,
+        d.raw,
         to
     )
 }
 
 @inline(never)
 public func portStoreInterleaved4F16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    _ d: SIMDFloat16.Vector,
-    to: UnsafeMutablePointer<SIMDFloat16.Lane>
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    _ d: SIMD<Float16>,
+    to: UnsafeMutablePointer<Float16>
 ) {
     unsafe SIMDFloat16.storeInterleaved4(
         a,
@@ -599,26 +586,26 @@ public func portStoreInterleaved4F16ConstantB(
 
 @inline(never)
 public func highwayStoreInterleaved4F16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    _ d: SIMDFloat16.Vector,
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    _ d: SIMD<Float16>,
     to: UnsafeMutablePointer<Float16>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved4F16(
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        c,
-        d,
+        a.raw,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
+        c.raw,
+        d.raw,
         to
     )
 }
 
 @inline(never)
 public func portStoreInterleaved4F16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ d: SIMDFloat16.Vector,
-    to: UnsafeMutablePointer<SIMDFloat16.Lane>
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ d: SIMD<Float16>,
+    to: UnsafeMutablePointer<Float16>
 ) {
     unsafe SIMDFloat16.storeInterleaved4(
         a,
@@ -631,26 +618,26 @@ public func portStoreInterleaved4F16ConstantC(
 
 @inline(never)
 public func highwayStoreInterleaved4F16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ d: SIMDFloat16.Vector,
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ d: SIMD<Float16>,
     to: UnsafeMutablePointer<Float16>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved4F16(
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        d,
+        a.raw,
+        b.raw,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
+        d.raw,
         to
     )
 }
 
 @inline(never)
 public func portStoreInterleaved4F16ConstantD(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    to: UnsafeMutablePointer<SIMDFloat16.Lane>
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    to: UnsafeMutablePointer<Float16>
 ) {
     unsafe SIMDFloat16.storeInterleaved4(
         a,
@@ -663,16 +650,16 @@ public func portStoreInterleaved4F16ConstantD(
 
 @inline(never)
 public func highwayStoreInterleaved4F16ConstantD(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
     to: UnsafeMutablePointer<Float16>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved4F16(
-        a,
-        b,
-        c,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
+        a.raw,
+        b.raw,
+        c.raw,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
         to
     )
 }

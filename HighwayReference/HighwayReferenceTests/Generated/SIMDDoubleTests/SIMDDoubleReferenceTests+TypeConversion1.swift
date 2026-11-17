@@ -116,7 +116,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(bitPattern: a),
-                HighwayReference.vectorBitPatternF32ToF64(a),
+                HighwayReference.vectorBitPatternF32ToF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -130,7 +130,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(bitPattern: a),
-                HighwayReference.vectorBitPatternF16ToF64(a),
+                HighwayReference.vectorBitPatternF16ToF64(a.raw),
                 "a: \(describe(a))"
             )
         }

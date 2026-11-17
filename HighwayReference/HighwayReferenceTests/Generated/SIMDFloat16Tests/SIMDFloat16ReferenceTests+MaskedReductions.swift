@@ -14,7 +14,7 @@ extension SIMDFloat16ReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) where !hasUnorderedNaNs(lanesOf: a) {
             mismatches.check(
                 H.sum(a, where: mask),
-                Float16(bitPattern: HighwayReference.sumWhereF16(mask.raw, a)),
+                Float16(bitPattern: HighwayReference.sumWhereF16(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -28,7 +28,7 @@ extension SIMDFloat16ReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) where !hasUnorderedNaNs(lanesOf: a) {
             mismatches.check(
                 H.sum(a, where: mask),
-                Float16(bitPattern: HighwayReference.sumWhereF16(mask.raw, a)),
+                Float16(bitPattern: HighwayReference.sumWhereF16(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -42,7 +42,7 @@ extension SIMDFloat16ReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.smallest(a, where: mask),
-                Float16(bitPattern: HighwayReference.smallestWhereF16(mask.raw, a)),
+                Float16(bitPattern: HighwayReference.smallestWhereF16(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -56,7 +56,7 @@ extension SIMDFloat16ReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.smallest(a, where: mask),
-                Float16(bitPattern: HighwayReference.smallestWhereF16(mask.raw, a)),
+                Float16(bitPattern: HighwayReference.smallestWhereF16(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -70,7 +70,7 @@ extension SIMDFloat16ReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.largest(a, where: mask),
-                Float16(bitPattern: HighwayReference.largestWhereF16(mask.raw, a)),
+                Float16(bitPattern: HighwayReference.largestWhereF16(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -84,7 +84,7 @@ extension SIMDFloat16ReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.largest(a, where: mask),
-                Float16(bitPattern: HighwayReference.largestWhereF16(mask.raw, a)),
+                Float16(bitPattern: HighwayReference.largestWhereF16(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }

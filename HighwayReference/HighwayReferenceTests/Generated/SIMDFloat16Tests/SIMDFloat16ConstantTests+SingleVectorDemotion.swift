@@ -18,7 +18,7 @@ extension SIMDFloat16ConstantTests {
         mismatches.check(
             H.halfVector(converting: SIMDFloat.repeating(value)),
             H.HalfVector(
-                raw: HighwayReference.halfVectorConvertingF32ToF16(SIMDFloat.repeating(value))
+                raw: HighwayReference.halfVectorConvertingF32ToF16(SIMDFloat.repeating(value).raw)
             ),
             ""
         )
@@ -114,7 +114,9 @@ extension SIMDFloat16ConstantTests {
         mismatches.check(
             H.quarterVector(converting: SIMDDouble.repeating(value)),
             H.QuarterVector(
-                raw: HighwayReference.quarterVectorConvertingF64ToF16(SIMDDouble.repeating(value))
+                raw: HighwayReference.quarterVectorConvertingF64ToF16(
+                    SIMDDouble.repeating(value).raw
+                )
             ),
             ""
         )

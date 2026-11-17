@@ -144,7 +144,7 @@ extension SIMDDoubleConstantTests {
                         otherwise: H.repeating(value)
                     ),
                     unsafe HighwayReference.gatherFirstOtherwiseF64(
-                        H.repeating(value),
+                        H.repeating(value).raw,
                         source.baseAddress!,
                         indices.raw,
                         count
@@ -261,7 +261,7 @@ extension SIMDDoubleConstantTests {
                         otherwise: otherwise
                     ),
                     unsafe HighwayReference.gatherFirstOtherwiseF64(
-                        otherwise,
+                        otherwise.raw,
                         source.baseAddress!,
                         SIMDInt64.repeating(value).raw,
                         count
@@ -358,7 +358,7 @@ extension SIMDDoubleConstantTests {
                         otherwise: H.repeating(value)
                     ),
                     unsafe HighwayReference.gatherWhereOtherwiseF64(
-                        H.repeating(value),
+                        H.repeating(value).raw,
                         mask.raw,
                         source.baseAddress!,
                         indices.raw
@@ -475,7 +475,7 @@ extension SIMDDoubleConstantTests {
                         otherwise: otherwise
                     ),
                     unsafe HighwayReference.gatherWhereOtherwiseF64(
-                        otherwise,
+                        otherwise.raw,
                         mask.raw,
                         source.baseAddress!,
                         SIMDInt64.repeating(value).raw
@@ -518,7 +518,7 @@ extension SIMDDoubleConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.scatterF64(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     destination.baseAddress!,
                     indices.raw
                 )
@@ -621,7 +621,7 @@ extension SIMDDoubleConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.scatterF64(
-                    a,
+                    a.raw,
                     destination.baseAddress!,
                     SIMDInt64.repeating(value).raw
                 )
@@ -662,7 +662,7 @@ extension SIMDDoubleConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.scatterByteOffsetsF64(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     destination.baseAddress!,
                     byteOffsets.raw
                 )
@@ -765,7 +765,7 @@ extension SIMDDoubleConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.scatterByteOffsetsF64(
-                    a,
+                    a.raw,
                     destination.baseAddress!,
                     SIMDInt64.repeating(value).raw
                 )
@@ -809,7 +809,7 @@ extension SIMDDoubleConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.scatterFirstF64(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     destination.baseAddress!,
                     indices.raw,
                     count
@@ -919,7 +919,7 @@ extension SIMDDoubleConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.scatterFirstF64(
-                    a,
+                    a.raw,
                     destination.baseAddress!,
                     SIMDInt64.repeating(value).raw,
                     count
@@ -964,7 +964,7 @@ extension SIMDDoubleConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.scatterWhereF64(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     mask.raw,
                     destination.baseAddress!,
                     indices.raw
@@ -1074,7 +1074,7 @@ extension SIMDDoubleConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.scatterWhereF64(
-                    a,
+                    a.raw,
                     mask.raw,
                     destination.baseAddress!,
                     SIMDInt64.repeating(value).raw

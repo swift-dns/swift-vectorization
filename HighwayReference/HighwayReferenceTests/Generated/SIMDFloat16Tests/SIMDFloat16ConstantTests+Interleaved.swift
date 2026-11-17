@@ -25,8 +25,8 @@ extension SIMDFloat16ConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeInterleaved2F16(
-                    H.repeating(value),
-                    b,
+                    H.repeating(value).raw,
+                    b.raw,
                     destination.baseAddress!
                 )
             }
@@ -53,8 +53,8 @@ extension SIMDFloat16ConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeInterleaved2F16(
-                    a,
-                    H.repeating(value),
+                    a.raw,
+                    H.repeating(value).raw,
                     destination.baseAddress!
                 )
             }
@@ -177,9 +177,9 @@ extension SIMDFloat16ConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeInterleaved3F16(
-                    H.repeating(value),
-                    b,
-                    c,
+                    H.repeating(value).raw,
+                    b.raw,
+                    c.raw,
                     destination.baseAddress!
                 )
             }
@@ -207,9 +207,9 @@ extension SIMDFloat16ConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeInterleaved3F16(
-                    a,
-                    H.repeating(value),
-                    c,
+                    a.raw,
+                    H.repeating(value).raw,
+                    c.raw,
                     destination.baseAddress!
                 )
             }
@@ -237,9 +237,9 @@ extension SIMDFloat16ConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeInterleaved3F16(
-                    a,
-                    b,
-                    H.repeating(value),
+                    a.raw,
+                    b.raw,
+                    H.repeating(value).raw,
                     destination.baseAddress!
                 )
             }
@@ -388,10 +388,10 @@ extension SIMDFloat16ConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeInterleaved4F16(
-                    H.repeating(value),
-                    b,
-                    c,
-                    d,
+                    H.repeating(value).raw,
+                    b.raw,
+                    c.raw,
+                    d.raw,
                     destination.baseAddress!
                 )
             }
@@ -430,10 +430,10 @@ extension SIMDFloat16ConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeInterleaved4F16(
-                    a,
-                    H.repeating(value),
-                    c,
-                    d,
+                    a.raw,
+                    H.repeating(value).raw,
+                    c.raw,
+                    d.raw,
                     destination.baseAddress!
                 )
             }
@@ -472,10 +472,10 @@ extension SIMDFloat16ConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeInterleaved4F16(
-                    a,
-                    b,
-                    H.repeating(value),
-                    d,
+                    a.raw,
+                    b.raw,
+                    H.repeating(value).raw,
+                    d.raw,
                     destination.baseAddress!
                 )
             }
@@ -514,10 +514,10 @@ extension SIMDFloat16ConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeInterleaved4F16(
-                    a,
-                    b,
-                    c,
-                    H.repeating(value),
+                    a.raw,
+                    b.raw,
+                    c.raw,
+                    H.repeating(value).raw,
                     destination.baseAddress!
                 )
             }

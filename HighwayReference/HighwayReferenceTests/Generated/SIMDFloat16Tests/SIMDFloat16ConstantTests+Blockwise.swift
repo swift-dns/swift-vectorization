@@ -25,7 +25,7 @@ extension SIMDFloat16ConstantTests {
         for indices in indicesInputs {
             mismatches.check(
                 H.tableLookupBytes(H.repeating(value), at: indices),
-                HighwayReference.tableLookupBytesF16(H.repeating(value), indices),
+                HighwayReference.tableLookupBytesF16(H.repeating(value).raw, indices.raw),
                 "indices: \(describe(indices))"
             )
         }
@@ -127,7 +127,7 @@ extension SIMDFloat16ConstantTests {
         for indices in indicesInputs {
             mismatches.check(
                 H.tableLookupBytesOrZero(H.repeating(value), at: indices),
-                HighwayReference.tableLookupBytesOrZeroF16(H.repeating(value), indices),
+                HighwayReference.tableLookupBytesOrZeroF16(H.repeating(value).raw, indices.raw),
                 "indices: \(describe(indices))"
             )
         }
@@ -223,7 +223,7 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.broadcastingInBlocks(H.repeating(value), lane: lane),
                 HighwayReference.broadcastingInBlocksF16(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: lane)
                 ),
                 "lane: \(lane)"
@@ -320,7 +320,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs where !hasUnorderedNaNs(adjacentLanesOf: H.repeating(value), b) {
             mismatches.check(
                 H.pairwiseAddingBlocks(H.repeating(value), b),
-                HighwayReference.pairwiseAddingBlocksF16(H.repeating(value), b),
+                HighwayReference.pairwiseAddingBlocksF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -339,7 +339,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs where !hasUnorderedNaNs(adjacentLanesOf: a, H.repeating(value)) {
             mismatches.check(
                 H.pairwiseAddingBlocks(a, H.repeating(value)),
-                HighwayReference.pairwiseAddingBlocksF16(a, H.repeating(value)),
+                HighwayReference.pairwiseAddingBlocksF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -453,7 +453,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.pairwiseSubtractingBlocks(H.repeating(value), b),
-                HighwayReference.pairwiseSubtractingBlocksF16(H.repeating(value), b),
+                HighwayReference.pairwiseSubtractingBlocksF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -472,7 +472,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.pairwiseSubtractingBlocks(a, H.repeating(value)),
-                HighwayReference.pairwiseSubtractingBlocksF16(a, H.repeating(value)),
+                HighwayReference.pairwiseSubtractingBlocksF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }

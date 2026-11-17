@@ -5,28 +5,28 @@ public import Vectorization
 
 @inline(never)
 public func portHalfVectorConvertingF32ToBF16(
-    converting a: SIMDFloat.Vector
-) -> SIMDBFloat16.HalfVector {
+    converting a: SIMD<Float>
+) -> SIMD<BFloat16>.HalfVector {
     SIMDBFloat16.halfVector(converting: a)
 }
 
 @inline(never)
 public func highwayHalfVectorConvertingF32ToBF16(
-    converting a: SIMDFloat.Vector
-) -> SIMDBFloat16.HalfVector {
-    SIMDBFloat16.HalfVector(raw: HighwayReference.Nothrow.halfVectorConvertingF32ToBF16(a))
+    converting a: SIMD<Float>
+) -> SIMD<BFloat16>.HalfVector {
+    SIMDBFloat16.HalfVector(raw: HighwayReference.Nothrow.halfVectorConvertingF32ToBF16(a.raw))
 }
 
 @inline(never)
-public func portHalfVectorConvertingF32ToBF16ConstantA() -> SIMDBFloat16.HalfVector {
+public func portHalfVectorConvertingF32ToBF16ConstantA() -> SIMD<BFloat16>.HalfVector {
     SIMDBFloat16.halfVector(converting: SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayHalfVectorConvertingF32ToBF16ConstantA() -> SIMDBFloat16.HalfVector {
+public func highwayHalfVectorConvertingF32ToBF16ConstantA() -> SIMD<BFloat16>.HalfVector {
     SIMDBFloat16.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorConvertingF32ToBF16(
-            HighwayReference.Nothrow.repeatingF32(1.5)
+            HighwayReference.Nothrow.repeatingF32(1.5).raw
         )
     )
 }

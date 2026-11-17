@@ -14,7 +14,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.approximateReciprocalSquareRoot(H.repeating(value)),
-            HighwayReference.approximateReciprocalSquareRootF64(H.repeating(value)),
+            HighwayReference.approximateReciprocalSquareRootF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -147,7 +147,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.approximateReciprocal(H.repeating(value)),
-            HighwayReference.approximateReciprocalF64(H.repeating(value)),
+            HighwayReference.approximateReciprocalF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -235,7 +235,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.exponent(H.repeating(value)),
-            HighwayReference.exponentF64(H.repeating(value)),
+            HighwayReference.exponentF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -323,7 +323,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.mantissa(H.repeating(value)),
-            HighwayReference.mantissaF64(H.repeating(value)),
+            HighwayReference.mantissaF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -413,7 +413,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs where !hasUnorderedNaNs(adjacentLanesOf: H.repeating(value), b) {
             mismatches.check(
                 H.pairwiseAdding(H.repeating(value), b),
-                HighwayReference.pairwiseAddingF64(H.repeating(value), b),
+                HighwayReference.pairwiseAddingF64(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -428,7 +428,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs where !hasUnorderedNaNs(adjacentLanesOf: a, H.repeating(value)) {
             mismatches.check(
                 H.pairwiseAdding(a, H.repeating(value)),
-                HighwayReference.pairwiseAddingF64(a, H.repeating(value)),
+                HighwayReference.pairwiseAddingF64(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -538,7 +538,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.pairwiseSubtracting(H.repeating(value), b),
-                HighwayReference.pairwiseSubtractingF64(H.repeating(value), b),
+                HighwayReference.pairwiseSubtractingF64(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -553,7 +553,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.pairwiseSubtracting(a, H.repeating(value)),
-                HighwayReference.pairwiseSubtractingF64(a, H.repeating(value)),
+                HighwayReference.pairwiseSubtractingF64(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -665,7 +665,7 @@ extension SIMDDoubleConstantTests {
         )
         mismatches.check(
             H.sumsOf2(SIMDFloat.repeating(value)),
-            HighwayReference.sumsOf2F32ToF64(SIMDFloat.repeating(value)),
+            HighwayReference.sumsOf2F32ToF64(SIMDFloat.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -758,7 +758,7 @@ extension SIMDDoubleConstantTests {
         )
         mismatches.check(
             H.sumsOf4(SIMDFloat16.repeating(value)),
-            HighwayReference.sumsOf4F16ToF64(SIMDFloat16.repeating(value)),
+            HighwayReference.sumsOf4F16ToF64(SIMDFloat16.repeating(value).raw),
             ""
         )
         mismatches.record()

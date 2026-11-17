@@ -19,7 +19,7 @@ extension SIMDFloat16ConstantTests {
         for mask in maskInputs {
             mismatches.check(
                 H.isNaN(H.repeating(value), where: mask),
-                H.Mask(raw: HighwayReference.isNaNWhereF16(mask.raw, H.repeating(value))),
+                H.Mask(raw: HighwayReference.isNaNWhereF16(mask.raw, H.repeating(value).raw)),
                 "mask: \(describe(mask))"
             )
         }

@@ -14,7 +14,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, mask) in everyPair(aInputs, maskInputs) {
             mismatches.check(
                 H.expanded(a, where: mask),
-                HighwayReference.expandedF16(a, mask.raw),
+                HighwayReference.expandedF16(a.raw, mask.raw),
                 "a: \(describe(a)), mask: \(describe(mask))"
             )
         }
@@ -28,7 +28,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, mask) in everyPair(aInputs, maskInputs) {
             mismatches.check(
                 H.expanded(a, where: mask),
-                HighwayReference.expandedF16(a, mask.raw),
+                HighwayReference.expandedF16(a.raw, mask.raw),
                 "a: \(describe(a)), mask: \(describe(mask))"
             )
         }
@@ -160,7 +160,7 @@ extension SIMDFloat16ReferenceTests {
                         otherwise: otherwise
                     ),
                     unsafe HighwayReference.loadExpandedWhereOtherwiseF16(
-                        otherwise,
+                        otherwise.raw,
                         mask.raw,
                         source.baseAddress!
                     )
@@ -194,7 +194,7 @@ extension SIMDFloat16ReferenceTests {
                 (
                     unsafe H.loadExpanded(from: source, where: mask, otherwise: otherwise),
                     unsafe HighwayReference.loadExpandedWhereOtherwiseF16(
-                        otherwise,
+                        otherwise.raw,
                         mask.raw,
                         source
                     )
@@ -232,7 +232,7 @@ extension SIMDFloat16ReferenceTests {
                         otherwise: otherwise
                     ),
                     unsafe HighwayReference.loadExpandedWhereOtherwiseF16(
-                        otherwise,
+                        otherwise.raw,
                         mask.raw,
                         source.baseAddress!
                     )

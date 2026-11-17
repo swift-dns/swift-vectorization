@@ -17,7 +17,12 @@ extension SIMDFloatConstantTests {
         where !hasUnorderedNaNs(negating: H.repeating(value), b, adding: c) {
             mismatches.check(
                 H.negatedMultiplyAdding(H.repeating(value), b, c, where: mask),
-                HighwayReference.negatedMultiplyAddingWhereF32(mask.raw, H.repeating(value), b, c),
+                HighwayReference.negatedMultiplyAddingWhereF32(
+                    mask.raw,
+                    H.repeating(value).raw,
+                    b.raw,
+                    c.raw
+                ),
                 "mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -35,7 +40,12 @@ extension SIMDFloatConstantTests {
         where !hasUnorderedNaNs(negating: a, H.repeating(value), adding: c) {
             mismatches.check(
                 H.negatedMultiplyAdding(a, H.repeating(value), c, where: mask),
-                HighwayReference.negatedMultiplyAddingWhereF32(mask.raw, a, H.repeating(value), c),
+                HighwayReference.negatedMultiplyAddingWhereF32(
+                    mask.raw,
+                    a.raw,
+                    H.repeating(value).raw,
+                    c.raw
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -53,7 +63,12 @@ extension SIMDFloatConstantTests {
         where !hasUnorderedNaNs(negating: a, b, adding: H.repeating(value)) {
             mismatches.check(
                 H.negatedMultiplyAdding(a, b, H.repeating(value), where: mask),
-                HighwayReference.negatedMultiplyAddingWhereF32(mask.raw, a, b, H.repeating(value)),
+                HighwayReference.negatedMultiplyAddingWhereF32(
+                    mask.raw,
+                    a.raw,
+                    b.raw,
+                    H.repeating(value).raw
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -189,9 +204,9 @@ extension SIMDFloatConstantTests {
                 H.negatedMultiplySubtracting(H.repeating(value), b, c, where: mask),
                 HighwayReference.negatedMultiplySubtractingWhereF32(
                     mask.raw,
-                    H.repeating(value),
-                    b,
-                    c
+                    H.repeating(value).raw,
+                    b.raw,
+                    c.raw
                 ),
                 "mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
             )
@@ -214,9 +229,9 @@ extension SIMDFloatConstantTests {
                 H.negatedMultiplySubtracting(a, H.repeating(value), c, where: mask),
                 HighwayReference.negatedMultiplySubtractingWhereF32(
                     mask.raw,
-                    a,
-                    H.repeating(value),
-                    c
+                    a.raw,
+                    H.repeating(value).raw,
+                    c.raw
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
             )
@@ -239,9 +254,9 @@ extension SIMDFloatConstantTests {
                 H.negatedMultiplySubtracting(a, b, H.repeating(value), where: mask),
                 HighwayReference.negatedMultiplySubtractingWhereF32(
                     mask.raw,
-                    a,
-                    b,
-                    H.repeating(value)
+                    a.raw,
+                    b.raw,
+                    H.repeating(value).raw
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
@@ -504,7 +519,7 @@ extension SIMDFloatConstantTests {
         for mask in maskInputs {
             mismatches.check(
                 H.approximateReciprocal(H.repeating(value), where: mask),
-                HighwayReference.approximateReciprocalWhereF32(mask.raw, H.repeating(value)),
+                HighwayReference.approximateReciprocalWhereF32(mask.raw, H.repeating(value).raw),
                 "mask: \(describe(mask))"
             )
         }
@@ -599,7 +614,7 @@ extension SIMDFloatConstantTests {
                 H.approximateReciprocalSquareRoot(H.repeating(value), where: mask),
                 HighwayReference.approximateReciprocalSquareRootWhereF32(
                     mask.raw,
-                    H.repeating(value)
+                    H.repeating(value).raw
                 ),
                 "mask: \(describe(mask))"
             )

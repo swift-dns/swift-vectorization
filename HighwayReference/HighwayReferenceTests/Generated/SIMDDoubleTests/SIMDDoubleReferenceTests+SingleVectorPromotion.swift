@@ -38,7 +38,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningLower: a),
-                HighwayReference.vectorWideningLowerF32ToF64(a),
+                HighwayReference.vectorWideningLowerF32ToF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -77,7 +77,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningUpper: a),
-                HighwayReference.vectorWideningUpperF32ToF64(a),
+                HighwayReference.vectorWideningUpperF32ToF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -116,7 +116,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningEven: a),
-                HighwayReference.vectorWideningEvenF32ToF64(a),
+                HighwayReference.vectorWideningEvenF32ToF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -155,7 +155,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningOdd: a),
-                HighwayReference.vectorWideningOddF32ToF64(a),
+                HighwayReference.vectorWideningOddF32ToF64(a.raw),
                 "a: \(describe(a))"
             )
         }

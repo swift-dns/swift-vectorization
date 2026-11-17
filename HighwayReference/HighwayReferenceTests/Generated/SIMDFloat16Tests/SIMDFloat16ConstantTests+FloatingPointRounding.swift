@@ -17,7 +17,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.roundedToNearestOrEven(H.repeating(value)),
-            HighwayReference.roundedToNearestOrEvenF16(H.repeating(value)),
+            HighwayReference.roundedToNearestOrEvenF16(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -109,7 +109,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.roundedTowardZero(H.repeating(value)),
-            HighwayReference.roundedTowardZeroF16(H.repeating(value)),
+            HighwayReference.roundedTowardZeroF16(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -201,7 +201,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.roundedUp(H.repeating(value)),
-            HighwayReference.roundedUpF16(H.repeating(value)),
+            HighwayReference.roundedUpF16(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -293,7 +293,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.roundedDown(H.repeating(value)),
-            HighwayReference.roundedDownF16(H.repeating(value)),
+            HighwayReference.roundedDownF16(H.repeating(value).raw),
             ""
         )
         mismatches.record()

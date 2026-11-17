@@ -14,7 +14,7 @@ extension SIMDDoubleConstantTests {
         for mask in maskInputs {
             mismatches.check(
                 H.expanded(H.repeating(value), where: mask),
-                HighwayReference.expandedF64(H.repeating(value), mask.raw),
+                HighwayReference.expandedF64(H.repeating(value).raw, mask.raw),
                 "mask: \(describe(mask))"
             )
         }
@@ -118,7 +118,7 @@ extension SIMDDoubleConstantTests {
                         otherwise: H.repeating(value)
                     ),
                     unsafe HighwayReference.loadExpandedWhereOtherwiseF64(
-                        H.repeating(value),
+                        H.repeating(value).raw,
                         mask.raw,
                         source.baseAddress!
                     )

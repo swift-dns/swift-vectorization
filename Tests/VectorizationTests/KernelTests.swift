@@ -6,7 +6,7 @@ func maskHighNibbles(
     _ count: Int,
     _ output: UnsafeMutablePointer<UInt8>
 ) {
-    typealias H = SIMDUInt8
+    typealias H = SIMD<UInt8>
 
     let lanes = H.laneCount
     let mask = H.repeating(0x0F)
@@ -19,35 +19,34 @@ func maskHighNibbles(
     }
 }
 
-func sum<E: SIMDIntegerElement>(
-    _ type: E.Type,
-    _ input: UnsafePointer<E.Lane>,
+func sum<Lane: SIMDIntegerElement>(
+    _ input: UnsafePointer<Lane>,
     _ count: Int
-) -> E.Vector {
-    var total = E.zero()
+) -> SIMD<Lane> {
+    var total = SIMD<Lane>.zero()
     var index = 0
-    while count - index >= E.laneCount {
-        total = unsafe E.adding(total, E.load(from: input + index))
-        index += E.laneCount
+    while count - index >= SIMD<Lane>.laneCount {
+        total = unsafe SIMD<Lane>.adding(total, SIMD<Lane>.load(from: input + index))
+        index += SIMD<Lane>.laneCount
     }
     return total
 }
 
-func sum<E: SIMDIntegerElement>(_ type: E.Type, _ input: Span<E.Lane>) -> E.Vector {
-    var total = E.zero()
+func sum<Lane: SIMDIntegerElement>(_ input: Span<Lane>) -> SIMD<Lane> {
+    var total = SIMD<Lane>.zero()
     var rest = input
-    while rest.count >= E.laneCount {
-        total = E.adding(total, E.load(from: rest))
-        rest = rest.extracting(droppingFirst: E.laneCount)
+    while rest.count >= SIMD<Lane>.laneCount {
+        total = SIMD<Lane>.adding(total, SIMD<Lane>.load(from: rest))
+        rest = rest.extracting(droppingFirst: SIMD<Lane>.laneCount)
     }
-    return E.adding(total, E.loadFirst(from: rest))
+    return SIMD<Lane>.adding(total, SIMD<Lane>.loadFirst(from: rest))
 }
 
 @Suite("Kernels")
 struct KernelTests {
     @Test("A hand-written kernel masks high nibbles")
     func kernelExample() {
-        let lanes = SIMDUInt8.laneCount
+        let lanes = SIMD<UInt8>.laneCount
         let input = (0..<(lanes * 2)).map { UInt8(truncatingIfNeeded: $0 &* 7) }
         var output = [UInt8](repeating: 0, count: lanes * 2)
 
@@ -62,11 +61,11 @@ struct KernelTests {
 
     @Test("A generic kernel sums lanes")
     func genericExample() {
-        let lanes = SIMDInt32.laneCount
+        let lanes = SIMD<Int32>.laneCount
         let input = (0..<(lanes * 3)).map { Int32($0) }
 
         let total = input.withUnsafeBufferPointer { source in
-            unsafe SIMDInt32.sum(sum(SIMDInt32.self, source.baseAddress!, input.count))
+            unsafe SIMD<Int32>.sum(sum(source.baseAddress!, input.count))
         }
 
         #expect(total == input.reduce(0, &+))
@@ -74,10 +73,10 @@ struct KernelTests {
 
     @Test("A generic span kernel sums lanes, including a partial last vector")
     func genericSpanExample() {
-        let lanes = SIMDInt32.laneCount
+        let lanes = SIMD<Int32>.laneCount
         let input = ContiguousArray((0..<(lanes * 3 + 1)).map { Int32($0) })
 
-        let total = SIMDInt32.sum(sum(SIMDInt32.self, input.span))
+        let total = SIMD<Int32>.sum(sum(input.span))
 
         #expect(total == input.reduce(0, &+))
     }

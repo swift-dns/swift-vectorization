@@ -12,7 +12,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.roundedToNearestOrEven(H.repeating(value)),
-            HighwayReference.roundedToNearestOrEvenF32(H.repeating(value)),
+            HighwayReference.roundedToNearestOrEvenF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -100,7 +100,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.roundedTowardZero(H.repeating(value)),
-            HighwayReference.roundedTowardZeroF32(H.repeating(value)),
+            HighwayReference.roundedTowardZeroF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -188,7 +188,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.roundedUp(H.repeating(value)),
-            HighwayReference.roundedUpF32(H.repeating(value)),
+            HighwayReference.roundedUpF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -276,7 +276,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.roundedDown(H.repeating(value)),
-            HighwayReference.roundedDownF32(H.repeating(value)),
+            HighwayReference.roundedDownF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()

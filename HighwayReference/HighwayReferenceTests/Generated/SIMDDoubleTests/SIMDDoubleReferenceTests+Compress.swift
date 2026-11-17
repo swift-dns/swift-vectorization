@@ -12,7 +12,7 @@ extension SIMDDoubleReferenceTests {
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x57F9_D686_7BC1_AD41)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let port = H.compressed(a, where: mask)
-            let reference = HighwayReference.compressedF64(a, mask.raw)
+            let reference = HighwayReference.compressedF64(a.raw, mask.raw)
             let checkedLanes =
                 HighwayReference.compressTailIsDeterministicF64() ? H.laneCount : H.trueCount(mask)
             mismatches.check(
@@ -30,7 +30,7 @@ extension SIMDDoubleReferenceTests {
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xC84E_F148_F2AE_9F8A)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let port = H.compressed(a, where: mask)
-            let reference = HighwayReference.compressedF64(a, mask.raw)
+            let reference = HighwayReference.compressedF64(a.raw, mask.raw)
             let checkedLanes =
                 HighwayReference.compressTailIsDeterministicF64() ? H.laneCount : H.trueCount(mask)
             mismatches.check(
@@ -48,7 +48,7 @@ extension SIMDDoubleReferenceTests {
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xD5BA_37F0_CC8B_C10E)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let port = H.compressedNot(a, where: mask)
-            let reference = HighwayReference.compressedNotF64(a, mask.raw)
+            let reference = HighwayReference.compressedNotF64(a.raw, mask.raw)
             let checkedLanes =
                 HighwayReference.compressTailIsDeterministicF64()
                 ? H.laneCount : H.laneCount - H.trueCount(mask)
@@ -67,7 +67,7 @@ extension SIMDDoubleReferenceTests {
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xC72F_B951_BF39_84F9)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let port = H.compressedNot(a, where: mask)
-            let reference = HighwayReference.compressedNotF64(a, mask.raw)
+            let reference = HighwayReference.compressedNotF64(a.raw, mask.raw)
             let checkedLanes =
                 HighwayReference.compressTailIsDeterministicF64()
                 ? H.laneCount : H.laneCount - H.trueCount(mask)
@@ -87,7 +87,7 @@ extension SIMDDoubleReferenceTests {
         for (a, mask) in everyPair(aInputs, maskInputs) {
             mismatches.check(
                 H.partitioned(a, where: mask),
-                HighwayReference.partitionedF64(a, mask.raw),
+                HighwayReference.partitionedF64(a.raw, mask.raw),
                 "a: \(describe(a)), mask: \(describe(mask))"
             )
         }
@@ -101,7 +101,7 @@ extension SIMDDoubleReferenceTests {
         for (a, mask) in everyPair(aInputs, maskInputs) {
             mismatches.check(
                 H.partitioned(a, where: mask),
-                HighwayReference.partitionedF64(a, mask.raw),
+                HighwayReference.partitionedF64(a.raw, mask.raw),
                 "a: \(describe(a)), mask: \(describe(mask))"
             )
         }
@@ -120,7 +120,11 @@ extension SIMDDoubleReferenceTests {
             }
             var referenceLanes = sentinel
             let referenceResult = referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeCompressedF64(a, mask.raw, destination.baseAddress!)
+                unsafe HighwayReference.storeCompressedF64(
+                    a.raw,
+                    mask.raw,
+                    destination.baseAddress!
+                )
             }
             mismatches.check(
                 portLanes,
@@ -146,7 +150,8 @@ extension SIMDDoubleReferenceTests {
                 unsafe H.storeCompressed(a, where: mask, to: destination)
             }
             let (referenceResult, referenceLanes) = unsafe withGuardedLanes(sentinel) {
-                destination in unsafe HighwayReference.storeCompressedF64(a, mask.raw, destination)
+                destination in
+                unsafe HighwayReference.storeCompressedF64(a.raw, mask.raw, destination)
             }
             mismatches.check(
                 portLanes,
@@ -174,7 +179,11 @@ extension SIMDDoubleReferenceTests {
             }
             var referenceLanes = sentinel
             let referenceResult = referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeCompressedF64(a, mask.raw, destination.baseAddress!)
+                unsafe HighwayReference.storeCompressedF64(
+                    a.raw,
+                    mask.raw,
+                    destination.baseAddress!
+                )
             }
             mismatches.check(
                 portLanes,
@@ -237,7 +246,7 @@ extension SIMDDoubleReferenceTests {
             var referenceLanes = sentinel
             let referenceResult = referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeCompressedBlendedF64(
-                    a,
+                    a.raw,
                     mask.raw,
                     destination.baseAddress!
                 )
@@ -267,7 +276,7 @@ extension SIMDDoubleReferenceTests {
             }
             let (referenceResult, referenceLanes) = unsafe withGuardedLanes(sentinel) {
                 destination in
-                unsafe HighwayReference.storeCompressedBlendedF64(a, mask.raw, destination)
+                unsafe HighwayReference.storeCompressedBlendedF64(a.raw, mask.raw, destination)
             }
             mismatches.check(
                 portLanes,
@@ -296,7 +305,7 @@ extension SIMDDoubleReferenceTests {
             var referenceLanes = sentinel
             let referenceResult = referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeCompressedBlendedF64(
-                    a,
+                    a.raw,
                     mask.raw,
                     destination.baseAddress!
                 )
@@ -362,7 +371,7 @@ extension SIMDDoubleReferenceTests {
                 (
                     unsafe H.compressed(a, bits: source.baseAddress!),
                     (bits + [UInt8](repeating: 0, count: 8)).withUnsafeBufferPointer { padded in
-                        unsafe HighwayReference.compressedBitsF64(a, padded.baseAddress!)
+                        unsafe HighwayReference.compressedBitsF64(a.raw, padded.baseAddress!)
                     }
                 )
             }
@@ -393,7 +402,7 @@ extension SIMDDoubleReferenceTests {
                 (
                     unsafe H.compressed(a, bits: source),
                     (bits + [UInt8](repeating: 0, count: 8)).withUnsafeBufferPointer { padded in
-                        unsafe HighwayReference.compressedBitsF64(a, padded.baseAddress!)
+                        unsafe HighwayReference.compressedBitsF64(a.raw, padded.baseAddress!)
                     }
                 )
             }.result
@@ -472,7 +481,7 @@ extension SIMDDoubleReferenceTests {
                     referenceLanes.withUnsafeMutableBufferPointer { destination in
                         (bits + [UInt8](repeating: 0, count: 8)).withUnsafeBufferPointer { padded in
                             unsafe HighwayReference.storeCompressedBitsF64(
-                                a,
+                                a.raw,
                                 padded.baseAddress!,
                                 destination.baseAddress!
                             )
@@ -514,7 +523,7 @@ extension SIMDDoubleReferenceTests {
                 unsafe withGuardedLanes(bits) { source in
                     (bits + [UInt8](repeating: 0, count: 8)).withUnsafeBufferPointer { padded in
                         unsafe HighwayReference.storeCompressedBitsF64(
-                            a,
+                            a.raw,
                             padded.baseAddress!,
                             destination
                         )

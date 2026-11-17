@@ -4,11 +4,11 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portLowerHalfOfMaskBF16(_ mask: SIMDBFloat16.Mask) -> SIMDBFloat16.HalfMask {
+public func portLowerHalfOfMaskBF16(_ mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16>.HalfMask {
     SIMDBFloat16.lowerHalf(mask)
 }
 
 @inline(never)
-public func highwayLowerHalfOfMaskBF16(_ mask: SIMDBFloat16.Mask) -> SIMDBFloat16.HalfMask {
+public func highwayLowerHalfOfMaskBF16(_ mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16>.HalfMask {
     SIMDBFloat16.HalfMask(raw: HighwayReference.Nothrow.lowerHalfOfMaskBF16(mask.raw))
 }

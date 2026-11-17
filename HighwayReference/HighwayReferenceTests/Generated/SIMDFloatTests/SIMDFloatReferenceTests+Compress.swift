@@ -12,7 +12,7 @@ extension SIMDFloatReferenceTests {
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x9B39_43DE_9FEB_A88C)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let port = H.compressed(a, where: mask)
-            let reference = HighwayReference.compressedF32(a, mask.raw)
+            let reference = HighwayReference.compressedF32(a.raw, mask.raw)
             let checkedLanes =
                 HighwayReference.compressTailIsDeterministicF32() ? H.laneCount : H.trueCount(mask)
             mismatches.check(
@@ -30,7 +30,7 @@ extension SIMDFloatReferenceTests {
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xCD2E_5D6A_50C7_F77F)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let port = H.compressed(a, where: mask)
-            let reference = HighwayReference.compressedF32(a, mask.raw)
+            let reference = HighwayReference.compressedF32(a.raw, mask.raw)
             let checkedLanes =
                 HighwayReference.compressTailIsDeterministicF32() ? H.laneCount : H.trueCount(mask)
             mismatches.check(
@@ -48,7 +48,7 @@ extension SIMDFloatReferenceTests {
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x5BBF_D0CB_1261_40C9)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let port = H.compressedNot(a, where: mask)
-            let reference = HighwayReference.compressedNotF32(a, mask.raw)
+            let reference = HighwayReference.compressedNotF32(a.raw, mask.raw)
             let checkedLanes =
                 HighwayReference.compressTailIsDeterministicF32()
                 ? H.laneCount : H.laneCount - H.trueCount(mask)
@@ -67,7 +67,7 @@ extension SIMDFloatReferenceTests {
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x45BE_258D_AE2A_92D2)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let port = H.compressedNot(a, where: mask)
-            let reference = HighwayReference.compressedNotF32(a, mask.raw)
+            let reference = HighwayReference.compressedNotF32(a.raw, mask.raw)
             let checkedLanes =
                 HighwayReference.compressTailIsDeterministicF32()
                 ? H.laneCount : H.laneCount - H.trueCount(mask)
@@ -87,7 +87,7 @@ extension SIMDFloatReferenceTests {
         for (a, mask) in everyPair(aInputs, maskInputs) {
             mismatches.check(
                 H.partitioned(a, where: mask),
-                HighwayReference.partitionedF32(a, mask.raw),
+                HighwayReference.partitionedF32(a.raw, mask.raw),
                 "a: \(describe(a)), mask: \(describe(mask))"
             )
         }
@@ -101,7 +101,7 @@ extension SIMDFloatReferenceTests {
         for (a, mask) in everyPair(aInputs, maskInputs) {
             mismatches.check(
                 H.partitioned(a, where: mask),
-                HighwayReference.partitionedF32(a, mask.raw),
+                HighwayReference.partitionedF32(a.raw, mask.raw),
                 "a: \(describe(a)), mask: \(describe(mask))"
             )
         }
@@ -120,7 +120,11 @@ extension SIMDFloatReferenceTests {
             }
             var referenceLanes = sentinel
             let referenceResult = referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeCompressedF32(a, mask.raw, destination.baseAddress!)
+                unsafe HighwayReference.storeCompressedF32(
+                    a.raw,
+                    mask.raw,
+                    destination.baseAddress!
+                )
             }
             mismatches.check(
                 portLanes,
@@ -146,7 +150,8 @@ extension SIMDFloatReferenceTests {
                 unsafe H.storeCompressed(a, where: mask, to: destination)
             }
             let (referenceResult, referenceLanes) = unsafe withGuardedLanes(sentinel) {
-                destination in unsafe HighwayReference.storeCompressedF32(a, mask.raw, destination)
+                destination in
+                unsafe HighwayReference.storeCompressedF32(a.raw, mask.raw, destination)
             }
             mismatches.check(
                 portLanes,
@@ -174,7 +179,11 @@ extension SIMDFloatReferenceTests {
             }
             var referenceLanes = sentinel
             let referenceResult = referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeCompressedF32(a, mask.raw, destination.baseAddress!)
+                unsafe HighwayReference.storeCompressedF32(
+                    a.raw,
+                    mask.raw,
+                    destination.baseAddress!
+                )
             }
             mismatches.check(
                 portLanes,
@@ -237,7 +246,7 @@ extension SIMDFloatReferenceTests {
             var referenceLanes = sentinel
             let referenceResult = referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeCompressedBlendedF32(
-                    a,
+                    a.raw,
                     mask.raw,
                     destination.baseAddress!
                 )
@@ -267,7 +276,7 @@ extension SIMDFloatReferenceTests {
             }
             let (referenceResult, referenceLanes) = unsafe withGuardedLanes(sentinel) {
                 destination in
-                unsafe HighwayReference.storeCompressedBlendedF32(a, mask.raw, destination)
+                unsafe HighwayReference.storeCompressedBlendedF32(a.raw, mask.raw, destination)
             }
             mismatches.check(
                 portLanes,
@@ -296,7 +305,7 @@ extension SIMDFloatReferenceTests {
             var referenceLanes = sentinel
             let referenceResult = referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeCompressedBlendedF32(
-                    a,
+                    a.raw,
                     mask.raw,
                     destination.baseAddress!
                 )
@@ -362,7 +371,7 @@ extension SIMDFloatReferenceTests {
                 (
                     unsafe H.compressed(a, bits: source.baseAddress!),
                     (bits + [UInt8](repeating: 0, count: 8)).withUnsafeBufferPointer { padded in
-                        unsafe HighwayReference.compressedBitsF32(a, padded.baseAddress!)
+                        unsafe HighwayReference.compressedBitsF32(a.raw, padded.baseAddress!)
                     }
                 )
             }
@@ -393,7 +402,7 @@ extension SIMDFloatReferenceTests {
                 (
                     unsafe H.compressed(a, bits: source),
                     (bits + [UInt8](repeating: 0, count: 8)).withUnsafeBufferPointer { padded in
-                        unsafe HighwayReference.compressedBitsF32(a, padded.baseAddress!)
+                        unsafe HighwayReference.compressedBitsF32(a.raw, padded.baseAddress!)
                     }
                 )
             }.result
@@ -472,7 +481,7 @@ extension SIMDFloatReferenceTests {
                     referenceLanes.withUnsafeMutableBufferPointer { destination in
                         (bits + [UInt8](repeating: 0, count: 8)).withUnsafeBufferPointer { padded in
                             unsafe HighwayReference.storeCompressedBitsF32(
-                                a,
+                                a.raw,
                                 padded.baseAddress!,
                                 destination.baseAddress!
                             )
@@ -514,7 +523,7 @@ extension SIMDFloatReferenceTests {
                 unsafe withGuardedLanes(bits) { source in
                     (bits + [UInt8](repeating: 0, count: 8)).withUnsafeBufferPointer { padded in
                         unsafe HighwayReference.storeCompressedBitsF32(
-                            a,
+                            a.raw,
                             padded.baseAddress!,
                             destination
                         )

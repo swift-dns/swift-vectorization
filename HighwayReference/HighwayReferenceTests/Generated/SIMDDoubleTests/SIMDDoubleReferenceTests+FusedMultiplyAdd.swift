@@ -14,7 +14,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x75D9_86F1_C179_9BC2) {
             mismatches.check(
                 H.multiplyAdding(a, b, c),
-                HighwayReference.multiplyAddingF64(a, b, c),
+                HighwayReference.multiplyAddingF64(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -30,7 +30,7 @@ extension SIMDDoubleReferenceTests {
         where !hasUnorderedNaNs(negating: a, b, adding: c) {
             mismatches.check(
                 H.negatedMultiplyAdding(a, b, c),
-                HighwayReference.negatedMultiplyAddingF64(a, b, c),
+                HighwayReference.negatedMultiplyAddingF64(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -46,7 +46,7 @@ extension SIMDDoubleReferenceTests {
         where !hasUnorderedNaNs(multiplying: a, b, adding: c) {
             mismatches.check(
                 H.multiplySubtracting(a, b, c),
-                HighwayReference.multiplySubtractingF64(a, b, c),
+                HighwayReference.multiplySubtractingF64(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -62,7 +62,7 @@ extension SIMDDoubleReferenceTests {
         where !hasUnorderedNaNs(negating: a, b, adding: c) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, b, c),
-                HighwayReference.negatedMultiplySubtractingF64(a, b, c),
+                HighwayReference.negatedMultiplySubtractingF64(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -78,7 +78,7 @@ extension SIMDDoubleReferenceTests {
         where !hasUnorderedNaNs(multiplying: a, b, adding: c) {
             mismatches.check(
                 H.multiplyAddingSubtracting(a, b, c),
-                HighwayReference.multiplyAddingSubtractingF64(a, b, c),
+                HighwayReference.multiplyAddingSubtractingF64(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -98,7 +98,7 @@ extension SIMDDoubleReferenceTests {
             where !hasUnorderedNaNs(multiplying: a, b, adding: c) {
                 mismatches.check(
                     H.multiplySubtractingAdding(a, b, c),
-                    HighwayReference.multiplySubtractingAddingF64(a, b, c),
+                    HighwayReference.multiplySubtractingAddingF64(a.raw, b.raw, c.raw),
                     "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
                 )
             }

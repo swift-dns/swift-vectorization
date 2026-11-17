@@ -344,7 +344,7 @@ extension SIMDUInt16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.biasedExponent(a),
-                H.Vector(raw: HighwayReference.biasedExponentF16ToU16(a)),
+                H.Vector(raw: HighwayReference.biasedExponentF16ToU16(a.raw)),
                 "a: \(describe(a))"
             )
         }

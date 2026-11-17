@@ -17,7 +17,7 @@ extension SIMDBFloat16ConstantTests {
         mismatches.check(
             H.halfVector(converting: SIMDFloat.repeating(value)),
             H.HalfVector(
-                raw: HighwayReference.halfVectorConvertingF32ToBF16(SIMDFloat.repeating(value))
+                raw: HighwayReference.halfVectorConvertingF32ToBF16(SIMDFloat.repeating(value).raw)
             ),
             ""
         )

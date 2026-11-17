@@ -74,7 +74,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.halfVector(converting: a),
-                H.HalfVector(raw: HighwayReference.halfVectorConvertingF64ToF32(a)),
+                H.HalfVector(raw: HighwayReference.halfVectorConvertingF64ToF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -92,7 +92,7 @@ extension SIMDFloatReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(converting: a))
                 ),
-                HighwayReference.resizedHalfVectorConvertingF64ToF32(a),
+                HighwayReference.resizedHalfVectorConvertingF64ToF32(a.raw),
                 "a: \(describe(a))"
             )
         }

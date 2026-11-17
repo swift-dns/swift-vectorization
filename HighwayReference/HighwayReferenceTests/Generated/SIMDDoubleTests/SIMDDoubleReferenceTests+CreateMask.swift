@@ -25,7 +25,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.mask(from: a),
-                H.Mask(raw: HighwayReference.maskFromVectorF64(a)),
+                H.Mask(raw: HighwayReference.maskFromVectorF64(a.raw)),
                 "a: \(describe(a))"
             )
         }

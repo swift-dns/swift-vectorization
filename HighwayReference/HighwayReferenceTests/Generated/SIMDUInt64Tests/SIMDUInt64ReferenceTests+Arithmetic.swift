@@ -250,7 +250,7 @@ extension SIMDUInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.biasedExponent(a),
-                H.Vector(raw: HighwayReference.biasedExponentF64ToU64(a)),
+                H.Vector(raw: HighwayReference.biasedExponentF64ToU64(a.raw)),
                 "a: \(describe(a))"
             )
         }

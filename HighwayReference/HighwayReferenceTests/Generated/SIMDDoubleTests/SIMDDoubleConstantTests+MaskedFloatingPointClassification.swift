@@ -14,7 +14,7 @@ extension SIMDDoubleConstantTests {
         for mask in maskInputs {
             mismatches.check(
                 H.isNaN(H.repeating(value), where: mask),
-                H.Mask(raw: HighwayReference.isNaNWhereF64(mask.raw, H.repeating(value))),
+                H.Mask(raw: HighwayReference.isNaNWhereF64(mask.raw, H.repeating(value).raw)),
                 "mask: \(describe(mask))"
             )
         }

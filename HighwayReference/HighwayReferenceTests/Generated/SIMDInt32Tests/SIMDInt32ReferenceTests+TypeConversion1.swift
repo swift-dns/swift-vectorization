@@ -103,7 +103,7 @@ extension SIMDInt32ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(bitPattern: a),
-                H.Vector(raw: HighwayReference.vectorBitPatternF32ToI32(a)),
+                H.Vector(raw: HighwayReference.vectorBitPatternF32ToI32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -116,7 +116,7 @@ extension SIMDInt32ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(bitPattern: a),
-                H.Vector(raw: HighwayReference.vectorBitPatternF64ToI32(a)),
+                H.Vector(raw: HighwayReference.vectorBitPatternF64ToI32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -130,7 +130,7 @@ extension SIMDInt32ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(bitPattern: a),
-                H.Vector(raw: HighwayReference.vectorBitPatternF16ToI32(a)),
+                H.Vector(raw: HighwayReference.vectorBitPatternF16ToI32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -157,7 +157,7 @@ extension SIMDInt32ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(converting: a),
-                H.Vector(raw: HighwayReference.vectorConvertingF32ToI32(a)),
+                H.Vector(raw: HighwayReference.vectorConvertingF32ToI32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -170,7 +170,7 @@ extension SIMDInt32ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(convertingInRange: a),
-                H.Vector(raw: HighwayReference.vectorConvertingInRangeF32ToI32(a)),
+                H.Vector(raw: HighwayReference.vectorConvertingInRangeF32ToI32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -184,7 +184,7 @@ extension SIMDInt32ReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.vector(converting: a, where: mask),
-                H.Vector(raw: HighwayReference.vectorConvertingWhereF32ToI32(mask.raw, a)),
+                H.Vector(raw: HighwayReference.vectorConvertingWhereF32ToI32(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -200,7 +200,7 @@ extension SIMDInt32ReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.vector(converting: a, where: mask),
-                H.Vector(raw: HighwayReference.vectorConvertingWhereF32ToI32(mask.raw, a)),
+                H.Vector(raw: HighwayReference.vectorConvertingWhereF32ToI32(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -213,7 +213,7 @@ extension SIMDInt32ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(roundingToNearestOrEven: a),
-                H.Vector(raw: HighwayReference.vectorRoundingToNearestOrEvenF32ToI32(a)),
+                H.Vector(raw: HighwayReference.vectorRoundingToNearestOrEvenF32ToI32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -226,7 +226,7 @@ extension SIMDInt32ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(roundingUp: a),
-                H.Vector(raw: HighwayReference.vectorRoundingUpF32ToI32(a)),
+                H.Vector(raw: HighwayReference.vectorRoundingUpF32ToI32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -239,7 +239,7 @@ extension SIMDInt32ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(roundingDown: a),
-                H.Vector(raw: HighwayReference.vectorRoundingDownF32ToI32(a)),
+                H.Vector(raw: HighwayReference.vectorRoundingDownF32ToI32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -252,7 +252,9 @@ extension SIMDInt32ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.halfVector(roundingToNearestOrEven: a),
-                H.HalfVector(raw: HighwayReference.halfVectorRoundingToNearestOrEvenF64ToI32(a)),
+                H.HalfVector(
+                    raw: HighwayReference.halfVectorRoundingToNearestOrEvenF64ToI32(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -270,7 +272,9 @@ extension SIMDInt32ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(roundingToNearestOrEven: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorRoundingToNearestOrEvenF64ToI32(a)),
+                H.Vector(
+                    raw: HighwayReference.resizedHalfVectorRoundingToNearestOrEvenF64ToI32(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }

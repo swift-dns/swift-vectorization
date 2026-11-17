@@ -180,7 +180,9 @@ extension SIMDInt64ConstantTests {
         )
         mismatches.check(
             H.vector(wideningLower: SIMDFloat.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorWideningLowerF32ToI64(SIMDFloat.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorWideningLowerF32ToI64(SIMDFloat.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()
@@ -436,7 +438,9 @@ extension SIMDInt64ConstantTests {
         )
         mismatches.check(
             H.vector(wideningUpper: SIMDFloat.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorWideningUpperF32ToI64(SIMDFloat.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorWideningUpperF32ToI64(SIMDFloat.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()
@@ -531,7 +535,9 @@ extension SIMDInt64ConstantTests {
         mismatches.check(
             H.vector(wideningLowerInRange: SIMDFloat.repeating(value)),
             H.Vector(
-                raw: HighwayReference.vectorWideningLowerInRangeF32ToI64(SIMDFloat.repeating(value))
+                raw: HighwayReference.vectorWideningLowerInRangeF32ToI64(
+                    SIMDFloat.repeating(value).raw
+                )
             ),
             ""
         )
@@ -627,7 +633,9 @@ extension SIMDInt64ConstantTests {
         mismatches.check(
             H.vector(wideningUpperInRange: SIMDFloat.repeating(value)),
             H.Vector(
-                raw: HighwayReference.vectorWideningUpperInRangeF32ToI64(SIMDFloat.repeating(value))
+                raw: HighwayReference.vectorWideningUpperInRangeF32ToI64(
+                    SIMDFloat.repeating(value).raw
+                )
             ),
             ""
         )
@@ -884,7 +892,9 @@ extension SIMDInt64ConstantTests {
         )
         mismatches.check(
             H.vector(wideningEven: SIMDFloat.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorWideningEvenF32ToI64(SIMDFloat.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorWideningEvenF32ToI64(SIMDFloat.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()

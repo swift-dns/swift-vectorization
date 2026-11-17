@@ -685,7 +685,7 @@ extension SIMDInt32ConstantTests {
         mismatches.check(
             H.halfVector(converting: SIMDDouble.repeating(value)),
             H.HalfVector(
-                raw: HighwayReference.halfVectorConvertingF64ToI32(SIMDDouble.repeating(value))
+                raw: HighwayReference.halfVectorConvertingF64ToI32(SIMDDouble.repeating(value).raw)
             ),
             ""
         )
@@ -782,7 +782,7 @@ extension SIMDInt32ConstantTests {
             H.halfVector(convertingInRange: SIMDDouble.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorConvertingInRangeF64ToI32(
-                    SIMDDouble.repeating(value)
+                    SIMDDouble.repeating(value).raw
                 )
             ),
             ""

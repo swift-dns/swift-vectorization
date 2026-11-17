@@ -14,7 +14,7 @@ extension SIMDFloatConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.oddEven(H.repeating(value), b),
-                HighwayReference.oddEvenF32(H.repeating(value), b),
+                HighwayReference.oddEvenF32(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -29,7 +29,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.oddEven(a, H.repeating(value)),
-                HighwayReference.oddEvenF32(a, H.repeating(value)),
+                HighwayReference.oddEvenF32(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -137,7 +137,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.duplicatingEven(H.repeating(value)),
-            HighwayReference.duplicatingEvenF32(H.repeating(value)),
+            HighwayReference.duplicatingEvenF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -225,7 +225,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.duplicatingOdd(H.repeating(value)),
-            HighwayReference.duplicatingOddF32(H.repeating(value)),
+            HighwayReference.duplicatingOddF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -313,7 +313,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.shuffled1032(H.repeating(value)),
-            HighwayReference.shuffled1032F32(H.repeating(value)),
+            HighwayReference.shuffled1032F32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -401,7 +401,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.shuffled0321(H.repeating(value)),
-            HighwayReference.shuffled0321F32(H.repeating(value)),
+            HighwayReference.shuffled0321F32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -489,7 +489,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.shuffled2103(H.repeating(value)),
-            HighwayReference.shuffled2103F32(H.repeating(value)),
+            HighwayReference.shuffled2103F32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -577,7 +577,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.shuffled2301(H.repeating(value)),
-            HighwayReference.shuffled2301F32(H.repeating(value)),
+            HighwayReference.shuffled2301F32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -665,7 +665,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.shuffled0123(H.repeating(value)),
-            HighwayReference.shuffled0123F32(H.repeating(value)),
+            HighwayReference.shuffled0123F32(H.repeating(value).raw),
             ""
         )
         mismatches.record()

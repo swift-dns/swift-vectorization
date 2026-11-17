@@ -4,81 +4,83 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portRoundedToNearestOrEvenF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+public func portRoundedToNearestOrEvenF64(_ a: SIMD<Double>) -> SIMD<Double> {
     SIMDDouble.roundedToNearestOrEven(a)
 }
 
 @inline(never)
-public func highwayRoundedToNearestOrEvenF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.roundedToNearestOrEvenF64(a)
+public func highwayRoundedToNearestOrEvenF64(_ a: SIMD<Double>) -> SIMD<Double> {
+    HighwayReference.Nothrow.roundedToNearestOrEvenF64(a.raw)
 }
 
 @inline(never)
-public func portRoundedToNearestOrEvenF64ConstantA() -> SIMDDouble.Vector {
+public func portRoundedToNearestOrEvenF64ConstantA() -> SIMD<Double> {
     SIMDDouble.roundedToNearestOrEven(SIMDDouble.repeating(1.5))
 }
 
 @inline(never)
-public func highwayRoundedToNearestOrEvenF64ConstantA() -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.roundedToNearestOrEvenF64(HighwayReference.Nothrow.repeatingF64(1.5))
+public func highwayRoundedToNearestOrEvenF64ConstantA() -> SIMD<Double> {
+    HighwayReference.Nothrow.roundedToNearestOrEvenF64(
+        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    )
 }
 
 @inline(never)
-public func portRoundedTowardZeroF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+public func portRoundedTowardZeroF64(_ a: SIMD<Double>) -> SIMD<Double> {
     SIMDDouble.roundedTowardZero(a)
 }
 
 @inline(never)
-public func highwayRoundedTowardZeroF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.roundedTowardZeroF64(a)
+public func highwayRoundedTowardZeroF64(_ a: SIMD<Double>) -> SIMD<Double> {
+    HighwayReference.Nothrow.roundedTowardZeroF64(a.raw)
 }
 
 @inline(never)
-public func portRoundedTowardZeroF64ConstantA() -> SIMDDouble.Vector {
+public func portRoundedTowardZeroF64ConstantA() -> SIMD<Double> {
     SIMDDouble.roundedTowardZero(SIMDDouble.repeating(1.5))
 }
 
 @inline(never)
-public func highwayRoundedTowardZeroF64ConstantA() -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.roundedTowardZeroF64(HighwayReference.Nothrow.repeatingF64(1.5))
+public func highwayRoundedTowardZeroF64ConstantA() -> SIMD<Double> {
+    HighwayReference.Nothrow.roundedTowardZeroF64(HighwayReference.Nothrow.repeatingF64(1.5).raw)
 }
 
 @inline(never)
-public func portRoundedUpF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+public func portRoundedUpF64(_ a: SIMD<Double>) -> SIMD<Double> {
     SIMDDouble.roundedUp(a)
 }
 
 @inline(never)
-public func highwayRoundedUpF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.roundedUpF64(a)
+public func highwayRoundedUpF64(_ a: SIMD<Double>) -> SIMD<Double> {
+    HighwayReference.Nothrow.roundedUpF64(a.raw)
 }
 
 @inline(never)
-public func portRoundedUpF64ConstantA() -> SIMDDouble.Vector {
+public func portRoundedUpF64ConstantA() -> SIMD<Double> {
     SIMDDouble.roundedUp(SIMDDouble.repeating(1.5))
 }
 
 @inline(never)
-public func highwayRoundedUpF64ConstantA() -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.roundedUpF64(HighwayReference.Nothrow.repeatingF64(1.5))
+public func highwayRoundedUpF64ConstantA() -> SIMD<Double> {
+    HighwayReference.Nothrow.roundedUpF64(HighwayReference.Nothrow.repeatingF64(1.5).raw)
 }
 
 @inline(never)
-public func portRoundedDownF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+public func portRoundedDownF64(_ a: SIMD<Double>) -> SIMD<Double> {
     SIMDDouble.roundedDown(a)
 }
 
 @inline(never)
-public func highwayRoundedDownF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.roundedDownF64(a)
+public func highwayRoundedDownF64(_ a: SIMD<Double>) -> SIMD<Double> {
+    HighwayReference.Nothrow.roundedDownF64(a.raw)
 }
 
 @inline(never)
-public func portRoundedDownF64ConstantA() -> SIMDDouble.Vector {
+public func portRoundedDownF64ConstantA() -> SIMD<Double> {
     SIMDDouble.roundedDown(SIMDDouble.repeating(1.5))
 }
 
 @inline(never)
-public func highwayRoundedDownF64ConstantA() -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.roundedDownF64(HighwayReference.Nothrow.repeatingF64(1.5))
+public func highwayRoundedDownF64ConstantA() -> SIMD<Double> {
+    HighwayReference.Nothrow.roundedDownF64(HighwayReference.Nothrow.repeatingF64(1.5).raw)
 }

@@ -14,7 +14,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.interleavingLower(H.repeating(value), b),
-                HighwayReference.interleavingLowerF64(H.repeating(value), b),
+                HighwayReference.interleavingLowerF64(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -29,7 +29,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.interleavingLower(a, H.repeating(value)),
-                HighwayReference.interleavingLowerF64(a, H.repeating(value)),
+                HighwayReference.interleavingLowerF64(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -139,7 +139,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.interleavingUpper(H.repeating(value), b),
-                HighwayReference.interleavingUpperF64(H.repeating(value), b),
+                HighwayReference.interleavingUpperF64(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -154,7 +154,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.interleavingUpper(a, H.repeating(value)),
-                HighwayReference.interleavingUpperF64(a, H.repeating(value)),
+                HighwayReference.interleavingUpperF64(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -264,7 +264,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.interleavingEven(H.repeating(value), b),
-                HighwayReference.interleavingEvenF64(H.repeating(value), b),
+                HighwayReference.interleavingEvenF64(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -279,7 +279,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.interleavingEven(a, H.repeating(value)),
-                HighwayReference.interleavingEvenF64(a, H.repeating(value)),
+                HighwayReference.interleavingEvenF64(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -389,7 +389,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.interleavingOdd(H.repeating(value), b),
-                HighwayReference.interleavingOddF64(H.repeating(value), b),
+                HighwayReference.interleavingOddF64(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -404,7 +404,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.interleavingOdd(a, H.repeating(value)),
-                HighwayReference.interleavingOddF64(a, H.repeating(value)),
+                HighwayReference.interleavingOddF64(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }

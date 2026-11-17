@@ -21,7 +21,7 @@ extension SIMDUInt32ConstantTests {
                 H.Vector(
                     raw: HighwayReference.vectorConvertingWhereF32ToU32(
                         mask.raw,
-                        SIMDFloat.repeating(value)
+                        SIMDFloat.repeating(value).raw
                     )
                 ),
                 "mask: \(describe(mask))"
@@ -484,7 +484,7 @@ extension SIMDUInt32ConstantTests {
         )
         let port = H.vector(resizing: SIMDFloat.repeating(value))
         let reference = H.Vector(
-            raw: HighwayReference.vectorResizingF32ToU32(SIMDFloat.repeating(value))
+            raw: HighwayReference.vectorResizingF32ToU32(SIMDFloat.repeating(value).raw)
         )
         let definedBytes = SIMDFloat.laneCount * MemoryLayout<SIMDFloat.Lane>.stride
         let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
@@ -588,7 +588,7 @@ extension SIMDUInt32ConstantTests {
         )
         let port = H.halfVector(resizing: SIMDFloat.repeating(value))
         let reference = H.HalfVector(
-            raw: HighwayReference.halfVectorResizingF32ToU32(SIMDFloat.repeating(value))
+            raw: HighwayReference.halfVectorResizingF32ToU32(SIMDFloat.repeating(value).raw)
         )
         let definedBytes = SIMDFloat.laneCount * MemoryLayout<SIMDFloat.Lane>.stride
         let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
@@ -692,7 +692,7 @@ extension SIMDUInt32ConstantTests {
         )
         let port = H.vector(resizing: SIMDDouble.repeating(value))
         let reference = H.Vector(
-            raw: HighwayReference.vectorResizingF64ToU32(SIMDDouble.repeating(value))
+            raw: HighwayReference.vectorResizingF64ToU32(SIMDDouble.repeating(value).raw)
         )
         let definedBytes = SIMDDouble.laneCount * MemoryLayout<SIMDDouble.Lane>.stride
         let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
@@ -796,7 +796,7 @@ extension SIMDUInt32ConstantTests {
         )
         let port = H.halfVector(resizing: SIMDDouble.repeating(value))
         let reference = H.HalfVector(
-            raw: HighwayReference.halfVectorResizingF64ToU32(SIMDDouble.repeating(value))
+            raw: HighwayReference.halfVectorResizingF64ToU32(SIMDDouble.repeating(value).raw)
         )
         let definedBytes = SIMDDouble.laneCount * MemoryLayout<SIMDDouble.Lane>.stride
         let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
@@ -901,7 +901,7 @@ extension SIMDUInt32ConstantTests {
         )
         let port = H.vector(resizing: SIMDFloat16.repeating(value))
         let reference = H.Vector(
-            raw: HighwayReference.vectorResizingF16ToU32(SIMDFloat16.repeating(value))
+            raw: HighwayReference.vectorResizingF16ToU32(SIMDFloat16.repeating(value).raw)
         )
         let definedBytes = SIMDFloat16.laneCount * MemoryLayout<SIMDFloat16.Lane>.stride
         let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride

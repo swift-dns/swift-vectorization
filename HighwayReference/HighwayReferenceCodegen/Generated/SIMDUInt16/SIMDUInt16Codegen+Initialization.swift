@@ -4,117 +4,111 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portZeroU16() -> SIMDUInt16.Vector {
+public func portZeroU16() -> SIMD<UInt16> {
     SIMDUInt16.zero()
 }
 
 @inline(never)
-public func highwayZeroU16() -> SIMDUInt16.Vector {
+public func highwayZeroU16() -> SIMD<UInt16> {
     SIMDUInt16.Vector(raw: HighwayReference.Nothrow.zeroU16())
 }
 
 @inline(never)
-public func portRepeatingU16(_ value: SIMDUInt16.Lane) -> SIMDUInt16.Vector {
+public func portRepeatingU16(_ value: UInt16) -> SIMD<UInt16> {
     SIMDUInt16.repeating(value)
 }
 
 @inline(never)
-public func highwayRepeatingU16(_ value: UInt16) -> SIMDUInt16.Vector {
+public func highwayRepeatingU16(_ value: UInt16) -> SIMD<UInt16> {
     SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(value))
 }
 
 @inline(never)
-public func portRepeatingU16ConstantValue() -> SIMDUInt16.Vector {
+public func portRepeatingU16ConstantValue() -> SIMD<UInt16> {
     SIMDUInt16.repeating(26)
 }
 
 @inline(never)
-public func highwayRepeatingU16ConstantValue() -> SIMDUInt16.Vector {
+public func highwayRepeatingU16ConstantValue() -> SIMD<UInt16> {
     SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26))
 }
 
 @inline(never)
-public func portIotaU16(_ value: SIMDUInt16.Lane) -> SIMDUInt16.Vector {
+public func portIotaU16(_ value: UInt16) -> SIMD<UInt16> {
     SIMDUInt16.iota(value)
 }
 
 @inline(never)
-public func highwayIotaU16(_ value: UInt16) -> SIMDUInt16.Vector {
+public func highwayIotaU16(_ value: UInt16) -> SIMD<UInt16> {
     SIMDUInt16.Vector(raw: HighwayReference.Nothrow.iotaU16(value))
 }
 
 @inline(never)
-public func portIotaU16ConstantValue() -> SIMDUInt16.Vector {
+public func portIotaU16ConstantValue() -> SIMD<UInt16> {
     SIMDUInt16.iota(26)
 }
 
 @inline(never)
-public func highwayIotaU16ConstantValue() -> SIMDUInt16.Vector {
+public func highwayIotaU16ConstantValue() -> SIMD<UInt16> {
     SIMDUInt16.Vector(raw: HighwayReference.Nothrow.iotaU16(26))
 }
 
 @inline(never)
-public func portSignBitU16() -> SIMDUInt16.Vector {
+public func portSignBitU16() -> SIMD<UInt16> {
     SIMDUInt16.signBit()
 }
 
 @inline(never)
-public func highwaySignBitU16() -> SIMDUInt16.Vector {
+public func highwaySignBitU16() -> SIMD<UInt16> {
     SIMDUInt16.Vector(raw: HighwayReference.Nothrow.signBitU16())
 }
 
 @inline(never)
-public func portUnspecifiedU16() -> SIMDUInt16.Vector {
+public func portUnspecifiedU16() -> SIMD<UInt16> {
     SIMDUInt16.unspecified()
 }
 
 @inline(never)
-public func highwayUnspecifiedU16() -> SIMDUInt16.Vector {
+public func highwayUnspecifiedU16() -> SIMD<UInt16> {
     SIMDUInt16.Vector(raw: HighwayReference.Nothrow.unspecifiedU16())
 }
 
 @inline(never)
-public func portRepeatingWhereU16(
-    _ value: SIMDUInt16.Lane,
-    where mask: SIMDUInt16.Mask
-) -> SIMDUInt16.Vector {
+public func portRepeatingWhereU16(_ value: UInt16, where mask: SIMD<UInt16>.Mask) -> SIMD<UInt16> {
     SIMDUInt16.repeating(value, where: mask)
 }
 
 @inline(never)
-public func highwayRepeatingWhereU16(
-    _ value: UInt16,
-    where mask: SIMDUInt16.Mask
-) -> SIMDUInt16.Vector {
+public func highwayRepeatingWhereU16(_ value: UInt16, where mask: SIMD<UInt16>.Mask) -> SIMD<UInt16>
+{
     SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingWhereU16(mask.raw, value))
 }
 
 @inline(never)
-public func portRepeatingWhereU16ConstantValue(where mask: SIMDUInt16.Mask) -> SIMDUInt16.Vector {
+public func portRepeatingWhereU16ConstantValue(where mask: SIMD<UInt16>.Mask) -> SIMD<UInt16> {
     SIMDUInt16.repeating(26, where: mask)
 }
 
 @inline(never)
-public func highwayRepeatingWhereU16ConstantValue(where mask: SIMDUInt16.Mask) -> SIMDUInt16.Vector
-{
+public func highwayRepeatingWhereU16ConstantValue(where mask: SIMD<UInt16>.Mask) -> SIMD<UInt16> {
     SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingWhereU16(mask.raw, 26))
 }
 
 @inline(never)
 public func portRepeatingWhereOtherwiseU16(
-    _ value: SIMDUInt16.Lane,
-    where mask: SIMDUInt16.Mask,
-    otherwise: SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
+    _ value: UInt16,
+    where mask: SIMD<UInt16>.Mask,
+    otherwise: SIMD<UInt16>
+) -> SIMD<UInt16> {
     SIMDUInt16.repeating(value, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayRepeatingWhereOtherwiseU16(
     _ value: UInt16,
-    where mask: SIMDUInt16.Mask,
-    otherwise: SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
+    where mask: SIMD<UInt16>.Mask,
+    otherwise: SIMD<UInt16>
+) -> SIMD<UInt16> {
     SIMDUInt16.Vector(
         raw: HighwayReference.Nothrow.repeatingWhereOtherwiseU16(otherwise.raw, mask.raw, value)
     )
@@ -122,17 +116,17 @@ public func highwayRepeatingWhereOtherwiseU16(
 
 @inline(never)
 public func portRepeatingWhereOtherwiseU16ConstantValue(
-    where mask: SIMDUInt16.Mask,
-    otherwise: SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
+    where mask: SIMD<UInt16>.Mask,
+    otherwise: SIMD<UInt16>
+) -> SIMD<UInt16> {
     SIMDUInt16.repeating(26, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayRepeatingWhereOtherwiseU16ConstantValue(
-    where mask: SIMDUInt16.Mask,
-    otherwise: SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
+    where mask: SIMD<UInt16>.Mask,
+    otherwise: SIMD<UInt16>
+) -> SIMD<UInt16> {
     SIMDUInt16.Vector(
         raw: HighwayReference.Nothrow.repeatingWhereOtherwiseU16(otherwise.raw, mask.raw, 26)
     )
@@ -140,17 +134,17 @@ public func highwayRepeatingWhereOtherwiseU16ConstantValue(
 
 @inline(never)
 public func portRepeatingWhereOtherwiseU16ConstantOtherwise(
-    _ value: SIMDUInt16.Lane,
-    where mask: SIMDUInt16.Mask
-) -> SIMDUInt16.Vector {
+    _ value: UInt16,
+    where mask: SIMD<UInt16>.Mask
+) -> SIMD<UInt16> {
     SIMDUInt16.repeating(value, where: mask, otherwise: SIMDUInt16.repeating(26))
 }
 
 @inline(never)
 public func highwayRepeatingWhereOtherwiseU16ConstantOtherwise(
     _ value: UInt16,
-    where mask: SIMDUInt16.Mask
-) -> SIMDUInt16.Vector {
+    where mask: SIMD<UInt16>.Mask
+) -> SIMD<UInt16> {
     SIMDUInt16.Vector(
         raw: HighwayReference.Nothrow.repeatingWhereOtherwiseU16(
             SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
@@ -170,7 +164,7 @@ public func portRepeatingBlockU16(
     _ v5: SIMDUInt16.Lane,
     _ v6: SIMDUInt16.Lane,
     _ v7: SIMDUInt16.Lane
-) -> SIMDUInt16.Vector {
+) -> SIMD<UInt16> {
     SIMDUInt16.repeatingBlock(v0, v1, v2, v3, v4, v5, v6, v7)
 }
 
@@ -184,7 +178,7 @@ public func highwayRepeatingBlockU16(
     _ v5: UInt16,
     _ v6: UInt16,
     _ v7: UInt16
-) -> SIMDUInt16.Vector {
+) -> SIMD<UInt16> {
     SIMDUInt16.Vector(
         raw: HighwayReference.Nothrow.repeatingBlockU16(v0, v1, v2, v3, v4, v5, v6, v7)
     )

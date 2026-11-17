@@ -13,7 +13,7 @@ extension SIMDDoubleReferenceTests {
         for (a, bytes) in everyPair(aInputs, bytesInputs) {
             mismatches.check(
                 H.shiftedLeftBytes(a, by: bytes),
-                HighwayReference.shiftedLeftBytesF64(a, Int32(truncatingIfNeeded: bytes)),
+                HighwayReference.shiftedLeftBytesF64(a.raw, Int32(truncatingIfNeeded: bytes)),
                 "a: \(describe(a)), bytes: \(bytes)"
             )
         }
@@ -27,7 +27,7 @@ extension SIMDDoubleReferenceTests {
         for (a, bytes) in everyPair(aInputs, bytesInputs) {
             mismatches.check(
                 unsafe H.shiftedLeftBytes(a, byUnchecked: bytes),
-                HighwayReference.shiftedLeftBytesF64(a, Int32(truncatingIfNeeded: bytes)),
+                HighwayReference.shiftedLeftBytesF64(a.raw, Int32(truncatingIfNeeded: bytes)),
                 "a: \(describe(a)), bytes: \(bytes)"
             )
         }
@@ -41,7 +41,7 @@ extension SIMDDoubleReferenceTests {
         for (a, bytes) in everyPair(aInputs, bytesInputs) {
             mismatches.check(
                 H.shiftedRightBytes(a, by: bytes),
-                HighwayReference.shiftedRightBytesF64(a, Int32(truncatingIfNeeded: bytes)),
+                HighwayReference.shiftedRightBytesF64(a.raw, Int32(truncatingIfNeeded: bytes)),
                 "a: \(describe(a)), bytes: \(bytes)"
             )
         }
@@ -55,7 +55,7 @@ extension SIMDDoubleReferenceTests {
         for (a, bytes) in everyPair(aInputs, bytesInputs) {
             mismatches.check(
                 unsafe H.shiftedRightBytes(a, byUnchecked: bytes),
-                HighwayReference.shiftedRightBytesF64(a, Int32(truncatingIfNeeded: bytes)),
+                HighwayReference.shiftedRightBytesF64(a.raw, Int32(truncatingIfNeeded: bytes)),
                 "a: \(describe(a)), bytes: \(bytes)"
             )
         }
@@ -69,7 +69,7 @@ extension SIMDDoubleReferenceTests {
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.shiftedLeftLanes(a, by: lanes),
-                HighwayReference.shiftedLeftLanesF64(a, Int32(truncatingIfNeeded: lanes)),
+                HighwayReference.shiftedLeftLanesF64(a.raw, Int32(truncatingIfNeeded: lanes)),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -83,7 +83,7 @@ extension SIMDDoubleReferenceTests {
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 unsafe H.shiftedLeftLanes(a, byUnchecked: lanes),
-                HighwayReference.shiftedLeftLanesF64(a, Int32(truncatingIfNeeded: lanes)),
+                HighwayReference.shiftedLeftLanesF64(a.raw, Int32(truncatingIfNeeded: lanes)),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -97,7 +97,7 @@ extension SIMDDoubleReferenceTests {
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.shiftedRightLanes(a, by: lanes),
-                HighwayReference.shiftedRightLanesF64(a, Int32(truncatingIfNeeded: lanes)),
+                HighwayReference.shiftedRightLanesF64(a.raw, Int32(truncatingIfNeeded: lanes)),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -111,7 +111,7 @@ extension SIMDDoubleReferenceTests {
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 unsafe H.shiftedRightLanes(a, byUnchecked: lanes),
-                HighwayReference.shiftedRightLanesF64(a, Int32(truncatingIfNeeded: lanes)),
+                HighwayReference.shiftedRightLanesF64(a.raw, Int32(truncatingIfNeeded: lanes)),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -132,8 +132,8 @@ extension SIMDDoubleReferenceTests {
             mismatches.check(
                 H.combinedShiftedRightBytes(a, b, by: bytes),
                 HighwayReference.combinedShiftedRightBytesF64(
-                    a,
-                    b,
+                    a.raw,
+                    b.raw,
                     Int32(truncatingIfNeeded: bytes)
                 ),
                 "a: \(describe(a)), b: \(describe(b)), bytes: \(bytes)"
@@ -156,8 +156,8 @@ extension SIMDDoubleReferenceTests {
             mismatches.check(
                 unsafe H.combinedShiftedRightBytes(a, b, byUnchecked: bytes),
                 HighwayReference.combinedShiftedRightBytesF64(
-                    a,
-                    b,
+                    a.raw,
+                    b.raw,
                     Int32(truncatingIfNeeded: bytes)
                 ),
                 "a: \(describe(a)), b: \(describe(b)), bytes: \(bytes)"
@@ -180,8 +180,8 @@ extension SIMDDoubleReferenceTests {
             mismatches.check(
                 H.combinedShiftedRightLanes(a, b, by: lanes),
                 HighwayReference.combinedShiftedRightLanesF64(
-                    a,
-                    b,
+                    a.raw,
+                    b.raw,
                     Int32(truncatingIfNeeded: lanes)
                 ),
                 "a: \(describe(a)), b: \(describe(b)), lanes: \(lanes)"
@@ -204,8 +204,8 @@ extension SIMDDoubleReferenceTests {
             mismatches.check(
                 unsafe H.combinedShiftedRightLanes(a, b, byUnchecked: lanes),
                 HighwayReference.combinedShiftedRightLanesF64(
-                    a,
-                    b,
+                    a.raw,
+                    b.raw,
                     Int32(truncatingIfNeeded: lanes)
                 ),
                 "a: \(describe(a)), b: \(describe(b)), lanes: \(lanes)"

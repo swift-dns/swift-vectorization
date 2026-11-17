@@ -5,620 +5,599 @@ public import Vectorization
 
 @inline(never)
 public func portMultiplyAddingF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.multiplyAdding(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyAddingF32(a, b, c)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.multiplyAddingF32(a.raw, b.raw, c.raw)
 }
 
 @inline(never)
-public func portMultiplyAddingF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portMultiplyAddingF32ConstantA(_ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.multiplyAdding(SIMDFloat.repeating(1.5), b, c)
 }
 
 @inline(never)
-public func highwayMultiplyAddingF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyAddingF32(HighwayReference.Nothrow.repeatingF32(1.5), b, c)
+public func highwayMultiplyAddingF32ConstantA(_ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.multiplyAddingF32(
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw,
+        c.raw
+    )
 }
 
 @inline(never)
-public func portMultiplyAddingF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portMultiplyAddingF32ConstantB(_ a: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.multiplyAdding(a, SIMDFloat.repeating(1.5), c)
 }
 
 @inline(never)
-public func highwayMultiplyAddingF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyAddingF32(a, HighwayReference.Nothrow.repeatingF32(1.5), c)
+public func highwayMultiplyAddingF32ConstantB(_ a: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.multiplyAddingF32(
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        c.raw
+    )
 }
 
 @inline(never)
-public func portMultiplyAddingF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portMultiplyAddingF32ConstantC(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.multiplyAdding(a, b, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayMultiplyAddingF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyAddingF32(a, b, HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayMultiplyAddingF32ConstantC(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.multiplyAddingF32(
+        a.raw,
+        b.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    )
 }
 
 @inline(never)
 public func portNegatedMultiplyAddingF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.negatedMultiplyAdding(a, b, c)
 }
 
 @inline(never)
 public func highwayNegatedMultiplyAddingF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.negatedMultiplyAddingF32(a, b, c)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.negatedMultiplyAddingF32(a.raw, b.raw, c.raw)
 }
 
 @inline(never)
-public func portNegatedMultiplyAddingF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portNegatedMultiplyAddingF32ConstantA(_ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float>
+{
     SIMDFloat.negatedMultiplyAdding(SIMDFloat.repeating(1.5), b, c)
 }
 
 @inline(never)
 public func highwayNegatedMultiplyAddingF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.negatedMultiplyAddingF32(
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        b,
-        c
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw,
+        c.raw
     )
 }
 
 @inline(never)
-public func portNegatedMultiplyAddingF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portNegatedMultiplyAddingF32ConstantB(_ a: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float>
+{
     SIMDFloat.negatedMultiplyAdding(a, SIMDFloat.repeating(1.5), c)
 }
 
 @inline(never)
 public func highwayNegatedMultiplyAddingF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.negatedMultiplyAddingF32(
-        a,
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        c
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        c.raw
     )
 }
 
 @inline(never)
-public func portNegatedMultiplyAddingF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portNegatedMultiplyAddingF32ConstantC(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float>
+{
     SIMDFloat.negatedMultiplyAdding(a, b, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
 public func highwayNegatedMultiplyAddingF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.negatedMultiplyAddingF32(
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+        a.raw,
+        b.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
     )
 }
 
 @inline(never)
 public func portMultiplySubtractingF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.multiplySubtracting(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplySubtractingF32(a, b, c)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.multiplySubtractingF32(a.raw, b.raw, c.raw)
 }
 
 @inline(never)
-public func portMultiplySubtractingF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portMultiplySubtractingF32ConstantA(_ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.multiplySubtracting(SIMDFloat.repeating(1.5), b, c)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.multiplySubtractingF32(
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        b,
-        c
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw,
+        c.raw
     )
 }
 
 @inline(never)
-public func portMultiplySubtractingF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portMultiplySubtractingF32ConstantB(_ a: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.multiplySubtracting(a, SIMDFloat.repeating(1.5), c)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.multiplySubtractingF32(
-        a,
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        c
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        c.raw
     )
 }
 
 @inline(never)
-public func portMultiplySubtractingF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portMultiplySubtractingF32ConstantC(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.multiplySubtracting(a, b, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMultiplySubtractingF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.multiplySubtractingF32(
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+        a.raw,
+        b.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
     )
 }
 
 @inline(never)
 public func portNegatedMultiplySubtractingF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.negatedMultiplySubtracting(a, b, c)
 }
 
 @inline(never)
 public func highwayNegatedMultiplySubtractingF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.negatedMultiplySubtractingF32(a, b, c)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.negatedMultiplySubtractingF32(a.raw, b.raw, c.raw)
 }
 
 @inline(never)
 public func portNegatedMultiplySubtractingF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.negatedMultiplySubtracting(SIMDFloat.repeating(1.5), b, c)
 }
 
 @inline(never)
 public func highwayNegatedMultiplySubtractingF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.negatedMultiplySubtractingF32(
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        b,
-        c
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw,
+        c.raw
     )
 }
 
 @inline(never)
 public func portNegatedMultiplySubtractingF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.negatedMultiplySubtracting(a, SIMDFloat.repeating(1.5), c)
 }
 
 @inline(never)
 public func highwayNegatedMultiplySubtractingF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.negatedMultiplySubtractingF32(
-        a,
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        c
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        c.raw
     )
 }
 
 @inline(never)
 public func portNegatedMultiplySubtractingF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.negatedMultiplySubtracting(a, b, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
 public func highwayNegatedMultiplySubtractingF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.negatedMultiplySubtractingF32(
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+        a.raw,
+        b.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
     )
 }
 
 @inline(never)
 public func portMultiplyAddingSubtractingF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.multiplyAddingSubtracting(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingSubtractingF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyAddingSubtractingF32(a, b, c)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.multiplyAddingSubtractingF32(a.raw, b.raw, c.raw)
 }
 
 @inline(never)
 public func portMultiplyAddingSubtractingF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.multiplyAddingSubtracting(SIMDFloat.repeating(1.5), b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingSubtractingF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.multiplyAddingSubtractingF32(
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        b,
-        c
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw,
+        c.raw
     )
 }
 
 @inline(never)
 public func portMultiplyAddingSubtractingF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.multiplyAddingSubtracting(a, SIMDFloat.repeating(1.5), c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingSubtractingF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.multiplyAddingSubtractingF32(
-        a,
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        c
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        c.raw
     )
 }
 
 @inline(never)
 public func portMultiplyAddingSubtractingF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.multiplyAddingSubtracting(a, b, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMultiplyAddingSubtractingF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.multiplyAddingSubtractingF32(
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+        a.raw,
+        b.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
     )
 }
 
 @inline(never)
 public func portMultiplySubtractingAddingF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.multiplySubtractingAdding(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingAddingF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplySubtractingAddingF32(a, b, c)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.multiplySubtractingAddingF32(a.raw, b.raw, c.raw)
 }
 
 @inline(never)
 public func portMultiplySubtractingAddingF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.multiplySubtractingAdding(SIMDFloat.repeating(1.5), b, c)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingAddingF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.multiplySubtractingAddingF32(
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        b,
-        c
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw,
+        c.raw
     )
 }
 
 @inline(never)
 public func portMultiplySubtractingAddingF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.multiplySubtractingAdding(a, SIMDFloat.repeating(1.5), c)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingAddingF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.multiplySubtractingAddingF32(
-        a,
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        c
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        c.raw
     )
 }
 
 @inline(never)
 public func portMultiplySubtractingAddingF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.multiplySubtractingAdding(a, b, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMultiplySubtractingAddingF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.multiplySubtractingAddingF32(
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+        a.raw,
+        b.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
     )
 }
 
 @inline(never)
 public func portMultiplyAddingEvenBF16ToF32(
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<BFloat16>,
+    _ b: SIMD<BFloat16>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.multiplyAddingEven(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingEvenBF16ToF32(
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyAddingEvenBF16ToF32(a.raw, b.raw, c)
+    _ a: SIMD<BFloat16>,
+    _ b: SIMD<BFloat16>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.multiplyAddingEvenBF16ToF32(a.raw, b.raw, c.raw)
 }
 
 @inline(never)
 public func portMultiplyAddingEvenBF16ToF32ConstantA(
-    _ b: SIMDBFloat16.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ b: SIMD<BFloat16>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.multiplyAddingEven(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingEvenBF16ToF32ConstantA(
-    _ b: SIMDBFloat16.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ b: SIMD<BFloat16>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.multiplyAddingEvenBF16ToF32(
         SIMDBFloat16.Vector(
             raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
         ).raw,
         b.raw,
-        c
+        c.raw
     )
 }
 
 @inline(never)
 public func portMultiplyAddingEvenBF16ToF32ConstantB(
-    _ a: SIMDBFloat16.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<BFloat16>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.multiplyAddingEven(a, SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingEvenBF16ToF32ConstantB(
-    _ a: SIMDBFloat16.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<BFloat16>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.multiplyAddingEvenBF16ToF32(
         a.raw,
         SIMDBFloat16.Vector(
             raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
         ).raw,
-        c
+        c.raw
     )
 }
 
 @inline(never)
 public func portMultiplyAddingEvenBF16ToF32ConstantC(
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<BFloat16>,
+    _ b: SIMD<BFloat16>
+) -> SIMD<Float> {
     SIMDFloat.multiplyAddingEven(a, b, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMultiplyAddingEvenBF16ToF32ConstantC(
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<BFloat16>,
+    _ b: SIMD<BFloat16>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.multiplyAddingEvenBF16ToF32(
         a.raw,
         b.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
     )
 }
 
 @inline(never)
 public func portMultiplyAddingOddBF16ToF32(
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<BFloat16>,
+    _ b: SIMD<BFloat16>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.multiplyAddingOdd(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingOddBF16ToF32(
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyAddingOddBF16ToF32(a.raw, b.raw, c)
+    _ a: SIMD<BFloat16>,
+    _ b: SIMD<BFloat16>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.multiplyAddingOddBF16ToF32(a.raw, b.raw, c.raw)
 }
 
 @inline(never)
 public func portMultiplyAddingOddBF16ToF32ConstantA(
-    _ b: SIMDBFloat16.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ b: SIMD<BFloat16>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.multiplyAddingOdd(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingOddBF16ToF32ConstantA(
-    _ b: SIMDBFloat16.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ b: SIMD<BFloat16>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.multiplyAddingOddBF16ToF32(
         SIMDBFloat16.Vector(
             raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
         ).raw,
         b.raw,
-        c
+        c.raw
     )
 }
 
 @inline(never)
 public func portMultiplyAddingOddBF16ToF32ConstantB(
-    _ a: SIMDBFloat16.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<BFloat16>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.multiplyAddingOdd(a, SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingOddBF16ToF32ConstantB(
-    _ a: SIMDBFloat16.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<BFloat16>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.multiplyAddingOddBF16ToF32(
         a.raw,
         SIMDBFloat16.Vector(
             raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
         ).raw,
-        c
+        c.raw
     )
 }
 
 @inline(never)
 public func portMultiplyAddingOddBF16ToF32ConstantC(
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<BFloat16>,
+    _ b: SIMD<BFloat16>
+) -> SIMD<Float> {
     SIMDFloat.multiplyAddingOdd(a, b, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMultiplyAddingOddBF16ToF32ConstantC(
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<BFloat16>,
+    _ b: SIMD<BFloat16>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.multiplyAddingOddBF16ToF32(
         a.raw,
         b.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
     )
 }

@@ -594,7 +594,7 @@ extension SIMDInt8ConstantTests {
         )
         let port = H.vector(resizing: SIMDFloat.repeating(value))
         let reference = H.Vector(
-            raw: HighwayReference.vectorResizingF32ToI8(SIMDFloat.repeating(value))
+            raw: HighwayReference.vectorResizingF32ToI8(SIMDFloat.repeating(value).raw)
         )
         let definedBytes = SIMDFloat.laneCount * MemoryLayout<SIMDFloat.Lane>.stride
         let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
@@ -698,7 +698,7 @@ extension SIMDInt8ConstantTests {
         )
         let port = H.halfVector(resizing: SIMDFloat.repeating(value))
         let reference = H.HalfVector(
-            raw: HighwayReference.halfVectorResizingF32ToI8(SIMDFloat.repeating(value))
+            raw: HighwayReference.halfVectorResizingF32ToI8(SIMDFloat.repeating(value).raw)
         )
         let definedBytes = SIMDFloat.laneCount * MemoryLayout<SIMDFloat.Lane>.stride
         let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
@@ -802,7 +802,7 @@ extension SIMDInt8ConstantTests {
         )
         let port = H.quarterVector(resizing: SIMDFloat.repeating(value))
         let reference = H.QuarterVector(
-            raw: HighwayReference.quarterVectorResizingF32ToI8(SIMDFloat.repeating(value))
+            raw: HighwayReference.quarterVectorResizingF32ToI8(SIMDFloat.repeating(value).raw)
         )
         let definedBytes = SIMDFloat.laneCount * MemoryLayout<SIMDFloat.Lane>.stride
         let grownBytes = H.QuarterVector.laneCount * MemoryLayout<H.Lane>.stride
@@ -906,7 +906,7 @@ extension SIMDInt8ConstantTests {
         )
         let port = H.eighthVector(resizing: SIMDFloat.repeating(value))
         let reference = H.EighthVector(
-            raw: HighwayReference.eighthVectorResizingF32ToI8(SIMDFloat.repeating(value))
+            raw: HighwayReference.eighthVectorResizingF32ToI8(SIMDFloat.repeating(value).raw)
         )
         let definedBytes = SIMDFloat.laneCount * MemoryLayout<SIMDFloat.Lane>.stride
         let grownBytes = H.EighthVector.laneCount * MemoryLayout<H.Lane>.stride
@@ -1010,7 +1010,7 @@ extension SIMDInt8ConstantTests {
         )
         let port = H.vector(resizing: SIMDDouble.repeating(value))
         let reference = H.Vector(
-            raw: HighwayReference.vectorResizingF64ToI8(SIMDDouble.repeating(value))
+            raw: HighwayReference.vectorResizingF64ToI8(SIMDDouble.repeating(value).raw)
         )
         let definedBytes = SIMDDouble.laneCount * MemoryLayout<SIMDDouble.Lane>.stride
         let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride

@@ -13,7 +13,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.oddEvenBlocks(a, b),
-                HighwayReference.oddEvenBlocksF64(a, b),
+                HighwayReference.oddEvenBlocksF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -26,7 +26,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.swappingAdjacentBlocks(a),
-                HighwayReference.swappingAdjacentBlocksF64(a),
+                HighwayReference.swappingAdjacentBlocksF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -40,7 +40,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingEvenBlocks(a, b),
-                HighwayReference.interleavingEvenBlocksF64(a, b),
+                HighwayReference.interleavingEvenBlocksF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -54,7 +54,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingOddBlocks(a, b),
-                HighwayReference.interleavingOddBlocksF64(a, b),
+                HighwayReference.interleavingOddBlocksF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -68,7 +68,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingLowerBlocks(a, b),
-                HighwayReference.interleavingLowerBlocksF64(a, b),
+                HighwayReference.interleavingLowerBlocksF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -82,7 +82,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingUpperBlocks(a, b),
-                HighwayReference.interleavingUpperBlocksF64(a, b),
+                HighwayReference.interleavingUpperBlocksF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -96,7 +96,7 @@ extension SIMDDoubleReferenceTests {
         for (a, lane) in everyPair(aInputs, laneInputs) {
             mismatches.check(
                 H.broadcasting(a, lane: lane),
-                HighwayReference.broadcastingLaneF64(a, Int32(truncatingIfNeeded: lane)),
+                HighwayReference.broadcastingLaneF64(a.raw, Int32(truncatingIfNeeded: lane)),
                 "a: \(describe(a)), lane: \(lane)"
             )
         }
@@ -110,7 +110,7 @@ extension SIMDDoubleReferenceTests {
         for (a, lane) in everyPair(aInputs, laneInputs) {
             mismatches.check(
                 unsafe H.broadcasting(a, laneUnchecked: lane),
-                HighwayReference.broadcastingLaneF64(a, Int32(truncatingIfNeeded: lane)),
+                HighwayReference.broadcastingLaneF64(a.raw, Int32(truncatingIfNeeded: lane)),
                 "a: \(describe(a)), lane: \(lane)"
             )
         }
@@ -124,7 +124,7 @@ extension SIMDDoubleReferenceTests {
         for (a, block) in everyPair(aInputs, blockInputs) {
             mismatches.check(
                 H.broadcasting(a, block: block),
-                HighwayReference.broadcastingBlockF64(a, Int32(truncatingIfNeeded: block)),
+                HighwayReference.broadcastingBlockF64(a.raw, Int32(truncatingIfNeeded: block)),
                 "a: \(describe(a)), block: \(block)"
             )
         }
@@ -138,7 +138,7 @@ extension SIMDDoubleReferenceTests {
         for (a, block) in everyPair(aInputs, blockInputs) {
             mismatches.check(
                 unsafe H.broadcasting(a, blockUnchecked: block),
-                HighwayReference.broadcastingBlockF64(a, Int32(truncatingIfNeeded: block)),
+                HighwayReference.broadcastingBlockF64(a.raw, Int32(truncatingIfNeeded: block)),
                 "a: \(describe(a)), block: \(block)"
             )
         }

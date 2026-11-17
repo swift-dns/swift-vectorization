@@ -13,7 +13,7 @@ import Android
 struct OpsTests {
     @Test("A vector survives a store after a load")
     func loadStoreRoundTrip() {
-        typealias H = SIMDUInt8
+        typealias H = SIMD<UInt8>
         let lanes = H.laneCount
         let input = (0..<lanes).map { UInt8($0 &* 3) }
         var output = [UInt8](repeating: 0, count: lanes)
@@ -29,7 +29,7 @@ struct OpsTests {
 
     @Test("Arithmetic matches the scalar result")
     func arithmetic() {
-        typealias H = SIMDInt32
+        typealias H = SIMD<Int32>
         let lanes = H.laneCount
         let a = (0..<lanes).map { Int32($0) - 4 }
         let b = (0..<lanes).map { Int32($0) * 3 }
@@ -61,7 +61,7 @@ struct OpsTests {
 
     @Test("Multiply-adding the low 52 bits of a product keeps what is below bit 52")
     func multiplyAddingLow52Bits() {
-        typealias H = SIMDUInt64
+        typealias H = SIMD<UInt64>
         let lanes = H.laneCount
         let limit: UInt64 = 1 << 52
         let cases: [(a: UInt64, b: UInt64, c: UInt64)] = [
@@ -99,7 +99,7 @@ struct OpsTests {
 
     @Test("Multiply-adding the high 52 bits of a product keeps bits 52 to 103, past the carry")
     func multiplyAddingHigh52Bits() {
-        typealias H = SIMDUInt64
+        typealias H = SIMD<UInt64>
         let lanes = H.laneCount
         let limit: UInt64 = 1 << 52
         let cases: [(a: UInt64, b: UInt64, c: UInt64)] = [
@@ -142,7 +142,7 @@ struct OpsTests {
 
     @Test("Shifts and bitwise ops match the scalar result")
     func bitwise() {
-        typealias H = SIMDUInt32
+        typealias H = SIMD<UInt32>
         let lanes = H.laneCount
         let a = (0..<lanes).map { UInt32(truncatingIfNeeded: $0) &* 2_654_435_761 }
 
@@ -166,12 +166,13 @@ struct OpsTests {
 
     @Test("An and-xor combines three vectors lane by lane")
     func bitwiseAndXor() {
-        func check<H: SIMDIntegerElement>(_ type: H.Type) where H.Lane: FixedWidthInteger {
+        func check<Lane: SIMDIntegerElement & FixedWidthInteger>(_ type: Lane.Type) {
+            typealias H = SIMD<Lane>
             let lanes = H.laneCount
-            let a = ContiguousArray((0..<lanes).map { H.Lane(truncatingIfNeeded: $0 &* 37 &+ 11) })
-            let b = ContiguousArray((0..<lanes).map { H.Lane(truncatingIfNeeded: $0 &* 91 &+ 5) })
-            let c = ContiguousArray((0..<lanes).map { H.Lane(truncatingIfNeeded: $0 &* 53 &+ 29) })
-            var output = ContiguousArray<H.Lane>(repeating: 0, count: lanes)
+            let a = ContiguousArray((0..<lanes).map { Lane(truncatingIfNeeded: $0 &* 37 &+ 11) })
+            let b = ContiguousArray((0..<lanes).map { Lane(truncatingIfNeeded: $0 &* 91 &+ 5) })
+            let c = ContiguousArray((0..<lanes).map { Lane(truncatingIfNeeded: $0 &* 53 &+ 29) })
+            var output = ContiguousArray<Lane>(repeating: 0, count: lanes)
 
             var destination = output.mutableSpan
             H.store(
@@ -182,19 +183,20 @@ struct OpsTests {
             #expect(Array(output) == (0..<lanes).map { a[$0] & (b[$0] ^ c[$0]) })
         }
 
-        check(SIMDUInt32.self)
-        check(SIMDInt8.self)
+        check(UInt32.self)
+        check(Int8.self)
     }
 
     @Test("A masked bitwise op zeroes the lanes the mask does not select")
     func maskedBitwise() {
-        func check<H: SIMDIntegerElement>(_ type: H.Type) where H.Lane: FixedWidthInteger {
+        func check<Lane: SIMDIntegerElement & FixedWidthInteger>(_ type: Lane.Type) {
+            typealias H = SIMD<Lane>
             let lanes = H.laneCount
             let selected = lanes / 2
-            let a = ContiguousArray((0..<lanes).map { H.Lane(truncatingIfNeeded: $0 &* 37 &+ 11) })
-            let b = ContiguousArray((0..<lanes).map { H.Lane(truncatingIfNeeded: $0 &* 91 &+ 5) })
+            let a = ContiguousArray((0..<lanes).map { Lane(truncatingIfNeeded: $0 &* 37 &+ 11) })
+            let b = ContiguousArray((0..<lanes).map { Lane(truncatingIfNeeded: $0 &* 91 &+ 5) })
             let mask = H.firstLanes(count: selected)
-            let operations: [(vector: H.Vector, scalar: (H.Lane, H.Lane) -> H.Lane)] = [
+            let operations: [(vector: H, scalar: (Lane, Lane) -> Lane)] = [
                 (
                     H.bitwiseAnd(H.load(from: a.span), H.load(from: b.span), where: mask),
                     { $0 & $1 }
@@ -207,7 +209,7 @@ struct OpsTests {
             ]
 
             for operation in operations {
-                var output = ContiguousArray<H.Lane>(repeating: 1, count: lanes)
+                var output = ContiguousArray<Lane>(repeating: 1, count: lanes)
                 var destination = output.mutableSpan
                 H.store(operation.vector, to: &destination)
                 let expected = (0..<lanes).map { lane in
@@ -217,32 +219,33 @@ struct OpsTests {
             }
         }
 
-        check(SIMDUInt16.self)
-        check(SIMDInt64.self)
+        check(UInt16.self)
+        check(Int64.self)
     }
 
     @Test("A masked bitwise op takes the lanes the mask does not select from otherwise")
     func maskedBitwiseOtherwise() {
-        func check<H: SIMDIntegerElement>(_ type: H.Type) where H.Lane: FixedWidthInteger {
+        func check<Lane: SIMDIntegerElement & FixedWidthInteger>(_ type: Lane.Type) {
+            typealias H = SIMD<Lane>
             let lanes = H.laneCount
             let selected = lanes / 2
-            let a = ContiguousArray((0..<lanes).map { H.Lane(truncatingIfNeeded: $0 &* 37 &+ 11) })
-            let b = ContiguousArray((0..<lanes).map { H.Lane(truncatingIfNeeded: $0 &* 91 &+ 5) })
+            let a = ContiguousArray((0..<lanes).map { Lane(truncatingIfNeeded: $0 &* 37 &+ 11) })
+            let b = ContiguousArray((0..<lanes).map { Lane(truncatingIfNeeded: $0 &* 91 &+ 5) })
             let other = ContiguousArray(
-                (0..<lanes).map { H.Lane(truncatingIfNeeded: $0 &* 53 &+ 29) }
+                (0..<lanes).map { Lane(truncatingIfNeeded: $0 &* 53 &+ 29) }
             )
             let mask = H.firstLanes(count: selected)
             let (va, vb, vo) = (
                 H.load(from: a.span), H.load(from: b.span), H.load(from: other.span)
             )
-            let operations: [(vector: H.Vector, scalar: (H.Lane, H.Lane) -> H.Lane)] = [
+            let operations: [(vector: H, scalar: (Lane, Lane) -> Lane)] = [
                 (H.bitwiseAnd(va, vb, where: mask, otherwise: vo), { $0 & $1 }),
                 (H.bitwiseOr(va, vb, where: mask, otherwise: vo), { $0 | $1 }),
                 (H.bitwiseXor(va, vb, where: mask, otherwise: vo), { $0 ^ $1 }),
             ]
 
             for operation in operations {
-                var output = ContiguousArray<H.Lane>(repeating: 0, count: lanes)
+                var output = ContiguousArray<Lane>(repeating: 0, count: lanes)
                 var destination = output.mutableSpan
                 H.store(operation.vector, to: &destination)
                 let expected = (0..<lanes).map { lane in
@@ -252,13 +255,13 @@ struct OpsTests {
             }
         }
 
-        check(SIMDUInt8.self)
-        check(SIMDInt32.self)
+        check(UInt8.self)
+        check(Int32.self)
     }
 
     @Test("Comparing produces a mask that selects")
     func compareAndSelect() {
-        typealias H = SIMDFloat
+        typealias H = SIMD<Float>
         let lanes = H.laneCount
         let a = (0..<lanes).map { Float($0) - 2 }
 
@@ -277,7 +280,7 @@ struct OpsTests {
 
     @Test("First lanes select every lane for any count of at least the lane count")
     func firstLanes() {
-        typealias H = SIMDUInt8
+        typealias H = SIMD<UInt8>
         let lanes = H.laneCount
         for count in [0, 1, lanes - 1, lanes, lanes + 1, 127, 128, 200, Int.max] {
             let mask = H.firstLanes(count: count)
@@ -288,15 +291,15 @@ struct OpsTests {
 
     @Test("Complex products of integer lanes wrap around as the scalar ones do")
     func integerComplexProductsWrap() {
-        verifyWrappingComplexProducts(SIMDInt8.self)
-        verifyWrappingComplexProducts(SIMDInt16.self)
-        verifyWrappingComplexProducts(SIMDInt32.self)
-        verifyWrappingComplexProducts(SIMDInt64.self)
+        verifyWrappingComplexProducts(Int8.self)
+        verifyWrappingComplexProducts(Int16.self)
+        verifyWrappingComplexProducts(Int32.self)
+        verifyWrappingComplexProducts(Int64.self)
     }
 
     @Test("Reductions match the scalar result")
     func reductions() {
-        typealias H = SIMDInt32
+        typealias H = SIMD<Int32>
         let lanes = H.laneCount
         let a = (0..<lanes).map { Int32($0) - 3 }
 
@@ -314,8 +317,8 @@ struct OpsTests {
 
     @Test("Extrema or NaN are NaN when any lane is NaN, and the extrema otherwise")
     func extremaOrNaN() {
-        typealias F = SIMDFloat
-        typealias D = SIMDDouble
+        typealias F = SIMD<Float>
+        typealias D = SIMD<Double>
         let floats = ContiguousArray((0..<F.laneCount).map { Float($0 &* 3) - 4.5 })
         let doubles = ContiguousArray((0..<D.laneCount).map { Double($0 &* 3) - 4.5 })
 
@@ -347,7 +350,7 @@ struct OpsTests {
 
     @Test("Extrema or NaN see past infinities and a NaN in the lane that would be the extremum")
     func extremaOrNaNWithInfinities() {
-        typealias F = SIMDFloat
+        typealias F = SIMD<Float>
         let lanes = F.laneCount
 
         for nanLane in 0..<lanes {
@@ -367,11 +370,11 @@ struct OpsTests {
     func maskedMaximumOfNaN() {
         let isSVE = SIMDTarget.targetName == "SVE2_128"
         let isNEON = SIMDTarget.targetName.hasPrefix("NEON")
-        expectMaskedMaximumOfNaN(SIMDFloat.self, isNaN: isSVE, isNumber: isNEON)
-        expectMaskedMaximumOfNaN(SIMDDouble.self, isNaN: isSVE, isNumber: isNEON)
+        expectMaskedMaximumOfNaN(Float.self, isNaN: isSVE, isNumber: isNEON)
+        expectMaskedMaximumOfNaN(Double.self, isNaN: isSVE, isNumber: isNEON)
         #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
         expectMaskedMaximumOfNaN(
-            SIMDFloat16.self,
+            Float16.self,
             isNaN: isSVE,
             isNumber: isNEON && SIMDTarget.hasNativeFloat16Arithmetic
         )
@@ -381,14 +384,14 @@ struct OpsTests {
     @Test("All bits clear counts a negative zero as clear, except on the AVX-512 targets")
     func allBitsClearOfNegativeZero() {
         let isClear = !SIMDTarget.targetName.hasPrefix("AVX3")
-        expectAllBitsClearOfNegativeZero(SIMDFloat.self, isClear: isClear)
-        expectAllBitsClearOfNegativeZero(SIMDDouble.self, isClear: isClear)
+        expectAllBitsClearOfNegativeZero(Float.self, isClear: isClear)
+        expectAllBitsClearOfNegativeZero(Double.self, isClear: isClear)
     }
 
     @Test("A repeated block fills every 128-bit block with its lanes")
     func repeatingBlock() {
-        typealias H = SIMDUInt8
-        typealias D = SIMDDouble
+        typealias H = SIMD<UInt8>
+        typealias D = SIMD<Double>
         var output = ContiguousArray<UInt8>(repeating: 0, count: H.laneCount)
         var doubles = ContiguousArray<Double>(repeating: 0, count: D.laneCount)
 
@@ -423,7 +426,7 @@ struct OpsTests {
 
     @Test("A slide up moves the lanes up and zeroes the lanes it leaves behind")
     func slideUp() {
-        typealias H = SIMDUInt8
+        typealias H = SIMD<UInt8>
         let lanes = H.laneCount
         let input = ContiguousArray((0..<lanes).map { UInt8($0 &+ 1) })
         let vector = H.load(from: input.span)
@@ -444,7 +447,7 @@ struct OpsTests {
 
     @Test("A slide down moves the lanes down and zeroes the lanes it leaves behind")
     func slideDown() {
-        typealias H = SIMDUInt8
+        typealias H = SIMD<UInt8>
         let lanes = H.laneCount
         let input = ContiguousArray((0..<lanes).map { UInt8($0 &+ 1) })
         let vector = H.load(from: input.span)
@@ -465,7 +468,7 @@ struct OpsTests {
 
     @Test("A slide up with a fill takes the lanes it leaves behind from the fill")
     func slideUpFilling() {
-        typealias H = SIMDUInt8
+        typealias H = SIMD<UInt8>
         let lanes = H.laneCount
         let input = ContiguousArray((0..<lanes).map { UInt8($0 &+ 1) })
         let filler = ContiguousArray((0..<lanes).map { UInt8($0 &+ 0x41) })
@@ -488,7 +491,7 @@ struct OpsTests {
 
     @Test("A slide down with a fill takes the lanes it leaves behind from the fill")
     func slideDownFilling() {
-        typealias H = SIMDUInt8
+        typealias H = SIMD<UInt8>
         let lanes = H.laneCount
         let input = ContiguousArray((0..<lanes).map { UInt8($0 &+ 1) })
         let filler = ContiguousArray((0..<lanes).map { UInt8($0 &+ 0x41) })
@@ -511,7 +514,7 @@ struct OpsTests {
 
     @Test("An unchecked slide gives the lanes the checked one does")
     func uncheckedSlides() {
-        typealias H = SIMDUInt8
+        typealias H = SIMD<UInt8>
         let lanes = H.laneCount
         let input = ContiguousArray((0..<lanes).map { UInt8($0 &+ 1) })
         let vector = H.load(from: input.span)
@@ -531,7 +534,7 @@ struct OpsTests {
 
     @Test("An unchecked slide with a fill gives the lanes the checked one does")
     func uncheckedFillingSlides() {
-        typealias H = SIMDUInt8
+        typealias H = SIMD<UInt8>
         let lanes = H.laneCount
         let input = ContiguousArray((0..<lanes).map { UInt8($0 &+ 1) })
         let filler = ContiguousArray((0..<lanes).map { UInt8($0 &+ 0x41) })
@@ -560,7 +563,7 @@ struct OpsTests {
 
     @Test("A partial load only reads the lanes it is asked for")
     func partialLoad() {
-        typealias H = SIMDUInt8
+        typealias H = SIMD<UInt8>
         let lanes = H.laneCount
         guard lanes > 3 else { return }
         let input = (0..<lanes).map { UInt8($0 &+ 1) }
@@ -579,8 +582,8 @@ struct OpsTests {
 
     @Test("A widening load promotes every lane it reads")
     func wideningLoad() {
-        typealias H = SIMDUInt32
-        typealias S = SIMDInt64
+        typealias H = SIMD<UInt32>
+        typealias S = SIMD<Int64>
         let lanes = H.laneCount
         let unsigned = (0..<lanes).map { UInt8(truncatingIfNeeded: $0 &* 37 &+ 200) }
         let signed = (0..<S.laneCount).map { Int16(truncatingIfNeeded: $0 &* -3001 &- 1) }
@@ -605,7 +608,7 @@ struct OpsTests {
 
     @Test("A partial widening load zeroes the lanes it is not asked for")
     func partialWideningLoad() {
-        typealias H = SIMDDouble
+        typealias H = SIMD<Double>
         let lanes = H.laneCount
         guard lanes > 1 else { return }
         let input = (0..<lanes).map { Float($0) + 0.5 }
@@ -624,7 +627,7 @@ struct OpsTests {
 
     @Test("Interleaved load and store round trip three channels")
     func interleaved() {
-        typealias H = SIMDUInt8
+        typealias H = SIMD<UInt8>
         let lanes = H.laneCount
         let input = (0..<(lanes * 3)).map { UInt8($0 & 0xFF) }
         var output = [UInt8](repeating: 0, count: lanes * 3)
@@ -644,7 +647,7 @@ struct OpsTests {
 
     @Test("A vector survives a span store after a span load")
     func spanLoadStoreRoundTrip() {
-        typealias H = SIMDUInt8
+        typealias H = SIMD<UInt8>
         let lanes = H.laneCount
         let input = ContiguousArray((0..<lanes).map { UInt8($0 &* 3) })
         var output = ContiguousArray<UInt8>(repeating: 0, count: lanes)
@@ -657,7 +660,7 @@ struct OpsTests {
 
     @Test("A vector survives an unchecked span store after an unchecked span load")
     func uncheckedSpanLoadStoreRoundTrip() {
-        typealias H = SIMDInt32
+        typealias H = SIMD<Int32>
         let lanes = H.laneCount
         let input = ContiguousArray((0..<lanes).map { Int32($0) - 2 })
         var output = ContiguousArray<Int32>(repeating: 0, count: lanes)
@@ -670,7 +673,7 @@ struct OpsTests {
 
     @Test("A vector survives aligned span stores after aligned span loads")
     func alignedSpanLoadStoreRoundTrip() {
-        typealias H = SIMDUInt32
+        typealias H = SIMD<UInt32>
         let lanes = H.laneCount
         let byteCount = lanes * MemoryLayout<UInt32>.stride
         let values = (0..<lanes).map { UInt32(truncatingIfNeeded: $0) &* 2_654_435_761 }
@@ -707,7 +710,7 @@ struct OpsTests {
 
     @Test("A span load reads the start of the span")
     func spanLoadReadsStart() {
-        typealias H = SIMDUInt16
+        typealias H = SIMD<UInt16>
         let lanes = H.laneCount
         let input = ContiguousArray((0..<(lanes * 2)).map { UInt16($0 &* 5) })
         var output = ContiguousArray<UInt16>(repeating: 0, count: lanes)
@@ -720,7 +723,7 @@ struct OpsTests {
 
     @Test("A partial span load and store only touch the lanes the span has")
     func partialSpanLoadStore() {
-        typealias H = SIMDUInt8
+        typealias H = SIMD<UInt8>
         let lanes = H.laneCount
         guard lanes > 3 else { return }
         let input = ContiguousArray((0..<lanes).map { UInt8($0 &+ 1) })
@@ -744,7 +747,7 @@ struct OpsTests {
 
     @Test("A partial span load and store accept an empty span")
     func emptySpanLoadStore() {
-        typealias H = SIMDFloat
+        typealias H = SIMD<Float>
         let input = ContiguousArray<Float>()
         var output = ContiguousArray<Float>()
 
@@ -760,8 +763,8 @@ struct OpsTests {
     @Test("A partial span load and store of a span of 2^32 or more elements use a whole vector")
     func hugeSpanLoadStore() {
         guard SIMDTarget.targetName == "SVE2_128" else { return }
-        typealias H = SIMDUInt8
-        typealias W = SIMDUInt16
+        typealias H = SIMD<UInt8>
+        typealias W = SIMD<UInt16>
         let lanes = H.laneCount
         let wrapped = 1 << 32
         let byteCount = wrapped + lanes
@@ -805,8 +808,8 @@ struct OpsTests {
 
     @Test("A widening span load promotes every lane it reads")
     func spanWideningLoad() {
-        typealias H = SIMDUInt32
-        typealias S = SIMDInt64
+        typealias H = SIMD<UInt32>
+        typealias S = SIMD<Int64>
         let unsigned = ContiguousArray(
             (0..<H.laneCount).map { UInt8(truncatingIfNeeded: $0 &* 37 &+ 200) }
         )
@@ -827,7 +830,7 @@ struct OpsTests {
 
     @Test("A partial widening span load zeroes the lanes the span does not have")
     func partialSpanWideningLoad() {
-        typealias H = SIMDDouble
+        typealias H = SIMD<Double>
         let lanes = H.laneCount
         guard lanes > 1 else { return }
         let input = ContiguousArray((0..<lanes).map { Float($0) + 0.5 })
@@ -842,7 +845,7 @@ struct OpsTests {
 
     @Test("Interleaved span load and store round trip three channels")
     func spanInterleaved() {
-        typealias H = SIMDUInt8
+        typealias H = SIMD<UInt8>
         let lanes = H.laneCount
         let input = ContiguousArray((0..<(lanes * 3)).map { UInt8($0 & 0xFF) })
         var output = ContiguousArray<UInt8>(repeating: 0, count: lanes * 3)
@@ -859,7 +862,7 @@ struct OpsTests {
 
     @Test("Unchecked interleaved span load and store round trip two channels")
     func uncheckedSpanInterleaved() {
-        typealias H = SIMDUInt16
+        typealias H = SIMD<UInt16>
         let lanes = H.laneCount
         let input = ContiguousArray((0..<(lanes * 2)).map { UInt16($0 &* 7) })
         var output = ContiguousArray<UInt16>(repeating: 0, count: lanes * 2)
@@ -875,7 +878,7 @@ struct OpsTests {
 
     @Test("A vector survives appends to an output span after a span load")
     func outputSpanAppendRoundTrip() {
-        typealias H = SIMDUInt8
+        typealias H = SIMD<UInt8>
         let lanes = H.laneCount
         let input = ContiguousArray((0..<lanes).map { UInt8($0 &* 3) })
 
@@ -889,7 +892,7 @@ struct OpsTests {
 
     @Test("An append of a count to an output span only touches that many lanes")
     func partialOutputSpanAppend() {
-        typealias H = SIMDUInt8
+        typealias H = SIMD<UInt8>
         let lanes = H.laneCount
         guard lanes > 3 else { return }
         let input = ContiguousArray((0..<lanes).map { UInt8($0 &+ 1) })
@@ -911,7 +914,7 @@ struct OpsTests {
 
     @Test("An append of no lanes accepts an output span without a buffer")
     func emptyOutputSpanAppend() {
-        typealias H = SIMDFloat
+        typealias H = SIMD<Float>
         var output = OutputSpan<Float>()
 
         H.append(H.zero(), addingCount: 0, to: &output)
@@ -923,7 +926,7 @@ struct OpsTests {
 
     @Test("Aligned appends to an output span continue at aligned addresses")
     func alignedOutputSpanAppend() {
-        typealias H = SIMDUInt32
+        typealias H = SIMD<UInt32>
         let lanes = H.laneCount
         let byteCount = lanes * MemoryLayout<UInt32>.stride
         let values = (0..<lanes).map { UInt32(truncatingIfNeeded: $0) &* 2_654_435_761 }
@@ -945,7 +948,7 @@ struct OpsTests {
 
     @Test("Interleaved appends to an output span round trip three channels")
     func outputSpanInterleaved() {
-        typealias H = SIMDUInt8
+        typealias H = SIMD<UInt8>
         let lanes = H.laneCount
         let input = ContiguousArray((0..<(lanes * 3)).map { UInt8($0 & 0xFF) })
 
@@ -962,7 +965,7 @@ struct OpsTests {
 
     @Test("Unchecked interleaved appends to an output span round trip two channels")
     func uncheckedOutputSpanInterleaved() {
-        typealias H = SIMDUInt16
+        typealias H = SIMD<UInt16>
         let lanes = H.laneCount
         let input = ContiguousArray((0..<(lanes * 2)).map { UInt16($0 &* 7) })
 
@@ -978,9 +981,9 @@ struct OpsTests {
 
     @Test("A 4-lane reversal reverses every group of 4 lanes of 64 bits")
     func reversed4Of64BitLanes() {
-        typealias U = SIMDUInt64
-        typealias I = SIMDInt64
-        typealias D = SIMDDouble
+        typealias U = SIMD<UInt64>
+        typealias I = SIMD<Int64>
+        typealias D = SIMD<Double>
         guard U.canReverse4, I.canReverse4, D.canReverse4 else { return }
         let unsigned = ContiguousArray(
             (0..<U.laneCount).map { UInt64($0) &* 0x0101_0101_0101_0101 }
@@ -989,48 +992,48 @@ struct OpsTests {
         let doubles = ContiguousArray((0..<D.laneCount).map { Double($0) - 2.5 })
 
         #expect(
-            lanes(U.self, U.reversed4(U.load(from: unsigned.span)))
+            lanes(U.reversed4(U.load(from: unsigned.span)))
                 == unsigned.indices.map { unsigned[$0 ^ 3] }
         )
         #expect(
-            lanes(I.self, I.reversed4(I.load(from: signed.span)))
+            lanes(I.reversed4(I.load(from: signed.span)))
                 == signed.indices.map { signed[$0 ^ 3] }
         )
         #expect(
-            lanes(D.self, D.reversed4(D.load(from: doubles.span)))
+            lanes(D.reversed4(D.load(from: doubles.span)))
                 == doubles.indices.map { doubles[$0 ^ 3] }
         )
     }
 
     @Test("An 8-lane reversal reverses every group of 8 lanes of 32 bits")
     func reversed8Of32BitLanes() {
-        typealias U = SIMDUInt32
-        typealias I = SIMDInt32
-        typealias F = SIMDFloat
+        typealias U = SIMD<UInt32>
+        typealias I = SIMD<Int32>
+        typealias F = SIMD<Float>
         guard U.canReverse8, I.canReverse8, F.canReverse8 else { return }
         let unsigned = ContiguousArray((0..<U.laneCount).map { UInt32($0) &* 0x0101_0101 })
         let signed = ContiguousArray((0..<I.laneCount).map { Int32($0) - 5 })
         let floats = ContiguousArray((0..<F.laneCount).map { Float($0) * 0.5 - 3 })
 
         #expect(
-            lanes(U.self, U.reversed8(U.load(from: unsigned.span)))
+            lanes(U.reversed8(U.load(from: unsigned.span)))
                 == unsigned.indices.map { unsigned[$0 ^ 7] }
         )
         #expect(
-            lanes(I.self, I.reversed8(I.load(from: signed.span)))
+            lanes(I.reversed8(I.load(from: signed.span)))
                 == signed.indices.map { signed[$0 ^ 7] }
         )
         #expect(
-            lanes(F.self, F.reversed8(F.load(from: floats.span)))
+            lanes(F.reversed8(F.load(from: floats.span)))
                 == floats.indices.map { floats[$0 ^ 7] }
         )
     }
 
     @Test("An 8-lane reversal reverses every group of 8 lanes of 64 bits")
     func reversed8Of64BitLanes() {
-        typealias U = SIMDUInt64
-        typealias I = SIMDInt64
-        typealias D = SIMDDouble
+        typealias U = SIMD<UInt64>
+        typealias I = SIMD<Int64>
+        typealias D = SIMD<Double>
         guard U.canReverse8, I.canReverse8, D.canReverse8 else { return }
         let unsigned = ContiguousArray(
             (0..<U.laneCount).map { UInt64($0) &* 0x0101_0101_0101_0101 }
@@ -1039,22 +1042,22 @@ struct OpsTests {
         let doubles = ContiguousArray((0..<D.laneCount).map { Double($0) - 2.5 })
 
         #expect(
-            lanes(U.self, U.reversed8(U.load(from: unsigned.span)))
+            lanes(U.reversed8(U.load(from: unsigned.span)))
                 == unsigned.indices.map { unsigned[$0 ^ 7] }
         )
         #expect(
-            lanes(I.self, I.reversed8(I.load(from: signed.span)))
+            lanes(I.reversed8(I.load(from: signed.span)))
                 == signed.indices.map { signed[$0 ^ 7] }
         )
         #expect(
-            lanes(D.self, D.reversed8(D.load(from: doubles.span)))
+            lanes(D.reversed8(D.load(from: doubles.span)))
                 == doubles.indices.map { doubles[$0 ^ 7] }
         )
     }
 
     @Test("An 8-lane reversal reverses every group of 8 bfloat16 lanes")
     func reversed8OfBFloat16Lanes() {
-        typealias H = SIMDBFloat16
+        typealias H = SIMD<BFloat16>
         guard H.canReverse8 else { return }
         let input = ContiguousArray((0..<H.laneCount).map { BFloat16(Float($0) - 2.5) })
         let output = ContiguousArray<BFloat16>(capacity: H.laneCount) { output in
@@ -1067,12 +1070,12 @@ struct OpsTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test("An 8-lane reversal reverses every group of 8 float16 lanes")
     func reversed8OfFloat16Lanes() {
-        typealias H = SIMDFloat16
+        typealias H = SIMD<Float16>
         guard H.canReverse8 else { return }
         let input = ContiguousArray((0..<H.laneCount).map { Float16($0) - 2.5 })
 
         #expect(
-            lanes(H.self, H.reversed8(H.load(from: input.span)))
+            lanes(H.reversed8(H.load(from: input.span)))
                 == input.indices.map { input[$0 ^ 7] }
         )
     }
@@ -1082,66 +1085,66 @@ struct OpsTests {
     @Test("Checked span ops trap on a span that is too short")
     func checkedSpanOpsTrap() async {
         await #expect(processExitsWith: .failure) {
-            let input = ContiguousArray<UInt8>(repeating: 0, count: SIMDUInt8.laneCount - 1)
-            _ = SIMDUInt8.load(from: input.span)
+            let input = ContiguousArray<UInt8>(repeating: 0, count: SIMD<UInt8>.laneCount - 1)
+            _ = SIMD<UInt8>.load(from: input.span)
         }
         await #expect(processExitsWith: .failure) {
-            var output = ContiguousArray<UInt8>(repeating: 0, count: SIMDUInt8.laneCount - 1)
+            var output = ContiguousArray<UInt8>(repeating: 0, count: SIMD<UInt8>.laneCount - 1)
             var destination = output.mutableSpan
-            SIMDUInt8.store(SIMDUInt8.zero(), to: &destination)
+            SIMD<UInt8>.store(SIMD<UInt8>.zero(), to: &destination)
         }
         await #expect(processExitsWith: .failure) {
-            let count = SIMDUInt8.laneCount * 3 - 1
+            let count = SIMD<UInt8>.laneCount * 3 - 1
             let input = ContiguousArray<UInt8>(repeating: 0, count: count)
-            var v0 = SIMDUInt8.zero()
-            var v1 = SIMDUInt8.zero()
-            var v2 = SIMDUInt8.zero()
-            SIMDUInt8.loadInterleaved3(from: input.span, &v0, &v1, &v2)
+            var v0 = SIMD<UInt8>.zero()
+            var v1 = SIMD<UInt8>.zero()
+            var v2 = SIMD<UInt8>.zero()
+            SIMD<UInt8>.loadInterleaved3(from: input.span, &v0, &v1, &v2)
         }
         await #expect(processExitsWith: .failure) {
-            let count = SIMDUInt8.laneCount * 2 - 1
+            let count = SIMD<UInt8>.laneCount * 2 - 1
             var output = ContiguousArray<UInt8>(repeating: 0, count: count)
             var destination = output.mutableSpan
-            let zero = SIMDUInt8.zero()
-            SIMDUInt8.storeInterleaved2(zero, zero, to: &destination)
+            let zero = SIMD<UInt8>.zero()
+            SIMD<UInt8>.storeInterleaved2(zero, zero, to: &destination)
         }
         await #expect(processExitsWith: .failure) {
-            let input = ContiguousArray<UInt8>(repeating: 0, count: SIMDUInt32.laneCount - 1)
-            _ = SIMDUInt32.loadWidening(from: input.span)
+            let input = ContiguousArray<UInt8>(repeating: 0, count: SIMD<UInt32>.laneCount - 1)
+            _ = SIMD<UInt32>.loadWidening(from: input.span)
         }
         await #expect(processExitsWith: .failure) {
-            let count = (SIMDUInt8.laneCount + 7) / 8 - 1
+            let count = (SIMD<UInt8>.laneCount + 7) / 8 - 1
             let input = ContiguousArray<UInt8>(repeating: 0, count: count)
-            _ = SIMDUInt8.loadMask(from: input.span)
+            _ = SIMD<UInt8>.loadMask(from: input.span)
         }
         await #expect(processExitsWith: .failure) {
-            let count = (SIMDUInt8.laneCount + 7) / 8 - 1
+            let count = (SIMD<UInt8>.laneCount + 7) / 8 - 1
             var output = ContiguousArray<UInt8>(repeating: 0, count: count)
             var destination = output.mutableSpan
-            _ = SIMDUInt8.storeMask(SIMDUInt8.repeatingMask(true), to: &destination)
+            _ = SIMD<UInt8>.storeMask(SIMD<UInt8>.repeatingMask(true), to: &destination)
         }
     }
 
     @Test("Checked aligned span ops trap on a misaligned span")
     func checkedAlignedSpanOpsTrap() async {
-        guard SIMDUInt8.laneCount > 1 else { return }
+        guard SIMD<UInt8>.laneCount > 1 else { return }
         await #expect(processExitsWith: .failure) {
-            let input = ContiguousArray<UInt8>(repeating: 0, count: SIMDUInt8.laneCount * 2)
-            _ = SIMDUInt8.loadAligned(from: input.span.extracting(droppingFirst: 1))
+            let input = ContiguousArray<UInt8>(repeating: 0, count: SIMD<UInt8>.laneCount * 2)
+            _ = SIMD<UInt8>.loadAligned(from: input.span.extracting(droppingFirst: 1))
         }
         await #expect(processExitsWith: .failure) {
-            var output = ContiguousArray<UInt8>(repeating: 0, count: SIMDUInt8.laneCount * 2)
+            var output = ContiguousArray<UInt8>(repeating: 0, count: SIMD<UInt8>.laneCount * 2)
             output.withUnsafeMutableBufferPointer { buffer in
                 let shifted = unsafe UnsafeMutableBufferPointer(rebasing: buffer[1...])
                 var destination = unsafe shifted.mutableSpan
-                SIMDUInt8.storeAligned(SIMDUInt8.zero(), to: &destination)
+                SIMD<UInt8>.storeAligned(SIMD<UInt8>.zero(), to: &destination)
             }
         }
     }
 
     @Test("A lookup reads the table at the indices through every form")
     func lookupReadsTable() {
-        typealias H = SIMDUInt32
+        typealias H = SIMD<UInt32>
         guard H.canLookup8 else { return }
         let table = (0..<8).map { UInt32($0 &* 7) &+ 100 }
         let indices = ContiguousArray((0..<H.laneCount).map { UInt32(($0 &* 3) % 8) })
@@ -1149,18 +1152,18 @@ struct OpsTests {
         let vector = H.load(from: indices.span)
 
         withAlignedTable(table) { span in
-            #expect(lanes(H.self, H.lookup8(at: vector, from: span)) == expected)
-            #expect(lanes(H.self, unsafe H.lookup8(at: vector, fromUnchecked: span)) == expected)
+            #expect(lanes(H.lookup8(at: vector, from: span)) == expected)
+            #expect(lanes(unsafe H.lookup8(at: vector, fromUnchecked: span)) == expected)
             span.withUnsafeBufferPointer { pointer in
                 let result = unsafe H.lookup8(at: vector, from: pointer.baseAddress!)
-                #expect(lanes(H.self, result) == expected)
+                #expect(lanes(result) == expected)
             }
         }
     }
 
     @Test("A 16-lane lookup reads the table at the indices through every form")
     func lookup16ReadsTable() {
-        typealias H = SIMDUInt16
+        typealias H = SIMD<UInt16>
         guard H.canLookup16 else { return }
         let table = (0..<16).map { UInt16($0 &* 7) &+ 100 }
         let indices = ContiguousArray((0..<H.laneCount).map { UInt16(($0 &* 5) % 16) })
@@ -1168,18 +1171,18 @@ struct OpsTests {
         let vector = H.load(from: indices.span)
 
         withAlignedTable(table) { span in
-            #expect(lanes(H.self, H.lookup16(at: vector, from: span)) == expected)
-            #expect(lanes(H.self, unsafe H.lookup16(at: vector, fromUnchecked: span)) == expected)
+            #expect(lanes(H.lookup16(at: vector, from: span)) == expected)
+            #expect(lanes(unsafe H.lookup16(at: vector, fromUnchecked: span)) == expected)
             span.withUnsafeBufferPointer { pointer in
                 let result = unsafe H.lookup16(at: vector, from: pointer.baseAddress!)
-                #expect(lanes(H.self, result) == expected)
+                #expect(lanes(result) == expected)
             }
         }
     }
 
     @Test("A 32-lane lookup reads the table at the indices through every form")
     func lookup32ReadsTable() {
-        typealias H = SIMDUInt8
+        typealias H = SIMD<UInt8>
         guard H.canLookup32 else { return }
         let table = (0..<32).map { UInt8(truncatingIfNeeded: $0 &* 7) &+ 100 }
         let indices = ContiguousArray((0..<H.laneCount).map { UInt8(($0 &* 5) % 32) })
@@ -1187,18 +1190,18 @@ struct OpsTests {
         let vector = H.load(from: indices.span)
 
         withAlignedTable(table) { span in
-            #expect(lanes(H.self, H.lookup32(at: vector, from: span)) == expected)
-            #expect(lanes(H.self, unsafe H.lookup32(at: vector, fromUnchecked: span)) == expected)
+            #expect(lanes(H.lookup32(at: vector, from: span)) == expected)
+            #expect(lanes(unsafe H.lookup32(at: vector, fromUnchecked: span)) == expected)
             span.withUnsafeBufferPointer { pointer in
                 let result = unsafe H.lookup32(at: vector, from: pointer.baseAddress!)
-                #expect(lanes(H.self, result) == expected)
+                #expect(lanes(result) == expected)
             }
         }
     }
 
     @Test("A 64-lane lookup reads the table at the indices through every form")
     func lookup64ReadsTable() {
-        typealias H = SIMDUInt8
+        typealias H = SIMD<UInt8>
         guard H.canLookup64 else { return }
         let table = (0..<64).map { UInt8(truncatingIfNeeded: $0 &* 7) &+ 100 }
         let indices = ContiguousArray((0..<H.laneCount).map { UInt8(($0 &* 5) % 64) })
@@ -1206,39 +1209,39 @@ struct OpsTests {
         let vector = H.load(from: indices.span)
 
         withAlignedTable(table) { span in
-            #expect(lanes(H.self, H.lookup64(at: vector, from: span)) == expected)
-            #expect(lanes(H.self, unsafe H.lookup64(at: vector, fromUnchecked: span)) == expected)
+            #expect(lanes(H.lookup64(at: vector, from: span)) == expected)
+            #expect(lanes(unsafe H.lookup64(at: vector, fromUnchecked: span)) == expected)
             span.withUnsafeBufferPointer { pointer in
                 let result = unsafe H.lookup64(at: vector, from: pointer.baseAddress!)
-                #expect(lanes(H.self, result) == expected)
+                #expect(lanes(result) == expected)
             }
         }
     }
 
     @Test("Loaded indices hold the lanes of the span through every form")
     func loadIndicesReadsLanes() {
-        typealias H = SIMDUInt32
+        typealias H = SIMD<UInt32>
         let indices = ContiguousArray((0..<H.laneCount).map { UInt32(H.laneCount - 1 - $0) })
 
-        #expect(lanes(H.self, H.loadIndices(from: indices.span)) == Array(indices))
+        #expect(lanes(H.loadIndices(from: indices.span)) == Array(indices))
         #expect(
-            lanes(H.self, unsafe H.loadIndices(fromUnchecked: indices.span)) == Array(indices)
+            lanes(unsafe H.loadIndices(fromUnchecked: indices.span)) == Array(indices)
         )
         indices.withUnsafeBufferPointer { pointer in
             let result = unsafe H.loadIndices(from: pointer.baseAddress!)
-            #expect(lanes(H.self, result) == Array(indices))
+            #expect(lanes(result) == Array(indices))
         }
     }
 
     @Test("Loaded indices may select the lanes of a second table, below 2 * laneCount")
     func loadIndicesSelectSecondTable() {
-        typealias H = SIMDUInt32
+        typealias H = SIMD<UInt32>
         let last = ContiguousArray((0..<H.laneCount).map { UInt32(2 * H.laneCount - 1 - $0) })
         let first = H.iota(0)
         let second = H.iota(UInt32(H.laneCount))
 
         #expect(
-            lanes(H.self, H.twoTablesLookupLanes(first, second, at: H.loadIndices(from: last.span)))
+            lanes(H.twoTablesLookupLanes(first, second, at: H.loadIndices(from: last.span)))
                 == Array(last)
         )
     }
@@ -1247,33 +1250,33 @@ struct OpsTests {
     func checkedLookupsTrap() async {
         await #expect(processExitsWith: .failure) {
             withAlignedTable([UInt32](repeating: 0, count: 7)) { span in
-                _ = SIMDUInt32.lookup8(at: SIMDUInt32.zero(), from: span)
+                _ = SIMD<UInt32>.lookup8(at: SIMD<UInt32>.zero(), from: span)
             }
         }
         await #expect(processExitsWith: .failure) {
             let table = ContiguousArray<UInt32>(repeating: 0, count: 16)
-            _ = SIMDUInt32.lookup8(
-                at: SIMDUInt32.zero(),
+            _ = SIMD<UInt32>.lookup8(
+                at: SIMD<UInt32>.zero(),
                 from: table.span.extracting(droppingFirst: 1)
             )
         }
         await #expect(processExitsWith: .failure) {
             withAlignedTable([UInt32](repeating: 0, count: 8)) { span in
-                _ = SIMDUInt32.lookup8(at: SIMDUInt32.repeating(8), from: span)
+                _ = SIMD<UInt32>.lookup8(at: SIMD<UInt32>.repeating(8), from: span)
             }
         }
     }
 
     @Test("Reversals trap where a vector has too few lanes for them")
     func reversalsTrapWithTooFewLanes() async {
-        if !SIMDUInt64.canReverse4 {
+        if !SIMD<UInt64>.canReverse4 {
             await #expect(processExitsWith: .failure) {
-                _ = SIMDUInt64.reversed4(SIMDUInt64.zero())
+                _ = SIMD<UInt64>.reversed4(SIMD<UInt64>.zero())
             }
         }
-        if !SIMDUInt32.canReverse8 {
+        if !SIMD<UInt32>.canReverse8 {
             await #expect(processExitsWith: .failure) {
-                _ = SIMDUInt32.reversed8(SIMDUInt32.zero())
+                _ = SIMD<UInt32>.reversed8(SIMD<UInt32>.zero())
             }
         }
     }
@@ -1281,139 +1284,143 @@ struct OpsTests {
     @Test("Checked immediate ops trap on an immediate that is out of range")
     func checkedImmediateOpsTrap() async {
         await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt8.shiftedLeftBytes(SIMDUInt8.zero(), by: 17)
+            _ = SIMD<UInt8>.shiftedLeftBytes(SIMD<UInt8>.zero(), by: 17)
         }
         await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt8.shiftedRightBytes(SIMDUInt8.zero(), by: -1)
+            _ = SIMD<UInt8>.shiftedRightBytes(SIMD<UInt8>.zero(), by: -1)
         }
         await #expect(processExitsWith: .failure) {
-            let zero = SIMDUInt8.zero()
-            _ = SIMDUInt8.combinedShiftedRightBytes(zero, zero, by: 0)
+            let zero = SIMD<UInt8>.zero()
+            _ = SIMD<UInt8>.combinedShiftedRightBytes(zero, zero, by: 0)
         }
         await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt32.broadcastingInBlocks(SIMDUInt32.zero(), lane: 4)
+            _ = SIMD<UInt32>.broadcastingInBlocks(SIMD<UInt32>.zero(), lane: 4)
         }
         await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt32.broadcasting(SIMDUInt32.zero(), lane: SIMDUInt32.laneCount)
+            _ = SIMD<UInt32>.broadcasting(SIMD<UInt32>.zero(), lane: SIMD<UInt32>.laneCount)
         }
         await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt32.slideUpBlocks(SIMDUInt32.zero(), by: SIMDUInt32.laneCount / 4)
+            _ = SIMD<UInt32>.slideUpBlocks(SIMD<UInt32>.zero(), by: SIMD<UInt32>.laneCount / 4)
         }
         await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt32.shuffledPer4Lanes(SIMDUInt32.zero(), 0, 4, 0, 0)
+            _ = SIMD<UInt32>.shuffledPer4Lanes(SIMD<UInt32>.zero(), 0, 4, 0, 0)
         }
     }
 
     @Test("Checked shift-and-demote ops trap on a shift amount that is out of range")
     func checkedShiftAndDemoteOpsTrap() async {
         await #expect(processExitsWith: .failure) {
-            let zero = SIMDInt16.zero()
-            _ = SIMDInt8.vector(clamping: zero, zero, shiftedRightBy: 16)
+            let zero = SIMD<Int16>.zero()
+            _ = SIMD<Int8>.vector(clamping: zero, zero, shiftedRightBy: 16)
         }
         await #expect(processExitsWith: .failure) {
-            let zero = SIMDUInt32.zero()
-            _ = SIMDUInt16.vector(clamping: zero, zero, roundingShiftedRightBy: -1)
+            let zero = SIMD<UInt32>.zero()
+            _ = SIMD<UInt16>.vector(clamping: zero, zero, roundingShiftedRightBy: -1)
         }
         await #expect(processExitsWith: .failure) {
-            let zero = SIMDInt64.zero()
-            _ = SIMDInt32.vector(clampingInAnyOrder: zero, zero, shiftedRightBy: 64)
+            let zero = SIMD<Int64>.zero()
+            _ = SIMD<Int32>.vector(clampingInAnyOrder: zero, zero, shiftedRightBy: 64)
         }
         await #expect(processExitsWith: .failure) {
-            let zero = SIMDUInt16.zero()
-            _ = SIMDUInt8.vector(clampingInAnyOrder: zero, zero, roundingShiftedRightBy: 16)
+            let zero = SIMD<UInt16>.zero()
+            _ = SIMD<UInt8>.vector(clampingInAnyOrder: zero, zero, roundingShiftedRightBy: 16)
         }
     }
 
     @Test("Checked lane ops trap on an index outside 0..<laneCount")
     func checkedLaneOpsTrap() async {
         await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt32.lane(SIMDUInt32.zero(), at: -1)
+            _ = SIMD<UInt32>.lane(SIMD<UInt32>.zero(), at: -1)
         }
         await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt32.lane(SIMDUInt32.zero(), at: SIMDUInt32.laneCount)
+            _ = SIMD<UInt32>.lane(SIMD<UInt32>.zero(), at: SIMD<UInt32>.laneCount)
         }
         await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt32.replacingLane(SIMDUInt32.zero(), at: -1, with: 1)
+            _ = SIMD<UInt32>.replacingLane(SIMD<UInt32>.zero(), at: -1, with: 1)
         }
         await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt32.replacingLane(SIMDUInt32.zero(), at: SIMDUInt32.laneCount, with: 1)
+            _ = SIMD<UInt32>.replacingLane(SIMD<UInt32>.zero(), at: SIMD<UInt32>.laneCount, with: 1)
         }
     }
 
     @Test("Checked tuple ops trap on an index outside 0..<N")
     func checkedTupleOpsTrap() async {
         await #expect(processExitsWith: .failure) {
-            let zero = SIMDUInt32.zero()
-            _ = SIMDUInt32.get2(SIMDUInt32.create2(zero, zero), at: -1)
+            let zero = SIMD<UInt32>.zero()
+            _ = SIMD<UInt32>.get2(SIMD<UInt32>.create2(zero, zero), at: -1)
         }
         await #expect(processExitsWith: .failure) {
-            let zero = SIMDUInt32.zero()
-            _ = SIMDUInt32.get2(SIMDUInt32.create2(zero, zero), at: 2)
+            let zero = SIMD<UInt32>.zero()
+            _ = SIMD<UInt32>.get2(SIMD<UInt32>.create2(zero, zero), at: 2)
         }
         await #expect(processExitsWith: .failure) {
-            let zero = SIMDUInt32.zero()
-            _ = SIMDUInt32.get3(SIMDUInt32.create3(zero, zero, zero), at: -1)
+            let zero = SIMD<UInt32>.zero()
+            _ = SIMD<UInt32>.get3(SIMD<UInt32>.create3(zero, zero, zero), at: -1)
         }
         await #expect(processExitsWith: .failure) {
-            let zero = SIMDUInt32.zero()
-            _ = SIMDUInt32.get3(SIMDUInt32.create3(zero, zero, zero), at: 3)
+            let zero = SIMD<UInt32>.zero()
+            _ = SIMD<UInt32>.get3(SIMD<UInt32>.create3(zero, zero, zero), at: 3)
         }
         await #expect(processExitsWith: .failure) {
-            let zero = SIMDUInt32.zero()
-            _ = SIMDUInt32.get4(SIMDUInt32.create4(zero, zero, zero, zero), at: -1)
+            let zero = SIMD<UInt32>.zero()
+            _ = SIMD<UInt32>.get4(SIMD<UInt32>.create4(zero, zero, zero, zero), at: -1)
         }
         await #expect(processExitsWith: .failure) {
-            let zero = SIMDUInt32.zero()
-            _ = SIMDUInt32.get4(SIMDUInt32.create4(zero, zero, zero, zero), at: 4)
+            let zero = SIMD<UInt32>.zero()
+            _ = SIMD<UInt32>.get4(SIMD<UInt32>.create4(zero, zero, zero, zero), at: 4)
         }
         await #expect(processExitsWith: .failure) {
-            let zero = SIMDUInt32.zero()
-            _ = SIMDUInt32.set2(SIMDUInt32.create2(zero, zero), at: -1, to: zero)
+            let zero = SIMD<UInt32>.zero()
+            _ = SIMD<UInt32>.set2(SIMD<UInt32>.create2(zero, zero), at: -1, to: zero)
         }
         await #expect(processExitsWith: .failure) {
-            let zero = SIMDUInt32.zero()
-            _ = SIMDUInt32.set2(SIMDUInt32.create2(zero, zero), at: 2, to: zero)
+            let zero = SIMD<UInt32>.zero()
+            _ = SIMD<UInt32>.set2(SIMD<UInt32>.create2(zero, zero), at: 2, to: zero)
         }
         await #expect(processExitsWith: .failure) {
-            let zero = SIMDUInt32.zero()
-            _ = SIMDUInt32.set3(SIMDUInt32.create3(zero, zero, zero), at: -1, to: zero)
+            let zero = SIMD<UInt32>.zero()
+            _ = SIMD<UInt32>.set3(SIMD<UInt32>.create3(zero, zero, zero), at: -1, to: zero)
         }
         await #expect(processExitsWith: .failure) {
-            let zero = SIMDUInt32.zero()
-            _ = SIMDUInt32.set3(SIMDUInt32.create3(zero, zero, zero), at: 3, to: zero)
+            let zero = SIMD<UInt32>.zero()
+            _ = SIMD<UInt32>.set3(SIMD<UInt32>.create3(zero, zero, zero), at: 3, to: zero)
         }
         await #expect(processExitsWith: .failure) {
-            let zero = SIMDUInt32.zero()
-            _ = SIMDUInt32.set4(SIMDUInt32.create4(zero, zero, zero, zero), at: -1, to: zero)
+            let zero = SIMD<UInt32>.zero()
+            _ = SIMD<UInt32>.set4(SIMD<UInt32>.create4(zero, zero, zero, zero), at: -1, to: zero)
         }
         await #expect(processExitsWith: .failure) {
-            let zero = SIMDUInt32.zero()
-            _ = SIMDUInt32.set4(SIMDUInt32.create4(zero, zero, zero, zero), at: 4, to: zero)
+            let zero = SIMD<UInt32>.zero()
+            _ = SIMD<UInt32>.set4(SIMD<UInt32>.create4(zero, zero, zero, zero), at: 4, to: zero)
         }
     }
 
     @Test("Checked gathers and scatters trap on an index or a byte offset outside the span")
     func checkedGathersAndScattersTrap() async {
         await #expect(processExitsWith: .failure) {
-            let source = ContiguousArray<UInt32>(repeating: 0, count: SIMDUInt32.laneCount)
-            _ = SIMDUInt32.gather(from: source.span, indices: SIMDInt32.iota(1))
+            let source = ContiguousArray<UInt32>(repeating: 0, count: SIMD<UInt32>.laneCount)
+            _ = SIMD<UInt32>.gather(from: source.span, indices: SIMD<Int32>.iota(1))
         }
         await #expect(processExitsWith: .failure) {
-            let source = ContiguousArray<Float>(repeating: 0, count: SIMDFloat.laneCount)
-            let offset = SIMDInt32.repeating(Int32(SIMDFloat.laneCount * 4 - 3))
-            _ = SIMDFloat.gather(from: source.span, byteOffsets: offset)
+            let source = ContiguousArray<Float>(repeating: 0, count: SIMD<Float>.laneCount)
+            let offset = SIMD<Int32>.repeating(Int32(SIMD<Float>.laneCount * 4 - 3))
+            _ = SIMD<Float>.gather(from: source.span, byteOffsets: offset)
         }
         await #expect(processExitsWith: .failure) {
-            var output = ContiguousArray<Int32>(repeating: 0, count: SIMDInt32.laneCount)
+            var output = ContiguousArray<Int32>(repeating: 0, count: SIMD<Int32>.laneCount)
             var destination = output.mutableSpan
-            SIMDInt32.scatter(SIMDInt32.zero(), to: &destination, indices: SIMDInt32.repeating(-1))
+            SIMD<Int32>.scatter(
+                SIMD<Int32>.zero(),
+                to: &destination,
+                indices: SIMD<Int32>.repeating(-1)
+            )
         }
         await #expect(processExitsWith: .failure) {
-            let source = ContiguousArray<Double>(repeating: 0, count: SIMDDouble.laneCount)
-            _ = SIMDDouble.gather(
+            let source = ContiguousArray<Double>(repeating: 0, count: SIMD<Double>.laneCount)
+            _ = SIMD<Double>.gather(
                 from: source.span,
-                indices: SIMDInt64.repeating(Int64(SIMDDouble.laneCount)),
-                where: SIMDDouble.firstLanes(count: 1)
+                indices: SIMD<Int64>.repeating(Int64(SIMD<Double>.laneCount)),
+                where: SIMD<Double>.firstLanes(count: 1)
             )
         }
     }
@@ -1421,27 +1428,27 @@ struct OpsTests {
     @Test("Checked masked gathers and scatters trap on an index outside the span in any mask lane")
     func checkedMaskedGathersAndScattersTrap() async {
         await #expect(processExitsWith: .failure) {
-            let lanes = SIMDUInt32.laneCount
+            let lanes = SIMD<UInt32>.laneCount
             let source = ContiguousArray<UInt32>(repeating: 0, count: lanes)
             let bits = ContiguousArray((0..<lanes).map { $0 == 0 ? UInt32(0x8000_0000) : 0 })
-            let mask = SIMDUInt32.mask(from: SIMDUInt32.load(from: bits.span))
-            _ = SIMDUInt32.gather(
+            let mask = SIMD<UInt32>.mask(from: SIMD<UInt32>.load(from: bits.span))
+            _ = SIMD<UInt32>.gather(
                 from: source.span,
-                indices: SIMDInt32.repeating(Int32(lanes)),
+                indices: SIMD<Int32>.repeating(Int32(lanes)),
                 where: mask
             )
         }
         await #expect(processExitsWith: .failure) {
-            let lanes = SIMDDouble.laneCount
+            let lanes = SIMD<Double>.laneCount
             var output = ContiguousArray<Double>(repeating: 0, count: lanes)
             var destination = output.mutableSpan
             let negative = -Double.leastNonzeroMagnitude
             let bits = ContiguousArray((0..<lanes).map { $0 == 0 ? negative : 0 })
-            let mask = SIMDDouble.mask(from: SIMDDouble.load(from: bits.span))
-            SIMDDouble.scatter(
-                SIMDDouble.zero(),
+            let mask = SIMD<Double>.mask(from: SIMD<Double>.load(from: bits.span))
+            SIMD<Double>.scatter(
+                SIMD<Double>.zero(),
                 to: &destination,
-                indices: SIMDInt64.repeating(Int64(lanes)),
+                indices: SIMD<Int64>.repeating(Int64(lanes)),
                 where: mask
             )
         }
@@ -1450,13 +1457,15 @@ struct OpsTests {
     @Test("Checked indices ops trap on an index outside 0..<2 * laneCount")
     func checkedIndicesOpsTrap() async {
         await #expect(processExitsWith: .failure) {
-            _ = SIMDInt32.indices(from: SIMDInt32.repeating(-1))
+            _ = SIMD<Int32>.indices(from: SIMD<Int32>.repeating(-1))
         }
         await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt32.indices(from: SIMDUInt32.repeating(UInt32(2 * SIMDUInt32.laneCount)))
+            _ = SIMD<UInt32>.indices(
+                from: SIMD<UInt32>.repeating(UInt32(2 * SIMD<UInt32>.laneCount))
+            )
         }
         await #expect(processExitsWith: .failure) {
-            _ = SIMDFloat.indices(from: SIMDInt32.repeating(Int32(2 * SIMDFloat.laneCount)))
+            _ = SIMD<Float>.indices(from: SIMD<Int32>.repeating(Int32(2 * SIMD<Float>.laneCount)))
         }
     }
 
@@ -1464,49 +1473,49 @@ struct OpsTests {
     func checkedIndexLoadsTrap() async {
         await #expect(processExitsWith: .failure) {
             let indices = ContiguousArray(
-                repeating: UInt32(2 * SIMDUInt32.laneCount),
-                count: SIMDUInt32.laneCount
+                repeating: UInt32(2 * SIMD<UInt32>.laneCount),
+                count: SIMD<UInt32>.laneCount
             )
-            _ = SIMDUInt32.loadIndices(from: indices.span)
+            _ = SIMD<UInt32>.loadIndices(from: indices.span)
         }
         await #expect(processExitsWith: .failure) {
-            let indices = ContiguousArray<Int32>(repeating: -1, count: SIMDInt32.laneCount)
-            _ = SIMDInt32.loadIndices(from: indices.span)
+            let indices = ContiguousArray<Int32>(repeating: -1, count: SIMD<Int32>.laneCount)
+            _ = SIMD<Int32>.loadIndices(from: indices.span)
         }
     }
 
     @Test("Checked output span ops trap on too little free capacity or a count out of bounds")
     func checkedOutputSpanOpsTrap() async {
         await #expect(processExitsWith: .failure) {
-            _ = ContiguousArray<UInt8>(capacity: SIMDUInt8.laneCount - 1) { output in
-                SIMDUInt8.append(SIMDUInt8.zero(), to: &output)
+            _ = ContiguousArray<UInt8>(capacity: SIMD<UInt8>.laneCount - 1) { output in
+                SIMD<UInt8>.append(SIMD<UInt8>.zero(), to: &output)
             }
         }
         await #expect(processExitsWith: .failure) {
-            _ = ContiguousArray<UInt8>(capacity: SIMDUInt8.laneCount * 2 - 1) { output in
-                let zero = SIMDUInt8.zero()
-                SIMDUInt8.appendInterleaved2(zero, zero, to: &output)
+            _ = ContiguousArray<UInt8>(capacity: SIMD<UInt8>.laneCount * 2 - 1) { output in
+                let zero = SIMD<UInt8>.zero()
+                SIMD<UInt8>.appendInterleaved2(zero, zero, to: &output)
             }
         }
         await #expect(processExitsWith: .failure) {
             _ = ContiguousArray<UInt8>(capacity: 2) { output in
-                SIMDUInt8.append(SIMDUInt8.zero(), addingCount: 3, to: &output)
+                SIMD<UInt8>.append(SIMD<UInt8>.zero(), addingCount: 3, to: &output)
             }
         }
         await #expect(processExitsWith: .failure) {
-            _ = ContiguousArray<UInt8>(capacity: SIMDUInt8.laneCount * 2) { output in
-                let count = SIMDUInt8.laneCount + 1
-                SIMDUInt8.append(SIMDUInt8.zero(), addingCount: count, to: &output)
+            _ = ContiguousArray<UInt8>(capacity: SIMD<UInt8>.laneCount * 2) { output in
+                let count = SIMD<UInt8>.laneCount + 1
+                SIMD<UInt8>.append(SIMD<UInt8>.zero(), addingCount: count, to: &output)
             }
         }
         await #expect(processExitsWith: .failure) {
             _ = ContiguousArray<UInt8>(capacity: 1) { output in
-                SIMDUInt8.append(SIMDUInt8.zero(), addingCount: -1, to: &output)
+                SIMD<UInt8>.append(SIMD<UInt8>.zero(), addingCount: -1, to: &output)
             }
         }
         await #expect(processExitsWith: .failure) {
-            _ = ContiguousArray<UInt8>(capacity: (SIMDUInt8.laneCount + 7) / 8 - 1) { output in
-                SIMDUInt8.appendMask(SIMDUInt8.repeatingMask(true), to: &output)
+            _ = ContiguousArray<UInt8>(capacity: (SIMD<UInt8>.laneCount + 7) / 8 - 1) { output in
+                SIMD<UInt8>.appendMask(SIMD<UInt8>.repeatingMask(true), to: &output)
             }
         }
     }
@@ -1514,71 +1523,85 @@ struct OpsTests {
     @Test("Checked lane amount ops trap on an amount outside 0...laneCount")
     func checkedLaneAmountOpsTrap() async {
         await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt8.slideUpLanes(SIMDUInt8.repeatingMask(true), by: -1)
+            _ = SIMD<UInt8>.slideUpLanes(SIMD<UInt8>.repeatingMask(true), by: -1)
         }
         await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt8.slideDownLanes(SIMDUInt8.repeatingMask(true), by: SIMDUInt8.laneCount + 1)
-        }
-        await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt8.slideUpLanes(SIMDUInt8.zero(), by: -1)
-        }
-        await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt8.slideUpLanes(SIMDUInt8.zero(), by: SIMDUInt8.laneCount + 1)
-        }
-        await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt8.slideDownLanes(SIMDUInt8.zero(), by: -1)
-        }
-        await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt8.slideDownLanes(SIMDUInt8.zero(), by: SIMDUInt8.laneCount + 1)
-        }
-        await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt8.slideUpLanes(SIMDUInt8.zero(), by: -1, fillingWith: SIMDUInt8.zero())
-        }
-        await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt8.slideUpLanes(
-                SIMDUInt8.zero(),
-                by: SIMDUInt8.laneCount + 1,
-                fillingWith: SIMDUInt8.zero()
+            _ = SIMD<UInt8>.slideDownLanes(
+                SIMD<UInt8>.repeatingMask(true),
+                by: SIMD<UInt8>.laneCount + 1
             )
         }
         await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt8.slideDownLanes(SIMDUInt8.zero(), by: -1, fillingWith: SIMDUInt8.zero())
+            _ = SIMD<UInt8>.slideUpLanes(SIMD<UInt8>.zero(), by: -1)
         }
         await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt8.slideDownLanes(
-                SIMDUInt8.zero(),
-                by: SIMDUInt8.laneCount + 1,
-                fillingWith: SIMDUInt8.zero()
+            _ = SIMD<UInt8>.slideUpLanes(SIMD<UInt8>.zero(), by: SIMD<UInt8>.laneCount + 1)
+        }
+        await #expect(processExitsWith: .failure) {
+            _ = SIMD<UInt8>.slideDownLanes(SIMD<UInt8>.zero(), by: -1)
+        }
+        await #expect(processExitsWith: .failure) {
+            _ = SIMD<UInt8>.slideDownLanes(SIMD<UInt8>.zero(), by: SIMD<UInt8>.laneCount + 1)
+        }
+        await #expect(processExitsWith: .failure) {
+            _ = SIMD<UInt8>.slideUpLanes(
+                SIMD<UInt8>.zero(),
+                by: -1,
+                fillingWith: SIMD<UInt8>.zero()
+            )
+        }
+        await #expect(processExitsWith: .failure) {
+            _ = SIMD<UInt8>.slideUpLanes(
+                SIMD<UInt8>.zero(),
+                by: SIMD<UInt8>.laneCount + 1,
+                fillingWith: SIMD<UInt8>.zero()
+            )
+        }
+        await #expect(processExitsWith: .failure) {
+            _ = SIMD<UInt8>.slideDownLanes(
+                SIMD<UInt8>.zero(),
+                by: -1,
+                fillingWith: SIMD<UInt8>.zero()
+            )
+        }
+        await #expect(processExitsWith: .failure) {
+            _ = SIMD<UInt8>.slideDownLanes(
+                SIMD<UInt8>.zero(),
+                by: SIMD<UInt8>.laneCount + 1,
+                fillingWith: SIMD<UInt8>.zero()
             )
         }
     }
 
     @Test("Checked aligned appends trap on an output span that continues misaligned")
     func checkedAlignedOutputSpanAppendTraps() async {
-        guard SIMDUInt8.laneCount > 1 else { return }
+        guard SIMD<UInt8>.laneCount > 1 else { return }
         await #expect(processExitsWith: .failure) {
-            let lanes = SIMDUInt8.laneCount
+            let lanes = SIMD<UInt8>.laneCount
             let buffer =
                 unsafe UnsafeMutableRawBufferPointer
                 .allocate(byteCount: lanes * 2, alignment: lanes)
                 .bindMemory(to: UInt8.self)
             unsafe buffer.initialize(repeating: 0)
             var output = unsafe OutputSpan(buffer: buffer, initializedCount: 1)
-            SIMDUInt8.appendAligned(SIMDUInt8.zero(), to: &output)
+            SIMD<UInt8>.appendAligned(SIMD<UInt8>.zero(), to: &output)
         }
     }
     #endif
 }
 
-private func verifyWrappingComplexProducts<H: SIMDIntegerElement>(_ type: H.Type)
-where H.Lane: FixedWidthInteger {
-    let extremes: [H.Lane] = [.max, .min, .max / 3, .min / 3 + 1, .min / 7, 33, -1, .max - 7]
+private func verifyWrappingComplexProducts<Lane: SIMDIntegerElement & FixedWidthInteger>(
+    _ type: Lane.Type
+) {
+    typealias H = SIMD<Lane>
+
+    let extremes: [Lane] = [.max, .min, .max / 3, .min / 3 + 1, .min / 7, 33, -1, .max - 7]
     let pick = { (offset: Int) in
         ContiguousArray((0..<H.laneCount).map { extremes[($0 &* 3 &+ offset) % extremes.count] })
     }
     let (a, b, c) = (pick(0), pick(5), pick(2))
-    var products: [H.Lane] = []
-    var conjugates: [H.Lane] = []
+    var products: [Lane] = []
+    var conjugates: [Lane] = []
     for pair in stride(from: 0, to: H.laneCount, by: 2) {
         let (u, v, x, y) = (a[pair], a[pair + 1], b[pair], b[pair + 1])
         products += [u &* x &- v &* y, u &* y &+ v &* x]
@@ -1586,27 +1609,29 @@ where H.Lane: FixedWidthInteger {
     }
     let (va, vb, vc) = (H.load(from: a.span), H.load(from: b.span), H.load(from: c.span))
 
-    #expect(lanes(H.self, H.multiplyingComplex(va, vb)) == products)
-    #expect(lanes(H.self, H.multiplyingComplexConjugate(va, vb)) == conjugates)
-    #expect(lanes(H.self, H.multiplyAddingComplex(va, vb, vc)) == zip(products, c).map(&+))
+    #expect(lanes(H.multiplyingComplex(va, vb)) == products)
+    #expect(lanes(H.multiplyingComplexConjugate(va, vb)) == conjugates)
+    #expect(lanes(H.multiplyAddingComplex(va, vb, vc)) == zip(products, c).map(&+))
     #expect(
-        lanes(H.self, H.multiplyAddingComplexConjugate(va, vb, vc)) == zip(conjugates, c).map(&+)
+        lanes(H.multiplyAddingComplexConjugate(va, vb, vc)) == zip(conjugates, c).map(&+)
     )
 }
 
-private func lanes<H: SIMDElement>(_ type: H.Type, _ vector: H.Vector) -> [H.Lane] {
-    let output = ContiguousArray<H.Lane>(capacity: H.laneCount) { output in
-        H.append(vector, to: &output)
+private func lanes<Lane: SIMDElement>(_ vector: SIMD<Lane>) -> [Lane] {
+    let output = ContiguousArray<Lane>(capacity: SIMD<Lane>.laneCount) { output in
+        SIMD<Lane>.append(vector, to: &output)
     }
     return Array(output)
 }
 
-private func expectMaskedMaximumOfNaN<H: SIMDElement>(
-    _ type: H.Type,
+private func expectMaskedMaximumOfNaN<Lane: SIMDNumericElement & BinaryFloatingPoint>(
+    _ type: Lane.Type,
     isNaN: Bool,
     isNumber: Bool
-) where H.Lane: BinaryFloatingPoint {
-    let numbers = ContiguousArray((0..<H.laneCount).map { H.Lane($0) + 1.5 })
+) {
+    typealias H = SIMD<Lane>
+
+    let numbers = ContiguousArray((0..<H.laneCount).map { Lane($0) + 1.5 })
     let number = H.load(from: numbers.span)
     let mask = H.repeatingMask(true)
     for nanLane in 0..<H.laneCount {
@@ -1625,13 +1650,15 @@ private func expectMaskedMaximumOfNaN<H: SIMDElement>(
     }
 }
 
-private func expectAllBitsClearOfNegativeZero<H: SIMDElement>(
-    _ type: H.Type,
+private func expectAllBitsClearOfNegativeZero<Lane: SIMDNumericElement & BinaryFloatingPoint>(
+    _ type: Lane.Type,
     isClear: Bool
-) where H.Lane: BinaryFloatingPoint {
+) {
+    typealias H = SIMD<Lane>
+
     #expect(H.allBitsClear(H.repeating(-0.0)) == isClear, "\(H.self) of negative zeros")
     for lane in 0..<H.laneCount {
-        var lanes = ContiguousArray(repeating: H.Lane(0), count: H.laneCount)
+        var lanes = ContiguousArray(repeating: Lane(0), count: H.laneCount)
         lanes[lane] = -0.0
         #expect(
             H.allBitsClear(H.load(from: lanes.span)) == isClear,

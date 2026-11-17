@@ -14,7 +14,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.equalTo(H.repeating(value), b),
-                H.Mask(raw: HighwayReference.equalToF64(H.repeating(value), b)),
+                H.Mask(raw: HighwayReference.equalToF64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -29,7 +29,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.equalTo(a, H.repeating(value)),
-                H.Mask(raw: HighwayReference.equalToF64(a, H.repeating(value))),
+                H.Mask(raw: HighwayReference.equalToF64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -139,7 +139,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.notEqualTo(H.repeating(value), b),
-                H.Mask(raw: HighwayReference.notEqualToF64(H.repeating(value), b)),
+                H.Mask(raw: HighwayReference.notEqualToF64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -154,7 +154,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.notEqualTo(a, H.repeating(value)),
-                H.Mask(raw: HighwayReference.notEqualToF64(a, H.repeating(value))),
+                H.Mask(raw: HighwayReference.notEqualToF64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -264,7 +264,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.lessThan(H.repeating(value), b),
-                H.Mask(raw: HighwayReference.lessThanF64(H.repeating(value), b)),
+                H.Mask(raw: HighwayReference.lessThanF64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -279,7 +279,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.lessThan(a, H.repeating(value)),
-                H.Mask(raw: HighwayReference.lessThanF64(a, H.repeating(value))),
+                H.Mask(raw: HighwayReference.lessThanF64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -389,7 +389,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.greaterThan(H.repeating(value), b),
-                H.Mask(raw: HighwayReference.greaterThanF64(H.repeating(value), b)),
+                H.Mask(raw: HighwayReference.greaterThanF64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -404,7 +404,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.greaterThan(a, H.repeating(value)),
-                H.Mask(raw: HighwayReference.greaterThanF64(a, H.repeating(value))),
+                H.Mask(raw: HighwayReference.greaterThanF64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -514,7 +514,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.lessThanOrEqualTo(H.repeating(value), b),
-                H.Mask(raw: HighwayReference.lessThanOrEqualToF64(H.repeating(value), b)),
+                H.Mask(raw: HighwayReference.lessThanOrEqualToF64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -529,7 +529,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.lessThanOrEqualTo(a, H.repeating(value)),
-                H.Mask(raw: HighwayReference.lessThanOrEqualToF64(a, H.repeating(value))),
+                H.Mask(raw: HighwayReference.lessThanOrEqualToF64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -639,7 +639,9 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.greaterThanOrEqualTo(H.repeating(value), b),
-                H.Mask(raw: HighwayReference.greaterThanOrEqualToF64(H.repeating(value), b)),
+                H.Mask(
+                    raw: HighwayReference.greaterThanOrEqualToF64(H.repeating(value).raw, b.raw)
+                ),
                 "b: \(describe(b))"
             )
         }
@@ -654,7 +656,9 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.greaterThanOrEqualTo(a, H.repeating(value)),
-                H.Mask(raw: HighwayReference.greaterThanOrEqualToF64(a, H.repeating(value))),
+                H.Mask(
+                    raw: HighwayReference.greaterThanOrEqualToF64(a.raw, H.repeating(value).raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -762,7 +766,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.isNegative(H.repeating(value)),
-            H.Mask(raw: HighwayReference.isNegativeF64(H.repeating(value))),
+            H.Mask(raw: HighwayReference.isNegativeF64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()

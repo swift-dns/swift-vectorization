@@ -14,7 +14,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.approximateReciprocalSquareRoot(H.repeating(value)),
-            HighwayReference.approximateReciprocalSquareRootF32(H.repeating(value)),
+            HighwayReference.approximateReciprocalSquareRootF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -102,7 +102,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.approximateReciprocal(H.repeating(value)),
-            HighwayReference.approximateReciprocalF32(H.repeating(value)),
+            HighwayReference.approximateReciprocalF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -190,7 +190,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.exponent(H.repeating(value)),
-            HighwayReference.exponentF32(H.repeating(value)),
+            HighwayReference.exponentF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -278,7 +278,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.mantissa(H.repeating(value)),
-            HighwayReference.mantissaF32(H.repeating(value)),
+            HighwayReference.mantissaF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -368,7 +368,7 @@ extension SIMDFloatConstantTests {
         for b in bInputs where !hasUnorderedNaNs(adjacentLanesOf: H.repeating(value), b) {
             mismatches.check(
                 H.pairwiseAdding(H.repeating(value), b),
-                HighwayReference.pairwiseAddingF32(H.repeating(value), b),
+                HighwayReference.pairwiseAddingF32(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -383,7 +383,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs where !hasUnorderedNaNs(adjacentLanesOf: a, H.repeating(value)) {
             mismatches.check(
                 H.pairwiseAdding(a, H.repeating(value)),
-                HighwayReference.pairwiseAddingF32(a, H.repeating(value)),
+                HighwayReference.pairwiseAddingF32(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -493,7 +493,7 @@ extension SIMDFloatConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.pairwiseSubtracting(H.repeating(value), b),
-                HighwayReference.pairwiseSubtractingF32(H.repeating(value), b),
+                HighwayReference.pairwiseSubtractingF32(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -508,7 +508,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.pairwiseSubtracting(a, H.repeating(value)),
-                HighwayReference.pairwiseSubtractingF32(a, H.repeating(value)),
+                HighwayReference.pairwiseSubtractingF32(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -621,7 +621,7 @@ extension SIMDFloatConstantTests {
         )
         mismatches.check(
             H.sumsOf2(SIMDFloat16.repeating(value)),
-            HighwayReference.sumsOf2F16ToF32(SIMDFloat16.repeating(value)),
+            HighwayReference.sumsOf2F16ToF32(SIMDFloat16.repeating(value).raw),
             ""
         )
         mismatches.record()

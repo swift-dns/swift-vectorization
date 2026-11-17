@@ -19,7 +19,7 @@ extension SIMDFloat16ConstantTests {
         for lanes in lanesInputs {
             mismatches.check(
                 H.slideUpLanes(H.repeating(value), by: lanes),
-                HighwayReference.slideUpLanesF16(H.repeating(value), lanes),
+                HighwayReference.slideUpLanesF16(H.repeating(value).raw, lanes),
                 "lanes: \(lanes)"
             )
         }
@@ -115,7 +115,7 @@ extension SIMDFloat16ConstantTests {
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes, fillingWith: H.repeating(value)),
-                HighwayReference.slideUpLanesFillingWithF16(H.repeating(value), a, lanes),
+                HighwayReference.slideUpLanesFillingWithF16(H.repeating(value).raw, a.raw, lanes),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -135,7 +135,11 @@ extension SIMDFloat16ConstantTests {
         for (fill, lanes) in everyPair(fillInputs, lanesInputs) {
             mismatches.check(
                 H.slideUpLanes(H.repeating(value), by: lanes, fillingWith: fill),
-                HighwayReference.slideUpLanesFillingWithF16(fill, H.repeating(value), lanes),
+                HighwayReference.slideUpLanesFillingWithF16(
+                    fill.raw,
+                    H.repeating(value).raw,
+                    lanes
+                ),
                 "fill: \(describe(fill)), lanes: \(lanes)"
             )
         }
@@ -249,7 +253,7 @@ extension SIMDFloat16ConstantTests {
         for lanes in lanesInputs {
             mismatches.check(
                 H.slideDownLanes(H.repeating(value), by: lanes),
-                HighwayReference.slideDownLanesF16(H.repeating(value), lanes),
+                HighwayReference.slideDownLanesF16(H.repeating(value).raw, lanes),
                 "lanes: \(lanes)"
             )
         }
@@ -345,7 +349,7 @@ extension SIMDFloat16ConstantTests {
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes, fillingWith: H.repeating(value)),
-                HighwayReference.slideDownLanesFillingWithF16(H.repeating(value), a, lanes),
+                HighwayReference.slideDownLanesFillingWithF16(H.repeating(value).raw, a.raw, lanes),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -365,7 +369,11 @@ extension SIMDFloat16ConstantTests {
         for (fill, lanes) in everyPair(fillInputs, lanesInputs) {
             mismatches.check(
                 H.slideDownLanes(H.repeating(value), by: lanes, fillingWith: fill),
-                HighwayReference.slideDownLanesFillingWithF16(fill, H.repeating(value), lanes),
+                HighwayReference.slideDownLanesFillingWithF16(
+                    fill.raw,
+                    H.repeating(value).raw,
+                    lanes
+                ),
                 "fill: \(describe(fill)), lanes: \(lanes)"
             )
         }
@@ -477,7 +485,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.slide1Up(H.repeating(value)),
-            HighwayReference.slide1UpF16(H.repeating(value)),
+            HighwayReference.slide1UpF16(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -571,7 +579,7 @@ extension SIMDFloat16ConstantTests {
         for fill in fillInputs {
             mismatches.check(
                 H.slide1Up(H.repeating(value), fillingWith: fill),
-                HighwayReference.slide1UpFillingWithF16(fill.bitPattern, H.repeating(value)),
+                HighwayReference.slide1UpFillingWithF16(fill.bitPattern, H.repeating(value).raw),
                 "fill: \(hex(fill))"
             )
         }
@@ -664,7 +672,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.slide1Down(H.repeating(value)),
-            HighwayReference.slide1DownF16(H.repeating(value)),
+            HighwayReference.slide1DownF16(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -758,7 +766,7 @@ extension SIMDFloat16ConstantTests {
         for fill in fillInputs {
             mismatches.check(
                 H.slide1Down(H.repeating(value), fillingWith: fill),
-                HighwayReference.slide1DownFillingWithF16(fill.bitPattern, H.repeating(value)),
+                HighwayReference.slide1DownFillingWithF16(fill.bitPattern, H.repeating(value).raw),
                 "fill: \(hex(fill))"
             )
         }
@@ -854,7 +862,7 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.slideUpBlocks(H.repeating(value), by: blocks),
                 HighwayReference.slideUpBlocksF16(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: blocks)
                 ),
                 "blocks: \(blocks)"
@@ -952,7 +960,7 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.slideDownBlocks(H.repeating(value), by: blocks),
                 HighwayReference.slideDownBlocksF16(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: blocks)
                 ),
                 "blocks: \(blocks)"

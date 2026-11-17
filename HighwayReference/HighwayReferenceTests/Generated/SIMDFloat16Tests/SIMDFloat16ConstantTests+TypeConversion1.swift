@@ -593,7 +593,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.vector(bitPattern: SIMDFloat.repeating(value)),
-            HighwayReference.vectorBitPatternF32ToF16(SIMDFloat.repeating(value)),
+            HighwayReference.vectorBitPatternF32ToF16(SIMDFloat.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -685,7 +685,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.vector(bitPattern: SIMDDouble.repeating(value)),
-            HighwayReference.vectorBitPatternF64ToF16(SIMDDouble.repeating(value)),
+            HighwayReference.vectorBitPatternF64ToF16(SIMDDouble.repeating(value).raw),
             ""
         )
         mismatches.record()

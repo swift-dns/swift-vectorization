@@ -20,7 +20,9 @@ extension SIMDFloat16ConstantTests {
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 H.equalTo(H.repeating(value), b, where: mask),
-                H.Mask(raw: HighwayReference.equalToWhereF16(mask.raw, H.repeating(value), b)),
+                H.Mask(
+                    raw: HighwayReference.equalToWhereF16(mask.raw, H.repeating(value).raw, b.raw)
+                ),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -40,7 +42,9 @@ extension SIMDFloat16ConstantTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.equalTo(a, H.repeating(value), where: mask),
-                H.Mask(raw: HighwayReference.equalToWhereF16(mask.raw, a, H.repeating(value))),
+                H.Mask(
+                    raw: HighwayReference.equalToWhereF16(mask.raw, a.raw, H.repeating(value).raw)
+                ),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -155,7 +159,13 @@ extension SIMDFloat16ConstantTests {
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 H.notEqualTo(H.repeating(value), b, where: mask),
-                H.Mask(raw: HighwayReference.notEqualToWhereF16(mask.raw, H.repeating(value), b)),
+                H.Mask(
+                    raw: HighwayReference.notEqualToWhereF16(
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw
+                    )
+                ),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -175,7 +185,13 @@ extension SIMDFloat16ConstantTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.notEqualTo(a, H.repeating(value), where: mask),
-                H.Mask(raw: HighwayReference.notEqualToWhereF16(mask.raw, a, H.repeating(value))),
+                H.Mask(
+                    raw: HighwayReference.notEqualToWhereF16(
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw
+                    )
+                ),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -290,7 +306,9 @@ extension SIMDFloat16ConstantTests {
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 H.lessThan(H.repeating(value), b, where: mask),
-                H.Mask(raw: HighwayReference.lessThanWhereF16(mask.raw, H.repeating(value), b)),
+                H.Mask(
+                    raw: HighwayReference.lessThanWhereF16(mask.raw, H.repeating(value).raw, b.raw)
+                ),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -310,7 +328,9 @@ extension SIMDFloat16ConstantTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.lessThan(a, H.repeating(value), where: mask),
-                H.Mask(raw: HighwayReference.lessThanWhereF16(mask.raw, a, H.repeating(value))),
+                H.Mask(
+                    raw: HighwayReference.lessThanWhereF16(mask.raw, a.raw, H.repeating(value).raw)
+                ),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -558,7 +578,13 @@ extension SIMDFloat16ConstantTests {
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 H.greaterThan(H.repeating(value), b, where: mask),
-                H.Mask(raw: HighwayReference.greaterThanWhereF16(mask.raw, H.repeating(value), b)),
+                H.Mask(
+                    raw: HighwayReference.greaterThanWhereF16(
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw
+                    )
+                ),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -578,7 +604,13 @@ extension SIMDFloat16ConstantTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.greaterThan(a, H.repeating(value), where: mask),
-                H.Mask(raw: HighwayReference.greaterThanWhereF16(mask.raw, a, H.repeating(value))),
+                H.Mask(
+                    raw: HighwayReference.greaterThanWhereF16(
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw
+                    )
+                ),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -827,7 +859,11 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.lessThanOrEqualTo(H.repeating(value), b, where: mask),
                 H.Mask(
-                    raw: HighwayReference.lessThanOrEqualToWhereF16(mask.raw, H.repeating(value), b)
+                    raw: HighwayReference.lessThanOrEqualToWhereF16(
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw
+                    )
                 ),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
@@ -849,7 +885,11 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.lessThanOrEqualTo(a, H.repeating(value), where: mask),
                 H.Mask(
-                    raw: HighwayReference.lessThanOrEqualToWhereF16(mask.raw, a, H.repeating(value))
+                    raw: HighwayReference.lessThanOrEqualToWhereF16(
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw
+                    )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )

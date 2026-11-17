@@ -14,7 +14,10 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.block(a, at: index),
                 H.BlockVector(
-                    raw: HighwayReference.extractingBlockF32(a, Int32(truncatingIfNeeded: index))
+                    raw: HighwayReference.extractingBlockF32(
+                        a.raw,
+                        Int32(truncatingIfNeeded: index)
+                    )
                 ),
                 "a: \(describe(a))"
             )
@@ -46,7 +49,10 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 unsafe H.block(a, atUnchecked: index),
                 H.BlockVector(
-                    raw: HighwayReference.extractingBlockF32(a, Int32(truncatingIfNeeded: index))
+                    raw: HighwayReference.extractingBlockF32(
+                        a.raw,
+                        Int32(truncatingIfNeeded: index)
+                    )
                 ),
                 "a: \(describe(a))"
             )
@@ -80,7 +86,7 @@ extension SIMDFloatConstantTests {
                 H.block(H.repeating(value), at: index),
                 H.BlockVector(
                     raw: HighwayReference.extractingBlockF32(
-                        H.repeating(value),
+                        H.repeating(value).raw,
                         Int32(truncatingIfNeeded: index)
                     )
                 ),
@@ -176,7 +182,7 @@ extension SIMDFloatConstantTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.replacingBlock(a, at: index, with: b),
-                HighwayReference.replacingBlockF32(a, Int32(truncatingIfNeeded: index), b.raw),
+                HighwayReference.replacingBlockF32(a.raw, Int32(truncatingIfNeeded: index), b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -209,7 +215,7 @@ extension SIMDFloatConstantTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 unsafe H.replacingBlock(a, atUnchecked: index, with: b),
-                HighwayReference.replacingBlockF32(a, Int32(truncatingIfNeeded: index), b.raw),
+                HighwayReference.replacingBlockF32(a.raw, Int32(truncatingIfNeeded: index), b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -244,7 +250,7 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.replacingBlock(H.repeating(value), at: index, with: b),
                 HighwayReference.replacingBlockF32(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: index),
                     b.raw
                 ),

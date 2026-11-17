@@ -13,7 +13,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.zippingLower(a, b),
-                HighwayReference.zippingLowerF32ToF64(a, b),
+                HighwayReference.zippingLowerF32ToF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -27,7 +27,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.zippingUpper(a, b),
-                HighwayReference.zippingUpperF32ToF64(a, b),
+                HighwayReference.zippingUpperF32ToF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

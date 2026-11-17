@@ -103,7 +103,7 @@ extension SIMDInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(bitPattern: a),
-                H.Vector(raw: HighwayReference.vectorBitPatternF32ToI64(a)),
+                H.Vector(raw: HighwayReference.vectorBitPatternF32ToI64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -116,7 +116,7 @@ extension SIMDInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(bitPattern: a),
-                H.Vector(raw: HighwayReference.vectorBitPatternF64ToI64(a)),
+                H.Vector(raw: HighwayReference.vectorBitPatternF64ToI64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -130,7 +130,7 @@ extension SIMDInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(bitPattern: a),
-                H.Vector(raw: HighwayReference.vectorBitPatternF16ToI64(a)),
+                H.Vector(raw: HighwayReference.vectorBitPatternF16ToI64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -157,7 +157,7 @@ extension SIMDInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(converting: a),
-                H.Vector(raw: HighwayReference.vectorConvertingF64ToI64(a)),
+                H.Vector(raw: HighwayReference.vectorConvertingF64ToI64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -170,7 +170,7 @@ extension SIMDInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(convertingInRange: a),
-                H.Vector(raw: HighwayReference.vectorConvertingInRangeF64ToI64(a)),
+                H.Vector(raw: HighwayReference.vectorConvertingInRangeF64ToI64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -184,7 +184,7 @@ extension SIMDInt64ReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.vector(converting: a, where: mask),
-                H.Vector(raw: HighwayReference.vectorConvertingWhereF64ToI64(mask.raw, a)),
+                H.Vector(raw: HighwayReference.vectorConvertingWhereF64ToI64(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -200,7 +200,7 @@ extension SIMDInt64ReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.vector(converting: a, where: mask),
-                H.Vector(raw: HighwayReference.vectorConvertingWhereF64ToI64(mask.raw, a)),
+                H.Vector(raw: HighwayReference.vectorConvertingWhereF64ToI64(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -213,7 +213,7 @@ extension SIMDInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(roundingToNearestOrEven: a),
-                H.Vector(raw: HighwayReference.vectorRoundingToNearestOrEvenF64ToI64(a)),
+                H.Vector(raw: HighwayReference.vectorRoundingToNearestOrEvenF64ToI64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -226,7 +226,7 @@ extension SIMDInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(roundingUp: a),
-                H.Vector(raw: HighwayReference.vectorRoundingUpF64ToI64(a)),
+                H.Vector(raw: HighwayReference.vectorRoundingUpF64ToI64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -239,7 +239,7 @@ extension SIMDInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(roundingDown: a),
-                H.Vector(raw: HighwayReference.vectorRoundingDownF64ToI64(a)),
+                H.Vector(raw: HighwayReference.vectorRoundingDownF64ToI64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -1842,7 +1842,7 @@ extension SIMDInt64ReferenceTests {
         let aInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0xF518_AB44_B2EB_DD3C)
         for a in aInputs {
             let port = H.vector(resizing: a)
-            let reference = H.Vector(raw: HighwayReference.vectorResizingF32ToI64(a))
+            let reference = H.Vector(raw: HighwayReference.vectorResizingF32ToI64(a.raw))
             let definedBytes = SIMDFloat.laneCount * MemoryLayout<SIMDFloat.Lane>.stride
             let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(

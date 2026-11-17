@@ -17,7 +17,11 @@ extension SIMDFloatConstantTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.squareRoot(a, where: mask, otherwise: H.repeating(value)),
-                HighwayReference.squareRootWhereOtherwiseF32(H.repeating(value), mask.raw, a),
+                HighwayReference.squareRootWhereOtherwiseF32(
+                    H.repeating(value).raw,
+                    mask.raw,
+                    a.raw
+                ),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -34,9 +38,9 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.squareRoot(H.repeating(value), where: mask, otherwise: otherwise),
                 HighwayReference.squareRootWhereOtherwiseF32(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    H.repeating(value)
+                    H.repeating(value).raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask))"
             )
@@ -150,7 +154,12 @@ extension SIMDFloatConstantTests {
         where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.minimum(a, b, where: mask, otherwise: H.repeating(value)),
-                HighwayReference.minimumWhereOtherwiseF32(H.repeating(value), mask.raw, a, b),
+                HighwayReference.minimumWhereOtherwiseF32(
+                    H.repeating(value).raw,
+                    mask.raw,
+                    a.raw,
+                    b.raw
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -173,10 +182,10 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.minimum(H.repeating(value), b, where: mask, otherwise: otherwise),
                 HighwayReference.minimumWhereOtherwiseF32(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    H.repeating(value),
-                    b
+                    H.repeating(value).raw,
+                    b.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b))"
             )
@@ -200,10 +209,10 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.minimum(a, H.repeating(value), where: mask, otherwise: otherwise),
                 HighwayReference.minimumWhereOtherwiseF32(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    H.repeating(value)
+                    a.raw,
+                    H.repeating(value).raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
             )
@@ -336,7 +345,12 @@ extension SIMDFloatConstantTests {
         where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.maximum(a, b, where: mask, otherwise: H.repeating(value)),
-                HighwayReference.maximumWhereOtherwiseF32(H.repeating(value), mask.raw, a, b),
+                HighwayReference.maximumWhereOtherwiseF32(
+                    H.repeating(value).raw,
+                    mask.raw,
+                    a.raw,
+                    b.raw
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -359,10 +373,10 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.maximum(H.repeating(value), b, where: mask, otherwise: otherwise),
                 HighwayReference.maximumWhereOtherwiseF32(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    H.repeating(value),
-                    b
+                    H.repeating(value).raw,
+                    b.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b))"
             )
@@ -386,10 +400,10 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.maximum(a, H.repeating(value), where: mask, otherwise: otherwise),
                 HighwayReference.maximumWhereOtherwiseF32(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    H.repeating(value)
+                    a.raw,
+                    H.repeating(value).raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
             )
@@ -522,7 +536,12 @@ extension SIMDFloatConstantTests {
         where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.adding(a, b, where: mask, otherwise: H.repeating(value)),
-                HighwayReference.addingWhereOtherwiseF32(H.repeating(value), mask.raw, a, b),
+                HighwayReference.addingWhereOtherwiseF32(
+                    H.repeating(value).raw,
+                    mask.raw,
+                    a.raw,
+                    b.raw
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -545,10 +564,10 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.adding(H.repeating(value), b, where: mask, otherwise: otherwise),
                 HighwayReference.addingWhereOtherwiseF32(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    H.repeating(value),
-                    b
+                    H.repeating(value).raw,
+                    b.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b))"
             )
@@ -572,10 +591,10 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.adding(a, H.repeating(value), where: mask, otherwise: otherwise),
                 HighwayReference.addingWhereOtherwiseF32(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    H.repeating(value)
+                    a.raw,
+                    H.repeating(value).raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
             )
@@ -710,7 +729,12 @@ extension SIMDFloatConstantTests {
         {
             mismatches.check(
                 H.subtracting(a, b, where: mask, otherwise: H.repeating(value)),
-                HighwayReference.subtractingWhereOtherwiseF32(H.repeating(value), mask.raw, a, b),
+                HighwayReference.subtractingWhereOtherwiseF32(
+                    H.repeating(value).raw,
+                    mask.raw,
+                    a.raw,
+                    b.raw
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -733,10 +757,10 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.subtracting(H.repeating(value), b, where: mask, otherwise: otherwise),
                 HighwayReference.subtractingWhereOtherwiseF32(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    H.repeating(value),
-                    b
+                    H.repeating(value).raw,
+                    b.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b))"
             )
@@ -760,10 +784,10 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.subtracting(a, H.repeating(value), where: mask, otherwise: otherwise),
                 HighwayReference.subtractingWhereOtherwiseF32(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    H.repeating(value)
+                    a.raw,
+                    H.repeating(value).raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
             )
@@ -898,7 +922,12 @@ extension SIMDFloatConstantTests {
         where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.multiplying(a, b, where: mask, otherwise: H.repeating(value)),
-                HighwayReference.multiplyingWhereOtherwiseF32(H.repeating(value), mask.raw, a, b),
+                HighwayReference.multiplyingWhereOtherwiseF32(
+                    H.repeating(value).raw,
+                    mask.raw,
+                    a.raw,
+                    b.raw
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -921,10 +950,10 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.multiplying(H.repeating(value), b, where: mask, otherwise: otherwise),
                 HighwayReference.multiplyingWhereOtherwiseF32(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    H.repeating(value),
-                    b
+                    H.repeating(value).raw,
+                    b.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b))"
             )
@@ -948,10 +977,10 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.multiplying(a, H.repeating(value), where: mask, otherwise: otherwise),
                 HighwayReference.multiplyingWhereOtherwiseF32(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    H.repeating(value)
+                    a.raw,
+                    H.repeating(value).raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
             )

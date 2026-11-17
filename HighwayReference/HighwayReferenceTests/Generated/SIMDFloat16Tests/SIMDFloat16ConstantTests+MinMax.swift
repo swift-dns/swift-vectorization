@@ -19,7 +19,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.minimum(H.repeating(value), b),
-                HighwayReference.minimumF16(H.repeating(value), b),
+                HighwayReference.minimumF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -38,7 +38,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.minimum(a, H.repeating(value)),
-                HighwayReference.minimumF16(a, H.repeating(value)),
+                HighwayReference.minimumF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -158,7 +158,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.maximum(H.repeating(value), b),
-                HighwayReference.maximumF16(H.repeating(value), b),
+                HighwayReference.maximumF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -177,7 +177,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.maximum(a, H.repeating(value)),
-                HighwayReference.maximumF16(a, H.repeating(value)),
+                HighwayReference.maximumF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -297,7 +297,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.minimumNumber(H.repeating(value), b),
-                HighwayReference.minimumNumberF16(H.repeating(value), b),
+                HighwayReference.minimumNumberF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -316,7 +316,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.minimumNumber(a, H.repeating(value)),
-                HighwayReference.minimumNumberF16(a, H.repeating(value)),
+                HighwayReference.minimumNumberF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -436,7 +436,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.maximumNumber(H.repeating(value), b),
-                HighwayReference.maximumNumberF16(H.repeating(value), b),
+                HighwayReference.maximumNumberF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -455,7 +455,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.maximumNumber(a, H.repeating(value)),
-                HighwayReference.maximumNumberF16(a, H.repeating(value)),
+                HighwayReference.maximumNumberF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -575,7 +575,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs where !hasUnorderedNaNs(H.repeating(value), b) {
             mismatches.check(
                 H.minimumMagnitude(H.repeating(value), b),
-                HighwayReference.minimumMagnitudeF16(H.repeating(value), b),
+                HighwayReference.minimumMagnitudeF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -594,7 +594,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs where !hasUnorderedNaNs(a, H.repeating(value)) {
             mismatches.check(
                 H.minimumMagnitude(a, H.repeating(value)),
-                HighwayReference.minimumMagnitudeF16(a, H.repeating(value)),
+                HighwayReference.minimumMagnitudeF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -708,7 +708,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs where !hasUnorderedNaNs(H.repeating(value), b) {
             mismatches.check(
                 H.maximumMagnitude(H.repeating(value), b),
-                HighwayReference.maximumMagnitudeF16(H.repeating(value), b),
+                HighwayReference.maximumMagnitudeF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -727,7 +727,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs where !hasUnorderedNaNs(a, H.repeating(value)) {
             mismatches.check(
                 H.maximumMagnitude(a, H.repeating(value)),
-                HighwayReference.maximumMagnitudeF16(a, H.repeating(value)),
+                HighwayReference.maximumMagnitudeF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }

@@ -21,7 +21,7 @@ extension SIMDFloat16ConstantTests {
         {
             mismatches.check(
                 H.clamped(H.repeating(value), between: b, and: c),
-                HighwayReference.clampedF16(H.repeating(value), b, c),
+                HighwayReference.clampedF16(H.repeating(value).raw, b.raw, c.raw),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -42,7 +42,7 @@ extension SIMDFloat16ConstantTests {
         {
             mismatches.check(
                 H.clamped(a, between: H.repeating(value), and: c),
-                HighwayReference.clampedF16(a, H.repeating(value), c),
+                HighwayReference.clampedF16(a.raw, H.repeating(value).raw, c.raw),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -63,7 +63,7 @@ extension SIMDFloat16ConstantTests {
         {
             mismatches.check(
                 H.clamped(a, between: b, and: H.repeating(value)),
-                HighwayReference.clampedF16(a, b, H.repeating(value)),
+                HighwayReference.clampedF16(a.raw, b.raw, H.repeating(value).raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -206,7 +206,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.approximateReciprocal(H.repeating(value)),
-            HighwayReference.approximateReciprocalF16(H.repeating(value)),
+            HighwayReference.approximateReciprocalF16(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -300,7 +300,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.approximateReciprocalSquareRoot(H.repeating(value)),
-            HighwayReference.approximateReciprocalSquareRootF16(H.repeating(value)),
+            HighwayReference.approximateReciprocalSquareRootF16(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -394,7 +394,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs where !hasUnorderedNaNs(adjacentLanesOf: H.repeating(value), b) {
             mismatches.check(
                 H.pairwiseAdding(H.repeating(value), b),
-                HighwayReference.pairwiseAddingF16(H.repeating(value), b),
+                HighwayReference.pairwiseAddingF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -413,7 +413,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs where !hasUnorderedNaNs(adjacentLanesOf: a, H.repeating(value)) {
             mismatches.check(
                 H.pairwiseAdding(a, H.repeating(value)),
-                HighwayReference.pairwiseAddingF16(a, H.repeating(value)),
+                HighwayReference.pairwiseAddingF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -527,7 +527,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.pairwiseSubtracting(H.repeating(value), b),
-                HighwayReference.pairwiseSubtractingF16(H.repeating(value), b),
+                HighwayReference.pairwiseSubtractingF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -546,7 +546,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.pairwiseSubtracting(a, H.repeating(value)),
-                HighwayReference.pairwiseSubtractingF16(a, H.repeating(value)),
+                HighwayReference.pairwiseSubtractingF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -658,7 +658,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.exponent(H.repeating(value)),
-            HighwayReference.exponentF16(H.repeating(value)),
+            HighwayReference.exponentF16(H.repeating(value).raw),
             ""
         )
         mismatches.record()

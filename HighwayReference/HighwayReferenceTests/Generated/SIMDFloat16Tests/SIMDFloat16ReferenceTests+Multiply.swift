@@ -14,7 +14,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplyingByPowerOf2(a, b),
-                HighwayReference.multiplyingByPowerOf2I16ToF16(a, b.raw),
+                HighwayReference.multiplyingByPowerOf2I16ToF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -29,7 +29,7 @@ extension SIMDFloat16ReferenceTests {
         where HighwayReference.hasNativeFloat16Arithmetic() || !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.multiplying(a, b),
-                HighwayReference.multiplyingF16(a, b),
+                HighwayReference.multiplyingF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -43,7 +43,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.multiplyingRounded(a, b),
-                HighwayReference.multiplyingRoundedF16(a, b),
+                HighwayReference.multiplyingRoundedF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -57,7 +57,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplyingByFloorPowerOf2(a, b),
-                HighwayReference.multiplyingByFloorPowerOf2F16(a, b),
+                HighwayReference.multiplyingByFloorPowerOf2F16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

@@ -23,7 +23,7 @@ extension SIMDInt16ConstantTests {
             H.quarterVector(zeroExtendingResizing: SIMDFloat16.repeating(value)),
             H.QuarterVector(
                 raw: HighwayReference.quarterVectorZeroExtendingResizingF16ToI16(
-                    SIMDFloat16.repeating(value)
+                    SIMDFloat16.repeating(value).raw
                 )
             ),
             ""
@@ -533,7 +533,9 @@ extension SIMDInt16ConstantTests {
         )
         mismatches.check(
             H.vector(converting: SIMDFloat16.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorConvertingF16ToI16(SIMDFloat16.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorConvertingF16ToI16(SIMDFloat16.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()
@@ -668,7 +670,9 @@ extension SIMDInt16ConstantTests {
         mismatches.check(
             H.vector(convertingInRange: SIMDFloat16.repeating(value)),
             H.Vector(
-                raw: HighwayReference.vectorConvertingInRangeF16ToI16(SIMDFloat16.repeating(value))
+                raw: HighwayReference.vectorConvertingInRangeF16ToI16(
+                    SIMDFloat16.repeating(value).raw
+                )
             ),
             ""
         )
@@ -805,7 +809,7 @@ extension SIMDInt16ConstantTests {
             H.vector(roundingToNearestOrEven: SIMDFloat16.repeating(value)),
             H.Vector(
                 raw: HighwayReference.vectorRoundingToNearestOrEvenF16ToI16(
-                    SIMDFloat16.repeating(value)
+                    SIMDFloat16.repeating(value).raw
                 )
             ),
             ""
@@ -941,7 +945,9 @@ extension SIMDInt16ConstantTests {
         )
         mismatches.check(
             H.vector(roundingUp: SIMDFloat16.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorRoundingUpF16ToI16(SIMDFloat16.repeating(value))),
+            H.Vector(
+                raw: HighwayReference.vectorRoundingUpF16ToI16(SIMDFloat16.repeating(value).raw)
+            ),
             ""
         )
         mismatches.record()
@@ -1074,7 +1080,7 @@ extension SIMDInt16ConstantTests {
         mismatches.check(
             H.vector(roundingDown: SIMDFloat16.repeating(value)),
             H.Vector(
-                raw: HighwayReference.vectorRoundingDownF16ToI16(SIMDFloat16.repeating(value))
+                raw: HighwayReference.vectorRoundingDownF16ToI16(SIMDFloat16.repeating(value).raw)
             ),
             ""
         )

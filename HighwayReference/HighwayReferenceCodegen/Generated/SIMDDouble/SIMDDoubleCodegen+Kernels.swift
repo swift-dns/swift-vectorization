@@ -5,13 +5,10 @@ public import Vectorization
 
 @available(SwiftStdlib 5.1, *)
 @inline(never)
-public func portSumAboveSpanF64(
-    above t: SIMDDouble.Lane,
-    in values: Span<SIMDDouble.Lane>
-) -> SIMDDouble.Lane {
+public func portSumAboveSpanF64(above t: Double, in values: Span<Double>) -> Double {
     let laneCount = SIMDDouble.laneCount
     let threshold = SIMDDouble.repeating(t)
-    var total: SIMDDouble.Lane = 0
+    var total: Double = 0
     var remainingValuesSpan = values
     while remainingValuesSpan.count >= laneCount {
         let loaded = SIMDDouble.load(from: remainingValuesSpan)
@@ -48,9 +45,9 @@ public func highwaySumAboveSpanF64(above t: Double, in values: Span<Double>) -> 
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portCountEqualAboveSpanF64(
-    above t: SIMDDouble.Lane,
-    in values: Span<SIMDDouble.Lane>,
-    matching others: Span<SIMDDouble.Lane>
+    above t: Double,
+    in values: Span<Double>,
+    matching others: Span<Double>
 ) -> Int {
     let laneCount = SIMDDouble.laneCount
     let threshold = SIMDDouble.repeating(t)
@@ -111,9 +108,9 @@ public func highwayCountEqualAboveSpanF64(
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portClampAboveSpanF64(
-    atMost t: SIMDDouble.Lane,
-    in values: Span<SIMDDouble.Lane>,
-    into output: inout MutableSpan<SIMDDouble.Lane>
+    atMost t: Double,
+    in values: Span<Double>,
+    into output: inout MutableSpan<Double>
 ) -> Int {
     let laneCount = SIMDDouble.laneCount
     let limit = SIMDDouble.repeating(t)
@@ -177,9 +174,9 @@ public func highwayClampAboveSpanF64(
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portSelectBelowSpanF64(
-    below t: SIMDDouble.Lane,
-    in values: Span<SIMDDouble.Lane>,
-    into output: inout MutableSpan<SIMDDouble.Lane>
+    below t: Double,
+    in values: Span<Double>,
+    into output: inout MutableSpan<Double>
 ) -> Int {
     let laneCount = SIMDDouble.laneCount
     let threshold = SIMDDouble.repeating(t)

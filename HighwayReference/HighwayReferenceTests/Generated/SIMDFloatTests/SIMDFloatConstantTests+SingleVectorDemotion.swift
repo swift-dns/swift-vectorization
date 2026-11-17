@@ -181,7 +181,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(
             H.halfVector(converting: SIMDDouble.repeating(value)),
             H.HalfVector(
-                raw: HighwayReference.halfVectorConvertingF64ToF32(SIMDDouble.repeating(value))
+                raw: HighwayReference.halfVectorConvertingF64ToF32(SIMDDouble.repeating(value).raw)
             ),
             ""
         )

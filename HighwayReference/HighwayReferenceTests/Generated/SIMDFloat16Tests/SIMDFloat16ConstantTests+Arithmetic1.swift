@@ -17,7 +17,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.negated(H.repeating(value)),
-            HighwayReference.negatedF16(H.repeating(value)),
+            HighwayReference.negatedF16(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -109,7 +109,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.magnitude(H.repeating(value)),
-            HighwayReference.magnitudeF16(H.repeating(value)),
+            HighwayReference.magnitudeF16(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -203,7 +203,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs where !hasUnorderedNaNs(H.repeating(value), b) {
             mismatches.check(
                 H.adding(H.repeating(value), b),
-                HighwayReference.addingF16(H.repeating(value), b),
+                HighwayReference.addingF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -222,7 +222,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs where !hasUnorderedNaNs(a, H.repeating(value)) {
             mismatches.check(
                 H.adding(a, H.repeating(value)),
-                HighwayReference.addingF16(a, H.repeating(value)),
+                HighwayReference.addingF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -336,7 +336,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.subtracting(H.repeating(value), b),
-                HighwayReference.subtractingF16(H.repeating(value), b),
+                HighwayReference.subtractingF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -355,7 +355,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.subtracting(a, H.repeating(value)),
-                HighwayReference.subtractingF16(a, H.repeating(value)),
+                HighwayReference.subtractingF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -505,7 +505,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.dividing(H.repeating(value), b),
-                HighwayReference.dividingF16(H.repeating(value), b),
+                HighwayReference.dividingF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -524,7 +524,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.dividing(a, H.repeating(value)),
-                HighwayReference.dividingF16(a, H.repeating(value)),
+                HighwayReference.dividingF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -672,7 +672,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.squareRoot(H.repeating(value)),
-            HighwayReference.squareRootF16(H.repeating(value)),
+            HighwayReference.squareRootF16(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -766,7 +766,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.absoluteDifference(H.repeating(value), b),
-                HighwayReference.absoluteDifferenceF16(H.repeating(value), b),
+                HighwayReference.absoluteDifferenceF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -785,7 +785,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.absoluteDifference(a, H.repeating(value)),
-                HighwayReference.absoluteDifferenceF16(a, H.repeating(value)),
+                HighwayReference.absoluteDifferenceF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -899,7 +899,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs where !hasUnorderedNaNs(alternatingNegation: H.repeating(value), b) {
             mismatches.check(
                 H.addingSubtracting(H.repeating(value), b),
-                HighwayReference.addingSubtractingF16(H.repeating(value), b),
+                HighwayReference.addingSubtractingF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -918,7 +918,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs where !hasUnorderedNaNs(alternatingNegation: a, H.repeating(value)) {
             mismatches.check(
                 H.addingSubtracting(a, H.repeating(value)),
-                HighwayReference.addingSubtractingF16(a, H.repeating(value)),
+                HighwayReference.addingSubtractingF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }

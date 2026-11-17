@@ -5,174 +5,157 @@ public import Vectorization
 
 @inline(never)
 public func portSelectingF32(
-    _ mask: SIMDFloat.Mask,
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ mask: SIMD<Float>.Mask,
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.selecting(mask, a, b)
 }
 
 @inline(never)
 public func highwaySelectingF32(
-    _ mask: SIMDFloat.Mask,
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.selectingF32(mask.raw, a, b)
+    _ mask: SIMD<Float>.Mask,
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.selectingF32(mask.raw, a.raw, b.raw)
 }
 
 @inline(never)
-public func portSelectingF32ConstantA(
-    _ mask: SIMDFloat.Mask,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portSelectingF32ConstantA(_ mask: SIMD<Float>.Mask, _ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.selecting(mask, SIMDFloat.repeating(1.5), b)
 }
 
 @inline(never)
-public func highwaySelectingF32ConstantA(
-    _ mask: SIMDFloat.Mask,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.selectingF32(mask.raw, HighwayReference.Nothrow.repeatingF32(1.5), b)
-}
-
-@inline(never)
-public func portSelectingF32ConstantB(
-    _ mask: SIMDFloat.Mask,
-    _ a: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    SIMDFloat.selecting(mask, a, SIMDFloat.repeating(1.5))
-}
-
-@inline(never)
-public func highwaySelectingF32ConstantB(
-    _ mask: SIMDFloat.Mask,
-    _ a: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.selectingF32(mask.raw, a, HighwayReference.Nothrow.repeatingF32(1.5))
-}
-
-@inline(never)
-public func portSelectingOrZeroF32(
-    _ mask: SIMDFloat.Mask,
-    _ a: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    SIMDFloat.selectingOrZero(mask, a)
-}
-
-@inline(never)
-public func highwaySelectingOrZeroF32(
-    _ mask: SIMDFloat.Mask,
-    _ a: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.selectingOrZeroF32(mask.raw, a)
-}
-
-@inline(never)
-public func portSelectingOrZeroF32ConstantA(_ mask: SIMDFloat.Mask) -> SIMDFloat.Vector {
-    SIMDFloat.selectingOrZero(mask, SIMDFloat.repeating(1.5))
-}
-
-@inline(never)
-public func highwaySelectingOrZeroF32ConstantA(_ mask: SIMDFloat.Mask) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.selectingOrZeroF32(
+public func highwaySelectingF32ConstantA(_ mask: SIMD<Float>.Mask, _ b: SIMD<Float>) -> SIMD<Float>
+{
+    HighwayReference.Nothrow.selectingF32(
         mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw
     )
 }
 
 @inline(never)
-public func portZeroingSelectedF32(
-    _ mask: SIMDFloat.Mask,
-    _ a: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portSelectingF32ConstantB(_ mask: SIMD<Float>.Mask, _ a: SIMD<Float>) -> SIMD<Float> {
+    SIMDFloat.selecting(mask, a, SIMDFloat.repeating(1.5))
+}
+
+@inline(never)
+public func highwaySelectingF32ConstantB(_ mask: SIMD<Float>.Mask, _ a: SIMD<Float>) -> SIMD<Float>
+{
+    HighwayReference.Nothrow.selectingF32(
+        mask.raw,
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    )
+}
+
+@inline(never)
+public func portSelectingOrZeroF32(_ mask: SIMD<Float>.Mask, _ a: SIMD<Float>) -> SIMD<Float> {
+    SIMDFloat.selectingOrZero(mask, a)
+}
+
+@inline(never)
+public func highwaySelectingOrZeroF32(_ mask: SIMD<Float>.Mask, _ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.selectingOrZeroF32(mask.raw, a.raw)
+}
+
+@inline(never)
+public func portSelectingOrZeroF32ConstantA(_ mask: SIMD<Float>.Mask) -> SIMD<Float> {
+    SIMDFloat.selectingOrZero(mask, SIMDFloat.repeating(1.5))
+}
+
+@inline(never)
+public func highwaySelectingOrZeroF32ConstantA(_ mask: SIMD<Float>.Mask) -> SIMD<Float> {
+    HighwayReference.Nothrow.selectingOrZeroF32(
+        mask.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    )
+}
+
+@inline(never)
+public func portZeroingSelectedF32(_ mask: SIMD<Float>.Mask, _ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.zeroingSelected(mask, a)
 }
 
 @inline(never)
-public func highwayZeroingSelectedF32(
-    _ mask: SIMDFloat.Mask,
-    _ a: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.zeroingSelectedF32(mask.raw, a)
+public func highwayZeroingSelectedF32(_ mask: SIMD<Float>.Mask, _ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.zeroingSelectedF32(mask.raw, a.raw)
 }
 
 @inline(never)
-public func portZeroingSelectedF32ConstantA(_ mask: SIMDFloat.Mask) -> SIMDFloat.Vector {
+public func portZeroingSelectedF32ConstantA(_ mask: SIMD<Float>.Mask) -> SIMD<Float> {
     SIMDFloat.zeroingSelected(mask, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayZeroingSelectedF32ConstantA(_ mask: SIMDFloat.Mask) -> SIMDFloat.Vector {
+public func highwayZeroingSelectedF32ConstantA(_ mask: SIMD<Float>.Mask) -> SIMD<Float> {
     HighwayReference.Nothrow.zeroingSelectedF32(
         mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
     )
 }
 
 @inline(never)
 public func portSelectingByVectorF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.selecting(a, b, c)
 }
 
 @inline(never)
 public func highwaySelectingByVectorF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.selectingByVectorF32(a, b, c)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.selectingByVectorF32(a.raw, b.raw, c.raw)
 }
 
 @inline(never)
-public func portSelectingByVectorF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portSelectingByVectorF32ConstantA(_ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.selecting(SIMDFloat.repeating(1.5), b, c)
 }
 
 @inline(never)
-public func highwaySelectingByVectorF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.selectingByVectorF32(HighwayReference.Nothrow.repeatingF32(1.5), b, c)
+public func highwaySelectingByVectorF32ConstantA(_ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float>
+{
+    HighwayReference.Nothrow.selectingByVectorF32(
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw,
+        c.raw
+    )
 }
 
 @inline(never)
-public func portSelectingByVectorF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portSelectingByVectorF32ConstantB(_ a: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.selecting(a, SIMDFloat.repeating(1.5), c)
 }
 
 @inline(never)
-public func highwaySelectingByVectorF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.selectingByVectorF32(a, HighwayReference.Nothrow.repeatingF32(1.5), c)
+public func highwaySelectingByVectorF32ConstantB(_ a: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float>
+{
+    HighwayReference.Nothrow.selectingByVectorF32(
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        c.raw
+    )
 }
 
 @inline(never)
-public func portSelectingByVectorF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portSelectingByVectorF32ConstantC(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.selecting(a, b, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwaySelectingByVectorF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.selectingByVectorF32(a, b, HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwaySelectingByVectorF32ConstantC(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float>
+{
+    HighwayReference.Nothrow.selectingByVectorF32(
+        a.raw,
+        b.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    )
 }

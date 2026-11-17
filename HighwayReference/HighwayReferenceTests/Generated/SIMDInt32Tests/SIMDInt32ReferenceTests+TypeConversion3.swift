@@ -12,7 +12,7 @@ extension SIMDInt32ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(zeroExtendingResizing: a),
-                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF32ToI32(a)),
+                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF32ToI32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -25,7 +25,7 @@ extension SIMDInt32ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.halfVector(zeroExtendingResizing: a),
-                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF32ToI32(a)),
+                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF32ToI32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -43,7 +43,9 @@ extension SIMDInt32ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(zeroExtendingResizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF32ToI32(a)),
+                H.Vector(
+                    raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF32ToI32(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -107,7 +109,7 @@ extension SIMDInt32ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(zeroExtendingResizing: a),
-                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF64ToI32(a)),
+                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF64ToI32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -120,7 +122,7 @@ extension SIMDInt32ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.halfVector(zeroExtendingResizing: a),
-                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF64ToI32(a)),
+                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF64ToI32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -138,7 +140,9 @@ extension SIMDInt32ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(zeroExtendingResizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF64ToI32(a)),
+                H.Vector(
+                    raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF64ToI32(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -203,7 +207,7 @@ extension SIMDInt32ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(zeroExtendingResizing: a),
-                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF16ToI32(a)),
+                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF16ToI32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -218,7 +222,7 @@ extension SIMDInt32ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.halfVector(zeroExtendingResizing: a),
-                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF16ToI32(a)),
+                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF16ToI32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -238,7 +242,9 @@ extension SIMDInt32ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(zeroExtendingResizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF16ToI32(a)),
+                H.Vector(
+                    raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF16ToI32(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }

@@ -4,22 +4,22 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portComplexConjugateI16(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func portComplexConjugateI16(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.complexConjugate(a)
 }
 
 @inline(never)
-public func highwayComplexConjugateI16(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func highwayComplexConjugateI16(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.complexConjugateI16(a.raw))
 }
 
 @inline(never)
-public func portComplexConjugateI16ConstantA() -> SIMDInt16.Vector {
+public func portComplexConjugateI16ConstantA() -> SIMD<Int16> {
     SIMDInt16.complexConjugate(SIMDInt16.repeating(26))
 }
 
 @inline(never)
-public func highwayComplexConjugateI16ConstantA() -> SIMDInt16.Vector {
+public func highwayComplexConjugateI16ConstantA() -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.complexConjugateI16(
             SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
@@ -28,28 +28,22 @@ public func highwayComplexConjugateI16ConstantA() -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func portMultiplyingComplexI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+public func portMultiplyingComplexI16(_ a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.multiplyingComplex(a, b)
 }
 
 @inline(never)
-public func highwayMultiplyingComplexI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+public func highwayMultiplyingComplexI16(_ a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.multiplyingComplexI16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMultiplyingComplexI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func portMultiplyingComplexI16ConstantA(_ b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.multiplyingComplex(SIMDInt16.repeating(26), b)
 }
 
 @inline(never)
-public func highwayMultiplyingComplexI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func highwayMultiplyingComplexI16ConstantA(_ b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.multiplyingComplexI16(
             SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
@@ -59,12 +53,12 @@ public func highwayMultiplyingComplexI16ConstantA(_ b: SIMDInt16.Vector) -> SIMD
 }
 
 @inline(never)
-public func portMultiplyingComplexI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func portMultiplyingComplexI16ConstantB(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.multiplyingComplex(a, SIMDInt16.repeating(26))
 }
 
 @inline(never)
-public func highwayMultiplyingComplexI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func highwayMultiplyingComplexI16ConstantB(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.multiplyingComplexI16(
             a.raw,
@@ -74,30 +68,23 @@ public func highwayMultiplyingComplexI16ConstantB(_ a: SIMDInt16.Vector) -> SIMD
 }
 
 @inline(never)
-public func portMultiplyingComplexConjugateI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+public func portMultiplyingComplexConjugateI16(_ a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.multiplyingComplexConjugate(a, b)
 }
 
 @inline(never)
-public func highwayMultiplyingComplexConjugateI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+public func highwayMultiplyingComplexConjugateI16(_ a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<Int16>
+{
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.multiplyingComplexConjugateI16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMultiplyingComplexConjugateI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func portMultiplyingComplexConjugateI16ConstantA(_ b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.multiplyingComplexConjugate(SIMDInt16.repeating(26), b)
 }
 
 @inline(never)
-public func highwayMultiplyingComplexConjugateI16ConstantA(
-    _ b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+public func highwayMultiplyingComplexConjugateI16ConstantA(_ b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.multiplyingComplexConjugateI16(
             SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
@@ -107,14 +94,12 @@ public func highwayMultiplyingComplexConjugateI16ConstantA(
 }
 
 @inline(never)
-public func portMultiplyingComplexConjugateI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func portMultiplyingComplexConjugateI16ConstantB(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.multiplyingComplexConjugate(a, SIMDInt16.repeating(26))
 }
 
 @inline(never)
-public func highwayMultiplyingComplexConjugateI16ConstantB(
-    _ a: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+public func highwayMultiplyingComplexConjugateI16ConstantB(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.multiplyingComplexConjugateI16(
             a.raw,
@@ -125,35 +110,33 @@ public func highwayMultiplyingComplexConjugateI16ConstantB(
 
 @inline(never)
 public func portMultiplyAddingComplexI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.multiplyAddingComplex(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.multiplyAddingComplexI16(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
-public func portMultiplyAddingComplexI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+public func portMultiplyAddingComplexI16ConstantA(_ b: SIMD<Int16>, _ c: SIMD<Int16>) -> SIMD<Int16>
+{
     SIMDInt16.multiplyAddingComplex(SIMDInt16.repeating(26), b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingComplexI16(
             SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
@@ -164,18 +147,16 @@ public func highwayMultiplyAddingComplexI16ConstantA(
 }
 
 @inline(never)
-public func portMultiplyAddingComplexI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+public func portMultiplyAddingComplexI16ConstantB(_ a: SIMD<Int16>, _ c: SIMD<Int16>) -> SIMD<Int16>
+{
     SIMDInt16.multiplyAddingComplex(a, SIMDInt16.repeating(26), c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingComplexI16(
             a.raw,
@@ -186,18 +167,16 @@ public func highwayMultiplyAddingComplexI16ConstantB(
 }
 
 @inline(never)
-public func portMultiplyAddingComplexI16ConstantC(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+public func portMultiplyAddingComplexI16ConstantC(_ a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<Int16>
+{
     SIMDInt16.multiplyAddingComplex(a, b, SIMDInt16.repeating(26))
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexI16ConstantC(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingComplexI16(
             a.raw,
@@ -209,19 +188,19 @@ public func highwayMultiplyAddingComplexI16ConstantC(
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.multiplyAddingComplexConjugate(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateI16(a.raw, b.raw, c.raw)
     )
@@ -229,17 +208,17 @@ public func highwayMultiplyAddingComplexConjugateI16(
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.multiplyAddingComplexConjugate(SIMDInt16.repeating(26), b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateI16(
             SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
@@ -251,17 +230,17 @@ public func highwayMultiplyAddingComplexConjugateI16ConstantA(
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.multiplyAddingComplexConjugate(a, SIMDInt16.repeating(26), c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateI16(
             a.raw,
@@ -273,17 +252,17 @@ public func highwayMultiplyAddingComplexConjugateI16ConstantB(
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateI16ConstantC(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.multiplyAddingComplexConjugate(a, b, SIMDInt16.repeating(26))
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateI16ConstantC(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateI16(
             a.raw,
@@ -295,21 +274,21 @@ public func highwayMultiplyAddingComplexConjugateI16ConstantC(
 
 @inline(never)
 public func portMultiplyingComplexWhereOtherwiseI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask,
-    otherwise: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask,
+    otherwise: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.multiplyingComplex(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexWhereOtherwiseI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask,
-    otherwise: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask,
+    otherwise: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseI16(
             otherwise.raw,
@@ -322,19 +301,19 @@ public func highwayMultiplyingComplexWhereOtherwiseI16(
 
 @inline(never)
 public func portMultiplyingComplexWhereOtherwiseI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask,
-    otherwise: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask,
+    otherwise: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.multiplyingComplex(SIMDInt16.repeating(26), b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexWhereOtherwiseI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask,
-    otherwise: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask,
+    otherwise: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseI16(
             otherwise.raw,
@@ -347,19 +326,19 @@ public func highwayMultiplyingComplexWhereOtherwiseI16ConstantA(
 
 @inline(never)
 public func portMultiplyingComplexWhereOtherwiseI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask,
-    otherwise: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask,
+    otherwise: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.multiplyingComplex(a, SIMDInt16.repeating(26), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexWhereOtherwiseI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask,
-    otherwise: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask,
+    otherwise: SIMD<Int16>
+) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseI16(
             otherwise.raw,
@@ -372,19 +351,19 @@ public func highwayMultiplyingComplexWhereOtherwiseI16ConstantB(
 
 @inline(never)
 public func portMultiplyingComplexWhereOtherwiseI16ConstantOtherwise(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16> {
     SIMDInt16.multiplyingComplex(a, b, where: mask, otherwise: SIMDInt16.repeating(26))
 }
 
 @inline(never)
 public func highwayMultiplyingComplexWhereOtherwiseI16ConstantOtherwise(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseI16(
             SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
@@ -397,19 +376,19 @@ public func highwayMultiplyingComplexWhereOtherwiseI16ConstantOtherwise(
 
 @inline(never)
 public func portMultiplyingComplexConjugateWhereI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16> {
     SIMDInt16.multiplyingComplexConjugate(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexConjugateWhereI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.multiplyingComplexConjugateWhereI16(mask.raw, a.raw, b.raw)
     )
@@ -417,17 +396,17 @@ public func highwayMultiplyingComplexConjugateWhereI16(
 
 @inline(never)
 public func portMultiplyingComplexConjugateWhereI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16> {
     SIMDInt16.multiplyingComplexConjugate(SIMDInt16.repeating(26), b, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexConjugateWhereI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.multiplyingComplexConjugateWhereI16(
             mask.raw,
@@ -439,17 +418,17 @@ public func highwayMultiplyingComplexConjugateWhereI16ConstantA(
 
 @inline(never)
 public func portMultiplyingComplexConjugateWhereI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16> {
     SIMDInt16.multiplyingComplexConjugate(a, SIMDInt16.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexConjugateWhereI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.multiplyingComplexConjugateWhereI16(
             mask.raw,
@@ -461,21 +440,21 @@ public func highwayMultiplyingComplexConjugateWhereI16ConstantB(
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateWhereI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16> {
     SIMDInt16.multiplyAddingComplexConjugate(a, b, c, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateWhereI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereI16(
             mask.raw,
@@ -488,19 +467,19 @@ public func highwayMultiplyAddingComplexConjugateWhereI16(
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateWhereI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16> {
     SIMDInt16.multiplyAddingComplexConjugate(SIMDInt16.repeating(26), b, c, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateWhereI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereI16(
             mask.raw,
@@ -513,19 +492,19 @@ public func highwayMultiplyAddingComplexConjugateWhereI16ConstantA(
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateWhereI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    _ c: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16> {
     SIMDInt16.multiplyAddingComplexConjugate(a, SIMDInt16.repeating(26), c, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateWhereI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    _ c: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereI16(
             mask.raw,
@@ -538,19 +517,19 @@ public func highwayMultiplyAddingComplexConjugateWhereI16ConstantB(
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateWhereI16ConstantC(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16> {
     SIMDInt16.multiplyAddingComplexConjugate(a, b, SIMDInt16.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateWhereI16ConstantC(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    where mask: SIMDInt16.Mask
-) -> SIMDInt16.Vector {
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    where mask: SIMD<Int16>.Mask
+) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereI16(
             mask.raw,

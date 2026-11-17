@@ -4,145 +4,145 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portInterleavingLowerF64(
-    _ a: SIMDDouble.Vector,
-    _ b: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
+public func portInterleavingLowerF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
     SIMDDouble.interleavingLower(a, b)
 }
 
 @inline(never)
-public func highwayInterleavingLowerF64(
-    _ a: SIMDDouble.Vector,
-    _ b: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.interleavingLowerF64(a, b)
+public func highwayInterleavingLowerF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
+    HighwayReference.Nothrow.interleavingLowerF64(a.raw, b.raw)
 }
 
 @inline(never)
-public func portInterleavingLowerF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vector {
+public func portInterleavingLowerF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
     SIMDDouble.interleavingLower(SIMDDouble.repeating(1.5), b)
 }
 
 @inline(never)
-public func highwayInterleavingLowerF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.interleavingLowerF64(HighwayReference.Nothrow.repeatingF64(1.5), b)
+public func highwayInterleavingLowerF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
+    HighwayReference.Nothrow.interleavingLowerF64(
+        HighwayReference.Nothrow.repeatingF64(1.5).raw,
+        b.raw
+    )
 }
 
 @inline(never)
-public func portInterleavingLowerF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+public func portInterleavingLowerF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
     SIMDDouble.interleavingLower(a, SIMDDouble.repeating(1.5))
 }
 
 @inline(never)
-public func highwayInterleavingLowerF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.interleavingLowerF64(a, HighwayReference.Nothrow.repeatingF64(1.5))
+public func highwayInterleavingLowerF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
+    HighwayReference.Nothrow.interleavingLowerF64(
+        a.raw,
+        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    )
 }
 
 @inline(never)
-public func portInterleavingUpperF64(
-    _ a: SIMDDouble.Vector,
-    _ b: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
+public func portInterleavingUpperF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
     SIMDDouble.interleavingUpper(a, b)
 }
 
 @inline(never)
-public func highwayInterleavingUpperF64(
-    _ a: SIMDDouble.Vector,
-    _ b: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.interleavingUpperF64(a, b)
+public func highwayInterleavingUpperF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
+    HighwayReference.Nothrow.interleavingUpperF64(a.raw, b.raw)
 }
 
 @inline(never)
-public func portInterleavingUpperF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vector {
+public func portInterleavingUpperF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
     SIMDDouble.interleavingUpper(SIMDDouble.repeating(1.5), b)
 }
 
 @inline(never)
-public func highwayInterleavingUpperF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.interleavingUpperF64(HighwayReference.Nothrow.repeatingF64(1.5), b)
+public func highwayInterleavingUpperF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
+    HighwayReference.Nothrow.interleavingUpperF64(
+        HighwayReference.Nothrow.repeatingF64(1.5).raw,
+        b.raw
+    )
 }
 
 @inline(never)
-public func portInterleavingUpperF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+public func portInterleavingUpperF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
     SIMDDouble.interleavingUpper(a, SIMDDouble.repeating(1.5))
 }
 
 @inline(never)
-public func highwayInterleavingUpperF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.interleavingUpperF64(a, HighwayReference.Nothrow.repeatingF64(1.5))
+public func highwayInterleavingUpperF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
+    HighwayReference.Nothrow.interleavingUpperF64(
+        a.raw,
+        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    )
 }
 
 @inline(never)
-public func portInterleavingEvenF64(
-    _ a: SIMDDouble.Vector,
-    _ b: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
+public func portInterleavingEvenF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
     SIMDDouble.interleavingEven(a, b)
 }
 
 @inline(never)
-public func highwayInterleavingEvenF64(
-    _ a: SIMDDouble.Vector,
-    _ b: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.interleavingEvenF64(a, b)
+public func highwayInterleavingEvenF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
+    HighwayReference.Nothrow.interleavingEvenF64(a.raw, b.raw)
 }
 
 @inline(never)
-public func portInterleavingEvenF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vector {
+public func portInterleavingEvenF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
     SIMDDouble.interleavingEven(SIMDDouble.repeating(1.5), b)
 }
 
 @inline(never)
-public func highwayInterleavingEvenF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.interleavingEvenF64(HighwayReference.Nothrow.repeatingF64(1.5), b)
+public func highwayInterleavingEvenF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
+    HighwayReference.Nothrow.interleavingEvenF64(
+        HighwayReference.Nothrow.repeatingF64(1.5).raw,
+        b.raw
+    )
 }
 
 @inline(never)
-public func portInterleavingEvenF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+public func portInterleavingEvenF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
     SIMDDouble.interleavingEven(a, SIMDDouble.repeating(1.5))
 }
 
 @inline(never)
-public func highwayInterleavingEvenF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.interleavingEvenF64(a, HighwayReference.Nothrow.repeatingF64(1.5))
+public func highwayInterleavingEvenF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
+    HighwayReference.Nothrow.interleavingEvenF64(
+        a.raw,
+        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    )
 }
 
 @inline(never)
-public func portInterleavingOddF64(
-    _ a: SIMDDouble.Vector,
-    _ b: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
+public func portInterleavingOddF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
     SIMDDouble.interleavingOdd(a, b)
 }
 
 @inline(never)
-public func highwayInterleavingOddF64(
-    _ a: SIMDDouble.Vector,
-    _ b: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.interleavingOddF64(a, b)
+public func highwayInterleavingOddF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
+    HighwayReference.Nothrow.interleavingOddF64(a.raw, b.raw)
 }
 
 @inline(never)
-public func portInterleavingOddF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vector {
+public func portInterleavingOddF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
     SIMDDouble.interleavingOdd(SIMDDouble.repeating(1.5), b)
 }
 
 @inline(never)
-public func highwayInterleavingOddF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.interleavingOddF64(HighwayReference.Nothrow.repeatingF64(1.5), b)
+public func highwayInterleavingOddF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
+    HighwayReference.Nothrow.interleavingOddF64(
+        HighwayReference.Nothrow.repeatingF64(1.5).raw,
+        b.raw
+    )
 }
 
 @inline(never)
-public func portInterleavingOddF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+public func portInterleavingOddF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
     SIMDDouble.interleavingOdd(a, SIMDDouble.repeating(1.5))
 }
 
 @inline(never)
-public func highwayInterleavingOddF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.interleavingOddF64(a, HighwayReference.Nothrow.repeatingF64(1.5))
+public func highwayInterleavingOddF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
+    HighwayReference.Nothrow.interleavingOddF64(
+        a.raw,
+        HighwayReference.Nothrow.repeatingF64(1.5).raw
+    )
 }

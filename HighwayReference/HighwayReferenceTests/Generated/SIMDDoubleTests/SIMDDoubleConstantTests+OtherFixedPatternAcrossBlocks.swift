@@ -14,7 +14,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.oddEvenBlocks(H.repeating(value), b),
-                HighwayReference.oddEvenBlocksF64(H.repeating(value), b),
+                HighwayReference.oddEvenBlocksF64(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -29,7 +29,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.oddEvenBlocks(a, H.repeating(value)),
-                HighwayReference.oddEvenBlocksF64(a, H.repeating(value)),
+                HighwayReference.oddEvenBlocksF64(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -137,7 +137,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.swappingAdjacentBlocks(H.repeating(value)),
-            HighwayReference.swappingAdjacentBlocksF64(H.repeating(value)),
+            HighwayReference.swappingAdjacentBlocksF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -227,7 +227,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.interleavingEvenBlocks(H.repeating(value), b),
-                HighwayReference.interleavingEvenBlocksF64(H.repeating(value), b),
+                HighwayReference.interleavingEvenBlocksF64(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -242,7 +242,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.interleavingEvenBlocks(a, H.repeating(value)),
-                HighwayReference.interleavingEvenBlocksF64(a, H.repeating(value)),
+                HighwayReference.interleavingEvenBlocksF64(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -352,7 +352,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.interleavingOddBlocks(H.repeating(value), b),
-                HighwayReference.interleavingOddBlocksF64(H.repeating(value), b),
+                HighwayReference.interleavingOddBlocksF64(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -367,7 +367,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.interleavingOddBlocks(a, H.repeating(value)),
-                HighwayReference.interleavingOddBlocksF64(a, H.repeating(value)),
+                HighwayReference.interleavingOddBlocksF64(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -477,7 +477,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.interleavingLowerBlocks(H.repeating(value), b),
-                HighwayReference.interleavingLowerBlocksF64(H.repeating(value), b),
+                HighwayReference.interleavingLowerBlocksF64(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -492,7 +492,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.interleavingLowerBlocks(a, H.repeating(value)),
-                HighwayReference.interleavingLowerBlocksF64(a, H.repeating(value)),
+                HighwayReference.interleavingLowerBlocksF64(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -602,7 +602,7 @@ extension SIMDDoubleConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.interleavingUpperBlocks(H.repeating(value), b),
-                HighwayReference.interleavingUpperBlocksF64(H.repeating(value), b),
+                HighwayReference.interleavingUpperBlocksF64(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -617,7 +617,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.interleavingUpperBlocks(a, H.repeating(value)),
-                HighwayReference.interleavingUpperBlocksF64(a, H.repeating(value)),
+                HighwayReference.interleavingUpperBlocksF64(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -726,7 +726,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.broadcasting(a, lane: lane),
-                HighwayReference.broadcastingLaneF64(a, Int32(truncatingIfNeeded: lane)),
+                HighwayReference.broadcastingLaneF64(a.raw, Int32(truncatingIfNeeded: lane)),
                 "a: \(describe(a))"
             )
         }
@@ -772,7 +772,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 unsafe H.broadcasting(a, laneUnchecked: lane),
-                HighwayReference.broadcastingLaneF64(a, Int32(truncatingIfNeeded: lane)),
+                HighwayReference.broadcastingLaneF64(a.raw, Int32(truncatingIfNeeded: lane)),
                 "a: \(describe(a))"
             )
         }
@@ -820,7 +820,7 @@ extension SIMDDoubleConstantTests {
             mismatches.check(
                 H.broadcasting(H.repeating(value), lane: lane),
                 HighwayReference.broadcastingLaneF64(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: lane)
                 ),
                 "lane: \(lane)"
@@ -912,7 +912,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.broadcasting(a, block: block),
-                HighwayReference.broadcastingBlockF64(a, Int32(truncatingIfNeeded: block)),
+                HighwayReference.broadcastingBlockF64(a.raw, Int32(truncatingIfNeeded: block)),
                 "a: \(describe(a))"
             )
         }
@@ -942,7 +942,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 unsafe H.broadcasting(a, blockUnchecked: block),
-                HighwayReference.broadcastingBlockF64(a, Int32(truncatingIfNeeded: block)),
+                HighwayReference.broadcastingBlockF64(a.raw, Int32(truncatingIfNeeded: block)),
                 "a: \(describe(a))"
             )
         }
@@ -974,7 +974,7 @@ extension SIMDDoubleConstantTests {
             mismatches.check(
                 H.broadcasting(H.repeating(value), block: block),
                 HighwayReference.broadcastingBlockF64(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: block)
                 ),
                 "block: \(block)"

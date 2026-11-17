@@ -13,7 +13,7 @@ extension SIMDFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.firstLane(a),
-                Float16(bitPattern: HighwayReference.firstLaneF16(a)),
+                Float16(bitPattern: HighwayReference.firstLaneF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -27,7 +27,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, index) in everyPair(aInputs, indexInputs) {
             mismatches.check(
                 H.lane(a, at: index),
-                Float16(bitPattern: HighwayReference.laneF16(a, index)),
+                Float16(bitPattern: HighwayReference.laneF16(a.raw, index)),
                 "a: \(describe(a)), index: \(index)"
             )
         }
@@ -41,7 +41,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, index) in everyPair(aInputs, indexInputs) {
             mismatches.check(
                 unsafe H.lane(a, atUnchecked: index),
-                Float16(bitPattern: HighwayReference.laneF16(a, index)),
+                Float16(bitPattern: HighwayReference.laneF16(a.raw, index)),
                 "a: \(describe(a)), index: \(index)"
             )
         }
@@ -61,7 +61,7 @@ extension SIMDFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.replacingLane(a, at: index, with: value),
-                HighwayReference.replacingLaneF16(a, index, value.bitPattern),
+                HighwayReference.replacingLaneF16(a.raw, index, value.bitPattern),
                 "a: \(describe(a)), index: \(index), value: \(hex(value))"
             )
         }
@@ -81,7 +81,7 @@ extension SIMDFloat16ReferenceTests {
         ) {
             mismatches.check(
                 unsafe H.replacingLane(a, atUnchecked: index, with: value),
-                HighwayReference.replacingLaneF16(a, index, value.bitPattern),
+                HighwayReference.replacingLaneF16(a.raw, index, value.bitPattern),
                 "a: \(describe(a)), index: \(index), value: \(hex(value))"
             )
         }

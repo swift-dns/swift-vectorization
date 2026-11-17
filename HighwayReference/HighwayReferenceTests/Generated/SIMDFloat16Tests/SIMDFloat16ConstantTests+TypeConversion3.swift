@@ -842,7 +842,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.vector(zeroExtendingResizing: SIMDFloat.repeating(value)),
-            HighwayReference.vectorZeroExtendingResizingF32ToF16(SIMDFloat.repeating(value)),
+            HighwayReference.vectorZeroExtendingResizingF32ToF16(SIMDFloat.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -938,7 +938,7 @@ extension SIMDFloat16ConstantTests {
             H.halfVector(zeroExtendingResizing: SIMDFloat.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorZeroExtendingResizingF32ToF16(
-                    SIMDFloat.repeating(value)
+                    SIMDFloat.repeating(value).raw
                 )
             ),
             ""
@@ -1039,7 +1039,7 @@ extension SIMDFloat16ConstantTests {
             H.quarterVector(zeroExtendingResizing: SIMDFloat.repeating(value)),
             H.QuarterVector(
                 raw: HighwayReference.quarterVectorZeroExtendingResizingF32ToF16(
-                    SIMDFloat.repeating(value)
+                    SIMDFloat.repeating(value).raw
                 )
             ),
             ""

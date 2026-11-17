@@ -26,9 +26,9 @@ extension SIMDFloat16ConstantTests {
                 H.multiplyAddingComplexConjugate(H.repeating(value), b, c, where: mask),
                 HighwayReference.multiplyAddingComplexConjugateWhereF16(
                     mask.raw,
-                    H.repeating(value),
-                    b,
-                    c
+                    H.repeating(value).raw,
+                    b.raw,
+                    c.raw
                 ),
                 "mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
             )
@@ -55,9 +55,9 @@ extension SIMDFloat16ConstantTests {
                 H.multiplyAddingComplexConjugate(a, H.repeating(value), c, where: mask),
                 HighwayReference.multiplyAddingComplexConjugateWhereF16(
                     mask.raw,
-                    a,
-                    H.repeating(value),
-                    c
+                    a.raw,
+                    H.repeating(value).raw,
+                    c.raw
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
             )
@@ -84,9 +84,9 @@ extension SIMDFloat16ConstantTests {
                 H.multiplyAddingComplexConjugate(a, b, H.repeating(value), where: mask),
                 HighwayReference.multiplyAddingComplexConjugateWhereF16(
                     mask.raw,
-                    a,
-                    b,
-                    H.repeating(value)
+                    a.raw,
+                    b.raw,
+                    H.repeating(value).raw
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )

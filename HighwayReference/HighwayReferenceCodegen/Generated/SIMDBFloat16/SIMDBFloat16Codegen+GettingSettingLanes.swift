@@ -5,19 +5,19 @@ public import Vectorization
 
 @inline(never)
 public func portReplacingLaneBF16(
-    _ a: SIMDBFloat16.Vector,
+    _ a: SIMD<BFloat16>,
     atUnchecked index: Int,
-    with value: SIMDBFloat16.Lane
-) -> SIMDBFloat16.Vector {
+    with value: BFloat16
+) -> SIMD<BFloat16> {
     unsafe SIMDBFloat16.replacingLane(a, atUnchecked: index, with: value)
 }
 
 @inline(never)
 public func highwayReplacingLaneBF16(
-    _ a: SIMDBFloat16.Vector,
+    _ a: SIMD<BFloat16>,
     atUnchecked index: Int,
     with value: BFloat16
-) -> SIMDBFloat16.Vector {
+) -> SIMD<BFloat16> {
     SIMDBFloat16.Vector(
         raw: HighwayReference.Nothrow.replacingLaneBF16(a.raw, index, value.bitPattern)
     )
@@ -26,8 +26,8 @@ public func highwayReplacingLaneBF16(
 @inline(never)
 public func portReplacingLaneBF16ConstantA(
     atUnchecked index: Int,
-    with value: SIMDBFloat16.Lane
-) -> SIMDBFloat16.Vector {
+    with value: BFloat16
+) -> SIMD<BFloat16> {
     unsafe SIMDBFloat16.replacingLane(
         SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
         atUnchecked: index,
@@ -39,7 +39,7 @@ public func portReplacingLaneBF16ConstantA(
 public func highwayReplacingLaneBF16ConstantA(
     atUnchecked index: Int,
     with value: BFloat16
-) -> SIMDBFloat16.Vector {
+) -> SIMD<BFloat16> {
     SIMDBFloat16.Vector(
         raw: HighwayReference.Nothrow.replacingLaneBF16(
             SIMDBFloat16.Vector(
@@ -53,33 +53,33 @@ public func highwayReplacingLaneBF16ConstantA(
 
 @inline(never)
 public func portReplacingLaneBF16ConstantIndex(
-    _ a: SIMDBFloat16.Vector,
-    with value: SIMDBFloat16.Lane
-) -> SIMDBFloat16.Vector {
+    _ a: SIMD<BFloat16>,
+    with value: BFloat16
+) -> SIMD<BFloat16> {
     unsafe SIMDBFloat16.replacingLane(a, atUnchecked: 1, with: value)
 }
 
 @inline(never)
 public func highwayReplacingLaneBF16ConstantIndex(
-    _ a: SIMDBFloat16.Vector,
+    _ a: SIMD<BFloat16>,
     with value: BFloat16
-) -> SIMDBFloat16.Vector {
+) -> SIMD<BFloat16> {
     SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.replacingLaneBF16(a.raw, 1, value.bitPattern))
 }
 
 @inline(never)
 public func portReplacingLaneBF16ConstantValue(
-    _ a: SIMDBFloat16.Vector,
+    _ a: SIMD<BFloat16>,
     atUnchecked index: Int
-) -> SIMDBFloat16.Vector {
+) -> SIMD<BFloat16> {
     unsafe SIMDBFloat16.replacingLane(a, atUnchecked: index, with: BFloat16(bitPattern: 26))
 }
 
 @inline(never)
 public func highwayReplacingLaneBF16ConstantValue(
-    _ a: SIMDBFloat16.Vector,
+    _ a: SIMD<BFloat16>,
     atUnchecked index: Int
-) -> SIMDBFloat16.Vector {
+) -> SIMD<BFloat16> {
     SIMDBFloat16.Vector(
         raw: HighwayReference.Nothrow.replacingLaneBF16(
             a.raw,

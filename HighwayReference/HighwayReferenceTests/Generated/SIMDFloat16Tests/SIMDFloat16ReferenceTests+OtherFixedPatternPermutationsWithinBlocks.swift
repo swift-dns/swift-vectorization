@@ -14,7 +14,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.oddEven(a, b),
-                HighwayReference.oddEvenF16(a, b),
+                HighwayReference.oddEvenF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -27,7 +27,7 @@ extension SIMDFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.duplicatingEven(a),
-                HighwayReference.duplicatingEvenF16(a),
+                HighwayReference.duplicatingEvenF16(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -40,7 +40,7 @@ extension SIMDFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.duplicatingOdd(a),
-                HighwayReference.duplicatingOddF16(a),
+                HighwayReference.duplicatingOddF16(a.raw),
                 "a: \(describe(a))"
             )
         }

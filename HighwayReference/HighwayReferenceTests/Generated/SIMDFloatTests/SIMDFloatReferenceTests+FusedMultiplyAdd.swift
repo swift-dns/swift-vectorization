@@ -14,7 +14,7 @@ extension SIMDFloatReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x7407_DBB7_7944_5749) {
             mismatches.check(
                 H.multiplyAdding(a, b, c),
-                HighwayReference.multiplyAddingF32(a, b, c),
+                HighwayReference.multiplyAddingF32(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -30,7 +30,7 @@ extension SIMDFloatReferenceTests {
         where !hasUnorderedNaNs(negating: a, b, adding: c) {
             mismatches.check(
                 H.negatedMultiplyAdding(a, b, c),
-                HighwayReference.negatedMultiplyAddingF32(a, b, c),
+                HighwayReference.negatedMultiplyAddingF32(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -46,7 +46,7 @@ extension SIMDFloatReferenceTests {
         where !hasUnorderedNaNs(multiplying: a, b, adding: c) {
             mismatches.check(
                 H.multiplySubtracting(a, b, c),
-                HighwayReference.multiplySubtractingF32(a, b, c),
+                HighwayReference.multiplySubtractingF32(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -62,7 +62,7 @@ extension SIMDFloatReferenceTests {
         where !hasUnorderedNaNs(negating: a, b, adding: c) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, b, c),
-                HighwayReference.negatedMultiplySubtractingF32(a, b, c),
+                HighwayReference.negatedMultiplySubtractingF32(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -78,7 +78,7 @@ extension SIMDFloatReferenceTests {
         where !hasUnorderedNaNs(multiplying: a, b, adding: c) {
             mismatches.check(
                 H.multiplyAddingSubtracting(a, b, c),
-                HighwayReference.multiplyAddingSubtractingF32(a, b, c),
+                HighwayReference.multiplyAddingSubtractingF32(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -98,7 +98,7 @@ extension SIMDFloatReferenceTests {
             where !hasUnorderedNaNs(multiplying: a, b, adding: c) {
                 mismatches.check(
                     H.multiplySubtractingAdding(a, b, c),
-                    HighwayReference.multiplySubtractingAddingF32(a, b, c),
+                    HighwayReference.multiplySubtractingAddingF32(a.raw, b.raw, c.raw),
                     "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
                 )
             }
@@ -119,7 +119,7 @@ extension SIMDFloatReferenceTests {
         where !hasUnorderedNaNs(widening: a, b, parity: 0, adding: c) {
             mismatches.check(
                 H.multiplyAddingEven(a, b, c),
-                HighwayReference.multiplyAddingEvenBF16ToF32(a.raw, b.raw, c),
+                HighwayReference.multiplyAddingEvenBF16ToF32(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -135,7 +135,7 @@ extension SIMDFloatReferenceTests {
         where !hasUnorderedNaNs(widening: a, b, parity: 1, adding: c) {
             mismatches.check(
                 H.multiplyAddingOdd(a, b, c),
-                HighwayReference.multiplyAddingOddBF16ToF32(a.raw, b.raw, c),
+                HighwayReference.multiplyAddingOddBF16ToF32(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }

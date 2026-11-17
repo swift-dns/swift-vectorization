@@ -498,7 +498,7 @@ extension SIMDUInt64ConstantTests {
             H.vector(zeroExtendingResizing: SIMDFloat.repeating(value)),
             H.Vector(
                 raw: HighwayReference.vectorZeroExtendingResizingF32ToU64(
-                    SIMDFloat.repeating(value)
+                    SIMDFloat.repeating(value).raw
                 )
             ),
             ""
@@ -596,7 +596,7 @@ extension SIMDUInt64ConstantTests {
             H.halfVector(zeroExtendingResizing: SIMDFloat.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorZeroExtendingResizingF32ToU64(
-                    SIMDFloat.repeating(value)
+                    SIMDFloat.repeating(value).raw
                 )
             ),
             ""
@@ -696,7 +696,7 @@ extension SIMDUInt64ConstantTests {
             H.vector(zeroExtendingResizing: SIMDDouble.repeating(value)),
             H.Vector(
                 raw: HighwayReference.vectorZeroExtendingResizingF64ToU64(
-                    SIMDDouble.repeating(value)
+                    SIMDDouble.repeating(value).raw
                 )
             ),
             ""
@@ -796,7 +796,7 @@ extension SIMDUInt64ConstantTests {
             H.halfVector(zeroExtendingResizing: SIMDDouble.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorZeroExtendingResizingF64ToU64(
-                    SIMDDouble.repeating(value)
+                    SIMDDouble.repeating(value).raw
                 )
             ),
             ""
@@ -897,7 +897,7 @@ extension SIMDUInt64ConstantTests {
             H.vector(zeroExtendingResizing: SIMDFloat16.repeating(value)),
             H.Vector(
                 raw: HighwayReference.vectorZeroExtendingResizingF16ToU64(
-                    SIMDFloat16.repeating(value)
+                    SIMDFloat16.repeating(value).raw
                 )
             ),
             ""
@@ -1038,7 +1038,7 @@ extension SIMDUInt64ConstantTests {
             H.halfVector(zeroExtendingResizing: SIMDFloat16.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorZeroExtendingResizingF16ToU64(
-                    SIMDFloat16.repeating(value)
+                    SIMDFloat16.repeating(value).raw
                 )
             ),
             ""

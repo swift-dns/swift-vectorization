@@ -4,23 +4,22 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portSumWhereU32(_ a: SIMDUInt32.Vector, where mask: SIMDUInt32.Mask) -> SIMDUInt32.Lane
-{
+public func portSumWhereU32(_ a: SIMD<UInt32>, where mask: SIMD<UInt32>.Mask) -> UInt32 {
     SIMDUInt32.sum(a, where: mask)
 }
 
 @inline(never)
-public func highwaySumWhereU32(_ a: SIMDUInt32.Vector, where mask: SIMDUInt32.Mask) -> UInt32 {
+public func highwaySumWhereU32(_ a: SIMD<UInt32>, where mask: SIMD<UInt32>.Mask) -> UInt32 {
     HighwayReference.Nothrow.sumWhereU32(mask.raw, a.raw)
 }
 
 @inline(never)
-public func portSumWhereU32ConstantA(where mask: SIMDUInt32.Mask) -> SIMDUInt32.Lane {
+public func portSumWhereU32ConstantA(where mask: SIMD<UInt32>.Mask) -> UInt32 {
     SIMDUInt32.sum(SIMDUInt32.repeating(26), where: mask)
 }
 
 @inline(never)
-public func highwaySumWhereU32ConstantA(where mask: SIMDUInt32.Mask) -> UInt32 {
+public func highwaySumWhereU32ConstantA(where mask: SIMD<UInt32>.Mask) -> UInt32 {
     HighwayReference.Nothrow.sumWhereU32(
         mask.raw,
         SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
@@ -28,25 +27,22 @@ public func highwaySumWhereU32ConstantA(where mask: SIMDUInt32.Mask) -> UInt32 {
 }
 
 @inline(never)
-public func portSmallestWhereU32(
-    _ a: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask
-) -> SIMDUInt32.Lane {
+public func portSmallestWhereU32(_ a: SIMD<UInt32>, where mask: SIMD<UInt32>.Mask) -> UInt32 {
     SIMDUInt32.smallest(a, where: mask)
 }
 
 @inline(never)
-public func highwaySmallestWhereU32(_ a: SIMDUInt32.Vector, where mask: SIMDUInt32.Mask) -> UInt32 {
+public func highwaySmallestWhereU32(_ a: SIMD<UInt32>, where mask: SIMD<UInt32>.Mask) -> UInt32 {
     HighwayReference.Nothrow.smallestWhereU32(mask.raw, a.raw)
 }
 
 @inline(never)
-public func portSmallestWhereU32ConstantA(where mask: SIMDUInt32.Mask) -> SIMDUInt32.Lane {
+public func portSmallestWhereU32ConstantA(where mask: SIMD<UInt32>.Mask) -> UInt32 {
     SIMDUInt32.smallest(SIMDUInt32.repeating(26), where: mask)
 }
 
 @inline(never)
-public func highwaySmallestWhereU32ConstantA(where mask: SIMDUInt32.Mask) -> UInt32 {
+public func highwaySmallestWhereU32ConstantA(where mask: SIMD<UInt32>.Mask) -> UInt32 {
     HighwayReference.Nothrow.smallestWhereU32(
         mask.raw,
         SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
@@ -54,25 +50,22 @@ public func highwaySmallestWhereU32ConstantA(where mask: SIMDUInt32.Mask) -> UIn
 }
 
 @inline(never)
-public func portLargestWhereU32(
-    _ a: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask
-) -> SIMDUInt32.Lane {
+public func portLargestWhereU32(_ a: SIMD<UInt32>, where mask: SIMD<UInt32>.Mask) -> UInt32 {
     SIMDUInt32.largest(a, where: mask)
 }
 
 @inline(never)
-public func highwayLargestWhereU32(_ a: SIMDUInt32.Vector, where mask: SIMDUInt32.Mask) -> UInt32 {
+public func highwayLargestWhereU32(_ a: SIMD<UInt32>, where mask: SIMD<UInt32>.Mask) -> UInt32 {
     HighwayReference.Nothrow.largestWhereU32(mask.raw, a.raw)
 }
 
 @inline(never)
-public func portLargestWhereU32ConstantA(where mask: SIMDUInt32.Mask) -> SIMDUInt32.Lane {
+public func portLargestWhereU32ConstantA(where mask: SIMD<UInt32>.Mask) -> UInt32 {
     SIMDUInt32.largest(SIMDUInt32.repeating(26), where: mask)
 }
 
 @inline(never)
-public func highwayLargestWhereU32ConstantA(where mask: SIMDUInt32.Mask) -> UInt32 {
+public func highwayLargestWhereU32ConstantA(where mask: SIMD<UInt32>.Mask) -> UInt32 {
     HighwayReference.Nothrow.largestWhereU32(
         mask.raw,
         SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw

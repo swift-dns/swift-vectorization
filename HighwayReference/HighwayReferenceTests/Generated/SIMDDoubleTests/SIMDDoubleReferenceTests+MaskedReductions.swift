@@ -13,7 +13,7 @@ extension SIMDDoubleReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) where !hasUnorderedNaNs(lanesOf: a) {
             mismatches.check(
                 H.sum(a, where: mask),
-                HighwayReference.sumWhereF64(mask.raw, a),
+                HighwayReference.sumWhereF64(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -27,7 +27,7 @@ extension SIMDDoubleReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) where !hasUnorderedNaNs(lanesOf: a) {
             mismatches.check(
                 H.sum(a, where: mask),
-                HighwayReference.sumWhereF64(mask.raw, a),
+                HighwayReference.sumWhereF64(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -41,7 +41,7 @@ extension SIMDDoubleReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.smallest(a, where: mask),
-                HighwayReference.smallestWhereF64(mask.raw, a),
+                HighwayReference.smallestWhereF64(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -55,7 +55,7 @@ extension SIMDDoubleReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.smallest(a, where: mask),
-                HighwayReference.smallestWhereF64(mask.raw, a),
+                HighwayReference.smallestWhereF64(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -69,7 +69,7 @@ extension SIMDDoubleReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.largest(a, where: mask),
-                HighwayReference.largestWhereF64(mask.raw, a),
+                HighwayReference.largestWhereF64(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -83,7 +83,7 @@ extension SIMDDoubleReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.largest(a, where: mask),
-                HighwayReference.largestWhereF64(mask.raw, a),
+                HighwayReference.largestWhereF64(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }

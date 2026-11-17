@@ -25,7 +25,7 @@ extension SIMDFloatConstantTests {
                         otherwise: H.repeating(value)
                     ),
                     unsafe HighwayReference.loadWhereOtherwiseF32(
-                        H.repeating(value),
+                        H.repeating(value).raw,
                         mask.raw,
                         source.baseAddress!
                     )
@@ -134,7 +134,7 @@ extension SIMDFloatConstantTests {
                         otherwise: otherwise
                     ),
                     unsafe HighwayReference.loadFirstOtherwiseF32(
-                        otherwise,
+                        otherwise.raw,
                         source.baseAddress!,
                         count
                     )
@@ -263,7 +263,7 @@ extension SIMDFloatConstantTests {
                 source in
                 (
                     unsafe H.loadFirst(from: source, count: count, otherwise: otherwise),
-                    unsafe HighwayReference.loadFirstOtherwiseF32(otherwise, source, count)
+                    unsafe HighwayReference.loadFirstOtherwiseF32(otherwise.raw, source, count)
                 )
             }.result
             mismatches.check(
@@ -394,7 +394,7 @@ extension SIMDFloatConstantTests {
                         otherwise: H.repeating(value)
                     ),
                     unsafe HighwayReference.loadFirstOtherwiseF32(
-                        H.repeating(value),
+                        H.repeating(value).raw,
                         source.baseAddress!,
                         count
                     )
@@ -500,7 +500,7 @@ extension SIMDFloatConstantTests {
                     unsafe H.loadingUpperHalf(H.repeating(value), from: source.baseAddress!),
                     unsafe HighwayReference.loadingUpperHalfF32(
                         source.baseAddress!,
-                        H.repeating(value)
+                        H.repeating(value).raw
                     )
                 )
             }

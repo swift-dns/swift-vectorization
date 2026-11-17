@@ -4,22 +4,22 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portComplexConjugateI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portComplexConjugateI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.complexConjugate(a)
 }
 
 @inline(never)
-public func highwayComplexConjugateI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayComplexConjugateI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.complexConjugateI64(a.raw))
 }
 
 @inline(never)
-public func portComplexConjugateI64ConstantA() -> SIMDInt64.Vector {
+public func portComplexConjugateI64ConstantA() -> SIMD<Int64> {
     SIMDInt64.complexConjugate(SIMDInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayComplexConjugateI64ConstantA() -> SIMDInt64.Vector {
+public func highwayComplexConjugateI64ConstantA() -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.complexConjugateI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
@@ -28,28 +28,22 @@ public func highwayComplexConjugateI64ConstantA() -> SIMDInt64.Vector {
 }
 
 @inline(never)
-public func portMultiplyingComplexI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portMultiplyingComplexI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.multiplyingComplex(a, b)
 }
 
 @inline(never)
-public func highwayMultiplyingComplexI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayMultiplyingComplexI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.multiplyingComplexI64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMultiplyingComplexI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portMultiplyingComplexI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.multiplyingComplex(SIMDInt64.repeating(26), b)
 }
 
 @inline(never)
-public func highwayMultiplyingComplexI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayMultiplyingComplexI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyingComplexI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -59,12 +53,12 @@ public func highwayMultiplyingComplexI64ConstantA(_ b: SIMDInt64.Vector) -> SIMD
 }
 
 @inline(never)
-public func portMultiplyingComplexI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portMultiplyingComplexI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.multiplyingComplex(a, SIMDInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayMultiplyingComplexI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func highwayMultiplyingComplexI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyingComplexI64(
             a.raw,
@@ -74,30 +68,23 @@ public func highwayMultiplyingComplexI64ConstantB(_ a: SIMDInt64.Vector) -> SIMD
 }
 
 @inline(never)
-public func portMultiplyingComplexConjugateI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portMultiplyingComplexConjugateI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.multiplyingComplexConjugate(a, b)
 }
 
 @inline(never)
-public func highwayMultiplyingComplexConjugateI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayMultiplyingComplexConjugateI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64>
+{
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.multiplyingComplexConjugateI64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMultiplyingComplexConjugateI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portMultiplyingComplexConjugateI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.multiplyingComplexConjugate(SIMDInt64.repeating(26), b)
 }
 
 @inline(never)
-public func highwayMultiplyingComplexConjugateI64ConstantA(
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayMultiplyingComplexConjugateI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyingComplexConjugateI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -107,14 +94,12 @@ public func highwayMultiplyingComplexConjugateI64ConstantA(
 }
 
 @inline(never)
-public func portMultiplyingComplexConjugateI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+public func portMultiplyingComplexConjugateI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.multiplyingComplexConjugate(a, SIMDInt64.repeating(26))
 }
 
 @inline(never)
-public func highwayMultiplyingComplexConjugateI64ConstantB(
-    _ a: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func highwayMultiplyingComplexConjugateI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyingComplexConjugateI64(
             a.raw,
@@ -125,35 +110,33 @@ public func highwayMultiplyingComplexConjugateI64ConstantB(
 
 @inline(never)
 public func portMultiplyAddingComplexI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.multiplyAddingComplex(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.multiplyAddingComplexI64(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
-public func portMultiplyAddingComplexI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portMultiplyAddingComplexI64ConstantA(_ b: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64>
+{
     SIMDInt64.multiplyAddingComplex(SIMDInt64.repeating(26), b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingComplexI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -164,18 +147,16 @@ public func highwayMultiplyAddingComplexI64ConstantA(
 }
 
 @inline(never)
-public func portMultiplyAddingComplexI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portMultiplyAddingComplexI64ConstantB(_ a: SIMD<Int64>, _ c: SIMD<Int64>) -> SIMD<Int64>
+{
     SIMDInt64.multiplyAddingComplex(a, SIMDInt64.repeating(26), c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingComplexI64(
             a.raw,
@@ -186,18 +167,16 @@ public func highwayMultiplyAddingComplexI64ConstantB(
 }
 
 @inline(never)
-public func portMultiplyAddingComplexI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+public func portMultiplyAddingComplexI64ConstantC(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64>
+{
     SIMDInt64.multiplyAddingComplex(a, b, SIMDInt64.repeating(26))
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingComplexI64(
             a.raw,
@@ -209,19 +188,19 @@ public func highwayMultiplyAddingComplexI64ConstantC(
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.multiplyAddingComplexConjugate(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateI64(a.raw, b.raw, c.raw)
     )
@@ -229,17 +208,17 @@ public func highwayMultiplyAddingComplexConjugateI64(
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.multiplyAddingComplexConjugate(SIMDInt64.repeating(26), b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -251,17 +230,17 @@ public func highwayMultiplyAddingComplexConjugateI64ConstantA(
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.multiplyAddingComplexConjugate(a, SIMDInt64.repeating(26), c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ c: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateI64(
             a.raw,
@@ -273,17 +252,17 @@ public func highwayMultiplyAddingComplexConjugateI64ConstantB(
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.multiplyAddingComplexConjugate(a, b, SIMDInt64.repeating(26))
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateI64(
             a.raw,
@@ -295,21 +274,21 @@ public func highwayMultiplyAddingComplexConjugateI64ConstantC(
 
 @inline(never)
 public func portMultiplyingComplexWhereOtherwiseI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.multiplyingComplex(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexWhereOtherwiseI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseI64(
             otherwise.raw,
@@ -322,19 +301,19 @@ public func highwayMultiplyingComplexWhereOtherwiseI64(
 
 @inline(never)
 public func portMultiplyingComplexWhereOtherwiseI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.multiplyingComplex(SIMDInt64.repeating(26), b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexWhereOtherwiseI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseI64(
             otherwise.raw,
@@ -347,19 +326,19 @@ public func highwayMultiplyingComplexWhereOtherwiseI64ConstantA(
 
 @inline(never)
 public func portMultiplyingComplexWhereOtherwiseI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.multiplyingComplex(a, SIMDInt64.repeating(26), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexWhereOtherwiseI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseI64(
             otherwise.raw,
@@ -372,19 +351,19 @@ public func highwayMultiplyingComplexWhereOtherwiseI64ConstantB(
 
 @inline(never)
 public func portMultiplyingComplexWhereOtherwiseI64ConstantOtherwise(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.multiplyingComplex(a, b, where: mask, otherwise: SIMDInt64.repeating(26))
 }
 
 @inline(never)
 public func highwayMultiplyingComplexWhereOtherwiseI64ConstantOtherwise(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseI64(
             SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
@@ -397,19 +376,19 @@ public func highwayMultiplyingComplexWhereOtherwiseI64ConstantOtherwise(
 
 @inline(never)
 public func portMultiplyingComplexConjugateWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.multiplyingComplexConjugate(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexConjugateWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyingComplexConjugateWhereI64(mask.raw, a.raw, b.raw)
     )
@@ -417,17 +396,17 @@ public func highwayMultiplyingComplexConjugateWhereI64(
 
 @inline(never)
 public func portMultiplyingComplexConjugateWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.multiplyingComplexConjugate(SIMDInt64.repeating(26), b, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexConjugateWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyingComplexConjugateWhereI64(
             mask.raw,
@@ -439,17 +418,17 @@ public func highwayMultiplyingComplexConjugateWhereI64ConstantA(
 
 @inline(never)
 public func portMultiplyingComplexConjugateWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.multiplyingComplexConjugate(a, SIMDInt64.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexConjugateWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyingComplexConjugateWhereI64(
             mask.raw,
@@ -461,21 +440,21 @@ public func highwayMultiplyingComplexConjugateWhereI64ConstantB(
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.multiplyAddingComplexConjugate(a, b, c, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateWhereI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereI64(
             mask.raw,
@@ -488,19 +467,19 @@ public func highwayMultiplyAddingComplexConjugateWhereI64(
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.multiplyAddingComplexConjugate(SIMDInt64.repeating(26), b, c, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateWhereI64ConstantA(
-    _ b: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ b: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereI64(
             mask.raw,
@@ -513,19 +492,19 @@ public func highwayMultiplyAddingComplexConjugateWhereI64ConstantA(
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.multiplyAddingComplexConjugate(a, SIMDInt64.repeating(26), c, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateWhereI64ConstantB(
-    _ a: SIMDInt64.Vector,
-    _ c: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ c: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereI64(
             mask.raw,
@@ -538,19 +517,19 @@ public func highwayMultiplyAddingComplexConjugateWhereI64ConstantB(
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateWhereI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.multiplyAddingComplexConjugate(a, b, SIMDInt64.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateWhereI64ConstantC(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
+    _ a: SIMD<Int64>,
+    _ b: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
     SIMDInt64.Vector(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereI64(
             mask.raw,

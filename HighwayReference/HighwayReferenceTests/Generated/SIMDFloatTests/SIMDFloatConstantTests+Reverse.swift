@@ -12,7 +12,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.reversed(H.repeating(value)),
-            HighwayReference.reversedF32(H.repeating(value)),
+            HighwayReference.reversedF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -100,7 +100,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.byteSwapped(H.repeating(value)),
-            HighwayReference.byteSwappedF32(H.repeating(value)),
+            HighwayReference.byteSwappedF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -188,7 +188,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.reversedBlocks(H.repeating(value)),
-            HighwayReference.reversedBlocksF32(H.repeating(value)),
+            HighwayReference.reversedBlocksF32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -276,7 +276,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.reversed2(H.repeating(value)),
-            HighwayReference.reversed2F32(H.repeating(value)),
+            HighwayReference.reversed2F32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -364,7 +364,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.reversed4(H.repeating(value)),
-            HighwayReference.reversed4F32(H.repeating(value)),
+            HighwayReference.reversed4F32(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -452,7 +452,7 @@ extension SIMDFloatConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
         mismatches.check(
             H.reversed8(H.repeating(value)),
-            HighwayReference.reversed8F32(H.repeating(value)),
+            HighwayReference.reversed8F32(H.repeating(value).raw),
             ""
         )
         mismatches.record()

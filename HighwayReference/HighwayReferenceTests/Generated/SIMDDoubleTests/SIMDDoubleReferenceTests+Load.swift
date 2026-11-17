@@ -400,7 +400,7 @@ extension SIMDDoubleReferenceTests {
                 (
                     unsafe H.load(from: source.baseAddress!, where: mask, otherwise: otherwise),
                     unsafe HighwayReference.loadWhereOtherwiseF64(
-                        otherwise,
+                        otherwise.raw,
                         mask.raw,
                         source.baseAddress!
                     )
@@ -433,7 +433,7 @@ extension SIMDDoubleReferenceTests {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
                     unsafe H.load(from: source, where: mask, otherwise: otherwise),
-                    unsafe HighwayReference.loadWhereOtherwiseF64(otherwise, mask.raw, source)
+                    unsafe HighwayReference.loadWhereOtherwiseF64(otherwise.raw, mask.raw, source)
                 )
             }.result
             mismatches.check(
@@ -473,7 +473,7 @@ extension SIMDDoubleReferenceTests {
             ) { source in
                 (
                     unsafe H.load(from: source, where: mask, otherwise: otherwise),
-                    unsafe HighwayReference.loadWhereOtherwiseF64(otherwise, mask.raw, source)
+                    unsafe HighwayReference.loadWhereOtherwiseF64(otherwise.raw, mask.raw, source)
                 )
             }.result
             mismatches.check(
@@ -504,7 +504,7 @@ extension SIMDDoubleReferenceTests {
                 (
                     unsafe H.load(from: source.baseAddress!, where: mask, otherwise: otherwise),
                     unsafe HighwayReference.loadWhereOtherwiseF64(
-                        otherwise,
+                        otherwise.raw,
                         mask.raw,
                         source.baseAddress!
                     )
@@ -578,7 +578,7 @@ extension SIMDDoubleReferenceTests {
                         otherwise: otherwise
                     ),
                     unsafe HighwayReference.loadFirstOtherwiseF64(
-                        otherwise,
+                        otherwise.raw,
                         source.baseAddress!,
                         count
                     )
@@ -612,7 +612,7 @@ extension SIMDDoubleReferenceTests {
                 source in
                 (
                     unsafe H.loadFirst(from: source, count: count, otherwise: otherwise),
-                    unsafe HighwayReference.loadFirstOtherwiseF64(otherwise, source, count)
+                    unsafe HighwayReference.loadFirstOtherwiseF64(otherwise.raw, source, count)
                 )
             }.result
             mismatches.check(
@@ -636,7 +636,7 @@ extension SIMDDoubleReferenceTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadingUpperHalf(a, from: source.baseAddress!),
-                    unsafe HighwayReference.loadingUpperHalfF64(source.baseAddress!, a)
+                    unsafe HighwayReference.loadingUpperHalfF64(source.baseAddress!, a.raw)
                 )
             }
             mismatches.check(
@@ -660,7 +660,7 @@ extension SIMDDoubleReferenceTests {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
                     unsafe H.loadingUpperHalf(a, from: source),
-                    unsafe HighwayReference.loadingUpperHalfF64(source, a)
+                    unsafe HighwayReference.loadingUpperHalfF64(source, a.raw)
                 )
             }.result
             mismatches.check(

@@ -12,7 +12,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.lowerHalf(H.repeating(value)),
-            H.HalfVector(raw: HighwayReference.lowerHalfF64(H.repeating(value))),
+            H.HalfVector(raw: HighwayReference.lowerHalfF64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -100,7 +100,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.upperHalf(H.repeating(value)),
-            H.HalfVector(raw: HighwayReference.upperHalfF64(H.repeating(value))),
+            H.HalfVector(raw: HighwayReference.upperHalfF64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()

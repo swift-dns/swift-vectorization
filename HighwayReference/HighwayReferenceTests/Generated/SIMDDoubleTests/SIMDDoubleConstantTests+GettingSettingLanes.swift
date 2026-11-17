@@ -12,7 +12,7 @@ extension SIMDDoubleConstantTests {
         mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         mismatches.check(
             H.firstLane(H.repeating(value)),
-            HighwayReference.firstLaneF64(H.repeating(value)),
+            HighwayReference.firstLaneF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -101,7 +101,7 @@ extension SIMDDoubleConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.lane(a, at: index),
-                HighwayReference.laneF64(a, index),
+                HighwayReference.laneF64(a.raw, index),
                 "a: \(describe(a))"
             )
         }
@@ -148,7 +148,7 @@ extension SIMDDoubleConstantTests {
         for index in indexInputs {
             mismatches.check(
                 H.lane(H.repeating(value), at: index),
-                HighwayReference.laneF64(H.repeating(value), index),
+                HighwayReference.laneF64(H.repeating(value).raw, index),
                 "index: \(index)"
             )
         }
@@ -240,7 +240,7 @@ extension SIMDDoubleConstantTests {
         for (index, value) in everyPair(indexInputs, valueInputs) {
             mismatches.check(
                 H.replacingLane(H.repeating(value), at: index, with: value),
-                HighwayReference.replacingLaneF64(H.repeating(value), index, value),
+                HighwayReference.replacingLaneF64(H.repeating(value).raw, index, value),
                 "index: \(index), value: \(hex(value))"
             )
         }

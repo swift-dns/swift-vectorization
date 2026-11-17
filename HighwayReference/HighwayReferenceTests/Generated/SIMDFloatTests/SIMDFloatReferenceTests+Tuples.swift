@@ -12,7 +12,9 @@ extension SIMDFloatReferenceTests {
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x21CF_9E81_FCA2_ED99)
         for (a, b) in everyPair(aInputs, bInputs) {
             let port = H.create2(a, b)
-            let reference = { tuple in (tuple.v0, tuple.v1) }(HighwayReference.create2F32(a, b))
+            let reference = { tuple in (tuple.v0, tuple.v1) }(
+                HighwayReference.create2F32(a.raw, b.raw)
+            )
             mismatches.check(port.0, reference.0, "a: \(describe(a)), b: \(describe(b))")
             mismatches.check(port.1, reference.1, "a: \(describe(a)), b: \(describe(b))")
         }
@@ -29,7 +31,7 @@ extension SIMDFloatReferenceTests {
             mismatches.check(
                 H.get2(tuple, at: index),
                 HighwayReference.get2F32(
-                    cvectorization_ops_tuple2_f32(v0: tuple.0, v1: tuple.1),
+                    cvectorization_ops_tuple2_f32(v0: tuple.0.raw, v1: tuple.1.raw),
                     index
                 ),
                 "tuple: \([describe(tuple.0), describe(tuple.1)].joined(separator: ", ")), index: \(index)"
@@ -48,7 +50,7 @@ extension SIMDFloatReferenceTests {
             mismatches.check(
                 unsafe H.get2(tuple, atUnchecked: index),
                 HighwayReference.get2F32(
-                    cvectorization_ops_tuple2_f32(v0: tuple.0, v1: tuple.1),
+                    cvectorization_ops_tuple2_f32(v0: tuple.0.raw, v1: tuple.1.raw),
                     index
                 ),
                 "tuple: \([describe(tuple.0), describe(tuple.1)].joined(separator: ", ")), index: \(index)"
@@ -73,9 +75,9 @@ extension SIMDFloatReferenceTests {
             let port = H.set2(tuple, at: index, to: a)
             let reference = { tuple in (tuple.v0, tuple.v1) }(
                 HighwayReference.set2F32(
-                    cvectorization_ops_tuple2_f32(v0: tuple.0, v1: tuple.1),
+                    cvectorization_ops_tuple2_f32(v0: tuple.0.raw, v1: tuple.1.raw),
                     index,
-                    a
+                    a.raw
                 )
             )
             mismatches.check(
@@ -108,9 +110,9 @@ extension SIMDFloatReferenceTests {
             let port = unsafe H.set2(tuple, atUnchecked: index, to: a)
             let reference = { tuple in (tuple.v0, tuple.v1) }(
                 HighwayReference.set2F32(
-                    cvectorization_ops_tuple2_f32(v0: tuple.0, v1: tuple.1),
+                    cvectorization_ops_tuple2_f32(v0: tuple.0.raw, v1: tuple.1.raw),
                     index,
-                    a
+                    a.raw
                 )
             )
             mismatches.check(
@@ -135,7 +137,7 @@ extension SIMDFloatReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x8BD5_3486_0B22_B56B) {
             let port = H.create3(a, b, c)
             let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
-                HighwayReference.create3F32(a, b, c)
+                HighwayReference.create3F32(a.raw, b.raw, c.raw)
             )
             mismatches.check(
                 port.0,
@@ -166,7 +168,11 @@ extension SIMDFloatReferenceTests {
             mismatches.check(
                 H.get3(tuple, at: index),
                 HighwayReference.get3F32(
-                    cvectorization_ops_tuple3_f32(v0: tuple.0, v1: tuple.1, v2: tuple.2),
+                    cvectorization_ops_tuple3_f32(
+                        v0: tuple.0.raw,
+                        v1: tuple.1.raw,
+                        v2: tuple.2.raw
+                    ),
                     index
                 ),
                 "tuple: \([describe(tuple.0), describe(tuple.1), describe(tuple.2)].joined(separator: ", ")), index: \(index)"
@@ -185,7 +191,11 @@ extension SIMDFloatReferenceTests {
             mismatches.check(
                 unsafe H.get3(tuple, atUnchecked: index),
                 HighwayReference.get3F32(
-                    cvectorization_ops_tuple3_f32(v0: tuple.0, v1: tuple.1, v2: tuple.2),
+                    cvectorization_ops_tuple3_f32(
+                        v0: tuple.0.raw,
+                        v1: tuple.1.raw,
+                        v2: tuple.2.raw
+                    ),
                     index
                 ),
                 "tuple: \([describe(tuple.0), describe(tuple.1), describe(tuple.2)].joined(separator: ", ")), index: \(index)"
@@ -210,9 +220,13 @@ extension SIMDFloatReferenceTests {
             let port = H.set3(tuple, at: index, to: a)
             let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
                 HighwayReference.set3F32(
-                    cvectorization_ops_tuple3_f32(v0: tuple.0, v1: tuple.1, v2: tuple.2),
+                    cvectorization_ops_tuple3_f32(
+                        v0: tuple.0.raw,
+                        v1: tuple.1.raw,
+                        v2: tuple.2.raw
+                    ),
                     index,
-                    a
+                    a.raw
                 )
             )
             mismatches.check(
@@ -250,9 +264,13 @@ extension SIMDFloatReferenceTests {
             let port = unsafe H.set3(tuple, atUnchecked: index, to: a)
             let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2) }(
                 HighwayReference.set3F32(
-                    cvectorization_ops_tuple3_f32(v0: tuple.0, v1: tuple.1, v2: tuple.2),
+                    cvectorization_ops_tuple3_f32(
+                        v0: tuple.0.raw,
+                        v1: tuple.1.raw,
+                        v2: tuple.2.raw
+                    ),
                     index,
-                    a
+                    a.raw
                 )
             )
             mismatches.check(
@@ -289,7 +307,7 @@ extension SIMDFloatReferenceTests {
         ) {
             let port = H.create4(a, b, c, d)
             let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
-                HighwayReference.create4F32(a, b, c, d)
+                HighwayReference.create4F32(a.raw, b.raw, c.raw, d.raw)
             )
             mismatches.check(
                 port.0,
@@ -326,10 +344,10 @@ extension SIMDFloatReferenceTests {
                 H.get4(tuple, at: index),
                 HighwayReference.get4F32(
                     cvectorization_ops_tuple4_f32(
-                        v0: tuple.0,
-                        v1: tuple.1,
-                        v2: tuple.2,
-                        v3: tuple.3
+                        v0: tuple.0.raw,
+                        v1: tuple.1.raw,
+                        v2: tuple.2.raw,
+                        v3: tuple.3.raw
                     ),
                     index
                 ),
@@ -350,10 +368,10 @@ extension SIMDFloatReferenceTests {
                 unsafe H.get4(tuple, atUnchecked: index),
                 HighwayReference.get4F32(
                     cvectorization_ops_tuple4_f32(
-                        v0: tuple.0,
-                        v1: tuple.1,
-                        v2: tuple.2,
-                        v3: tuple.3
+                        v0: tuple.0.raw,
+                        v1: tuple.1.raw,
+                        v2: tuple.2.raw,
+                        v3: tuple.3.raw
                     ),
                     index
                 ),
@@ -380,13 +398,13 @@ extension SIMDFloatReferenceTests {
             let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
                 HighwayReference.set4F32(
                     cvectorization_ops_tuple4_f32(
-                        v0: tuple.0,
-                        v1: tuple.1,
-                        v2: tuple.2,
-                        v3: tuple.3
+                        v0: tuple.0.raw,
+                        v1: tuple.1.raw,
+                        v2: tuple.2.raw,
+                        v3: tuple.3.raw
                     ),
                     index,
-                    a
+                    a.raw
                 )
             )
             mismatches.check(
@@ -430,13 +448,13 @@ extension SIMDFloatReferenceTests {
             let reference = { tuple in (tuple.v0, tuple.v1, tuple.v2, tuple.v3) }(
                 HighwayReference.set4F32(
                     cvectorization_ops_tuple4_f32(
-                        v0: tuple.0,
-                        v1: tuple.1,
-                        v2: tuple.2,
-                        v3: tuple.3
+                        v0: tuple.0.raw,
+                        v1: tuple.1.raw,
+                        v2: tuple.2.raw,
+                        v3: tuple.3.raw
                     ),
                     index,
-                    a
+                    a.raw
                 )
             )
             mismatches.check(

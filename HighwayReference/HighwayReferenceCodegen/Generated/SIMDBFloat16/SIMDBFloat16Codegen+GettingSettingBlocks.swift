@@ -4,12 +4,12 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portExtractingBlockBF16ConstantA() -> SIMDBFloat16.BlockVector {
+public func portExtractingBlockBF16ConstantA() -> SIMD<BFloat16>.BlockVector {
     unsafe SIMDBFloat16.block(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), atUnchecked: 0)
 }
 
 @inline(never)
-public func highwayExtractingBlockBF16ConstantA() -> SIMDBFloat16.BlockVector {
+public func highwayExtractingBlockBF16ConstantA() -> SIMD<BFloat16>.BlockVector {
     SIMDBFloat16.BlockVector(
         raw: HighwayReference.Nothrow.extractingBlockBF16(
             SIMDBFloat16.Vector(
@@ -21,22 +21,20 @@ public func highwayExtractingBlockBF16ConstantA() -> SIMDBFloat16.BlockVector {
 }
 
 @inline(never)
-public func portExtractingBlockBF16ConstantIndex(
-    _ a: SIMDBFloat16.Vector
-) -> SIMDBFloat16.BlockVector {
+public func portExtractingBlockBF16ConstantIndex(_ a: SIMD<BFloat16>) -> SIMD<BFloat16>.BlockVector
+{
     unsafe SIMDBFloat16.block(a, atUnchecked: 0)
 }
 
 @inline(never)
 public func highwayExtractingBlockBF16ConstantIndex(
-    _ a: SIMDBFloat16.Vector
-) -> SIMDBFloat16.BlockVector {
+    _ a: SIMD<BFloat16>
+) -> SIMD<BFloat16>.BlockVector {
     SIMDBFloat16.BlockVector(raw: HighwayReference.Nothrow.extractingBlockBF16(a.raw, 0))
 }
 
 @inline(never)
-public func portReplacingBlockBF16ConstantA(with b: SIMDBFloat16.BlockVector) -> SIMDBFloat16.Vector
-{
+public func portReplacingBlockBF16ConstantA(with b: SIMD<BFloat16>.BlockVector) -> SIMD<BFloat16> {
     unsafe SIMDBFloat16.replacingBlock(
         SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
         atUnchecked: 0,
@@ -45,9 +43,8 @@ public func portReplacingBlockBF16ConstantA(with b: SIMDBFloat16.BlockVector) ->
 }
 
 @inline(never)
-public func highwayReplacingBlockBF16ConstantA(
-    with b: SIMDBFloat16.BlockVector
-) -> SIMDBFloat16.Vector {
+public func highwayReplacingBlockBF16ConstantA(with b: SIMD<BFloat16>.BlockVector) -> SIMD<BFloat16>
+{
     SIMDBFloat16.Vector(
         raw: HighwayReference.Nothrow.replacingBlockBF16(
             SIMDBFloat16.Vector(
@@ -61,16 +58,16 @@ public func highwayReplacingBlockBF16ConstantA(
 
 @inline(never)
 public func portReplacingBlockBF16ConstantIndex(
-    _ a: SIMDBFloat16.Vector,
-    with b: SIMDBFloat16.BlockVector
-) -> SIMDBFloat16.Vector {
+    _ a: SIMD<BFloat16>,
+    with b: SIMD<BFloat16>.BlockVector
+) -> SIMD<BFloat16> {
     unsafe SIMDBFloat16.replacingBlock(a, atUnchecked: 0, with: b)
 }
 
 @inline(never)
 public func highwayReplacingBlockBF16ConstantIndex(
-    _ a: SIMDBFloat16.Vector,
-    with b: SIMDBFloat16.BlockVector
-) -> SIMDBFloat16.Vector {
+    _ a: SIMD<BFloat16>,
+    with b: SIMD<BFloat16>.BlockVector
+) -> SIMD<BFloat16> {
     SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.replacingBlockBF16(a.raw, 0, b.raw))
 }

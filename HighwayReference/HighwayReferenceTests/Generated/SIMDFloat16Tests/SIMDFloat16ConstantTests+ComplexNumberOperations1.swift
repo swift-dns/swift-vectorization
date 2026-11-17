@@ -17,7 +17,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.complexConjugate(H.repeating(value)),
-            HighwayReference.complexConjugateF16(H.repeating(value)),
+            HighwayReference.complexConjugateF16(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -111,7 +111,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs where !hasUnorderedNaNs(complexLanesOf: H.repeating(value), b) {
             mismatches.check(
                 H.multiplyingComplex(H.repeating(value), b),
-                HighwayReference.multiplyingComplexF16(H.repeating(value), b),
+                HighwayReference.multiplyingComplexF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -130,7 +130,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs where !hasUnorderedNaNs(complexLanesOf: a, H.repeating(value)) {
             mismatches.check(
                 H.multiplyingComplex(a, H.repeating(value)),
-                HighwayReference.multiplyingComplexF16(a, H.repeating(value)),
+                HighwayReference.multiplyingComplexF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -244,7 +244,7 @@ extension SIMDFloat16ConstantTests {
         for b in bInputs where !hasUnorderedNaNs(complexLanesOf: H.repeating(value), b) {
             mismatches.check(
                 H.multiplyingComplexConjugate(H.repeating(value), b),
-                HighwayReference.multiplyingComplexConjugateF16(H.repeating(value), b),
+                HighwayReference.multiplyingComplexConjugateF16(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -263,7 +263,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs where !hasUnorderedNaNs(complexLanesOf: a, H.repeating(value)) {
             mismatches.check(
                 H.multiplyingComplexConjugate(a, H.repeating(value)),
-                HighwayReference.multiplyingComplexConjugateF16(a, H.repeating(value)),
+                HighwayReference.multiplyingComplexConjugateF16(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -379,7 +379,7 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(complexLanesOf: H.repeating(value), b, c) {
             mismatches.check(
                 H.multiplyAddingComplex(H.repeating(value), b, c),
-                HighwayReference.multiplyAddingComplexF16(H.repeating(value), b, c),
+                HighwayReference.multiplyAddingComplexF16(H.repeating(value).raw, b.raw, c.raw),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -400,7 +400,7 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(complexLanesOf: a, H.repeating(value), c) {
             mismatches.check(
                 H.multiplyAddingComplex(a, H.repeating(value), c),
-                HighwayReference.multiplyAddingComplexF16(a, H.repeating(value), c),
+                HighwayReference.multiplyAddingComplexF16(a.raw, H.repeating(value).raw, c.raw),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -421,7 +421,7 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(complexLanesOf: a, b, H.repeating(value)) {
             mismatches.check(
                 H.multiplyAddingComplex(a, b, H.repeating(value)),
-                HighwayReference.multiplyAddingComplexF16(a, b, H.repeating(value)),
+                HighwayReference.multiplyAddingComplexF16(a.raw, b.raw, H.repeating(value).raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -556,7 +556,11 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(complexLanesOf: H.repeating(value), b, c) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(H.repeating(value), b, c),
-                HighwayReference.multiplyAddingComplexConjugateF16(H.repeating(value), b, c),
+                HighwayReference.multiplyAddingComplexConjugateF16(
+                    H.repeating(value).raw,
+                    b.raw,
+                    c.raw
+                ),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -577,7 +581,11 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(complexLanesOf: a, H.repeating(value), c) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, H.repeating(value), c),
-                HighwayReference.multiplyAddingComplexConjugateF16(a, H.repeating(value), c),
+                HighwayReference.multiplyAddingComplexConjugateF16(
+                    a.raw,
+                    H.repeating(value).raw,
+                    c.raw
+                ),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -598,7 +606,11 @@ extension SIMDFloat16ConstantTests {
         where !hasUnorderedNaNs(complexLanesOf: a, b, H.repeating(value)) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, b, H.repeating(value)),
-                HighwayReference.multiplyAddingComplexConjugateF16(a, b, H.repeating(value)),
+                HighwayReference.multiplyAddingComplexConjugateF16(
+                    a.raw,
+                    b.raw,
+                    H.repeating(value).raw
+                ),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -737,10 +749,10 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.multiplyingComplex(a, b, where: mask, otherwise: H.repeating(value)),
                 HighwayReference.multiplyingComplexWhereOtherwiseF16(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     mask.raw,
-                    a,
-                    b
+                    a.raw,
+                    b.raw
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
@@ -770,10 +782,10 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.multiplyingComplex(H.repeating(value), b, where: mask, otherwise: otherwise),
                 HighwayReference.multiplyingComplexWhereOtherwiseF16(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    H.repeating(value),
-                    b
+                    H.repeating(value).raw,
+                    b.raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b))"
             )
@@ -803,10 +815,10 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.multiplyingComplex(a, H.repeating(value), where: mask, otherwise: otherwise),
                 HighwayReference.multiplyingComplexWhereOtherwiseF16(
-                    otherwise,
+                    otherwise.raw,
                     mask.raw,
-                    a,
-                    H.repeating(value)
+                    a.raw,
+                    H.repeating(value).raw
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
             )
@@ -946,8 +958,8 @@ extension SIMDFloat16ConstantTests {
                 H.multiplyingComplexConjugate(H.repeating(value), b, where: mask),
                 HighwayReference.multiplyingComplexConjugateWhereF16(
                     mask.raw,
-                    H.repeating(value),
-                    b
+                    H.repeating(value).raw,
+                    b.raw
                 ),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
@@ -973,8 +985,8 @@ extension SIMDFloat16ConstantTests {
                 H.multiplyingComplexConjugate(a, H.repeating(value), where: mask),
                 HighwayReference.multiplyingComplexConjugateWhereF16(
                     mask.raw,
-                    a,
-                    H.repeating(value)
+                    a.raw,
+                    H.repeating(value).raw
                 ),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )

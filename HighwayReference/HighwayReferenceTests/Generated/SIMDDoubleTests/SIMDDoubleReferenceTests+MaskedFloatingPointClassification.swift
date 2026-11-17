@@ -13,7 +13,7 @@ extension SIMDDoubleReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.isNaN(a, where: mask),
-                H.Mask(raw: HighwayReference.isNaNWhereF64(mask.raw, a)),
+                H.Mask(raw: HighwayReference.isNaNWhereF64(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -27,7 +27,7 @@ extension SIMDDoubleReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.isNaN(a, where: mask),
-                H.Mask(raw: HighwayReference.isNaNWhereF64(mask.raw, a)),
+                H.Mask(raw: HighwayReference.isNaNWhereF64(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }

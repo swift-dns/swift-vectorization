@@ -4,22 +4,22 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portShiftedLeftI32(_ a: SIMDInt32.Vector, by bits: Int32) -> SIMDInt32.Vector {
+public func portShiftedLeftI32(_ a: SIMD<Int32>, by bits: Int32) -> SIMD<Int32> {
     SIMDInt32.shiftedLeft(a, by: Int(bits))
 }
 
 @inline(never)
-public func highwayShiftedLeftI32(_ a: SIMDInt32.Vector, by bits: Int32) -> SIMDInt32.Vector {
+public func highwayShiftedLeftI32(_ a: SIMD<Int32>, by bits: Int32) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.shiftedLeftI32(a.raw, bits))
 }
 
 @inline(never)
-public func portShiftedLeftI32ConstantA(by bits: Int32) -> SIMDInt32.Vector {
+public func portShiftedLeftI32ConstantA(by bits: Int32) -> SIMD<Int32> {
     SIMDInt32.shiftedLeft(SIMDInt32.repeating(26), by: Int(bits))
 }
 
 @inline(never)
-public func highwayShiftedLeftI32ConstantA(by bits: Int32) -> SIMDInt32.Vector {
+public func highwayShiftedLeftI32ConstantA(by bits: Int32) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.shiftedLeftI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
@@ -29,32 +29,32 @@ public func highwayShiftedLeftI32ConstantA(by bits: Int32) -> SIMDInt32.Vector {
 }
 
 @inline(never)
-public func portShiftedLeftI32ConstantBits(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portShiftedLeftI32ConstantBits(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.shiftedLeft(a, by: 3)
 }
 
 @inline(never)
-public func highwayShiftedLeftI32ConstantBits(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayShiftedLeftI32ConstantBits(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.shiftedLeftTemplateI32(a.raw, 3))
 }
 
 @inline(never)
-public func portShiftedRightI32(_ a: SIMDInt32.Vector, by bits: Int32) -> SIMDInt32.Vector {
+public func portShiftedRightI32(_ a: SIMD<Int32>, by bits: Int32) -> SIMD<Int32> {
     SIMDInt32.shiftedRight(a, by: Int(bits))
 }
 
 @inline(never)
-public func highwayShiftedRightI32(_ a: SIMDInt32.Vector, by bits: Int32) -> SIMDInt32.Vector {
+public func highwayShiftedRightI32(_ a: SIMD<Int32>, by bits: Int32) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.shiftedRightI32(a.raw, bits))
 }
 
 @inline(never)
-public func portShiftedRightI32ConstantA(by bits: Int32) -> SIMDInt32.Vector {
+public func portShiftedRightI32ConstantA(by bits: Int32) -> SIMD<Int32> {
     SIMDInt32.shiftedRight(SIMDInt32.repeating(26), by: Int(bits))
 }
 
 @inline(never)
-public func highwayShiftedRightI32ConstantA(by bits: Int32) -> SIMDInt32.Vector {
+public func highwayShiftedRightI32ConstantA(by bits: Int32) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.shiftedRightI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
@@ -64,36 +64,32 @@ public func highwayShiftedRightI32ConstantA(by bits: Int32) -> SIMDInt32.Vector 
 }
 
 @inline(never)
-public func portShiftedRightI32ConstantBits(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portShiftedRightI32ConstantBits(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.shiftedRight(a, by: 3)
 }
 
 @inline(never)
-public func highwayShiftedRightI32ConstantBits(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayShiftedRightI32ConstantBits(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.shiftedRightTemplateI32(a.raw, 3))
 }
 
 @inline(never)
-public func portShiftedLeftByI32(_ a: SIMDInt32.Vector, by b: SIMDInt32.Vector) -> SIMDInt32.Vector
-{
+public func portShiftedLeftByI32(_ a: SIMD<Int32>, by b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.shiftedLeft(a, by: b)
 }
 
 @inline(never)
-public func highwayShiftedLeftByI32(
-    _ a: SIMDInt32.Vector,
-    by b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func highwayShiftedLeftByI32(_ a: SIMD<Int32>, by b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.shiftedLeftByI32(a.raw, b.raw))
 }
 
 @inline(never)
-public func portShiftedLeftByI32ConstantA(by b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portShiftedLeftByI32ConstantA(by b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.shiftedLeft(SIMDInt32.repeating(26), by: b)
 }
 
 @inline(never)
-public func highwayShiftedLeftByI32ConstantA(by b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayShiftedLeftByI32ConstantA(by b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.shiftedLeftByI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
@@ -103,12 +99,12 @@ public func highwayShiftedLeftByI32ConstantA(by b: SIMDInt32.Vector) -> SIMDInt3
 }
 
 @inline(never)
-public func portShiftedLeftByI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portShiftedLeftByI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.shiftedLeft(a, by: SIMDInt32.repeating(3))
 }
 
 @inline(never)
-public func highwayShiftedLeftByI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayShiftedLeftByI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.shiftedLeftByI32(
             a.raw,
@@ -118,26 +114,22 @@ public func highwayShiftedLeftByI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32
 }
 
 @inline(never)
-public func portShiftedRightByI32(_ a: SIMDInt32.Vector, by b: SIMDInt32.Vector) -> SIMDInt32.Vector
-{
+public func portShiftedRightByI32(_ a: SIMD<Int32>, by b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.shiftedRight(a, by: b)
 }
 
 @inline(never)
-public func highwayShiftedRightByI32(
-    _ a: SIMDInt32.Vector,
-    by b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func highwayShiftedRightByI32(_ a: SIMD<Int32>, by b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.shiftedRightByI32(a.raw, b.raw))
 }
 
 @inline(never)
-public func portShiftedRightByI32ConstantA(by b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portShiftedRightByI32ConstantA(by b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.shiftedRight(SIMDInt32.repeating(26), by: b)
 }
 
 @inline(never)
-public func highwayShiftedRightByI32ConstantA(by b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayShiftedRightByI32ConstantA(by b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.shiftedRightByI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
@@ -147,12 +139,12 @@ public func highwayShiftedRightByI32ConstantA(by b: SIMDInt32.Vector) -> SIMDInt
 }
 
 @inline(never)
-public func portShiftedRightByI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portShiftedRightByI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.shiftedRight(a, by: SIMDInt32.repeating(3))
 }
 
 @inline(never)
-public func highwayShiftedRightByI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayShiftedRightByI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.shiftedRightByI32(
             a.raw,
@@ -162,28 +154,22 @@ public func highwayShiftedRightByI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt3
 }
 
 @inline(never)
-public func portRoundingShiftedRightByI32(
-    _ a: SIMDInt32.Vector,
-    by b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func portRoundingShiftedRightByI32(_ a: SIMD<Int32>, by b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.roundingShiftedRight(a, by: b)
 }
 
 @inline(never)
-public func highwayRoundingShiftedRightByI32(
-    _ a: SIMDInt32.Vector,
-    by b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func highwayRoundingShiftedRightByI32(_ a: SIMD<Int32>, by b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.roundingShiftedRightByI32(a.raw, b.raw))
 }
 
 @inline(never)
-public func portRoundingShiftedRightByI32ConstantA(by b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portRoundingShiftedRightByI32ConstantA(by b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.roundingShiftedRight(SIMDInt32.repeating(26), by: b)
 }
 
 @inline(never)
-public func highwayRoundingShiftedRightByI32ConstantA(by b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayRoundingShiftedRightByI32ConstantA(by b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.roundingShiftedRightByI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
@@ -193,12 +179,12 @@ public func highwayRoundingShiftedRightByI32ConstantA(by b: SIMDInt32.Vector) ->
 }
 
 @inline(never)
-public func portRoundingShiftedRightByI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portRoundingShiftedRightByI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.roundingShiftedRight(a, by: SIMDInt32.repeating(3))
 }
 
 @inline(never)
-public func highwayRoundingShiftedRightByI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayRoundingShiftedRightByI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.roundingShiftedRightByI32(
             a.raw,
@@ -208,25 +194,22 @@ public func highwayRoundingShiftedRightByI32ConstantB(_ a: SIMDInt32.Vector) -> 
 }
 
 @inline(never)
-public func portRoundingShiftedRightI32(_ a: SIMDInt32.Vector, by bits: Int32) -> SIMDInt32.Vector {
+public func portRoundingShiftedRightI32(_ a: SIMD<Int32>, by bits: Int32) -> SIMD<Int32> {
     SIMDInt32.roundingShiftedRight(a, by: Int(bits))
 }
 
 @inline(never)
-public func highwayRoundingShiftedRightI32(
-    _ a: SIMDInt32.Vector,
-    by bits: Int32
-) -> SIMDInt32.Vector {
+public func highwayRoundingShiftedRightI32(_ a: SIMD<Int32>, by bits: Int32) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.roundingShiftedRightI32(a.raw, bits))
 }
 
 @inline(never)
-public func portRoundingShiftedRightI32ConstantA(by bits: Int32) -> SIMDInt32.Vector {
+public func portRoundingShiftedRightI32ConstantA(by bits: Int32) -> SIMD<Int32> {
     SIMDInt32.roundingShiftedRight(SIMDInt32.repeating(26), by: Int(bits))
 }
 
 @inline(never)
-public func highwayRoundingShiftedRightI32ConstantA(by bits: Int32) -> SIMDInt32.Vector {
+public func highwayRoundingShiftedRightI32ConstantA(by bits: Int32) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.roundingShiftedRightI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
@@ -236,36 +219,32 @@ public func highwayRoundingShiftedRightI32ConstantA(by bits: Int32) -> SIMDInt32
 }
 
 @inline(never)
-public func portRoundingShiftedRightI32ConstantBits(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portRoundingShiftedRightI32ConstantBits(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.roundingShiftedRight(a, by: 3)
 }
 
 @inline(never)
-public func highwayRoundingShiftedRightI32ConstantBits(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayRoundingShiftedRightI32ConstantBits(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.roundingShiftedRightTemplateI32(a.raw, 3))
 }
 
 @inline(never)
-public func portRotatedLeftByI32(_ a: SIMDInt32.Vector, by b: SIMDInt32.Vector) -> SIMDInt32.Vector
-{
+public func portRotatedLeftByI32(_ a: SIMD<Int32>, by b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.rotatedLeft(a, by: b)
 }
 
 @inline(never)
-public func highwayRotatedLeftByI32(
-    _ a: SIMDInt32.Vector,
-    by b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func highwayRotatedLeftByI32(_ a: SIMD<Int32>, by b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.rotatedLeftByI32(a.raw, b.raw))
 }
 
 @inline(never)
-public func portRotatedLeftByI32ConstantA(by b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portRotatedLeftByI32ConstantA(by b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.rotatedLeft(SIMDInt32.repeating(26), by: b)
 }
 
 @inline(never)
-public func highwayRotatedLeftByI32ConstantA(by b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayRotatedLeftByI32ConstantA(by b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.rotatedLeftByI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
@@ -275,12 +254,12 @@ public func highwayRotatedLeftByI32ConstantA(by b: SIMDInt32.Vector) -> SIMDInt3
 }
 
 @inline(never)
-public func portRotatedLeftByI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portRotatedLeftByI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.rotatedLeft(a, by: SIMDInt32.repeating(3))
 }
 
 @inline(never)
-public func highwayRotatedLeftByI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayRotatedLeftByI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.rotatedLeftByI32(
             a.raw,
@@ -290,26 +269,22 @@ public func highwayRotatedLeftByI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32
 }
 
 @inline(never)
-public func portRotatedRightByI32(_ a: SIMDInt32.Vector, by b: SIMDInt32.Vector) -> SIMDInt32.Vector
-{
+public func portRotatedRightByI32(_ a: SIMD<Int32>, by b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.rotatedRight(a, by: b)
 }
 
 @inline(never)
-public func highwayRotatedRightByI32(
-    _ a: SIMDInt32.Vector,
-    by b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func highwayRotatedRightByI32(_ a: SIMD<Int32>, by b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.rotatedRightByI32(a.raw, b.raw))
 }
 
 @inline(never)
-public func portRotatedRightByI32ConstantA(by b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portRotatedRightByI32ConstantA(by b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.rotatedRight(SIMDInt32.repeating(26), by: b)
 }
 
 @inline(never)
-public func highwayRotatedRightByI32ConstantA(by b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayRotatedRightByI32ConstantA(by b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.rotatedRightByI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
@@ -319,12 +294,12 @@ public func highwayRotatedRightByI32ConstantA(by b: SIMDInt32.Vector) -> SIMDInt
 }
 
 @inline(never)
-public func portRotatedRightByI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portRotatedRightByI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.rotatedRight(a, by: SIMDInt32.repeating(3))
 }
 
 @inline(never)
-public func highwayRotatedRightByI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayRotatedRightByI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.rotatedRightByI32(
             a.raw,
@@ -334,22 +309,22 @@ public func highwayRotatedRightByI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt3
 }
 
 @inline(never)
-public func portRotatedLeftI32(_ a: SIMDInt32.Vector, by bits: Int32) -> SIMDInt32.Vector {
+public func portRotatedLeftI32(_ a: SIMD<Int32>, by bits: Int32) -> SIMD<Int32> {
     SIMDInt32.rotatedLeft(a, by: Int(bits))
 }
 
 @inline(never)
-public func highwayRotatedLeftI32(_ a: SIMDInt32.Vector, by bits: Int32) -> SIMDInt32.Vector {
+public func highwayRotatedLeftI32(_ a: SIMD<Int32>, by bits: Int32) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.rotatedLeftI32(a.raw, bits))
 }
 
 @inline(never)
-public func portRotatedLeftI32ConstantA(by bits: Int32) -> SIMDInt32.Vector {
+public func portRotatedLeftI32ConstantA(by bits: Int32) -> SIMD<Int32> {
     SIMDInt32.rotatedLeft(SIMDInt32.repeating(26), by: Int(bits))
 }
 
 @inline(never)
-public func highwayRotatedLeftI32ConstantA(by bits: Int32) -> SIMDInt32.Vector {
+public func highwayRotatedLeftI32ConstantA(by bits: Int32) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.rotatedLeftI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
@@ -359,32 +334,32 @@ public func highwayRotatedLeftI32ConstantA(by bits: Int32) -> SIMDInt32.Vector {
 }
 
 @inline(never)
-public func portRotatedLeftI32ConstantBits(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portRotatedLeftI32ConstantBits(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.rotatedLeft(a, by: 3)
 }
 
 @inline(never)
-public func highwayRotatedLeftI32ConstantBits(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayRotatedLeftI32ConstantBits(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.rotatedLeftTemplateI32(a.raw, 3))
 }
 
 @inline(never)
-public func portRotatedRightI32(_ a: SIMDInt32.Vector, by bits: Int32) -> SIMDInt32.Vector {
+public func portRotatedRightI32(_ a: SIMD<Int32>, by bits: Int32) -> SIMD<Int32> {
     SIMDInt32.rotatedRight(a, by: Int(bits))
 }
 
 @inline(never)
-public func highwayRotatedRightI32(_ a: SIMDInt32.Vector, by bits: Int32) -> SIMDInt32.Vector {
+public func highwayRotatedRightI32(_ a: SIMD<Int32>, by bits: Int32) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.rotatedRightI32(a.raw, bits))
 }
 
 @inline(never)
-public func portRotatedRightI32ConstantA(by bits: Int32) -> SIMDInt32.Vector {
+public func portRotatedRightI32ConstantA(by bits: Int32) -> SIMD<Int32> {
     SIMDInt32.rotatedRight(SIMDInt32.repeating(26), by: Int(bits))
 }
 
 @inline(never)
-public func highwayRotatedRightI32ConstantA(by bits: Int32) -> SIMDInt32.Vector {
+public func highwayRotatedRightI32ConstantA(by bits: Int32) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.rotatedRightI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
@@ -394,11 +369,11 @@ public func highwayRotatedRightI32ConstantA(by bits: Int32) -> SIMDInt32.Vector 
 }
 
 @inline(never)
-public func portRotatedRightI32ConstantBits(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portRotatedRightI32ConstantBits(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.rotatedRight(a, by: 3)
 }
 
 @inline(never)
-public func highwayRotatedRightI32ConstantBits(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayRotatedRightI32ConstantBits(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.rotatedRightTemplateI32(a.raw, 3))
 }

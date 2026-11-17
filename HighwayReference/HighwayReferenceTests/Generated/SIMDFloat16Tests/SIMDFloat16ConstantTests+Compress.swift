@@ -18,7 +18,7 @@ extension SIMDFloat16ConstantTests {
         )
         for mask in maskInputs {
             let port = H.compressed(H.repeating(value), where: mask)
-            let reference = HighwayReference.compressedF16(H.repeating(value), mask.raw)
+            let reference = HighwayReference.compressedF16(H.repeating(value).raw, mask.raw)
             let checkedLanes =
                 HighwayReference.compressTailIsDeterministicF16() ? H.laneCount : H.trueCount(mask)
             mismatches.check(
@@ -117,7 +117,7 @@ extension SIMDFloat16ConstantTests {
         )
         for mask in maskInputs {
             let port = H.compressedNot(H.repeating(value), where: mask)
-            let reference = HighwayReference.compressedNotF16(H.repeating(value), mask.raw)
+            let reference = HighwayReference.compressedNotF16(H.repeating(value).raw, mask.raw)
             let checkedLanes =
                 HighwayReference.compressTailIsDeterministicF16()
                 ? H.laneCount : H.laneCount - H.trueCount(mask)
@@ -218,7 +218,7 @@ extension SIMDFloat16ConstantTests {
         for mask in maskInputs {
             mismatches.check(
                 H.partitioned(H.repeating(value), where: mask),
-                HighwayReference.partitionedF16(H.repeating(value), mask.raw),
+                HighwayReference.partitionedF16(H.repeating(value).raw, mask.raw),
                 "mask: \(describe(mask))"
             )
         }
@@ -323,7 +323,7 @@ extension SIMDFloat16ConstantTests {
             var referenceLanes = sentinel
             let referenceResult = referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeCompressedF16(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     mask.raw,
                     destination.baseAddress!
                 )
@@ -432,7 +432,7 @@ extension SIMDFloat16ConstantTests {
             var referenceLanes = sentinel
             let referenceResult = referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeCompressedBlendedF16(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     mask.raw,
                     destination.baseAddress!
                 )
@@ -538,7 +538,7 @@ extension SIMDFloat16ConstantTests {
                     unsafe H.compressed(H.repeating(value), bits: source.baseAddress!),
                     (bits + [UInt8](repeating: 0, count: 8)).withUnsafeBufferPointer { padded in
                         unsafe HighwayReference.compressedBitsF16(
-                            H.repeating(value),
+                            H.repeating(value).raw,
                             source.baseAddress!
                         )
                     }
@@ -663,7 +663,7 @@ extension SIMDFloat16ConstantTests {
                     referenceLanes.withUnsafeMutableBufferPointer { destination in
                         (bits + [UInt8](repeating: 0, count: 8)).withUnsafeBufferPointer { padded in
                             unsafe HighwayReference.storeCompressedBitsF16(
-                                H.repeating(value),
+                                H.repeating(value).raw,
                                 source.baseAddress!,
                                 destination.baseAddress!
                             )

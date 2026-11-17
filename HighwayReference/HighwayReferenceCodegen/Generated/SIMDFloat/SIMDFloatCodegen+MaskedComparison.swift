@@ -5,372 +5,374 @@ public import Vectorization
 
 @inline(never)
 public func portEqualToWhereF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.equalTo(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayEqualToWhereF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
-    SIMDFloat.Mask(raw: HighwayReference.Nothrow.equalToWhereF32(mask.raw, a, b))
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
+    SIMDFloat.Mask(raw: HighwayReference.Nothrow.equalToWhereF32(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portEqualToWhereF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.equalTo(SIMDFloat.repeating(1.5), b, where: mask)
 }
 
 @inline(never)
 public func highwayEqualToWhereF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.Mask(
         raw: HighwayReference.Nothrow.equalToWhereF32(
             mask.raw,
-            HighwayReference.Nothrow.repeatingF32(1.5),
-            b
+            HighwayReference.Nothrow.repeatingF32(1.5).raw,
+            b.raw
         )
     )
 }
 
 @inline(never)
 public func portEqualToWhereF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.equalTo(a, SIMDFloat.repeating(1.5), where: mask)
 }
 
 @inline(never)
 public func highwayEqualToWhereF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.Mask(
         raw: HighwayReference.Nothrow.equalToWhereF32(
             mask.raw,
-            a,
-            HighwayReference.Nothrow.repeatingF32(1.5)
+            a.raw,
+            HighwayReference.Nothrow.repeatingF32(1.5).raw
         )
     )
 }
 
 @inline(never)
 public func portNotEqualToWhereF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.notEqualTo(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayNotEqualToWhereF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
-    SIMDFloat.Mask(raw: HighwayReference.Nothrow.notEqualToWhereF32(mask.raw, a, b))
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
+    SIMDFloat.Mask(raw: HighwayReference.Nothrow.notEqualToWhereF32(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portNotEqualToWhereF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.notEqualTo(SIMDFloat.repeating(1.5), b, where: mask)
 }
 
 @inline(never)
 public func highwayNotEqualToWhereF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.Mask(
         raw: HighwayReference.Nothrow.notEqualToWhereF32(
             mask.raw,
-            HighwayReference.Nothrow.repeatingF32(1.5),
-            b
+            HighwayReference.Nothrow.repeatingF32(1.5).raw,
+            b.raw
         )
     )
 }
 
 @inline(never)
 public func portNotEqualToWhereF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.notEqualTo(a, SIMDFloat.repeating(1.5), where: mask)
 }
 
 @inline(never)
 public func highwayNotEqualToWhereF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.Mask(
         raw: HighwayReference.Nothrow.notEqualToWhereF32(
             mask.raw,
-            a,
-            HighwayReference.Nothrow.repeatingF32(1.5)
+            a.raw,
+            HighwayReference.Nothrow.repeatingF32(1.5).raw
         )
     )
 }
 
 @inline(never)
 public func portLessThanWhereF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.lessThan(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayLessThanWhereF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
-    SIMDFloat.Mask(raw: HighwayReference.Nothrow.lessThanWhereF32(mask.raw, a, b))
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
+    SIMDFloat.Mask(raw: HighwayReference.Nothrow.lessThanWhereF32(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portLessThanWhereF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.lessThan(SIMDFloat.repeating(1.5), b, where: mask)
 }
 
 @inline(never)
 public func highwayLessThanWhereF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.Mask(
         raw: HighwayReference.Nothrow.lessThanWhereF32(
             mask.raw,
-            HighwayReference.Nothrow.repeatingF32(1.5),
-            b
+            HighwayReference.Nothrow.repeatingF32(1.5).raw,
+            b.raw
         )
     )
 }
 
 @inline(never)
 public func portLessThanWhereF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.lessThan(a, SIMDFloat.repeating(1.5), where: mask)
 }
 
 @inline(never)
 public func highwayLessThanWhereF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.Mask(
         raw: HighwayReference.Nothrow.lessThanWhereF32(
             mask.raw,
-            a,
-            HighwayReference.Nothrow.repeatingF32(1.5)
+            a.raw,
+            HighwayReference.Nothrow.repeatingF32(1.5).raw
         )
     )
 }
 
 @inline(never)
 public func portGreaterThanWhereF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.greaterThan(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayGreaterThanWhereF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
-    SIMDFloat.Mask(raw: HighwayReference.Nothrow.greaterThanWhereF32(mask.raw, a, b))
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
+    SIMDFloat.Mask(raw: HighwayReference.Nothrow.greaterThanWhereF32(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portGreaterThanWhereF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.greaterThan(SIMDFloat.repeating(1.5), b, where: mask)
 }
 
 @inline(never)
 public func highwayGreaterThanWhereF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.Mask(
         raw: HighwayReference.Nothrow.greaterThanWhereF32(
             mask.raw,
-            HighwayReference.Nothrow.repeatingF32(1.5),
-            b
+            HighwayReference.Nothrow.repeatingF32(1.5).raw,
+            b.raw
         )
     )
 }
 
 @inline(never)
 public func portGreaterThanWhereF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.greaterThan(a, SIMDFloat.repeating(1.5), where: mask)
 }
 
 @inline(never)
 public func highwayGreaterThanWhereF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.Mask(
         raw: HighwayReference.Nothrow.greaterThanWhereF32(
             mask.raw,
-            a,
-            HighwayReference.Nothrow.repeatingF32(1.5)
+            a.raw,
+            HighwayReference.Nothrow.repeatingF32(1.5).raw
         )
     )
 }
 
 @inline(never)
 public func portLessThanOrEqualToWhereF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.lessThanOrEqualTo(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayLessThanOrEqualToWhereF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
-    SIMDFloat.Mask(raw: HighwayReference.Nothrow.lessThanOrEqualToWhereF32(mask.raw, a, b))
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
+    SIMDFloat.Mask(raw: HighwayReference.Nothrow.lessThanOrEqualToWhereF32(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portLessThanOrEqualToWhereF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.lessThanOrEqualTo(SIMDFloat.repeating(1.5), b, where: mask)
 }
 
 @inline(never)
 public func highwayLessThanOrEqualToWhereF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.Mask(
         raw: HighwayReference.Nothrow.lessThanOrEqualToWhereF32(
             mask.raw,
-            HighwayReference.Nothrow.repeatingF32(1.5),
-            b
+            HighwayReference.Nothrow.repeatingF32(1.5).raw,
+            b.raw
         )
     )
 }
 
 @inline(never)
 public func portLessThanOrEqualToWhereF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.lessThanOrEqualTo(a, SIMDFloat.repeating(1.5), where: mask)
 }
 
 @inline(never)
 public func highwayLessThanOrEqualToWhereF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.Mask(
         raw: HighwayReference.Nothrow.lessThanOrEqualToWhereF32(
             mask.raw,
-            a,
-            HighwayReference.Nothrow.repeatingF32(1.5)
+            a.raw,
+            HighwayReference.Nothrow.repeatingF32(1.5).raw
         )
     )
 }
 
 @inline(never)
 public func portGreaterThanOrEqualToWhereF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.greaterThanOrEqualTo(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayGreaterThanOrEqualToWhereF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
-    SIMDFloat.Mask(raw: HighwayReference.Nothrow.greaterThanOrEqualToWhereF32(mask.raw, a, b))
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
+    SIMDFloat.Mask(
+        raw: HighwayReference.Nothrow.greaterThanOrEqualToWhereF32(mask.raw, a.raw, b.raw)
+    )
 }
 
 @inline(never)
 public func portGreaterThanOrEqualToWhereF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.greaterThanOrEqualTo(SIMDFloat.repeating(1.5), b, where: mask)
 }
 
 @inline(never)
 public func highwayGreaterThanOrEqualToWhereF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.Mask(
         raw: HighwayReference.Nothrow.greaterThanOrEqualToWhereF32(
             mask.raw,
-            HighwayReference.Nothrow.repeatingF32(1.5),
-            b
+            HighwayReference.Nothrow.repeatingF32(1.5).raw,
+            b.raw
         )
     )
 }
 
 @inline(never)
 public func portGreaterThanOrEqualToWhereF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.greaterThanOrEqualTo(a, SIMDFloat.repeating(1.5), where: mask)
 }
 
 @inline(never)
 public func highwayGreaterThanOrEqualToWhereF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float>.Mask {
     SIMDFloat.Mask(
         raw: HighwayReference.Nothrow.greaterThanOrEqualToWhereF32(
             mask.raw,
-            a,
-            HighwayReference.Nothrow.repeatingF32(1.5)
+            a.raw,
+            HighwayReference.Nothrow.repeatingF32(1.5).raw
         )
     )
 }

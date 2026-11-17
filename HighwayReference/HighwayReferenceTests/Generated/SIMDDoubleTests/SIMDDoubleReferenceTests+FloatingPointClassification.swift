@@ -12,7 +12,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.isNaN(a),
-                H.Mask(raw: HighwayReference.isNaNF64(a)),
+                H.Mask(raw: HighwayReference.isNaNF64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -26,7 +26,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.isEitherNaN(a, b),
-                H.Mask(raw: HighwayReference.isEitherNaNF64(a, b)),
+                H.Mask(raw: HighwayReference.isEitherNaNF64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -39,7 +39,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.isInfinite(a),
-                H.Mask(raw: HighwayReference.isInfiniteF64(a)),
+                H.Mask(raw: HighwayReference.isInfiniteF64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -52,7 +52,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.isFinite(a),
-                H.Mask(raw: HighwayReference.isFiniteF64(a)),
+                H.Mask(raw: HighwayReference.isFiniteF64(a.raw)),
                 "a: \(describe(a))"
             )
         }

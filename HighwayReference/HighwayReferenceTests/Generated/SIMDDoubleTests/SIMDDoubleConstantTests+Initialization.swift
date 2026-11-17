@@ -17,7 +17,11 @@ extension SIMDDoubleConstantTests {
         for (mask, value) in everyPair(maskInputs, valueInputs) {
             mismatches.check(
                 H.repeating(value, where: mask, otherwise: H.repeating(value)),
-                HighwayReference.repeatingWhereOtherwiseF64(H.repeating(value), mask.raw, value),
+                HighwayReference.repeatingWhereOtherwiseF64(
+                    H.repeating(value).raw,
+                    mask.raw,
+                    value
+                ),
                 "mask: \(describe(mask)), value: \(hex(value))"
             )
         }

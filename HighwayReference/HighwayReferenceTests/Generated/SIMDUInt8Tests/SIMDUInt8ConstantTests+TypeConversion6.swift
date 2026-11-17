@@ -23,7 +23,7 @@ extension SIMDUInt8ConstantTests {
             H.eighthVector(zeroExtendingResizing: SIMDFloat16.repeating(value)),
             H.EighthVector(
                 raw: HighwayReference.eighthVectorZeroExtendingResizingF16ToU8(
-                    SIMDFloat16.repeating(value)
+                    SIMDFloat16.repeating(value).raw
                 )
             ),
             ""

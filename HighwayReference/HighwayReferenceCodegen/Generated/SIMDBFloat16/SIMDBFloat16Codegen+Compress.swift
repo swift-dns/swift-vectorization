@@ -6,14 +6,14 @@ public import Vectorization
 extension HighwayReferenceBFloat16 {
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
-    public static func compressed(_ a: Vector, bits span: Span<UInt8>) -> Vector {
+    public static func compressed(_ a: SIMD, bits span: Span<UInt8>) -> SIMD {
         precondition(span.count >= (laneCount + 7) / 8, "Span has fewer bytes than a mask has bits")
         return unsafe compressed(a, bitsUnchecked: span)
     }
 
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
-    public static func compressed(_ a: Vector, bitsUnchecked span: Span<UInt8>) -> Vector {
+    public static func compressed(_ a: SIMD, bitsUnchecked span: Span<UInt8>) -> SIMD {
         assert(span.count >= (laneCount + 7) / 8, "Span has fewer bytes than a mask has bits")
         return span.withUnsafeBufferPointer {
             unsafe SIMDBFloat16.Vector(
@@ -29,27 +29,27 @@ extension HighwayReferenceBFloat16 {
 
 @inline(never)
 public func portCompressedBF16(
-    _ a: SIMDBFloat16.Vector,
-    where mask: SIMDBFloat16.Mask
-) -> SIMDBFloat16.Vector {
+    _ a: SIMD<BFloat16>,
+    where mask: SIMD<BFloat16>.Mask
+) -> SIMD<BFloat16> {
     SIMDBFloat16.compressed(a, where: mask)
 }
 
 @inline(never)
 public func highwayCompressedBF16(
-    _ a: SIMDBFloat16.Vector,
-    where mask: SIMDBFloat16.Mask
-) -> SIMDBFloat16.Vector {
+    _ a: SIMD<BFloat16>,
+    where mask: SIMD<BFloat16>.Mask
+) -> SIMD<BFloat16> {
     SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.compressedBF16(a.raw, mask.raw))
 }
 
 @inline(never)
-public func portCompressedBF16ConstantA(where mask: SIMDBFloat16.Mask) -> SIMDBFloat16.Vector {
+public func portCompressedBF16ConstantA(where mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16> {
     SIMDBFloat16.compressed(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), where: mask)
 }
 
 @inline(never)
-public func highwayCompressedBF16ConstantA(where mask: SIMDBFloat16.Mask) -> SIMDBFloat16.Vector {
+public func highwayCompressedBF16ConstantA(where mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16> {
     SIMDBFloat16.Vector(
         raw: HighwayReference.Nothrow.compressedBF16(
             SIMDBFloat16.Vector(
@@ -62,28 +62,27 @@ public func highwayCompressedBF16ConstantA(where mask: SIMDBFloat16.Mask) -> SIM
 
 @inline(never)
 public func portCompressedNotBF16(
-    _ a: SIMDBFloat16.Vector,
-    where mask: SIMDBFloat16.Mask
-) -> SIMDBFloat16.Vector {
+    _ a: SIMD<BFloat16>,
+    where mask: SIMD<BFloat16>.Mask
+) -> SIMD<BFloat16> {
     SIMDBFloat16.compressedNot(a, where: mask)
 }
 
 @inline(never)
 public func highwayCompressedNotBF16(
-    _ a: SIMDBFloat16.Vector,
-    where mask: SIMDBFloat16.Mask
-) -> SIMDBFloat16.Vector {
+    _ a: SIMD<BFloat16>,
+    where mask: SIMD<BFloat16>.Mask
+) -> SIMD<BFloat16> {
     SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.compressedNotBF16(a.raw, mask.raw))
 }
 
 @inline(never)
-public func portCompressedNotBF16ConstantA(where mask: SIMDBFloat16.Mask) -> SIMDBFloat16.Vector {
+public func portCompressedNotBF16ConstantA(where mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16> {
     SIMDBFloat16.compressedNot(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), where: mask)
 }
 
 @inline(never)
-public func highwayCompressedNotBF16ConstantA(where mask: SIMDBFloat16.Mask) -> SIMDBFloat16.Vector
-{
+public func highwayCompressedNotBF16ConstantA(where mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16> {
     SIMDBFloat16.Vector(
         raw: HighwayReference.Nothrow.compressedNotBF16(
             SIMDBFloat16.Vector(
@@ -96,27 +95,27 @@ public func highwayCompressedNotBF16ConstantA(where mask: SIMDBFloat16.Mask) -> 
 
 @inline(never)
 public func portCompressedBitsBF16(
-    _ a: SIMDBFloat16.Vector,
+    _ a: SIMD<BFloat16>,
     bits: UnsafePointer<UInt8>
-) -> SIMDBFloat16.Vector {
+) -> SIMD<BFloat16> {
     unsafe SIMDBFloat16.compressed(a, bits: bits)
 }
 
 @inline(never)
 public func highwayCompressedBitsBF16(
-    _ a: SIMDBFloat16.Vector,
+    _ a: SIMD<BFloat16>,
     bits: UnsafePointer<UInt8>
-) -> SIMDBFloat16.Vector {
+) -> SIMD<BFloat16> {
     unsafe SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.compressedBitsBF16(a.raw, bits))
 }
 
 @inline(never)
-public func portCompressedBitsBF16ConstantA(bits: UnsafePointer<UInt8>) -> SIMDBFloat16.Vector {
+public func portCompressedBitsBF16ConstantA(bits: UnsafePointer<UInt8>) -> SIMD<BFloat16> {
     unsafe SIMDBFloat16.compressed(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), bits: bits)
 }
 
 @inline(never)
-public func highwayCompressedBitsBF16ConstantA(bits: UnsafePointer<UInt8>) -> SIMDBFloat16.Vector {
+public func highwayCompressedBitsBF16ConstantA(bits: UnsafePointer<UInt8>) -> SIMD<BFloat16> {
     unsafe SIMDBFloat16.Vector(
         raw: HighwayReference.Nothrow.compressedBitsBF16(
             SIMDBFloat16.Vector(

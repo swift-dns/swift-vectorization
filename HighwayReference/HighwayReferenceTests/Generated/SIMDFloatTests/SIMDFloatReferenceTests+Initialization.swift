@@ -100,7 +100,7 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.repeating(value, where: mask, otherwise: otherwise),
-                HighwayReference.repeatingWhereOtherwiseF32(otherwise, mask.raw, value),
+                HighwayReference.repeatingWhereOtherwiseF32(otherwise.raw, mask.raw, value),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), value: \(hex(value))"
             )
         }
@@ -120,7 +120,7 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.repeating(value, where: mask, otherwise: otherwise),
-                HighwayReference.repeatingWhereOtherwiseF32(otherwise, mask.raw, value),
+                HighwayReference.repeatingWhereOtherwiseF32(otherwise.raw, mask.raw, value),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), value: \(hex(value))"
             )
         }

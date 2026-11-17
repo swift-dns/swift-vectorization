@@ -3,12 +3,12 @@ import Vectorization
 
 @Suite("Carry-less multiply")
 struct CarrylessMultiplyTests {
-    typealias H = SIMDUInt64
+    typealias H = SIMD<UInt64>
     typealias Operands = (a: UInt64, b: UInt64)
 
     struct Operation {
         let name: String
-        let port: (H.Vector, H.Vector) -> H.Vector
+        let port: (H, H) -> H
         let operandLane: Int
     }
 

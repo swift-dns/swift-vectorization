@@ -4,22 +4,22 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portShiftedLeftI16(_ a: SIMDInt16.Vector, by bits: Int32) -> SIMDInt16.Vector {
+public func portShiftedLeftI16(_ a: SIMD<Int16>, by bits: Int32) -> SIMD<Int16> {
     SIMDInt16.shiftedLeft(a, by: Int(bits))
 }
 
 @inline(never)
-public func highwayShiftedLeftI16(_ a: SIMDInt16.Vector, by bits: Int32) -> SIMDInt16.Vector {
+public func highwayShiftedLeftI16(_ a: SIMD<Int16>, by bits: Int32) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.shiftedLeftI16(a.raw, bits))
 }
 
 @inline(never)
-public func portShiftedLeftI16ConstantA(by bits: Int32) -> SIMDInt16.Vector {
+public func portShiftedLeftI16ConstantA(by bits: Int32) -> SIMD<Int16> {
     SIMDInt16.shiftedLeft(SIMDInt16.repeating(26), by: Int(bits))
 }
 
 @inline(never)
-public func highwayShiftedLeftI16ConstantA(by bits: Int32) -> SIMDInt16.Vector {
+public func highwayShiftedLeftI16ConstantA(by bits: Int32) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.shiftedLeftI16(
             SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
@@ -29,32 +29,32 @@ public func highwayShiftedLeftI16ConstantA(by bits: Int32) -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func portShiftedLeftI16ConstantBits(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func portShiftedLeftI16ConstantBits(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.shiftedLeft(a, by: 3)
 }
 
 @inline(never)
-public func highwayShiftedLeftI16ConstantBits(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func highwayShiftedLeftI16ConstantBits(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.shiftedLeftTemplateI16(a.raw, 3))
 }
 
 @inline(never)
-public func portShiftedRightI16(_ a: SIMDInt16.Vector, by bits: Int32) -> SIMDInt16.Vector {
+public func portShiftedRightI16(_ a: SIMD<Int16>, by bits: Int32) -> SIMD<Int16> {
     SIMDInt16.shiftedRight(a, by: Int(bits))
 }
 
 @inline(never)
-public func highwayShiftedRightI16(_ a: SIMDInt16.Vector, by bits: Int32) -> SIMDInt16.Vector {
+public func highwayShiftedRightI16(_ a: SIMD<Int16>, by bits: Int32) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.shiftedRightI16(a.raw, bits))
 }
 
 @inline(never)
-public func portShiftedRightI16ConstantA(by bits: Int32) -> SIMDInt16.Vector {
+public func portShiftedRightI16ConstantA(by bits: Int32) -> SIMD<Int16> {
     SIMDInt16.shiftedRight(SIMDInt16.repeating(26), by: Int(bits))
 }
 
 @inline(never)
-public func highwayShiftedRightI16ConstantA(by bits: Int32) -> SIMDInt16.Vector {
+public func highwayShiftedRightI16ConstantA(by bits: Int32) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.shiftedRightI16(
             SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
@@ -64,36 +64,32 @@ public func highwayShiftedRightI16ConstantA(by bits: Int32) -> SIMDInt16.Vector 
 }
 
 @inline(never)
-public func portShiftedRightI16ConstantBits(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func portShiftedRightI16ConstantBits(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.shiftedRight(a, by: 3)
 }
 
 @inline(never)
-public func highwayShiftedRightI16ConstantBits(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func highwayShiftedRightI16ConstantBits(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.shiftedRightTemplateI16(a.raw, 3))
 }
 
 @inline(never)
-public func portShiftedLeftByI16(_ a: SIMDInt16.Vector, by b: SIMDInt16.Vector) -> SIMDInt16.Vector
-{
+public func portShiftedLeftByI16(_ a: SIMD<Int16>, by b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.shiftedLeft(a, by: b)
 }
 
 @inline(never)
-public func highwayShiftedLeftByI16(
-    _ a: SIMDInt16.Vector,
-    by b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+public func highwayShiftedLeftByI16(_ a: SIMD<Int16>, by b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.shiftedLeftByI16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portShiftedLeftByI16ConstantA(by b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func portShiftedLeftByI16ConstantA(by b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.shiftedLeft(SIMDInt16.repeating(26), by: b)
 }
 
 @inline(never)
-public func highwayShiftedLeftByI16ConstantA(by b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func highwayShiftedLeftByI16ConstantA(by b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.shiftedLeftByI16(
             SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
@@ -103,12 +99,12 @@ public func highwayShiftedLeftByI16ConstantA(by b: SIMDInt16.Vector) -> SIMDInt1
 }
 
 @inline(never)
-public func portShiftedLeftByI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func portShiftedLeftByI16ConstantB(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.shiftedLeft(a, by: SIMDInt16.repeating(3))
 }
 
 @inline(never)
-public func highwayShiftedLeftByI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func highwayShiftedLeftByI16ConstantB(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.shiftedLeftByI16(
             a.raw,
@@ -118,26 +114,22 @@ public func highwayShiftedLeftByI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16
 }
 
 @inline(never)
-public func portShiftedRightByI16(_ a: SIMDInt16.Vector, by b: SIMDInt16.Vector) -> SIMDInt16.Vector
-{
+public func portShiftedRightByI16(_ a: SIMD<Int16>, by b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.shiftedRight(a, by: b)
 }
 
 @inline(never)
-public func highwayShiftedRightByI16(
-    _ a: SIMDInt16.Vector,
-    by b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+public func highwayShiftedRightByI16(_ a: SIMD<Int16>, by b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.shiftedRightByI16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portShiftedRightByI16ConstantA(by b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func portShiftedRightByI16ConstantA(by b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.shiftedRight(SIMDInt16.repeating(26), by: b)
 }
 
 @inline(never)
-public func highwayShiftedRightByI16ConstantA(by b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func highwayShiftedRightByI16ConstantA(by b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.shiftedRightByI16(
             SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
@@ -147,12 +139,12 @@ public func highwayShiftedRightByI16ConstantA(by b: SIMDInt16.Vector) -> SIMDInt
 }
 
 @inline(never)
-public func portShiftedRightByI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func portShiftedRightByI16ConstantB(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.shiftedRight(a, by: SIMDInt16.repeating(3))
 }
 
 @inline(never)
-public func highwayShiftedRightByI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func highwayShiftedRightByI16ConstantB(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.shiftedRightByI16(
             a.raw,
@@ -162,28 +154,22 @@ public func highwayShiftedRightByI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt1
 }
 
 @inline(never)
-public func portRoundingShiftedRightByI16(
-    _ a: SIMDInt16.Vector,
-    by b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+public func portRoundingShiftedRightByI16(_ a: SIMD<Int16>, by b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.roundingShiftedRight(a, by: b)
 }
 
 @inline(never)
-public func highwayRoundingShiftedRightByI16(
-    _ a: SIMDInt16.Vector,
-    by b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+public func highwayRoundingShiftedRightByI16(_ a: SIMD<Int16>, by b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.roundingShiftedRightByI16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portRoundingShiftedRightByI16ConstantA(by b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func portRoundingShiftedRightByI16ConstantA(by b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.roundingShiftedRight(SIMDInt16.repeating(26), by: b)
 }
 
 @inline(never)
-public func highwayRoundingShiftedRightByI16ConstantA(by b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func highwayRoundingShiftedRightByI16ConstantA(by b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.roundingShiftedRightByI16(
             SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
@@ -193,12 +179,12 @@ public func highwayRoundingShiftedRightByI16ConstantA(by b: SIMDInt16.Vector) ->
 }
 
 @inline(never)
-public func portRoundingShiftedRightByI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func portRoundingShiftedRightByI16ConstantB(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.roundingShiftedRight(a, by: SIMDInt16.repeating(3))
 }
 
 @inline(never)
-public func highwayRoundingShiftedRightByI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func highwayRoundingShiftedRightByI16ConstantB(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.roundingShiftedRightByI16(
             a.raw,
@@ -208,25 +194,22 @@ public func highwayRoundingShiftedRightByI16ConstantB(_ a: SIMDInt16.Vector) -> 
 }
 
 @inline(never)
-public func portRoundingShiftedRightI16(_ a: SIMDInt16.Vector, by bits: Int32) -> SIMDInt16.Vector {
+public func portRoundingShiftedRightI16(_ a: SIMD<Int16>, by bits: Int32) -> SIMD<Int16> {
     SIMDInt16.roundingShiftedRight(a, by: Int(bits))
 }
 
 @inline(never)
-public func highwayRoundingShiftedRightI16(
-    _ a: SIMDInt16.Vector,
-    by bits: Int32
-) -> SIMDInt16.Vector {
+public func highwayRoundingShiftedRightI16(_ a: SIMD<Int16>, by bits: Int32) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.roundingShiftedRightI16(a.raw, bits))
 }
 
 @inline(never)
-public func portRoundingShiftedRightI16ConstantA(by bits: Int32) -> SIMDInt16.Vector {
+public func portRoundingShiftedRightI16ConstantA(by bits: Int32) -> SIMD<Int16> {
     SIMDInt16.roundingShiftedRight(SIMDInt16.repeating(26), by: Int(bits))
 }
 
 @inline(never)
-public func highwayRoundingShiftedRightI16ConstantA(by bits: Int32) -> SIMDInt16.Vector {
+public func highwayRoundingShiftedRightI16ConstantA(by bits: Int32) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.roundingShiftedRightI16(
             SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
@@ -236,36 +219,32 @@ public func highwayRoundingShiftedRightI16ConstantA(by bits: Int32) -> SIMDInt16
 }
 
 @inline(never)
-public func portRoundingShiftedRightI16ConstantBits(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func portRoundingShiftedRightI16ConstantBits(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.roundingShiftedRight(a, by: 3)
 }
 
 @inline(never)
-public func highwayRoundingShiftedRightI16ConstantBits(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func highwayRoundingShiftedRightI16ConstantBits(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.roundingShiftedRightTemplateI16(a.raw, 3))
 }
 
 @inline(never)
-public func portRotatedLeftByI16(_ a: SIMDInt16.Vector, by b: SIMDInt16.Vector) -> SIMDInt16.Vector
-{
+public func portRotatedLeftByI16(_ a: SIMD<Int16>, by b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.rotatedLeft(a, by: b)
 }
 
 @inline(never)
-public func highwayRotatedLeftByI16(
-    _ a: SIMDInt16.Vector,
-    by b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+public func highwayRotatedLeftByI16(_ a: SIMD<Int16>, by b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.rotatedLeftByI16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portRotatedLeftByI16ConstantA(by b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func portRotatedLeftByI16ConstantA(by b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.rotatedLeft(SIMDInt16.repeating(26), by: b)
 }
 
 @inline(never)
-public func highwayRotatedLeftByI16ConstantA(by b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func highwayRotatedLeftByI16ConstantA(by b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.rotatedLeftByI16(
             SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
@@ -275,12 +254,12 @@ public func highwayRotatedLeftByI16ConstantA(by b: SIMDInt16.Vector) -> SIMDInt1
 }
 
 @inline(never)
-public func portRotatedLeftByI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func portRotatedLeftByI16ConstantB(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.rotatedLeft(a, by: SIMDInt16.repeating(3))
 }
 
 @inline(never)
-public func highwayRotatedLeftByI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func highwayRotatedLeftByI16ConstantB(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.rotatedLeftByI16(
             a.raw,
@@ -290,26 +269,22 @@ public func highwayRotatedLeftByI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16
 }
 
 @inline(never)
-public func portRotatedRightByI16(_ a: SIMDInt16.Vector, by b: SIMDInt16.Vector) -> SIMDInt16.Vector
-{
+public func portRotatedRightByI16(_ a: SIMD<Int16>, by b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.rotatedRight(a, by: b)
 }
 
 @inline(never)
-public func highwayRotatedRightByI16(
-    _ a: SIMDInt16.Vector,
-    by b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
+public func highwayRotatedRightByI16(_ a: SIMD<Int16>, by b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.rotatedRightByI16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portRotatedRightByI16ConstantA(by b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func portRotatedRightByI16ConstantA(by b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.rotatedRight(SIMDInt16.repeating(26), by: b)
 }
 
 @inline(never)
-public func highwayRotatedRightByI16ConstantA(by b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func highwayRotatedRightByI16ConstantA(by b: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.rotatedRightByI16(
             SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
@@ -319,12 +294,12 @@ public func highwayRotatedRightByI16ConstantA(by b: SIMDInt16.Vector) -> SIMDInt
 }
 
 @inline(never)
-public func portRotatedRightByI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func portRotatedRightByI16ConstantB(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.rotatedRight(a, by: SIMDInt16.repeating(3))
 }
 
 @inline(never)
-public func highwayRotatedRightByI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func highwayRotatedRightByI16ConstantB(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.rotatedRightByI16(
             a.raw,
@@ -334,22 +309,22 @@ public func highwayRotatedRightByI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt1
 }
 
 @inline(never)
-public func portRotatedLeftI16(_ a: SIMDInt16.Vector, by bits: Int32) -> SIMDInt16.Vector {
+public func portRotatedLeftI16(_ a: SIMD<Int16>, by bits: Int32) -> SIMD<Int16> {
     SIMDInt16.rotatedLeft(a, by: Int(bits))
 }
 
 @inline(never)
-public func highwayRotatedLeftI16(_ a: SIMDInt16.Vector, by bits: Int32) -> SIMDInt16.Vector {
+public func highwayRotatedLeftI16(_ a: SIMD<Int16>, by bits: Int32) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.rotatedLeftI16(a.raw, bits))
 }
 
 @inline(never)
-public func portRotatedLeftI16ConstantA(by bits: Int32) -> SIMDInt16.Vector {
+public func portRotatedLeftI16ConstantA(by bits: Int32) -> SIMD<Int16> {
     SIMDInt16.rotatedLeft(SIMDInt16.repeating(26), by: Int(bits))
 }
 
 @inline(never)
-public func highwayRotatedLeftI16ConstantA(by bits: Int32) -> SIMDInt16.Vector {
+public func highwayRotatedLeftI16ConstantA(by bits: Int32) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.rotatedLeftI16(
             SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
@@ -359,32 +334,32 @@ public func highwayRotatedLeftI16ConstantA(by bits: Int32) -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func portRotatedLeftI16ConstantBits(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func portRotatedLeftI16ConstantBits(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.rotatedLeft(a, by: 3)
 }
 
 @inline(never)
-public func highwayRotatedLeftI16ConstantBits(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func highwayRotatedLeftI16ConstantBits(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.rotatedLeftTemplateI16(a.raw, 3))
 }
 
 @inline(never)
-public func portRotatedRightI16(_ a: SIMDInt16.Vector, by bits: Int32) -> SIMDInt16.Vector {
+public func portRotatedRightI16(_ a: SIMD<Int16>, by bits: Int32) -> SIMD<Int16> {
     SIMDInt16.rotatedRight(a, by: Int(bits))
 }
 
 @inline(never)
-public func highwayRotatedRightI16(_ a: SIMDInt16.Vector, by bits: Int32) -> SIMDInt16.Vector {
+public func highwayRotatedRightI16(_ a: SIMD<Int16>, by bits: Int32) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.rotatedRightI16(a.raw, bits))
 }
 
 @inline(never)
-public func portRotatedRightI16ConstantA(by bits: Int32) -> SIMDInt16.Vector {
+public func portRotatedRightI16ConstantA(by bits: Int32) -> SIMD<Int16> {
     SIMDInt16.rotatedRight(SIMDInt16.repeating(26), by: Int(bits))
 }
 
 @inline(never)
-public func highwayRotatedRightI16ConstantA(by bits: Int32) -> SIMDInt16.Vector {
+public func highwayRotatedRightI16ConstantA(by bits: Int32) -> SIMD<Int16> {
     SIMDInt16.Vector(
         raw: HighwayReference.Nothrow.rotatedRightI16(
             SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
@@ -394,11 +369,11 @@ public func highwayRotatedRightI16ConstantA(by bits: Int32) -> SIMDInt16.Vector 
 }
 
 @inline(never)
-public func portRotatedRightI16ConstantBits(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func portRotatedRightI16ConstantBits(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.rotatedRight(a, by: 3)
 }
 
 @inline(never)
-public func highwayRotatedRightI16ConstantBits(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+public func highwayRotatedRightI16ConstantBits(_ a: SIMD<Int16>) -> SIMD<Int16> {
     SIMDInt16.Vector(raw: HighwayReference.Nothrow.rotatedRightTemplateI16(a.raw, 3))
 }

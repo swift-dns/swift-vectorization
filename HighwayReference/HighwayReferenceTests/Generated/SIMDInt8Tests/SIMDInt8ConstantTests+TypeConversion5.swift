@@ -21,7 +21,7 @@ extension SIMDInt8ConstantTests {
             H.quarterVector(zeroExtendingResizing: SIMDFloat.repeating(value)),
             H.QuarterVector(
                 raw: HighwayReference.quarterVectorZeroExtendingResizingF32ToI8(
-                    SIMDFloat.repeating(value)
+                    SIMDFloat.repeating(value).raw
                 )
             ),
             ""
@@ -121,7 +121,7 @@ extension SIMDInt8ConstantTests {
             H.eighthVector(zeroExtendingResizing: SIMDFloat.repeating(value)),
             H.EighthVector(
                 raw: HighwayReference.eighthVectorZeroExtendingResizingF32ToI8(
-                    SIMDFloat.repeating(value)
+                    SIMDFloat.repeating(value).raw
                 )
             ),
             ""
@@ -221,7 +221,7 @@ extension SIMDInt8ConstantTests {
             H.vector(zeroExtendingResizing: SIMDDouble.repeating(value)),
             H.Vector(
                 raw: HighwayReference.vectorZeroExtendingResizingF64ToI8(
-                    SIMDDouble.repeating(value)
+                    SIMDDouble.repeating(value).raw
                 )
             ),
             ""
@@ -321,7 +321,7 @@ extension SIMDInt8ConstantTests {
             H.halfVector(zeroExtendingResizing: SIMDDouble.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorZeroExtendingResizingF64ToI8(
-                    SIMDDouble.repeating(value)
+                    SIMDDouble.repeating(value).raw
                 )
             ),
             ""
@@ -423,7 +423,7 @@ extension SIMDInt8ConstantTests {
             H.quarterVector(zeroExtendingResizing: SIMDDouble.repeating(value)),
             H.QuarterVector(
                 raw: HighwayReference.quarterVectorZeroExtendingResizingF64ToI8(
-                    SIMDDouble.repeating(value)
+                    SIMDDouble.repeating(value).raw
                 )
             ),
             ""
@@ -524,7 +524,7 @@ extension SIMDInt8ConstantTests {
             H.eighthVector(zeroExtendingResizing: SIMDDouble.repeating(value)),
             H.EighthVector(
                 raw: HighwayReference.eighthVectorZeroExtendingResizingF64ToI8(
-                    SIMDDouble.repeating(value)
+                    SIMDDouble.repeating(value).raw
                 )
             ),
             ""
@@ -625,7 +625,7 @@ extension SIMDInt8ConstantTests {
             H.vector(zeroExtendingResizing: SIMDFloat16.repeating(value)),
             H.Vector(
                 raw: HighwayReference.vectorZeroExtendingResizingF16ToI8(
-                    SIMDFloat16.repeating(value)
+                    SIMDFloat16.repeating(value).raw
                 )
             ),
             ""
@@ -766,7 +766,7 @@ extension SIMDInt8ConstantTests {
             H.halfVector(zeroExtendingResizing: SIMDFloat16.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorZeroExtendingResizingF16ToI8(
-                    SIMDFloat16.repeating(value)
+                    SIMDFloat16.repeating(value).raw
                 )
             ),
             ""
@@ -908,7 +908,7 @@ extension SIMDInt8ConstantTests {
             H.quarterVector(zeroExtendingResizing: SIMDFloat16.repeating(value)),
             H.QuarterVector(
                 raw: HighwayReference.quarterVectorZeroExtendingResizingF16ToI8(
-                    SIMDFloat16.repeating(value)
+                    SIMDFloat16.repeating(value).raw
                 )
             ),
             ""
@@ -1050,7 +1050,7 @@ extension SIMDInt8ConstantTests {
             H.eighthVector(zeroExtendingResizing: SIMDFloat16.repeating(value)),
             H.EighthVector(
                 raw: HighwayReference.eighthVectorZeroExtendingResizingF16ToI8(
-                    SIMDFloat16.repeating(value)
+                    SIMDFloat16.repeating(value).raw
                 )
             ),
             ""

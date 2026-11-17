@@ -17,7 +17,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.reversed(H.repeating(value)),
-            HighwayReference.reversedF16(H.repeating(value)),
+            HighwayReference.reversedF16(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -109,7 +109,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.byteSwapped(H.repeating(value)),
-            HighwayReference.byteSwappedF16(H.repeating(value)),
+            HighwayReference.byteSwappedF16(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -201,7 +201,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.reversedBlocks(H.repeating(value)),
-            HighwayReference.reversedBlocksF16(H.repeating(value)),
+            HighwayReference.reversedBlocksF16(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -293,7 +293,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.reversed2(H.repeating(value)),
-            HighwayReference.reversed2F16(H.repeating(value)),
+            HighwayReference.reversed2F16(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -385,7 +385,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.reversed4(H.repeating(value)),
-            HighwayReference.reversed4F16(H.repeating(value)),
+            HighwayReference.reversed4F16(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -477,7 +477,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.reversed8(H.repeating(value)),
-            HighwayReference.reversed8F16(H.repeating(value)),
+            HighwayReference.reversed8F16(H.repeating(value).raw),
             ""
         )
         mismatches.record()

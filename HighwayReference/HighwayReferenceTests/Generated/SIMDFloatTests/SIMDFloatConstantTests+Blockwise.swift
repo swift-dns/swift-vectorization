@@ -20,7 +20,7 @@ extension SIMDFloatConstantTests {
         for indices in indicesInputs {
             mismatches.check(
                 H.tableLookupBytes(H.repeating(value), at: indices),
-                HighwayReference.tableLookupBytesF32(H.repeating(value), indices),
+                HighwayReference.tableLookupBytesF32(H.repeating(value).raw, indices.raw),
                 "indices: \(describe(indices))"
             )
         }
@@ -118,7 +118,7 @@ extension SIMDFloatConstantTests {
         for indices in indicesInputs {
             mismatches.check(
                 H.tableLookupBytesOrZero(H.repeating(value), at: indices),
-                HighwayReference.tableLookupBytesOrZeroF32(H.repeating(value), indices),
+                HighwayReference.tableLookupBytesOrZeroF32(H.repeating(value).raw, indices.raw),
                 "indices: \(describe(indices))"
             )
         }
@@ -209,7 +209,7 @@ extension SIMDFloatConstantTests {
         for b in bInputs where !hasUnorderedNaNs(adjacentLanesOf: H.repeating(value), b) {
             mismatches.check(
                 H.pairwiseAddingBlocks(H.repeating(value), b),
-                HighwayReference.pairwiseAddingBlocksF32(H.repeating(value), b),
+                HighwayReference.pairwiseAddingBlocksF32(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -224,7 +224,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs where !hasUnorderedNaNs(adjacentLanesOf: a, H.repeating(value)) {
             mismatches.check(
                 H.pairwiseAddingBlocks(a, H.repeating(value)),
-                HighwayReference.pairwiseAddingBlocksF32(a, H.repeating(value)),
+                HighwayReference.pairwiseAddingBlocksF32(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -341,7 +341,10 @@ extension SIMDFloatConstantTests {
         where !hasUnorderedNaNs(adjacentLanesOf: H.repeatingBlock(even, odd, even, odd), b) {
             mismatches.check(
                 H.pairwiseAddingBlocks(H.repeatingBlock(even, odd, even, odd), b),
-                HighwayReference.pairwiseAddingBlocksF32(H.repeatingBlock(even, odd, even, odd), b),
+                HighwayReference.pairwiseAddingBlocksF32(
+                    H.repeatingBlock(even, odd, even, odd).raw,
+                    b.raw
+                ),
                 "b: \(describe(b))"
             )
         }
@@ -375,7 +378,10 @@ extension SIMDFloatConstantTests {
         where !hasUnorderedNaNs(adjacentLanesOf: a, H.repeatingBlock(even, odd, even, odd)) {
             mismatches.check(
                 H.pairwiseAddingBlocks(a, H.repeatingBlock(even, odd, even, odd)),
-                HighwayReference.pairwiseAddingBlocksF32(a, H.repeatingBlock(even, odd, even, odd)),
+                HighwayReference.pairwiseAddingBlocksF32(
+                    a.raw,
+                    H.repeatingBlock(even, odd, even, odd).raw
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -402,7 +408,7 @@ extension SIMDFloatConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.pairwiseSubtractingBlocks(H.repeating(value), b),
-                HighwayReference.pairwiseSubtractingBlocksF32(H.repeating(value), b),
+                HighwayReference.pairwiseSubtractingBlocksF32(H.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -417,7 +423,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.pairwiseSubtractingBlocks(a, H.repeating(value)),
-                HighwayReference.pairwiseSubtractingBlocksF32(a, H.repeating(value)),
+                HighwayReference.pairwiseSubtractingBlocksF32(a.raw, H.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }
@@ -526,7 +532,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.broadcastingInBlocks(a, lane: lane),
-                HighwayReference.broadcastingInBlocksF32(a, Int32(truncatingIfNeeded: lane)),
+                HighwayReference.broadcastingInBlocksF32(a.raw, Int32(truncatingIfNeeded: lane)),
                 "a: \(describe(a))"
             )
         }
@@ -556,7 +562,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 unsafe H.broadcastingInBlocks(a, laneUnchecked: lane),
-                HighwayReference.broadcastingInBlocksF32(a, Int32(truncatingIfNeeded: lane)),
+                HighwayReference.broadcastingInBlocksF32(a.raw, Int32(truncatingIfNeeded: lane)),
                 "a: \(describe(a))"
             )
         }
@@ -588,7 +594,7 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.broadcastingInBlocks(H.repeating(value), lane: lane),
                 HighwayReference.broadcastingInBlocksF32(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: lane)
                 ),
                 "lane: \(lane)"

@@ -223,7 +223,7 @@ extension SIMDUInt32ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.biasedExponent(a),
-                H.Vector(raw: HighwayReference.biasedExponentF32ToU32(a)),
+                H.Vector(raw: HighwayReference.biasedExponentF32ToU32(a.raw)),
                 "a: \(describe(a))"
             )
         }

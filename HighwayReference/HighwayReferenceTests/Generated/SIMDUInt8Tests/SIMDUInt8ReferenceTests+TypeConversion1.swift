@@ -103,7 +103,7 @@ extension SIMDUInt8ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(bitPattern: a),
-                H.Vector(raw: HighwayReference.vectorBitPatternF32ToU8(a)),
+                H.Vector(raw: HighwayReference.vectorBitPatternF32ToU8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -116,7 +116,7 @@ extension SIMDUInt8ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(bitPattern: a),
-                H.Vector(raw: HighwayReference.vectorBitPatternF64ToU8(a)),
+                H.Vector(raw: HighwayReference.vectorBitPatternF64ToU8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -130,7 +130,7 @@ extension SIMDUInt8ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(bitPattern: a),
-                H.Vector(raw: HighwayReference.vectorBitPatternF16ToU8(a)),
+                H.Vector(raw: HighwayReference.vectorBitPatternF16ToU8(a.raw)),
                 "a: \(describe(a))"
             )
         }

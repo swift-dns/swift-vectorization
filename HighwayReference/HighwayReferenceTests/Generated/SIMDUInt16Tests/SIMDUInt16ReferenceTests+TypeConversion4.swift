@@ -88,7 +88,7 @@ extension SIMDUInt16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(zeroExtendingResizing: a),
-                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF32ToU16(a)),
+                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF32ToU16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -101,7 +101,7 @@ extension SIMDUInt16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.halfVector(zeroExtendingResizing: a),
-                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF32ToU16(a)),
+                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF32ToU16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -119,7 +119,9 @@ extension SIMDUInt16ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(zeroExtendingResizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF32ToU16(a)),
+                H.Vector(
+                    raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF32ToU16(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -133,7 +135,7 @@ extension SIMDUInt16ReferenceTests {
             mismatches.check(
                 H.quarterVector(zeroExtendingResizing: a),
                 H.QuarterVector(
-                    raw: HighwayReference.quarterVectorZeroExtendingResizingF32ToU16(a)
+                    raw: HighwayReference.quarterVectorZeroExtendingResizingF32ToU16(a.raw)
                 ),
                 "a: \(describe(a))"
             )
@@ -153,7 +155,7 @@ extension SIMDUInt16ReferenceTests {
                     H.vector(resizing: H.quarterVector(zeroExtendingResizing: a))
                 ),
                 H.Vector(
-                    raw: HighwayReference.resizedQuarterVectorZeroExtendingResizingF32ToU16(a)
+                    raw: HighwayReference.resizedQuarterVectorZeroExtendingResizingF32ToU16(a.raw)
                 ),
                 "a: \(describe(a))"
             )
@@ -257,7 +259,7 @@ extension SIMDUInt16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(zeroExtendingResizing: a),
-                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF64ToU16(a)),
+                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF64ToU16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -270,7 +272,7 @@ extension SIMDUInt16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.halfVector(zeroExtendingResizing: a),
-                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF64ToU16(a)),
+                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF64ToU16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -288,7 +290,9 @@ extension SIMDUInt16ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(zeroExtendingResizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF64ToU16(a)),
+                H.Vector(
+                    raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF64ToU16(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -302,7 +306,7 @@ extension SIMDUInt16ReferenceTests {
             mismatches.check(
                 H.quarterVector(zeroExtendingResizing: a),
                 H.QuarterVector(
-                    raw: HighwayReference.quarterVectorZeroExtendingResizingF64ToU16(a)
+                    raw: HighwayReference.quarterVectorZeroExtendingResizingF64ToU16(a.raw)
                 ),
                 "a: \(describe(a))"
             )
@@ -322,7 +326,7 @@ extension SIMDUInt16ReferenceTests {
                     H.vector(resizing: H.quarterVector(zeroExtendingResizing: a))
                 ),
                 H.Vector(
-                    raw: HighwayReference.resizedQuarterVectorZeroExtendingResizingF64ToU16(a)
+                    raw: HighwayReference.resizedQuarterVectorZeroExtendingResizingF64ToU16(a.raw)
                 ),
                 "a: \(describe(a))"
             )
@@ -427,7 +431,7 @@ extension SIMDUInt16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(zeroExtendingResizing: a),
-                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF16ToU16(a)),
+                H.Vector(raw: HighwayReference.vectorZeroExtendingResizingF16ToU16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -442,7 +446,7 @@ extension SIMDUInt16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.halfVector(zeroExtendingResizing: a),
-                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF16ToU16(a)),
+                H.HalfVector(raw: HighwayReference.halfVectorZeroExtendingResizingF16ToU16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -462,7 +466,9 @@ extension SIMDUInt16ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(zeroExtendingResizing: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF16ToU16(a)),
+                H.Vector(
+                    raw: HighwayReference.resizedHalfVectorZeroExtendingResizingF16ToU16(a.raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -478,7 +484,7 @@ extension SIMDUInt16ReferenceTests {
             mismatches.check(
                 H.quarterVector(zeroExtendingResizing: a),
                 H.QuarterVector(
-                    raw: HighwayReference.quarterVectorZeroExtendingResizingF16ToU16(a)
+                    raw: HighwayReference.quarterVectorZeroExtendingResizingF16ToU16(a.raw)
                 ),
                 "a: \(describe(a))"
             )
@@ -500,7 +506,7 @@ extension SIMDUInt16ReferenceTests {
                     H.vector(resizing: H.quarterVector(zeroExtendingResizing: a))
                 ),
                 H.Vector(
-                    raw: HighwayReference.resizedQuarterVectorZeroExtendingResizingF16ToU16(a)
+                    raw: HighwayReference.resizedQuarterVectorZeroExtendingResizingF16ToU16(a.raw)
                 ),
                 "a: \(describe(a))"
             )
@@ -1001,7 +1007,7 @@ extension SIMDUInt16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(converting: a),
-                H.Vector(raw: HighwayReference.vectorConvertingF16ToU16(a)),
+                H.Vector(raw: HighwayReference.vectorConvertingF16ToU16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -1016,7 +1022,7 @@ extension SIMDUInt16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(convertingInRange: a),
-                H.Vector(raw: HighwayReference.vectorConvertingInRangeF16ToU16(a)),
+                H.Vector(raw: HighwayReference.vectorConvertingInRangeF16ToU16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -1032,7 +1038,7 @@ extension SIMDUInt16ReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.vector(converting: a, where: mask),
-                H.Vector(raw: HighwayReference.vectorConvertingWhereF16ToU16(mask.raw, a)),
+                H.Vector(raw: HighwayReference.vectorConvertingWhereF16ToU16(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -1050,7 +1056,7 @@ extension SIMDUInt16ReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.vector(converting: a, where: mask),
-                H.Vector(raw: HighwayReference.vectorConvertingWhereF16ToU16(mask.raw, a)),
+                H.Vector(raw: HighwayReference.vectorConvertingWhereF16ToU16(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }

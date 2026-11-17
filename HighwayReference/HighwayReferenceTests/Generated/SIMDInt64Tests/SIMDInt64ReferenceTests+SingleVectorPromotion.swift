@@ -38,7 +38,7 @@ extension SIMDInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningLower: a),
-                H.Vector(raw: HighwayReference.vectorWideningLowerF32ToI64(a)),
+                H.Vector(raw: HighwayReference.vectorWideningLowerF32ToI64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -77,7 +77,7 @@ extension SIMDInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningUpper: a),
-                H.Vector(raw: HighwayReference.vectorWideningUpperF32ToI64(a)),
+                H.Vector(raw: HighwayReference.vectorWideningUpperF32ToI64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -90,7 +90,7 @@ extension SIMDInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningLowerInRange: a),
-                H.Vector(raw: HighwayReference.vectorWideningLowerInRangeF32ToI64(a)),
+                H.Vector(raw: HighwayReference.vectorWideningLowerInRangeF32ToI64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -103,7 +103,7 @@ extension SIMDInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningUpperInRange: a),
-                H.Vector(raw: HighwayReference.vectorWideningUpperInRangeF32ToI64(a)),
+                H.Vector(raw: HighwayReference.vectorWideningUpperInRangeF32ToI64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -142,7 +142,7 @@ extension SIMDInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningEven: a),
-                H.Vector(raw: HighwayReference.vectorWideningEvenF32ToI64(a)),
+                H.Vector(raw: HighwayReference.vectorWideningEvenF32ToI64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -181,7 +181,7 @@ extension SIMDInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningOdd: a),
-                H.Vector(raw: HighwayReference.vectorWideningOddF32ToI64(a)),
+                H.Vector(raw: HighwayReference.vectorWideningOddF32ToI64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -194,7 +194,7 @@ extension SIMDInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningEvenInRange: a),
-                H.Vector(raw: HighwayReference.vectorWideningEvenInRangeF32ToI64(a)),
+                H.Vector(raw: HighwayReference.vectorWideningEvenInRangeF32ToI64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -207,7 +207,7 @@ extension SIMDInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(wideningOddInRange: a),
-                H.Vector(raw: HighwayReference.vectorWideningOddInRangeF32ToI64(a)),
+                H.Vector(raw: HighwayReference.vectorWideningOddInRangeF32ToI64(a.raw)),
                 "a: \(describe(a))"
             )
         }

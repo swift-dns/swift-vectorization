@@ -15,7 +15,7 @@ extension SIMDFloatConstantTests {
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 H.selecting(mask, H.repeating(value), b),
-                HighwayReference.selectingF32(mask.raw, H.repeating(value), b),
+                HighwayReference.selectingF32(mask.raw, H.repeating(value).raw, b.raw),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -31,7 +31,7 @@ extension SIMDFloatConstantTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.selecting(mask, a, H.repeating(value)),
-                HighwayReference.selectingF32(mask.raw, a, H.repeating(value)),
+                HighwayReference.selectingF32(mask.raw, a.raw, H.repeating(value).raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -141,7 +141,7 @@ extension SIMDFloatConstantTests {
         for mask in maskInputs {
             mismatches.check(
                 H.selectingOrZero(mask, H.repeating(value)),
-                HighwayReference.selectingOrZeroF32(mask.raw, H.repeating(value)),
+                HighwayReference.selectingOrZeroF32(mask.raw, H.repeating(value).raw),
                 "mask: \(describe(mask))"
             )
         }
@@ -232,7 +232,7 @@ extension SIMDFloatConstantTests {
         for mask in maskInputs {
             mismatches.check(
                 H.zeroingSelected(mask, H.repeating(value)),
-                HighwayReference.zeroingSelectedF32(mask.raw, H.repeating(value)),
+                HighwayReference.zeroingSelectedF32(mask.raw, H.repeating(value).raw),
                 "mask: \(describe(mask))"
             )
         }
@@ -324,7 +324,7 @@ extension SIMDFloatConstantTests {
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 H.selecting(H.repeating(value), b, c),
-                HighwayReference.selectingByVectorF32(H.repeating(value), b, c),
+                HighwayReference.selectingByVectorF32(H.repeating(value).raw, b.raw, c.raw),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -340,7 +340,7 @@ extension SIMDFloatConstantTests {
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 H.selecting(a, H.repeating(value), c),
-                HighwayReference.selectingByVectorF32(a, H.repeating(value), c),
+                HighwayReference.selectingByVectorF32(a.raw, H.repeating(value).raw, c.raw),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -356,7 +356,7 @@ extension SIMDFloatConstantTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.selecting(a, b, H.repeating(value)),
-                HighwayReference.selectingByVectorF32(a, b, H.repeating(value)),
+                HighwayReference.selectingByVectorF32(a.raw, b.raw, H.repeating(value).raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

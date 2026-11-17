@@ -6,14 +6,14 @@ public import Vectorization
 extension HighwayReferenceFloat {
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
-    public static func loadExpanded(from span: Span<Lane>, where mask: Mask) -> Vector {
+    public static func loadExpanded(from span: Span<Lane>, where mask: Mask) -> SIMD {
         precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return unsafe loadExpanded(fromUnchecked: span, where: mask)
     }
 
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
-    public static func loadExpanded(fromUnchecked span: Span<Lane>, where mask: Mask) -> Vector {
+    public static func loadExpanded(fromUnchecked span: Span<Lane>, where mask: Mask) -> SIMD {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return span.withUnsafeBufferPointer {
             unsafe HighwayReference.Nothrow.loadExpandedWhereF32(
@@ -28,8 +28,8 @@ extension HighwayReferenceFloat {
     public static func loadExpanded(
         from span: Span<Lane>,
         where mask: Mask,
-        otherwise: Vector
-    ) -> Vector {
+        otherwise: SIMD
+    ) -> SIMD {
         precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return unsafe loadExpanded(fromUnchecked: span, where: mask, otherwise: otherwise)
     }
@@ -39,12 +39,12 @@ extension HighwayReferenceFloat {
     public static func loadExpanded(
         fromUnchecked span: Span<Lane>,
         where mask: Mask,
-        otherwise: Vector
-    ) -> Vector {
+        otherwise: SIMD
+    ) -> SIMD {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return span.withUnsafeBufferPointer {
             unsafe HighwayReference.Nothrow.loadExpandedWhereOtherwiseF32(
-                otherwise,
+                otherwise.raw,
                 mask.raw,
                 $0.baseAddress.unsafelyUnwrapped
             )
@@ -54,77 +54,74 @@ extension HighwayReferenceFloat {
 }
 
 @inline(never)
-public func portExpandedF32(_ a: SIMDFloat.Vector, where mask: SIMDFloat.Mask) -> SIMDFloat.Vector {
+public func portExpandedF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mask) -> SIMD<Float> {
     SIMDFloat.expanded(a, where: mask)
 }
 
 @inline(never)
-public func highwayExpandedF32(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.expandedF32(a, mask.raw)
+public func highwayExpandedF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mask) -> SIMD<Float> {
+    HighwayReference.Nothrow.expandedF32(a.raw, mask.raw)
 }
 
 @inline(never)
-public func portExpandedF32ConstantA(where mask: SIMDFloat.Mask) -> SIMDFloat.Vector {
+public func portExpandedF32ConstantA(where mask: SIMD<Float>.Mask) -> SIMD<Float> {
     SIMDFloat.expanded(SIMDFloat.repeating(1.5), where: mask)
 }
 
 @inline(never)
-public func highwayExpandedF32ConstantA(where mask: SIMDFloat.Mask) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.expandedF32(HighwayReference.Nothrow.repeatingF32(1.5), mask.raw)
+public func highwayExpandedF32ConstantA(where mask: SIMD<Float>.Mask) -> SIMD<Float> {
+    HighwayReference.Nothrow.expandedF32(HighwayReference.Nothrow.repeatingF32(1.5).raw, mask.raw)
 }
 
 @inline(never)
 public func portLoadExpandedWhereF32(
-    from: UnsafePointer<SIMDFloat.Lane>,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    from: UnsafePointer<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     unsafe SIMDFloat.loadExpanded(from: from, where: mask)
 }
 
 @inline(never)
 public func highwayLoadExpandedWhereF32(
     from: UnsafePointer<Float>,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     unsafe HighwayReference.Nothrow.loadExpandedWhereF32(mask.raw, from)
 }
 
 @inline(never)
 public func portLoadExpandedWhereOtherwiseF32(
-    from: UnsafePointer<SIMDFloat.Lane>,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    from: UnsafePointer<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
     unsafe SIMDFloat.loadExpanded(from: from, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayLoadExpandedWhereOtherwiseF32(
     from: UnsafePointer<Float>,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    unsafe HighwayReference.Nothrow.loadExpandedWhereOtherwiseF32(otherwise, mask.raw, from)
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
+    unsafe HighwayReference.Nothrow.loadExpandedWhereOtherwiseF32(otherwise.raw, mask.raw, from)
 }
 
 @inline(never)
 public func portLoadExpandedWhereOtherwiseF32ConstantOtherwise(
-    from: UnsafePointer<SIMDFloat.Lane>,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    from: UnsafePointer<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     unsafe SIMDFloat.loadExpanded(from: from, where: mask, otherwise: SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
 public func highwayLoadExpandedWhereOtherwiseF32ConstantOtherwise(
     from: UnsafePointer<Float>,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     unsafe HighwayReference.Nothrow.loadExpandedWhereOtherwiseF32(
-        HighwayReference.Nothrow.repeatingF32(1.5),
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
         mask.raw,
         from
     )

@@ -10,7 +10,7 @@ extension SIMDFloatReferenceTests {
         let mismatches = Mismatches("sum")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDF4F_8089_1FE7_126B)
         for a in aInputs {
-            mismatches.check(H.sum(a), HighwayReference.sumF32(a), "a: \(describe(a))")
+            mismatches.check(H.sum(a), HighwayReference.sumF32(a.raw), "a: \(describe(a))")
         }
         mismatches.record()
     }
@@ -19,7 +19,11 @@ extension SIMDFloatReferenceTests {
         let mismatches = Mismatches("smallest")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x42C2_432F_5335_A5CF)
         for a in aInputs {
-            mismatches.check(H.smallest(a), HighwayReference.smallestF32(a), "a: \(describe(a))")
+            mismatches.check(
+                H.smallest(a),
+                HighwayReference.smallestF32(a.raw),
+                "a: \(describe(a))"
+            )
         }
         mismatches.record()
     }
@@ -30,7 +34,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.smallestOrNaN(a),
-                HighwayReference.smallestOrNaNF32(a),
+                HighwayReference.smallestOrNaNF32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -41,7 +45,7 @@ extension SIMDFloatReferenceTests {
         let mismatches = Mismatches("largest")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4AFC_26B0_A5FA_9598)
         for a in aInputs {
-            mismatches.check(H.largest(a), HighwayReference.largestF32(a), "a: \(describe(a))")
+            mismatches.check(H.largest(a), HighwayReference.largestF32(a.raw), "a: \(describe(a))")
         }
         mismatches.record()
     }
@@ -52,7 +56,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.largestOrNaN(a),
-                HighwayReference.largestOrNaNF32(a),
+                HighwayReference.largestOrNaNF32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -65,7 +69,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.repeatingSum(a),
-                HighwayReference.repeatingSumF32(a),
+                HighwayReference.repeatingSumF32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -78,7 +82,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.repeatingSmallest(a),
-                HighwayReference.repeatingSmallestF32(a),
+                HighwayReference.repeatingSmallestF32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -91,7 +95,7 @@ extension SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.repeatingLargest(a),
-                HighwayReference.repeatingLargestF32(a),
+                HighwayReference.repeatingLargestF32(a.raw),
                 "a: \(describe(a))"
             )
         }

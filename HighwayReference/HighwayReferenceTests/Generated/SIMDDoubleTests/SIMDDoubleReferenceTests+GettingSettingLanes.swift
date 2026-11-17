@@ -10,7 +10,11 @@ extension SIMDDoubleReferenceTests {
         let mismatches = Mismatches("firstLane")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9363_273C_79D2_C29F)
         for a in aInputs {
-            mismatches.check(H.firstLane(a), HighwayReference.firstLaneF64(a), "a: \(describe(a))")
+            mismatches.check(
+                H.firstLane(a),
+                HighwayReference.firstLaneF64(a.raw),
+                "a: \(describe(a))"
+            )
         }
         mismatches.record()
     }
@@ -22,7 +26,7 @@ extension SIMDDoubleReferenceTests {
         for (a, index) in everyPair(aInputs, indexInputs) {
             mismatches.check(
                 H.lane(a, at: index),
-                HighwayReference.laneF64(a, index),
+                HighwayReference.laneF64(a.raw, index),
                 "a: \(describe(a)), index: \(index)"
             )
         }
@@ -36,7 +40,7 @@ extension SIMDDoubleReferenceTests {
         for (a, index) in everyPair(aInputs, indexInputs) {
             mismatches.check(
                 unsafe H.lane(a, atUnchecked: index),
-                HighwayReference.laneF64(a, index),
+                HighwayReference.laneF64(a.raw, index),
                 "a: \(describe(a)), index: \(index)"
             )
         }
@@ -56,7 +60,7 @@ extension SIMDDoubleReferenceTests {
         ) {
             mismatches.check(
                 H.replacingLane(a, at: index, with: value),
-                HighwayReference.replacingLaneF64(a, index, value),
+                HighwayReference.replacingLaneF64(a.raw, index, value),
                 "a: \(describe(a)), index: \(index), value: \(hex(value))"
             )
         }
@@ -76,7 +80,7 @@ extension SIMDDoubleReferenceTests {
         ) {
             mismatches.check(
                 unsafe H.replacingLane(a, atUnchecked: index, with: value),
-                HighwayReference.replacingLaneF64(a, index, value),
+                HighwayReference.replacingLaneF64(a.raw, index, value),
                 "a: \(describe(a)), index: \(index), value: \(hex(value))"
             )
         }

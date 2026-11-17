@@ -274,7 +274,7 @@ extension SIMDInt32ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.halfVector(converting: a),
-                H.HalfVector(raw: HighwayReference.halfVectorConvertingF64ToI32(a)),
+                H.HalfVector(raw: HighwayReference.halfVectorConvertingF64ToI32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -292,7 +292,7 @@ extension SIMDInt32ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(converting: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorConvertingF64ToI32(a)),
+                H.Vector(raw: HighwayReference.resizedHalfVectorConvertingF64ToI32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -305,7 +305,7 @@ extension SIMDInt32ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.halfVector(convertingInRange: a),
-                H.HalfVector(raw: HighwayReference.halfVectorConvertingInRangeF64ToI32(a)),
+                H.HalfVector(raw: HighwayReference.halfVectorConvertingInRangeF64ToI32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -323,7 +323,7 @@ extension SIMDInt32ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(convertingInRange: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorConvertingInRangeF64ToI32(a)),
+                H.Vector(raw: HighwayReference.resizedHalfVectorConvertingInRangeF64ToI32(a.raw)),
                 "a: \(describe(a))"
             )
         }

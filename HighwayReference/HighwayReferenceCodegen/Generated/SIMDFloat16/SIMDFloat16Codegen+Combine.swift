@@ -5,432 +5,386 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portConcatenatingLowerLowerF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
+public func portConcatenatingLowerLowerF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16>
+{
     SIMDFloat16.concatenatingLowerLower(a, b)
 }
 
 @inline(never)
 public func highwayConcatenatingLowerLowerF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.concatenatingLowerLowerF16(a, b)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    HighwayReference.Nothrow.concatenatingLowerLowerF16(a.raw, b.raw)
 }
 
 @inline(never)
-public func portConcatenatingLowerLowerF16ConstantA(_ b: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+public func portConcatenatingLowerLowerF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
     SIMDFloat16.concatenatingLowerLower(SIMDFloat16.repeating(Float16(bitPattern: 26)), b)
 }
 
 @inline(never)
-public func highwayConcatenatingLowerLowerF16ConstantA(
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
+public func highwayConcatenatingLowerLowerF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
     HighwayReference.Nothrow.concatenatingLowerLowerF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
+        b.raw
     )
 }
 
 @inline(never)
-public func portConcatenatingLowerLowerF16ConstantB(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+public func portConcatenatingLowerLowerF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
     SIMDFloat16.concatenatingLowerLower(a, SIMDFloat16.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayConcatenatingLowerLowerF16ConstantB(
-    _ a: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
+public func highwayConcatenatingLowerLowerF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
     HighwayReference.Nothrow.concatenatingLowerLowerF16(
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+        a.raw,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
     )
 }
 
 @inline(never)
-public func portConcatenatingUpperUpperF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
+public func portConcatenatingUpperUpperF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16>
+{
     SIMDFloat16.concatenatingUpperUpper(a, b)
 }
 
 @inline(never)
 public func highwayConcatenatingUpperUpperF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.concatenatingUpperUpperF16(a, b)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    HighwayReference.Nothrow.concatenatingUpperUpperF16(a.raw, b.raw)
 }
 
 @inline(never)
-public func portConcatenatingUpperUpperF16ConstantA(_ b: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+public func portConcatenatingUpperUpperF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
     SIMDFloat16.concatenatingUpperUpper(SIMDFloat16.repeating(Float16(bitPattern: 26)), b)
 }
 
 @inline(never)
-public func highwayConcatenatingUpperUpperF16ConstantA(
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
+public func highwayConcatenatingUpperUpperF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
     HighwayReference.Nothrow.concatenatingUpperUpperF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
+        b.raw
     )
 }
 
 @inline(never)
-public func portConcatenatingUpperUpperF16ConstantB(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+public func portConcatenatingUpperUpperF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
     SIMDFloat16.concatenatingUpperUpper(a, SIMDFloat16.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayConcatenatingUpperUpperF16ConstantB(
-    _ a: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
+public func highwayConcatenatingUpperUpperF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
     HighwayReference.Nothrow.concatenatingUpperUpperF16(
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+        a.raw,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
     )
 }
 
 @inline(never)
-public func portConcatenatingLowerUpperF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
+public func portConcatenatingLowerUpperF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16>
+{
     SIMDFloat16.concatenatingLowerUpper(a, b)
 }
 
 @inline(never)
 public func highwayConcatenatingLowerUpperF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.concatenatingLowerUpperF16(a, b)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    HighwayReference.Nothrow.concatenatingLowerUpperF16(a.raw, b.raw)
 }
 
 @inline(never)
-public func portConcatenatingLowerUpperF16ConstantA(_ b: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+public func portConcatenatingLowerUpperF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
     SIMDFloat16.concatenatingLowerUpper(SIMDFloat16.repeating(Float16(bitPattern: 26)), b)
 }
 
 @inline(never)
-public func highwayConcatenatingLowerUpperF16ConstantA(
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
+public func highwayConcatenatingLowerUpperF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
     HighwayReference.Nothrow.concatenatingLowerUpperF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
+        b.raw
     )
 }
 
 @inline(never)
-public func portConcatenatingLowerUpperF16ConstantB(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+public func portConcatenatingLowerUpperF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
     SIMDFloat16.concatenatingLowerUpper(a, SIMDFloat16.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayConcatenatingLowerUpperF16ConstantB(
-    _ a: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
+public func highwayConcatenatingLowerUpperF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
     HighwayReference.Nothrow.concatenatingLowerUpperF16(
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+        a.raw,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
     )
 }
 
 @inline(never)
-public func portConcatenatingUpperLowerF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
+public func portConcatenatingUpperLowerF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16>
+{
     SIMDFloat16.concatenatingUpperLower(a, b)
 }
 
 @inline(never)
 public func highwayConcatenatingUpperLowerF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.concatenatingUpperLowerF16(a, b)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    HighwayReference.Nothrow.concatenatingUpperLowerF16(a.raw, b.raw)
 }
 
 @inline(never)
-public func portConcatenatingUpperLowerF16ConstantA(_ b: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+public func portConcatenatingUpperLowerF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
     SIMDFloat16.concatenatingUpperLower(SIMDFloat16.repeating(Float16(bitPattern: 26)), b)
 }
 
 @inline(never)
-public func highwayConcatenatingUpperLowerF16ConstantA(
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
+public func highwayConcatenatingUpperLowerF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
     HighwayReference.Nothrow.concatenatingUpperLowerF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
+        b.raw
     )
 }
 
 @inline(never)
-public func portConcatenatingUpperLowerF16ConstantB(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+public func portConcatenatingUpperLowerF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
     SIMDFloat16.concatenatingUpperLower(a, SIMDFloat16.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayConcatenatingUpperLowerF16ConstantB(
-    _ a: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
+public func highwayConcatenatingUpperLowerF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
     HighwayReference.Nothrow.concatenatingUpperLowerF16(
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+        a.raw,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
     )
 }
 
 @inline(never)
-public func portConcatenatingOddF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
+public func portConcatenatingOddF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16> {
     SIMDFloat16.concatenatingOdd(a, b)
 }
 
 @inline(never)
-public func highwayConcatenatingOddF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.concatenatingOddF16(a, b)
+public func highwayConcatenatingOddF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16> {
+    HighwayReference.Nothrow.concatenatingOddF16(a.raw, b.raw)
 }
 
 @inline(never)
-public func portConcatenatingOddF16ConstantA(_ b: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+public func portConcatenatingOddF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
     SIMDFloat16.concatenatingOdd(SIMDFloat16.repeating(Float16(bitPattern: 26)), b)
 }
 
 @inline(never)
-public func highwayConcatenatingOddF16ConstantA(_ b: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+public func highwayConcatenatingOddF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
     HighwayReference.Nothrow.concatenatingOddF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
+        b.raw
     )
 }
 
 @inline(never)
-public func portConcatenatingOddF16ConstantB(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+public func portConcatenatingOddF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
     SIMDFloat16.concatenatingOdd(a, SIMDFloat16.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayConcatenatingOddF16ConstantB(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+public func highwayConcatenatingOddF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
     HighwayReference.Nothrow.concatenatingOddF16(
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+        a.raw,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
     )
 }
 
 @inline(never)
-public func portConcatenatingEvenF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
+public func portConcatenatingEvenF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16> {
     SIMDFloat16.concatenatingEven(a, b)
 }
 
 @inline(never)
-public func highwayConcatenatingEvenF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.concatenatingEvenF16(a, b)
+public func highwayConcatenatingEvenF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16> {
+    HighwayReference.Nothrow.concatenatingEvenF16(a.raw, b.raw)
 }
 
 @inline(never)
-public func portConcatenatingEvenF16ConstantA(_ b: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+public func portConcatenatingEvenF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
     SIMDFloat16.concatenatingEven(SIMDFloat16.repeating(Float16(bitPattern: 26)), b)
 }
 
 @inline(never)
-public func highwayConcatenatingEvenF16ConstantA(_ b: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+public func highwayConcatenatingEvenF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
     HighwayReference.Nothrow.concatenatingEvenF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
+        b.raw
     )
 }
 
 @inline(never)
-public func portConcatenatingEvenF16ConstantB(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+public func portConcatenatingEvenF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
     SIMDFloat16.concatenatingEven(a, SIMDFloat16.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayConcatenatingEvenF16ConstantB(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+public func highwayConcatenatingEvenF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
     HighwayReference.Nothrow.concatenatingEvenF16(
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+        a.raw,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
     )
 }
 
 @inline(never)
-public func portInterleavingWholeLowerF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
+public func portInterleavingWholeLowerF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16> {
     SIMDFloat16.interleavingWholeLower(a, b)
 }
 
 @inline(never)
 public func highwayInterleavingWholeLowerF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.interleavingWholeLowerF16(a, b)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    HighwayReference.Nothrow.interleavingWholeLowerF16(a.raw, b.raw)
 }
 
 @inline(never)
-public func portInterleavingWholeLowerF16ConstantA(_ b: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+public func portInterleavingWholeLowerF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
     SIMDFloat16.interleavingWholeLower(SIMDFloat16.repeating(Float16(bitPattern: 26)), b)
 }
 
 @inline(never)
-public func highwayInterleavingWholeLowerF16ConstantA(_ b: SIMDFloat16.Vector) -> SIMDFloat16.Vector
-{
+public func highwayInterleavingWholeLowerF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
     HighwayReference.Nothrow.interleavingWholeLowerF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
+        b.raw
     )
 }
 
 @inline(never)
-public func portInterleavingWholeLowerF16ConstantB(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+public func portInterleavingWholeLowerF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
     SIMDFloat16.interleavingWholeLower(a, SIMDFloat16.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayInterleavingWholeLowerF16ConstantB(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector
-{
+public func highwayInterleavingWholeLowerF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
     HighwayReference.Nothrow.interleavingWholeLowerF16(
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+        a.raw,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
     )
 }
 
 @inline(never)
-public func portInterleavingWholeUpperF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
+public func portInterleavingWholeUpperF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16> {
     SIMDFloat16.interleavingWholeUpper(a, b)
 }
 
 @inline(never)
 public func highwayInterleavingWholeUpperF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.interleavingWholeUpperF16(a, b)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    HighwayReference.Nothrow.interleavingWholeUpperF16(a.raw, b.raw)
 }
 
 @inline(never)
-public func portInterleavingWholeUpperF16ConstantA(_ b: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+public func portInterleavingWholeUpperF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
     SIMDFloat16.interleavingWholeUpper(SIMDFloat16.repeating(Float16(bitPattern: 26)), b)
 }
 
 @inline(never)
-public func highwayInterleavingWholeUpperF16ConstantA(_ b: SIMDFloat16.Vector) -> SIMDFloat16.Vector
-{
+public func highwayInterleavingWholeUpperF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
     HighwayReference.Nothrow.interleavingWholeUpperF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw,
+        b.raw
     )
 }
 
 @inline(never)
-public func portInterleavingWholeUpperF16ConstantB(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+public func portInterleavingWholeUpperF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
     SIMDFloat16.interleavingWholeUpper(a, SIMDFloat16.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayInterleavingWholeUpperF16ConstantB(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector
-{
+public func highwayInterleavingWholeUpperF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
     HighwayReference.Nothrow.interleavingWholeUpperF16(
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+        a.raw,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
     )
 }
 
 @inline(never)
-public func portLowerHalfF16(_ a: SIMDFloat16.Vector) -> SIMDFloat16.HalfVector {
+public func portLowerHalfF16(_ a: SIMD<Float16>) -> SIMD<Float16>.HalfVector {
     SIMDFloat16.lowerHalf(a)
 }
 
 @inline(never)
-public func highwayLowerHalfF16(_ a: SIMDFloat16.Vector) -> SIMDFloat16.HalfVector {
-    SIMDFloat16.HalfVector(raw: HighwayReference.Nothrow.lowerHalfF16(a))
+public func highwayLowerHalfF16(_ a: SIMD<Float16>) -> SIMD<Float16>.HalfVector {
+    SIMDFloat16.HalfVector(raw: HighwayReference.Nothrow.lowerHalfF16(a.raw))
 }
 
 @inline(never)
-public func portLowerHalfF16ConstantA() -> SIMDFloat16.HalfVector {
+public func portLowerHalfF16ConstantA() -> SIMD<Float16>.HalfVector {
     SIMDFloat16.lowerHalf(SIMDFloat16.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayLowerHalfF16ConstantA() -> SIMDFloat16.HalfVector {
+public func highwayLowerHalfF16ConstantA() -> SIMD<Float16>.HalfVector {
     SIMDFloat16.HalfVector(
         raw: HighwayReference.Nothrow.lowerHalfF16(
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
         )
     )
 }
 
 @inline(never)
-public func portUpperHalfF16(_ a: SIMDFloat16.Vector) -> SIMDFloat16.HalfVector {
+public func portUpperHalfF16(_ a: SIMD<Float16>) -> SIMD<Float16>.HalfVector {
     SIMDFloat16.upperHalf(a)
 }
 
 @inline(never)
-public func highwayUpperHalfF16(_ a: SIMDFloat16.Vector) -> SIMDFloat16.HalfVector {
-    SIMDFloat16.HalfVector(raw: HighwayReference.Nothrow.upperHalfF16(a))
+public func highwayUpperHalfF16(_ a: SIMD<Float16>) -> SIMD<Float16>.HalfVector {
+    SIMDFloat16.HalfVector(raw: HighwayReference.Nothrow.upperHalfF16(a.raw))
 }
 
 @inline(never)
-public func portUpperHalfF16ConstantA() -> SIMDFloat16.HalfVector {
+public func portUpperHalfF16ConstantA() -> SIMD<Float16>.HalfVector {
     SIMDFloat16.upperHalf(SIMDFloat16.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayUpperHalfF16ConstantA() -> SIMDFloat16.HalfVector {
+public func highwayUpperHalfF16ConstantA() -> SIMD<Float16>.HalfVector {
     SIMDFloat16.HalfVector(
         raw: HighwayReference.Nothrow.upperHalfF16(
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern).raw
         )
     )
 }
 
 @inline(never)
 public func portCombiningF16(
-    _ a: SIMDFloat16.HalfVector,
-    _ b: SIMDFloat16.HalfVector
-) -> SIMDFloat16.Vector {
+    _ a: SIMD<Float16>.HalfVector,
+    _ b: SIMD<Float16>.HalfVector
+) -> SIMD<Float16> {
     SIMDFloat16.combining(a, b)
 }
 
 @inline(never)
 public func highwayCombiningF16(
-    _ a: SIMDFloat16.HalfVector,
-    _ b: SIMDFloat16.HalfVector
-) -> SIMDFloat16.Vector {
+    _ a: SIMD<Float16>.HalfVector,
+    _ b: SIMD<Float16>.HalfVector
+) -> SIMD<Float16> {
     HighwayReference.Nothrow.combiningF16(a.raw, b.raw)
 }
 
 @inline(never)
-public func portZeroExtendingF16(_ a: SIMDFloat16.HalfVector) -> SIMDFloat16.Vector {
+public func portZeroExtendingF16(_ a: SIMD<Float16>.HalfVector) -> SIMD<Float16> {
     SIMDFloat16.zeroExtending(a)
 }
 
 @inline(never)
-public func highwayZeroExtendingF16(_ a: SIMDFloat16.HalfVector) -> SIMDFloat16.Vector {
+public func highwayZeroExtendingF16(_ a: SIMD<Float16>.HalfVector) -> SIMD<Float16> {
     HighwayReference.Nothrow.zeroExtendingF16(a.raw)
 }
 #endif

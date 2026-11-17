@@ -6,14 +6,14 @@ public import Vectorization
 extension HighwayReferenceInt8 {
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
-    public static func loadExpanded(from span: Span<Lane>, where mask: Mask) -> Vector {
+    public static func loadExpanded(from span: Span<Lane>, where mask: Mask) -> SIMD {
         precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return unsafe loadExpanded(fromUnchecked: span, where: mask)
     }
 
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
-    public static func loadExpanded(fromUnchecked span: Span<Lane>, where mask: Mask) -> Vector {
+    public static func loadExpanded(fromUnchecked span: Span<Lane>, where mask: Mask) -> SIMD {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return span.withUnsafeBufferPointer {
             unsafe SIMDInt8.Vector(
@@ -30,8 +30,8 @@ extension HighwayReferenceInt8 {
     public static func loadExpanded(
         from span: Span<Lane>,
         where mask: Mask,
-        otherwise: Vector
-    ) -> Vector {
+        otherwise: SIMD
+    ) -> SIMD {
         precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return unsafe loadExpanded(fromUnchecked: span, where: mask, otherwise: otherwise)
     }
@@ -41,8 +41,8 @@ extension HighwayReferenceInt8 {
     public static func loadExpanded(
         fromUnchecked span: Span<Lane>,
         where mask: Mask,
-        otherwise: Vector
-    ) -> Vector {
+        otherwise: SIMD
+    ) -> SIMD {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return span.withUnsafeBufferPointer {
             unsafe SIMDInt8.Vector(
@@ -58,22 +58,22 @@ extension HighwayReferenceInt8 {
 }
 
 @inline(never)
-public func portExpandedI8(_ a: SIMDInt8.Vector, where mask: SIMDInt8.Mask) -> SIMDInt8.Vector {
+public func portExpandedI8(_ a: SIMD<Int8>, where mask: SIMD<Int8>.Mask) -> SIMD<Int8> {
     SIMDInt8.expanded(a, where: mask)
 }
 
 @inline(never)
-public func highwayExpandedI8(_ a: SIMDInt8.Vector, where mask: SIMDInt8.Mask) -> SIMDInt8.Vector {
+public func highwayExpandedI8(_ a: SIMD<Int8>, where mask: SIMD<Int8>.Mask) -> SIMD<Int8> {
     SIMDInt8.Vector(raw: HighwayReference.Nothrow.expandedI8(a.raw, mask.raw))
 }
 
 @inline(never)
-public func portExpandedI8ConstantA(where mask: SIMDInt8.Mask) -> SIMDInt8.Vector {
+public func portExpandedI8ConstantA(where mask: SIMD<Int8>.Mask) -> SIMD<Int8> {
     SIMDInt8.expanded(SIMDInt8.repeating(26), where: mask)
 }
 
 @inline(never)
-public func highwayExpandedI8ConstantA(where mask: SIMDInt8.Mask) -> SIMDInt8.Vector {
+public func highwayExpandedI8ConstantA(where mask: SIMD<Int8>.Mask) -> SIMD<Int8> {
     SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.expandedI8(
             SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
@@ -84,35 +84,35 @@ public func highwayExpandedI8ConstantA(where mask: SIMDInt8.Mask) -> SIMDInt8.Ve
 
 @inline(never)
 public func portLoadExpandedWhereI8(
-    from: UnsafePointer<SIMDInt8.Lane>,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
+    from: UnsafePointer<Int8>,
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
     unsafe SIMDInt8.loadExpanded(from: from, where: mask)
 }
 
 @inline(never)
 public func highwayLoadExpandedWhereI8(
     from: UnsafePointer<Int8>,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
     unsafe SIMDInt8.Vector(raw: HighwayReference.Nothrow.loadExpandedWhereI8(mask.raw, from))
 }
 
 @inline(never)
 public func portLoadExpandedWhereOtherwiseI8(
-    from: UnsafePointer<SIMDInt8.Lane>,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
+    from: UnsafePointer<Int8>,
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
     unsafe SIMDInt8.loadExpanded(from: from, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayLoadExpandedWhereOtherwiseI8(
     from: UnsafePointer<Int8>,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
     unsafe SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.loadExpandedWhereOtherwiseI8(otherwise.raw, mask.raw, from)
     )
@@ -120,17 +120,17 @@ public func highwayLoadExpandedWhereOtherwiseI8(
 
 @inline(never)
 public func portLoadExpandedWhereOtherwiseI8ConstantOtherwise(
-    from: UnsafePointer<SIMDInt8.Lane>,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
+    from: UnsafePointer<Int8>,
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
     unsafe SIMDInt8.loadExpanded(from: from, where: mask, otherwise: SIMDInt8.repeating(26))
 }
 
 @inline(never)
 public func highwayLoadExpandedWhereOtherwiseI8ConstantOtherwise(
     from: UnsafePointer<Int8>,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
     unsafe SIMDInt8.Vector(
         raw: HighwayReference.Nothrow.loadExpandedWhereOtherwiseI8(
             SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,

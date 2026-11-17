@@ -4,1050 +4,990 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portCopyingSignF32(_ a: SIMDFloat.Vector, from b: SIMDFloat.Vector) -> SIMDFloat.Vector
-{
+public func portCopyingSignF32(_ a: SIMD<Float>, from b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.copyingSign(a, from: b)
 }
 
 @inline(never)
-public func highwayCopyingSignF32(
-    _ a: SIMDFloat.Vector,
-    from b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.copyingSignF32(a, b)
+public func highwayCopyingSignF32(_ a: SIMD<Float>, from b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.copyingSignF32(a.raw, b.raw)
 }
 
 @inline(never)
-public func portCopyingSignF32ConstantA(from b: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portCopyingSignF32ConstantA(from b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.copyingSign(SIMDFloat.repeating(1.5), from: b)
 }
 
 @inline(never)
-public func highwayCopyingSignF32ConstantA(from b: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.copyingSignF32(HighwayReference.Nothrow.repeatingF32(1.5), b)
+public func highwayCopyingSignF32ConstantA(from b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.copyingSignF32(HighwayReference.Nothrow.repeatingF32(1.5).raw, b.raw)
 }
 
 @inline(never)
-public func portCopyingSignF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portCopyingSignF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.copyingSign(a, from: SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayCopyingSignF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.copyingSignF32(a, HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayCopyingSignF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.copyingSignF32(a.raw, HighwayReference.Nothrow.repeatingF32(1.5).raw)
 }
 
 @inline(never)
-public func portCopyingSignToMagnitudeF32(
-    _ a: SIMDFloat.Vector,
-    from b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portCopyingSignToMagnitudeF32(_ a: SIMD<Float>, from b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.copyingSignToMagnitude(a, from: b)
 }
 
 @inline(never)
-public func highwayCopyingSignToMagnitudeF32(
-    _ a: SIMDFloat.Vector,
-    from b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.copyingSignToMagnitudeF32(a, b)
+public func highwayCopyingSignToMagnitudeF32(_ a: SIMD<Float>, from b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.copyingSignToMagnitudeF32(a.raw, b.raw)
 }
 
 @inline(never)
-public func portCopyingSignToMagnitudeF32ConstantA(from b: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portCopyingSignToMagnitudeF32ConstantA(from b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.copyingSignToMagnitude(SIMDFloat.repeating(1.5), from: b)
 }
 
 @inline(never)
-public func highwayCopyingSignToMagnitudeF32ConstantA(from b: SIMDFloat.Vector) -> SIMDFloat.Vector
-{
+public func highwayCopyingSignToMagnitudeF32ConstantA(from b: SIMD<Float>) -> SIMD<Float> {
     HighwayReference.Nothrow.copyingSignToMagnitudeF32(
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        b
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw
     )
 }
 
 @inline(never)
-public func portCopyingSignToMagnitudeF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portCopyingSignToMagnitudeF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.copyingSignToMagnitude(a, from: SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayCopyingSignToMagnitudeF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func highwayCopyingSignToMagnitudeF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
     HighwayReference.Nothrow.copyingSignToMagnitudeF32(
-        a,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
     )
 }
 
 @inline(never)
-public func portBitwiseAndF32(_ a: SIMDFloat.Vector, _ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portBitwiseAndF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseAnd(a, b)
 }
 
 @inline(never)
-public func highwayBitwiseAndF32(_ a: SIMDFloat.Vector, _ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseAndF32(a, b)
+public func highwayBitwiseAndF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseAndF32(a.raw, b.raw)
 }
 
 @inline(never)
-public func portBitwiseAndF32ConstantA(_ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portBitwiseAndF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseAnd(SIMDFloat.repeating(1.5), b)
 }
 
 @inline(never)
-public func highwayBitwiseAndF32ConstantA(_ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseAndF32(HighwayReference.Nothrow.repeatingF32(1.5), b)
+public func highwayBitwiseAndF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseAndF32(HighwayReference.Nothrow.repeatingF32(1.5).raw, b.raw)
 }
 
 @inline(never)
-public func portBitwiseAndF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portBitwiseAndF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseAnd(a, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayBitwiseAndF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseAndF32(a, HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayBitwiseAndF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseAndF32(a.raw, HighwayReference.Nothrow.repeatingF32(1.5).raw)
 }
 
 @inline(never)
-public func portBitwiseOrF32(_ a: SIMDFloat.Vector, _ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portBitwiseOrF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseOr(a, b)
 }
 
 @inline(never)
-public func highwayBitwiseOrF32(_ a: SIMDFloat.Vector, _ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseOrF32(a, b)
+public func highwayBitwiseOrF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseOrF32(a.raw, b.raw)
 }
 
 @inline(never)
-public func portBitwiseOrF32ConstantA(_ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portBitwiseOrF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseOr(SIMDFloat.repeating(1.5), b)
 }
 
 @inline(never)
-public func highwayBitwiseOrF32ConstantA(_ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseOrF32(HighwayReference.Nothrow.repeatingF32(1.5), b)
+public func highwayBitwiseOrF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseOrF32(HighwayReference.Nothrow.repeatingF32(1.5).raw, b.raw)
 }
 
 @inline(never)
-public func portBitwiseOrF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portBitwiseOrF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseOr(a, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayBitwiseOrF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseOrF32(a, HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayBitwiseOrF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseOrF32(a.raw, HighwayReference.Nothrow.repeatingF32(1.5).raw)
 }
 
 @inline(never)
-public func portBitwiseXorF32(_ a: SIMDFloat.Vector, _ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portBitwiseXorF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseXor(a, b)
 }
 
 @inline(never)
-public func highwayBitwiseXorF32(_ a: SIMDFloat.Vector, _ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseXorF32(a, b)
+public func highwayBitwiseXorF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseXorF32(a.raw, b.raw)
 }
 
 @inline(never)
-public func portBitwiseXorF32ConstantA(_ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portBitwiseXorF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseXor(SIMDFloat.repeating(1.5), b)
 }
 
 @inline(never)
-public func highwayBitwiseXorF32ConstantA(_ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseXorF32(HighwayReference.Nothrow.repeatingF32(1.5), b)
+public func highwayBitwiseXorF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseXorF32(HighwayReference.Nothrow.repeatingF32(1.5).raw, b.raw)
 }
 
 @inline(never)
-public func portBitwiseXorF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portBitwiseXorF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseXor(a, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayBitwiseXorF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseXorF32(a, HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayBitwiseXorF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseXorF32(a.raw, HighwayReference.Nothrow.repeatingF32(1.5).raw)
 }
 
 @inline(never)
-public func portBitwiseAndNotF32(_ a: SIMDFloat.Vector, _ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portBitwiseAndNotF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseAndNot(a, b)
 }
 
 @inline(never)
-public func highwayBitwiseAndNotF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseAndNotF32(a, b)
+public func highwayBitwiseAndNotF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseAndNotF32(a.raw, b.raw)
 }
 
 @inline(never)
-public func portBitwiseAndNotF32ConstantA(_ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portBitwiseAndNotF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseAndNot(SIMDFloat.repeating(1.5), b)
 }
 
 @inline(never)
-public func highwayBitwiseAndNotF32ConstantA(_ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseAndNotF32(HighwayReference.Nothrow.repeatingF32(1.5), b)
+public func highwayBitwiseAndNotF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseAndNotF32(HighwayReference.Nothrow.repeatingF32(1.5).raw, b.raw)
 }
 
 @inline(never)
-public func portBitwiseAndNotF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portBitwiseAndNotF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseAndNot(a, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayBitwiseAndNotF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseAndNotF32(a, HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayBitwiseAndNotF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseAndNotF32(a.raw, HighwayReference.Nothrow.repeatingF32(1.5).raw)
 }
 
 @inline(never)
 public func portBitwiseAndXorF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.bitwiseAndXor(a, b, c)
 }
 
 @inline(never)
 public func highwayBitwiseAndXorF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseAndXorF32(a, b, c)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseAndXorF32(a.raw, b.raw, c.raw)
 }
 
 @inline(never)
-public func portBitwiseAndXorF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portBitwiseAndXorF32ConstantA(_ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseAndXor(SIMDFloat.repeating(1.5), b, c)
 }
 
 @inline(never)
-public func highwayBitwiseAndXorF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseAndXorF32(HighwayReference.Nothrow.repeatingF32(1.5), b, c)
+public func highwayBitwiseAndXorF32ConstantA(_ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseAndXorF32(
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw,
+        c.raw
+    )
 }
 
 @inline(never)
-public func portBitwiseAndXorF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portBitwiseAndXorF32ConstantB(_ a: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseAndXor(a, SIMDFloat.repeating(1.5), c)
 }
 
 @inline(never)
-public func highwayBitwiseAndXorF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseAndXorF32(a, HighwayReference.Nothrow.repeatingF32(1.5), c)
+public func highwayBitwiseAndXorF32ConstantB(_ a: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseAndXorF32(
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        c.raw
+    )
 }
 
 @inline(never)
-public func portBitwiseAndXorF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portBitwiseAndXorF32ConstantC(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseAndXor(a, b, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayBitwiseAndXorF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseAndXorF32(a, b, HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayBitwiseAndXorF32ConstantC(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseAndXorF32(
+        a.raw,
+        b.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    )
 }
 
 @inline(never)
-public func portBitwiseXor3F32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portBitwiseXor3F32(_ a: SIMD<Float>, _ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float>
+{
     SIMDFloat.bitwiseXor(a, b, c)
 }
 
 @inline(never)
 public func highwayBitwiseXor3F32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseXor3F32(a, b, c)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseXor3F32(a.raw, b.raw, c.raw)
 }
 
 @inline(never)
-public func portBitwiseXor3F32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portBitwiseXor3F32ConstantA(_ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseXor(SIMDFloat.repeating(1.5), b, c)
 }
 
 @inline(never)
-public func highwayBitwiseXor3F32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseXor3F32(HighwayReference.Nothrow.repeatingF32(1.5), b, c)
+public func highwayBitwiseXor3F32ConstantA(_ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseXor3F32(
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw,
+        c.raw
+    )
 }
 
 @inline(never)
-public func portBitwiseXor3F32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portBitwiseXor3F32ConstantB(_ a: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseXor(a, SIMDFloat.repeating(1.5), c)
 }
 
 @inline(never)
-public func highwayBitwiseXor3F32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseXor3F32(a, HighwayReference.Nothrow.repeatingF32(1.5), c)
+public func highwayBitwiseXor3F32ConstantB(_ a: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseXor3F32(
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        c.raw
+    )
 }
 
 @inline(never)
-public func portBitwiseXor3F32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portBitwiseXor3F32ConstantC(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseXor(a, b, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayBitwiseXor3F32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseXor3F32(a, b, HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayBitwiseXor3F32ConstantC(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseXor3F32(
+        a.raw,
+        b.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    )
 }
 
 @inline(never)
-public func portBitwiseOr3F32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portBitwiseOr3F32(_ a: SIMD<Float>, _ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseOr(a, b, c)
 }
 
 @inline(never)
 public func highwayBitwiseOr3F32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseOr3F32(a, b, c)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseOr3F32(a.raw, b.raw, c.raw)
 }
 
 @inline(never)
-public func portBitwiseOr3F32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portBitwiseOr3F32ConstantA(_ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseOr(SIMDFloat.repeating(1.5), b, c)
 }
 
 @inline(never)
-public func highwayBitwiseOr3F32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseOr3F32(HighwayReference.Nothrow.repeatingF32(1.5), b, c)
+public func highwayBitwiseOr3F32ConstantA(_ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseOr3F32(
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw,
+        c.raw
+    )
 }
 
 @inline(never)
-public func portBitwiseOr3F32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portBitwiseOr3F32ConstantB(_ a: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseOr(a, SIMDFloat.repeating(1.5), c)
 }
 
 @inline(never)
-public func highwayBitwiseOr3F32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseOr3F32(a, HighwayReference.Nothrow.repeatingF32(1.5), c)
+public func highwayBitwiseOr3F32ConstantB(_ a: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseOr3F32(
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        c.raw
+    )
 }
 
 @inline(never)
-public func portBitwiseOr3F32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portBitwiseOr3F32ConstantC(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseOr(a, b, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayBitwiseOr3F32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseOr3F32(a, b, HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayBitwiseOr3F32ConstantC(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseOr3F32(
+        a.raw,
+        b.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    )
 }
 
 @inline(never)
-public func portBitwiseOrAndF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portBitwiseOrAndF32(_ a: SIMD<Float>, _ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float>
+{
     SIMDFloat.bitwiseOrAnd(a, b, c)
 }
 
 @inline(never)
 public func highwayBitwiseOrAndF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseOrAndF32(a, b, c)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseOrAndF32(a.raw, b.raw, c.raw)
 }
 
 @inline(never)
-public func portBitwiseOrAndF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portBitwiseOrAndF32ConstantA(_ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseOrAnd(SIMDFloat.repeating(1.5), b, c)
 }
 
 @inline(never)
-public func highwayBitwiseOrAndF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseOrAndF32(HighwayReference.Nothrow.repeatingF32(1.5), b, c)
+public func highwayBitwiseOrAndF32ConstantA(_ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseOrAndF32(
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw,
+        c.raw
+    )
 }
 
 @inline(never)
-public func portBitwiseOrAndF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portBitwiseOrAndF32ConstantB(_ a: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseOrAnd(a, SIMDFloat.repeating(1.5), c)
 }
 
 @inline(never)
-public func highwayBitwiseOrAndF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseOrAndF32(a, HighwayReference.Nothrow.repeatingF32(1.5), c)
+public func highwayBitwiseOrAndF32ConstantB(_ a: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseOrAndF32(
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        c.raw
+    )
 }
 
 @inline(never)
-public func portBitwiseOrAndF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portBitwiseOrAndF32ConstantC(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseOrAnd(a, b, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayBitwiseOrAndF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseOrAndF32(a, b, HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayBitwiseOrAndF32ConstantC(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseOrAndF32(
+        a.raw,
+        b.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    )
 }
 
 @inline(never)
 public func portBitwiseXorAndNotF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.bitwiseXorAndNot(a, b, c)
 }
 
 @inline(never)
 public func highwayBitwiseXorAndNotF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseXorAndNotF32(a, b, c)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseXorAndNotF32(a.raw, b.raw, c.raw)
 }
 
 @inline(never)
-public func portBitwiseXorAndNotF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portBitwiseXorAndNotF32ConstantA(_ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseXorAndNot(SIMDFloat.repeating(1.5), b, c)
 }
 
 @inline(never)
-public func highwayBitwiseXorAndNotF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseXorAndNotF32(HighwayReference.Nothrow.repeatingF32(1.5), b, c)
+public func highwayBitwiseXorAndNotF32ConstantA(_ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseXorAndNotF32(
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw,
+        c.raw
+    )
 }
 
 @inline(never)
-public func portBitwiseXorAndNotF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portBitwiseXorAndNotF32ConstantB(_ a: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseXorAndNot(a, SIMDFloat.repeating(1.5), c)
 }
 
 @inline(never)
-public func highwayBitwiseXorAndNotF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseXorAndNotF32(a, HighwayReference.Nothrow.repeatingF32(1.5), c)
+public func highwayBitwiseXorAndNotF32ConstantB(_ a: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseXorAndNotF32(
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        c.raw
+    )
 }
 
 @inline(never)
-public func portBitwiseXorAndNotF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portBitwiseXorAndNotF32ConstantC(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseXorAndNot(a, b, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayBitwiseXorAndNotF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseXorAndNotF32(a, b, HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayBitwiseXorAndNotF32ConstantC(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseXorAndNotF32(
+        a.raw,
+        b.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    )
 }
 
 @inline(never)
 public func portBitwiseSelectingF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.bitwiseSelecting(a, b, c)
 }
 
 @inline(never)
 public func highwayBitwiseSelectingF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseSelectingF32(a, b, c)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseSelectingF32(a.raw, b.raw, c.raw)
 }
 
 @inline(never)
-public func portBitwiseSelectingF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portBitwiseSelectingF32ConstantA(_ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseSelecting(SIMDFloat.repeating(1.5), b, c)
 }
 
 @inline(never)
-public func highwayBitwiseSelectingF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseSelectingF32(HighwayReference.Nothrow.repeatingF32(1.5), b, c)
+public func highwayBitwiseSelectingF32ConstantA(_ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseSelectingF32(
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw,
+        c.raw
+    )
 }
 
 @inline(never)
-public func portBitwiseSelectingF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portBitwiseSelectingF32ConstantB(_ a: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseSelecting(a, SIMDFloat.repeating(1.5), c)
 }
 
 @inline(never)
-public func highwayBitwiseSelectingF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseSelectingF32(a, HighwayReference.Nothrow.repeatingF32(1.5), c)
+public func highwayBitwiseSelectingF32ConstantB(_ a: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseSelectingF32(
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        c.raw
+    )
 }
 
 @inline(never)
-public func portBitwiseSelectingF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portBitwiseSelectingF32ConstantC(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.bitwiseSelecting(a, b, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayBitwiseSelectingF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseSelectingF32(a, b, HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayBitwiseSelectingF32ConstantC(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseSelectingF32(
+        a.raw,
+        b.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    )
 }
 
 @inline(never)
 public func portBitwiseAndWhereF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     SIMDFloat.bitwiseAnd(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayBitwiseAndWhereF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseAndWhereF32(mask.raw, a, b)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseAndWhereF32(mask.raw, a.raw, b.raw)
 }
 
 @inline(never)
 public func portBitwiseAndWhereF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     SIMDFloat.bitwiseAnd(SIMDFloat.repeating(1.5), b, where: mask)
 }
 
 @inline(never)
 public func highwayBitwiseAndWhereF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     HighwayReference.Nothrow.bitwiseAndWhereF32(
         mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        b
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw
     )
 }
 
 @inline(never)
 public func portBitwiseAndWhereF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     SIMDFloat.bitwiseAnd(a, SIMDFloat.repeating(1.5), where: mask)
 }
 
 @inline(never)
 public func highwayBitwiseAndWhereF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     HighwayReference.Nothrow.bitwiseAndWhereF32(
         mask.raw,
-        a,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
     )
 }
 
 @inline(never)
 public func portBitwiseOrWhereF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     SIMDFloat.bitwiseOr(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayBitwiseOrWhereF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseOrWhereF32(mask.raw, a, b)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseOrWhereF32(mask.raw, a.raw, b.raw)
 }
 
 @inline(never)
 public func portBitwiseOrWhereF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     SIMDFloat.bitwiseOr(SIMDFloat.repeating(1.5), b, where: mask)
 }
 
 @inline(never)
 public func highwayBitwiseOrWhereF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     HighwayReference.Nothrow.bitwiseOrWhereF32(
         mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        b
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw
     )
 }
 
 @inline(never)
 public func portBitwiseOrWhereF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     SIMDFloat.bitwiseOr(a, SIMDFloat.repeating(1.5), where: mask)
 }
 
 @inline(never)
 public func highwayBitwiseOrWhereF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     HighwayReference.Nothrow.bitwiseOrWhereF32(
         mask.raw,
-        a,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
     )
 }
 
 @inline(never)
 public func portBitwiseXorWhereF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     SIMDFloat.bitwiseXor(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayBitwiseXorWhereF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseXorWhereF32(mask.raw, a, b)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseXorWhereF32(mask.raw, a.raw, b.raw)
 }
 
 @inline(never)
 public func portBitwiseXorWhereF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     SIMDFloat.bitwiseXor(SIMDFloat.repeating(1.5), b, where: mask)
 }
 
 @inline(never)
 public func highwayBitwiseXorWhereF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     HighwayReference.Nothrow.bitwiseXorWhereF32(
         mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        b
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw
     )
 }
 
 @inline(never)
 public func portBitwiseXorWhereF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     SIMDFloat.bitwiseXor(a, SIMDFloat.repeating(1.5), where: mask)
 }
 
 @inline(never)
 public func highwayBitwiseXorWhereF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     HighwayReference.Nothrow.bitwiseXorWhereF32(
         mask.raw,
-        a,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
     )
 }
 
 @inline(never)
 public func portBitwiseAndWhereOtherwiseF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.bitwiseAnd(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayBitwiseAndWhereOtherwiseF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseAndWhereOtherwiseF32(otherwise, mask.raw, a, b)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseAndWhereOtherwiseF32(otherwise.raw, mask.raw, a.raw, b.raw)
 }
 
 @inline(never)
 public func portBitwiseAndWhereOtherwiseF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.bitwiseAnd(SIMDFloat.repeating(1.5), b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayBitwiseAndWhereOtherwiseF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.bitwiseAndWhereOtherwiseF32(
-        otherwise,
+        otherwise.raw,
         mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        b
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw
     )
 }
 
 @inline(never)
 public func portBitwiseAndWhereOtherwiseF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.bitwiseAnd(a, SIMDFloat.repeating(1.5), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayBitwiseAndWhereOtherwiseF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.bitwiseAndWhereOtherwiseF32(
-        otherwise,
+        otherwise.raw,
         mask.raw,
-        a,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
     )
 }
 
 @inline(never)
 public func portBitwiseAndWhereOtherwiseF32ConstantOtherwise(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     SIMDFloat.bitwiseAnd(a, b, where: mask, otherwise: SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
 public func highwayBitwiseAndWhereOtherwiseF32ConstantOtherwise(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     HighwayReference.Nothrow.bitwiseAndWhereOtherwiseF32(
-        HighwayReference.Nothrow.repeatingF32(1.5),
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
         mask.raw,
-        a,
-        b
+        a.raw,
+        b.raw
     )
 }
 
 @inline(never)
 public func portBitwiseOrWhereOtherwiseF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.bitwiseOr(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayBitwiseOrWhereOtherwiseF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseOrWhereOtherwiseF32(otherwise, mask.raw, a, b)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseOrWhereOtherwiseF32(otherwise.raw, mask.raw, a.raw, b.raw)
 }
 
 @inline(never)
 public func portBitwiseOrWhereOtherwiseF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.bitwiseOr(SIMDFloat.repeating(1.5), b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayBitwiseOrWhereOtherwiseF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.bitwiseOrWhereOtherwiseF32(
-        otherwise,
+        otherwise.raw,
         mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        b
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw
     )
 }
 
 @inline(never)
 public func portBitwiseOrWhereOtherwiseF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.bitwiseOr(a, SIMDFloat.repeating(1.5), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayBitwiseOrWhereOtherwiseF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.bitwiseOrWhereOtherwiseF32(
-        otherwise,
+        otherwise.raw,
         mask.raw,
-        a,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
     )
 }
 
 @inline(never)
 public func portBitwiseOrWhereOtherwiseF32ConstantOtherwise(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     SIMDFloat.bitwiseOr(a, b, where: mask, otherwise: SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
 public func highwayBitwiseOrWhereOtherwiseF32ConstantOtherwise(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     HighwayReference.Nothrow.bitwiseOrWhereOtherwiseF32(
-        HighwayReference.Nothrow.repeatingF32(1.5),
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
         mask.raw,
-        a,
-        b
+        a.raw,
+        b.raw
     )
 }
 
 @inline(never)
 public func portBitwiseXorWhereOtherwiseF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.bitwiseXor(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayBitwiseXorWhereOtherwiseF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.bitwiseXorWhereOtherwiseF32(otherwise, mask.raw, a, b)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.bitwiseXorWhereOtherwiseF32(otherwise.raw, mask.raw, a.raw, b.raw)
 }
 
 @inline(never)
 public func portBitwiseXorWhereOtherwiseF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.bitwiseXor(SIMDFloat.repeating(1.5), b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayBitwiseXorWhereOtherwiseF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.bitwiseXorWhereOtherwiseF32(
-        otherwise,
+        otherwise.raw,
         mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        b
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw
     )
 }
 
 @inline(never)
 public func portBitwiseXorWhereOtherwiseF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.bitwiseXor(a, SIMDFloat.repeating(1.5), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayBitwiseXorWhereOtherwiseF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.bitwiseXorWhereOtherwiseF32(
-        otherwise,
+        otherwise.raw,
         mask.raw,
-        a,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
     )
 }
 
 @inline(never)
 public func portBitwiseXorWhereOtherwiseF32ConstantOtherwise(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     SIMDFloat.bitwiseXor(a, b, where: mask, otherwise: SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
 public func highwayBitwiseXorWhereOtherwiseF32ConstantOtherwise(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
     HighwayReference.Nothrow.bitwiseXorWhereOtherwiseF32(
-        HighwayReference.Nothrow.repeatingF32(1.5),
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
         mask.raw,
-        a,
-        b
+        a.raw,
+        b.raw
     )
 }
 
 @inline(never)
-public func portAllBitsSetF32(_ a: SIMDFloat.Vector) -> Bool {
+public func portAllBitsSetF32(_ a: SIMD<Float>) -> Bool {
     SIMDFloat.allBitsSet(a)
 }
 
 @inline(never)
-public func highwayAllBitsSetF32(_ a: SIMDFloat.Vector) -> Bool {
-    HighwayReference.Nothrow.allBitsSetF32(a)
+public func highwayAllBitsSetF32(_ a: SIMD<Float>) -> Bool {
+    HighwayReference.Nothrow.allBitsSetF32(a.raw)
 }
 
 @inline(never)
@@ -1057,17 +997,17 @@ public func portAllBitsSetF32ConstantA() -> Bool {
 
 @inline(never)
 public func highwayAllBitsSetF32ConstantA() -> Bool {
-    HighwayReference.Nothrow.allBitsSetF32(HighwayReference.Nothrow.repeatingF32(1.5))
+    HighwayReference.Nothrow.allBitsSetF32(HighwayReference.Nothrow.repeatingF32(1.5).raw)
 }
 
 @inline(never)
-public func portAllBitsClearF32(_ a: SIMDFloat.Vector) -> Bool {
+public func portAllBitsClearF32(_ a: SIMD<Float>) -> Bool {
     SIMDFloat.allBitsClear(a)
 }
 
 @inline(never)
-public func highwayAllBitsClearF32(_ a: SIMDFloat.Vector) -> Bool {
-    HighwayReference.Nothrow.allBitsClearF32(a)
+public func highwayAllBitsClearF32(_ a: SIMD<Float>) -> Bool {
+    HighwayReference.Nothrow.allBitsClearF32(a.raw)
 }
 
 @inline(never)
@@ -1077,219 +1017,202 @@ public func portAllBitsClearF32ConstantA() -> Bool {
 
 @inline(never)
 public func highwayAllBitsClearF32ConstantA() -> Bool {
-    HighwayReference.Nothrow.allBitsClearF32(HighwayReference.Nothrow.repeatingF32(1.5))
+    HighwayReference.Nothrow.allBitsClearF32(HighwayReference.Nothrow.repeatingF32(1.5).raw)
 }
 
 @inline(never)
-public func portZeroingNegativeF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portZeroingNegativeF32(_ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.zeroingNegative(a)
 }
 
 @inline(never)
-public func highwayZeroingNegativeF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.zeroingNegativeF32(a)
+public func highwayZeroingNegativeF32(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.zeroingNegativeF32(a.raw)
 }
 
 @inline(never)
-public func portZeroingNegativeF32ConstantA() -> SIMDFloat.Vector {
+public func portZeroingNegativeF32ConstantA() -> SIMD<Float> {
     SIMDFloat.zeroingNegative(SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayZeroingNegativeF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.zeroingNegativeF32(HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayZeroingNegativeF32ConstantA() -> SIMD<Float> {
+    HighwayReference.Nothrow.zeroingNegativeF32(HighwayReference.Nothrow.repeatingF32(1.5).raw)
 }
 
 @inline(never)
 public func portSelectingIfNegativeF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     SIMDFloat.selectingIfNegative(a, b, c)
 }
 
 @inline(never)
 public func highwaySelectingIfNegativeF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.selectingIfNegativeF32(a, b, c)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    HighwayReference.Nothrow.selectingIfNegativeF32(a.raw, b.raw, c.raw)
 }
 
 @inline(never)
-public func portSelectingIfNegativeF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portSelectingIfNegativeF32ConstantA(_ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.selectingIfNegative(SIMDFloat.repeating(1.5), b, c)
 }
 
 @inline(never)
 public func highwaySelectingIfNegativeF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.selectingIfNegativeF32(
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        b,
-        c
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw,
+        c.raw
     )
 }
 
 @inline(never)
-public func portSelectingIfNegativeF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portSelectingIfNegativeF32ConstantB(_ a: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.selectingIfNegative(a, SIMDFloat.repeating(1.5), c)
 }
 
 @inline(never)
 public func highwaySelectingIfNegativeF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.selectingIfNegativeF32(
-        a,
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        c
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        c.raw
     )
 }
 
 @inline(never)
-public func portSelectingIfNegativeF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portSelectingIfNegativeF32ConstantC(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.selectingIfNegative(a, b, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
 public func highwaySelectingIfNegativeF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>
+) -> SIMD<Float> {
     HighwayReference.Nothrow.selectingIfNegativeF32(
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+        a.raw,
+        b.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
     )
 }
 
 @inline(never)
-public func portSelectingIfNegativeOrZeroF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portSelectingIfNegativeOrZeroF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.selectingIfNegativeOrZero(a, b)
 }
 
 @inline(never)
-public func highwaySelectingIfNegativeOrZeroF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.selectingIfNegativeOrZeroF32(a, b)
+public func highwaySelectingIfNegativeOrZeroF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.selectingIfNegativeOrZeroF32(a.raw, b.raw)
 }
 
 @inline(never)
-public func portSelectingIfNegativeOrZeroF32ConstantA(_ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portSelectingIfNegativeOrZeroF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.selectingIfNegativeOrZero(SIMDFloat.repeating(1.5), b)
 }
 
 @inline(never)
-public func highwaySelectingIfNegativeOrZeroF32ConstantA(_ b: SIMDFloat.Vector) -> SIMDFloat.Vector
-{
+public func highwaySelectingIfNegativeOrZeroF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
     HighwayReference.Nothrow.selectingIfNegativeOrZeroF32(
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        b
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw
     )
 }
 
 @inline(never)
-public func portSelectingIfNegativeOrZeroF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portSelectingIfNegativeOrZeroF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.selectingIfNegativeOrZero(a, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwaySelectingIfNegativeOrZeroF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector
-{
+public func highwaySelectingIfNegativeOrZeroF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
     HighwayReference.Nothrow.selectingIfNegativeOrZeroF32(
-        a,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
     )
 }
 
 @inline(never)
-public func portZeroingIfNegativeF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portZeroingIfNegativeF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.zeroingIfNegative(a, b)
 }
 
 @inline(never)
-public func highwayZeroingIfNegativeF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.zeroingIfNegativeF32(a, b)
+public func highwayZeroingIfNegativeF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.zeroingIfNegativeF32(a.raw, b.raw)
 }
 
 @inline(never)
-public func portZeroingIfNegativeF32ConstantA(_ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portZeroingIfNegativeF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.zeroingIfNegative(SIMDFloat.repeating(1.5), b)
 }
 
 @inline(never)
-public func highwayZeroingIfNegativeF32ConstantA(_ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.zeroingIfNegativeF32(HighwayReference.Nothrow.repeatingF32(1.5), b)
+public func highwayZeroingIfNegativeF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.zeroingIfNegativeF32(
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw
+    )
 }
 
 @inline(never)
-public func portZeroingIfNegativeF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portZeroingIfNegativeF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.zeroingIfNegative(a, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayZeroingIfNegativeF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.zeroingIfNegativeF32(a, HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayZeroingIfNegativeF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.zeroingIfNegativeF32(
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    )
 }
 
 @inline(never)
-public func portNegatingIfNegativeF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
+public func portNegatingIfNegativeF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.negatingIfNegative(a, b)
 }
 
 @inline(never)
-public func highwayNegatingIfNegativeF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.negatingIfNegativeF32(a, b)
+public func highwayNegatingIfNegativeF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.negatingIfNegativeF32(a.raw, b.raw)
 }
 
 @inline(never)
-public func portNegatingIfNegativeF32ConstantA(_ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portNegatingIfNegativeF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.negatingIfNegative(SIMDFloat.repeating(1.5), b)
 }
 
 @inline(never)
-public func highwayNegatingIfNegativeF32ConstantA(_ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.negatingIfNegativeF32(HighwayReference.Nothrow.repeatingF32(1.5), b)
+public func highwayNegatingIfNegativeF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.negatingIfNegativeF32(
+        HighwayReference.Nothrow.repeatingF32(1.5).raw,
+        b.raw
+    )
 }
 
 @inline(never)
-public func portNegatingIfNegativeF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+public func portNegatingIfNegativeF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
     SIMDFloat.negatingIfNegative(a, SIMDFloat.repeating(1.5))
 }
 
 @inline(never)
-public func highwayNegatingIfNegativeF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.negatingIfNegativeF32(a, HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayNegatingIfNegativeF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
+    HighwayReference.Nothrow.negatingIfNegativeF32(
+        a.raw,
+        HighwayReference.Nothrow.repeatingF32(1.5).raw
+    )
 }

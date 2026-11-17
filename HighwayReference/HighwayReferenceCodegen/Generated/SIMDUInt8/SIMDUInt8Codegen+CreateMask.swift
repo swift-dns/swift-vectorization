@@ -25,76 +25,76 @@ extension HighwayReferenceUInt8 {
 }
 
 @inline(never)
-public func portFirstLanesU8(count: Int) -> SIMDUInt8.Mask {
+public func portFirstLanesU8(count: Int) -> SIMD<UInt8>.Mask {
     SIMDUInt8.firstLanes(count: count)
 }
 
 @inline(never)
-public func highwayFirstLanesU8(count: Int) -> SIMDUInt8.Mask {
+public func highwayFirstLanesU8(count: Int) -> SIMD<UInt8>.Mask {
     SIMDUInt8.Mask(raw: HighwayReference.Nothrow.firstLanesU8(count))
 }
 
 @inline(never)
-public func portFirstLanesU8ConstantCount() -> SIMDUInt8.Mask {
+public func portFirstLanesU8ConstantCount() -> SIMD<UInt8>.Mask {
     SIMDUInt8.firstLanes(count: 1)
 }
 
 @inline(never)
-public func highwayFirstLanesU8ConstantCount() -> SIMDUInt8.Mask {
+public func highwayFirstLanesU8ConstantCount() -> SIMD<UInt8>.Mask {
     SIMDUInt8.Mask(raw: HighwayReference.Nothrow.firstLanesU8(1))
 }
 
 @inline(never)
-public func portFirstLanesU8ConstantCountTwo() -> SIMDUInt8.Mask {
+public func portFirstLanesU8ConstantCountTwo() -> SIMD<UInt8>.Mask {
     SIMDUInt8.firstLanes(count: 2)
 }
 
 @inline(never)
-public func highwayFirstLanesU8ConstantCountTwo() -> SIMDUInt8.Mask {
+public func highwayFirstLanesU8ConstantCountTwo() -> SIMD<UInt8>.Mask {
     SIMDUInt8.Mask(raw: HighwayReference.Nothrow.firstLanesU8(2))
 }
 
 @inline(never)
-public func portFirstLanesU8ConstantCountLaneCount() -> SIMDUInt8.Mask {
+public func portFirstLanesU8ConstantCountLaneCount() -> SIMD<UInt8>.Mask {
     SIMDUInt8.firstLanes(count: SIMDUInt8.laneCount)
 }
 
 @inline(never)
-public func highwayFirstLanesU8ConstantCountLaneCount() -> SIMDUInt8.Mask {
+public func highwayFirstLanesU8ConstantCountLaneCount() -> SIMD<UInt8>.Mask {
     SIMDUInt8.Mask(
         raw: HighwayReference.Nothrow.firstLanesU8(HighwayReference.Nothrow.laneCountU8())
     )
 }
 
 @inline(never)
-public func portFirstLanesU8ConstantCountTwiceLaneCount() -> SIMDUInt8.Mask {
+public func portFirstLanesU8ConstantCountTwiceLaneCount() -> SIMD<UInt8>.Mask {
     SIMDUInt8.firstLanes(count: 2 * SIMDUInt8.laneCount)
 }
 
 @inline(never)
-public func highwayFirstLanesU8ConstantCountTwiceLaneCount() -> SIMDUInt8.Mask {
+public func highwayFirstLanesU8ConstantCountTwiceLaneCount() -> SIMD<UInt8>.Mask {
     SIMDUInt8.Mask(
         raw: HighwayReference.Nothrow.firstLanesU8(2 * HighwayReference.Nothrow.laneCountU8())
     )
 }
 
 @inline(never)
-public func portMaskFromVectorU8(from a: SIMDUInt8.Vector) -> SIMDUInt8.Mask {
+public func portMaskFromVectorU8(from a: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
     SIMDUInt8.mask(from: a)
 }
 
 @inline(never)
-public func highwayMaskFromVectorU8(from a: SIMDUInt8.Vector) -> SIMDUInt8.Mask {
+public func highwayMaskFromVectorU8(from a: SIMD<UInt8>) -> SIMD<UInt8>.Mask {
     SIMDUInt8.Mask(raw: HighwayReference.Nothrow.maskFromVectorU8(a.raw))
 }
 
 @inline(never)
-public func portMaskFromVectorU8ConstantA() -> SIMDUInt8.Mask {
+public func portMaskFromVectorU8ConstantA() -> SIMD<UInt8>.Mask {
     SIMDUInt8.mask(from: SIMDUInt8.repeating(26))
 }
 
 @inline(never)
-public func highwayMaskFromVectorU8ConstantA() -> SIMDUInt8.Mask {
+public func highwayMaskFromVectorU8ConstantA() -> SIMD<UInt8>.Mask {
     SIMDUInt8.Mask(
         raw: HighwayReference.Nothrow.maskFromVectorU8(
             SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
@@ -103,51 +103,51 @@ public func highwayMaskFromVectorU8ConstantA() -> SIMDUInt8.Mask {
 }
 
 @inline(never)
-public func portRepeatingMaskU8(_ value: Bool) -> SIMDUInt8.Mask {
+public func portRepeatingMaskU8(_ value: Bool) -> SIMD<UInt8>.Mask {
     SIMDUInt8.repeatingMask(value)
 }
 
 @inline(never)
-public func highwayRepeatingMaskU8(_ value: Bool) -> SIMDUInt8.Mask {
+public func highwayRepeatingMaskU8(_ value: Bool) -> SIMD<UInt8>.Mask {
     SIMDUInt8.Mask(raw: HighwayReference.Nothrow.repeatingMaskU8(value))
 }
 
 @inline(never)
-public func portRepeatingMaskU8ConstantValue() -> SIMDUInt8.Mask {
+public func portRepeatingMaskU8ConstantValue() -> SIMD<UInt8>.Mask {
     SIMDUInt8.repeatingMask(false)
 }
 
 @inline(never)
-public func highwayRepeatingMaskU8ConstantValue() -> SIMDUInt8.Mask {
+public func highwayRepeatingMaskU8ConstantValue() -> SIMD<UInt8>.Mask {
     SIMDUInt8.Mask(raw: HighwayReference.Nothrow.repeatingMaskU8(false))
 }
 
 @inline(never)
-public func portRepeatingBlockMaskU8(bits: UInt) -> SIMDUInt8.Mask {
+public func portRepeatingBlockMaskU8(bits: UInt) -> SIMD<UInt8>.Mask {
     SIMDUInt8.repeatingBlockMask(bits: bits)
 }
 
 @inline(never)
-public func highwayRepeatingBlockMaskU8(bits: UInt) -> SIMDUInt8.Mask {
+public func highwayRepeatingBlockMaskU8(bits: UInt) -> SIMD<UInt8>.Mask {
     SIMDUInt8.Mask(raw: HighwayReference.Nothrow.repeatingBlockMaskU8(bits))
 }
 
 @inline(never)
-public func portRepeatingBlockMaskU8ConstantBits() -> SIMDUInt8.Mask {
+public func portRepeatingBlockMaskU8ConstantBits() -> SIMD<UInt8>.Mask {
     SIMDUInt8.repeatingBlockMask(bits: 5)
 }
 
 @inline(never)
-public func highwayRepeatingBlockMaskU8ConstantBits() -> SIMDUInt8.Mask {
+public func highwayRepeatingBlockMaskU8ConstantBits() -> SIMD<UInt8>.Mask {
     SIMDUInt8.Mask(raw: HighwayReference.Nothrow.repeatingBlockMaskU8(5))
 }
 
 @inline(never)
-public func portLoadMaskU8(from: UnsafePointer<UInt8>) -> SIMDUInt8.Mask {
+public func portLoadMaskU8(from: UnsafePointer<UInt8>) -> SIMD<UInt8>.Mask {
     unsafe SIMDUInt8.loadMask(from: from)
 }
 
 @inline(never)
-public func highwayLoadMaskU8(from: UnsafePointer<UInt8>) -> SIMDUInt8.Mask {
+public func highwayLoadMaskU8(from: UnsafePointer<UInt8>) -> SIMD<UInt8>.Mask {
     unsafe SIMDUInt8.Mask(raw: HighwayReference.Nothrow.loadMaskU8(from))
 }

@@ -14,7 +14,7 @@ extension SIMDFloatConstantTests {
         for mask in maskInputs {
             mismatches.check(
                 H.squareRoot(H.repeating(value), where: mask),
-                HighwayReference.squareRootWhereF32(mask.raw, H.repeating(value)),
+                HighwayReference.squareRootWhereF32(mask.raw, H.repeating(value).raw),
                 "mask: \(describe(mask))"
             )
         }
@@ -107,7 +107,7 @@ extension SIMDFloatConstantTests {
         where !hasUnorderedNaNs(H.repeating(value), b) {
             mismatches.check(
                 H.maximum(H.repeating(value), b, where: mask),
-                HighwayReference.maximumWhereF32(mask.raw, H.repeating(value), b),
+                HighwayReference.maximumWhereF32(mask.raw, H.repeating(value).raw, b.raw),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -124,7 +124,7 @@ extension SIMDFloatConstantTests {
         where !hasUnorderedNaNs(a, H.repeating(value)) {
             mismatches.check(
                 H.maximum(a, H.repeating(value), where: mask),
-                HighwayReference.maximumWhereF32(mask.raw, a, H.repeating(value)),
+                HighwayReference.maximumWhereF32(mask.raw, a.raw, H.repeating(value).raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -236,7 +236,7 @@ extension SIMDFloatConstantTests {
         where !hasUnorderedNaNs(H.repeating(value), b) {
             mismatches.check(
                 H.adding(H.repeating(value), b, where: mask),
-                HighwayReference.addingWhereF32(mask.raw, H.repeating(value), b),
+                HighwayReference.addingWhereF32(mask.raw, H.repeating(value).raw, b.raw),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -253,7 +253,7 @@ extension SIMDFloatConstantTests {
         where !hasUnorderedNaNs(a, H.repeating(value)) {
             mismatches.check(
                 H.adding(a, H.repeating(value), where: mask),
-                HighwayReference.addingWhereF32(mask.raw, a, H.repeating(value)),
+                HighwayReference.addingWhereF32(mask.raw, a.raw, H.repeating(value).raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -364,7 +364,7 @@ extension SIMDFloatConstantTests {
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 H.subtracting(H.repeating(value), b, where: mask),
-                HighwayReference.subtractingWhereF32(mask.raw, H.repeating(value), b),
+                HighwayReference.subtractingWhereF32(mask.raw, H.repeating(value).raw, b.raw),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -380,7 +380,7 @@ extension SIMDFloatConstantTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.subtracting(a, H.repeating(value), where: mask),
-                HighwayReference.subtractingWhereF32(mask.raw, a, H.repeating(value)),
+                HighwayReference.subtractingWhereF32(mask.raw, a.raw, H.repeating(value).raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -492,7 +492,7 @@ extension SIMDFloatConstantTests {
         where !hasUnorderedNaNs(H.repeating(value), b) {
             mismatches.check(
                 H.multiplying(H.repeating(value), b, where: mask),
-                HighwayReference.multiplyingWhereF32(mask.raw, H.repeating(value), b),
+                HighwayReference.multiplyingWhereF32(mask.raw, H.repeating(value).raw, b.raw),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -509,7 +509,7 @@ extension SIMDFloatConstantTests {
         where !hasUnorderedNaNs(a, H.repeating(value)) {
             mismatches.check(
                 H.multiplying(a, H.repeating(value), where: mask),
-                HighwayReference.multiplyingWhereF32(mask.raw, a, H.repeating(value)),
+                HighwayReference.multiplyingWhereF32(mask.raw, a.raw, H.repeating(value).raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -620,7 +620,7 @@ extension SIMDFloatConstantTests {
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 H.dividing(H.repeating(value), b, where: mask),
-                HighwayReference.dividingWhereF32(mask.raw, H.repeating(value), b),
+                HighwayReference.dividingWhereF32(mask.raw, H.repeating(value).raw, b.raw),
                 "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
@@ -636,7 +636,7 @@ extension SIMDFloatConstantTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.dividing(a, H.repeating(value), where: mask),
-                HighwayReference.dividingWhereF32(mask.raw, a, H.repeating(value)),
+                HighwayReference.dividingWhereF32(mask.raw, a.raw, H.repeating(value).raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -749,7 +749,12 @@ extension SIMDFloatConstantTests {
         where !hasUnorderedNaNs(multiplying: H.repeating(value), b, adding: c) {
             mismatches.check(
                 H.multiplyAdding(H.repeating(value), b, c, where: mask),
-                HighwayReference.multiplyAddingWhereF32(mask.raw, H.repeating(value), b, c),
+                HighwayReference.multiplyAddingWhereF32(
+                    mask.raw,
+                    H.repeating(value).raw,
+                    b.raw,
+                    c.raw
+                ),
                 "mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -767,7 +772,12 @@ extension SIMDFloatConstantTests {
         where !hasUnorderedNaNs(multiplying: a, H.repeating(value), adding: c) {
             mismatches.check(
                 H.multiplyAdding(a, H.repeating(value), c, where: mask),
-                HighwayReference.multiplyAddingWhereF32(mask.raw, a, H.repeating(value), c),
+                HighwayReference.multiplyAddingWhereF32(
+                    mask.raw,
+                    a.raw,
+                    H.repeating(value).raw,
+                    c.raw
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -785,7 +795,12 @@ extension SIMDFloatConstantTests {
         where !hasUnorderedNaNs(multiplying: a, b, adding: H.repeating(value)) {
             mismatches.check(
                 H.multiplyAdding(a, b, H.repeating(value), where: mask),
-                HighwayReference.multiplyAddingWhereF32(mask.raw, a, b, H.repeating(value)),
+                HighwayReference.multiplyAddingWhereF32(
+                    mask.raw,
+                    a.raw,
+                    b.raw,
+                    H.repeating(value).raw
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -917,7 +932,12 @@ extension SIMDFloatConstantTests {
         where !hasUnorderedNaNs(multiplying: H.repeating(value), b, adding: c) {
             mismatches.check(
                 H.multiplySubtracting(H.repeating(value), b, c, where: mask),
-                HighwayReference.multiplySubtractingWhereF32(mask.raw, H.repeating(value), b, c),
+                HighwayReference.multiplySubtractingWhereF32(
+                    mask.raw,
+                    H.repeating(value).raw,
+                    b.raw,
+                    c.raw
+                ),
                 "mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -935,7 +955,12 @@ extension SIMDFloatConstantTests {
         where !hasUnorderedNaNs(multiplying: a, H.repeating(value), adding: c) {
             mismatches.check(
                 H.multiplySubtracting(a, H.repeating(value), c, where: mask),
-                HighwayReference.multiplySubtractingWhereF32(mask.raw, a, H.repeating(value), c),
+                HighwayReference.multiplySubtractingWhereF32(
+                    mask.raw,
+                    a.raw,
+                    H.repeating(value).raw,
+                    c.raw
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -953,7 +978,12 @@ extension SIMDFloatConstantTests {
         where !hasUnorderedNaNs(multiplying: a, b, adding: H.repeating(value)) {
             mismatches.check(
                 H.multiplySubtracting(a, b, H.repeating(value), where: mask),
-                HighwayReference.multiplySubtractingWhereF32(mask.raw, a, b, H.repeating(value)),
+                HighwayReference.multiplySubtractingWhereF32(
+                    mask.raw,
+                    a.raw,
+                    b.raw,
+                    H.repeating(value).raw
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }

@@ -30,7 +30,7 @@ extension SIMDFloat16ConstantTests {
                         otherwise: H.repeating(value)
                     ),
                     unsafe HighwayReference.loadWhereOtherwiseF16(
-                        H.repeating(value),
+                        H.repeating(value).raw,
                         mask.raw,
                         source.baseAddress!
                     )
@@ -144,7 +144,7 @@ extension SIMDFloat16ConstantTests {
                         otherwise: H.repeating(value)
                     ),
                     unsafe HighwayReference.loadFirstOtherwiseF16(
-                        H.repeating(value),
+                        H.repeating(value).raw,
                         source.baseAddress!,
                         count
                     )
@@ -254,7 +254,7 @@ extension SIMDFloat16ConstantTests {
                     unsafe H.loadingUpperHalf(H.repeating(value), from: source.baseAddress!),
                     unsafe HighwayReference.loadingUpperHalfF16(
                         source.baseAddress!,
-                        H.repeating(value)
+                        H.repeating(value).raw
                     )
                 )
             }

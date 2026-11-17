@@ -21,7 +21,7 @@ extension SIMDFloat16ConstantTests {
                 H.block(H.repeating(value), at: index),
                 H.BlockVector(
                     raw: HighwayReference.extractingBlockF16(
-                        H.repeating(value),
+                        H.repeating(value).raw,
                         Int32(truncatingIfNeeded: index)
                     )
                 ),
@@ -123,7 +123,7 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.replacingBlock(H.repeating(value), at: index, with: b),
                 HighwayReference.replacingBlockF16(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: index),
                     b.raw
                 ),

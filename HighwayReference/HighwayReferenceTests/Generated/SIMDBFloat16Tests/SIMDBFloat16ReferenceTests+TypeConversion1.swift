@@ -116,7 +116,7 @@ extension SIMDBFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(bitPattern: a),
-                H.Vector(raw: HighwayReference.vectorBitPatternF32ToBF16(a)),
+                H.Vector(raw: HighwayReference.vectorBitPatternF32ToBF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -129,7 +129,7 @@ extension SIMDBFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(bitPattern: a),
-                H.Vector(raw: HighwayReference.vectorBitPatternF64ToBF16(a)),
+                H.Vector(raw: HighwayReference.vectorBitPatternF64ToBF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -143,7 +143,7 @@ extension SIMDBFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.vector(bitPattern: a),
-                H.Vector(raw: HighwayReference.vectorBitPatternF16ToBF16(a)),
+                H.Vector(raw: HighwayReference.vectorBitPatternF16ToBF16(a.raw)),
                 "a: \(describe(a))"
             )
         }

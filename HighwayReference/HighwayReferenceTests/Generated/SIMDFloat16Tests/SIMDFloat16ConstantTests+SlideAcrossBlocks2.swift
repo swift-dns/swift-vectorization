@@ -21,8 +21,8 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.combinedSlideDownLanes(H.repeating(value), b, by: lanes),
                 HighwayReference.combinedSlideDownLanesF16(
-                    H.repeating(value),
-                    b,
+                    H.repeating(value).raw,
+                    b.raw,
                     Int32(truncatingIfNeeded: lanes)
                 ),
                 "b: \(describe(b)), lanes: \(lanes)"
@@ -45,8 +45,8 @@ extension SIMDFloat16ConstantTests {
             mismatches.check(
                 H.combinedSlideDownLanes(a, H.repeating(value), by: lanes),
                 HighwayReference.combinedSlideDownLanesF16(
-                    a,
-                    H.repeating(value),
+                    a.raw,
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: lanes)
                 ),
                 "a: \(describe(a)), lanes: \(lanes)"

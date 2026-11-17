@@ -20,7 +20,7 @@ extension SIMDFloatConstantTests {
         for b in bInputs {
             mismatches.check(
                 H.zippingLower(SIMDFloat16.repeating(value), b),
-                HighwayReference.zippingLowerF16ToF32(SIMDFloat16.repeating(value), b),
+                HighwayReference.zippingLowerF16ToF32(SIMDFloat16.repeating(value).raw, b.raw),
                 "b: \(describe(b))"
             )
         }
@@ -41,7 +41,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.zippingLower(a, SIMDFloat16.repeating(value)),
-                HighwayReference.zippingLowerF16ToF32(a, SIMDFloat16.repeating(value)),
+                HighwayReference.zippingLowerF16ToF32(a.raw, SIMDFloat16.repeating(value).raw),
                 "a: \(describe(a))"
             )
         }

@@ -12,7 +12,7 @@ extension SIMDBFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.halfVector(converting: a),
-                H.HalfVector(raw: HighwayReference.halfVectorConvertingF32ToBF16(a)),
+                H.HalfVector(raw: HighwayReference.halfVectorConvertingF32ToBF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -30,7 +30,7 @@ extension SIMDBFloat16ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(converting: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorConvertingF32ToBF16(a)),
+                H.Vector(raw: HighwayReference.resizedHalfVectorConvertingF32ToBF16(a.raw)),
                 "a: \(describe(a))"
             )
         }

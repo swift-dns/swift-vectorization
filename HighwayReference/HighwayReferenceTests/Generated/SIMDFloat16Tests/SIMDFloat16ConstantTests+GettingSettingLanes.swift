@@ -17,7 +17,7 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.firstLane(H.repeating(value)),
-            Float16(bitPattern: HighwayReference.firstLaneF16(H.repeating(value))),
+            Float16(bitPattern: HighwayReference.firstLaneF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -106,7 +106,7 @@ extension SIMDFloat16ConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.lane(a, at: index),
-                Float16(bitPattern: HighwayReference.laneF16(a, index)),
+                Float16(bitPattern: HighwayReference.laneF16(a.raw, index)),
                 "a: \(describe(a))"
             )
         }
@@ -253,7 +253,7 @@ extension SIMDFloat16ConstantTests {
         for index in indexInputs {
             mismatches.check(
                 H.lane(H.repeating(value), at: index),
-                Float16(bitPattern: HighwayReference.laneF16(H.repeating(value), index)),
+                Float16(bitPattern: HighwayReference.laneF16(H.repeating(value).raw, index)),
                 "index: \(index)"
             )
         }
@@ -349,7 +349,7 @@ extension SIMDFloat16ConstantTests {
         for (index, value) in everyPair(indexInputs, valueInputs) {
             mismatches.check(
                 H.replacingLane(H.repeating(value), at: index, with: value),
-                HighwayReference.replacingLaneF16(H.repeating(value), index, value.bitPattern),
+                HighwayReference.replacingLaneF16(H.repeating(value).raw, index, value.bitPattern),
                 "index: \(index), value: \(hex(value))"
             )
         }

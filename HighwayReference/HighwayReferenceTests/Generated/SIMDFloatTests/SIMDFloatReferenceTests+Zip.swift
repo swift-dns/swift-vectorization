@@ -15,7 +15,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.zippingLower(a, b),
-                HighwayReference.zippingLowerF16ToF32(a, b),
+                HighwayReference.zippingLowerF16ToF32(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

@@ -25,7 +25,7 @@ extension SIMDInt16ConstantTests {
                 H.Vector(
                     raw: HighwayReference.vectorConvertingWhereF16ToI16(
                         mask.raw,
-                        SIMDFloat16.repeating(value)
+                        SIMDFloat16.repeating(value).raw
                     )
                 ),
                 "mask: \(describe(mask))"

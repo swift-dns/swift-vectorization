@@ -13,7 +13,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.equalTo(a, b),
-                H.Mask(raw: HighwayReference.equalToF64(a, b)),
+                H.Mask(raw: HighwayReference.equalToF64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -27,7 +27,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.notEqualTo(a, b),
-                H.Mask(raw: HighwayReference.notEqualToF64(a, b)),
+                H.Mask(raw: HighwayReference.notEqualToF64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -41,7 +41,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.lessThan(a, b),
-                H.Mask(raw: HighwayReference.lessThanF64(a, b)),
+                H.Mask(raw: HighwayReference.lessThanF64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -55,7 +55,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.greaterThan(a, b),
-                H.Mask(raw: HighwayReference.greaterThanF64(a, b)),
+                H.Mask(raw: HighwayReference.greaterThanF64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -69,7 +69,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.lessThanOrEqualTo(a, b),
-                H.Mask(raw: HighwayReference.lessThanOrEqualToF64(a, b)),
+                H.Mask(raw: HighwayReference.lessThanOrEqualToF64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -83,7 +83,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.greaterThanOrEqualTo(a, b),
-                H.Mask(raw: HighwayReference.greaterThanOrEqualToF64(a, b)),
+                H.Mask(raw: HighwayReference.greaterThanOrEqualToF64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -96,7 +96,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.isNegative(a),
-                H.Mask(raw: HighwayReference.isNegativeF64(a)),
+                H.Mask(raw: HighwayReference.isNegativeF64(a.raw)),
                 "a: \(describe(a))"
             )
         }

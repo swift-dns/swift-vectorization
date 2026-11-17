@@ -13,7 +13,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplying(a, b),
-                HighwayReference.multiplyingF32(a, b),
+                HighwayReference.multiplyingF32(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -27,7 +27,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.multiplyingRounded(a, b),
-                HighwayReference.multiplyingRoundedF32(a, b),
+                HighwayReference.multiplyingRoundedF32(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -41,7 +41,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplyingByFloorPowerOf2(a, b),
-                HighwayReference.multiplyingByFloorPowerOf2F32(a, b),
+                HighwayReference.multiplyingByFloorPowerOf2F32(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -55,7 +55,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplyingByPowerOf2(a, b),
-                HighwayReference.multiplyingByPowerOf2I32ToF32(a, b.raw),
+                HighwayReference.multiplyingByPowerOf2I32ToF32(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -69,7 +69,7 @@ extension SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.rearrangedToOddPlusEven(a, b),
-                HighwayReference.rearrangedToOddPlusEvenF32(a, b),
+                HighwayReference.rearrangedToOddPlusEvenF32(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -109,8 +109,8 @@ extension SIMDFloatReferenceTests {
             let reference = HighwayReference.multiplyAccumulatingInAnyOrderBF16ToF32(
                 a.raw,
                 b.raw,
-                c,
-                &r0
+                c.raw,
+                &r0.raw
             )
             mismatches.check(
                 port,

@@ -19,7 +19,7 @@ extension SIMDDoubleConstantTests {
             mismatches.check(
                 H.shuffledPer4Lanes(a, i3, i2, i1, i0),
                 HighwayReference.shuffledPer4LanesF64(
-                    a,
+                    a.raw,
                     Int32(truncatingIfNeeded: i3),
                     Int32(truncatingIfNeeded: i2),
                     Int32(truncatingIfNeeded: i1),
@@ -1070,7 +1070,7 @@ extension SIMDDoubleConstantTests {
             mismatches.check(
                 unsafe H.shuffledPer4Lanes(a, unchecked: i3, i2, i1, i0),
                 HighwayReference.shuffledPer4LanesF64(
-                    a,
+                    a.raw,
                     Int32(truncatingIfNeeded: i3),
                     Int32(truncatingIfNeeded: i2),
                     Int32(truncatingIfNeeded: i1),
@@ -2124,7 +2124,7 @@ extension SIMDDoubleConstantTests {
             mismatches.check(
                 H.shuffledPer4Lanes(H.repeating(value), i3, i2, i1, i0),
                 HighwayReference.shuffledPer4LanesF64(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: i3),
                     Int32(truncatingIfNeeded: i2),
                     Int32(truncatingIfNeeded: i1),

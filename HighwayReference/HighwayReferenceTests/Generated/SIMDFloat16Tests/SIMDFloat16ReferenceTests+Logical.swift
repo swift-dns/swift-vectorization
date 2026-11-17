@@ -14,7 +14,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.copyingSign(a, from: b),
-                HighwayReference.copyingSignF16(a, b),
+                HighwayReference.copyingSignF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -28,7 +28,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.copyingSignToMagnitude(a, from: b),
-                HighwayReference.copyingSignToMagnitudeF16(a, b),
+                HighwayReference.copyingSignToMagnitudeF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -42,7 +42,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseAnd(a, b),
-                HighwayReference.bitwiseAndF16(a, b),
+                HighwayReference.bitwiseAndF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -56,7 +56,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseOr(a, b),
-                HighwayReference.bitwiseOrF16(a, b),
+                HighwayReference.bitwiseOrF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -70,7 +70,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseXor(a, b),
-                HighwayReference.bitwiseXorF16(a, b),
+                HighwayReference.bitwiseXorF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -84,7 +84,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseAndNot(a, b),
-                HighwayReference.bitwiseAndNotF16(a, b),
+                HighwayReference.bitwiseAndNotF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -99,7 +99,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xBEA6_0103_27B9_9911) {
             mismatches.check(
                 H.bitwiseAndXor(a, b, c),
-                HighwayReference.bitwiseAndXorF16(a, b, c),
+                HighwayReference.bitwiseAndXorF16(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -114,7 +114,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x6B2A_8893_AEF3_4069) {
             mismatches.check(
                 H.bitwiseXor(a, b, c),
-                HighwayReference.bitwiseXor3F16(a, b, c),
+                HighwayReference.bitwiseXor3F16(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -129,7 +129,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x0DBE_D415_D53F_22CD) {
             mismatches.check(
                 H.bitwiseOr(a, b, c),
-                HighwayReference.bitwiseOr3F16(a, b, c),
+                HighwayReference.bitwiseOr3F16(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -144,7 +144,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x1795_B023_56D2_52B1) {
             mismatches.check(
                 H.bitwiseOrAnd(a, b, c),
-                HighwayReference.bitwiseOrAndF16(a, b, c),
+                HighwayReference.bitwiseOrAndF16(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -159,7 +159,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x3D7F_D6F3_7446_91B6) {
             mismatches.check(
                 H.bitwiseXorAndNot(a, b, c),
-                HighwayReference.bitwiseXorAndNotF16(a, b, c),
+                HighwayReference.bitwiseXorAndNotF16(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -174,7 +174,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xF7A1_CE44_3D33_0593) {
             mismatches.check(
                 H.bitwiseSelecting(a, b, c),
-                HighwayReference.bitwiseSelectingF16(a, b, c),
+                HighwayReference.bitwiseSelectingF16(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -190,7 +190,7 @@ extension SIMDFloat16ReferenceTests {
         {
             mismatches.check(
                 H.bitwiseAnd(a, b, where: mask),
-                HighwayReference.bitwiseAndWhereF16(mask.raw, a, b),
+                HighwayReference.bitwiseAndWhereF16(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -206,7 +206,7 @@ extension SIMDFloat16ReferenceTests {
         {
             mismatches.check(
                 H.bitwiseAnd(a, b, where: mask),
-                HighwayReference.bitwiseAndWhereF16(mask.raw, a, b),
+                HighwayReference.bitwiseAndWhereF16(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -222,7 +222,7 @@ extension SIMDFloat16ReferenceTests {
         {
             mismatches.check(
                 H.bitwiseOr(a, b, where: mask),
-                HighwayReference.bitwiseOrWhereF16(mask.raw, a, b),
+                HighwayReference.bitwiseOrWhereF16(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -238,7 +238,7 @@ extension SIMDFloat16ReferenceTests {
         {
             mismatches.check(
                 H.bitwiseOr(a, b, where: mask),
-                HighwayReference.bitwiseOrWhereF16(mask.raw, a, b),
+                HighwayReference.bitwiseOrWhereF16(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -254,7 +254,7 @@ extension SIMDFloat16ReferenceTests {
         {
             mismatches.check(
                 H.bitwiseXor(a, b, where: mask),
-                HighwayReference.bitwiseXorWhereF16(mask.raw, a, b),
+                HighwayReference.bitwiseXorWhereF16(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -270,7 +270,7 @@ extension SIMDFloat16ReferenceTests {
         {
             mismatches.check(
                 H.bitwiseXor(a, b, where: mask),
-                HighwayReference.bitwiseXorWhereF16(mask.raw, a, b),
+                HighwayReference.bitwiseXorWhereF16(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -292,7 +292,7 @@ extension SIMDFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.bitwiseAnd(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseAndWhereOtherwiseF16(otherwise, mask.raw, a, b),
+                HighwayReference.bitwiseAndWhereOtherwiseF16(otherwise.raw, mask.raw, a.raw, b.raw),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -314,7 +314,7 @@ extension SIMDFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.bitwiseAnd(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseAndWhereOtherwiseF16(otherwise, mask.raw, a, b),
+                HighwayReference.bitwiseAndWhereOtherwiseF16(otherwise.raw, mask.raw, a.raw, b.raw),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -336,7 +336,7 @@ extension SIMDFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.bitwiseOr(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseOrWhereOtherwiseF16(otherwise, mask.raw, a, b),
+                HighwayReference.bitwiseOrWhereOtherwiseF16(otherwise.raw, mask.raw, a.raw, b.raw),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -358,7 +358,7 @@ extension SIMDFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.bitwiseOr(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseOrWhereOtherwiseF16(otherwise, mask.raw, a, b),
+                HighwayReference.bitwiseOrWhereOtherwiseF16(otherwise.raw, mask.raw, a.raw, b.raw),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -380,7 +380,7 @@ extension SIMDFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.bitwiseXor(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseXorWhereOtherwiseF16(otherwise, mask.raw, a, b),
+                HighwayReference.bitwiseXorWhereOtherwiseF16(otherwise.raw, mask.raw, a.raw, b.raw),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -402,7 +402,7 @@ extension SIMDFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.bitwiseXor(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.bitwiseXorWhereOtherwiseF16(otherwise, mask.raw, a, b),
+                HighwayReference.bitwiseXorWhereOtherwiseF16(otherwise.raw, mask.raw, a.raw, b.raw),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -415,7 +415,7 @@ extension SIMDFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.allBitsSet(a),
-                HighwayReference.allBitsSetF16(a),
+                HighwayReference.allBitsSetF16(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -428,7 +428,7 @@ extension SIMDFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.allBitsClear(a),
-                HighwayReference.allBitsClearF16(a),
+                HighwayReference.allBitsClearF16(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -441,7 +441,7 @@ extension SIMDFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.zeroingNegative(a),
-                HighwayReference.zeroingNegativeF16(a),
+                HighwayReference.zeroingNegativeF16(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -456,7 +456,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x0D74_6807_0DCA_1C9E) {
             mismatches.check(
                 H.selectingIfNegative(a, b, c),
-                HighwayReference.selectingIfNegativeF16(a, b, c),
+                HighwayReference.selectingIfNegativeF16(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -470,7 +470,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.selectingIfNegativeOrZero(a, b),
-                HighwayReference.selectingIfNegativeOrZeroF16(a, b),
+                HighwayReference.selectingIfNegativeOrZeroF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -484,7 +484,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.zeroingIfNegative(a, b),
-                HighwayReference.zeroingIfNegativeF16(a, b),
+                HighwayReference.zeroingIfNegativeF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -498,7 +498,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.negatingIfNegative(a, b),
-                HighwayReference.negatingIfNegativeF16(a, b),
+                HighwayReference.negatingIfNegativeF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

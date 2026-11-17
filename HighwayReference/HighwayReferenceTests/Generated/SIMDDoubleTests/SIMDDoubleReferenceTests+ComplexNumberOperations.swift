@@ -12,7 +12,7 @@ extension SIMDDoubleReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.complexConjugate(a),
-                HighwayReference.complexConjugateF64(a),
+                HighwayReference.complexConjugateF64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -26,7 +26,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(complexLanesOf: a, b) {
             mismatches.check(
                 H.multiplyingComplex(a, b),
-                HighwayReference.multiplyingComplexF64(a, b),
+                HighwayReference.multiplyingComplexF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -40,7 +40,7 @@ extension SIMDDoubleReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(complexLanesOf: a, b) {
             mismatches.check(
                 H.multiplyingComplexConjugate(a, b),
-                HighwayReference.multiplyingComplexConjugateF64(a, b),
+                HighwayReference.multiplyingComplexConjugateF64(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -56,7 +56,7 @@ extension SIMDDoubleReferenceTests {
         where !hasUnorderedNaNs(complexLanesOf: a, b, c) {
             mismatches.check(
                 H.multiplyAddingComplex(a, b, c),
-                HighwayReference.multiplyAddingComplexF64(a, b, c),
+                HighwayReference.multiplyAddingComplexF64(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -72,7 +72,7 @@ extension SIMDDoubleReferenceTests {
         where !hasUnorderedNaNs(complexLanesOf: a, b, c) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, b, c),
-                HighwayReference.multiplyAddingComplexConjugateF64(a, b, c),
+                HighwayReference.multiplyAddingComplexConjugateF64(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -94,7 +94,12 @@ extension SIMDDoubleReferenceTests {
         ) where !hasUnorderedNaNs(complexLanesOf: a, b) {
             mismatches.check(
                 H.multiplyingComplex(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.multiplyingComplexWhereOtherwiseF64(otherwise, mask.raw, a, b),
+                HighwayReference.multiplyingComplexWhereOtherwiseF64(
+                    otherwise.raw,
+                    mask.raw,
+                    a.raw,
+                    b.raw
+                ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -118,7 +123,12 @@ extension SIMDDoubleReferenceTests {
         ) where !hasUnorderedNaNs(complexLanesOf: a, b) {
             mismatches.check(
                 H.multiplyingComplex(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.multiplyingComplexWhereOtherwiseF64(otherwise, mask.raw, a, b),
+                HighwayReference.multiplyingComplexWhereOtherwiseF64(
+                    otherwise.raw,
+                    mask.raw,
+                    a.raw,
+                    b.raw
+                ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -134,7 +144,7 @@ extension SIMDDoubleReferenceTests {
         where !hasUnorderedNaNs(complexLanesOf: a, b) {
             mismatches.check(
                 H.multiplyingComplexConjugate(a, b, where: mask),
-                HighwayReference.multiplyingComplexConjugateWhereF64(mask.raw, a, b),
+                HighwayReference.multiplyingComplexConjugateWhereF64(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -152,7 +162,7 @@ extension SIMDDoubleReferenceTests {
         where !hasUnorderedNaNs(complexLanesOf: a, b) {
             mismatches.check(
                 H.multiplyingComplexConjugate(a, b, where: mask),
-                HighwayReference.multiplyingComplexConjugateWhereF64(mask.raw, a, b),
+                HighwayReference.multiplyingComplexConjugateWhereF64(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -174,7 +184,12 @@ extension SIMDDoubleReferenceTests {
         ) where !hasUnorderedNaNs(complexLanesOf: a, b, c) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, b, c, where: mask),
-                HighwayReference.multiplyAddingComplexConjugateWhereF64(mask.raw, a, b, c),
+                HighwayReference.multiplyAddingComplexConjugateWhereF64(
+                    mask.raw,
+                    a.raw,
+                    b.raw,
+                    c.raw
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -198,7 +213,12 @@ extension SIMDDoubleReferenceTests {
         ) where !hasUnorderedNaNs(complexLanesOf: a, b, c) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, b, c, where: mask),
-                HighwayReference.multiplyAddingComplexConjugateWhereF64(mask.raw, a, b, c),
+                HighwayReference.multiplyAddingComplexConjugateWhereF64(
+                    mask.raw,
+                    a.raw,
+                    b.raw,
+                    c.raw
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }

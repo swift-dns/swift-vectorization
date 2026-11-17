@@ -4,22 +4,22 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portAddingI32(_ a: SIMDInt32.Vector, _ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portAddingI32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.adding(a, b)
 }
 
 @inline(never)
-public func highwayAddingI32(_ a: SIMDInt32.Vector, _ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayAddingI32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.addingI32(a.raw, b.raw))
 }
 
 @inline(never)
-public func portAddingI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portAddingI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.adding(SIMDInt32.repeating(26), b)
 }
 
 @inline(never)
-public func highwayAddingI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayAddingI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.addingI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
@@ -29,12 +29,12 @@ public func highwayAddingI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector
 }
 
 @inline(never)
-public func portAddingI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portAddingI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.adding(a, SIMDInt32.repeating(26))
 }
 
 @inline(never)
-public func highwayAddingI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayAddingI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.addingI32(
             a.raw,
@@ -44,23 +44,22 @@ public func highwayAddingI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector
 }
 
 @inline(never)
-public func portSubtractingI32(_ a: SIMDInt32.Vector, _ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portSubtractingI32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.subtracting(a, b)
 }
 
 @inline(never)
-public func highwaySubtractingI32(_ a: SIMDInt32.Vector, _ b: SIMDInt32.Vector) -> SIMDInt32.Vector
-{
+public func highwaySubtractingI32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.subtractingI32(a.raw, b.raw))
 }
 
 @inline(never)
-public func portSubtractingI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portSubtractingI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.subtracting(SIMDInt32.repeating(26), b)
 }
 
 @inline(never)
-public func highwaySubtractingI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwaySubtractingI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.subtractingI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
@@ -70,12 +69,12 @@ public func highwaySubtractingI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.V
 }
 
 @inline(never)
-public func portSubtractingI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portSubtractingI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.subtracting(a, SIMDInt32.repeating(26))
 }
 
 @inline(never)
-public func highwaySubtractingI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwaySubtractingI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.subtractingI32(
             a.raw,
@@ -85,28 +84,22 @@ public func highwaySubtractingI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.V
 }
 
 @inline(never)
-public func portAddingSubtractingI32(
-    _ a: SIMDInt32.Vector,
-    _ b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func portAddingSubtractingI32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.addingSubtracting(a, b)
 }
 
 @inline(never)
-public func highwayAddingSubtractingI32(
-    _ a: SIMDInt32.Vector,
-    _ b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func highwayAddingSubtractingI32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.addingSubtractingI32(a.raw, b.raw))
 }
 
 @inline(never)
-public func portAddingSubtractingI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portAddingSubtractingI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.addingSubtracting(SIMDInt32.repeating(26), b)
 }
 
 @inline(never)
-public func highwayAddingSubtractingI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayAddingSubtractingI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.addingSubtractingI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
@@ -116,12 +109,12 @@ public func highwayAddingSubtractingI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDI
 }
 
 @inline(never)
-public func portAddingSubtractingI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portAddingSubtractingI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.addingSubtracting(a, SIMDInt32.repeating(26))
 }
 
 @inline(never)
-public func highwayAddingSubtractingI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayAddingSubtractingI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.addingSubtractingI32(
             a.raw,
@@ -131,22 +124,22 @@ public func highwayAddingSubtractingI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDI
 }
 
 @inline(never)
-public func portDividingI32(_ a: SIMDInt32.Vector, _ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portDividingI32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.dividing(a, b)
 }
 
 @inline(never)
-public func highwayDividingI32(_ a: SIMDInt32.Vector, _ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayDividingI32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.dividingI32(a.raw, b.raw))
 }
 
 @inline(never)
-public func portDividingI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portDividingI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.dividing(SIMDInt32.repeating(26), b)
 }
 
 @inline(never)
-public func highwayDividingI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayDividingI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.dividingI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
@@ -156,12 +149,12 @@ public func highwayDividingI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vect
 }
 
 @inline(never)
-public func portDividingI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portDividingI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.dividing(a, SIMDInt32.repeating(26))
 }
 
 @inline(never)
-public func highwayDividingI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayDividingI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.dividingI32(
             a.raw,
@@ -172,35 +165,29 @@ public func highwayDividingI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vect
 
 @inline(never)
 public func portClampedI32(
-    _ a: SIMDInt32.Vector,
-    between b: SIMDInt32.Vector,
-    and c: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+    _ a: SIMD<Int32>,
+    between b: SIMD<Int32>,
+    and c: SIMD<Int32>
+) -> SIMD<Int32> {
     SIMDInt32.clamped(a, between: b, and: c)
 }
 
 @inline(never)
 public func highwayClampedI32(
-    _ a: SIMDInt32.Vector,
-    between b: SIMDInt32.Vector,
-    and c: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+    _ a: SIMD<Int32>,
+    between b: SIMD<Int32>,
+    and c: SIMD<Int32>
+) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.clampedI32(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
-public func portClampedI32ConstantA(
-    between b: SIMDInt32.Vector,
-    and c: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func portClampedI32ConstantA(between b: SIMD<Int32>, and c: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.clamped(SIMDInt32.repeating(26), between: b, and: c)
 }
 
 @inline(never)
-public func highwayClampedI32ConstantA(
-    between b: SIMDInt32.Vector,
-    and c: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func highwayClampedI32ConstantA(between b: SIMD<Int32>, and c: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.clampedI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
@@ -211,18 +198,12 @@ public func highwayClampedI32ConstantA(
 }
 
 @inline(never)
-public func portClampedI32ConstantB(
-    _ a: SIMDInt32.Vector,
-    and c: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func portClampedI32ConstantB(_ a: SIMD<Int32>, and c: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.clamped(a, between: SIMDInt32.repeating(26), and: c)
 }
 
 @inline(never)
-public func highwayClampedI32ConstantB(
-    _ a: SIMDInt32.Vector,
-    and c: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func highwayClampedI32ConstantB(_ a: SIMD<Int32>, and c: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.clampedI32(
             a.raw,
@@ -233,18 +214,12 @@ public func highwayClampedI32ConstantB(
 }
 
 @inline(never)
-public func portClampedI32ConstantC(
-    _ a: SIMDInt32.Vector,
-    between b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func portClampedI32ConstantC(_ a: SIMD<Int32>, between b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.clamped(a, between: b, and: SIMDInt32.repeating(26))
 }
 
 @inline(never)
-public func highwayClampedI32ConstantC(
-    _ a: SIMDInt32.Vector,
-    between b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func highwayClampedI32ConstantC(_ a: SIMD<Int32>, between b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.clampedI32(
             a.raw,
@@ -255,28 +230,22 @@ public func highwayClampedI32ConstantC(
 }
 
 @inline(never)
-public func portAbsoluteDifferenceI32(
-    _ a: SIMDInt32.Vector,
-    _ b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func portAbsoluteDifferenceI32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.absoluteDifference(a, b)
 }
 
 @inline(never)
-public func highwayAbsoluteDifferenceI32(
-    _ a: SIMDInt32.Vector,
-    _ b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func highwayAbsoluteDifferenceI32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.absoluteDifferenceI32(a.raw, b.raw))
 }
 
 @inline(never)
-public func portAbsoluteDifferenceI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portAbsoluteDifferenceI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.absoluteDifference(SIMDInt32.repeating(26), b)
 }
 
 @inline(never)
-public func highwayAbsoluteDifferenceI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayAbsoluteDifferenceI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.absoluteDifferenceI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
@@ -286,12 +255,12 @@ public func highwayAbsoluteDifferenceI32ConstantA(_ b: SIMDInt32.Vector) -> SIMD
 }
 
 @inline(never)
-public func portAbsoluteDifferenceI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portAbsoluteDifferenceI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.absoluteDifference(a, SIMDInt32.repeating(26))
 }
 
 @inline(never)
-public func highwayAbsoluteDifferenceI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayAbsoluteDifferenceI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.absoluteDifferenceI32(
             a.raw,
@@ -301,22 +270,22 @@ public func highwayAbsoluteDifferenceI32ConstantB(_ a: SIMDInt32.Vector) -> SIMD
 }
 
 @inline(never)
-public func portNegatedI32(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portNegatedI32(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.negated(a)
 }
 
 @inline(never)
-public func highwayNegatedI32(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayNegatedI32(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.negatedI32(a.raw))
 }
 
 @inline(never)
-public func portNegatedI32ConstantA() -> SIMDInt32.Vector {
+public func portNegatedI32ConstantA() -> SIMD<Int32> {
     SIMDInt32.negated(SIMDInt32.repeating(26))
 }
 
 @inline(never)
-public func highwayNegatedI32ConstantA() -> SIMDInt32.Vector {
+public func highwayNegatedI32ConstantA() -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.negatedI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
@@ -325,22 +294,22 @@ public func highwayNegatedI32ConstantA() -> SIMDInt32.Vector {
 }
 
 @inline(never)
-public func portSaturatingNegatedI32(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portSaturatingNegatedI32(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.saturatingNegated(a)
 }
 
 @inline(never)
-public func highwaySaturatingNegatedI32(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwaySaturatingNegatedI32(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.saturatingNegatedI32(a.raw))
 }
 
 @inline(never)
-public func portSaturatingNegatedI32ConstantA() -> SIMDInt32.Vector {
+public func portSaturatingNegatedI32ConstantA() -> SIMD<Int32> {
     SIMDInt32.saturatingNegated(SIMDInt32.repeating(26))
 }
 
 @inline(never)
-public func highwaySaturatingNegatedI32ConstantA() -> SIMDInt32.Vector {
+public func highwaySaturatingNegatedI32ConstantA() -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.saturatingNegatedI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
@@ -349,22 +318,22 @@ public func highwaySaturatingNegatedI32ConstantA() -> SIMDInt32.Vector {
 }
 
 @inline(never)
-public func portMagnitudeI32(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portMagnitudeI32(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.magnitude(a)
 }
 
 @inline(never)
-public func highwayMagnitudeI32(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayMagnitudeI32(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.magnitudeI32(a.raw))
 }
 
 @inline(never)
-public func portMagnitudeI32ConstantA() -> SIMDInt32.Vector {
+public func portMagnitudeI32ConstantA() -> SIMD<Int32> {
     SIMDInt32.magnitude(SIMDInt32.repeating(26))
 }
 
 @inline(never)
-public func highwayMagnitudeI32ConstantA() -> SIMDInt32.Vector {
+public func highwayMagnitudeI32ConstantA() -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.magnitudeI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
@@ -373,22 +342,22 @@ public func highwayMagnitudeI32ConstantA() -> SIMDInt32.Vector {
 }
 
 @inline(never)
-public func portSaturatingMagnitudeI32(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portSaturatingMagnitudeI32(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.saturatingMagnitude(a)
 }
 
 @inline(never)
-public func highwaySaturatingMagnitudeI32(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwaySaturatingMagnitudeI32(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.saturatingMagnitudeI32(a.raw))
 }
 
 @inline(never)
-public func portSaturatingMagnitudeI32ConstantA() -> SIMDInt32.Vector {
+public func portSaturatingMagnitudeI32ConstantA() -> SIMD<Int32> {
     SIMDInt32.saturatingMagnitude(SIMDInt32.repeating(26))
 }
 
 @inline(never)
-public func highwaySaturatingMagnitudeI32ConstantA() -> SIMDInt32.Vector {
+public func highwaySaturatingMagnitudeI32ConstantA() -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.saturatingMagnitudeI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw
@@ -397,22 +366,22 @@ public func highwaySaturatingMagnitudeI32ConstantA() -> SIMDInt32.Vector {
 }
 
 @inline(never)
-public func portRemainderI32(_ a: SIMDInt32.Vector, _ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portRemainderI32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.remainder(a, b)
 }
 
 @inline(never)
-public func highwayRemainderI32(_ a: SIMDInt32.Vector, _ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayRemainderI32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.remainderI32(a.raw, b.raw))
 }
 
 @inline(never)
-public func portRemainderI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portRemainderI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.remainder(SIMDInt32.repeating(26), b)
 }
 
 @inline(never)
-public func highwayRemainderI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayRemainderI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.remainderI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
@@ -422,12 +391,12 @@ public func highwayRemainderI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vec
 }
 
 @inline(never)
-public func portRemainderI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portRemainderI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.remainder(a, SIMDInt32.repeating(26))
 }
 
 @inline(never)
-public func highwayRemainderI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayRemainderI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.remainderI32(
             a.raw,
@@ -437,28 +406,22 @@ public func highwayRemainderI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vec
 }
 
 @inline(never)
-public func portSaturatingAddingI32(
-    _ a: SIMDInt32.Vector,
-    _ b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func portSaturatingAddingI32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.saturatingAdding(a, b)
 }
 
 @inline(never)
-public func highwaySaturatingAddingI32(
-    _ a: SIMDInt32.Vector,
-    _ b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func highwaySaturatingAddingI32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.saturatingAddingI32(a.raw, b.raw))
 }
 
 @inline(never)
-public func portSaturatingAddingI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portSaturatingAddingI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.saturatingAdding(SIMDInt32.repeating(26), b)
 }
 
 @inline(never)
-public func highwaySaturatingAddingI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwaySaturatingAddingI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.saturatingAddingI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
@@ -468,12 +431,12 @@ public func highwaySaturatingAddingI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDIn
 }
 
 @inline(never)
-public func portSaturatingAddingI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portSaturatingAddingI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.saturatingAdding(a, SIMDInt32.repeating(26))
 }
 
 @inline(never)
-public func highwaySaturatingAddingI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwaySaturatingAddingI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.saturatingAddingI32(
             a.raw,
@@ -483,28 +446,22 @@ public func highwaySaturatingAddingI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDIn
 }
 
 @inline(never)
-public func portSaturatingSubtractingI32(
-    _ a: SIMDInt32.Vector,
-    _ b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func portSaturatingSubtractingI32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.saturatingSubtracting(a, b)
 }
 
 @inline(never)
-public func highwaySaturatingSubtractingI32(
-    _ a: SIMDInt32.Vector,
-    _ b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func highwaySaturatingSubtractingI32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.saturatingSubtractingI32(a.raw, b.raw))
 }
 
 @inline(never)
-public func portSaturatingSubtractingI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portSaturatingSubtractingI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.saturatingSubtracting(SIMDInt32.repeating(26), b)
 }
 
 @inline(never)
-public func highwaySaturatingSubtractingI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwaySaturatingSubtractingI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.saturatingSubtractingI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
@@ -514,12 +471,12 @@ public func highwaySaturatingSubtractingI32ConstantA(_ b: SIMDInt32.Vector) -> S
 }
 
 @inline(never)
-public func portSaturatingSubtractingI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portSaturatingSubtractingI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.saturatingSubtracting(a, SIMDInt32.repeating(26))
 }
 
 @inline(never)
-public func highwaySaturatingSubtractingI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwaySaturatingSubtractingI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.saturatingSubtractingI32(
             a.raw,
@@ -529,26 +486,22 @@ public func highwaySaturatingSubtractingI32ConstantB(_ a: SIMDInt32.Vector) -> S
 }
 
 @inline(never)
-public func portRoundedAverageI32(_ a: SIMDInt32.Vector, _ b: SIMDInt32.Vector) -> SIMDInt32.Vector
-{
+public func portRoundedAverageI32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.roundedAverage(a, b)
 }
 
 @inline(never)
-public func highwayRoundedAverageI32(
-    _ a: SIMDInt32.Vector,
-    _ b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func highwayRoundedAverageI32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.roundedAverageI32(a.raw, b.raw))
 }
 
 @inline(never)
-public func portRoundedAverageI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portRoundedAverageI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.roundedAverage(SIMDInt32.repeating(26), b)
 }
 
 @inline(never)
-public func highwayRoundedAverageI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayRoundedAverageI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.roundedAverageI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
@@ -558,12 +511,12 @@ public func highwayRoundedAverageI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt3
 }
 
 @inline(never)
-public func portRoundedAverageI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portRoundedAverageI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.roundedAverage(a, SIMDInt32.repeating(26))
 }
 
 @inline(never)
-public func highwayRoundedAverageI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayRoundedAverageI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.roundedAverageI32(
             a.raw,
@@ -573,26 +526,22 @@ public func highwayRoundedAverageI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt3
 }
 
 @inline(never)
-public func portPairwiseAddingI32(_ a: SIMDInt32.Vector, _ b: SIMDInt32.Vector) -> SIMDInt32.Vector
-{
+public func portPairwiseAddingI32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.pairwiseAdding(a, b)
 }
 
 @inline(never)
-public func highwayPairwiseAddingI32(
-    _ a: SIMDInt32.Vector,
-    _ b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func highwayPairwiseAddingI32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.pairwiseAddingI32(a.raw, b.raw))
 }
 
 @inline(never)
-public func portPairwiseAddingI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portPairwiseAddingI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.pairwiseAdding(SIMDInt32.repeating(26), b)
 }
 
 @inline(never)
-public func highwayPairwiseAddingI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayPairwiseAddingI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.pairwiseAddingI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
@@ -602,12 +551,12 @@ public func highwayPairwiseAddingI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt3
 }
 
 @inline(never)
-public func portPairwiseAddingI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portPairwiseAddingI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.pairwiseAdding(a, SIMDInt32.repeating(26))
 }
 
 @inline(never)
-public func highwayPairwiseAddingI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayPairwiseAddingI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.pairwiseAddingI32(
             a.raw,
@@ -617,28 +566,22 @@ public func highwayPairwiseAddingI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt3
 }
 
 @inline(never)
-public func portPairwiseSubtractingI32(
-    _ a: SIMDInt32.Vector,
-    _ b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func portPairwiseSubtractingI32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.pairwiseSubtracting(a, b)
 }
 
 @inline(never)
-public func highwayPairwiseSubtractingI32(
-    _ a: SIMDInt32.Vector,
-    _ b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
+public func highwayPairwiseSubtractingI32(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.pairwiseSubtractingI32(a.raw, b.raw))
 }
 
 @inline(never)
-public func portPairwiseSubtractingI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portPairwiseSubtractingI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.pairwiseSubtracting(SIMDInt32.repeating(26), b)
 }
 
 @inline(never)
-public func highwayPairwiseSubtractingI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayPairwiseSubtractingI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.pairwiseSubtractingI32(
             SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
@@ -648,12 +591,12 @@ public func highwayPairwiseSubtractingI32ConstantA(_ b: SIMDInt32.Vector) -> SIM
 }
 
 @inline(never)
-public func portPairwiseSubtractingI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func portPairwiseSubtractingI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.pairwiseSubtracting(a, SIMDInt32.repeating(26))
 }
 
 @inline(never)
-public func highwayPairwiseSubtractingI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
+public func highwayPairwiseSubtractingI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.pairwiseSubtractingI32(
             a.raw,
@@ -663,22 +606,22 @@ public func highwayPairwiseSubtractingI32ConstantB(_ a: SIMDInt32.Vector) -> SIM
 }
 
 @inline(never)
-public func portSumsOf2I16ToI32(_ a: SIMDInt16.Vector) -> SIMDInt32.Vector {
+public func portSumsOf2I16ToI32(_ a: SIMD<Int16>) -> SIMD<Int32> {
     SIMDInt32.sumsOf2(a)
 }
 
 @inline(never)
-public func highwaySumsOf2I16ToI32(_ a: SIMDInt16.Vector) -> SIMDInt32.Vector {
+public func highwaySumsOf2I16ToI32(_ a: SIMD<Int16>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.sumsOf2I16ToI32(a.raw))
 }
 
 @inline(never)
-public func portSumsOf2I16ToI32ConstantA() -> SIMDInt32.Vector {
+public func portSumsOf2I16ToI32ConstantA() -> SIMD<Int32> {
     SIMDInt32.sumsOf2(SIMDInt16.repeating(26))
 }
 
 @inline(never)
-public func highwaySumsOf2I16ToI32ConstantA() -> SIMDInt32.Vector {
+public func highwaySumsOf2I16ToI32ConstantA() -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.sumsOf2I16ToI32(
             SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
@@ -687,22 +630,22 @@ public func highwaySumsOf2I16ToI32ConstantA() -> SIMDInt32.Vector {
 }
 
 @inline(never)
-public func portSumsOf4I8ToI32(_ a: SIMDInt8.Vector) -> SIMDInt32.Vector {
+public func portSumsOf4I8ToI32(_ a: SIMD<Int8>) -> SIMD<Int32> {
     SIMDInt32.sumsOf4(a)
 }
 
 @inline(never)
-public func highwaySumsOf4I8ToI32(_ a: SIMDInt8.Vector) -> SIMDInt32.Vector {
+public func highwaySumsOf4I8ToI32(_ a: SIMD<Int8>) -> SIMD<Int32> {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.sumsOf4I8ToI32(a.raw))
 }
 
 @inline(never)
-public func portSumsOf4I8ToI32ConstantA() -> SIMDInt32.Vector {
+public func portSumsOf4I8ToI32ConstantA() -> SIMD<Int32> {
     SIMDInt32.sumsOf4(SIMDInt8.repeating(26))
 }
 
 @inline(never)
-public func highwaySumsOf4I8ToI32ConstantA() -> SIMDInt32.Vector {
+public func highwaySumsOf4I8ToI32ConstantA() -> SIMD<Int32> {
     SIMDInt32.Vector(
         raw: HighwayReference.Nothrow.sumsOf4I8ToI32(
             SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw

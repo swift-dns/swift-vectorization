@@ -13,7 +13,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.broadcasting(a, block: block),
-                HighwayReference.broadcastingBlockF32(a, Int32(truncatingIfNeeded: block)),
+                HighwayReference.broadcastingBlockF32(a.raw, Int32(truncatingIfNeeded: block)),
                 "a: \(describe(a))"
             )
         }
@@ -43,7 +43,7 @@ extension SIMDFloatConstantTests {
         for a in aInputs {
             mismatches.check(
                 unsafe H.broadcasting(a, blockUnchecked: block),
-                HighwayReference.broadcastingBlockF32(a, Int32(truncatingIfNeeded: block)),
+                HighwayReference.broadcastingBlockF32(a.raw, Int32(truncatingIfNeeded: block)),
                 "a: \(describe(a))"
             )
         }
@@ -75,7 +75,7 @@ extension SIMDFloatConstantTests {
             mismatches.check(
                 H.broadcasting(H.repeating(value), block: block),
                 HighwayReference.broadcastingBlockF32(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     Int32(truncatingIfNeeded: block)
                 ),
                 "block: \(block)"

@@ -176,7 +176,7 @@ extension SIMDDoubleConstantTests {
         )
         mismatches.check(
             H.vector(wideningLower: SIMDFloat.repeating(value)),
-            HighwayReference.vectorWideningLowerF32ToF64(SIMDFloat.repeating(value)),
+            HighwayReference.vectorWideningLowerF32ToF64(SIMDFloat.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -428,7 +428,7 @@ extension SIMDDoubleConstantTests {
         )
         mismatches.check(
             H.vector(wideningUpper: SIMDFloat.repeating(value)),
-            HighwayReference.vectorWideningUpperF32ToF64(SIMDFloat.repeating(value)),
+            HighwayReference.vectorWideningUpperF32ToF64(SIMDFloat.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -680,7 +680,7 @@ extension SIMDDoubleConstantTests {
         )
         mismatches.check(
             H.vector(wideningEven: SIMDFloat.repeating(value)),
-            HighwayReference.vectorWideningEvenF32ToF64(SIMDFloat.repeating(value)),
+            HighwayReference.vectorWideningEvenF32ToF64(SIMDFloat.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -932,7 +932,7 @@ extension SIMDDoubleConstantTests {
         )
         mismatches.check(
             H.vector(wideningOdd: SIMDFloat.repeating(value)),
-            HighwayReference.vectorWideningOddF32ToF64(SIMDFloat.repeating(value)),
+            HighwayReference.vectorWideningOddF32ToF64(SIMDFloat.repeating(value).raw),
             ""
         )
         mismatches.record()

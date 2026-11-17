@@ -14,7 +14,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingLowerLower(a, b),
-                HighwayReference.concatenatingLowerLowerF16(a, b),
+                HighwayReference.concatenatingLowerLowerF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -28,7 +28,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingUpperUpper(a, b),
-                HighwayReference.concatenatingUpperUpperF16(a, b),
+                HighwayReference.concatenatingUpperUpperF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -42,7 +42,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingLowerUpper(a, b),
-                HighwayReference.concatenatingLowerUpperF16(a, b),
+                HighwayReference.concatenatingLowerUpperF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -56,7 +56,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingUpperLower(a, b),
-                HighwayReference.concatenatingUpperLowerF16(a, b),
+                HighwayReference.concatenatingUpperLowerF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -70,7 +70,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingOdd(a, b),
-                HighwayReference.concatenatingOddF16(a, b),
+                HighwayReference.concatenatingOddF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -84,7 +84,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.concatenatingEven(a, b),
-                HighwayReference.concatenatingEvenF16(a, b),
+                HighwayReference.concatenatingEvenF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -98,7 +98,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingWholeLower(a, b),
-                HighwayReference.interleavingWholeLowerF16(a, b),
+                HighwayReference.interleavingWholeLowerF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -112,7 +112,7 @@ extension SIMDFloat16ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingWholeUpper(a, b),
-                HighwayReference.interleavingWholeUpperF16(a, b),
+                HighwayReference.interleavingWholeUpperF16(a.raw, b.raw),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -125,7 +125,7 @@ extension SIMDFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.lowerHalf(a),
-                H.HalfVector(raw: HighwayReference.lowerHalfF16(a)),
+                H.HalfVector(raw: HighwayReference.lowerHalfF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -141,7 +141,7 @@ extension SIMDFloat16ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.lowerHalf(a))
                 ),
-                HighwayReference.resizedLowerHalfF16(a),
+                HighwayReference.resizedLowerHalfF16(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -154,7 +154,7 @@ extension SIMDFloat16ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.upperHalf(a),
-                H.HalfVector(raw: HighwayReference.upperHalfF16(a)),
+                H.HalfVector(raw: HighwayReference.upperHalfF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -170,7 +170,7 @@ extension SIMDFloat16ReferenceTests {
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.upperHalf(a))
                 ),
-                HighwayReference.resizedUpperHalfF16(a),
+                HighwayReference.resizedUpperHalfF16(a.raw),
                 "a: \(describe(a))"
             )
         }

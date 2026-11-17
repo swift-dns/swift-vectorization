@@ -17,7 +17,7 @@ extension SIMDDoubleReferenceTests {
             }
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeF64(a, destination.baseAddress!)
+                unsafe HighwayReference.storeF64(a.raw, destination.baseAddress!)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
@@ -33,7 +33,7 @@ extension SIMDDoubleReferenceTests {
                 unsafe H.store(a, to: destination)
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.storeF64(a, destination)
+                unsafe HighwayReference.storeF64(a.raw, destination)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
@@ -88,7 +88,7 @@ extension SIMDDoubleReferenceTests {
                 destination in unsafe H.storeAligned(a, to: destination)
             }
             let (_, referenceLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
-                destination in unsafe HighwayReference.storeAlignedF64(a, destination)
+                destination in unsafe HighwayReference.storeAlignedF64(a.raw, destination)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
@@ -104,7 +104,7 @@ extension SIMDDoubleReferenceTests {
                 unsafe H.storeAligned(a, to: destination)
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.storeAlignedF64(a, destination)
+                unsafe HighwayReference.storeAlignedF64(a.raw, destination)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
@@ -178,7 +178,7 @@ extension SIMDDoubleReferenceTests {
             }
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeFirstF64(a, destination.baseAddress!, count)
+                unsafe HighwayReference.storeFirstF64(a.raw, destination.baseAddress!, count)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), count: \(count)")
         }
@@ -195,7 +195,7 @@ extension SIMDDoubleReferenceTests {
                 destination in unsafe H.storeFirst(a, to: destination, count: count)
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(count))) {
-                destination in unsafe HighwayReference.storeFirstF64(a, destination, count)
+                destination in unsafe HighwayReference.storeFirstF64(a.raw, destination, count)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), count: \(count)")
         }
@@ -230,7 +230,7 @@ extension SIMDDoubleReferenceTests {
             }
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeWhereF64(a, mask.raw, destination.baseAddress!)
+                unsafe HighwayReference.storeWhereF64(a.raw, mask.raw, destination.baseAddress!)
             }
             mismatches.check(
                 portLanes,
@@ -251,7 +251,7 @@ extension SIMDDoubleReferenceTests {
                 unsafe H.store(a, to: destination, where: mask)
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.storeWhereF64(a, mask.raw, destination)
+                unsafe HighwayReference.storeWhereF64(a.raw, mask.raw, destination)
             }
             mismatches.check(
                 portLanes,
@@ -281,7 +281,7 @@ extension SIMDDoubleReferenceTests {
             ) { destination in unsafe H.store(a, to: destination, where: mask) }
             let (_, referenceLanes) = unsafe withGuardedLanes(
                 Array(sentinel.prefix(lanesThroughLastTrue(of: mask)))
-            ) { destination in unsafe HighwayReference.storeWhereF64(a, mask.raw, destination) }
+            ) { destination in unsafe HighwayReference.storeWhereF64(a.raw, mask.raw, destination) }
             mismatches.check(
                 portLanes,
                 referenceLanes,
@@ -303,7 +303,7 @@ extension SIMDDoubleReferenceTests {
             }
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeWhereF64(a, mask.raw, destination.baseAddress!)
+                unsafe HighwayReference.storeWhereF64(a.raw, mask.raw, destination.baseAddress!)
             }
             mismatches.check(
                 portLanes,

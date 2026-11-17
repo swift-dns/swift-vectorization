@@ -15,7 +15,7 @@ extension SIMDFloatReferenceTests {
         {
             mismatches.check(
                 H.selecting(mask, a, b),
-                HighwayReference.selectingF32(mask.raw, a, b),
+                HighwayReference.selectingF32(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -31,7 +31,7 @@ extension SIMDFloatReferenceTests {
         {
             mismatches.check(
                 H.selecting(mask, a, b),
-                HighwayReference.selectingF32(mask.raw, a, b),
+                HighwayReference.selectingF32(mask.raw, a.raw, b.raw),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -45,7 +45,7 @@ extension SIMDFloatReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.selectingOrZero(mask, a),
-                HighwayReference.selectingOrZeroF32(mask.raw, a),
+                HighwayReference.selectingOrZeroF32(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -59,7 +59,7 @@ extension SIMDFloatReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.selectingOrZero(mask, a),
-                HighwayReference.selectingOrZeroF32(mask.raw, a),
+                HighwayReference.selectingOrZeroF32(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -73,7 +73,7 @@ extension SIMDFloatReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.zeroingSelected(mask, a),
-                HighwayReference.zeroingSelectedF32(mask.raw, a),
+                HighwayReference.zeroingSelectedF32(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -87,7 +87,7 @@ extension SIMDFloatReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.zeroingSelected(mask, a),
-                HighwayReference.zeroingSelectedF32(mask.raw, a),
+                HighwayReference.zeroingSelectedF32(mask.raw, a.raw),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -102,7 +102,7 @@ extension SIMDFloatReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x466A_B350_2995_6DC2) {
             mismatches.check(
                 H.selecting(a, b, c),
-                HighwayReference.selectingByVectorF32(a, b, c),
+                HighwayReference.selectingByVectorF32(a.raw, b.raw, c.raw),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
