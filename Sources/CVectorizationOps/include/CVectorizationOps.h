@@ -112754,69 +112754,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_m
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_rounded_to_nearest_or_even_f32(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  float lanes[8];
-  for (size_t i = 0; i < 8; ++i) {
-    lanes[i] = a[i];
-  }
-  float absolute[8];
-  for (size_t i = 0; i < 8; ++i) {
-    absolute[i] = __builtin_fabsf(lanes[i]);
-  }
-  for (size_t i = 0; i < 8; ++i) {
-    if (!(absolute[i] < 8388608.0f)) {
-      continue;
-    }
-    const float bias = lanes[i] < 0 ? -0.5 : 0.5;
-    const int32_t rounded = (int32_t)(lanes[i] + bias);
-    if (rounded == 0) {
-      lanes[i] = __builtin_signbit(lanes[i]) ? -0.0 : 0.0;
-      continue;
-    }
-    const float roundedLane = (float)rounded;
-    if ((rounded & 1) && __builtin_fabsf(roundedLane - lanes[i]) == 0.5) {
-      const float even = (float)(rounded - (lanes[i] < 0 ? -1 : 1));
-      lanes[i] = even == 0 && __builtin_signbit(lanes[i]) ? -0.0 : even;
-      continue;
-    }
-    lanes[i] = roundedLane;
-  }
-  cvectorization_ops_vector_f32 result;
-  for (size_t i = 0; i < 8; ++i) {
-    result[i] = lanes[i];
-  }
-  return (cvectorization_ops_raw_vector_f32)(result);
+  return (cvectorization_ops_raw_vector_f32)(__builtin_elementwise_roundeven(a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  float lanes[16];
-  for (size_t i = 0; i < 16; ++i) {
-    lanes[i] = a[i];
-  }
-  float absolute[16];
-  for (size_t i = 0; i < 16; ++i) {
-    absolute[i] = __builtin_fabsf(lanes[i]);
-  }
-  for (size_t i = 0; i < 16; ++i) {
-    if (!(absolute[i] < 8388608.0f)) {
-      continue;
-    }
-    const float bias = lanes[i] < 0 ? -0.5 : 0.5;
-    const int32_t rounded = (int32_t)(lanes[i] + bias);
-    if (rounded == 0) {
-      lanes[i] = __builtin_signbit(lanes[i]) ? -0.0 : 0.0;
-      continue;
-    }
-    const float roundedLane = (float)rounded;
-    if ((rounded & 1) && __builtin_fabsf(roundedLane - lanes[i]) == 0.5) {
-      const float even = (float)(rounded - (lanes[i] < 0 ? -1 : 1));
-      lanes[i] = even == 0 && __builtin_signbit(lanes[i]) ? -0.0 : even;
-      continue;
-    }
-    lanes[i] = roundedLane;
-  }
-  cvectorization_ops_vector_f32 result;
-  for (size_t i = 0; i < 16; ++i) {
-    result[i] = lanes[i];
-  }
-  return (cvectorization_ops_raw_vector_f32)(result);
+  return (cvectorization_ops_raw_vector_f32)(__builtin_elementwise_roundeven(a));
 #elif CVECTORIZATION_OPS_NEON || (CVECTORIZATION_OPS_X86 >= 3 && CVECTORIZATION_OPS_X86 <= 6)
   return (cvectorization_ops_raw_vector_f32)(__builtin_elementwise_roundeven(a));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
@@ -112864,55 +112804,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_r
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_rounded_toward_zero_f32(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  float lanes[8];
-  for (size_t i = 0; i < 8; ++i) {
-    lanes[i] = a[i];
-  }
-  float absolute[8];
-  for (size_t i = 0; i < 8; ++i) {
-    absolute[i] = __builtin_fabsf(lanes[i]);
-  }
-  for (size_t i = 0; i < 8; ++i) {
-    if (!(absolute[i] <= 8388608.0f)) {
-      continue;
-    }
-    const int32_t truncated = (int32_t)lanes[i];
-    if (truncated == 0) {
-      lanes[i] = __builtin_signbit(lanes[i]) ? -0.0 : 0.0;
-      continue;
-    }
-    lanes[i] = (float)truncated;
-  }
-  cvectorization_ops_vector_f32 result;
-  for (size_t i = 0; i < 8; ++i) {
-    result[i] = lanes[i];
-  }
-  return (cvectorization_ops_raw_vector_f32)(result);
+  return (cvectorization_ops_raw_vector_f32)(__builtin_elementwise_trunc(a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  float lanes[16];
-  for (size_t i = 0; i < 16; ++i) {
-    lanes[i] = a[i];
-  }
-  float absolute[16];
-  for (size_t i = 0; i < 16; ++i) {
-    absolute[i] = __builtin_fabsf(lanes[i]);
-  }
-  for (size_t i = 0; i < 16; ++i) {
-    if (!(absolute[i] <= 8388608.0f)) {
-      continue;
-    }
-    const int32_t truncated = (int32_t)lanes[i];
-    if (truncated == 0) {
-      lanes[i] = __builtin_signbit(lanes[i]) ? -0.0 : 0.0;
-      continue;
-    }
-    lanes[i] = (float)truncated;
-  }
-  cvectorization_ops_vector_f32 result;
-  for (size_t i = 0; i < 16; ++i) {
-    result[i] = lanes[i];
-  }
-  return (cvectorization_ops_raw_vector_f32)(result);
+  return (cvectorization_ops_raw_vector_f32)(__builtin_elementwise_trunc(a));
 #elif CVECTORIZATION_OPS_NEON || (CVECTORIZATION_OPS_X86 >= 3 && CVECTORIZATION_OPS_X86 <= 6)
   return (cvectorization_ops_raw_vector_f32)(__builtin_elementwise_trunc(a));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
@@ -112954,63 +112848,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_r
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_rounded_up_f32(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_vector_f32 result = a;
-  for (size_t i = 0; i < 8; ++i) {
-    const float value = a[i];
-    const bool positive = value > 0.0;
-    uint32_t bits = __builtin_bit_cast(uint32_t, value);
-    const int exponent = (int)((bits >> 23) & 255) - 127;
-    if (exponent >= 23) {
-      continue;
-    }
-    if (exponent < 0) {
-      if (positive) {
-        result[i] = 1.0;
-      } else if (value != 0.0) {
-        result[i] = -0.0;
-      }
-      continue;
-    }
-    const uint32_t mantissaMask = 0x7fffffu >> exponent;
-    if ((bits & mantissaMask) == 0) {
-      continue;
-    }
-    if (positive) {
-      bits += (0x7fffffu + 1) >> exponent;
-    }
-    bits &= ~mantissaMask;
-    result[i] = __builtin_bit_cast(float, bits);
-  }
-  return (cvectorization_ops_raw_vector_f32)(result);
+  return (cvectorization_ops_raw_vector_f32)(__builtin_elementwise_ceil(a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_vector_f32 result = a;
-  for (size_t i = 0; i < 16; ++i) {
-    const float value = a[i];
-    const bool positive = value > 0.0;
-    uint32_t bits = __builtin_bit_cast(uint32_t, value);
-    const int exponent = (int)((bits >> 23) & 255) - 127;
-    if (exponent >= 23) {
-      continue;
-    }
-    if (exponent < 0) {
-      if (positive) {
-        result[i] = 1.0;
-      } else if (value != 0.0) {
-        result[i] = -0.0;
-      }
-      continue;
-    }
-    const uint32_t mantissaMask = 0x7fffffu >> exponent;
-    if ((bits & mantissaMask) == 0) {
-      continue;
-    }
-    if (positive) {
-      bits += (0x7fffffu + 1) >> exponent;
-    }
-    bits &= ~mantissaMask;
-    result[i] = __builtin_bit_cast(float, bits);
-  }
-  return (cvectorization_ops_raw_vector_f32)(result);
+  return (cvectorization_ops_raw_vector_f32)(__builtin_elementwise_ceil(a));
 #elif CVECTORIZATION_OPS_NEON || (CVECTORIZATION_OPS_X86 >= 3 && CVECTORIZATION_OPS_X86 <= 6)
   return (cvectorization_ops_raw_vector_f32)(__builtin_elementwise_ceil(a));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
@@ -113057,63 +112897,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_r
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_rounded_down_f32(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_vector_f32 result = a;
-  for (size_t i = 0; i < 8; ++i) {
-    const float value = a[i];
-    const bool negative = value < 0.0;
-    uint32_t bits = __builtin_bit_cast(uint32_t, value);
-    const int exponent = (int)((bits >> 23) & 255) - 127;
-    if (exponent >= 23) {
-      continue;
-    }
-    if (exponent < 0) {
-      if (negative) {
-        result[i] = -1.0;
-      } else if (value != 0.0) {
-        result[i] = 0.0;
-      }
-      continue;
-    }
-    const uint32_t mantissaMask = 0x7fffffu >> exponent;
-    if ((bits & mantissaMask) == 0) {
-      continue;
-    }
-    if (negative) {
-      bits += (0x7fffffu + 1) >> exponent;
-    }
-    bits &= ~mantissaMask;
-    result[i] = __builtin_bit_cast(float, bits);
-  }
-  return (cvectorization_ops_raw_vector_f32)(result);
+  return (cvectorization_ops_raw_vector_f32)(__builtin_elementwise_floor(a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_vector_f32 result = a;
-  for (size_t i = 0; i < 16; ++i) {
-    const float value = a[i];
-    const bool negative = value < 0.0;
-    uint32_t bits = __builtin_bit_cast(uint32_t, value);
-    const int exponent = (int)((bits >> 23) & 255) - 127;
-    if (exponent >= 23) {
-      continue;
-    }
-    if (exponent < 0) {
-      if (negative) {
-        result[i] = -1.0;
-      } else if (value != 0.0) {
-        result[i] = 0.0;
-      }
-      continue;
-    }
-    const uint32_t mantissaMask = 0x7fffffu >> exponent;
-    if ((bits & mantissaMask) == 0) {
-      continue;
-    }
-    if (negative) {
-      bits += (0x7fffffu + 1) >> exponent;
-    }
-    bits &= ~mantissaMask;
-    result[i] = __builtin_bit_cast(float, bits);
-  }
-  return (cvectorization_ops_raw_vector_f32)(result);
+  return (cvectorization_ops_raw_vector_f32)(__builtin_elementwise_floor(a));
 #elif CVECTORIZATION_OPS_NEON || (CVECTORIZATION_OPS_X86 >= 3 && CVECTORIZATION_OPS_X86 <= 6)
   return (cvectorization_ops_raw_vector_f32)(__builtin_elementwise_floor(a));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
@@ -124522,69 +124308,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_m
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_rounded_to_nearest_or_even_f64(cvectorization_ops_raw_vector_f64 rawA) {
   const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  double lanes[4];
-  for (size_t i = 0; i < 4; ++i) {
-    lanes[i] = a[i];
-  }
-  double absolute[4];
-  for (size_t i = 0; i < 4; ++i) {
-    absolute[i] = __builtin_fabs(lanes[i]);
-  }
-  for (size_t i = 0; i < 4; ++i) {
-    if (!(absolute[i] < 4503599627370496.0)) {
-      continue;
-    }
-    const double bias = lanes[i] < 0 ? -0.5 : 0.5;
-    const int64_t rounded = (int64_t)(lanes[i] + bias);
-    if (rounded == 0) {
-      lanes[i] = __builtin_signbit(lanes[i]) ? -0.0 : 0.0;
-      continue;
-    }
-    const double roundedLane = (double)rounded;
-    if ((rounded & 1) && __builtin_fabs(roundedLane - lanes[i]) == 0.5) {
-      const double even = (double)(rounded - (lanes[i] < 0 ? -1 : 1));
-      lanes[i] = even == 0 && __builtin_signbit(lanes[i]) ? -0.0 : even;
-      continue;
-    }
-    lanes[i] = roundedLane;
-  }
-  cvectorization_ops_vector_f64 result;
-  for (size_t i = 0; i < 4; ++i) {
-    result[i] = lanes[i];
-  }
-  return (cvectorization_ops_raw_vector_f64)(result);
+  return (cvectorization_ops_raw_vector_f64)(__builtin_elementwise_roundeven(a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  double lanes[8];
-  for (size_t i = 0; i < 8; ++i) {
-    lanes[i] = a[i];
-  }
-  double absolute[8];
-  for (size_t i = 0; i < 8; ++i) {
-    absolute[i] = __builtin_fabs(lanes[i]);
-  }
-  for (size_t i = 0; i < 8; ++i) {
-    if (!(absolute[i] < 4503599627370496.0)) {
-      continue;
-    }
-    const double bias = lanes[i] < 0 ? -0.5 : 0.5;
-    const int64_t rounded = (int64_t)(lanes[i] + bias);
-    if (rounded == 0) {
-      lanes[i] = __builtin_signbit(lanes[i]) ? -0.0 : 0.0;
-      continue;
-    }
-    const double roundedLane = (double)rounded;
-    if ((rounded & 1) && __builtin_fabs(roundedLane - lanes[i]) == 0.5) {
-      const double even = (double)(rounded - (lanes[i] < 0 ? -1 : 1));
-      lanes[i] = even == 0 && __builtin_signbit(lanes[i]) ? -0.0 : even;
-      continue;
-    }
-    lanes[i] = roundedLane;
-  }
-  cvectorization_ops_vector_f64 result;
-  for (size_t i = 0; i < 8; ++i) {
-    result[i] = lanes[i];
-  }
-  return (cvectorization_ops_raw_vector_f64)(result);
+  return (cvectorization_ops_raw_vector_f64)(__builtin_elementwise_roundeven(a));
 #elif CVECTORIZATION_OPS_NEON || (CVECTORIZATION_OPS_X86 >= 3 && CVECTORIZATION_OPS_X86 <= 6)
   return (cvectorization_ops_raw_vector_f64)(__builtin_elementwise_roundeven(a));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
@@ -124632,55 +124358,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_r
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_rounded_toward_zero_f64(cvectorization_ops_raw_vector_f64 rawA) {
   const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  double lanes[4];
-  for (size_t i = 0; i < 4; ++i) {
-    lanes[i] = a[i];
-  }
-  double absolute[4];
-  for (size_t i = 0; i < 4; ++i) {
-    absolute[i] = __builtin_fabs(lanes[i]);
-  }
-  for (size_t i = 0; i < 4; ++i) {
-    if (!(absolute[i] <= 4503599627370496.0)) {
-      continue;
-    }
-    const int64_t truncated = (int64_t)lanes[i];
-    if (truncated == 0) {
-      lanes[i] = __builtin_signbit(lanes[i]) ? -0.0 : 0.0;
-      continue;
-    }
-    lanes[i] = (double)truncated;
-  }
-  cvectorization_ops_vector_f64 result;
-  for (size_t i = 0; i < 4; ++i) {
-    result[i] = lanes[i];
-  }
-  return (cvectorization_ops_raw_vector_f64)(result);
+  return (cvectorization_ops_raw_vector_f64)(__builtin_elementwise_trunc(a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  double lanes[8];
-  for (size_t i = 0; i < 8; ++i) {
-    lanes[i] = a[i];
-  }
-  double absolute[8];
-  for (size_t i = 0; i < 8; ++i) {
-    absolute[i] = __builtin_fabs(lanes[i]);
-  }
-  for (size_t i = 0; i < 8; ++i) {
-    if (!(absolute[i] <= 4503599627370496.0)) {
-      continue;
-    }
-    const int64_t truncated = (int64_t)lanes[i];
-    if (truncated == 0) {
-      lanes[i] = __builtin_signbit(lanes[i]) ? -0.0 : 0.0;
-      continue;
-    }
-    lanes[i] = (double)truncated;
-  }
-  cvectorization_ops_vector_f64 result;
-  for (size_t i = 0; i < 8; ++i) {
-    result[i] = lanes[i];
-  }
-  return (cvectorization_ops_raw_vector_f64)(result);
+  return (cvectorization_ops_raw_vector_f64)(__builtin_elementwise_trunc(a));
 #elif CVECTORIZATION_OPS_NEON || (CVECTORIZATION_OPS_X86 >= 3 && CVECTORIZATION_OPS_X86 <= 6)
   return (cvectorization_ops_raw_vector_f64)(__builtin_elementwise_trunc(a));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
@@ -124724,63 +124404,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_r
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_rounded_up_f64(cvectorization_ops_raw_vector_f64 rawA) {
   const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_vector_f64 result = a;
-  for (size_t i = 0; i < 4; ++i) {
-    const double value = a[i];
-    const bool positive = value > 0.0;
-    uint64_t bits = __builtin_bit_cast(uint64_t, value);
-    const int exponent = (int)((bits >> 52) & 2047) - 1023;
-    if (exponent >= 52) {
-      continue;
-    }
-    if (exponent < 0) {
-      if (positive) {
-        result[i] = 1.0;
-      } else if (value != 0.0) {
-        result[i] = -0.0;
-      }
-      continue;
-    }
-    const uint64_t mantissaMask = 0xfffffffffffffull >> exponent;
-    if ((bits & mantissaMask) == 0) {
-      continue;
-    }
-    if (positive) {
-      bits += (0xfffffffffffffull + 1) >> exponent;
-    }
-    bits &= ~mantissaMask;
-    result[i] = __builtin_bit_cast(double, bits);
-  }
-  return (cvectorization_ops_raw_vector_f64)(result);
+  return (cvectorization_ops_raw_vector_f64)(__builtin_elementwise_ceil(a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_vector_f64 result = a;
-  for (size_t i = 0; i < 8; ++i) {
-    const double value = a[i];
-    const bool positive = value > 0.0;
-    uint64_t bits = __builtin_bit_cast(uint64_t, value);
-    const int exponent = (int)((bits >> 52) & 2047) - 1023;
-    if (exponent >= 52) {
-      continue;
-    }
-    if (exponent < 0) {
-      if (positive) {
-        result[i] = 1.0;
-      } else if (value != 0.0) {
-        result[i] = -0.0;
-      }
-      continue;
-    }
-    const uint64_t mantissaMask = 0xfffffffffffffull >> exponent;
-    if ((bits & mantissaMask) == 0) {
-      continue;
-    }
-    if (positive) {
-      bits += (0xfffffffffffffull + 1) >> exponent;
-    }
-    bits &= ~mantissaMask;
-    result[i] = __builtin_bit_cast(double, bits);
-  }
-  return (cvectorization_ops_raw_vector_f64)(result);
+  return (cvectorization_ops_raw_vector_f64)(__builtin_elementwise_ceil(a));
 #elif CVECTORIZATION_OPS_NEON || (CVECTORIZATION_OPS_X86 >= 3 && CVECTORIZATION_OPS_X86 <= 6)
   return (cvectorization_ops_raw_vector_f64)(__builtin_elementwise_ceil(a));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
@@ -124829,63 +124455,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_r
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_rounded_down_f64(cvectorization_ops_raw_vector_f64 rawA) {
   const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_vector_f64 result = a;
-  for (size_t i = 0; i < 4; ++i) {
-    const double value = a[i];
-    const bool negative = value < 0.0;
-    uint64_t bits = __builtin_bit_cast(uint64_t, value);
-    const int exponent = (int)((bits >> 52) & 2047) - 1023;
-    if (exponent >= 52) {
-      continue;
-    }
-    if (exponent < 0) {
-      if (negative) {
-        result[i] = -1.0;
-      } else if (value != 0.0) {
-        result[i] = 0.0;
-      }
-      continue;
-    }
-    const uint64_t mantissaMask = 0xfffffffffffffull >> exponent;
-    if ((bits & mantissaMask) == 0) {
-      continue;
-    }
-    if (negative) {
-      bits += (0xfffffffffffffull + 1) >> exponent;
-    }
-    bits &= ~mantissaMask;
-    result[i] = __builtin_bit_cast(double, bits);
-  }
-  return (cvectorization_ops_raw_vector_f64)(result);
+  return (cvectorization_ops_raw_vector_f64)(__builtin_elementwise_floor(a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_vector_f64 result = a;
-  for (size_t i = 0; i < 8; ++i) {
-    const double value = a[i];
-    const bool negative = value < 0.0;
-    uint64_t bits = __builtin_bit_cast(uint64_t, value);
-    const int exponent = (int)((bits >> 52) & 2047) - 1023;
-    if (exponent >= 52) {
-      continue;
-    }
-    if (exponent < 0) {
-      if (negative) {
-        result[i] = -1.0;
-      } else if (value != 0.0) {
-        result[i] = 0.0;
-      }
-      continue;
-    }
-    const uint64_t mantissaMask = 0xfffffffffffffull >> exponent;
-    if ((bits & mantissaMask) == 0) {
-      continue;
-    }
-    if (negative) {
-      bits += (0xfffffffffffffull + 1) >> exponent;
-    }
-    bits &= ~mantissaMask;
-    result[i] = __builtin_bit_cast(double, bits);
-  }
-  return (cvectorization_ops_raw_vector_f64)(result);
+  return (cvectorization_ops_raw_vector_f64)(__builtin_elementwise_floor(a));
 #elif CVECTORIZATION_OPS_NEON || (CVECTORIZATION_OPS_X86 >= 3 && CVECTORIZATION_OPS_X86 <= 6)
   return (cvectorization_ops_raw_vector_f64)(__builtin_elementwise_floor(a));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2

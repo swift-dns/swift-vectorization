@@ -12583,6 +12583,7 @@ func x86Rounded(_ rounding: FloatRounding, for element: Element) -> String {
 func roundingTargets(_ rounding: FloatRounding) -> TargetBodies<Element> {
     TargetBodies(
         neon: { element in vectorRounded(rounding, for: element) },
+        sve: { element in vectorRounded(rounding, for: element) },
         avx3: { element in vectorRounded(rounding, for: element) },
         avx2: { element in vectorRounded(rounding, for: element) },
         sse4: { element in vectorRounded(rounding, for: element) },
