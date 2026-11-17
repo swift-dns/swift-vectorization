@@ -943,7 +943,7 @@ package enum GenericBiasedExponentBySource<Source: SIMDFloatElement> {
 }
 
 package enum GenericTruncatingPair<
-    Lane: SIMDUnsignedIntegerElement,
+    Lane: SIMDElement,
     Source: SIMDUnsignedIntegerElement & SIMDWideIntegerElement
 > where Source.NarrowLane == Lane {
     package static func halfVector(truncatingIfNeeded a: SIMD<Source>) -> SIMD<Lane>.HalfVector {
@@ -953,6 +953,22 @@ package enum GenericTruncatingPair<
     package static func vector(truncatingIfNeeded a: SIMD<Source>, _ b: SIMD<Source>) -> SIMD<Lane>
     {
         SIMD<Lane>.vector(truncatingIfNeeded: a, b)
+    }
+}
+
+package enum GenericTruncatingBySource<Source: SIMDUnsignedIntegerElement & SIMDWideIntegerElement>
+{
+    package static func halfVector(
+        truncatingIfNeeded a: SIMD<Source>
+    ) -> SIMD<Source.NarrowLane>.HalfVector {
+        SIMD<Source.NarrowLane>.halfVector(truncatingIfNeeded: a)
+    }
+
+    package static func vector(
+        truncatingIfNeeded a: SIMD<Source>,
+        _ b: SIMD<Source>
+    ) -> SIMD<Source.NarrowLane> {
+        SIMD<Source.NarrowLane>.vector(truncatingIfNeeded: a, b)
     }
 }
 

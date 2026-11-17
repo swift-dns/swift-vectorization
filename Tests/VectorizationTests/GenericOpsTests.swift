@@ -153,7 +153,7 @@ struct GenericOpsTests {
         #expect(genericBytes.laneCount == SIMD<UInt8>.laneCount)
         #expect(genericBytes.copy == Array(concreteBytes))
         #expect(genericBytes.copy == Array(bytes))
-        #expect(genericBytes.zero.raw == SIMD<UInt8>.zero().raw)
+        #expect(genericBytes.zero.simd == SIMD<UInt8>.zero().simd)
 
         let floats = ContiguousArray((0..<SIMD<Float>.laneCount).map { Float($0) * 1.5 - 4 })
         let genericFloats = elementOps(floats)
@@ -164,7 +164,7 @@ struct GenericOpsTests {
         #expect(genericFloats.laneCount == SIMD<Float>.laneCount)
         #expect(genericFloats.copy == Array(concreteFloats))
         #expect(genericFloats.copy == Array(floats))
-        #expect(genericFloats.zero.raw == SIMD<Float>.zero().raw)
+        #expect(genericFloats.zero.simd == SIMD<Float>.zero().simd)
 
         let brains = ContiguousArray(
             (0..<SIMD<BFloat16>.laneCount).map { BFloat16(Float($0) * 0.5) }
@@ -178,7 +178,7 @@ struct GenericOpsTests {
         #expect(genericBrains.laneCount == SIMD<BFloat16>.laneCount)
         #expect(genericBrains.copy == Array(concreteBrains))
         #expect(genericBrains.copy == Array(brains))
-        #expect(genericBrains.zero.raw == SIMD<BFloat16>.zero().raw)
+        #expect(genericBrains.zero.simd == SIMD<BFloat16>.zero().simd)
     }
 
     @Test("Half and block ops of SIMDElement called through a generic lane type match the lanes")
@@ -232,8 +232,8 @@ struct GenericOpsTests {
         let genericShorts = numericOps(shorts, others)
         let isSmaller = SIMD<Int16>.lessThan(shorts, others)
 
-        #expect(genericShorts.sum.raw == SIMD<Int16>.adding(shorts, others).raw)
-        #expect(genericShorts.smaller.raw == SIMD<Int16>.selecting(isSmaller, shorts, others).raw)
+        #expect(genericShorts.sum.simd == SIMD<Int16>.adding(shorts, others).simd)
+        #expect(genericShorts.smaller.simd == SIMD<Int16>.selecting(isSmaller, shorts, others).simd)
         #expect(genericShorts.count == SIMD<Int16>.trueCount(isSmaller))
         #expect(genericShorts.lane == SIMD<Int16>.lane(shorts, at: 1))
         let uncheckedShort = unsafe SIMD<Int16>.lane(shorts, atUnchecked: 1)
@@ -243,10 +243,10 @@ struct GenericOpsTests {
         let genericFloats = numericOps(floats, otherFloats)
         let isSmallerFloat = SIMD<Float>.lessThan(floats, otherFloats)
 
-        #expect(genericFloats.sum.raw == SIMD<Float>.adding(floats, otherFloats).raw)
+        #expect(genericFloats.sum.simd == SIMD<Float>.adding(floats, otherFloats).simd)
         #expect(
-            genericFloats.smaller.raw
-                == SIMD<Float>.selecting(isSmallerFloat, floats, otherFloats).raw
+            genericFloats.smaller.simd
+                == SIMD<Float>.selecting(isSmallerFloat, floats, otherFloats).simd
         )
         #expect(genericFloats.count == SIMD<Float>.trueCount(isSmallerFloat))
         #expect(genericFloats.lane == SIMD<Float>.lane(floats, at: 1))
@@ -259,16 +259,16 @@ struct GenericOpsTests {
         let bytes = SIMD<UInt8>.iota(100)
         let genericBytes = integerOps(bytes)
 
-        #expect(genericBytes.shifted.raw == SIMD<UInt8>.shiftedLeft(bytes, by: 1).raw)
-        #expect(genericBytes.inverted.raw == SIMD<UInt8>.bitwiseNot(bytes).raw)
-        #expect(genericBytes.saturated.raw == SIMD<UInt8>.saturatingAdding(bytes, bytes).raw)
+        #expect(genericBytes.shifted.simd == SIMD<UInt8>.shiftedLeft(bytes, by: 1).simd)
+        #expect(genericBytes.inverted.simd == SIMD<UInt8>.bitwiseNot(bytes).simd)
+        #expect(genericBytes.saturated.simd == SIMD<UInt8>.saturatingAdding(bytes, bytes).simd)
 
         let words = SIMD<Int32>.iota(-3)
         let genericWords = integerOps(words)
 
-        #expect(genericWords.shifted.raw == SIMD<Int32>.shiftedLeft(words, by: 1).raw)
-        #expect(genericWords.inverted.raw == SIMD<Int32>.bitwiseNot(words).raw)
-        #expect(genericWords.saturated.raw == SIMD<Int32>.saturatingAdding(words, words).raw)
+        #expect(genericWords.shifted.simd == SIMD<Int32>.shiftedLeft(words, by: 1).simd)
+        #expect(genericWords.inverted.simd == SIMD<Int32>.bitwiseNot(words).simd)
+        #expect(genericWords.saturated.simd == SIMD<Int32>.saturatingAdding(words, words).simd)
     }
 
     @Test("Ops of SIMDFloatElement called through a generic lane type match the concrete ones")
@@ -277,19 +277,20 @@ struct GenericOpsTests {
         let genericFloats = floatOps(floats)
 
         #expect(
-            genericFloats.root.raw == SIMD<Float>.squareRoot(SIMD<Float>.magnitude(floats)).raw
+            genericFloats.root.simd == SIMD<Float>.squareRoot(SIMD<Float>.magnitude(floats)).simd
         )
-        #expect(genericFloats.rounded.raw == SIMD<Float>.roundedDown(floats).raw)
-        #expect(genericFloats.negated.raw == SIMD<Float>.negated(floats).raw)
+        #expect(genericFloats.rounded.simd == SIMD<Float>.roundedDown(floats).simd)
+        #expect(genericFloats.negated.simd == SIMD<Float>.negated(floats).simd)
 
         let doubles = SIMD<Double>.iota(-1.5)
         let genericDoubles = floatOps(doubles)
 
         #expect(
-            genericDoubles.root.raw == SIMD<Double>.squareRoot(SIMD<Double>.magnitude(doubles)).raw
+            genericDoubles.root.simd
+                == SIMD<Double>.squareRoot(SIMD<Double>.magnitude(doubles)).simd
         )
-        #expect(genericDoubles.rounded.raw == SIMD<Double>.roundedDown(doubles).raw)
-        #expect(genericDoubles.negated.raw == SIMD<Double>.negated(doubles).raw)
+        #expect(genericDoubles.rounded.simd == SIMD<Double>.roundedDown(doubles).simd)
+        #expect(genericDoubles.negated.simd == SIMD<Double>.negated(doubles).simd)
     }
 
     @Test("Ops of SIMDSignedElement called through a generic lane type match the concrete ones")
@@ -297,18 +298,18 @@ struct GenericOpsTests {
         let shorts = SIMD<Int16>.iota(-3)
         let genericShorts = signedOps(shorts)
 
-        #expect(genericShorts.negated.raw == SIMD<Int16>.negated(shorts).raw)
-        #expect(genericShorts.magnitude.raw == SIMD<Int16>.magnitude(shorts).raw)
-        #expect(genericShorts.signs.raw == SIMD<Int16>.isNegative(shorts).raw)
-        #expect(genericShorts.zeroed.raw == SIMD<Int16>.zeroingNegative(shorts).raw)
+        #expect(genericShorts.negated.simd == SIMD<Int16>.negated(shorts).simd)
+        #expect(genericShorts.magnitude.simd == SIMD<Int16>.magnitude(shorts).simd)
+        #expect(genericShorts.signs.simd == SIMD<Int16>.isNegative(shorts).simd)
+        #expect(genericShorts.zeroed.simd == SIMD<Int16>.zeroingNegative(shorts).simd)
 
         let floats = SIMD<Float>.iota(-2.5)
         let genericFloats = signedOps(floats)
 
-        #expect(genericFloats.negated.raw == SIMD<Float>.negated(floats).raw)
-        #expect(genericFloats.magnitude.raw == SIMD<Float>.magnitude(floats).raw)
-        #expect(genericFloats.signs.raw == SIMD<Float>.isNegative(floats).raw)
-        #expect(genericFloats.zeroed.raw == SIMD<Float>.zeroingNegative(floats).raw)
+        #expect(genericFloats.negated.simd == SIMD<Float>.negated(floats).simd)
+        #expect(genericFloats.magnitude.simd == SIMD<Float>.magnitude(floats).simd)
+        #expect(genericFloats.signs.simd == SIMD<Float>.isNegative(floats).simd)
+        #expect(genericFloats.zeroed.simd == SIMD<Float>.zeroingNegative(floats).simd)
     }
 
     @Test(
@@ -319,15 +320,15 @@ struct GenericOpsTests {
         let genericBytes = unsignedIntegerOps(bytes)
         let byteCounts = SIMD<UInt8>.nonzeroBitCount(bytes)
 
-        #expect(genericBytes.bitCounts.raw == byteCounts.raw)
-        #expect(genericBytes.halved.raw == SIMD<UInt8>.shiftedRight(byteCounts, by: 1).raw)
+        #expect(genericBytes.bitCounts.simd == byteCounts.simd)
+        #expect(genericBytes.halved.simd == SIMD<UInt8>.shiftedRight(byteCounts, by: 1).simd)
 
         let words = SIMD<UInt32>.iota(0xFFFF_FFFE)
         let genericWords = unsignedIntegerOps(words)
         let wordCounts = SIMD<UInt32>.nonzeroBitCount(words)
 
-        #expect(genericWords.bitCounts.raw == wordCounts.raw)
-        #expect(genericWords.halved.raw == SIMD<UInt32>.shiftedRight(wordCounts, by: 1).raw)
+        #expect(genericWords.bitCounts.simd == wordCounts.simd)
+        #expect(genericWords.halved.simd == SIMD<UInt32>.shiftedRight(wordCounts, by: 1).simd)
     }
 
     @Test(
@@ -337,20 +338,20 @@ struct GenericOpsTests {
         let bytes = SIMD<Int8>.iota(-128)
         let genericBytes = signedIntegerOps(bytes)
 
-        #expect(genericBytes.saturated.raw == SIMD<Int8>.saturatingNegated(bytes).raw)
-        #expect(genericBytes.magnitude.raw == SIMD<Int8>.saturatingMagnitude(bytes).raw)
-        #expect(genericBytes.signs.raw == SIMD<Int8>.broadcastingSignBit(bytes).raw)
+        #expect(genericBytes.saturated.simd == SIMD<Int8>.saturatingNegated(bytes).simd)
+        #expect(genericBytes.magnitude.simd == SIMD<Int8>.saturatingMagnitude(bytes).simd)
+        #expect(genericBytes.signs.simd == SIMD<Int8>.broadcastingSignBit(bytes).simd)
         let maskedBytes = SIMD<Int8>.magnitude(bytes, where: SIMD<Int8>.isNegative(bytes))
-        #expect(genericBytes.masked.raw == maskedBytes.raw)
+        #expect(genericBytes.masked.simd == maskedBytes.simd)
 
         let words = SIMD<Int32>.iota(-3)
         let genericWords = signedIntegerOps(words)
 
-        #expect(genericWords.saturated.raw == SIMD<Int32>.saturatingNegated(words).raw)
-        #expect(genericWords.magnitude.raw == SIMD<Int32>.saturatingMagnitude(words).raw)
-        #expect(genericWords.signs.raw == SIMD<Int32>.broadcastingSignBit(words).raw)
+        #expect(genericWords.saturated.simd == SIMD<Int32>.saturatingNegated(words).simd)
+        #expect(genericWords.magnitude.simd == SIMD<Int32>.saturatingMagnitude(words).simd)
+        #expect(genericWords.signs.simd == SIMD<Int32>.broadcastingSignBit(words).simd)
         let maskedWords = SIMD<Int32>.magnitude(words, where: SIMD<Int32>.isNegative(words))
-        #expect(genericWords.masked.raw == maskedWords.raw)
+        #expect(genericWords.masked.simd == maskedWords.simd)
     }
 
     @Test(

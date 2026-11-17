@@ -16,19 +16,16 @@ struct TypeCheckingTests {
         #expect(Array(output) == (0..<H.laneCount).map { UInt8(0x10 + $0 % 16) })
     }
 
+    #if os(macOS) || os(Linux) || os(Windows) || os(FreeBSD) || os(OpenBSD)
     @Test("A lane count in the arithmetic of an exit test closure type-checks")
     func propertyArithmeticInClosure() async {
-        await #expect(processExitsWith: .success) {
+        await #expect(processExitsWith: .failure) {
             let count = (SIMD<UInt8>.laneCount + 7) / 8 - 1
-            var output = ContiguousArray<UInt8>(
-                repeating: 0,
-                count: count * 2 + SIMD<UInt8>.laneCount
-            )
-            output.withUnsafeMutableBufferPointer { buffer in
-                unsafe SIMD<UInt8>.store(SIMD<UInt8>.zero(), to: buffer.baseAddress!)
-            }
+            let input = ContiguousArray<UInt8>(repeating: 0, count: count)
+            _ = SIMD<UInt8>.loadMask(from: input.span)
         }
     }
+    #endif
 
     @Test("Op calls in a comparison type-check")
     func opCallsInComparison() {

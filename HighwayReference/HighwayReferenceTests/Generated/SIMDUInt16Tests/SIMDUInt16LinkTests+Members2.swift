@@ -2788,6 +2788,25 @@ extension SIMDUInt16LinkTests {
         mismatches.record()
     }
 
+    @Test func halfVectorTruncatingIfNeededFromUInt32ThroughBySource() {
+        let mismatches = Mismatches(
+            "halfVectorTruncatingIfNeededFromUInt32 through GenericTruncatingBySource<UInt32>"
+        )
+        let aInputs = Inputs.integerDemotions(
+            SIMD<UInt32>.self,
+            to: Lane.self,
+            seed: 0x9AB0_4376_260C_877A
+        )
+        for a in aInputs {
+            mismatches.check(
+                GenericTruncatingBySource<UInt32>.halfVector(truncatingIfNeeded: a),
+                H.halfVector(truncatingIfNeeded: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func vectorTruncatingIfNeededFromUInt32ThroughPair() {
         let mismatches = Mismatches(
             "vectorTruncatingIfNeededFromUInt32 through GenericTruncatingPair<UInt16, UInt32>"
@@ -2797,6 +2816,22 @@ extension SIMDUInt16LinkTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 GenericTruncatingPair<UInt16, UInt32>.vector(truncatingIfNeeded: a, b),
+                H.vector(truncatingIfNeeded: a, b),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func vectorTruncatingIfNeededFromUInt32ThroughBySource() {
+        let mismatches = Mismatches(
+            "vectorTruncatingIfNeededFromUInt32 through GenericTruncatingBySource<UInt32>"
+        )
+        let aInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0xB9F2_D5E5_7AD7_9F1D)
+        let bInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0xB9F2_D4E5_7AD7_9D6A)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                GenericTruncatingBySource<UInt32>.vector(truncatingIfNeeded: a, b),
                 H.vector(truncatingIfNeeded: a, b),
                 "a: \(describe(a)), b: \(describe(b))"
             )

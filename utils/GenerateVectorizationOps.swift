@@ -45692,10 +45692,15 @@ let linkForms = [
         anchor: .source,
         requirementLane: "UnsignedLane.NarrowLane",
         requirementSource: "UnsignedLane",
-        extending: "SIMD where Lane: SIMDUnsignedIntegerElement",
+        extending: "SIMD",
         genericParameter: "Source: SIMDUnsignedIntegerElement & SIMDWideIntegerElement",
         constraint: "Source.NarrowLane == Lane",
-        anchorsSignedSibling: true
+        anchorsSignedSibling: true,
+        sourceWrapper: LinkWrapper(
+            parameter: "Source: SIMDUnsignedIntegerElement & SIMDWideIntegerElement",
+            spelling: "Source.NarrowLane",
+            linked: { narrowElement(of: $0) }
+        )
     ),
     LinkForm(
         fileName: "MaskNarrowing",
