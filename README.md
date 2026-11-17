@@ -158,9 +158,8 @@ itself unsupported although it runs.
 Every op reproduces what highway does on the same target, down to NaN payloads and the results of
 out-of-range inputs, so the ops behave like highway's. `HighwayReference/` holds a copy of highway
 and generated tests that compare every op with highway's, lane for lane, on NEON, NEON_WITHOUT_AES,
-SVE2_128, SSE2, SSSE3, SSE4, AVX2, the AVX-512 targets under Intel's SDE, and highway's EMU128.
-No CI runner has the wide SVE targets: their ops were compared with highway's under QEMU, outside
-these tests.
+NEON_BF16, SVE2_128, SVE_256 and SVE and SVE2 at 512 bits under QEMU, SSE2, SSSE3, SSE4, AVX2, the
+AVX-512 targets under Intel's SDE, and highway's EMU128.
 
 When an op meets two NaNs with different payloads, as in an addition, a multiplication, a sum, or
 an absolute difference, minimum or maximum on SVE, which payload comes out is up to the compiler, in
