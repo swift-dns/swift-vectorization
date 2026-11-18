@@ -320,11 +320,6 @@ jobs:
         env:
           FLAGS: ${{ matrix.target.flags }}
           SIMD_EXPECTED_TARGET: ${{ matrix.target.expected-target }}
-          # Swift's backtracer crashes while looking up inline frames in the test runners' debug
-          # info, which leaves a crashed runner without a backtrace, so it only looks up symbols.
-          # The emulated and sanitized rows keep the default, under which swift-testing turns the
-          # backtracer off in the child processes of exit tests: with it on, those rows take hours.
-          SWIFT_BACKTRACE: &swift_backtrace "symbolicate=fast"
         run: |
           read -r -a flags <<< "${FLAGS}"
           swift test --package-path HighwayReference "${flags[@]}"
@@ -334,7 +329,6 @@ jobs:
         env:
           FLAGS: ${{ matrix.target.flags }}
           SIMD_EXPECTED_TARGET: ${{ matrix.target.expected-target }}
-          SWIFT_BACKTRACE: *swift_backtrace
         run: |
           read -r -a flags <<< "${FLAGS}"
           swift test -c release --jobs 2 --package-path HighwayReference "${flags[@]}"
