@@ -15,6 +15,9 @@ defaults:
 
 env:
   TEST_ONLY_NEW_OPS: &test_only_new_ops ${{ github.event_name == 'pull_request' && !github.event.pull_request.draft && !contains(github.event.pull_request.labels.*.name, 'full-reference-tests') }}
+  # Swift's backtracer crashes while looking up inline frames in the test runners' debug info, which
+  # leaves a crashed runner without a backtrace, so it only looks up symbols.
+  SWIFT_BACKTRACE: "symbolicate=fast"
 
 jobs:
   reference-tests:
