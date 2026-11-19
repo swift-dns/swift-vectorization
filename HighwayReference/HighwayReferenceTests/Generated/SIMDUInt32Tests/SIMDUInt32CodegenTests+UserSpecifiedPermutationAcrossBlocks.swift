@@ -390,4 +390,26 @@ extension SIMDUInt32CodegenTests {
         }
         mismatches.record()
     }
+
+    @Test func loadIndicesMisaligned() {
+        let mismatches = Mismatches("portLoadIndicesU32 on misaligned memory")
+        let fromInputs = Inputs.indexBuffers(
+            UInt32.self,
+            lanes: H.laneCount,
+            seed: 0xDD1F_9B4A_0FBC_2C75
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe portLoadIndicesU32(from: source),
+                    unsafe highwayLoadIndicesU32(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
 }

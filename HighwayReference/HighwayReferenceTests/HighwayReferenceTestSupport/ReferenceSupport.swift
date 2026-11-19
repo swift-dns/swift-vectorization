@@ -870,6 +870,24 @@ package func withAlignedLanes<Lane: ReferenceLane, Result>(
     return (result, unsafe Array(UnsafeBufferPointer(start: pointer, count: lanes.count)))
 }
 
+package func withMisalignedLanes<Lane: ReferenceLane, Result>(
+    _ lanes: [Lane],
+    vectorBytes: Int,
+    _ body: (UnsafeMutablePointer<Lane>) -> Result
+) -> (result: Result, lanes: [Lane]) {
+    let byteCount = (lanes.count + 1) * MemoryLayout<Lane>.stride
+    let raw = UnsafeMutableRawPointer.allocate(byteCount: byteCount, alignment: vectorBytes)
+    defer { unsafe raw.deallocate() }
+    let start = unsafe raw + MemoryLayout<Lane>.stride
+    let pointer = unsafe start.initializeMemory(as: Lane.self, from: lanes, count: lanes.count)
+    precondition(
+        UInt(bitPattern: pointer) % UInt(vectorBytes) != 0,
+        "Lanes start at an address aligned to \(vectorBytes) bytes"
+    )
+    let result = unsafe body(pointer)
+    return (result, unsafe Array(UnsafeBufferPointer(start: pointer, count: lanes.count)))
+}
+
 package func withOutputSpan<Lane: ReferenceLane, Result>(
     capacity: Int,
     alignment: Int = MemoryLayout<Lane>.alignment,
@@ -887,6 +905,21 @@ package func withOutputSpan<Lane: ReferenceLane, Result>(
     let result = body(&output)
     _ = unsafe output.finalize(for: region)
     return (result, unsafe Array(buffer))
+}
+
+package func withMisalignedOutputSpan<Lane: ReferenceLane, Result>(
+    capacity: Int,
+    vectorBytes: Int,
+    _ body: (inout OutputSpan<Lane>) -> Result
+) -> (result: Result, lanes: [Lane]) {
+    let sentinel = Inputs.sentinel(Lane.self, count: capacity + 4)
+    return unsafe withMisalignedLanes(sentinel, vectorBytes: vectorBytes) { pointer in
+        let region = unsafe UnsafeMutableBufferPointer(start: pointer, count: capacity)
+        var output = unsafe OutputSpan(buffer: region, initializedCount: 0)
+        let result = body(&output)
+        _ = unsafe output.finalize(for: region)
+        return result
+    }
 }
 
 package func withMutableSpan<Lane: ReferenceLane, Result>(

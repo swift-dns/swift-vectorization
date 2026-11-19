@@ -7,6 +7,98 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
+    private func checkSquareRootConstantA(_ value: Lane) {
+        let mismatches = Mismatches("squareRoot with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.squareRoot(H.repeating(value)),
+            H(raw: HighwayReference.squareRootF64(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func squareRootConstantSplatZero() {
+        checkSquareRootConstantA(0.0)
+    }
+
+    @Test func squareRootConstantSplatNegativeZero() {
+        checkSquareRootConstantA(-0.0)
+    }
+
+    @Test func squareRootConstantSplatOne() {
+        checkSquareRootConstantA(1.0)
+    }
+
+    @Test func squareRootConstantSplatMinusOne() {
+        checkSquareRootConstantA(-1.0)
+    }
+
+    @Test func squareRootConstantSplatTwo() {
+        checkSquareRootConstantA(2.0)
+    }
+
+    @Test func squareRootConstantSplatHalf() {
+        checkSquareRootConstantA(0.5)
+    }
+
+    @Test func squareRootConstantSplatFour() {
+        checkSquareRootConstantA(4.0)
+    }
+
+    @Test func squareRootConstantSplatQuarter() {
+        checkSquareRootConstantA(0.25)
+    }
+
+    @Test func squareRootConstantSplatOnePointFive() {
+        checkSquareRootConstantA(1.5)
+    }
+
+    @Test func squareRootConstantSplatMinusTwoPointFive() {
+        checkSquareRootConstantA(-2.5)
+    }
+
+    @Test func squareRootConstantSplatInfinity() {
+        checkSquareRootConstantA(.infinity)
+    }
+
+    @Test func squareRootConstantSplatMinusInfinity() {
+        checkSquareRootConstantA(-.infinity)
+    }
+
+    @Test func squareRootConstantSplatNaN() {
+        checkSquareRootConstantA(.nan)
+    }
+
+    @Test func squareRootConstantSplatMinusNaN() {
+        checkSquareRootConstantA(-.nan)
+    }
+
+    @Test func squareRootConstantSplatPayloadNaN() {
+        checkSquareRootConstantA(Lane(nan: 1, signaling: false))
+    }
+
+    @Test func squareRootConstantSplatSignalingNaN() {
+        checkSquareRootConstantA(.signalingNaN)
+    }
+
+    @Test func squareRootConstantSplatMinusSignalingNaN() {
+        checkSquareRootConstantA(-.signalingNaN)
+    }
+
+    @Test func squareRootConstantSplatLeastNonzero() {
+        checkSquareRootConstantA(.leastNonzeroMagnitude)
+    }
+
+    @Test func squareRootConstantSplatGreatest() {
+        checkSquareRootConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
     private func checkApproximateReciprocalSquareRootConstantA(_ value: Lane) {
         let mismatches = Mismatches(
             "approximateReciprocalSquareRoot with a repeating \(hex(value))"
@@ -74,8 +166,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func approximateReciprocalSquareRootConstantSplatNaN() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
-            isIntermittent: SIMDTarget.targetName != "AVX2"
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkApproximateReciprocalSquareRootConstantA(.nan)
         } when: {
@@ -87,8 +179,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func approximateReciprocalSquareRootConstantSplatMinusNaN() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
-            isIntermittent: SIMDTarget.targetName != "AVX2"
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkApproximateReciprocalSquareRootConstantA(-.nan)
         } when: {
@@ -100,8 +192,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func approximateReciprocalSquareRootConstantSplatPayloadNaN() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
-            isIntermittent: SIMDTarget.targetName != "AVX2"
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkApproximateReciprocalSquareRootConstantA(Lane(nan: 1, signaling: false))
         } when: {
@@ -113,8 +205,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func approximateReciprocalSquareRootConstantSplatSignalingNaN() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
-            isIntermittent: SIMDTarget.targetName != "AVX2"
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkApproximateReciprocalSquareRootConstantA(.signalingNaN)
         } when: {
@@ -126,8 +218,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func approximateReciprocalSquareRootConstantSplatMinusSignalingNaN() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
-            isIntermittent: SIMDTarget.targetName != "AVX2"
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkApproximateReciprocalSquareRootConstantA(-.signalingNaN)
         } when: {

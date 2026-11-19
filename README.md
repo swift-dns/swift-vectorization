@@ -139,8 +139,9 @@ EMU128, as highway's is, where scalar code is faster.
 `HWY_MEM_OPS_MIGHT_FAULT`, `hasNativeFusedMultiplyAdd` is `HWY_NATIVE_FMA`, `hasNativeMasking` is
 `HWY_NATIVE_MASK`, `hasNativeBFloat16DotProduct` is `HWY_NATIVE_DOT_BF16`,
 `hasNativeWholeInterleave` is `HWY_NATIVE_INTERLEAVE_WHOLE`, `hasNativeStoreFirst` is
-`HWY_NATIVE_STORE_N`, `hasNative64BitMultiply` is `HWY_NATIVE_MUL64`, `hasNativeFloat16Arithmetic`
-is `HWY_HAVE_FLOAT16` and `registerCount` is `HWY_REGISTERS`. They describe the port's own ops, so
+`HWY_NATIVE_STORE_N`, `hasNative64BitMultiply` is `HWY_NATIVE_MUL64`,
+`hasNativeMultiplyByPowerOf2` is `HWY_NATIVE_MUL_BY_POW2`, `hasNativeFloat16Arithmetic` is
+`HWY_HAVE_FLOAT16` and `registerCount` is `HWY_REGISTERS`. They describe the port's own ops, so
 on the portable C targets, whose ops follow highway's EMU128, they take EMU128's values:
 `hasNativeFusedMultiplyAdd` is false on PPC8 and Z14, for example, where highway's own ops fuse.
 
@@ -157,12 +158,12 @@ itself unsupported although it runs.
 Every op reproduces what highway does on the same target, down to NaN payloads and the results of
 out-of-range inputs, so the ops behave like highway's. `HighwayReference/` holds a copy of highway
 and generated tests that compare every op with highway's, lane for lane, on NEON, NEON_WITHOUT_AES,
-SVE2_128, SSE2, SSSE3, SSE4, AVX2, the AVX-512 targets under Intel's SDE, and highway's EMU128.
-No CI runner has the wide SVE targets: their ops were compared with highway's under QEMU, outside
-these tests.
+NEON_BF16, SVE2_128, SVE_256 and SVE and SVE2 at 512 bits under QEMU, SSE2, SSSE3, SSE4, AVX2, the
+AVX-512 targets under Intel's SDE, and highway's EMU128.
 
-When an op meets two NaNs with different payloads, as in an addition, a multiplication, a sum, or a
-minimum or maximum on SVE, which payload comes out is up to the compiler, in highway as in the port.
+When an op meets two NaNs with different payloads, as in an addition, a multiplication, a sum, or
+an absolute difference, minimum or maximum on SVE, which payload comes out is up to the compiler, in
+highway as in the port.
 
 A mask made from a vector whose lanes are not all zeros or all ones, with `mask(from:)` or
 `Mask(raw:)`, behaves in every op as highway's `MaskFromVec` of the same vector does on the same

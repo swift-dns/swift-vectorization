@@ -93,6 +93,11 @@ The public headers are:
 *   hwy/base.h: included from headers that only need compiler/platform-dependent
     definitions (e.g. `PopCount`) without the full highway.h.
 
+*   hwy/base_c.h: macro-only subset of base.h (e.g. `HWY_MUST_USE_RESULT`,
+    `HWY_RESTRICT`, `HWY_DLLEXPORT`, compiler/arch detection) that is also
+    usable from C, e.g. in `extern "C"` library interfaces. Included by base.h;
+    pure-C Bazel targets can depend on `:base_c` to avoid linking C++.
+
 *   hwy/foreach_target.h: re-includes the translation unit (specified by
     `HWY_TARGET_INCLUDE`) once per enabled target to generate code from the same
     source code. highway.h must still be included.
@@ -444,6 +449,19 @@ for comparisons, for example `Lt` instead of `operator<`.
     the result, with `t0` in the least-significant (lowest-indexed) lane of each
     128-bit block and `tK` in the most-significant (highest-indexed) lane of
     each 128-bit block: `{t0, t1, ..., tK}`
+
+    For example, with 64-bit lanes (`T = int64_t`, `K = 1`) on a 256-bit target (`Lanes(d) == 4`):
+
+    ```cpp
+    const ScalableTag<int64_t> d;
+    const auto v = Dup128VecFromValues(d, 100, 200);
+    // Result across lanes [0..3]: [100, 200, 100, 200]
+    ```
+
+    | Lane | 0 | 1 | 2 | 3 |
+    | :--- | :--- | :--- | :--- | :--- |
+    | **128-bit Block** | Block 0 | Block 0 | Block 1 | Block 1 |
+    | **Value** | `t0` (100) | `t1` (200) | `t0` (100) | `t1` (200) |
 
 *   <code>V **MaskedSetOr**(V no, M m, T a)</code>: returns N-lane vector with
     lane `i` equal to `a` if `m[i]` is true else `no[i]`.
@@ -3142,6 +3160,9 @@ supported for the `HWY_SCALAR` target.
 *   `HWY_NATIVE_MUL64` expands to 1 if u64 `Mul` and `MulHigh` use native
     instructions.
 
+*   `HWY_NATIVE_MUL_BY_POW2` expands to 1 if `MulByPow2` and `MulByFloorPow2`
+    use native instructions.
+
 *   `HWY_IS_LITTLE_ENDIAN` expands to 1 on little-endian targets and to 0 on
     big-endian targets.
 
@@ -3196,6 +3217,14 @@ least one baseline target which `HWY_EXPORT` can use.
 *   `HWY_DISABLE_BMI2_FMA` prevents emitting BMI/BMI2/FMA instructions. This
     allows using AVX2 in VMs that do not support the other instructions, but
     only if defined for all translation units.
+*   `HWY_DISABLE_GCC_GATHER_WORKAROUND` restores the original x86 `GatherIndex`
+    and `GatherOffset` intrinsic implementations when compiling with GCC.
+    The workaround is enabled by default to break false dependencies on gather
+    destinations ([GCC bug 127946](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=127946)).
+    Define this macro before including Highway headers, for example with
+    `-DHWY_DISABLE_GCC_GATHER_WORKAROUND`, to opt out when using a newer GCC with
+    an older Highway release. Its presence disables the workaround even if
+    defined as `0`. Other compilers and explicitly masked gathers are unaffected.
 
 The following `*_TARGETS` are zero or more `HWY_Target` bits and can be defined
 as an expression, e.g. `-DHWY_DISABLED_TARGETS=(HWY_SSE4|HWY_AVX3)`.

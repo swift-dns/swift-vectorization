@@ -559,4 +559,23 @@ extension SIMDInt8CodegenTests {
         }
         mismatches.record()
     }
+
+    @Test func loadIndicesMisaligned() {
+        let mismatches = Mismatches("portLoadIndicesI8 on misaligned memory")
+        let fromInputs = Inputs.indexBuffers(
+            Int8.self,
+            lanes: H.laneCount,
+            seed: 0x1908_89D1_3090_C970
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (unsafe portLoadIndicesI8(from: source), unsafe highwayLoadIndicesI8(from: source))
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
 }

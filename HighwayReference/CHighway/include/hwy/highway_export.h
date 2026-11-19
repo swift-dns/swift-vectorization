@@ -1,3 +1,7 @@
+// Copyright 2026 Google LLC
+// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BSD-3-Clause
+
 // Pseudo-generated file to handle both cmake & bazel build system.
 
 // Initial generation done using cmake code:
@@ -13,6 +17,7 @@
 #define HWY_DLLEXPORT
 #define HWY_CONTRIB_DLLEXPORT
 #define HWY_TEST_DLLEXPORT
+#define HWY_IO_DLLEXPORT
 #else  // !HWY_SHARED_DEFINE
 
 #ifndef HWY_DLLEXPORT
@@ -68,6 +73,24 @@
 #endif
 #endif  // defined(hwy_test_EXPORTS)
 #endif  // HWY_TEST_DLLEXPORT
+
+#ifndef HWY_IO_DLLEXPORT
+#if defined(hwy_io_EXPORTS)
+/* We are building this library */
+#ifdef _WIN32
+#define HWY_IO_DLLEXPORT __declspec(dllexport)
+#else
+#define HWY_IO_DLLEXPORT __attribute__((visibility("default")))
+#endif
+#else  // defined(hwy_io_EXPORTS)
+/* We are using this library */
+#ifdef _WIN32
+#define HWY_IO_DLLEXPORT __declspec(dllimport)
+#else
+#define HWY_IO_DLLEXPORT __attribute__((visibility("default")))
+#endif
+#endif  // defined(hwy_io_EXPORTS)
+#endif  // HWY_IO_DLLEXPORT
 
 #endif  // !HWY_SHARED_DEFINE
 

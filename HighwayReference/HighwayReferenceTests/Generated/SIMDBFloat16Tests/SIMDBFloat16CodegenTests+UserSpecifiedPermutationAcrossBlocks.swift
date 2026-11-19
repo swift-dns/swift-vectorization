@@ -68,4 +68,26 @@ extension SIMDBFloat16CodegenTests {
         }
         mismatches.record()
     }
+
+    @Test func loadIndicesMisaligned() {
+        let mismatches = Mismatches("portLoadIndicesBF16 on misaligned memory")
+        let fromInputs = Inputs.indexBuffers(
+            Int16.self,
+            lanes: H.laneCount,
+            seed: 0xB603_6F5D_D505_FEFA
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe portLoadIndicesBF16(from: source),
+                    unsafe highwayLoadIndicesBF16(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
 }

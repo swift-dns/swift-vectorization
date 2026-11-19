@@ -390,4 +390,26 @@ extension SIMDFloatCodegenTests {
         }
         mismatches.record()
     }
+
+    @Test func loadIndicesMisaligned() {
+        let mismatches = Mismatches("portLoadIndicesF32 on misaligned memory")
+        let fromInputs = Inputs.indexBuffers(
+            Int32.self,
+            lanes: H.laneCount,
+            seed: 0xD375_6C93_8A7C_4FC0
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe portLoadIndicesF32(from: source),
+                    unsafe highwayLoadIndicesF32(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
 }

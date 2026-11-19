@@ -56,6 +56,34 @@ extension SIMDFloatReferenceTests {
         mismatches.record()
     }
 
+    @Test func gatherMisaligned() {
+        let mismatches = Mismatches("gather on misaligned memory")
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xBD4F_A090_3C18_130C)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0xBD4F_A190_3C18_14BF,
+            inContract: true
+        )
+        for (from, indices) in everyPair(fromInputs, indicesInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe H.gather(from: source, indices: indices),
+                    unsafe H(raw: HighwayReference.gatherF32(source, indices.raw))
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func gatherUncheckedSpan() {
         let mismatches = Mismatches("gather unchecked span")
         let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x6C9B_8E60_4DDA_D6A1)
@@ -78,6 +106,44 @@ extension SIMDFloatReferenceTests {
                     })()
                 )
             }
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("gather unchecked span on misaligned memory")
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xCEF9_C321_8A8F_FF34)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0xCEF9_C421_8A90_00E7,
+            inContract: true
+        )
+        for (from, indices) in everyPair(fromInputs, indicesInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return unsafe H.gather(fromUnchecked: span, indices: indices)
+                    })(),
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return H.gather(from: span, indices: indices)
+                    })()
+                )
+            }.result
             mismatches.check(
                 portResult,
                 referenceResult,
@@ -142,6 +208,34 @@ extension SIMDFloatReferenceTests {
         mismatches.record()
     }
 
+    @Test func gatherByteOffsetsMisaligned() {
+        let mismatches = Mismatches("gatherByteOffsets on misaligned memory")
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xDF7C_19FC_4416_86FA)
+        let byteOffsetsInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
+            seed: 0xDF7C_1AFC_4416_88AD,
+            inContract: true
+        )
+        for (from, byteOffsets) in everyPair(fromInputs, byteOffsetsInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe H.gather(from: source, byteOffsets: byteOffsets),
+                    unsafe H(raw: HighwayReference.gatherByteOffsetsF32(source, byteOffsets.raw))
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), byteOffsets: \(describe(byteOffsets))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func gatherByteOffsetsUncheckedSpan() {
         let mismatches = Mismatches("gatherByteOffsets unchecked span")
         let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x6067_B456_DC82_21D7)
@@ -164,6 +258,44 @@ extension SIMDFloatReferenceTests {
                     })()
                 )
             }
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), byteOffsets: \(describe(byteOffsets))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherByteOffsetsUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("gatherByteOffsets unchecked span on misaligned memory")
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xE8DB_9B0F_95D2_1C3E)
+        let byteOffsetsInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
+            seed: 0xE8DB_9C0F_95D2_1DF1,
+            inContract: true
+        )
+        for (from, byteOffsets) in everyPair(fromInputs, byteOffsetsInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return unsafe H.gather(fromUnchecked: span, byteOffsets: byteOffsets)
+                    })(),
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return H.gather(from: span, byteOffsets: byteOffsets)
+                    })()
+                )
+            }.result
             mismatches.check(
                 portResult,
                 referenceResult,
@@ -243,6 +375,41 @@ extension SIMDFloatReferenceTests {
         mismatches.record()
     }
 
+    @Test func gatherFirstMisaligned() {
+        let mismatches = Mismatches("gatherFirst on misaligned memory")
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xF104_D1A1_8ACA_0FA2)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0xF104_D2A1_8ACA_1155,
+            inContract: true
+        )
+        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
+        for (from, indices, count) in mixedTriples(
+            fromInputs,
+            indicesInputs,
+            countInputs,
+            seed: 0x3D8B_05ED_2D30_D7E6
+        ) {
+            let indices = poisoned(indices, firstLanes: count, with: H.laneCount)
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe H.gather(from: source, indices: indices, count: count),
+                    unsafe H(raw: HighwayReference.gatherFirstF32(source, indices.raw, count))
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), indices: \(describe(indices)), count: \(count)"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func gatherFirstUncheckedSpan() {
         let mismatches = Mismatches("gatherFirst unchecked span")
         let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xE127_D0F6_EFE3_305F)
@@ -272,6 +439,51 @@ extension SIMDFloatReferenceTests {
                     })()
                 )
             }
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), indices: \(describe(indices)), count: \(count)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherFirstUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("gatherFirst unchecked span on misaligned memory")
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x089A_3A95_BC9F_EF76)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0x089A_3B95_BC9F_F129,
+            inContract: true
+        )
+        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
+        for (from, indices, count) in mixedTriples(
+            fromInputs,
+            indicesInputs,
+            countInputs,
+            seed: 0x3486_AEBB_EAE4_B7F2
+        ) {
+            let indices = poisoned(indices, firstLanes: count, with: H.laneCount)
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return unsafe H.gather(fromUnchecked: span, indices: indices, count: count)
+                    })(),
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return H.gather(from: span, indices: indices, count: count)
+                    })()
+                )
+            }.result
             mismatches.check(
                 portResult,
                 referenceResult,
@@ -373,6 +585,55 @@ extension SIMDFloatReferenceTests {
         mismatches.record()
     }
 
+    @Test func gatherFirstOtherwiseMisaligned() {
+        let mismatches = Mismatches("gatherFirstOtherwise on misaligned memory")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x456B_710B_4D0B_853C)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x456B_720B_4D0B_86EF)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0x456B_730B_4D0B_88A2,
+            inContract: true
+        )
+        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
+        for (otherwise, from, indices, count) in mixedQuadruples(
+            otherwiseInputs,
+            fromInputs,
+            indicesInputs,
+            countInputs,
+            seed: 0xCA91_2246_5198_0E90
+        ) {
+            let indices = poisoned(indices, firstLanes: count, with: H.laneCount)
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe H.gather(
+                        from: source,
+                        indices: indices,
+                        count: count,
+                        otherwise: otherwise
+                    ),
+                    unsafe H(
+                        raw: HighwayReference.gatherFirstOtherwiseF32(
+                            otherwise.raw,
+                            source,
+                            indices.raw,
+                            count
+                        )
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), from: \(describe(from)), indices: \(describe(indices)), count: \(count)"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func gatherFirstOtherwiseUncheckedSpan() {
         let mismatches = Mismatches("gatherFirstOtherwise unchecked span")
         let otherwiseInputs = Inputs.vectors(H.self, seed: 0x33FD_A03C_A033_3D71)
@@ -414,6 +675,63 @@ extension SIMDFloatReferenceTests {
                     })()
                 )
             }
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), from: \(describe(from)), indices: \(describe(indices)), count: \(count)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherFirstOtherwiseUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("gatherFirstOtherwise unchecked span on misaligned memory")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x335E_1B35_3902_5924)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x335E_1C35_3902_5AD7)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0x335E_1D35_3902_5C8A,
+            inContract: true
+        )
+        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
+        for (otherwise, from, indices, count) in mixedQuadruples(
+            otherwiseInputs,
+            fromInputs,
+            indicesInputs,
+            countInputs,
+            seed: 0xAB6F_4BE9_2F1B_7058
+        ) {
+            let indices = poisoned(indices, firstLanes: count, with: H.laneCount)
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return unsafe H.gather(
+                            fromUnchecked: span,
+                            indices: indices,
+                            count: count,
+                            otherwise: otherwise
+                        )
+                    })(),
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return H.gather(
+                            from: span,
+                            indices: indices,
+                            count: count,
+                            otherwise: otherwise
+                        )
+                    })()
+                )
+            }.result
             mismatches.check(
                 portResult,
                 referenceResult,
@@ -479,6 +797,41 @@ extension SIMDFloatReferenceTests {
         ) {
             let indices = poisoned(indices, where: mask, with: H.laneCount)
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe H.gather(from: source, indices: indices, where: mask),
+                    unsafe H(raw: HighwayReference.gatherWhereF32(mask.raw, source, indices.raw))
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "mask: \(describe(mask)), from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherWhereMisaligned() {
+        let mismatches = Mismatches("gatherWhere on misaligned memory")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3CA2_4467_8151_2523)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x3CA2_4367_8151_2370)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0x3CA2_4667_8151_2889,
+            inContract: true
+        )
+        for (mask, from, indices) in mixedTriples(
+            maskInputs,
+            fromInputs,
+            indicesInputs,
+            seed: 0x14B9_B39B_3731_0C25
+        ) {
+            let indices = poisoned(indices, where: mask, with: H.laneCount)
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
                 (
                     unsafe H.gather(from: source, indices: indices, where: mask),
                     unsafe H(raw: HighwayReference.gatherWhereF32(mask.raw, source, indices.raw))
@@ -569,6 +922,51 @@ extension SIMDFloatReferenceTests {
         mismatches.record()
     }
 
+    @Test func gatherWhereUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("gatherWhere unchecked span on misaligned memory")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1F7F_68F0_F22B_CC1D)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x1F7F_67F0_F22B_CA6A)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0x1F7F_66F0_F22B_C8B7,
+            inContract: true
+        )
+        for (mask, from, indices) in mixedTriples(
+            maskInputs,
+            fromInputs,
+            indicesInputs,
+            seed: 0x5F2F_F3A4_E828_5C6F
+        ) {
+            let indices = poisoned(indices, where: mask, with: H.laneCount)
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return unsafe H.gather(fromUnchecked: span, indices: indices, where: mask)
+                    })(),
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return H.gather(from: span, indices: indices, where: mask)
+                    })()
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "mask: \(describe(mask)), from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func gatherWhereOtherwise() {
         let mismatches = Mismatches("gatherWhereOtherwise")
         let otherwiseInputs = Inputs.vectors(H.self, seed: 0xCDCC_718B_46A6_4FC2)
@@ -635,6 +1033,55 @@ extension SIMDFloatReferenceTests {
         ) {
             let indices = poisoned(indices, where: mask, with: H.laneCount)
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe H.gather(
+                        from: source,
+                        indices: indices,
+                        where: mask,
+                        otherwise: otherwise
+                    ),
+                    unsafe H(
+                        raw: HighwayReference.gatherWhereOtherwiseF32(
+                            otherwise.raw,
+                            mask.raw,
+                            source,
+                            indices.raw
+                        )
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherWhereOtherwiseMisaligned() {
+        let mismatches = Mismatches("gatherWhereOtherwise on misaligned memory")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x24B6_36D8_FE7F_0E9B)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x24B6_35D8_FE7F_0CE8)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x24B6_38D8_FE7F_1201)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0x24B6_37D8_FE7F_104E,
+            inContract: true
+        )
+        for (otherwise, mask, from, indices) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            fromInputs,
+            indicesInputs,
+            seed: 0xF641_0364_5E24_48BD
+        ) {
+            let indices = poisoned(indices, where: mask, with: H.laneCount)
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
                 (
                     unsafe H.gather(
                         from: source,
@@ -757,6 +1204,63 @@ extension SIMDFloatReferenceTests {
         mismatches.record()
     }
 
+    @Test func gatherWhereOtherwiseUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("gatherWhereOtherwise unchecked span on misaligned memory")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x7295_C819_86EE_5285)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7295_C719_86EE_50D2)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x7295_C619_86EE_4F1F)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0x7295_C519_86EE_4D6C,
+            inContract: true
+        )
+        for (otherwise, mask, from, indices) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            fromInputs,
+            indicesInputs,
+            seed: 0xC1E0_E003_046F_5D77
+        ) {
+            let indices = poisoned(indices, where: mask, with: H.laneCount)
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return unsafe H.gather(
+                            fromUnchecked: span,
+                            indices: indices,
+                            where: mask,
+                            otherwise: otherwise
+                        )
+                    })(),
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return H.gather(
+                            from: span,
+                            indices: indices,
+                            where: mask,
+                            otherwise: otherwise
+                        )
+                    })()
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func scatter() {
         let mismatches = Mismatches("scatter")
         let aInputs = Inputs.vectors(H.self, seed: 0x74A1_AC93_2335_BF82)
@@ -811,6 +1315,34 @@ extension SIMDFloatReferenceTests {
         mismatches.record()
     }
 
+    @Test func scatterMisaligned() {
+        let mismatches = Mismatches("scatter on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x7686_348E_D7E7_775B)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0x7686_338E_D7E7_75A8,
+            inContract: true
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for (a, indices) in everyPair(aInputs, indicesInputs) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe H.scatter(a, to: destination, indices: indices) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe HighwayReference.scatterF32(a.raw, destination, indices.raw) }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func scatterUncheckedSpan() {
         let mismatches = Mismatches("scatter unchecked span")
         let aInputs = Inputs.vectors(H.self, seed: 0x36C2_2ECA_19F3_E0D8)
@@ -833,6 +1365,54 @@ extension SIMDFloatReferenceTests {
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 ({
                     var span = unsafe MutableSpan(_unsafeElements: destination)
+                    return H.scatter(a, to: &span, indices: indices)
+                })()
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func scatterUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("scatter unchecked span on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0xA2CE_56B1_8DE7_BA45)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0xA2CE_55B1_8DE7_B892,
+            inContract: true
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for (a, indices) in everyPair(aInputs, indicesInputs) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: H.laneCount
+                        )
+                    )
+                    return unsafe H.scatter(a, toUnchecked: &span, indices: indices)
+                })()
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: H.laneCount
+                        )
+                    )
                     return H.scatter(a, to: &span, indices: indices)
                 })()
             }
@@ -903,6 +1483,36 @@ extension SIMDFloatReferenceTests {
         mismatches.record()
     }
 
+    @Test func scatterByteOffsetsMisaligned() {
+        let mismatches = Mismatches("scatterByteOffsets on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0xA06D_69E7_6DD6_E6FB)
+        let byteOffsetsInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
+            seed: 0xA06D_68E7_6DD6_E548,
+            inContract: true
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for (a, byteOffsets) in everyPair(aInputs, byteOffsetsInputs) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe H.scatter(a, to: destination, byteOffsets: byteOffsets) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe HighwayReference.scatterByteOffsetsF32(a.raw, destination, byteOffsets.raw)
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), byteOffsets: \(describe(byteOffsets))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func scatterByteOffsetsUncheckedSpan() {
         let mismatches = Mismatches("scatterByteOffsets unchecked span")
         let aInputs = Inputs.vectors(H.self, seed: 0x7DAF_89CF_DB97_9838)
@@ -925,6 +1535,54 @@ extension SIMDFloatReferenceTests {
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 ({
                     var span = unsafe MutableSpan(_unsafeElements: destination)
+                    return H.scatter(a, to: &span, byteOffsets: byteOffsets)
+                })()
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), byteOffsets: \(describe(byteOffsets))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func scatterByteOffsetsUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("scatterByteOffsets unchecked span on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0xA5D9_5D95_20BC_CD65)
+        let byteOffsetsInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
+            seed: 0xA5D9_5C95_20BC_CBB2,
+            inContract: true
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for (a, byteOffsets) in everyPair(aInputs, byteOffsetsInputs) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: H.laneCount
+                        )
+                    )
+                    return unsafe H.scatter(a, toUnchecked: &span, byteOffsets: byteOffsets)
+                })()
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: H.laneCount
+                        )
+                    )
                     return H.scatter(a, to: &span, byteOffsets: byteOffsets)
                 })()
             }
@@ -1010,6 +1668,44 @@ extension SIMDFloatReferenceTests {
         mismatches.record()
     }
 
+    @Test func scatterFirstMisaligned() {
+        let mismatches = Mismatches("scatterFirst on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x7C16_822F_94C1_8D2F)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0x7C16_812F_94C1_8B7C,
+            inContract: true
+        )
+        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for (a, indices, count) in mixedTriples(
+            aInputs,
+            indicesInputs,
+            countInputs,
+            seed: 0xAD3A_BF0C_8EC5_4909
+        ) {
+            let indices = poisoned(indices, firstLanes: count, with: H.laneCount)
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe H.scatter(a, to: destination, indices: indices, count: count)
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe HighwayReference.scatterFirstF32(a.raw, destination, indices.raw, count)
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), indices: \(describe(indices)), count: \(count)"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func scatterFirstUncheckedSpan() {
         let mismatches = Mismatches("scatterFirst unchecked span")
         let aInputs = Inputs.vectors(H.self, seed: 0xC296_408C_5E63_AD34)
@@ -1039,6 +1735,61 @@ extension SIMDFloatReferenceTests {
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 ({
                     var span = unsafe MutableSpan(_unsafeElements: destination)
+                    return H.scatter(a, to: &span, indices: indices, count: count)
+                })()
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), indices: \(describe(indices)), count: \(count)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func scatterFirstUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("scatterFirst unchecked span on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x2377_8E41_F8B1_C2D1)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0x2377_8D41_F8B1_C11E,
+            inContract: true
+        )
+        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for (a, indices, count) in mixedTriples(
+            aInputs,
+            indicesInputs,
+            countInputs,
+            seed: 0x922E_C994_EBC5_930B
+        ) {
+            let indices = poisoned(indices, firstLanes: count, with: H.laneCount)
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: H.laneCount
+                        )
+                    )
+                    return unsafe H.scatter(a, toUnchecked: &span, indices: indices, count: count)
+                })()
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: H.laneCount
+                        )
+                    )
                     return H.scatter(a, to: &span, indices: indices, count: count)
                 })()
             }
@@ -1124,6 +1875,43 @@ extension SIMDFloatReferenceTests {
         mismatches.record()
     }
 
+    @Test func scatterWhereMisaligned() {
+        let mismatches = Mismatches("scatterWhere on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x6701_FEA7_CADF_12FE)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6701_FFA7_CADF_14B1)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0x6701_FCA7_CADF_0F98,
+            inContract: true
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for (a, mask, indices) in mixedTriples(
+            aInputs,
+            maskInputs,
+            indicesInputs,
+            seed: 0xE6D0_A64F_72E5_F69A
+        ) {
+            let indices = poisoned(indices, where: mask, with: H.laneCount)
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe H.scatter(a, to: destination, indices: indices, where: mask) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe HighwayReference.scatterWhereF32(a.raw, mask.raw, destination, indices.raw)
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), mask: \(describe(mask)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func scatterWhereNonCanonical() {
         let mismatches = Mismatches("scatterWhere with masks from arbitrary vectors")
         let aInputs = Inputs.vectors(H.self, seed: 0x01B4_E4C2_4697_F5E4)
@@ -1193,6 +1981,61 @@ extension SIMDFloatReferenceTests {
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 ({
                     var span = unsafe MutableSpan(_unsafeElements: destination)
+                    return H.scatter(a, to: &span, indices: indices, where: mask)
+                })()
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), mask: \(describe(mask)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func scatterWhereUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("scatterWhere unchecked span on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0xA8B8_B6B5_3196_24CA)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA8B8_B7B5_3196_267D)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0xA8B8_B4B5_3196_2164,
+            inContract: true
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for (a, mask, indices) in mixedTriples(
+            aInputs,
+            maskInputs,
+            indicesInputs,
+            seed: 0xFCEC_35FD_5593_140E
+        ) {
+            let indices = poisoned(indices, where: mask, with: H.laneCount)
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: H.laneCount
+                        )
+                    )
+                    return unsafe H.scatter(a, toUnchecked: &span, indices: indices, where: mask)
+                })()
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: H.laneCount
+                        )
+                    )
                     return H.scatter(a, to: &span, indices: indices, where: mask)
                 })()
             }

@@ -1,5 +1,6 @@
 // Copyright 2020 Google LLC
 // SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BSD-3-Clause
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -255,7 +256,7 @@ AlignedUniquePtr<T[]> MakeUniqueAlignedArray(size_t items, Args&&... args) {
 class AlignedFreer {
  public:
   // Pass address of this to ctor to skip deleting externally-owned memory.
-  static void DoNothing(void* /*opaque*/, void* /*aligned_pointer*/) {}
+  HWY_DLLEXPORT static void DoNothing(void* opaque, void* aligned_pointer);
 
   AlignedFreer() : free_(nullptr), opaque_ptr_(nullptr) {}
   AlignedFreer(FreePtr free_ptr, void* opaque_ptr)
@@ -281,11 +282,7 @@ namespace detail {
 // Default deleter for AlignedPtr allocated via AllocateAlignedBytes.
 // `free_fn` holds the custom `FreePtr` (or nullptr for default free), while
 // the user's `opaque_ptr` is stored in AllocationHeader.
-static inline void FreeAlignedMemory(void* free_fn, void* memory) {
-  FreeAlignedBytes(
-      memory, reinterpret_cast<FreePtr>(reinterpret_cast<uintptr_t>(free_fn)),
-      nullptr);
-}
+HWY_DLLEXPORT void FreeAlignedMemory(void* free_fn, void* memory);
 
 }  // namespace detail
 
@@ -308,12 +305,12 @@ class AlignedPtr {
   constexpr AlignedPtr(std::nullptr_t) noexcept {}
 
   // Takes ownership of `[ptr, ptr + size)`. When destroyed, if `ptr != nullptr`
-  // and `free_fn != nullptr`, calls `free_fn(opaque, const_cast<...>(ptr))`.
-  // Passing `free_fn = nullptr` wraps externally-owned memory without freeing.
+  // and `deleter != nullptr`, calls `deleter(opaque, const_cast<...>(ptr))`.
+  // Passing `deleter = nullptr` wraps externally-owned memory without freeing.
   explicit AlignedPtr(T* ptr, size_t size,
-                      FreePtr free_fn = &detail::FreeAlignedMemory,
+                      FreePtr deleter = &detail::FreeAlignedMemory,
                       void* opaque = nullptr) noexcept
-      : ptr_(ptr), size_(ptr ? size : 0), free_(free_fn), opaque_(opaque) {}
+      : ptr_(ptr), size_(ptr ? size : 0), free_(deleter), opaque_(opaque) {}
 
   AlignedPtr(const AlignedPtr&) = delete;
   AlignedPtr& operator=(const AlignedPtr&) = delete;
@@ -382,15 +379,15 @@ class AlignedPtr {
 
   void reset(std::nullptr_t = nullptr) noexcept {
     T* ptr = ptr_;
-    FreePtr free_fn = free_;
+    FreePtr deleter = free_;
     void* opaque = opaque_;
     ptr_ = nullptr;
     size_ = 0;
     free_ = nullptr;
     opaque_ = nullptr;
-    if (ptr != nullptr && free_fn != nullptr) {
+    if (ptr != nullptr && deleter != nullptr) {
       void* mutable_ptr = const_cast<RemoveConst<T>*>(ptr);
-      free_fn(opaque, mutable_ptr);
+      deleter(opaque, mutable_ptr);
     }
   }
 
@@ -418,6 +415,7 @@ class AlignedPtr {
   size_t size() const noexcept { return size_; }
   size_t size_bytes() const noexcept { return size_ * sizeof(T); }
   bool empty() const noexcept { return size_ == 0; }
+  FreePtr free_fn() const noexcept { return free_; }
   explicit operator bool() const noexcept { return ptr_ != nullptr; }
 
   // Bounds-checked element access.
@@ -691,6 +689,72 @@ Span<const uint8_t> as_bytes(Span<T> s) noexcept {
 template <typename T, EnableIf<!IsConst<T>()>* = nullptr>
 Span<uint8_t> as_writable_bytes(Span<T> s) noexcept {
   return Span<uint8_t>(reinterpret_cast<uint8_t*>(s.data()), s.size_bytes());
+}
+
+// `ByteSpan` and `WritableByteSpan` return byte views of `count` elements
+// starting at `ptr`, of `bytes` starting at a `void*`, of a C array, of a
+// `Span<T>`, or of a container `c`. They exist for C++14 compatibility: without
+// class template argument deduction (C++17) and `std::as_bytes` (C++20),
+// callers would otherwise have to spell out
+// `Span<const uint8_t>(reinterpret_cast<const uint8_t*>(p), n)`. Note that a
+// string literal is `const char[N]`, so `ByteSpan("abc")` includes the trailing
+// NUL (4 bytes); pass `std::string` or `ByteSpan("abc", 3)` to exclude it.
+template <typename T, EnableIf<!IsSame<RemoveCvRef<T>, void>()>* = nullptr>
+Span<const uint8_t> ByteSpan(const T* ptr, size_t count) noexcept {
+  static_assert(IsTriviallyCopyable<RemoveCvRef<T>>(),
+                "ByteSpan requires trivially copyable T");
+  HWY_DASSERT(count <= LimitsMax<size_t>() / sizeof(T));
+  return Span<const uint8_t>(reinterpret_cast<const uint8_t*>(ptr),
+                             count * sizeof(T));
+}
+inline Span<const uint8_t> ByteSpan(const void* ptr, size_t bytes) noexcept {
+  return Span<const uint8_t>(static_cast<const uint8_t*>(ptr), bytes);
+}
+template <typename T, size_t N>
+Span<const uint8_t> ByteSpan(const T (&arr)[N]) noexcept {
+  return ByteSpan(arr, N);
+}
+template <typename T>
+Span<const uint8_t> ByteSpan(Span<T> s) noexcept {
+  return ByteSpan(s.data(), s.size());
+}
+template <typename C, EnableIf<!detail::IsSpan<C>() && !IsArray<C>() &&
+                               detail::HasDataT<const C&, const void*>::value &&
+                               detail::HasSizeT<const C&>::value>* = nullptr>
+Span<const uint8_t> ByteSpan(const C& c) noexcept {
+  return ByteSpan(c.data(), c.size());
+}
+template <typename C, EnableIf<!detail::IsSpan<C>() && !IsArray<C>() &&
+                               detail::HasDataT<const C&, const void*>::value &&
+                               detail::HasSizeT<const C&>::value>* = nullptr>
+void ByteSpan(const C&&) = delete;
+
+// Mutable counterpart of `ByteSpan`.
+template <typename T,
+          EnableIf<!IsConst<T>() && !IsSame<RemoveCvRef<T>, void>()>* = nullptr>
+Span<uint8_t> WritableByteSpan(T* ptr, size_t count) noexcept {
+  static_assert(IsTriviallyCopyable<RemoveCvRef<T>>(),
+                "WritableByteSpan requires trivially copyable T");
+  HWY_DASSERT(count <= LimitsMax<size_t>() / sizeof(T));
+  return Span<uint8_t>(reinterpret_cast<uint8_t*>(ptr), count * sizeof(T));
+}
+inline Span<uint8_t> WritableByteSpan(void* ptr, size_t bytes) noexcept {
+  return Span<uint8_t>(static_cast<uint8_t*>(ptr), bytes);
+}
+template <typename T, size_t N, EnableIf<!IsConst<T>()>* = nullptr>
+Span<uint8_t> WritableByteSpan(T (&arr)[N]) noexcept {
+  return WritableByteSpan(arr, N);
+}
+template <typename T, EnableIf<!IsConst<T>()>* = nullptr>
+Span<uint8_t> WritableByteSpan(Span<T> s) noexcept {
+  return WritableByteSpan(s.data(), s.size());
+}
+template <typename C,
+          EnableIf<!IsConst<C>() && !detail::IsSpan<C>() && !IsArray<C>() &&
+                   detail::HasDataT<C&, void*>::value &&
+                   detail::HasSizeT<C&>::value>* = nullptr>
+Span<uint8_t> WritableByteSpan(C& c) noexcept {
+  return WritableByteSpan(c.data(), c.size());
 }
 
 // Deduction guides to infer the constness of T from the constness of U

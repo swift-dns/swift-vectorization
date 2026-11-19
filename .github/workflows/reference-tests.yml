@@ -29,8 +29,14 @@ jobs:
         # so its ops do not inline into a release build without them. Swift's LLVM ignores
         # `-msve-vector-bits`, so the two `-Xllvm` options tell it the vector length, without which
         # it pads SVE ops with `ptrue` and `sel` the C compiler would not.
+        # Highway's NEON_BF16 target requires AES, FP16, DOTPROD, BF16 and I8MM but no SVE, which
+        # `-march=armv8.6-a+aes+fp16` turns on. Clang 21 cannot compile Highway's casts between
+        # bf16 and f16 vectors there with optimizations on, so that row tests in debug only.
+        # Clang 21 marks Highway's SVE, SVE_256 and SVE2 targets broken, so the wide SVE rows lift
+        # that.
         target:
-          - name: &neon_without_aes_name NEON_WITHOUT_AES
+          - &neon_without_aes
+            name: &neon_without_aes_name NEON_WITHOUT_AES
             expected-target: NEON_WITHOUT_AES
             runner: &neon_without_aes_runner ubuntu-24.04-arm
             flags: &neon_without_aes_flags ""
@@ -38,6 +44,16 @@ jobs:
             debug-tests: true
             release-tests: true
             sde-cpu: ""
+            qemu-cpu: ""
+          - name: NEON_BF16
+            expected-target: NEON_BF16
+            runner: ubuntu-24.04-arm
+            flags: "-Xcc -march=armv8.6-a+aes+fp16"
+            compare-codegen: false
+            debug-tests: true
+            release-tests: false
+            sde-cpu: ""
+            qemu-cpu: ""
           - name: SVE2_128
             expected-target: SVE2_128
             runner: ubuntu-24.04-arm
@@ -46,6 +62,37 @@ jobs:
             debug-tests: false
             release-tests: true
             sde-cpu: ""
+            qemu-cpu: ""
+          - name: SVE_256
+            expected-target: SVE_256
+            expected-vector-bytes: 32
+            runner: ubuntu-24.04-arm
+            flags: "-Xcc -march=armv8.4-a+sve+bf16+i8mm -Xcc -msve-vector-bits=256 -Xcc -DHWY_BROKEN_SVE=0 -Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-min=256 -Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-max=256"
+            compare-codegen: false
+            debug-tests: false
+            release-tests: true
+            sde-cpu: ""
+            qemu-cpu: neoverse-v1
+          - name: SVE_512
+            expected-target: SVE
+            expected-vector-bytes: 64
+            runner: ubuntu-24.04-arm
+            flags: "-Xcc -march=armv8.2-a+sve -Xcc -msve-vector-bits=512 -Xcc -DHWY_BROKEN_SVE=0 -Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-min=512 -Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-max=512"
+            compare-codegen: false
+            debug-tests: false
+            release-tests: true
+            sde-cpu: ""
+            qemu-cpu: a64fx
+          - name: SVE2_512
+            expected-target: SVE2
+            expected-vector-bytes: 64
+            runner: ubuntu-24.04-arm
+            flags: "-Xcc -march=armv9-a+bf16+i8mm -Xcc -msve-vector-bits=512 -Xcc -DHWY_BROKEN_SVE=0 -Xcc -DHWY_BROKEN_SVE2=0 -Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-min=512 -Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-max=512"
+            compare-codegen: false
+            debug-tests: false
+            release-tests: true
+            sde-cpu: ""
+            qemu-cpu: max,sve-default-vector-length=64
           - &sse2
             name: SSE2
             expected-target: SSE2
@@ -55,6 +102,7 @@ jobs:
             debug-tests: false
             release-tests: true
             sde-cpu: ""
+            qemu-cpu: ""
           - &ssse3
             name: SSSE3
             expected-target: SSSE3
@@ -64,6 +112,7 @@ jobs:
             debug-tests: false
             release-tests: true
             sde-cpu: ""
+            qemu-cpu: ""
             base: *sse2
           - name: SSE4
             expected-target: SSE4
@@ -73,8 +122,10 @@ jobs:
             debug-tests: false
             release-tests: true
             sde-cpu: ""
+            qemu-cpu: ""
             base: *ssse3
-          - name: AVX2
+          - &avx2
+            name: AVX2
             expected-target: AVX2
             runner: ubuntu-latest
             flags: "-Xcc -march=x86-64-v3 -Xcc -maes -Xcc -mpclmul -Xcc -D__MM_MALLOC_H"
@@ -82,6 +133,7 @@ jobs:
             debug-tests: true
             release-tests: true
             sde-cpu: ""
+            qemu-cpu: ""
           - name: AVX2_WITHOUT_BMI2_FMA_F16C
             expected-target: AVX2
             runner: ubuntu-latest
@@ -90,6 +142,7 @@ jobs:
             debug-tests: false
             release-tests: true
             sde-cpu: ""
+            qemu-cpu: ""
           - &avx3
             name: AVX3
             expected-target: AVX3
@@ -99,6 +152,7 @@ jobs:
             debug-tests: false
             release-tests: true
             sde-cpu: skx
+            qemu-cpu: ""
           - &avx3_dl
             name: AVX3_DL
             expected-target: AVX3_DL
@@ -108,6 +162,7 @@ jobs:
             debug-tests: false
             release-tests: true
             sde-cpu: icx
+            qemu-cpu: ""
             base: *avx3
           - name: AVX3_SPR
             expected-target: AVX3_SPR
@@ -117,6 +172,7 @@ jobs:
             debug-tests: false
             release-tests: true
             sde-cpu: spr
+            qemu-cpu: ""
             base: *avx3_dl
           - name: AVX3_ZEN4
             expected-target: AVX3_ZEN4
@@ -126,6 +182,7 @@ jobs:
             debug-tests: false
             release-tests: true
             sde-cpu: spr
+            qemu-cpu: ""
             base: *avx3_dl
           - name: EMU128
             expected-target: EMU128
@@ -135,6 +192,7 @@ jobs:
             debug-tests: true
             release-tests: false
             sde-cpu: ""
+            qemu-cpu: ""
           - name: EMU128-arm64
             expected-target: EMU128
             runner: ubuntu-24.04-arm
@@ -143,6 +201,7 @@ jobs:
             debug-tests: true
             release-tests: false
             sde-cpu: ""
+            qemu-cpu: ""
         mode: [debug, release, codegen]
         exclude:
           - target: { debug-tests: false }
@@ -161,8 +220,8 @@ jobs:
       # Intel SDE emulates an AVX-512 CPU by tracing the test runners with ptrace.
       options: ${{ matrix.target.sde-cpu && '--cap-add=SYS_PTRACE --security-opt seccomp=unconfined' || '' }}
 
-    # Intel SDE emulates the release test runners, which is far slower than running them.
-    timeout-minutes: ${{ matrix.mode == 'codegen' && 90 || matrix.target.sde-cpu && 240 || (matrix.mode == 'debug' && 90 || 120) }}
+    # Intel SDE and QEMU emulate the release test runners, which is far slower than running them.
+    timeout-minutes: ${{ matrix.mode == 'codegen' && 90 || (matrix.target.sde-cpu || matrix.target.qemu-cpu) && 240 || (matrix.mode == 'debug' && 90 || 120) }}
 
     permissions:
       contents: read
@@ -185,6 +244,14 @@ jobs:
         run: |
           apt-get update
           apt-get install -y --no-install-recommends curl xz-utils
+
+      - name: Install QEMU
+        if: ${{ matrix.mode != 'codegen' && matrix.target.qemu-cpu }}
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends qemu-user
 
       - name: Restore Intel SDE
         id: restore-sde
@@ -249,7 +316,7 @@ jobs:
         run: swift utils/GenerateVectorizationOps.swift --only-tests-of "${RUNNER_TEMP}/new-ops.txt"
 
       - name: Test the ops against highway
-        if: ${{ matrix.mode == 'debug' && !matrix.target.sde-cpu }}
+        if: ${{ matrix.mode == 'debug' && !matrix.target.sde-cpu && !matrix.target.qemu-cpu }}
         env:
           FLAGS: ${{ matrix.target.flags }}
           SIMD_EXPECTED_TARGET: ${{ matrix.target.expected-target }}
@@ -258,7 +325,7 @@ jobs:
           swift test --package-path HighwayReference "${flags[@]}"
 
       - name: Test the ops against highway in release
-        if: ${{ matrix.mode == 'release' && !matrix.target.sde-cpu }}
+        if: ${{ matrix.mode == 'release' && !matrix.target.sde-cpu && !matrix.target.qemu-cpu }}
         env:
           FLAGS: ${{ matrix.target.flags }}
           SIMD_EXPECTED_TARGET: ${{ matrix.target.expected-target }}
@@ -267,7 +334,7 @@ jobs:
           swift test -c release --jobs 2 --package-path HighwayReference "${flags[@]}"
 
       - name: Build the tests of the ops against highway in release
-        if: ${{ matrix.mode == 'release' && matrix.target.sde-cpu }}
+        if: ${{ matrix.mode == 'release' && (matrix.target.sde-cpu || matrix.target.qemu-cpu) }}
         env:
           FLAGS: ${{ matrix.target.flags }}
         run: |
@@ -294,6 +361,31 @@ jobs:
             sde64 "-${SDE_CPU}" -- "${runner}" --testing-library swift-testing
           done
 
+      - name: Test the ops against highway in release under QEMU
+        if: ${{ matrix.mode == 'release' && matrix.target.qemu-cpu }}
+        env:
+          QEMU_CPU: ${{ matrix.target.qemu-cpu }}
+          SIMD_EXPECTED_TARGET: ${{ matrix.target.expected-target }}
+          SIMD_EXPECTED_VECTOR_BYTES: ${{ matrix.target.expected-vector-bytes }}
+        run: |
+          mapfile -d '' -t runners < <(
+            find -L HighwayReference/.build/release -maxdepth 1 -type f -name '*-test-runner' -print0
+          )
+          if [[ "${#runners[@]}" -eq 0 ]]; then
+            printf '%s\n' "There is no test runner in HighwayReference/.build/release" >&2
+            exit 1
+          fi
+          failed_runners=()
+          for runner in "${runners[@]}"; do
+            if ! qemu-aarch64 -cpu "${QEMU_CPU}" "${runner}" --testing-library swift-testing --skip Trap; then
+              failed_runners+=( "${runner}" )
+            fi
+          done
+          if [[ "${#failed_runners[@]}" -gt 0 ]]; then
+            printf '%s\n' "These test runners failed under QEMU:" "${failed_runners[@]}" >&2
+            exit 1
+          fi
+
       - name: Compare the codegen of the ops with highway's
         if: ${{ matrix.mode == 'codegen' && matrix.target.compare-codegen }}
         env:
@@ -301,6 +393,46 @@ jobs:
         run: |
           read -r -a flags <<< "${FLAGS}"
           scripts/compare-codegen.sh -- "${flags[@]}"
+
+  sanitizer-reference-tests:
+    name: reference-tests (${{ matrix.target.name }}, sanitizers)
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - *neon_without_aes
+          - *avx2
+
+    runs-on: ${{ matrix.target.runner }}
+
+    if: ${{ !github.event.pull_request.draft }}
+
+    container: swift:6.4-resolute
+
+    timeout-minutes: 240
+
+    permissions:
+      contents: read
+
+    env:
+      ASAN_OPTIONS: "detect_leaks=1"
+      UBSAN_OPTIONS: "halt_on_error=1:print_stacktrace=1"
+
+    steps:
+      - name: Check out ${{ github.event.repository.name }}
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Test the ops against highway under the sanitizers
+        env:
+          FLAGS: ${{ matrix.target.flags }}
+          SIMD_EXPECTED_TARGET: ${{ matrix.target.expected-target }}
+        run: |
+          read -r -a flags <<< "${FLAGS}"
+          swift test --disable-xctest --sanitize=address --sanitize=undefined \
+            --package-path HighwayReference "${flags[@]}"
 
   macos-base-fingerprints:
     name: reference-tests (NEON_WITHOUT_AES, fingerprints)

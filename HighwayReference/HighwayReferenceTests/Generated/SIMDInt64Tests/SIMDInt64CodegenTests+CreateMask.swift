@@ -165,4 +165,29 @@ extension SIMDInt64CodegenTests {
         }
         mismatches.record()
     }
+
+    @Test func loadMaskMisaligned() {
+        let mismatches = Mismatches("portLoadMaskI64 on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            UInt8.self,
+            count: (H.laneCount + 7) / 8,
+            seed: 0x5AD0_3703_D7EB_F29D
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe portLoadMaskI64(from: source),
+                    unsafe withMisalignedLanes(
+                        from + [UInt8](repeating: 0, count: 8),
+                        vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                    ) { padded in unsafe highwayLoadMaskI64(from: padded) }.result
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
 }

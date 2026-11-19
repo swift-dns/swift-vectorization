@@ -1,6 +1,7 @@
 // Copyright 2021 Google LLC
 // Copyright 2025 Arm Limited and/or its affiliates <open-source-office@arm.com>
 // SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: BSD-3-Clause
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -2406,6 +2407,12 @@ HWY_API svbool_t IsFinite(const V v) {
 }
 
 // ------------------------------ MulByPow2/MulByFloorPow2
+
+#ifdef HWY_NATIVE_MUL_BY_POW2_TOGGLE
+#undef HWY_NATIVE_MUL_BY_POW2_TOGGLE
+#else
+#define HWY_NATIVE_MUL_BY_POW2_TOGGLE
+#endif
 
 #define HWY_SVE_MUL_BY_POW2(BASE, CHAR, BITS, HALF, NAME, OP)      \
   HWY_API HWY_SVE_V(BASE, BITS)                                    \

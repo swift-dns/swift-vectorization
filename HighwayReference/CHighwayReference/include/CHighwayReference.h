@@ -112,6 +112,7 @@ HWY_INLINE bool hasNativeBFloat16DotProduct() { return HWY_NATIVE_DOT_BF16; }
 HWY_INLINE bool hasNativeWholeInterleave() { return HWY_NATIVE_INTERLEAVE_WHOLE; }
 HWY_INLINE bool hasNativeStoreFirst() { return HWY_NATIVE_STORE_N; }
 HWY_INLINE bool hasNative64BitMultiply() { return HWY_NATIVE_MUL64; }
+HWY_INLINE bool hasNativeMultiplyByPowerOf2() { return HWY_NATIVE_MUL_BY_POW2; }
 HWY_INLINE bool hasNativeFloat16Arithmetic() { return HWY_HAVE_FLOAT16; }
 HWY_INLINE size_t registerCount() { return HWY_REGISTERS; }
 
