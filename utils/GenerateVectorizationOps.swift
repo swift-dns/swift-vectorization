@@ -36096,7 +36096,7 @@ func resizeOp(
             )
             let tags = arguments.dropLast().map { $0 == sourceTag ? unsignedTag : $0 }
             let viaUnsigned = "hn::\(name)(\((tags + [unsignedOperand]).joined(separator: ", ")))"
-            return "\n#if HWY_TARGET == HWY_SVE2_128\n\(viaUnsigned)\n#else\n\(direct)\n#endif\n"
+            return "\n#if HWY_TARGET_IS_SVE\n\(viaUnsigned)\n#else\n\(direct)\n#endif\n"
         },
         portable: { result in
             resultOf(expression, for: result)
@@ -40966,11 +40966,17 @@ func referenceMask(
     fromSigned vector: String,
     tag: String,
     of element: Element,
-    comparingFloat16: Bool = false
+    comparingFloat16: Bool = false,
+    keeping lanes: String? = nil
 ) -> String {
-    element.isHalfPrecision && !(comparingFloat16 && element.category == .float16)
-        ? "hn::RebindMask(\(tag)(), hn::MaskFromVec(\(vector)))"
-        : "hn::MaskFromVec(hn::BitCast(\(tag)(), \(vector)))"
+    let rebinds = element.isHalfPrecision && !(comparingFloat16 && element.category == .float16)
+    let compared = rebinds ? "hn::RebindToSigned<\(tag)>" : tag
+    let operand = rebinds ? vector : "hn::BitCast(\(tag)(), \(vector))"
+    let mask =
+        lanes.map {
+            "hn::MaskedNe(hn::FirstN(\(compared)(), \($0)), \(operand), hn::Zero(\(compared)()))"
+        } ?? "hn::MaskFromVec(\(operand))"
+    return rebinds ? "hn::RebindMask(\(tag)(), \(mask))" : mask
 }
 
 func referenceMaskReturn(fromSigned vector: String, tag: String, of element: Element) -> String {
@@ -41043,6 +41049,40 @@ func memoryPortConversions(of element: Element) -> String {
     output +=
         "hn::StoreU(\(referenceSignedVector(fromMask: "m", tag: element.tag, of: element)), di, "
     output += "reinterpret_cast<\(element.cMaskLane)*>(&port)); return port; }\n"
+    return output
+}
+
+func castFromPort(_ expression: String, tag: String) -> String {
+    let bytes = "hn::VFromD<hn::ScalableTag<uint8_t>>((\(sveVector("u8")))\(expression))"
+    return "hn::BitCast(\(tag)(), \(bytes))"
+}
+
+func castToPort(_ expression: String) -> String {
+    "(\(sveVector("u8")))hn::BitCast(hn::ScalableTag<uint8_t>(), \(expression))"
+}
+
+func castPortConversions(of element: Element) -> String {
+    let signedTag = "const hn::RebindToSigned<\(element.tag)> di;"
+    var output = ""
+    output += "HWY_INLINE \(element.vector) \(referenceFunctionName("fromPort", element))"
+    output += "(\(element.cRawVector) v) { return "
+    output += "\(castFromPort("v", tag: element.tag)); }\n"
+    output += "HWY_INLINE \(element.cRawVector) \(referenceFunctionName("toPort", element))"
+    output += "(\(element.vector) v) { return (\(element.cRawVector))"
+    output += "\(castToPort("v")); }\n"
+    output += "HWY_INLINE \(element.mask) \(referenceFunctionName("maskFromPort", element))"
+    output += "(\(element.cRawMask) m) { return "
+    output += referenceMask(
+        fromSigned: castFromPort("m", tag: "hn::RebindToSigned<\(element.tag)>"),
+        tag: element.tag,
+        of: element,
+        comparingFloat16: true
+    )
+    output += "; }\n"
+    output += "HWY_INLINE \(element.cRawMask) \(referenceFunctionName("maskToPort", element))"
+    output += "(\(element.mask) m) { \(signedTag) return (\(element.cRawMask))"
+    output += castToPort(referenceSignedVector(fromMask: "m", tag: element.tag, of: element))
+    output += "; }\n"
     return output
 }
 
@@ -41163,6 +41203,55 @@ func memoryNarrowMaskPortConversions(of element: Element, shape: Shape) -> Strin
     return output
 }
 
+func castNarrowPortConversions(of element: Element, shape: Shape) -> String {
+    let (raw, vector, tag) = (
+        element.cRawVector(of: shape), element.vector(of: shape), element.tag(of: shape)
+    )
+    let (wide, kept) = (element.cVector, element.cVector(of: shape))
+    var output = ""
+    output += "HWY_INLINE \(vector) \(referenceFunctionName(shape.conversion("fromPort"), element))"
+    output += "(\(raw) v) { return "
+    output += castFromPort("maskedZeroExtended<\(wide), sizeof(\(kept))>(v)", tag: tag)
+    output += "; }\n"
+    if shape.isPartial {
+        output += "HWY_INLINE \(vector) "
+        output += "\(referenceFunctionName(shape.conversion("registerFromPort"), element))"
+        output += "(\(raw) v) { return "
+        output += castFromPort("zeroExtended<\(wide), sizeof(\(raw))>(v)", tag: tag)
+        output += "; }\n"
+    }
+    output += "HWY_INLINE \(raw) \(referenceFunctionName(shape.conversion("toPort"), element))"
+    output += "(\(vector) v) { const \(wide) wide = (\(wide))"
+    output += castToPort("v")
+    output += "; \(raw) port; __builtin_memcpy(&port, &wide, sizeof(\(kept))); return port; }\n"
+    return output
+        + (shape.hasMask ? castNarrowMaskPortConversions(of: element, shape: shape) : "")
+}
+
+func castNarrowMaskPortConversions(of element: Element, shape: Shape) -> String {
+    let (raw, mask, tag) = (
+        element.cRawMask(of: shape), element.mask(of: shape), element.tag(of: shape)
+    )
+    let (wide, kept) = (element.cMask, element.cMask(of: shape))
+    var output = ""
+    output +=
+        "HWY_INLINE \(mask) \(referenceFunctionName(shape.conversion("maskFromPort"), element))"
+    output += "(\(raw) m) { return "
+    output += referenceMask(
+        fromSigned: castFromPort("widened<\(wide)>(m)", tag: "hn::RebindToSigned<\(tag)>"),
+        tag: tag,
+        of: element,
+        comparingFloat16: true,
+        keeping: "__builtin_vectorelements(\(kept))"
+    )
+    output += "; }\n"
+    output += "HWY_INLINE \(raw) \(referenceFunctionName(shape.conversion("maskToPort"), element))"
+    output += "(\(mask) m) { const hn::RebindToSigned<\(tag)> di; const \(wide) wide = (\(wide))"
+    output += castToPort(referenceSignedVector(fromMask: "m", tag: tag, of: element))
+    output += "; \(raw) port; __builtin_memcpy(&port, &wide, sizeof(\(kept))); return port; }\n"
+    return output
+}
+
 func narrowReferenceDeclarations(of element: Element) -> String {
     narrowShapes(of: element).map { shape in
         let mask =
@@ -41172,7 +41261,8 @@ func narrowReferenceDeclarations(of element: Element) -> String {
             using \(element.tag(of: shape)) = \(narrowReferenceTag(of: element, shape: shape));
             using \(element.vector(of: shape)) = hn::VFromD<\(element.tag(of: shape))>;
             \(mask)#if HWY_TARGET == HWY_SVE2_128
-            \(bridgedNarrowPortConversions(of: element, shape: shape))#else
+            \(bridgedNarrowPortConversions(of: element, shape: shape))#elif HWY_TARGET_IS_SVE
+            \(castNarrowPortConversions(of: element, shape: shape))#else
             \(memoryNarrowPortConversions(of: element, shape: shape))#endif
 
             """
@@ -41182,7 +41272,8 @@ func narrowReferenceDeclarations(of element: Element) -> String {
 func portConversions(of element: Element) -> String {
     """
     #if HWY_TARGET == HWY_SVE2_128
-    \(bridgedPortConversions(of: element))#else
+    \(bridgedPortConversions(of: element))#elif HWY_TARGET_IS_SVE
+    \(castPortConversions(of: element))#else
     \(memoryPortConversions(of: element))#endif
 
     """
@@ -41320,6 +41411,8 @@ func generateReferenceHeader() -> String {
         #include "hwy/highway.h"
         #if HWY_TARGET == HWY_SVE2_128
         #include <arm_neon_sve_bridge.h>
+        #elif HWY_TARGET_IS_SVE
+        #include <utility>
         #endif
 
         namespace hwy {
@@ -41349,6 +41442,50 @@ func generateReferenceHeader() -> String {
         HWY_INLINE size_t spanCount(size_t count, size_t lanes) {
           return HWY_TARGET_IS_SVE && count > lanes ? lanes : count;
         }
+
+        #if HWY_TARGET_IS_SVE && HWY_TARGET != HWY_SVE2_128
+        /// A narrow vector in the register of a `Wide` one, whose other bytes are unspecified.
+        template <typename Wide, typename Narrow, size_t... kLanes>
+        HWY_INLINE Wide widenedLanes(Narrow narrow, std::index_sequence<kLanes...>) {
+          return __builtin_shufflevector(
+              narrow, narrow,
+              (kLanes < __builtin_vectorelements(Narrow) ? static_cast<int>(kLanes) : -1)...);
+        }
+
+        template <typename Wide, typename Narrow>
+        HWY_INLINE Wide widened(Narrow narrow) {
+          return widenedLanes<Wide>(
+              narrow, std::make_index_sequence<__builtin_vectorelements(Wide)>());
+        }
+
+        /// The same with zeros after the first `kKeptBytes` bytes, which is what Highway's masked
+        /// load of a narrow vector leaves in the register. A shuffle with zeros costs nothing where
+        /// the register goes straight back to the port.
+        template <typename Wide, size_t kKeptBytes, typename Narrow, size_t... kLanes>
+        HWY_INLINE Wide zeroExtendedLanes(Narrow narrow, std::index_sequence<kLanes...>) {
+          constexpr size_t laneBytes = sizeof(Wide) / __builtin_vectorelements(Wide);
+          const Narrow zeros = {};
+          return __builtin_shufflevector(
+              narrow, zeros,
+              (kLanes * laneBytes < kKeptBytes ? static_cast<int>(kLanes)
+                                               : static_cast<int>(__builtin_vectorelements(Narrow)))...);
+        }
+
+        template <typename Wide, size_t kKeptBytes, typename Narrow>
+        HWY_INLINE Wide zeroExtended(Narrow narrow) {
+          return zeroExtendedLanes<Wide, kKeptBytes>(
+              narrow, std::make_index_sequence<__builtin_vectorelements(Wide)>());
+        }
+
+        /// The same with a select, which costs less where Highway reads the register.
+        template <typename Wide, size_t kKeptBytes, typename Narrow>
+        HWY_INLINE Wide maskedZeroExtended(Narrow narrow) {
+          const hn::ScalableTag<uint8_t> d;
+          const hn::VFromD<decltype(d)> bytes = (cvectorization_ops_sve_u8)widened<Wide>(narrow);
+          return (Wide)(cvectorization_ops_sve_u8)hn::IfThenElseZero(
+              hn::FirstN(d, kKeptBytes), bytes);
+        }
+        #endif
 
         /// Highway's BitsFromMask, which its scalable targets do not have, so there the bits come
         /// from StoreMaskBits, which gives the same ones.
@@ -51180,7 +51317,7 @@ let sveFirstTrueSettingGaps = [
 }
 
 let sveNaNOperandOrderComment =
-    "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+    "On SVE with a constant operand the compiler orders the operands of the destructive minimum or maximum instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
 
 let sveAt512Condition =
     "(SIMDTarget.targetName == \"SVE\" || SIMDTarget.targetName == \"SVE2\") && H.laneCount * MemoryLayout<Lane>.stride == 64"
@@ -51207,22 +51344,17 @@ func constantSplatTests(_ groups: [(identifiers: [String], splats: [String])]) -
 
 let sveWideNaNOperandOrderTests: [String: [String]] = [
     "SIMDDoubleConstant": constantSplatTests([
-        (["absoluteDifference"], ["MinusNaN", "NaN", "PayloadNaN"]),
         (["maximum", "minimum", "minimumNumber"], sveNaNSplatsWithoutSignalingNaN),
         (["maximumNumber"], sveNaNSplats),
     ]),
     "SIMDFloat16Constant": constantSplatTests([
-        (
-            ["absoluteDifference", "maximum", "maximumNumber", "minimum", "minimumNumber"],
-            sveNaNSplats
-        )
+        (["maximum", "maximumNumber", "minimum", "minimumNumber"], sveNaNSplats)
     ]),
     "SIMDFloatConstant": constantSplatTests([
-        (["absoluteDifference"], sveNaNSplats),
         (
             ["maximum", "maximumNumber", "minimum", "minimumNumber"],
             sveNaNSplatsWithoutSignalingNaN
-        ),
+        )
     ]),
 ]
 

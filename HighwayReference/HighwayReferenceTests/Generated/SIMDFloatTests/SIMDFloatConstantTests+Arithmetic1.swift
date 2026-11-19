@@ -816,68 +816,28 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func absoluteDifferenceConstantSplatNaN() {
-        withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
-        ) {
-            checkAbsoluteDifferenceConstantA(.nan)
-            checkAbsoluteDifferenceConstantB(.nan)
-        } when: {
-            SIMDTarget.targetName == "SVE_256"
-                || ((SIMDTarget.targetName == "SVE" || SIMDTarget.targetName == "SVE2")
-                    && H.laneCount * MemoryLayout<Lane>.stride == 64)
-        }
+        checkAbsoluteDifferenceConstantA(.nan)
+        checkAbsoluteDifferenceConstantB(.nan)
     }
 
     @Test func absoluteDifferenceConstantSplatMinusNaN() {
-        withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
-        ) {
-            checkAbsoluteDifferenceConstantA(-.nan)
-            checkAbsoluteDifferenceConstantB(-.nan)
-        } when: {
-            SIMDTarget.targetName == "SVE_256"
-                || ((SIMDTarget.targetName == "SVE" || SIMDTarget.targetName == "SVE2")
-                    && H.laneCount * MemoryLayout<Lane>.stride == 64)
-        }
+        checkAbsoluteDifferenceConstantA(-.nan)
+        checkAbsoluteDifferenceConstantB(-.nan)
     }
 
     @Test func absoluteDifferenceConstantSplatPayloadNaN() {
-        withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
-        ) {
-            checkAbsoluteDifferenceConstantA(Lane(nan: 1, signaling: false))
-            checkAbsoluteDifferenceConstantB(Lane(nan: 1, signaling: false))
-        } when: {
-            SIMDTarget.targetName == "SVE_256"
-                || ((SIMDTarget.targetName == "SVE" || SIMDTarget.targetName == "SVE2")
-                    && H.laneCount * MemoryLayout<Lane>.stride == 64)
-        }
+        checkAbsoluteDifferenceConstantA(Lane(nan: 1, signaling: false))
+        checkAbsoluteDifferenceConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func absoluteDifferenceConstantSplatSignalingNaN() {
-        withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
-        ) {
-            checkAbsoluteDifferenceConstantA(.signalingNaN)
-            checkAbsoluteDifferenceConstantB(.signalingNaN)
-        } when: {
-            SIMDTarget.targetName == "SVE_256"
-                || ((SIMDTarget.targetName == "SVE" || SIMDTarget.targetName == "SVE2")
-                    && H.laneCount * MemoryLayout<Lane>.stride == 64)
-        }
+        checkAbsoluteDifferenceConstantA(.signalingNaN)
+        checkAbsoluteDifferenceConstantB(.signalingNaN)
     }
 
     @Test func absoluteDifferenceConstantSplatMinusSignalingNaN() {
-        withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
-        ) {
-            checkAbsoluteDifferenceConstantA(-.signalingNaN)
-            checkAbsoluteDifferenceConstantB(-.signalingNaN)
-        } when: {
-            SIMDTarget.targetName == "SVE_256"
-                || ((SIMDTarget.targetName == "SVE" || SIMDTarget.targetName == "SVE2")
-                    && H.laneCount * MemoryLayout<Lane>.stride == 64)
-        }
+        checkAbsoluteDifferenceConstantA(-.signalingNaN)
+        checkAbsoluteDifferenceConstantB(-.signalingNaN)
     }
 
     @Test func absoluteDifferenceConstantSplatLeastNonzero() {
@@ -1072,5 +1032,97 @@ extension SIMDFloatConstantTests {
 
     @Test func magnitudeConstantSplatGreatest() {
         checkMagnitudeConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkSquareRootConstantA(_ value: Lane) {
+        let mismatches = Mismatches("squareRoot with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.squareRoot(H.repeating(value)),
+            H(raw: HighwayReference.squareRootF32(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func squareRootConstantSplatZero() {
+        checkSquareRootConstantA(0.0)
+    }
+
+    @Test func squareRootConstantSplatNegativeZero() {
+        checkSquareRootConstantA(-0.0)
+    }
+
+    @Test func squareRootConstantSplatOne() {
+        checkSquareRootConstantA(1.0)
+    }
+
+    @Test func squareRootConstantSplatMinusOne() {
+        checkSquareRootConstantA(-1.0)
+    }
+
+    @Test func squareRootConstantSplatTwo() {
+        checkSquareRootConstantA(2.0)
+    }
+
+    @Test func squareRootConstantSplatHalf() {
+        checkSquareRootConstantA(0.5)
+    }
+
+    @Test func squareRootConstantSplatFour() {
+        checkSquareRootConstantA(4.0)
+    }
+
+    @Test func squareRootConstantSplatQuarter() {
+        checkSquareRootConstantA(0.25)
+    }
+
+    @Test func squareRootConstantSplatOnePointFive() {
+        checkSquareRootConstantA(1.5)
+    }
+
+    @Test func squareRootConstantSplatMinusTwoPointFive() {
+        checkSquareRootConstantA(-2.5)
+    }
+
+    @Test func squareRootConstantSplatInfinity() {
+        checkSquareRootConstantA(.infinity)
+    }
+
+    @Test func squareRootConstantSplatMinusInfinity() {
+        checkSquareRootConstantA(-.infinity)
+    }
+
+    @Test func squareRootConstantSplatNaN() {
+        checkSquareRootConstantA(.nan)
+    }
+
+    @Test func squareRootConstantSplatMinusNaN() {
+        checkSquareRootConstantA(-.nan)
+    }
+
+    @Test func squareRootConstantSplatPayloadNaN() {
+        checkSquareRootConstantA(Lane(nan: 1, signaling: false))
+    }
+
+    @Test func squareRootConstantSplatSignalingNaN() {
+        checkSquareRootConstantA(.signalingNaN)
+    }
+
+    @Test func squareRootConstantSplatMinusSignalingNaN() {
+        checkSquareRootConstantA(-.signalingNaN)
+    }
+
+    @Test func squareRootConstantSplatLeastNonzero() {
+        checkSquareRootConstantA(.leastNonzeroMagnitude)
+    }
+
+    @Test func squareRootConstantSplatGreatest() {
+        checkSquareRootConstantA(.greatestFiniteMagnitude)
     }
 }

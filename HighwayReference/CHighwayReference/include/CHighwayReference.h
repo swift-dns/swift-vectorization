@@ -12,6 +12,8 @@
 #include "hwy/highway.h"
 #if HWY_TARGET == HWY_SVE2_128
 #include <arm_neon_sve_bridge.h>
+#elif HWY_TARGET_IS_SVE
+#include <utility>
 #endif
 
 namespace hwy {
@@ -41,6 +43,50 @@ HWY_INLINE Highway& inPlace(Port& port) {
 HWY_INLINE size_t spanCount(size_t count, size_t lanes) {
   return HWY_TARGET_IS_SVE && count > lanes ? lanes : count;
 }
+
+#if HWY_TARGET_IS_SVE && HWY_TARGET != HWY_SVE2_128
+/// A narrow vector in the register of a `Wide` one, whose other bytes are unspecified.
+template <typename Wide, typename Narrow, size_t... kLanes>
+HWY_INLINE Wide widenedLanes(Narrow narrow, std::index_sequence<kLanes...>) {
+  return __builtin_shufflevector(
+      narrow, narrow,
+      (kLanes < __builtin_vectorelements(Narrow) ? static_cast<int>(kLanes) : -1)...);
+}
+
+template <typename Wide, typename Narrow>
+HWY_INLINE Wide widened(Narrow narrow) {
+  return widenedLanes<Wide>(
+      narrow, std::make_index_sequence<__builtin_vectorelements(Wide)>());
+}
+
+/// The same with zeros after the first `kKeptBytes` bytes, which is what Highway's masked
+/// load of a narrow vector leaves in the register. A shuffle with zeros costs nothing where
+/// the register goes straight back to the port.
+template <typename Wide, size_t kKeptBytes, typename Narrow, size_t... kLanes>
+HWY_INLINE Wide zeroExtendedLanes(Narrow narrow, std::index_sequence<kLanes...>) {
+  constexpr size_t laneBytes = sizeof(Wide) / __builtin_vectorelements(Wide);
+  const Narrow zeros = {};
+  return __builtin_shufflevector(
+      narrow, zeros,
+      (kLanes * laneBytes < kKeptBytes ? static_cast<int>(kLanes)
+                                       : static_cast<int>(__builtin_vectorelements(Narrow)))...);
+}
+
+template <typename Wide, size_t kKeptBytes, typename Narrow>
+HWY_INLINE Wide zeroExtended(Narrow narrow) {
+  return zeroExtendedLanes<Wide, kKeptBytes>(
+      narrow, std::make_index_sequence<__builtin_vectorelements(Wide)>());
+}
+
+/// The same with a select, which costs less where Highway reads the register.
+template <typename Wide, size_t kKeptBytes, typename Narrow>
+HWY_INLINE Wide maskedZeroExtended(Narrow narrow) {
+  const hn::ScalableTag<uint8_t> d;
+  const hn::VFromD<decltype(d)> bytes = (cvectorization_ops_sve_u8)widened<Wide>(narrow);
+  return (Wide)(cvectorization_ops_sve_u8)hn::IfThenElseZero(
+      hn::FirstN(d, kKeptBytes), bytes);
+}
+#endif
 
 /// Highway's BitsFromMask, which its scalable targets do not have, so there the bits come
 /// from StoreMaskBits, which gives the same ones.
@@ -180,6 +226,11 @@ HWY_INLINE VectorU8 fromPortU8(cvectorization_ops_raw_vector_u8 v) { return svse
 HWY_INLINE cvectorization_ops_raw_vector_u8 toPortU8(VectorU8 v) { return (cvectorization_ops_raw_vector_u8)svget_neonq_u8(v); }
 HWY_INLINE MaskU8 maskFromPortU8(cvectorization_ops_raw_mask_u8 m) { return hn::MaskFromVec(hn::BitCast(TagU8(), svset_neonq_s8(svundef_s8(), (int8x16_t)m))); }
 HWY_INLINE cvectorization_ops_raw_mask_u8 maskToPortU8(MaskU8 m) { const hn::RebindToSigned<TagU8> di; return (cvectorization_ops_raw_mask_u8)svget_neonq_s8(hn::BitCast(di, hn::VecFromMask(TagU8(), m))); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE VectorU8 fromPortU8(cvectorization_ops_raw_vector_u8 v) { return hn::BitCast(TagU8(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)v)); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 toPortU8(VectorU8 v) { return (cvectorization_ops_raw_vector_u8)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); }
+HWY_INLINE MaskU8 maskFromPortU8(cvectorization_ops_raw_mask_u8 m) { return hn::MaskFromVec(hn::BitCast(TagU8(), hn::BitCast(hn::RebindToSigned<TagU8>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)m)))); }
+HWY_INLINE cvectorization_ops_raw_mask_u8 maskToPortU8(MaskU8 m) { const hn::RebindToSigned<TagU8> di; return (cvectorization_ops_raw_mask_u8)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(TagU8(), m))); }
 #else
 HWY_INLINE VectorU8 fromPortU8(cvectorization_ops_raw_vector_u8 v) { return hn::LoadU(TagU8(), reinterpret_cast<const uint8_t*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 toPortU8(VectorU8 v) { cvectorization_ops_raw_vector_u8 port; hn::StoreU(v, TagU8(), reinterpret_cast<uint8_t*>(&port)); return port; }
@@ -195,6 +246,12 @@ HWY_INLINE HalfVectorU8 halfRegisterFromPortU8(cvectorization_ops_raw_half_vecto
 HWY_INLINE cvectorization_ops_raw_half_vector_u8 halfToPortU8(HalfVectorU8 v) { return __builtin_shufflevector((cvectorization_ops_block_u8)svget_neonq_u8(v), (cvectorization_ops_block_u8)svget_neonq_u8(v), 0, 1, 2, 3, 4, 5, 6, 7); }
 HWY_INLINE HalfMaskU8 halfMaskFromPortU8(cvectorization_ops_raw_half_mask_u8 m) { return hn::MaskFromVec(hn::BitCast(HalfTagU8(), svset_neonq_s8(svundef_s8(), (int8x16_t)__builtin_shufflevector(m, m, 0, 1, 2, 3, 4, 5, 6, 7, -1, -1, -1, -1, -1, -1, -1, -1)))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_u8 halfMaskToPortU8(HalfMaskU8 m) { const hn::RebindToSigned<HalfTagU8> di; const auto v = hn::BitCast(di, hn::VecFromMask(HalfTagU8(), m)); return __builtin_shufflevector((cvectorization_ops_block_i8)svget_neonq_s8(v), (cvectorization_ops_block_i8)svget_neonq_s8(v), 0, 1, 2, 3, 4, 5, 6, 7); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE HalfVectorU8 halfFromPortU8(cvectorization_ops_raw_half_vector_u8 v) { return hn::BitCast(HalfTagU8(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_u8, sizeof(cvectorization_ops_half_vector_u8)>(v))); }
+HWY_INLINE HalfVectorU8 halfRegisterFromPortU8(cvectorization_ops_raw_half_vector_u8 v) { return hn::BitCast(HalfTagU8(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)zeroExtended<cvectorization_ops_vector_u8, sizeof(cvectorization_ops_raw_half_vector_u8)>(v))); }
+HWY_INLINE cvectorization_ops_raw_half_vector_u8 halfToPortU8(HalfVectorU8 v) { const cvectorization_ops_vector_u8 wide = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_half_vector_u8 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_vector_u8)); return port; }
+HWY_INLINE HalfMaskU8 halfMaskFromPortU8(cvectorization_ops_raw_half_mask_u8 m) { return hn::MaskedNe(hn::FirstN(HalfTagU8(), __builtin_vectorelements(cvectorization_ops_half_mask_u8)), hn::BitCast(HalfTagU8(), hn::BitCast(hn::RebindToSigned<HalfTagU8>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)widened<cvectorization_ops_mask_u8>(m)))), hn::Zero(HalfTagU8())); }
+HWY_INLINE cvectorization_ops_raw_half_mask_u8 halfMaskToPortU8(HalfMaskU8 m) { const hn::RebindToSigned<HalfTagU8> di; const cvectorization_ops_mask_u8 wide = (cvectorization_ops_mask_u8)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(HalfTagU8(), m))); cvectorization_ops_raw_half_mask_u8 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_mask_u8)); return port; }
 #else
 HWY_INLINE HalfVectorU8 halfFromPortU8(cvectorization_ops_raw_half_vector_u8 v) { return hn::LoadU(HalfTagU8(), reinterpret_cast<const uint8_t*>(&v)); }
 HWY_INLINE HalfVectorU8 halfRegisterFromPortU8(cvectorization_ops_raw_half_vector_u8 v) { return hn::ResizeBitCast(HalfTagU8(), hn::LoadU(hn::FixedTag<uint8_t, sizeof(cvectorization_ops_raw_half_vector_u8)>(), reinterpret_cast<const uint8_t*>(&v))); }
@@ -211,6 +268,12 @@ HWY_INLINE QuarterVectorU8 quarterRegisterFromPortU8(cvectorization_ops_raw_quar
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u8 quarterToPortU8(QuarterVectorU8 v) { return __builtin_shufflevector((cvectorization_ops_block_u8)svget_neonq_u8(v), (cvectorization_ops_block_u8)svget_neonq_u8(v), 0, 1, 2, 3, 4, 5, 6, 7); }
 HWY_INLINE QuarterMaskU8 quarterMaskFromPortU8(cvectorization_ops_raw_quarter_mask_u8 m) { return hn::MaskFromVec(hn::BitCast(QuarterTagU8(), svset_neonq_s8(svundef_s8(), (int8x16_t)__builtin_shufflevector(m, m, 0, 1, 2, 3, 4, 5, 6, 7, -1, -1, -1, -1, -1, -1, -1, -1)))); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_u8 quarterMaskToPortU8(QuarterMaskU8 m) { const hn::RebindToSigned<QuarterTagU8> di; const auto v = hn::BitCast(di, hn::VecFromMask(QuarterTagU8(), m)); return __builtin_shufflevector((cvectorization_ops_block_i8)svget_neonq_s8(v), (cvectorization_ops_block_i8)svget_neonq_s8(v), 0, 1, 2, 3, 4, 5, 6, 7); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE QuarterVectorU8 quarterFromPortU8(cvectorization_ops_raw_quarter_vector_u8 v) { return hn::BitCast(QuarterTagU8(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_u8, sizeof(cvectorization_ops_quarter_vector_u8)>(v))); }
+HWY_INLINE QuarterVectorU8 quarterRegisterFromPortU8(cvectorization_ops_raw_quarter_vector_u8 v) { return hn::BitCast(QuarterTagU8(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)zeroExtended<cvectorization_ops_vector_u8, sizeof(cvectorization_ops_raw_quarter_vector_u8)>(v))); }
+HWY_INLINE cvectorization_ops_raw_quarter_vector_u8 quarterToPortU8(QuarterVectorU8 v) { const cvectorization_ops_vector_u8 wide = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_quarter_vector_u8 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_quarter_vector_u8)); return port; }
+HWY_INLINE QuarterMaskU8 quarterMaskFromPortU8(cvectorization_ops_raw_quarter_mask_u8 m) { return hn::MaskedNe(hn::FirstN(QuarterTagU8(), __builtin_vectorelements(cvectorization_ops_quarter_mask_u8)), hn::BitCast(QuarterTagU8(), hn::BitCast(hn::RebindToSigned<QuarterTagU8>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)widened<cvectorization_ops_mask_u8>(m)))), hn::Zero(QuarterTagU8())); }
+HWY_INLINE cvectorization_ops_raw_quarter_mask_u8 quarterMaskToPortU8(QuarterMaskU8 m) { const hn::RebindToSigned<QuarterTagU8> di; const cvectorization_ops_mask_u8 wide = (cvectorization_ops_mask_u8)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(QuarterTagU8(), m))); cvectorization_ops_raw_quarter_mask_u8 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_quarter_mask_u8)); return port; }
 #else
 HWY_INLINE QuarterVectorU8 quarterFromPortU8(cvectorization_ops_raw_quarter_vector_u8 v) { return hn::LoadU(QuarterTagU8(), reinterpret_cast<const uint8_t*>(&v)); }
 HWY_INLINE QuarterVectorU8 quarterRegisterFromPortU8(cvectorization_ops_raw_quarter_vector_u8 v) { return hn::ResizeBitCast(QuarterTagU8(), hn::LoadU(hn::FixedTag<uint8_t, sizeof(cvectorization_ops_raw_quarter_vector_u8)>(), reinterpret_cast<const uint8_t*>(&v))); }
@@ -227,6 +290,12 @@ HWY_INLINE EighthVectorU8 eighthRegisterFromPortU8(cvectorization_ops_raw_eighth
 HWY_INLINE cvectorization_ops_raw_eighth_vector_u8 eighthToPortU8(EighthVectorU8 v) { return __builtin_shufflevector((cvectorization_ops_block_u8)svget_neonq_u8(v), (cvectorization_ops_block_u8)svget_neonq_u8(v), 0, 1, 2, 3, 4, 5, 6, 7); }
 HWY_INLINE EighthMaskU8 eighthMaskFromPortU8(cvectorization_ops_raw_eighth_mask_u8 m) { return hn::MaskFromVec(hn::BitCast(EighthTagU8(), svset_neonq_s8(svundef_s8(), (int8x16_t)__builtin_shufflevector(m, m, 0, 1, 2, 3, 4, 5, 6, 7, -1, -1, -1, -1, -1, -1, -1, -1)))); }
 HWY_INLINE cvectorization_ops_raw_eighth_mask_u8 eighthMaskToPortU8(EighthMaskU8 m) { const hn::RebindToSigned<EighthTagU8> di; const auto v = hn::BitCast(di, hn::VecFromMask(EighthTagU8(), m)); return __builtin_shufflevector((cvectorization_ops_block_i8)svget_neonq_s8(v), (cvectorization_ops_block_i8)svget_neonq_s8(v), 0, 1, 2, 3, 4, 5, 6, 7); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE EighthVectorU8 eighthFromPortU8(cvectorization_ops_raw_eighth_vector_u8 v) { return hn::BitCast(EighthTagU8(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_u8, sizeof(cvectorization_ops_eighth_vector_u8)>(v))); }
+HWY_INLINE EighthVectorU8 eighthRegisterFromPortU8(cvectorization_ops_raw_eighth_vector_u8 v) { return hn::BitCast(EighthTagU8(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)zeroExtended<cvectorization_ops_vector_u8, sizeof(cvectorization_ops_raw_eighth_vector_u8)>(v))); }
+HWY_INLINE cvectorization_ops_raw_eighth_vector_u8 eighthToPortU8(EighthVectorU8 v) { const cvectorization_ops_vector_u8 wide = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_eighth_vector_u8 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_eighth_vector_u8)); return port; }
+HWY_INLINE EighthMaskU8 eighthMaskFromPortU8(cvectorization_ops_raw_eighth_mask_u8 m) { return hn::MaskedNe(hn::FirstN(EighthTagU8(), __builtin_vectorelements(cvectorization_ops_eighth_mask_u8)), hn::BitCast(EighthTagU8(), hn::BitCast(hn::RebindToSigned<EighthTagU8>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)widened<cvectorization_ops_mask_u8>(m)))), hn::Zero(EighthTagU8())); }
+HWY_INLINE cvectorization_ops_raw_eighth_mask_u8 eighthMaskToPortU8(EighthMaskU8 m) { const hn::RebindToSigned<EighthTagU8> di; const cvectorization_ops_mask_u8 wide = (cvectorization_ops_mask_u8)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(EighthTagU8(), m))); cvectorization_ops_raw_eighth_mask_u8 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_eighth_mask_u8)); return port; }
 #else
 HWY_INLINE EighthVectorU8 eighthFromPortU8(cvectorization_ops_raw_eighth_vector_u8 v) { return hn::LoadU(EighthTagU8(), reinterpret_cast<const uint8_t*>(&v)); }
 HWY_INLINE EighthVectorU8 eighthRegisterFromPortU8(cvectorization_ops_raw_eighth_vector_u8 v) { return hn::ResizeBitCast(EighthTagU8(), hn::LoadU(hn::FixedTag<uint8_t, sizeof(cvectorization_ops_raw_eighth_vector_u8)>(), reinterpret_cast<const uint8_t*>(&v))); }
@@ -239,6 +308,9 @@ using BlockVectorU8 = hn::VFromD<BlockTagU8>;
 #if HWY_TARGET == HWY_SVE2_128
 HWY_INLINE BlockVectorU8 blockFromPortU8(cvectorization_ops_raw_block_u8 v) { return svset_neonq_u8(svundef_u8(), (uint8x16_t)v); }
 HWY_INLINE cvectorization_ops_raw_block_u8 blockToPortU8(BlockVectorU8 v) { return (cvectorization_ops_raw_block_u8)svget_neonq_u8(v); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE BlockVectorU8 blockFromPortU8(cvectorization_ops_raw_block_u8 v) { return hn::BitCast(BlockTagU8(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_u8, sizeof(cvectorization_ops_block_u8)>(v))); }
+HWY_INLINE cvectorization_ops_raw_block_u8 blockToPortU8(BlockVectorU8 v) { const cvectorization_ops_vector_u8 wide = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_block_u8 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_block_u8)); return port; }
 #else
 HWY_INLINE BlockVectorU8 blockFromPortU8(cvectorization_ops_raw_block_u8 v) { return hn::LoadU(BlockTagU8(), reinterpret_cast<const uint8_t*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_block_u8 blockToPortU8(BlockVectorU8 v) { cvectorization_ops_raw_block_u8 port; hn::StoreU(v, BlockTagU8(), reinterpret_cast<uint8_t*>(&port)); return port; }
@@ -259,6 +331,11 @@ HWY_INLINE VectorU16 fromPortU16(cvectorization_ops_raw_vector_u16 v) { return s
 HWY_INLINE cvectorization_ops_raw_vector_u16 toPortU16(VectorU16 v) { return (cvectorization_ops_raw_vector_u16)svget_neonq_u16(v); }
 HWY_INLINE MaskU16 maskFromPortU16(cvectorization_ops_raw_mask_u16 m) { return hn::MaskFromVec(hn::BitCast(TagU16(), svset_neonq_s16(svundef_s16(), (int16x8_t)m))); }
 HWY_INLINE cvectorization_ops_raw_mask_u16 maskToPortU16(MaskU16 m) { const hn::RebindToSigned<TagU16> di; return (cvectorization_ops_raw_mask_u16)svget_neonq_s16(hn::BitCast(di, hn::VecFromMask(TagU16(), m))); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE VectorU16 fromPortU16(cvectorization_ops_raw_vector_u16 v) { return hn::BitCast(TagU16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)v)); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 toPortU16(VectorU16 v) { return (cvectorization_ops_raw_vector_u16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); }
+HWY_INLINE MaskU16 maskFromPortU16(cvectorization_ops_raw_mask_u16 m) { return hn::MaskFromVec(hn::BitCast(TagU16(), hn::BitCast(hn::RebindToSigned<TagU16>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)m)))); }
+HWY_INLINE cvectorization_ops_raw_mask_u16 maskToPortU16(MaskU16 m) { const hn::RebindToSigned<TagU16> di; return (cvectorization_ops_raw_mask_u16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(TagU16(), m))); }
 #else
 HWY_INLINE VectorU16 fromPortU16(cvectorization_ops_raw_vector_u16 v) { return hn::LoadU(TagU16(), reinterpret_cast<const uint16_t*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_vector_u16 toPortU16(VectorU16 v) { cvectorization_ops_raw_vector_u16 port; hn::StoreU(v, TagU16(), reinterpret_cast<uint16_t*>(&port)); return port; }
@@ -274,6 +351,12 @@ HWY_INLINE HalfVectorU16 halfRegisterFromPortU16(cvectorization_ops_raw_half_vec
 HWY_INLINE cvectorization_ops_raw_half_vector_u16 halfToPortU16(HalfVectorU16 v) { return __builtin_shufflevector((cvectorization_ops_block_u16)svget_neonq_u16(v), (cvectorization_ops_block_u16)svget_neonq_u16(v), 0, 1, 2, 3); }
 HWY_INLINE HalfMaskU16 halfMaskFromPortU16(cvectorization_ops_raw_half_mask_u16 m) { return hn::MaskFromVec(hn::BitCast(HalfTagU16(), svset_neonq_s16(svundef_s16(), (int16x8_t)__builtin_shufflevector(m, m, 0, 1, 2, 3, -1, -1, -1, -1)))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_u16 halfMaskToPortU16(HalfMaskU16 m) { const hn::RebindToSigned<HalfTagU16> di; const auto v = hn::BitCast(di, hn::VecFromMask(HalfTagU16(), m)); return __builtin_shufflevector((cvectorization_ops_block_i16)svget_neonq_s16(v), (cvectorization_ops_block_i16)svget_neonq_s16(v), 0, 1, 2, 3); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE HalfVectorU16 halfFromPortU16(cvectorization_ops_raw_half_vector_u16 v) { return hn::BitCast(HalfTagU16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_u16, sizeof(cvectorization_ops_half_vector_u16)>(v))); }
+HWY_INLINE HalfVectorU16 halfRegisterFromPortU16(cvectorization_ops_raw_half_vector_u16 v) { return hn::BitCast(HalfTagU16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)zeroExtended<cvectorization_ops_vector_u16, sizeof(cvectorization_ops_raw_half_vector_u16)>(v))); }
+HWY_INLINE cvectorization_ops_raw_half_vector_u16 halfToPortU16(HalfVectorU16 v) { const cvectorization_ops_vector_u16 wide = (cvectorization_ops_vector_u16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_half_vector_u16 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_vector_u16)); return port; }
+HWY_INLINE HalfMaskU16 halfMaskFromPortU16(cvectorization_ops_raw_half_mask_u16 m) { return hn::MaskedNe(hn::FirstN(HalfTagU16(), __builtin_vectorelements(cvectorization_ops_half_mask_u16)), hn::BitCast(HalfTagU16(), hn::BitCast(hn::RebindToSigned<HalfTagU16>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)widened<cvectorization_ops_mask_u16>(m)))), hn::Zero(HalfTagU16())); }
+HWY_INLINE cvectorization_ops_raw_half_mask_u16 halfMaskToPortU16(HalfMaskU16 m) { const hn::RebindToSigned<HalfTagU16> di; const cvectorization_ops_mask_u16 wide = (cvectorization_ops_mask_u16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(HalfTagU16(), m))); cvectorization_ops_raw_half_mask_u16 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_mask_u16)); return port; }
 #else
 HWY_INLINE HalfVectorU16 halfFromPortU16(cvectorization_ops_raw_half_vector_u16 v) { return hn::LoadU(HalfTagU16(), reinterpret_cast<const uint16_t*>(&v)); }
 HWY_INLINE HalfVectorU16 halfRegisterFromPortU16(cvectorization_ops_raw_half_vector_u16 v) { return hn::ResizeBitCast(HalfTagU16(), hn::LoadU(hn::FixedTag<uint8_t, sizeof(cvectorization_ops_raw_half_vector_u16)>(), reinterpret_cast<const uint8_t*>(&v))); }
@@ -290,6 +373,12 @@ HWY_INLINE QuarterVectorU16 quarterRegisterFromPortU16(cvectorization_ops_raw_qu
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u16 quarterToPortU16(QuarterVectorU16 v) { return __builtin_shufflevector((cvectorization_ops_block_u16)svget_neonq_u16(v), (cvectorization_ops_block_u16)svget_neonq_u16(v), 0, 1, 2, 3); }
 HWY_INLINE QuarterMaskU16 quarterMaskFromPortU16(cvectorization_ops_raw_quarter_mask_u16 m) { return hn::MaskFromVec(hn::BitCast(QuarterTagU16(), svset_neonq_s16(svundef_s16(), (int16x8_t)__builtin_shufflevector(m, m, 0, 1, 2, 3, -1, -1, -1, -1)))); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_u16 quarterMaskToPortU16(QuarterMaskU16 m) { const hn::RebindToSigned<QuarterTagU16> di; const auto v = hn::BitCast(di, hn::VecFromMask(QuarterTagU16(), m)); return __builtin_shufflevector((cvectorization_ops_block_i16)svget_neonq_s16(v), (cvectorization_ops_block_i16)svget_neonq_s16(v), 0, 1, 2, 3); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE QuarterVectorU16 quarterFromPortU16(cvectorization_ops_raw_quarter_vector_u16 v) { return hn::BitCast(QuarterTagU16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_u16, sizeof(cvectorization_ops_quarter_vector_u16)>(v))); }
+HWY_INLINE QuarterVectorU16 quarterRegisterFromPortU16(cvectorization_ops_raw_quarter_vector_u16 v) { return hn::BitCast(QuarterTagU16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)zeroExtended<cvectorization_ops_vector_u16, sizeof(cvectorization_ops_raw_quarter_vector_u16)>(v))); }
+HWY_INLINE cvectorization_ops_raw_quarter_vector_u16 quarterToPortU16(QuarterVectorU16 v) { const cvectorization_ops_vector_u16 wide = (cvectorization_ops_vector_u16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_quarter_vector_u16 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_quarter_vector_u16)); return port; }
+HWY_INLINE QuarterMaskU16 quarterMaskFromPortU16(cvectorization_ops_raw_quarter_mask_u16 m) { return hn::MaskedNe(hn::FirstN(QuarterTagU16(), __builtin_vectorelements(cvectorization_ops_quarter_mask_u16)), hn::BitCast(QuarterTagU16(), hn::BitCast(hn::RebindToSigned<QuarterTagU16>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)widened<cvectorization_ops_mask_u16>(m)))), hn::Zero(QuarterTagU16())); }
+HWY_INLINE cvectorization_ops_raw_quarter_mask_u16 quarterMaskToPortU16(QuarterMaskU16 m) { const hn::RebindToSigned<QuarterTagU16> di; const cvectorization_ops_mask_u16 wide = (cvectorization_ops_mask_u16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(QuarterTagU16(), m))); cvectorization_ops_raw_quarter_mask_u16 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_quarter_mask_u16)); return port; }
 #else
 HWY_INLINE QuarterVectorU16 quarterFromPortU16(cvectorization_ops_raw_quarter_vector_u16 v) { return hn::LoadU(QuarterTagU16(), reinterpret_cast<const uint16_t*>(&v)); }
 HWY_INLINE QuarterVectorU16 quarterRegisterFromPortU16(cvectorization_ops_raw_quarter_vector_u16 v) { return hn::ResizeBitCast(QuarterTagU16(), hn::LoadU(hn::FixedTag<uint8_t, sizeof(cvectorization_ops_raw_quarter_vector_u16)>(), reinterpret_cast<const uint8_t*>(&v))); }
@@ -302,6 +391,9 @@ using BlockVectorU16 = hn::VFromD<BlockTagU16>;
 #if HWY_TARGET == HWY_SVE2_128
 HWY_INLINE BlockVectorU16 blockFromPortU16(cvectorization_ops_raw_block_u16 v) { return svset_neonq_u16(svundef_u16(), (uint16x8_t)v); }
 HWY_INLINE cvectorization_ops_raw_block_u16 blockToPortU16(BlockVectorU16 v) { return (cvectorization_ops_raw_block_u16)svget_neonq_u16(v); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE BlockVectorU16 blockFromPortU16(cvectorization_ops_raw_block_u16 v) { return hn::BitCast(BlockTagU16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_u16, sizeof(cvectorization_ops_block_u16)>(v))); }
+HWY_INLINE cvectorization_ops_raw_block_u16 blockToPortU16(BlockVectorU16 v) { const cvectorization_ops_vector_u16 wide = (cvectorization_ops_vector_u16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_block_u16 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_block_u16)); return port; }
 #else
 HWY_INLINE BlockVectorU16 blockFromPortU16(cvectorization_ops_raw_block_u16 v) { return hn::LoadU(BlockTagU16(), reinterpret_cast<const uint16_t*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_block_u16 blockToPortU16(BlockVectorU16 v) { cvectorization_ops_raw_block_u16 port; hn::StoreU(v, BlockTagU16(), reinterpret_cast<uint16_t*>(&port)); return port; }
@@ -322,6 +414,11 @@ HWY_INLINE VectorU32 fromPortU32(cvectorization_ops_raw_vector_u32 v) { return s
 HWY_INLINE cvectorization_ops_raw_vector_u32 toPortU32(VectorU32 v) { return (cvectorization_ops_raw_vector_u32)svget_neonq_u32(v); }
 HWY_INLINE MaskU32 maskFromPortU32(cvectorization_ops_raw_mask_u32 m) { return hn::MaskFromVec(hn::BitCast(TagU32(), svset_neonq_s32(svundef_s32(), (int32x4_t)m))); }
 HWY_INLINE cvectorization_ops_raw_mask_u32 maskToPortU32(MaskU32 m) { const hn::RebindToSigned<TagU32> di; return (cvectorization_ops_raw_mask_u32)svget_neonq_s32(hn::BitCast(di, hn::VecFromMask(TagU32(), m))); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE VectorU32 fromPortU32(cvectorization_ops_raw_vector_u32 v) { return hn::BitCast(TagU32(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)v)); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 toPortU32(VectorU32 v) { return (cvectorization_ops_raw_vector_u32)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); }
+HWY_INLINE MaskU32 maskFromPortU32(cvectorization_ops_raw_mask_u32 m) { return hn::MaskFromVec(hn::BitCast(TagU32(), hn::BitCast(hn::RebindToSigned<TagU32>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)m)))); }
+HWY_INLINE cvectorization_ops_raw_mask_u32 maskToPortU32(MaskU32 m) { const hn::RebindToSigned<TagU32> di; return (cvectorization_ops_raw_mask_u32)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(TagU32(), m))); }
 #else
 HWY_INLINE VectorU32 fromPortU32(cvectorization_ops_raw_vector_u32 v) { return hn::LoadU(TagU32(), reinterpret_cast<const uint32_t*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_vector_u32 toPortU32(VectorU32 v) { cvectorization_ops_raw_vector_u32 port; hn::StoreU(v, TagU32(), reinterpret_cast<uint32_t*>(&port)); return port; }
@@ -337,6 +434,12 @@ HWY_INLINE HalfVectorU32 halfRegisterFromPortU32(cvectorization_ops_raw_half_vec
 HWY_INLINE cvectorization_ops_raw_half_vector_u32 halfToPortU32(HalfVectorU32 v) { return __builtin_shufflevector((cvectorization_ops_block_u32)svget_neonq_u32(v), (cvectorization_ops_block_u32)svget_neonq_u32(v), 0, 1); }
 HWY_INLINE HalfMaskU32 halfMaskFromPortU32(cvectorization_ops_raw_half_mask_u32 m) { return hn::MaskFromVec(hn::BitCast(HalfTagU32(), svset_neonq_s32(svundef_s32(), (int32x4_t)__builtin_shufflevector(m, m, 0, 1, -1, -1)))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_u32 halfMaskToPortU32(HalfMaskU32 m) { const hn::RebindToSigned<HalfTagU32> di; const auto v = hn::BitCast(di, hn::VecFromMask(HalfTagU32(), m)); return __builtin_shufflevector((cvectorization_ops_block_i32)svget_neonq_s32(v), (cvectorization_ops_block_i32)svget_neonq_s32(v), 0, 1); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE HalfVectorU32 halfFromPortU32(cvectorization_ops_raw_half_vector_u32 v) { return hn::BitCast(HalfTagU32(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_u32, sizeof(cvectorization_ops_half_vector_u32)>(v))); }
+HWY_INLINE HalfVectorU32 halfRegisterFromPortU32(cvectorization_ops_raw_half_vector_u32 v) { return hn::BitCast(HalfTagU32(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)zeroExtended<cvectorization_ops_vector_u32, sizeof(cvectorization_ops_raw_half_vector_u32)>(v))); }
+HWY_INLINE cvectorization_ops_raw_half_vector_u32 halfToPortU32(HalfVectorU32 v) { const cvectorization_ops_vector_u32 wide = (cvectorization_ops_vector_u32)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_half_vector_u32 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_vector_u32)); return port; }
+HWY_INLINE HalfMaskU32 halfMaskFromPortU32(cvectorization_ops_raw_half_mask_u32 m) { return hn::MaskedNe(hn::FirstN(HalfTagU32(), __builtin_vectorelements(cvectorization_ops_half_mask_u32)), hn::BitCast(HalfTagU32(), hn::BitCast(hn::RebindToSigned<HalfTagU32>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)widened<cvectorization_ops_mask_u32>(m)))), hn::Zero(HalfTagU32())); }
+HWY_INLINE cvectorization_ops_raw_half_mask_u32 halfMaskToPortU32(HalfMaskU32 m) { const hn::RebindToSigned<HalfTagU32> di; const cvectorization_ops_mask_u32 wide = (cvectorization_ops_mask_u32)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(HalfTagU32(), m))); cvectorization_ops_raw_half_mask_u32 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_mask_u32)); return port; }
 #else
 HWY_INLINE HalfVectorU32 halfFromPortU32(cvectorization_ops_raw_half_vector_u32 v) { return hn::LoadU(HalfTagU32(), reinterpret_cast<const uint32_t*>(&v)); }
 HWY_INLINE HalfVectorU32 halfRegisterFromPortU32(cvectorization_ops_raw_half_vector_u32 v) { return hn::ResizeBitCast(HalfTagU32(), hn::LoadU(hn::FixedTag<uint8_t, sizeof(cvectorization_ops_raw_half_vector_u32)>(), reinterpret_cast<const uint8_t*>(&v))); }
@@ -349,6 +452,9 @@ using BlockVectorU32 = hn::VFromD<BlockTagU32>;
 #if HWY_TARGET == HWY_SVE2_128
 HWY_INLINE BlockVectorU32 blockFromPortU32(cvectorization_ops_raw_block_u32 v) { return svset_neonq_u32(svundef_u32(), (uint32x4_t)v); }
 HWY_INLINE cvectorization_ops_raw_block_u32 blockToPortU32(BlockVectorU32 v) { return (cvectorization_ops_raw_block_u32)svget_neonq_u32(v); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE BlockVectorU32 blockFromPortU32(cvectorization_ops_raw_block_u32 v) { return hn::BitCast(BlockTagU32(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_u32, sizeof(cvectorization_ops_block_u32)>(v))); }
+HWY_INLINE cvectorization_ops_raw_block_u32 blockToPortU32(BlockVectorU32 v) { const cvectorization_ops_vector_u32 wide = (cvectorization_ops_vector_u32)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_block_u32 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_block_u32)); return port; }
 #else
 HWY_INLINE BlockVectorU32 blockFromPortU32(cvectorization_ops_raw_block_u32 v) { return hn::LoadU(BlockTagU32(), reinterpret_cast<const uint32_t*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_block_u32 blockToPortU32(BlockVectorU32 v) { cvectorization_ops_raw_block_u32 port; hn::StoreU(v, BlockTagU32(), reinterpret_cast<uint32_t*>(&port)); return port; }
@@ -369,6 +475,11 @@ HWY_INLINE VectorU64 fromPortU64(cvectorization_ops_raw_vector_u64 v) { return s
 HWY_INLINE cvectorization_ops_raw_vector_u64 toPortU64(VectorU64 v) { return (cvectorization_ops_raw_vector_u64)svget_neonq_u64(v); }
 HWY_INLINE MaskU64 maskFromPortU64(cvectorization_ops_raw_mask_u64 m) { return hn::MaskFromVec(hn::BitCast(TagU64(), svset_neonq_s64(svundef_s64(), (int64x2_t)m))); }
 HWY_INLINE cvectorization_ops_raw_mask_u64 maskToPortU64(MaskU64 m) { const hn::RebindToSigned<TagU64> di; return (cvectorization_ops_raw_mask_u64)svget_neonq_s64(hn::BitCast(di, hn::VecFromMask(TagU64(), m))); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE VectorU64 fromPortU64(cvectorization_ops_raw_vector_u64 v) { return hn::BitCast(TagU64(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)v)); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 toPortU64(VectorU64 v) { return (cvectorization_ops_raw_vector_u64)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); }
+HWY_INLINE MaskU64 maskFromPortU64(cvectorization_ops_raw_mask_u64 m) { return hn::MaskFromVec(hn::BitCast(TagU64(), hn::BitCast(hn::RebindToSigned<TagU64>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)m)))); }
+HWY_INLINE cvectorization_ops_raw_mask_u64 maskToPortU64(MaskU64 m) { const hn::RebindToSigned<TagU64> di; return (cvectorization_ops_raw_mask_u64)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(TagU64(), m))); }
 #else
 HWY_INLINE VectorU64 fromPortU64(cvectorization_ops_raw_vector_u64 v) { return hn::LoadU(TagU64(), reinterpret_cast<const uint64_t*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_vector_u64 toPortU64(VectorU64 v) { cvectorization_ops_raw_vector_u64 port; hn::StoreU(v, TagU64(), reinterpret_cast<uint64_t*>(&port)); return port; }
@@ -384,6 +495,12 @@ HWY_INLINE HalfVectorU64 halfRegisterFromPortU64(cvectorization_ops_raw_half_vec
 HWY_INLINE cvectorization_ops_raw_half_vector_u64 halfToPortU64(HalfVectorU64 v) { return __builtin_shufflevector((cvectorization_ops_block_u64)svget_neonq_u64(v), (cvectorization_ops_block_u64)svget_neonq_u64(v), 0); }
 HWY_INLINE HalfMaskU64 halfMaskFromPortU64(cvectorization_ops_raw_half_mask_u64 m) { return hn::MaskFromVec(hn::BitCast(HalfTagU64(), svset_neonq_s64(svundef_s64(), (int64x2_t)__builtin_shufflevector(m, m, 0, -1)))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_u64 halfMaskToPortU64(HalfMaskU64 m) { const hn::RebindToSigned<HalfTagU64> di; const auto v = hn::BitCast(di, hn::VecFromMask(HalfTagU64(), m)); return __builtin_shufflevector((cvectorization_ops_block_i64)svget_neonq_s64(v), (cvectorization_ops_block_i64)svget_neonq_s64(v), 0); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE HalfVectorU64 halfFromPortU64(cvectorization_ops_raw_half_vector_u64 v) { return hn::BitCast(HalfTagU64(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_u64, sizeof(cvectorization_ops_half_vector_u64)>(v))); }
+HWY_INLINE HalfVectorU64 halfRegisterFromPortU64(cvectorization_ops_raw_half_vector_u64 v) { return hn::BitCast(HalfTagU64(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)zeroExtended<cvectorization_ops_vector_u64, sizeof(cvectorization_ops_raw_half_vector_u64)>(v))); }
+HWY_INLINE cvectorization_ops_raw_half_vector_u64 halfToPortU64(HalfVectorU64 v) { const cvectorization_ops_vector_u64 wide = (cvectorization_ops_vector_u64)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_half_vector_u64 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_vector_u64)); return port; }
+HWY_INLINE HalfMaskU64 halfMaskFromPortU64(cvectorization_ops_raw_half_mask_u64 m) { return hn::MaskedNe(hn::FirstN(HalfTagU64(), __builtin_vectorelements(cvectorization_ops_half_mask_u64)), hn::BitCast(HalfTagU64(), hn::BitCast(hn::RebindToSigned<HalfTagU64>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)widened<cvectorization_ops_mask_u64>(m)))), hn::Zero(HalfTagU64())); }
+HWY_INLINE cvectorization_ops_raw_half_mask_u64 halfMaskToPortU64(HalfMaskU64 m) { const hn::RebindToSigned<HalfTagU64> di; const cvectorization_ops_mask_u64 wide = (cvectorization_ops_mask_u64)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(HalfTagU64(), m))); cvectorization_ops_raw_half_mask_u64 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_mask_u64)); return port; }
 #else
 HWY_INLINE HalfVectorU64 halfFromPortU64(cvectorization_ops_raw_half_vector_u64 v) { return hn::LoadU(HalfTagU64(), reinterpret_cast<const uint64_t*>(&v)); }
 HWY_INLINE HalfVectorU64 halfRegisterFromPortU64(cvectorization_ops_raw_half_vector_u64 v) { return hn::ResizeBitCast(HalfTagU64(), hn::LoadU(hn::FixedTag<uint8_t, sizeof(cvectorization_ops_raw_half_vector_u64)>(), reinterpret_cast<const uint8_t*>(&v))); }
@@ -396,6 +513,9 @@ using BlockVectorU64 = hn::VFromD<BlockTagU64>;
 #if HWY_TARGET == HWY_SVE2_128
 HWY_INLINE BlockVectorU64 blockFromPortU64(cvectorization_ops_raw_block_u64 v) { return svset_neonq_u64(svundef_u64(), (uint64x2_t)v); }
 HWY_INLINE cvectorization_ops_raw_block_u64 blockToPortU64(BlockVectorU64 v) { return (cvectorization_ops_raw_block_u64)svget_neonq_u64(v); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE BlockVectorU64 blockFromPortU64(cvectorization_ops_raw_block_u64 v) { return hn::BitCast(BlockTagU64(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_u64, sizeof(cvectorization_ops_block_u64)>(v))); }
+HWY_INLINE cvectorization_ops_raw_block_u64 blockToPortU64(BlockVectorU64 v) { const cvectorization_ops_vector_u64 wide = (cvectorization_ops_vector_u64)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_block_u64 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_block_u64)); return port; }
 #else
 HWY_INLINE BlockVectorU64 blockFromPortU64(cvectorization_ops_raw_block_u64 v) { return hn::LoadU(BlockTagU64(), reinterpret_cast<const uint64_t*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_block_u64 blockToPortU64(BlockVectorU64 v) { cvectorization_ops_raw_block_u64 port; hn::StoreU(v, BlockTagU64(), reinterpret_cast<uint64_t*>(&port)); return port; }
@@ -418,6 +538,11 @@ HWY_INLINE VectorI8 fromPortI8(cvectorization_ops_raw_vector_i8 v) { return svse
 HWY_INLINE cvectorization_ops_raw_vector_i8 toPortI8(VectorI8 v) { return (cvectorization_ops_raw_vector_i8)svget_neonq_s8(v); }
 HWY_INLINE MaskI8 maskFromPortI8(cvectorization_ops_raw_mask_i8 m) { return hn::MaskFromVec(hn::BitCast(TagI8(), svset_neonq_s8(svundef_s8(), (int8x16_t)m))); }
 HWY_INLINE cvectorization_ops_raw_mask_i8 maskToPortI8(MaskI8 m) { const hn::RebindToSigned<TagI8> di; return (cvectorization_ops_raw_mask_i8)svget_neonq_s8(hn::BitCast(di, hn::VecFromMask(TagI8(), m))); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE VectorI8 fromPortI8(cvectorization_ops_raw_vector_i8 v) { return hn::BitCast(TagI8(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)v)); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 toPortI8(VectorI8 v) { return (cvectorization_ops_raw_vector_i8)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); }
+HWY_INLINE MaskI8 maskFromPortI8(cvectorization_ops_raw_mask_i8 m) { return hn::MaskFromVec(hn::BitCast(TagI8(), hn::BitCast(hn::RebindToSigned<TagI8>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)m)))); }
+HWY_INLINE cvectorization_ops_raw_mask_i8 maskToPortI8(MaskI8 m) { const hn::RebindToSigned<TagI8> di; return (cvectorization_ops_raw_mask_i8)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(TagI8(), m))); }
 #else
 HWY_INLINE VectorI8 fromPortI8(cvectorization_ops_raw_vector_i8 v) { return hn::LoadU(TagI8(), reinterpret_cast<const int8_t*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_vector_i8 toPortI8(VectorI8 v) { cvectorization_ops_raw_vector_i8 port; hn::StoreU(v, TagI8(), reinterpret_cast<int8_t*>(&port)); return port; }
@@ -433,6 +558,12 @@ HWY_INLINE HalfVectorI8 halfRegisterFromPortI8(cvectorization_ops_raw_half_vecto
 HWY_INLINE cvectorization_ops_raw_half_vector_i8 halfToPortI8(HalfVectorI8 v) { return __builtin_shufflevector((cvectorization_ops_block_i8)svget_neonq_s8(v), (cvectorization_ops_block_i8)svget_neonq_s8(v), 0, 1, 2, 3, 4, 5, 6, 7); }
 HWY_INLINE HalfMaskI8 halfMaskFromPortI8(cvectorization_ops_raw_half_mask_i8 m) { return hn::MaskFromVec(hn::BitCast(HalfTagI8(), svset_neonq_s8(svundef_s8(), (int8x16_t)__builtin_shufflevector(m, m, 0, 1, 2, 3, 4, 5, 6, 7, -1, -1, -1, -1, -1, -1, -1, -1)))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_i8 halfMaskToPortI8(HalfMaskI8 m) { const hn::RebindToSigned<HalfTagI8> di; const auto v = hn::BitCast(di, hn::VecFromMask(HalfTagI8(), m)); return __builtin_shufflevector((cvectorization_ops_block_i8)svget_neonq_s8(v), (cvectorization_ops_block_i8)svget_neonq_s8(v), 0, 1, 2, 3, 4, 5, 6, 7); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE HalfVectorI8 halfFromPortI8(cvectorization_ops_raw_half_vector_i8 v) { return hn::BitCast(HalfTagI8(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_i8, sizeof(cvectorization_ops_half_vector_i8)>(v))); }
+HWY_INLINE HalfVectorI8 halfRegisterFromPortI8(cvectorization_ops_raw_half_vector_i8 v) { return hn::BitCast(HalfTagI8(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)zeroExtended<cvectorization_ops_vector_i8, sizeof(cvectorization_ops_raw_half_vector_i8)>(v))); }
+HWY_INLINE cvectorization_ops_raw_half_vector_i8 halfToPortI8(HalfVectorI8 v) { const cvectorization_ops_vector_i8 wide = (cvectorization_ops_vector_i8)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_half_vector_i8 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_vector_i8)); return port; }
+HWY_INLINE HalfMaskI8 halfMaskFromPortI8(cvectorization_ops_raw_half_mask_i8 m) { return hn::MaskedNe(hn::FirstN(HalfTagI8(), __builtin_vectorelements(cvectorization_ops_half_mask_i8)), hn::BitCast(HalfTagI8(), hn::BitCast(hn::RebindToSigned<HalfTagI8>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)widened<cvectorization_ops_mask_i8>(m)))), hn::Zero(HalfTagI8())); }
+HWY_INLINE cvectorization_ops_raw_half_mask_i8 halfMaskToPortI8(HalfMaskI8 m) { const hn::RebindToSigned<HalfTagI8> di; const cvectorization_ops_mask_i8 wide = (cvectorization_ops_mask_i8)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(HalfTagI8(), m))); cvectorization_ops_raw_half_mask_i8 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_mask_i8)); return port; }
 #else
 HWY_INLINE HalfVectorI8 halfFromPortI8(cvectorization_ops_raw_half_vector_i8 v) { return hn::LoadU(HalfTagI8(), reinterpret_cast<const int8_t*>(&v)); }
 HWY_INLINE HalfVectorI8 halfRegisterFromPortI8(cvectorization_ops_raw_half_vector_i8 v) { return hn::ResizeBitCast(HalfTagI8(), hn::LoadU(hn::FixedTag<uint8_t, sizeof(cvectorization_ops_raw_half_vector_i8)>(), reinterpret_cast<const uint8_t*>(&v))); }
@@ -449,6 +580,12 @@ HWY_INLINE QuarterVectorI8 quarterRegisterFromPortI8(cvectorization_ops_raw_quar
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i8 quarterToPortI8(QuarterVectorI8 v) { return __builtin_shufflevector((cvectorization_ops_block_i8)svget_neonq_s8(v), (cvectorization_ops_block_i8)svget_neonq_s8(v), 0, 1, 2, 3, 4, 5, 6, 7); }
 HWY_INLINE QuarterMaskI8 quarterMaskFromPortI8(cvectorization_ops_raw_quarter_mask_i8 m) { return hn::MaskFromVec(hn::BitCast(QuarterTagI8(), svset_neonq_s8(svundef_s8(), (int8x16_t)__builtin_shufflevector(m, m, 0, 1, 2, 3, 4, 5, 6, 7, -1, -1, -1, -1, -1, -1, -1, -1)))); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_i8 quarterMaskToPortI8(QuarterMaskI8 m) { const hn::RebindToSigned<QuarterTagI8> di; const auto v = hn::BitCast(di, hn::VecFromMask(QuarterTagI8(), m)); return __builtin_shufflevector((cvectorization_ops_block_i8)svget_neonq_s8(v), (cvectorization_ops_block_i8)svget_neonq_s8(v), 0, 1, 2, 3, 4, 5, 6, 7); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE QuarterVectorI8 quarterFromPortI8(cvectorization_ops_raw_quarter_vector_i8 v) { return hn::BitCast(QuarterTagI8(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_i8, sizeof(cvectorization_ops_quarter_vector_i8)>(v))); }
+HWY_INLINE QuarterVectorI8 quarterRegisterFromPortI8(cvectorization_ops_raw_quarter_vector_i8 v) { return hn::BitCast(QuarterTagI8(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)zeroExtended<cvectorization_ops_vector_i8, sizeof(cvectorization_ops_raw_quarter_vector_i8)>(v))); }
+HWY_INLINE cvectorization_ops_raw_quarter_vector_i8 quarterToPortI8(QuarterVectorI8 v) { const cvectorization_ops_vector_i8 wide = (cvectorization_ops_vector_i8)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_quarter_vector_i8 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_quarter_vector_i8)); return port; }
+HWY_INLINE QuarterMaskI8 quarterMaskFromPortI8(cvectorization_ops_raw_quarter_mask_i8 m) { return hn::MaskedNe(hn::FirstN(QuarterTagI8(), __builtin_vectorelements(cvectorization_ops_quarter_mask_i8)), hn::BitCast(QuarterTagI8(), hn::BitCast(hn::RebindToSigned<QuarterTagI8>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)widened<cvectorization_ops_mask_i8>(m)))), hn::Zero(QuarterTagI8())); }
+HWY_INLINE cvectorization_ops_raw_quarter_mask_i8 quarterMaskToPortI8(QuarterMaskI8 m) { const hn::RebindToSigned<QuarterTagI8> di; const cvectorization_ops_mask_i8 wide = (cvectorization_ops_mask_i8)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(QuarterTagI8(), m))); cvectorization_ops_raw_quarter_mask_i8 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_quarter_mask_i8)); return port; }
 #else
 HWY_INLINE QuarterVectorI8 quarterFromPortI8(cvectorization_ops_raw_quarter_vector_i8 v) { return hn::LoadU(QuarterTagI8(), reinterpret_cast<const int8_t*>(&v)); }
 HWY_INLINE QuarterVectorI8 quarterRegisterFromPortI8(cvectorization_ops_raw_quarter_vector_i8 v) { return hn::ResizeBitCast(QuarterTagI8(), hn::LoadU(hn::FixedTag<uint8_t, sizeof(cvectorization_ops_raw_quarter_vector_i8)>(), reinterpret_cast<const uint8_t*>(&v))); }
@@ -465,6 +602,12 @@ HWY_INLINE EighthVectorI8 eighthRegisterFromPortI8(cvectorization_ops_raw_eighth
 HWY_INLINE cvectorization_ops_raw_eighth_vector_i8 eighthToPortI8(EighthVectorI8 v) { return __builtin_shufflevector((cvectorization_ops_block_i8)svget_neonq_s8(v), (cvectorization_ops_block_i8)svget_neonq_s8(v), 0, 1, 2, 3, 4, 5, 6, 7); }
 HWY_INLINE EighthMaskI8 eighthMaskFromPortI8(cvectorization_ops_raw_eighth_mask_i8 m) { return hn::MaskFromVec(hn::BitCast(EighthTagI8(), svset_neonq_s8(svundef_s8(), (int8x16_t)__builtin_shufflevector(m, m, 0, 1, 2, 3, 4, 5, 6, 7, -1, -1, -1, -1, -1, -1, -1, -1)))); }
 HWY_INLINE cvectorization_ops_raw_eighth_mask_i8 eighthMaskToPortI8(EighthMaskI8 m) { const hn::RebindToSigned<EighthTagI8> di; const auto v = hn::BitCast(di, hn::VecFromMask(EighthTagI8(), m)); return __builtin_shufflevector((cvectorization_ops_block_i8)svget_neonq_s8(v), (cvectorization_ops_block_i8)svget_neonq_s8(v), 0, 1, 2, 3, 4, 5, 6, 7); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE EighthVectorI8 eighthFromPortI8(cvectorization_ops_raw_eighth_vector_i8 v) { return hn::BitCast(EighthTagI8(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_i8, sizeof(cvectorization_ops_eighth_vector_i8)>(v))); }
+HWY_INLINE EighthVectorI8 eighthRegisterFromPortI8(cvectorization_ops_raw_eighth_vector_i8 v) { return hn::BitCast(EighthTagI8(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)zeroExtended<cvectorization_ops_vector_i8, sizeof(cvectorization_ops_raw_eighth_vector_i8)>(v))); }
+HWY_INLINE cvectorization_ops_raw_eighth_vector_i8 eighthToPortI8(EighthVectorI8 v) { const cvectorization_ops_vector_i8 wide = (cvectorization_ops_vector_i8)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_eighth_vector_i8 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_eighth_vector_i8)); return port; }
+HWY_INLINE EighthMaskI8 eighthMaskFromPortI8(cvectorization_ops_raw_eighth_mask_i8 m) { return hn::MaskedNe(hn::FirstN(EighthTagI8(), __builtin_vectorelements(cvectorization_ops_eighth_mask_i8)), hn::BitCast(EighthTagI8(), hn::BitCast(hn::RebindToSigned<EighthTagI8>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)widened<cvectorization_ops_mask_i8>(m)))), hn::Zero(EighthTagI8())); }
+HWY_INLINE cvectorization_ops_raw_eighth_mask_i8 eighthMaskToPortI8(EighthMaskI8 m) { const hn::RebindToSigned<EighthTagI8> di; const cvectorization_ops_mask_i8 wide = (cvectorization_ops_mask_i8)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(EighthTagI8(), m))); cvectorization_ops_raw_eighth_mask_i8 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_eighth_mask_i8)); return port; }
 #else
 HWY_INLINE EighthVectorI8 eighthFromPortI8(cvectorization_ops_raw_eighth_vector_i8 v) { return hn::LoadU(EighthTagI8(), reinterpret_cast<const int8_t*>(&v)); }
 HWY_INLINE EighthVectorI8 eighthRegisterFromPortI8(cvectorization_ops_raw_eighth_vector_i8 v) { return hn::ResizeBitCast(EighthTagI8(), hn::LoadU(hn::FixedTag<uint8_t, sizeof(cvectorization_ops_raw_eighth_vector_i8)>(), reinterpret_cast<const uint8_t*>(&v))); }
@@ -477,6 +620,9 @@ using BlockVectorI8 = hn::VFromD<BlockTagI8>;
 #if HWY_TARGET == HWY_SVE2_128
 HWY_INLINE BlockVectorI8 blockFromPortI8(cvectorization_ops_raw_block_i8 v) { return svset_neonq_s8(svundef_s8(), (int8x16_t)v); }
 HWY_INLINE cvectorization_ops_raw_block_i8 blockToPortI8(BlockVectorI8 v) { return (cvectorization_ops_raw_block_i8)svget_neonq_s8(v); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE BlockVectorI8 blockFromPortI8(cvectorization_ops_raw_block_i8 v) { return hn::BitCast(BlockTagI8(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_i8, sizeof(cvectorization_ops_block_i8)>(v))); }
+HWY_INLINE cvectorization_ops_raw_block_i8 blockToPortI8(BlockVectorI8 v) { const cvectorization_ops_vector_i8 wide = (cvectorization_ops_vector_i8)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_block_i8 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_block_i8)); return port; }
 #else
 HWY_INLINE BlockVectorI8 blockFromPortI8(cvectorization_ops_raw_block_i8 v) { return hn::LoadU(BlockTagI8(), reinterpret_cast<const int8_t*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_block_i8 blockToPortI8(BlockVectorI8 v) { cvectorization_ops_raw_block_i8 port; hn::StoreU(v, BlockTagI8(), reinterpret_cast<int8_t*>(&port)); return port; }
@@ -497,6 +643,11 @@ HWY_INLINE VectorI16 fromPortI16(cvectorization_ops_raw_vector_i16 v) { return s
 HWY_INLINE cvectorization_ops_raw_vector_i16 toPortI16(VectorI16 v) { return (cvectorization_ops_raw_vector_i16)svget_neonq_s16(v); }
 HWY_INLINE MaskI16 maskFromPortI16(cvectorization_ops_raw_mask_i16 m) { return hn::MaskFromVec(hn::BitCast(TagI16(), svset_neonq_s16(svundef_s16(), (int16x8_t)m))); }
 HWY_INLINE cvectorization_ops_raw_mask_i16 maskToPortI16(MaskI16 m) { const hn::RebindToSigned<TagI16> di; return (cvectorization_ops_raw_mask_i16)svget_neonq_s16(hn::BitCast(di, hn::VecFromMask(TagI16(), m))); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE VectorI16 fromPortI16(cvectorization_ops_raw_vector_i16 v) { return hn::BitCast(TagI16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)v)); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 toPortI16(VectorI16 v) { return (cvectorization_ops_raw_vector_i16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); }
+HWY_INLINE MaskI16 maskFromPortI16(cvectorization_ops_raw_mask_i16 m) { return hn::MaskFromVec(hn::BitCast(TagI16(), hn::BitCast(hn::RebindToSigned<TagI16>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)m)))); }
+HWY_INLINE cvectorization_ops_raw_mask_i16 maskToPortI16(MaskI16 m) { const hn::RebindToSigned<TagI16> di; return (cvectorization_ops_raw_mask_i16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(TagI16(), m))); }
 #else
 HWY_INLINE VectorI16 fromPortI16(cvectorization_ops_raw_vector_i16 v) { return hn::LoadU(TagI16(), reinterpret_cast<const int16_t*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_vector_i16 toPortI16(VectorI16 v) { cvectorization_ops_raw_vector_i16 port; hn::StoreU(v, TagI16(), reinterpret_cast<int16_t*>(&port)); return port; }
@@ -512,6 +663,12 @@ HWY_INLINE HalfVectorI16 halfRegisterFromPortI16(cvectorization_ops_raw_half_vec
 HWY_INLINE cvectorization_ops_raw_half_vector_i16 halfToPortI16(HalfVectorI16 v) { return __builtin_shufflevector((cvectorization_ops_block_i16)svget_neonq_s16(v), (cvectorization_ops_block_i16)svget_neonq_s16(v), 0, 1, 2, 3); }
 HWY_INLINE HalfMaskI16 halfMaskFromPortI16(cvectorization_ops_raw_half_mask_i16 m) { return hn::MaskFromVec(hn::BitCast(HalfTagI16(), svset_neonq_s16(svundef_s16(), (int16x8_t)__builtin_shufflevector(m, m, 0, 1, 2, 3, -1, -1, -1, -1)))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_i16 halfMaskToPortI16(HalfMaskI16 m) { const hn::RebindToSigned<HalfTagI16> di; const auto v = hn::BitCast(di, hn::VecFromMask(HalfTagI16(), m)); return __builtin_shufflevector((cvectorization_ops_block_i16)svget_neonq_s16(v), (cvectorization_ops_block_i16)svget_neonq_s16(v), 0, 1, 2, 3); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE HalfVectorI16 halfFromPortI16(cvectorization_ops_raw_half_vector_i16 v) { return hn::BitCast(HalfTagI16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_i16, sizeof(cvectorization_ops_half_vector_i16)>(v))); }
+HWY_INLINE HalfVectorI16 halfRegisterFromPortI16(cvectorization_ops_raw_half_vector_i16 v) { return hn::BitCast(HalfTagI16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)zeroExtended<cvectorization_ops_vector_i16, sizeof(cvectorization_ops_raw_half_vector_i16)>(v))); }
+HWY_INLINE cvectorization_ops_raw_half_vector_i16 halfToPortI16(HalfVectorI16 v) { const cvectorization_ops_vector_i16 wide = (cvectorization_ops_vector_i16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_half_vector_i16 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_vector_i16)); return port; }
+HWY_INLINE HalfMaskI16 halfMaskFromPortI16(cvectorization_ops_raw_half_mask_i16 m) { return hn::MaskedNe(hn::FirstN(HalfTagI16(), __builtin_vectorelements(cvectorization_ops_half_mask_i16)), hn::BitCast(HalfTagI16(), hn::BitCast(hn::RebindToSigned<HalfTagI16>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)widened<cvectorization_ops_mask_i16>(m)))), hn::Zero(HalfTagI16())); }
+HWY_INLINE cvectorization_ops_raw_half_mask_i16 halfMaskToPortI16(HalfMaskI16 m) { const hn::RebindToSigned<HalfTagI16> di; const cvectorization_ops_mask_i16 wide = (cvectorization_ops_mask_i16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(HalfTagI16(), m))); cvectorization_ops_raw_half_mask_i16 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_mask_i16)); return port; }
 #else
 HWY_INLINE HalfVectorI16 halfFromPortI16(cvectorization_ops_raw_half_vector_i16 v) { return hn::LoadU(HalfTagI16(), reinterpret_cast<const int16_t*>(&v)); }
 HWY_INLINE HalfVectorI16 halfRegisterFromPortI16(cvectorization_ops_raw_half_vector_i16 v) { return hn::ResizeBitCast(HalfTagI16(), hn::LoadU(hn::FixedTag<uint8_t, sizeof(cvectorization_ops_raw_half_vector_i16)>(), reinterpret_cast<const uint8_t*>(&v))); }
@@ -528,6 +685,12 @@ HWY_INLINE QuarterVectorI16 quarterRegisterFromPortI16(cvectorization_ops_raw_qu
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterToPortI16(QuarterVectorI16 v) { return __builtin_shufflevector((cvectorization_ops_block_i16)svget_neonq_s16(v), (cvectorization_ops_block_i16)svget_neonq_s16(v), 0, 1, 2, 3); }
 HWY_INLINE QuarterMaskI16 quarterMaskFromPortI16(cvectorization_ops_raw_quarter_mask_i16 m) { return hn::MaskFromVec(hn::BitCast(QuarterTagI16(), svset_neonq_s16(svundef_s16(), (int16x8_t)__builtin_shufflevector(m, m, 0, 1, 2, 3, -1, -1, -1, -1)))); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_i16 quarterMaskToPortI16(QuarterMaskI16 m) { const hn::RebindToSigned<QuarterTagI16> di; const auto v = hn::BitCast(di, hn::VecFromMask(QuarterTagI16(), m)); return __builtin_shufflevector((cvectorization_ops_block_i16)svget_neonq_s16(v), (cvectorization_ops_block_i16)svget_neonq_s16(v), 0, 1, 2, 3); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE QuarterVectorI16 quarterFromPortI16(cvectorization_ops_raw_quarter_vector_i16 v) { return hn::BitCast(QuarterTagI16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_i16, sizeof(cvectorization_ops_quarter_vector_i16)>(v))); }
+HWY_INLINE QuarterVectorI16 quarterRegisterFromPortI16(cvectorization_ops_raw_quarter_vector_i16 v) { return hn::BitCast(QuarterTagI16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)zeroExtended<cvectorization_ops_vector_i16, sizeof(cvectorization_ops_raw_quarter_vector_i16)>(v))); }
+HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterToPortI16(QuarterVectorI16 v) { const cvectorization_ops_vector_i16 wide = (cvectorization_ops_vector_i16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_quarter_vector_i16 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_quarter_vector_i16)); return port; }
+HWY_INLINE QuarterMaskI16 quarterMaskFromPortI16(cvectorization_ops_raw_quarter_mask_i16 m) { return hn::MaskedNe(hn::FirstN(QuarterTagI16(), __builtin_vectorelements(cvectorization_ops_quarter_mask_i16)), hn::BitCast(QuarterTagI16(), hn::BitCast(hn::RebindToSigned<QuarterTagI16>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)widened<cvectorization_ops_mask_i16>(m)))), hn::Zero(QuarterTagI16())); }
+HWY_INLINE cvectorization_ops_raw_quarter_mask_i16 quarterMaskToPortI16(QuarterMaskI16 m) { const hn::RebindToSigned<QuarterTagI16> di; const cvectorization_ops_mask_i16 wide = (cvectorization_ops_mask_i16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(QuarterTagI16(), m))); cvectorization_ops_raw_quarter_mask_i16 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_quarter_mask_i16)); return port; }
 #else
 HWY_INLINE QuarterVectorI16 quarterFromPortI16(cvectorization_ops_raw_quarter_vector_i16 v) { return hn::LoadU(QuarterTagI16(), reinterpret_cast<const int16_t*>(&v)); }
 HWY_INLINE QuarterVectorI16 quarterRegisterFromPortI16(cvectorization_ops_raw_quarter_vector_i16 v) { return hn::ResizeBitCast(QuarterTagI16(), hn::LoadU(hn::FixedTag<uint8_t, sizeof(cvectorization_ops_raw_quarter_vector_i16)>(), reinterpret_cast<const uint8_t*>(&v))); }
@@ -540,6 +703,9 @@ using BlockVectorI16 = hn::VFromD<BlockTagI16>;
 #if HWY_TARGET == HWY_SVE2_128
 HWY_INLINE BlockVectorI16 blockFromPortI16(cvectorization_ops_raw_block_i16 v) { return svset_neonq_s16(svundef_s16(), (int16x8_t)v); }
 HWY_INLINE cvectorization_ops_raw_block_i16 blockToPortI16(BlockVectorI16 v) { return (cvectorization_ops_raw_block_i16)svget_neonq_s16(v); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE BlockVectorI16 blockFromPortI16(cvectorization_ops_raw_block_i16 v) { return hn::BitCast(BlockTagI16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_i16, sizeof(cvectorization_ops_block_i16)>(v))); }
+HWY_INLINE cvectorization_ops_raw_block_i16 blockToPortI16(BlockVectorI16 v) { const cvectorization_ops_vector_i16 wide = (cvectorization_ops_vector_i16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_block_i16 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_block_i16)); return port; }
 #else
 HWY_INLINE BlockVectorI16 blockFromPortI16(cvectorization_ops_raw_block_i16 v) { return hn::LoadU(BlockTagI16(), reinterpret_cast<const int16_t*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_block_i16 blockToPortI16(BlockVectorI16 v) { cvectorization_ops_raw_block_i16 port; hn::StoreU(v, BlockTagI16(), reinterpret_cast<int16_t*>(&port)); return port; }
@@ -560,6 +726,11 @@ HWY_INLINE VectorI32 fromPortI32(cvectorization_ops_raw_vector_i32 v) { return s
 HWY_INLINE cvectorization_ops_raw_vector_i32 toPortI32(VectorI32 v) { return (cvectorization_ops_raw_vector_i32)svget_neonq_s32(v); }
 HWY_INLINE MaskI32 maskFromPortI32(cvectorization_ops_raw_mask_i32 m) { return hn::MaskFromVec(hn::BitCast(TagI32(), svset_neonq_s32(svundef_s32(), (int32x4_t)m))); }
 HWY_INLINE cvectorization_ops_raw_mask_i32 maskToPortI32(MaskI32 m) { const hn::RebindToSigned<TagI32> di; return (cvectorization_ops_raw_mask_i32)svget_neonq_s32(hn::BitCast(di, hn::VecFromMask(TagI32(), m))); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE VectorI32 fromPortI32(cvectorization_ops_raw_vector_i32 v) { return hn::BitCast(TagI32(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)v)); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 toPortI32(VectorI32 v) { return (cvectorization_ops_raw_vector_i32)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); }
+HWY_INLINE MaskI32 maskFromPortI32(cvectorization_ops_raw_mask_i32 m) { return hn::MaskFromVec(hn::BitCast(TagI32(), hn::BitCast(hn::RebindToSigned<TagI32>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)m)))); }
+HWY_INLINE cvectorization_ops_raw_mask_i32 maskToPortI32(MaskI32 m) { const hn::RebindToSigned<TagI32> di; return (cvectorization_ops_raw_mask_i32)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(TagI32(), m))); }
 #else
 HWY_INLINE VectorI32 fromPortI32(cvectorization_ops_raw_vector_i32 v) { return hn::LoadU(TagI32(), reinterpret_cast<const int32_t*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_vector_i32 toPortI32(VectorI32 v) { cvectorization_ops_raw_vector_i32 port; hn::StoreU(v, TagI32(), reinterpret_cast<int32_t*>(&port)); return port; }
@@ -575,6 +746,12 @@ HWY_INLINE HalfVectorI32 halfRegisterFromPortI32(cvectorization_ops_raw_half_vec
 HWY_INLINE cvectorization_ops_raw_half_vector_i32 halfToPortI32(HalfVectorI32 v) { return __builtin_shufflevector((cvectorization_ops_block_i32)svget_neonq_s32(v), (cvectorization_ops_block_i32)svget_neonq_s32(v), 0, 1); }
 HWY_INLINE HalfMaskI32 halfMaskFromPortI32(cvectorization_ops_raw_half_mask_i32 m) { return hn::MaskFromVec(hn::BitCast(HalfTagI32(), svset_neonq_s32(svundef_s32(), (int32x4_t)__builtin_shufflevector(m, m, 0, 1, -1, -1)))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_i32 halfMaskToPortI32(HalfMaskI32 m) { const hn::RebindToSigned<HalfTagI32> di; const auto v = hn::BitCast(di, hn::VecFromMask(HalfTagI32(), m)); return __builtin_shufflevector((cvectorization_ops_block_i32)svget_neonq_s32(v), (cvectorization_ops_block_i32)svget_neonq_s32(v), 0, 1); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE HalfVectorI32 halfFromPortI32(cvectorization_ops_raw_half_vector_i32 v) { return hn::BitCast(HalfTagI32(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_i32, sizeof(cvectorization_ops_half_vector_i32)>(v))); }
+HWY_INLINE HalfVectorI32 halfRegisterFromPortI32(cvectorization_ops_raw_half_vector_i32 v) { return hn::BitCast(HalfTagI32(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)zeroExtended<cvectorization_ops_vector_i32, sizeof(cvectorization_ops_raw_half_vector_i32)>(v))); }
+HWY_INLINE cvectorization_ops_raw_half_vector_i32 halfToPortI32(HalfVectorI32 v) { const cvectorization_ops_vector_i32 wide = (cvectorization_ops_vector_i32)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_half_vector_i32 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_vector_i32)); return port; }
+HWY_INLINE HalfMaskI32 halfMaskFromPortI32(cvectorization_ops_raw_half_mask_i32 m) { return hn::MaskedNe(hn::FirstN(HalfTagI32(), __builtin_vectorelements(cvectorization_ops_half_mask_i32)), hn::BitCast(HalfTagI32(), hn::BitCast(hn::RebindToSigned<HalfTagI32>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)widened<cvectorization_ops_mask_i32>(m)))), hn::Zero(HalfTagI32())); }
+HWY_INLINE cvectorization_ops_raw_half_mask_i32 halfMaskToPortI32(HalfMaskI32 m) { const hn::RebindToSigned<HalfTagI32> di; const cvectorization_ops_mask_i32 wide = (cvectorization_ops_mask_i32)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(HalfTagI32(), m))); cvectorization_ops_raw_half_mask_i32 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_mask_i32)); return port; }
 #else
 HWY_INLINE HalfVectorI32 halfFromPortI32(cvectorization_ops_raw_half_vector_i32 v) { return hn::LoadU(HalfTagI32(), reinterpret_cast<const int32_t*>(&v)); }
 HWY_INLINE HalfVectorI32 halfRegisterFromPortI32(cvectorization_ops_raw_half_vector_i32 v) { return hn::ResizeBitCast(HalfTagI32(), hn::LoadU(hn::FixedTag<uint8_t, sizeof(cvectorization_ops_raw_half_vector_i32)>(), reinterpret_cast<const uint8_t*>(&v))); }
@@ -587,6 +764,9 @@ using BlockVectorI32 = hn::VFromD<BlockTagI32>;
 #if HWY_TARGET == HWY_SVE2_128
 HWY_INLINE BlockVectorI32 blockFromPortI32(cvectorization_ops_raw_block_i32 v) { return svset_neonq_s32(svundef_s32(), (int32x4_t)v); }
 HWY_INLINE cvectorization_ops_raw_block_i32 blockToPortI32(BlockVectorI32 v) { return (cvectorization_ops_raw_block_i32)svget_neonq_s32(v); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE BlockVectorI32 blockFromPortI32(cvectorization_ops_raw_block_i32 v) { return hn::BitCast(BlockTagI32(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_i32, sizeof(cvectorization_ops_block_i32)>(v))); }
+HWY_INLINE cvectorization_ops_raw_block_i32 blockToPortI32(BlockVectorI32 v) { const cvectorization_ops_vector_i32 wide = (cvectorization_ops_vector_i32)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_block_i32 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_block_i32)); return port; }
 #else
 HWY_INLINE BlockVectorI32 blockFromPortI32(cvectorization_ops_raw_block_i32 v) { return hn::LoadU(BlockTagI32(), reinterpret_cast<const int32_t*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_block_i32 blockToPortI32(BlockVectorI32 v) { cvectorization_ops_raw_block_i32 port; hn::StoreU(v, BlockTagI32(), reinterpret_cast<int32_t*>(&port)); return port; }
@@ -607,6 +787,11 @@ HWY_INLINE VectorI64 fromPortI64(cvectorization_ops_raw_vector_i64 v) { return s
 HWY_INLINE cvectorization_ops_raw_vector_i64 toPortI64(VectorI64 v) { return (cvectorization_ops_raw_vector_i64)svget_neonq_s64(v); }
 HWY_INLINE MaskI64 maskFromPortI64(cvectorization_ops_raw_mask_i64 m) { return hn::MaskFromVec(hn::BitCast(TagI64(), svset_neonq_s64(svundef_s64(), (int64x2_t)m))); }
 HWY_INLINE cvectorization_ops_raw_mask_i64 maskToPortI64(MaskI64 m) { const hn::RebindToSigned<TagI64> di; return (cvectorization_ops_raw_mask_i64)svget_neonq_s64(hn::BitCast(di, hn::VecFromMask(TagI64(), m))); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE VectorI64 fromPortI64(cvectorization_ops_raw_vector_i64 v) { return hn::BitCast(TagI64(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)v)); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 toPortI64(VectorI64 v) { return (cvectorization_ops_raw_vector_i64)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); }
+HWY_INLINE MaskI64 maskFromPortI64(cvectorization_ops_raw_mask_i64 m) { return hn::MaskFromVec(hn::BitCast(TagI64(), hn::BitCast(hn::RebindToSigned<TagI64>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)m)))); }
+HWY_INLINE cvectorization_ops_raw_mask_i64 maskToPortI64(MaskI64 m) { const hn::RebindToSigned<TagI64> di; return (cvectorization_ops_raw_mask_i64)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(TagI64(), m))); }
 #else
 HWY_INLINE VectorI64 fromPortI64(cvectorization_ops_raw_vector_i64 v) { return hn::LoadU(TagI64(), reinterpret_cast<const int64_t*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_vector_i64 toPortI64(VectorI64 v) { cvectorization_ops_raw_vector_i64 port; hn::StoreU(v, TagI64(), reinterpret_cast<int64_t*>(&port)); return port; }
@@ -622,6 +807,12 @@ HWY_INLINE HalfVectorI64 halfRegisterFromPortI64(cvectorization_ops_raw_half_vec
 HWY_INLINE cvectorization_ops_raw_half_vector_i64 halfToPortI64(HalfVectorI64 v) { return __builtin_shufflevector((cvectorization_ops_block_i64)svget_neonq_s64(v), (cvectorization_ops_block_i64)svget_neonq_s64(v), 0); }
 HWY_INLINE HalfMaskI64 halfMaskFromPortI64(cvectorization_ops_raw_half_mask_i64 m) { return hn::MaskFromVec(hn::BitCast(HalfTagI64(), svset_neonq_s64(svundef_s64(), (int64x2_t)__builtin_shufflevector(m, m, 0, -1)))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_i64 halfMaskToPortI64(HalfMaskI64 m) { const hn::RebindToSigned<HalfTagI64> di; const auto v = hn::BitCast(di, hn::VecFromMask(HalfTagI64(), m)); return __builtin_shufflevector((cvectorization_ops_block_i64)svget_neonq_s64(v), (cvectorization_ops_block_i64)svget_neonq_s64(v), 0); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE HalfVectorI64 halfFromPortI64(cvectorization_ops_raw_half_vector_i64 v) { return hn::BitCast(HalfTagI64(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_i64, sizeof(cvectorization_ops_half_vector_i64)>(v))); }
+HWY_INLINE HalfVectorI64 halfRegisterFromPortI64(cvectorization_ops_raw_half_vector_i64 v) { return hn::BitCast(HalfTagI64(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)zeroExtended<cvectorization_ops_vector_i64, sizeof(cvectorization_ops_raw_half_vector_i64)>(v))); }
+HWY_INLINE cvectorization_ops_raw_half_vector_i64 halfToPortI64(HalfVectorI64 v) { const cvectorization_ops_vector_i64 wide = (cvectorization_ops_vector_i64)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_half_vector_i64 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_vector_i64)); return port; }
+HWY_INLINE HalfMaskI64 halfMaskFromPortI64(cvectorization_ops_raw_half_mask_i64 m) { return hn::MaskedNe(hn::FirstN(HalfTagI64(), __builtin_vectorelements(cvectorization_ops_half_mask_i64)), hn::BitCast(HalfTagI64(), hn::BitCast(hn::RebindToSigned<HalfTagI64>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)widened<cvectorization_ops_mask_i64>(m)))), hn::Zero(HalfTagI64())); }
+HWY_INLINE cvectorization_ops_raw_half_mask_i64 halfMaskToPortI64(HalfMaskI64 m) { const hn::RebindToSigned<HalfTagI64> di; const cvectorization_ops_mask_i64 wide = (cvectorization_ops_mask_i64)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(HalfTagI64(), m))); cvectorization_ops_raw_half_mask_i64 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_mask_i64)); return port; }
 #else
 HWY_INLINE HalfVectorI64 halfFromPortI64(cvectorization_ops_raw_half_vector_i64 v) { return hn::LoadU(HalfTagI64(), reinterpret_cast<const int64_t*>(&v)); }
 HWY_INLINE HalfVectorI64 halfRegisterFromPortI64(cvectorization_ops_raw_half_vector_i64 v) { return hn::ResizeBitCast(HalfTagI64(), hn::LoadU(hn::FixedTag<uint8_t, sizeof(cvectorization_ops_raw_half_vector_i64)>(), reinterpret_cast<const uint8_t*>(&v))); }
@@ -634,6 +825,9 @@ using BlockVectorI64 = hn::VFromD<BlockTagI64>;
 #if HWY_TARGET == HWY_SVE2_128
 HWY_INLINE BlockVectorI64 blockFromPortI64(cvectorization_ops_raw_block_i64 v) { return svset_neonq_s64(svundef_s64(), (int64x2_t)v); }
 HWY_INLINE cvectorization_ops_raw_block_i64 blockToPortI64(BlockVectorI64 v) { return (cvectorization_ops_raw_block_i64)svget_neonq_s64(v); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE BlockVectorI64 blockFromPortI64(cvectorization_ops_raw_block_i64 v) { return hn::BitCast(BlockTagI64(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_i64, sizeof(cvectorization_ops_block_i64)>(v))); }
+HWY_INLINE cvectorization_ops_raw_block_i64 blockToPortI64(BlockVectorI64 v) { const cvectorization_ops_vector_i64 wide = (cvectorization_ops_vector_i64)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_block_i64 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_block_i64)); return port; }
 #else
 HWY_INLINE BlockVectorI64 blockFromPortI64(cvectorization_ops_raw_block_i64 v) { return hn::LoadU(BlockTagI64(), reinterpret_cast<const int64_t*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_block_i64 blockToPortI64(BlockVectorI64 v) { cvectorization_ops_raw_block_i64 port; hn::StoreU(v, BlockTagI64(), reinterpret_cast<int64_t*>(&port)); return port; }
@@ -654,6 +848,11 @@ HWY_INLINE VectorF32 fromPortF32(cvectorization_ops_raw_vector_f32 v) { return s
 HWY_INLINE cvectorization_ops_raw_vector_f32 toPortF32(VectorF32 v) { return (cvectorization_ops_raw_vector_f32)svget_neonq_f32(v); }
 HWY_INLINE MaskF32 maskFromPortF32(cvectorization_ops_raw_mask_f32 m) { return hn::MaskFromVec(hn::BitCast(TagF32(), svset_neonq_s32(svundef_s32(), (int32x4_t)m))); }
 HWY_INLINE cvectorization_ops_raw_mask_f32 maskToPortF32(MaskF32 m) { const hn::RebindToSigned<TagF32> di; return (cvectorization_ops_raw_mask_f32)svget_neonq_s32(hn::BitCast(di, hn::VecFromMask(TagF32(), m))); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE VectorF32 fromPortF32(cvectorization_ops_raw_vector_f32 v) { return hn::BitCast(TagF32(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)v)); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 toPortF32(VectorF32 v) { return (cvectorization_ops_raw_vector_f32)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); }
+HWY_INLINE MaskF32 maskFromPortF32(cvectorization_ops_raw_mask_f32 m) { return hn::MaskFromVec(hn::BitCast(TagF32(), hn::BitCast(hn::RebindToSigned<TagF32>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)m)))); }
+HWY_INLINE cvectorization_ops_raw_mask_f32 maskToPortF32(MaskF32 m) { const hn::RebindToSigned<TagF32> di; return (cvectorization_ops_raw_mask_f32)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(TagF32(), m))); }
 #else
 HWY_INLINE VectorF32 fromPortF32(cvectorization_ops_raw_vector_f32 v) { return hn::LoadU(TagF32(), reinterpret_cast<const float*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 toPortF32(VectorF32 v) { cvectorization_ops_raw_vector_f32 port; hn::StoreU(v, TagF32(), reinterpret_cast<float*>(&port)); return port; }
@@ -669,6 +868,12 @@ HWY_INLINE HalfVectorF32 halfRegisterFromPortF32(cvectorization_ops_raw_half_vec
 HWY_INLINE cvectorization_ops_raw_half_vector_f32 halfToPortF32(HalfVectorF32 v) { return __builtin_shufflevector((cvectorization_ops_block_f32)svget_neonq_f32(v), (cvectorization_ops_block_f32)svget_neonq_f32(v), 0, 1); }
 HWY_INLINE HalfMaskF32 halfMaskFromPortF32(cvectorization_ops_raw_half_mask_f32 m) { return hn::MaskFromVec(hn::BitCast(HalfTagF32(), svset_neonq_s32(svundef_s32(), (int32x4_t)__builtin_shufflevector(m, m, 0, 1, -1, -1)))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_f32 halfMaskToPortF32(HalfMaskF32 m) { const hn::RebindToSigned<HalfTagF32> di; const auto v = hn::BitCast(di, hn::VecFromMask(HalfTagF32(), m)); return __builtin_shufflevector((cvectorization_ops_block_i32)svget_neonq_s32(v), (cvectorization_ops_block_i32)svget_neonq_s32(v), 0, 1); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE HalfVectorF32 halfFromPortF32(cvectorization_ops_raw_half_vector_f32 v) { return hn::BitCast(HalfTagF32(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_f32, sizeof(cvectorization_ops_half_vector_f32)>(v))); }
+HWY_INLINE HalfVectorF32 halfRegisterFromPortF32(cvectorization_ops_raw_half_vector_f32 v) { return hn::BitCast(HalfTagF32(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)zeroExtended<cvectorization_ops_vector_f32, sizeof(cvectorization_ops_raw_half_vector_f32)>(v))); }
+HWY_INLINE cvectorization_ops_raw_half_vector_f32 halfToPortF32(HalfVectorF32 v) { const cvectorization_ops_vector_f32 wide = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_half_vector_f32 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_vector_f32)); return port; }
+HWY_INLINE HalfMaskF32 halfMaskFromPortF32(cvectorization_ops_raw_half_mask_f32 m) { return hn::MaskedNe(hn::FirstN(HalfTagF32(), __builtin_vectorelements(cvectorization_ops_half_mask_f32)), hn::BitCast(HalfTagF32(), hn::BitCast(hn::RebindToSigned<HalfTagF32>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)widened<cvectorization_ops_mask_f32>(m)))), hn::Zero(HalfTagF32())); }
+HWY_INLINE cvectorization_ops_raw_half_mask_f32 halfMaskToPortF32(HalfMaskF32 m) { const hn::RebindToSigned<HalfTagF32> di; const cvectorization_ops_mask_f32 wide = (cvectorization_ops_mask_f32)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(HalfTagF32(), m))); cvectorization_ops_raw_half_mask_f32 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_mask_f32)); return port; }
 #else
 HWY_INLINE HalfVectorF32 halfFromPortF32(cvectorization_ops_raw_half_vector_f32 v) { return hn::LoadU(HalfTagF32(), reinterpret_cast<const float*>(&v)); }
 HWY_INLINE HalfVectorF32 halfRegisterFromPortF32(cvectorization_ops_raw_half_vector_f32 v) { return hn::ResizeBitCast(HalfTagF32(), hn::LoadU(hn::FixedTag<uint8_t, sizeof(cvectorization_ops_raw_half_vector_f32)>(), reinterpret_cast<const uint8_t*>(&v))); }
@@ -681,6 +886,9 @@ using BlockVectorF32 = hn::VFromD<BlockTagF32>;
 #if HWY_TARGET == HWY_SVE2_128
 HWY_INLINE BlockVectorF32 blockFromPortF32(cvectorization_ops_raw_block_f32 v) { return svset_neonq_f32(svundef_f32(), (float32x4_t)v); }
 HWY_INLINE cvectorization_ops_raw_block_f32 blockToPortF32(BlockVectorF32 v) { return (cvectorization_ops_raw_block_f32)svget_neonq_f32(v); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE BlockVectorF32 blockFromPortF32(cvectorization_ops_raw_block_f32 v) { return hn::BitCast(BlockTagF32(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_f32, sizeof(cvectorization_ops_block_f32)>(v))); }
+HWY_INLINE cvectorization_ops_raw_block_f32 blockToPortF32(BlockVectorF32 v) { const cvectorization_ops_vector_f32 wide = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_block_f32 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_block_f32)); return port; }
 #else
 HWY_INLINE BlockVectorF32 blockFromPortF32(cvectorization_ops_raw_block_f32 v) { return hn::LoadU(BlockTagF32(), reinterpret_cast<const float*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_block_f32 blockToPortF32(BlockVectorF32 v) { cvectorization_ops_raw_block_f32 port; hn::StoreU(v, BlockTagF32(), reinterpret_cast<float*>(&port)); return port; }
@@ -701,6 +909,11 @@ HWY_INLINE VectorF64 fromPortF64(cvectorization_ops_raw_vector_f64 v) { return s
 HWY_INLINE cvectorization_ops_raw_vector_f64 toPortF64(VectorF64 v) { return (cvectorization_ops_raw_vector_f64)svget_neonq_f64(v); }
 HWY_INLINE MaskF64 maskFromPortF64(cvectorization_ops_raw_mask_f64 m) { return hn::MaskFromVec(hn::BitCast(TagF64(), svset_neonq_s64(svundef_s64(), (int64x2_t)m))); }
 HWY_INLINE cvectorization_ops_raw_mask_f64 maskToPortF64(MaskF64 m) { const hn::RebindToSigned<TagF64> di; return (cvectorization_ops_raw_mask_f64)svget_neonq_s64(hn::BitCast(di, hn::VecFromMask(TagF64(), m))); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE VectorF64 fromPortF64(cvectorization_ops_raw_vector_f64 v) { return hn::BitCast(TagF64(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)v)); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 toPortF64(VectorF64 v) { return (cvectorization_ops_raw_vector_f64)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); }
+HWY_INLINE MaskF64 maskFromPortF64(cvectorization_ops_raw_mask_f64 m) { return hn::MaskFromVec(hn::BitCast(TagF64(), hn::BitCast(hn::RebindToSigned<TagF64>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)m)))); }
+HWY_INLINE cvectorization_ops_raw_mask_f64 maskToPortF64(MaskF64 m) { const hn::RebindToSigned<TagF64> di; return (cvectorization_ops_raw_mask_f64)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(TagF64(), m))); }
 #else
 HWY_INLINE VectorF64 fromPortF64(cvectorization_ops_raw_vector_f64 v) { return hn::LoadU(TagF64(), reinterpret_cast<const double*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 toPortF64(VectorF64 v) { cvectorization_ops_raw_vector_f64 port; hn::StoreU(v, TagF64(), reinterpret_cast<double*>(&port)); return port; }
@@ -716,6 +929,12 @@ HWY_INLINE HalfVectorF64 halfRegisterFromPortF64(cvectorization_ops_raw_half_vec
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfToPortF64(HalfVectorF64 v) { return __builtin_shufflevector((cvectorization_ops_block_f64)svget_neonq_f64(v), (cvectorization_ops_block_f64)svget_neonq_f64(v), 0); }
 HWY_INLINE HalfMaskF64 halfMaskFromPortF64(cvectorization_ops_raw_half_mask_f64 m) { return hn::MaskFromVec(hn::BitCast(HalfTagF64(), svset_neonq_s64(svundef_s64(), (int64x2_t)__builtin_shufflevector(m, m, 0, -1)))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_f64 halfMaskToPortF64(HalfMaskF64 m) { const hn::RebindToSigned<HalfTagF64> di; const auto v = hn::BitCast(di, hn::VecFromMask(HalfTagF64(), m)); return __builtin_shufflevector((cvectorization_ops_block_i64)svget_neonq_s64(v), (cvectorization_ops_block_i64)svget_neonq_s64(v), 0); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE HalfVectorF64 halfFromPortF64(cvectorization_ops_raw_half_vector_f64 v) { return hn::BitCast(HalfTagF64(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_f64, sizeof(cvectorization_ops_half_vector_f64)>(v))); }
+HWY_INLINE HalfVectorF64 halfRegisterFromPortF64(cvectorization_ops_raw_half_vector_f64 v) { return hn::BitCast(HalfTagF64(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)zeroExtended<cvectorization_ops_vector_f64, sizeof(cvectorization_ops_raw_half_vector_f64)>(v))); }
+HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfToPortF64(HalfVectorF64 v) { const cvectorization_ops_vector_f64 wide = (cvectorization_ops_vector_f64)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_half_vector_f64 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_vector_f64)); return port; }
+HWY_INLINE HalfMaskF64 halfMaskFromPortF64(cvectorization_ops_raw_half_mask_f64 m) { return hn::MaskedNe(hn::FirstN(HalfTagF64(), __builtin_vectorelements(cvectorization_ops_half_mask_f64)), hn::BitCast(HalfTagF64(), hn::BitCast(hn::RebindToSigned<HalfTagF64>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)widened<cvectorization_ops_mask_f64>(m)))), hn::Zero(HalfTagF64())); }
+HWY_INLINE cvectorization_ops_raw_half_mask_f64 halfMaskToPortF64(HalfMaskF64 m) { const hn::RebindToSigned<HalfTagF64> di; const cvectorization_ops_mask_f64 wide = (cvectorization_ops_mask_f64)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::BitCast(di, hn::VecFromMask(HalfTagF64(), m))); cvectorization_ops_raw_half_mask_f64 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_mask_f64)); return port; }
 #else
 HWY_INLINE HalfVectorF64 halfFromPortF64(cvectorization_ops_raw_half_vector_f64 v) { return hn::LoadU(HalfTagF64(), reinterpret_cast<const double*>(&v)); }
 HWY_INLINE HalfVectorF64 halfRegisterFromPortF64(cvectorization_ops_raw_half_vector_f64 v) { return hn::ResizeBitCast(HalfTagF64(), hn::LoadU(hn::FixedTag<uint8_t, sizeof(cvectorization_ops_raw_half_vector_f64)>(), reinterpret_cast<const uint8_t*>(&v))); }
@@ -728,6 +947,9 @@ using BlockVectorF64 = hn::VFromD<BlockTagF64>;
 #if HWY_TARGET == HWY_SVE2_128
 HWY_INLINE BlockVectorF64 blockFromPortF64(cvectorization_ops_raw_block_f64 v) { return svset_neonq_f64(svundef_f64(), (float64x2_t)v); }
 HWY_INLINE cvectorization_ops_raw_block_f64 blockToPortF64(BlockVectorF64 v) { return (cvectorization_ops_raw_block_f64)svget_neonq_f64(v); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE BlockVectorF64 blockFromPortF64(cvectorization_ops_raw_block_f64 v) { return hn::BitCast(BlockTagF64(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_f64, sizeof(cvectorization_ops_block_f64)>(v))); }
+HWY_INLINE cvectorization_ops_raw_block_f64 blockToPortF64(BlockVectorF64 v) { const cvectorization_ops_vector_f64 wide = (cvectorization_ops_vector_f64)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_block_f64 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_block_f64)); return port; }
 #else
 HWY_INLINE BlockVectorF64 blockFromPortF64(cvectorization_ops_raw_block_f64 v) { return hn::LoadU(BlockTagF64(), reinterpret_cast<const double*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_block_f64 blockToPortF64(BlockVectorF64 v) { cvectorization_ops_raw_block_f64 port; hn::StoreU(v, BlockTagF64(), reinterpret_cast<double*>(&port)); return port; }
@@ -748,6 +970,11 @@ HWY_INLINE VectorF16 fromPortF16(cvectorization_ops_raw_vector_f16 v) { return s
 HWY_INLINE cvectorization_ops_raw_vector_f16 toPortF16(VectorF16 v) { return (cvectorization_ops_raw_vector_f16)svget_neonq_f16(v); }
 HWY_INLINE MaskF16 maskFromPortF16(cvectorization_ops_raw_mask_f16 m) { return hn::MaskFromVec(hn::BitCast(TagF16(), svset_neonq_s16(svundef_s16(), (int16x8_t)m))); }
 HWY_INLINE cvectorization_ops_raw_mask_f16 maskToPortF16(MaskF16 m) { const hn::RebindToSigned<TagF16> di; return (cvectorization_ops_raw_mask_f16)svget_neonq_s16(hn::VecFromMask(di, hn::RebindMask(di, m))); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE VectorF16 fromPortF16(cvectorization_ops_raw_vector_f16 v) { return hn::BitCast(TagF16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)v)); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 toPortF16(VectorF16 v) { return (cvectorization_ops_raw_vector_f16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); }
+HWY_INLINE MaskF16 maskFromPortF16(cvectorization_ops_raw_mask_f16 m) { return hn::MaskFromVec(hn::BitCast(TagF16(), hn::BitCast(hn::RebindToSigned<TagF16>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)m)))); }
+HWY_INLINE cvectorization_ops_raw_mask_f16 maskToPortF16(MaskF16 m) { const hn::RebindToSigned<TagF16> di; return (cvectorization_ops_raw_mask_f16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::VecFromMask(di, hn::RebindMask(di, m))); }
 #else
 HWY_INLINE VectorF16 fromPortF16(cvectorization_ops_raw_vector_f16 v) { return hn::LoadU(TagF16(), reinterpret_cast<const hwy::float16_t*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 toPortF16(VectorF16 v) { cvectorization_ops_raw_vector_f16 port; hn::StoreU(v, TagF16(), reinterpret_cast<hwy::float16_t*>(&port)); return port; }
@@ -769,6 +996,12 @@ HWY_INLINE HalfVectorF16 halfRegisterFromPortF16(cvectorization_ops_raw_half_vec
 HWY_INLINE cvectorization_ops_raw_half_vector_f16 halfToPortF16(HalfVectorF16 v) { return __builtin_shufflevector((cvectorization_ops_block_f16)svget_neonq_f16(v), (cvectorization_ops_block_f16)svget_neonq_f16(v), 0, 1, 2, 3); }
 HWY_INLINE HalfMaskF16 halfMaskFromPortF16(cvectorization_ops_raw_half_mask_f16 m) { return hn::MaskFromVec(hn::BitCast(HalfTagF16(), svset_neonq_s16(svundef_s16(), (int16x8_t)__builtin_shufflevector(m, m, 0, 1, 2, 3, -1, -1, -1, -1)))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_f16 halfMaskToPortF16(HalfMaskF16 m) { const hn::RebindToSigned<HalfTagF16> di; const auto v = hn::VecFromMask(di, hn::RebindMask(di, m)); return __builtin_shufflevector((cvectorization_ops_block_i16)svget_neonq_s16(v), (cvectorization_ops_block_i16)svget_neonq_s16(v), 0, 1, 2, 3); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE HalfVectorF16 halfFromPortF16(cvectorization_ops_raw_half_vector_f16 v) { return hn::BitCast(HalfTagF16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_f16, sizeof(cvectorization_ops_half_vector_f16)>(v))); }
+HWY_INLINE HalfVectorF16 halfRegisterFromPortF16(cvectorization_ops_raw_half_vector_f16 v) { return hn::BitCast(HalfTagF16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)zeroExtended<cvectorization_ops_vector_f16, sizeof(cvectorization_ops_raw_half_vector_f16)>(v))); }
+HWY_INLINE cvectorization_ops_raw_half_vector_f16 halfToPortF16(HalfVectorF16 v) { const cvectorization_ops_vector_f16 wide = (cvectorization_ops_vector_f16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_half_vector_f16 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_vector_f16)); return port; }
+HWY_INLINE HalfMaskF16 halfMaskFromPortF16(cvectorization_ops_raw_half_mask_f16 m) { return hn::MaskedNe(hn::FirstN(HalfTagF16(), __builtin_vectorelements(cvectorization_ops_half_mask_f16)), hn::BitCast(HalfTagF16(), hn::BitCast(hn::RebindToSigned<HalfTagF16>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)widened<cvectorization_ops_mask_f16>(m)))), hn::Zero(HalfTagF16())); }
+HWY_INLINE cvectorization_ops_raw_half_mask_f16 halfMaskToPortF16(HalfMaskF16 m) { const hn::RebindToSigned<HalfTagF16> di; const cvectorization_ops_mask_f16 wide = (cvectorization_ops_mask_f16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::VecFromMask(di, hn::RebindMask(di, m))); cvectorization_ops_raw_half_mask_f16 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_mask_f16)); return port; }
 #else
 HWY_INLINE HalfVectorF16 halfFromPortF16(cvectorization_ops_raw_half_vector_f16 v) { return hn::LoadU(HalfTagF16(), reinterpret_cast<const hwy::float16_t*>(&v)); }
 HWY_INLINE HalfVectorF16 halfRegisterFromPortF16(cvectorization_ops_raw_half_vector_f16 v) { return hn::ResizeBitCast(HalfTagF16(), hn::LoadU(hn::FixedTag<uint8_t, sizeof(cvectorization_ops_raw_half_vector_f16)>(), reinterpret_cast<const uint8_t*>(&v))); }
@@ -791,6 +1024,12 @@ HWY_INLINE QuarterVectorF16 quarterRegisterFromPortF16(cvectorization_ops_raw_qu
 HWY_INLINE cvectorization_ops_raw_quarter_vector_f16 quarterToPortF16(QuarterVectorF16 v) { return __builtin_shufflevector((cvectorization_ops_block_f16)svget_neonq_f16(v), (cvectorization_ops_block_f16)svget_neonq_f16(v), 0, 1, 2, 3); }
 HWY_INLINE QuarterMaskF16 quarterMaskFromPortF16(cvectorization_ops_raw_quarter_mask_f16 m) { return hn::MaskFromVec(hn::BitCast(QuarterTagF16(), svset_neonq_s16(svundef_s16(), (int16x8_t)__builtin_shufflevector(m, m, 0, 1, 2, 3, -1, -1, -1, -1)))); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_f16 quarterMaskToPortF16(QuarterMaskF16 m) { const hn::RebindToSigned<QuarterTagF16> di; const auto v = hn::VecFromMask(di, hn::RebindMask(di, m)); return __builtin_shufflevector((cvectorization_ops_block_i16)svget_neonq_s16(v), (cvectorization_ops_block_i16)svget_neonq_s16(v), 0, 1, 2, 3); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE QuarterVectorF16 quarterFromPortF16(cvectorization_ops_raw_quarter_vector_f16 v) { return hn::BitCast(QuarterTagF16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_f16, sizeof(cvectorization_ops_quarter_vector_f16)>(v))); }
+HWY_INLINE QuarterVectorF16 quarterRegisterFromPortF16(cvectorization_ops_raw_quarter_vector_f16 v) { return hn::BitCast(QuarterTagF16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)zeroExtended<cvectorization_ops_vector_f16, sizeof(cvectorization_ops_raw_quarter_vector_f16)>(v))); }
+HWY_INLINE cvectorization_ops_raw_quarter_vector_f16 quarterToPortF16(QuarterVectorF16 v) { const cvectorization_ops_vector_f16 wide = (cvectorization_ops_vector_f16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_quarter_vector_f16 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_quarter_vector_f16)); return port; }
+HWY_INLINE QuarterMaskF16 quarterMaskFromPortF16(cvectorization_ops_raw_quarter_mask_f16 m) { return hn::MaskedNe(hn::FirstN(QuarterTagF16(), __builtin_vectorelements(cvectorization_ops_quarter_mask_f16)), hn::BitCast(QuarterTagF16(), hn::BitCast(hn::RebindToSigned<QuarterTagF16>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)widened<cvectorization_ops_mask_f16>(m)))), hn::Zero(QuarterTagF16())); }
+HWY_INLINE cvectorization_ops_raw_quarter_mask_f16 quarterMaskToPortF16(QuarterMaskF16 m) { const hn::RebindToSigned<QuarterTagF16> di; const cvectorization_ops_mask_f16 wide = (cvectorization_ops_mask_f16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::VecFromMask(di, hn::RebindMask(di, m))); cvectorization_ops_raw_quarter_mask_f16 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_quarter_mask_f16)); return port; }
 #else
 HWY_INLINE QuarterVectorF16 quarterFromPortF16(cvectorization_ops_raw_quarter_vector_f16 v) { return hn::LoadU(QuarterTagF16(), reinterpret_cast<const hwy::float16_t*>(&v)); }
 HWY_INLINE QuarterVectorF16 quarterRegisterFromPortF16(cvectorization_ops_raw_quarter_vector_f16 v) { return hn::ResizeBitCast(QuarterTagF16(), hn::LoadU(hn::FixedTag<uint8_t, sizeof(cvectorization_ops_raw_quarter_vector_f16)>(), reinterpret_cast<const uint8_t*>(&v))); }
@@ -809,6 +1048,9 @@ using BlockVectorF16 = hn::VFromD<BlockTagF16>;
 #if HWY_TARGET == HWY_SVE2_128
 HWY_INLINE BlockVectorF16 blockFromPortF16(cvectorization_ops_raw_block_f16 v) { return svset_neonq_f16(svundef_f16(), (float16x8_t)v); }
 HWY_INLINE cvectorization_ops_raw_block_f16 blockToPortF16(BlockVectorF16 v) { return (cvectorization_ops_raw_block_f16)svget_neonq_f16(v); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE BlockVectorF16 blockFromPortF16(cvectorization_ops_raw_block_f16 v) { return hn::BitCast(BlockTagF16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_f16, sizeof(cvectorization_ops_block_f16)>(v))); }
+HWY_INLINE cvectorization_ops_raw_block_f16 blockToPortF16(BlockVectorF16 v) { const cvectorization_ops_vector_f16 wide = (cvectorization_ops_vector_f16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_block_f16 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_block_f16)); return port; }
 #else
 HWY_INLINE BlockVectorF16 blockFromPortF16(cvectorization_ops_raw_block_f16 v) { return hn::LoadU(BlockTagF16(), reinterpret_cast<const hwy::float16_t*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_block_f16 blockToPortF16(BlockVectorF16 v) { cvectorization_ops_raw_block_f16 port; hn::StoreU(v, BlockTagF16(), reinterpret_cast<hwy::float16_t*>(&port)); return port; }
@@ -834,6 +1076,11 @@ HWY_INLINE VectorBF16 fromPortBF16(cvectorization_ops_raw_vector_bf16 v) { retur
 HWY_INLINE cvectorization_ops_raw_vector_bf16 toPortBF16(VectorBF16 v) { return (cvectorization_ops_raw_vector_bf16)svget_neonq_bf16(v); }
 HWY_INLINE MaskBF16 maskFromPortBF16(cvectorization_ops_raw_mask_bf16 m) { return hn::RebindMask(TagBF16(), hn::MaskFromVec(svset_neonq_s16(svundef_s16(), (int16x8_t)m))); }
 HWY_INLINE cvectorization_ops_raw_mask_bf16 maskToPortBF16(MaskBF16 m) { const hn::RebindToSigned<TagBF16> di; return (cvectorization_ops_raw_mask_bf16)svget_neonq_s16(hn::VecFromMask(di, hn::RebindMask(di, m))); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE VectorBF16 fromPortBF16(cvectorization_ops_raw_vector_bf16 v) { return hn::BitCast(TagBF16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)v)); }
+HWY_INLINE cvectorization_ops_raw_vector_bf16 toPortBF16(VectorBF16 v) { return (cvectorization_ops_raw_vector_bf16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); }
+HWY_INLINE MaskBF16 maskFromPortBF16(cvectorization_ops_raw_mask_bf16 m) { return hn::RebindMask(TagBF16(), hn::MaskFromVec(hn::BitCast(hn::RebindToSigned<TagBF16>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)m)))); }
+HWY_INLINE cvectorization_ops_raw_mask_bf16 maskToPortBF16(MaskBF16 m) { const hn::RebindToSigned<TagBF16> di; return (cvectorization_ops_raw_mask_bf16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::VecFromMask(di, hn::RebindMask(di, m))); }
 #else
 HWY_INLINE VectorBF16 fromPortBF16(cvectorization_ops_raw_vector_bf16 v) { return hn::LoadU(TagBF16(), reinterpret_cast<const hwy::bfloat16_t*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 toPortBF16(VectorBF16 v) { cvectorization_ops_raw_vector_bf16 port; hn::StoreU(v, TagBF16(), reinterpret_cast<hwy::bfloat16_t*>(&port)); return port; }
@@ -849,6 +1096,12 @@ HWY_INLINE HalfVectorBF16 halfRegisterFromPortBF16(cvectorization_ops_raw_half_v
 HWY_INLINE cvectorization_ops_raw_half_vector_bf16 halfToPortBF16(HalfVectorBF16 v) { return __builtin_shufflevector((cvectorization_ops_block_bf16)svget_neonq_bf16(v), (cvectorization_ops_block_bf16)svget_neonq_bf16(v), 0, 1, 2, 3); }
 HWY_INLINE HalfMaskBF16 halfMaskFromPortBF16(cvectorization_ops_raw_half_mask_bf16 m) { return hn::RebindMask(HalfTagBF16(), hn::MaskFromVec(svset_neonq_s16(svundef_s16(), (int16x8_t)__builtin_shufflevector(m, m, 0, 1, 2, 3, -1, -1, -1, -1)))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_bf16 halfMaskToPortBF16(HalfMaskBF16 m) { const hn::RebindToSigned<HalfTagBF16> di; const auto v = hn::VecFromMask(di, hn::RebindMask(di, m)); return __builtin_shufflevector((cvectorization_ops_block_i16)svget_neonq_s16(v), (cvectorization_ops_block_i16)svget_neonq_s16(v), 0, 1, 2, 3); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE HalfVectorBF16 halfFromPortBF16(cvectorization_ops_raw_half_vector_bf16 v) { return hn::BitCast(HalfTagBF16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_bf16, sizeof(cvectorization_ops_half_vector_bf16)>(v))); }
+HWY_INLINE HalfVectorBF16 halfRegisterFromPortBF16(cvectorization_ops_raw_half_vector_bf16 v) { return hn::BitCast(HalfTagBF16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)zeroExtended<cvectorization_ops_vector_bf16, sizeof(cvectorization_ops_raw_half_vector_bf16)>(v))); }
+HWY_INLINE cvectorization_ops_raw_half_vector_bf16 halfToPortBF16(HalfVectorBF16 v) { const cvectorization_ops_vector_bf16 wide = (cvectorization_ops_vector_bf16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_half_vector_bf16 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_vector_bf16)); return port; }
+HWY_INLINE HalfMaskBF16 halfMaskFromPortBF16(cvectorization_ops_raw_half_mask_bf16 m) { return hn::RebindMask(HalfTagBF16(), hn::MaskedNe(hn::FirstN(hn::RebindToSigned<HalfTagBF16>(), __builtin_vectorelements(cvectorization_ops_half_mask_bf16)), hn::BitCast(hn::RebindToSigned<HalfTagBF16>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)widened<cvectorization_ops_mask_bf16>(m))), hn::Zero(hn::RebindToSigned<HalfTagBF16>()))); }
+HWY_INLINE cvectorization_ops_raw_half_mask_bf16 halfMaskToPortBF16(HalfMaskBF16 m) { const hn::RebindToSigned<HalfTagBF16> di; const cvectorization_ops_mask_bf16 wide = (cvectorization_ops_mask_bf16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::VecFromMask(di, hn::RebindMask(di, m))); cvectorization_ops_raw_half_mask_bf16 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_half_mask_bf16)); return port; }
 #else
 HWY_INLINE HalfVectorBF16 halfFromPortBF16(cvectorization_ops_raw_half_vector_bf16 v) { return hn::LoadU(HalfTagBF16(), reinterpret_cast<const hwy::bfloat16_t*>(&v)); }
 HWY_INLINE HalfVectorBF16 halfRegisterFromPortBF16(cvectorization_ops_raw_half_vector_bf16 v) { return hn::ResizeBitCast(HalfTagBF16(), hn::LoadU(hn::FixedTag<uint8_t, sizeof(cvectorization_ops_raw_half_vector_bf16)>(), reinterpret_cast<const uint8_t*>(&v))); }
@@ -865,6 +1118,12 @@ HWY_INLINE QuarterVectorBF16 quarterRegisterFromPortBF16(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_quarter_vector_bf16 quarterToPortBF16(QuarterVectorBF16 v) { return __builtin_shufflevector((cvectorization_ops_block_bf16)svget_neonq_bf16(v), (cvectorization_ops_block_bf16)svget_neonq_bf16(v), 0, 1, 2, 3); }
 HWY_INLINE QuarterMaskBF16 quarterMaskFromPortBF16(cvectorization_ops_raw_quarter_mask_bf16 m) { return hn::RebindMask(QuarterTagBF16(), hn::MaskFromVec(svset_neonq_s16(svundef_s16(), (int16x8_t)__builtin_shufflevector(m, m, 0, 1, 2, 3, -1, -1, -1, -1)))); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_bf16 quarterMaskToPortBF16(QuarterMaskBF16 m) { const hn::RebindToSigned<QuarterTagBF16> di; const auto v = hn::VecFromMask(di, hn::RebindMask(di, m)); return __builtin_shufflevector((cvectorization_ops_block_i16)svget_neonq_s16(v), (cvectorization_ops_block_i16)svget_neonq_s16(v), 0, 1, 2, 3); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE QuarterVectorBF16 quarterFromPortBF16(cvectorization_ops_raw_quarter_vector_bf16 v) { return hn::BitCast(QuarterTagBF16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_bf16, sizeof(cvectorization_ops_quarter_vector_bf16)>(v))); }
+HWY_INLINE QuarterVectorBF16 quarterRegisterFromPortBF16(cvectorization_ops_raw_quarter_vector_bf16 v) { return hn::BitCast(QuarterTagBF16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)zeroExtended<cvectorization_ops_vector_bf16, sizeof(cvectorization_ops_raw_quarter_vector_bf16)>(v))); }
+HWY_INLINE cvectorization_ops_raw_quarter_vector_bf16 quarterToPortBF16(QuarterVectorBF16 v) { const cvectorization_ops_vector_bf16 wide = (cvectorization_ops_vector_bf16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_quarter_vector_bf16 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_quarter_vector_bf16)); return port; }
+HWY_INLINE QuarterMaskBF16 quarterMaskFromPortBF16(cvectorization_ops_raw_quarter_mask_bf16 m) { return hn::RebindMask(QuarterTagBF16(), hn::MaskedNe(hn::FirstN(hn::RebindToSigned<QuarterTagBF16>(), __builtin_vectorelements(cvectorization_ops_quarter_mask_bf16)), hn::BitCast(hn::RebindToSigned<QuarterTagBF16>(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)widened<cvectorization_ops_mask_bf16>(m))), hn::Zero(hn::RebindToSigned<QuarterTagBF16>()))); }
+HWY_INLINE cvectorization_ops_raw_quarter_mask_bf16 quarterMaskToPortBF16(QuarterMaskBF16 m) { const hn::RebindToSigned<QuarterTagBF16> di; const cvectorization_ops_mask_bf16 wide = (cvectorization_ops_mask_bf16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), hn::VecFromMask(di, hn::RebindMask(di, m))); cvectorization_ops_raw_quarter_mask_bf16 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_quarter_mask_bf16)); return port; }
 #else
 HWY_INLINE QuarterVectorBF16 quarterFromPortBF16(cvectorization_ops_raw_quarter_vector_bf16 v) { return hn::LoadU(QuarterTagBF16(), reinterpret_cast<const hwy::bfloat16_t*>(&v)); }
 HWY_INLINE QuarterVectorBF16 quarterRegisterFromPortBF16(cvectorization_ops_raw_quarter_vector_bf16 v) { return hn::ResizeBitCast(QuarterTagBF16(), hn::LoadU(hn::FixedTag<uint8_t, sizeof(cvectorization_ops_raw_quarter_vector_bf16)>(), reinterpret_cast<const uint8_t*>(&v))); }
@@ -877,6 +1136,9 @@ using BlockVectorBF16 = hn::VFromD<BlockTagBF16>;
 #if HWY_TARGET == HWY_SVE2_128
 HWY_INLINE BlockVectorBF16 blockFromPortBF16(cvectorization_ops_raw_block_bf16 v) { return svset_neonq_bf16(svundef_bf16(), (bfloat16x8_t)v); }
 HWY_INLINE cvectorization_ops_raw_block_bf16 blockToPortBF16(BlockVectorBF16 v) { return (cvectorization_ops_raw_block_bf16)svget_neonq_bf16(v); }
+#elif HWY_TARGET_IS_SVE
+HWY_INLINE BlockVectorBF16 blockFromPortBF16(cvectorization_ops_raw_block_bf16 v) { return hn::BitCast(BlockTagBF16(), hn::VFromD<hn::ScalableTag<uint8_t>>((cvectorization_ops_sve_u8)maskedZeroExtended<cvectorization_ops_vector_bf16, sizeof(cvectorization_ops_block_bf16)>(v))); }
+HWY_INLINE cvectorization_ops_raw_block_bf16 blockToPortBF16(BlockVectorBF16 v) { const cvectorization_ops_vector_bf16 wide = (cvectorization_ops_vector_bf16)(cvectorization_ops_sve_u8)hn::BitCast(hn::ScalableTag<uint8_t>(), v); cvectorization_ops_raw_block_bf16 port; __builtin_memcpy(&port, &wide, sizeof(cvectorization_ops_block_bf16)); return port; }
 #else
 HWY_INLINE BlockVectorBF16 blockFromPortBF16(cvectorization_ops_raw_block_bf16 v) { return hn::LoadU(BlockTagBF16(), reinterpret_cast<const hwy::bfloat16_t*>(&v)); }
 HWY_INLINE cvectorization_ops_raw_block_bf16 blockToPortBF16(BlockVectorBF16 v) { cvectorization_ops_raw_block_bf16 port; hn::StoreU(v, BlockTagBF16(), reinterpret_cast<hwy::bfloat16_t*>(&port)); return port; }
@@ -23118,7 +23380,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i64 vectorResizingF16ToI64(cvectorizati
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorResizingF16ToF32(cvectorization_ops_raw_vector_f16 a) { return toPortF32(hn::ResizeBitCast(TagF32(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorResizingF16ToF64(cvectorization_ops_raw_vector_f16 a) { return toPortF64(hn::ResizeBitCast(TagF64(), fromPortF16(a))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_bf16 vectorResizingF16ToBF16(cvectorization_ops_raw_vector_f16 a) { return toPortBF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(TagBF16(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
 #else
 hn::ResizeBitCast(TagBF16(), fromPortF16(a))
@@ -23147,14 +23409,14 @@ HWY_INLINE cvectorization_ops_raw_vector_f64 resizedHalfVectorResizingF16ToF64(c
 HWY_INLINE cvectorization_ops_raw_half_vector_f16 halfVectorResizingF16ToF16(cvectorization_ops_raw_vector_f16 a) { return halfToPortF16(hn::ResizeBitCast(HalfTagF16(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 resizedHalfVectorResizingF16ToF16(cvectorization_ops_raw_vector_f16 a) { return toPortF16(hn::IfThenElseZero(hn::FirstN(TagF16(), hn::Lanes(HalfTagF16())), hn::ResizeBitCast(TagF16(), hn::ResizeBitCast(HalfTagF16(), fromPortF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_bf16 halfVectorResizingF16ToBF16(cvectorization_ops_raw_vector_f16 a) { return halfToPortBF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(HalfTagBF16(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
 #else
 hn::ResizeBitCast(HalfTagBF16(), fromPortF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 resizedHalfVectorResizingF16ToBF16(cvectorization_ops_raw_vector_f16 a) { return toPortBF16(hn::IfThenElseZero(hn::FirstN(TagBF16(), hn::Lanes(HalfTagBF16())), hn::ResizeBitCast(TagBF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(HalfTagBF16(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
 #else
 hn::ResizeBitCast(HalfTagBF16(), fromPortF16(a))
@@ -23171,14 +23433,14 @@ HWY_INLINE cvectorization_ops_raw_vector_i16 resizedQuarterVectorResizingF16ToI1
 HWY_INLINE cvectorization_ops_raw_quarter_vector_f16 quarterVectorResizingF16ToF16(cvectorization_ops_raw_vector_f16 a) { return quarterToPortF16(hn::ResizeBitCast(QuarterTagF16(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 resizedQuarterVectorResizingF16ToF16(cvectorization_ops_raw_vector_f16 a) { return toPortF16(hn::IfThenElseZero(hn::FirstN(TagF16(), hn::Lanes(QuarterTagF16())), hn::ResizeBitCast(TagF16(), hn::ResizeBitCast(QuarterTagF16(), fromPortF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_bf16 quarterVectorResizingF16ToBF16(cvectorization_ops_raw_vector_f16 a) { return quarterToPortBF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(QuarterTagBF16(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
 #else
 hn::ResizeBitCast(QuarterTagBF16(), fromPortF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 resizedQuarterVectorResizingF16ToBF16(cvectorization_ops_raw_vector_f16 a) { return toPortBF16(hn::IfThenElseZero(hn::FirstN(TagBF16(), hn::Lanes(QuarterTagBF16())), hn::ResizeBitCast(TagBF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(QuarterTagBF16(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
 #else
 hn::ResizeBitCast(QuarterTagBF16(), fromPortF16(a))
@@ -23200,7 +23462,7 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 vectorResizingHalfF16ToF32(cvectori
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorResizingHalfF16ToF64(cvectorization_ops_raw_half_vector_f16 a) { return toPortF64(hn::ResizeBitCast(TagF64(), halfRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 vectorResizingHalfF16ToF16(cvectorization_ops_raw_half_vector_f16 a) { return toPortF16(hn::ResizeBitCast(TagF16(), halfRegisterFromPortF16(a))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_bf16 vectorResizingHalfF16ToBF16(cvectorization_ops_raw_half_vector_f16 a) { return toPortBF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(TagBF16(), halfRegisterFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
 #else
 hn::ResizeBitCast(TagBF16(), halfRegisterFromPortF16(a))
@@ -23227,14 +23489,14 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 resizedHalfVectorResizingHalfF16ToF
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorResizingHalfF16ToF64(cvectorization_ops_raw_half_vector_f16 a) { return halfToPortF64(hn::ResizeBitCast(HalfTagF64(), halfRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 resizedHalfVectorResizingHalfF16ToF64(cvectorization_ops_raw_half_vector_f16 a) { return toPortF64(hn::IfThenElseZero(hn::FirstN(TagF64(), hn::Lanes(HalfTagF64())), hn::ResizeBitCast(TagF64(), hn::ResizeBitCast(HalfTagF64(), halfRegisterFromPortF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_bf16 halfVectorResizingHalfF16ToBF16(cvectorization_ops_raw_half_vector_f16 a) { return halfToPortBF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(HalfTagBF16(), halfRegisterFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
 #else
 hn::ResizeBitCast(HalfTagBF16(), halfRegisterFromPortF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 resizedHalfVectorResizingHalfF16ToBF16(cvectorization_ops_raw_half_vector_f16 a) { return toPortBF16(hn::IfThenElseZero(hn::FirstN(TagBF16(), hn::Lanes(HalfTagBF16())), hn::ResizeBitCast(TagBF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(HalfTagBF16(), halfRegisterFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
 #else
 hn::ResizeBitCast(HalfTagBF16(), halfRegisterFromPortF16(a))
@@ -23251,14 +23513,14 @@ HWY_INLINE cvectorization_ops_raw_vector_i16 resizedQuarterVectorResizingHalfF16
 HWY_INLINE cvectorization_ops_raw_quarter_vector_f16 quarterVectorResizingHalfF16ToF16(cvectorization_ops_raw_half_vector_f16 a) { return quarterToPortF16(hn::ResizeBitCast(QuarterTagF16(), halfRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 resizedQuarterVectorResizingHalfF16ToF16(cvectorization_ops_raw_half_vector_f16 a) { return toPortF16(hn::IfThenElseZero(hn::FirstN(TagF16(), hn::Lanes(QuarterTagF16())), hn::ResizeBitCast(TagF16(), hn::ResizeBitCast(QuarterTagF16(), halfRegisterFromPortF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_bf16 quarterVectorResizingHalfF16ToBF16(cvectorization_ops_raw_half_vector_f16 a) { return quarterToPortBF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(QuarterTagBF16(), halfRegisterFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
 #else
 hn::ResizeBitCast(QuarterTagBF16(), halfRegisterFromPortF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 resizedQuarterVectorResizingHalfF16ToBF16(cvectorization_ops_raw_half_vector_f16 a) { return toPortBF16(hn::IfThenElseZero(hn::FirstN(TagBF16(), hn::Lanes(QuarterTagBF16())), hn::ResizeBitCast(TagBF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(QuarterTagBF16(), halfRegisterFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
 #else
 hn::ResizeBitCast(QuarterTagBF16(), halfRegisterFromPortF16(a))
@@ -23280,7 +23542,7 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 vectorResizingQuarterF16ToF32(cvect
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorResizingQuarterF16ToF64(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortF64(hn::ResizeBitCast(TagF64(), quarterRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 vectorResizingQuarterF16ToF16(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortF16(hn::ResizeBitCast(TagF16(), quarterRegisterFromPortF16(a))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_bf16 vectorResizingQuarterF16ToBF16(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortBF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(TagBF16(), quarterRegisterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
 #else
 hn::ResizeBitCast(TagBF16(), quarterRegisterFromPortF16(a))
@@ -23309,14 +23571,14 @@ HWY_INLINE cvectorization_ops_raw_vector_f64 resizedHalfVectorResizingQuarterF16
 HWY_INLINE cvectorization_ops_raw_half_vector_f16 halfVectorResizingQuarterF16ToF16(cvectorization_ops_raw_quarter_vector_f16 a) { return halfToPortF16(hn::ResizeBitCast(HalfTagF16(), quarterRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 resizedHalfVectorResizingQuarterF16ToF16(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortF16(hn::IfThenElseZero(hn::FirstN(TagF16(), hn::Lanes(HalfTagF16())), hn::ResizeBitCast(TagF16(), hn::ResizeBitCast(HalfTagF16(), quarterRegisterFromPortF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_bf16 halfVectorResizingQuarterF16ToBF16(cvectorization_ops_raw_quarter_vector_f16 a) { return halfToPortBF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(HalfTagBF16(), quarterRegisterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
 #else
 hn::ResizeBitCast(HalfTagBF16(), quarterRegisterFromPortF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 resizedHalfVectorResizingQuarterF16ToBF16(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortBF16(hn::IfThenElseZero(hn::FirstN(TagBF16(), hn::Lanes(HalfTagBF16())), hn::ResizeBitCast(TagBF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(HalfTagBF16(), quarterRegisterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
 #else
 hn::ResizeBitCast(HalfTagBF16(), quarterRegisterFromPortF16(a))
@@ -23331,14 +23593,14 @@ HWY_INLINE cvectorization_ops_raw_vector_i8 resizedQuarterVectorResizingQuarterF
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorResizingQuarterF16ToI16(cvectorization_ops_raw_quarter_vector_f16 a) { return quarterToPortI16(hn::ResizeBitCast(QuarterTagI16(), quarterRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_i16 resizedQuarterVectorResizingQuarterF16ToI16(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortI16(hn::IfThenElseZero(hn::FirstN(TagI16(), hn::Lanes(QuarterTagI16())), hn::ResizeBitCast(TagI16(), hn::ResizeBitCast(QuarterTagI16(), quarterRegisterFromPortF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_bf16 quarterVectorResizingQuarterF16ToBF16(cvectorization_ops_raw_quarter_vector_f16 a) { return quarterToPortBF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(QuarterTagBF16(), quarterRegisterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
 #else
 hn::ResizeBitCast(QuarterTagBF16(), quarterRegisterFromPortF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 resizedQuarterVectorResizingQuarterF16ToBF16(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortBF16(hn::IfThenElseZero(hn::FirstN(TagBF16(), hn::Lanes(QuarterTagBF16())), hn::ResizeBitCast(TagBF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(QuarterTagBF16(), quarterRegisterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
 #else
 hn::ResizeBitCast(QuarterTagBF16(), quarterRegisterFromPortF16(a))
@@ -23359,7 +23621,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i64 vectorResizingBF16ToI64(cvectorizat
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorResizingBF16ToF32(cvectorization_ops_raw_vector_bf16 a) { return toPortF32(hn::ResizeBitCast(TagF32(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorResizingBF16ToF64(cvectorization_ops_raw_vector_bf16 a) { return toPortF64(hn::ResizeBitCast(TagF64(), fromPortBF16(a))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_f16 vectorResizingBF16ToF16(cvectorization_ops_raw_vector_bf16 a) { return toPortF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(TagF16(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
 #else
 hn::ResizeBitCast(TagF16(), fromPortBF16(a))
@@ -23386,14 +23648,14 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 resizedHalfVectorResizingBF16ToF32(
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorResizingBF16ToF64(cvectorization_ops_raw_vector_bf16 a) { return halfToPortF64(hn::ResizeBitCast(HalfTagF64(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 resizedHalfVectorResizingBF16ToF64(cvectorization_ops_raw_vector_bf16 a) { return toPortF64(hn::IfThenElseZero(hn::FirstN(TagF64(), hn::Lanes(HalfTagF64())), hn::ResizeBitCast(TagF64(), hn::ResizeBitCast(HalfTagF64(), fromPortBF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_f16 halfVectorResizingBF16ToF16(cvectorization_ops_raw_vector_bf16 a) { return halfToPortF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(HalfTagF16(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
 #else
 hn::ResizeBitCast(HalfTagF16(), fromPortBF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 resizedHalfVectorResizingBF16ToF16(cvectorization_ops_raw_vector_bf16 a) { return toPortF16(hn::IfThenElseZero(hn::FirstN(TagF16(), hn::Lanes(HalfTagF16())), hn::ResizeBitCast(TagF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(HalfTagF16(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
 #else
 hn::ResizeBitCast(HalfTagF16(), fromPortBF16(a))
@@ -23410,14 +23672,14 @@ HWY_INLINE cvectorization_ops_raw_vector_i8 resizedQuarterVectorResizingBF16ToI8
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorResizingBF16ToI16(cvectorization_ops_raw_vector_bf16 a) { return quarterToPortI16(hn::ResizeBitCast(QuarterTagI16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_i16 resizedQuarterVectorResizingBF16ToI16(cvectorization_ops_raw_vector_bf16 a) { return toPortI16(hn::IfThenElseZero(hn::FirstN(TagI16(), hn::Lanes(QuarterTagI16())), hn::ResizeBitCast(TagI16(), hn::ResizeBitCast(QuarterTagI16(), fromPortBF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_f16 quarterVectorResizingBF16ToF16(cvectorization_ops_raw_vector_bf16 a) { return quarterToPortF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(QuarterTagF16(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
 #else
 hn::ResizeBitCast(QuarterTagF16(), fromPortBF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 resizedQuarterVectorResizingBF16ToF16(cvectorization_ops_raw_vector_bf16 a) { return toPortF16(hn::IfThenElseZero(hn::FirstN(TagF16(), hn::Lanes(QuarterTagF16())), hn::ResizeBitCast(TagF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(QuarterTagF16(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
 #else
 hn::ResizeBitCast(QuarterTagF16(), fromPortBF16(a))
@@ -23440,7 +23702,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i64 vectorResizingHalfBF16ToI64(cvector
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorResizingHalfBF16ToF32(cvectorization_ops_raw_half_vector_bf16 a) { return toPortF32(hn::ResizeBitCast(TagF32(), halfRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorResizingHalfBF16ToF64(cvectorization_ops_raw_half_vector_bf16 a) { return toPortF64(hn::ResizeBitCast(TagF64(), halfRegisterFromPortBF16(a))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_f16 vectorResizingHalfBF16ToF16(cvectorization_ops_raw_half_vector_bf16 a) { return toPortF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(TagF16(), halfRegisterFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
 #else
 hn::ResizeBitCast(TagF16(), halfRegisterFromPortBF16(a))
@@ -23468,14 +23730,14 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 resizedHalfVectorResizingHalfBF16To
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorResizingHalfBF16ToF64(cvectorization_ops_raw_half_vector_bf16 a) { return halfToPortF64(hn::ResizeBitCast(HalfTagF64(), halfRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 resizedHalfVectorResizingHalfBF16ToF64(cvectorization_ops_raw_half_vector_bf16 a) { return toPortF64(hn::IfThenElseZero(hn::FirstN(TagF64(), hn::Lanes(HalfTagF64())), hn::ResizeBitCast(TagF64(), hn::ResizeBitCast(HalfTagF64(), halfRegisterFromPortBF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_f16 halfVectorResizingHalfBF16ToF16(cvectorization_ops_raw_half_vector_bf16 a) { return halfToPortF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(HalfTagF16(), halfRegisterFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
 #else
 hn::ResizeBitCast(HalfTagF16(), halfRegisterFromPortBF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 resizedHalfVectorResizingHalfBF16ToF16(cvectorization_ops_raw_half_vector_bf16 a) { return toPortF16(hn::IfThenElseZero(hn::FirstN(TagF16(), hn::Lanes(HalfTagF16())), hn::ResizeBitCast(TagF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(HalfTagF16(), halfRegisterFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
 #else
 hn::ResizeBitCast(HalfTagF16(), halfRegisterFromPortBF16(a))
@@ -23490,14 +23752,14 @@ HWY_INLINE cvectorization_ops_raw_vector_i8 resizedQuarterVectorResizingHalfBF16
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorResizingHalfBF16ToI16(cvectorization_ops_raw_half_vector_bf16 a) { return quarterToPortI16(hn::ResizeBitCast(QuarterTagI16(), halfRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_i16 resizedQuarterVectorResizingHalfBF16ToI16(cvectorization_ops_raw_half_vector_bf16 a) { return toPortI16(hn::IfThenElseZero(hn::FirstN(TagI16(), hn::Lanes(QuarterTagI16())), hn::ResizeBitCast(TagI16(), hn::ResizeBitCast(QuarterTagI16(), halfRegisterFromPortBF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_f16 quarterVectorResizingHalfBF16ToF16(cvectorization_ops_raw_half_vector_bf16 a) { return quarterToPortF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(QuarterTagF16(), halfRegisterFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
 #else
 hn::ResizeBitCast(QuarterTagF16(), halfRegisterFromPortBF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 resizedQuarterVectorResizingHalfBF16ToF16(cvectorization_ops_raw_half_vector_bf16 a) { return toPortF16(hn::IfThenElseZero(hn::FirstN(TagF16(), hn::Lanes(QuarterTagF16())), hn::ResizeBitCast(TagF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(QuarterTagF16(), halfRegisterFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
 #else
 hn::ResizeBitCast(QuarterTagF16(), halfRegisterFromPortBF16(a))
@@ -23520,7 +23782,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i64 vectorResizingQuarterBF16ToI64(cvec
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorResizingQuarterBF16ToF32(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortF32(hn::ResizeBitCast(TagF32(), quarterRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorResizingQuarterBF16ToF64(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortF64(hn::ResizeBitCast(TagF64(), quarterRegisterFromPortBF16(a))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_f16 vectorResizingQuarterBF16ToF16(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(TagF16(), quarterRegisterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
 #else
 hn::ResizeBitCast(TagF16(), quarterRegisterFromPortBF16(a))
@@ -23548,14 +23810,14 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 resizedHalfVectorResizingQuarterBF1
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorResizingQuarterBF16ToF64(cvectorization_ops_raw_quarter_vector_bf16 a) { return halfToPortF64(hn::ResizeBitCast(HalfTagF64(), quarterRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 resizedHalfVectorResizingQuarterBF16ToF64(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortF64(hn::IfThenElseZero(hn::FirstN(TagF64(), hn::Lanes(HalfTagF64())), hn::ResizeBitCast(TagF64(), hn::ResizeBitCast(HalfTagF64(), quarterRegisterFromPortBF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_f16 halfVectorResizingQuarterBF16ToF16(cvectorization_ops_raw_quarter_vector_bf16 a) { return halfToPortF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(HalfTagF16(), quarterRegisterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
 #else
 hn::ResizeBitCast(HalfTagF16(), quarterRegisterFromPortBF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 resizedHalfVectorResizingQuarterBF16ToF16(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortF16(hn::IfThenElseZero(hn::FirstN(TagF16(), hn::Lanes(HalfTagF16())), hn::ResizeBitCast(TagF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(HalfTagF16(), quarterRegisterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
 #else
 hn::ResizeBitCast(HalfTagF16(), quarterRegisterFromPortBF16(a))
@@ -23572,14 +23834,14 @@ HWY_INLINE cvectorization_ops_raw_vector_i8 resizedQuarterVectorResizingQuarterB
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorResizingQuarterBF16ToI16(cvectorization_ops_raw_quarter_vector_bf16 a) { return quarterToPortI16(hn::ResizeBitCast(QuarterTagI16(), quarterRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_i16 resizedQuarterVectorResizingQuarterBF16ToI16(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortI16(hn::IfThenElseZero(hn::FirstN(TagI16(), hn::Lanes(QuarterTagI16())), hn::ResizeBitCast(TagI16(), hn::ResizeBitCast(QuarterTagI16(), quarterRegisterFromPortBF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_f16 quarterVectorResizingQuarterBF16ToF16(cvectorization_ops_raw_quarter_vector_bf16 a) { return quarterToPortF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(QuarterTagF16(), quarterRegisterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
 #else
 hn::ResizeBitCast(QuarterTagF16(), quarterRegisterFromPortBF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 resizedQuarterVectorResizingQuarterBF16ToF16(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortF16(hn::IfThenElseZero(hn::FirstN(TagF16(), hn::Lanes(QuarterTagF16())), hn::ResizeBitCast(TagF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ResizeBitCast(QuarterTagF16(), quarterRegisterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
 #else
 hn::ResizeBitCast(QuarterTagF16(), quarterRegisterFromPortBF16(a))
@@ -24910,7 +25172,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i64 vectorZeroExtendingResizingF16ToI64
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorZeroExtendingResizingF16ToF32(cvectorization_ops_raw_vector_f16 a) { return toPortF32(hn::ZeroExtendResizeBitCast(TagF32(), TagF16(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorZeroExtendingResizingF16ToF64(cvectorization_ops_raw_vector_f16 a) { return toPortF64(hn::ZeroExtendResizeBitCast(TagF64(), TagF16(), fromPortF16(a))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_bf16 vectorZeroExtendingResizingF16ToBF16(cvectorization_ops_raw_vector_f16 a) { return toPortBF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(TagBF16(), hn::RebindToUnsigned<TagF16>(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(TagBF16(), TagF16(), fromPortF16(a))
@@ -24939,14 +25201,14 @@ HWY_INLINE cvectorization_ops_raw_vector_f64 resizedHalfVectorZeroExtendingResiz
 HWY_INLINE cvectorization_ops_raw_half_vector_f16 halfVectorZeroExtendingResizingF16ToF16(cvectorization_ops_raw_vector_f16 a) { return halfToPortF16(hn::ZeroExtendResizeBitCast(HalfTagF16(), TagF16(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 resizedHalfVectorZeroExtendingResizingF16ToF16(cvectorization_ops_raw_vector_f16 a) { return toPortF16(hn::IfThenElseZero(hn::FirstN(TagF16(), hn::Lanes(HalfTagF16())), hn::ResizeBitCast(TagF16(), hn::ZeroExtendResizeBitCast(HalfTagF16(), TagF16(), fromPortF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_bf16 halfVectorZeroExtendingResizingF16ToBF16(cvectorization_ops_raw_vector_f16 a) { return halfToPortBF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(HalfTagBF16(), hn::RebindToUnsigned<TagF16>(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(HalfTagBF16(), TagF16(), fromPortF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 resizedHalfVectorZeroExtendingResizingF16ToBF16(cvectorization_ops_raw_vector_f16 a) { return toPortBF16(hn::IfThenElseZero(hn::FirstN(TagBF16(), hn::Lanes(HalfTagBF16())), hn::ResizeBitCast(TagBF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(HalfTagBF16(), hn::RebindToUnsigned<TagF16>(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(HalfTagBF16(), TagF16(), fromPortF16(a))
@@ -24963,14 +25225,14 @@ HWY_INLINE cvectorization_ops_raw_vector_i16 resizedQuarterVectorZeroExtendingRe
 HWY_INLINE cvectorization_ops_raw_quarter_vector_f16 quarterVectorZeroExtendingResizingF16ToF16(cvectorization_ops_raw_vector_f16 a) { return quarterToPortF16(hn::ZeroExtendResizeBitCast(QuarterTagF16(), TagF16(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 resizedQuarterVectorZeroExtendingResizingF16ToF16(cvectorization_ops_raw_vector_f16 a) { return toPortF16(hn::IfThenElseZero(hn::FirstN(TagF16(), hn::Lanes(QuarterTagF16())), hn::ResizeBitCast(TagF16(), hn::ZeroExtendResizeBitCast(QuarterTagF16(), TagF16(), fromPortF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_bf16 quarterVectorZeroExtendingResizingF16ToBF16(cvectorization_ops_raw_vector_f16 a) { return quarterToPortBF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(QuarterTagBF16(), hn::RebindToUnsigned<TagF16>(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(QuarterTagBF16(), TagF16(), fromPortF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 resizedQuarterVectorZeroExtendingResizingF16ToBF16(cvectorization_ops_raw_vector_f16 a) { return toPortBF16(hn::IfThenElseZero(hn::FirstN(TagBF16(), hn::Lanes(QuarterTagBF16())), hn::ResizeBitCast(TagBF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(QuarterTagBF16(), hn::RebindToUnsigned<TagF16>(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(QuarterTagBF16(), TagF16(), fromPortF16(a))
@@ -24992,7 +25254,7 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 vectorZeroExtendingResizingHalfF16T
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorZeroExtendingResizingHalfF16ToF64(cvectorization_ops_raw_half_vector_f16 a) { return toPortF64(hn::ZeroExtendResizeBitCast(TagF64(), HalfTagF16(), halfFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 vectorZeroExtendingResizingHalfF16ToF16(cvectorization_ops_raw_half_vector_f16 a) { return toPortF16(hn::ZeroExtendResizeBitCast(TagF16(), HalfTagF16(), halfFromPortF16(a))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_bf16 vectorZeroExtendingResizingHalfF16ToBF16(cvectorization_ops_raw_half_vector_f16 a) { return toPortBF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(TagBF16(), hn::RebindToUnsigned<HalfTagF16>(), halfFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(TagBF16(), HalfTagF16(), halfFromPortF16(a))
@@ -25019,14 +25281,14 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 resizedHalfVectorZeroExtendingResiz
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorZeroExtendingResizingHalfF16ToF64(cvectorization_ops_raw_half_vector_f16 a) { return halfToPortF64(hn::ZeroExtendResizeBitCast(HalfTagF64(), HalfTagF16(), halfFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 resizedHalfVectorZeroExtendingResizingHalfF16ToF64(cvectorization_ops_raw_half_vector_f16 a) { return toPortF64(hn::IfThenElseZero(hn::FirstN(TagF64(), hn::Lanes(HalfTagF64())), hn::ResizeBitCast(TagF64(), hn::ZeroExtendResizeBitCast(HalfTagF64(), HalfTagF16(), halfFromPortF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_bf16 halfVectorZeroExtendingResizingHalfF16ToBF16(cvectorization_ops_raw_half_vector_f16 a) { return halfToPortBF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(HalfTagBF16(), hn::RebindToUnsigned<HalfTagF16>(), halfFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(HalfTagBF16(), HalfTagF16(), halfFromPortF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 resizedHalfVectorZeroExtendingResizingHalfF16ToBF16(cvectorization_ops_raw_half_vector_f16 a) { return toPortBF16(hn::IfThenElseZero(hn::FirstN(TagBF16(), hn::Lanes(HalfTagBF16())), hn::ResizeBitCast(TagBF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(HalfTagBF16(), hn::RebindToUnsigned<HalfTagF16>(), halfFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(HalfTagBF16(), HalfTagF16(), halfFromPortF16(a))
@@ -25043,14 +25305,14 @@ HWY_INLINE cvectorization_ops_raw_vector_i16 resizedQuarterVectorZeroExtendingRe
 HWY_INLINE cvectorization_ops_raw_quarter_vector_f16 quarterVectorZeroExtendingResizingHalfF16ToF16(cvectorization_ops_raw_half_vector_f16 a) { return quarterToPortF16(hn::ZeroExtendResizeBitCast(QuarterTagF16(), HalfTagF16(), halfFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 resizedQuarterVectorZeroExtendingResizingHalfF16ToF16(cvectorization_ops_raw_half_vector_f16 a) { return toPortF16(hn::IfThenElseZero(hn::FirstN(TagF16(), hn::Lanes(QuarterTagF16())), hn::ResizeBitCast(TagF16(), hn::ZeroExtendResizeBitCast(QuarterTagF16(), HalfTagF16(), halfFromPortF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_bf16 quarterVectorZeroExtendingResizingHalfF16ToBF16(cvectorization_ops_raw_half_vector_f16 a) { return quarterToPortBF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(QuarterTagBF16(), hn::RebindToUnsigned<HalfTagF16>(), halfFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(QuarterTagBF16(), HalfTagF16(), halfFromPortF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 resizedQuarterVectorZeroExtendingResizingHalfF16ToBF16(cvectorization_ops_raw_half_vector_f16 a) { return toPortBF16(hn::IfThenElseZero(hn::FirstN(TagBF16(), hn::Lanes(QuarterTagBF16())), hn::ResizeBitCast(TagBF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(QuarterTagBF16(), hn::RebindToUnsigned<HalfTagF16>(), halfFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(QuarterTagBF16(), HalfTagF16(), halfFromPortF16(a))
@@ -25072,7 +25334,7 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 vectorZeroExtendingResizingQuarterF
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorZeroExtendingResizingQuarterF16ToF64(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortF64(hn::ZeroExtendResizeBitCast(TagF64(), QuarterTagF16(), quarterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 vectorZeroExtendingResizingQuarterF16ToF16(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortF16(hn::ZeroExtendResizeBitCast(TagF16(), QuarterTagF16(), quarterFromPortF16(a))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_bf16 vectorZeroExtendingResizingQuarterF16ToBF16(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortBF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(TagBF16(), hn::RebindToUnsigned<QuarterTagF16>(), quarterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(TagBF16(), QuarterTagF16(), quarterFromPortF16(a))
@@ -25101,14 +25363,14 @@ HWY_INLINE cvectorization_ops_raw_vector_f64 resizedHalfVectorZeroExtendingResiz
 HWY_INLINE cvectorization_ops_raw_half_vector_f16 halfVectorZeroExtendingResizingQuarterF16ToF16(cvectorization_ops_raw_quarter_vector_f16 a) { return halfToPortF16(hn::ZeroExtendResizeBitCast(HalfTagF16(), QuarterTagF16(), quarterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 resizedHalfVectorZeroExtendingResizingQuarterF16ToF16(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortF16(hn::IfThenElseZero(hn::FirstN(TagF16(), hn::Lanes(HalfTagF16())), hn::ResizeBitCast(TagF16(), hn::ZeroExtendResizeBitCast(HalfTagF16(), QuarterTagF16(), quarterFromPortF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_bf16 halfVectorZeroExtendingResizingQuarterF16ToBF16(cvectorization_ops_raw_quarter_vector_f16 a) { return halfToPortBF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(HalfTagBF16(), hn::RebindToUnsigned<QuarterTagF16>(), quarterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(HalfTagBF16(), QuarterTagF16(), quarterFromPortF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 resizedHalfVectorZeroExtendingResizingQuarterF16ToBF16(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortBF16(hn::IfThenElseZero(hn::FirstN(TagBF16(), hn::Lanes(HalfTagBF16())), hn::ResizeBitCast(TagBF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(HalfTagBF16(), hn::RebindToUnsigned<QuarterTagF16>(), quarterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(HalfTagBF16(), QuarterTagF16(), quarterFromPortF16(a))
@@ -25123,14 +25385,14 @@ HWY_INLINE cvectorization_ops_raw_vector_i8 resizedQuarterVectorZeroExtendingRes
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorZeroExtendingResizingQuarterF16ToI16(cvectorization_ops_raw_quarter_vector_f16 a) { return quarterToPortI16(hn::ZeroExtendResizeBitCast(QuarterTagI16(), QuarterTagF16(), quarterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_i16 resizedQuarterVectorZeroExtendingResizingQuarterF16ToI16(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortI16(hn::IfThenElseZero(hn::FirstN(TagI16(), hn::Lanes(QuarterTagI16())), hn::ResizeBitCast(TagI16(), hn::ZeroExtendResizeBitCast(QuarterTagI16(), QuarterTagF16(), quarterFromPortF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_bf16 quarterVectorZeroExtendingResizingQuarterF16ToBF16(cvectorization_ops_raw_quarter_vector_f16 a) { return quarterToPortBF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(QuarterTagBF16(), hn::RebindToUnsigned<QuarterTagF16>(), quarterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(QuarterTagBF16(), QuarterTagF16(), quarterFromPortF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 resizedQuarterVectorZeroExtendingResizingQuarterF16ToBF16(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortBF16(hn::IfThenElseZero(hn::FirstN(TagBF16(), hn::Lanes(QuarterTagBF16())), hn::ResizeBitCast(TagBF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(QuarterTagBF16(), hn::RebindToUnsigned<QuarterTagF16>(), quarterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(QuarterTagBF16(), QuarterTagF16(), quarterFromPortF16(a))
@@ -25151,7 +25413,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i64 vectorZeroExtendingResizingBF16ToI6
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorZeroExtendingResizingBF16ToF32(cvectorization_ops_raw_vector_bf16 a) { return toPortF32(hn::ZeroExtendResizeBitCast(TagF32(), TagBF16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorZeroExtendingResizingBF16ToF64(cvectorization_ops_raw_vector_bf16 a) { return toPortF64(hn::ZeroExtendResizeBitCast(TagF64(), TagBF16(), fromPortBF16(a))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_f16 vectorZeroExtendingResizingBF16ToF16(cvectorization_ops_raw_vector_bf16 a) { return toPortF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(TagF16(), hn::RebindToUnsigned<TagBF16>(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(TagF16(), TagBF16(), fromPortBF16(a))
@@ -25178,14 +25440,14 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 resizedHalfVectorZeroExtendingResiz
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorZeroExtendingResizingBF16ToF64(cvectorization_ops_raw_vector_bf16 a) { return halfToPortF64(hn::ZeroExtendResizeBitCast(HalfTagF64(), TagBF16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 resizedHalfVectorZeroExtendingResizingBF16ToF64(cvectorization_ops_raw_vector_bf16 a) { return toPortF64(hn::IfThenElseZero(hn::FirstN(TagF64(), hn::Lanes(HalfTagF64())), hn::ResizeBitCast(TagF64(), hn::ZeroExtendResizeBitCast(HalfTagF64(), TagBF16(), fromPortBF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_f16 halfVectorZeroExtendingResizingBF16ToF16(cvectorization_ops_raw_vector_bf16 a) { return halfToPortF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(HalfTagF16(), hn::RebindToUnsigned<TagBF16>(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(HalfTagF16(), TagBF16(), fromPortBF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 resizedHalfVectorZeroExtendingResizingBF16ToF16(cvectorization_ops_raw_vector_bf16 a) { return toPortF16(hn::IfThenElseZero(hn::FirstN(TagF16(), hn::Lanes(HalfTagF16())), hn::ResizeBitCast(TagF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(HalfTagF16(), hn::RebindToUnsigned<TagBF16>(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(HalfTagF16(), TagBF16(), fromPortBF16(a))
@@ -25202,14 +25464,14 @@ HWY_INLINE cvectorization_ops_raw_vector_i8 resizedQuarterVectorZeroExtendingRes
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorZeroExtendingResizingBF16ToI16(cvectorization_ops_raw_vector_bf16 a) { return quarterToPortI16(hn::ZeroExtendResizeBitCast(QuarterTagI16(), TagBF16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_i16 resizedQuarterVectorZeroExtendingResizingBF16ToI16(cvectorization_ops_raw_vector_bf16 a) { return toPortI16(hn::IfThenElseZero(hn::FirstN(TagI16(), hn::Lanes(QuarterTagI16())), hn::ResizeBitCast(TagI16(), hn::ZeroExtendResizeBitCast(QuarterTagI16(), TagBF16(), fromPortBF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_f16 quarterVectorZeroExtendingResizingBF16ToF16(cvectorization_ops_raw_vector_bf16 a) { return quarterToPortF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(QuarterTagF16(), hn::RebindToUnsigned<TagBF16>(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(QuarterTagF16(), TagBF16(), fromPortBF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 resizedQuarterVectorZeroExtendingResizingBF16ToF16(cvectorization_ops_raw_vector_bf16 a) { return toPortF16(hn::IfThenElseZero(hn::FirstN(TagF16(), hn::Lanes(QuarterTagF16())), hn::ResizeBitCast(TagF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(QuarterTagF16(), hn::RebindToUnsigned<TagBF16>(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(QuarterTagF16(), TagBF16(), fromPortBF16(a))
@@ -25232,7 +25494,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i64 vectorZeroExtendingResizingHalfBF16
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorZeroExtendingResizingHalfBF16ToF32(cvectorization_ops_raw_half_vector_bf16 a) { return toPortF32(hn::ZeroExtendResizeBitCast(TagF32(), HalfTagBF16(), halfFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorZeroExtendingResizingHalfBF16ToF64(cvectorization_ops_raw_half_vector_bf16 a) { return toPortF64(hn::ZeroExtendResizeBitCast(TagF64(), HalfTagBF16(), halfFromPortBF16(a))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_f16 vectorZeroExtendingResizingHalfBF16ToF16(cvectorization_ops_raw_half_vector_bf16 a) { return toPortF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(TagF16(), hn::RebindToUnsigned<HalfTagBF16>(), halfFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(TagF16(), HalfTagBF16(), halfFromPortBF16(a))
@@ -25260,14 +25522,14 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 resizedHalfVectorZeroExtendingResiz
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorZeroExtendingResizingHalfBF16ToF64(cvectorization_ops_raw_half_vector_bf16 a) { return halfToPortF64(hn::ZeroExtendResizeBitCast(HalfTagF64(), HalfTagBF16(), halfFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 resizedHalfVectorZeroExtendingResizingHalfBF16ToF64(cvectorization_ops_raw_half_vector_bf16 a) { return toPortF64(hn::IfThenElseZero(hn::FirstN(TagF64(), hn::Lanes(HalfTagF64())), hn::ResizeBitCast(TagF64(), hn::ZeroExtendResizeBitCast(HalfTagF64(), HalfTagBF16(), halfFromPortBF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_f16 halfVectorZeroExtendingResizingHalfBF16ToF16(cvectorization_ops_raw_half_vector_bf16 a) { return halfToPortF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(HalfTagF16(), hn::RebindToUnsigned<HalfTagBF16>(), halfFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(HalfTagF16(), HalfTagBF16(), halfFromPortBF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 resizedHalfVectorZeroExtendingResizingHalfBF16ToF16(cvectorization_ops_raw_half_vector_bf16 a) { return toPortF16(hn::IfThenElseZero(hn::FirstN(TagF16(), hn::Lanes(HalfTagF16())), hn::ResizeBitCast(TagF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(HalfTagF16(), hn::RebindToUnsigned<HalfTagBF16>(), halfFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(HalfTagF16(), HalfTagBF16(), halfFromPortBF16(a))
@@ -25282,14 +25544,14 @@ HWY_INLINE cvectorization_ops_raw_vector_i8 resizedQuarterVectorZeroExtendingRes
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorZeroExtendingResizingHalfBF16ToI16(cvectorization_ops_raw_half_vector_bf16 a) { return quarterToPortI16(hn::ZeroExtendResizeBitCast(QuarterTagI16(), HalfTagBF16(), halfFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_i16 resizedQuarterVectorZeroExtendingResizingHalfBF16ToI16(cvectorization_ops_raw_half_vector_bf16 a) { return toPortI16(hn::IfThenElseZero(hn::FirstN(TagI16(), hn::Lanes(QuarterTagI16())), hn::ResizeBitCast(TagI16(), hn::ZeroExtendResizeBitCast(QuarterTagI16(), HalfTagBF16(), halfFromPortBF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_f16 quarterVectorZeroExtendingResizingHalfBF16ToF16(cvectorization_ops_raw_half_vector_bf16 a) { return quarterToPortF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(QuarterTagF16(), hn::RebindToUnsigned<HalfTagBF16>(), halfFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(QuarterTagF16(), HalfTagBF16(), halfFromPortBF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 resizedQuarterVectorZeroExtendingResizingHalfBF16ToF16(cvectorization_ops_raw_half_vector_bf16 a) { return toPortF16(hn::IfThenElseZero(hn::FirstN(TagF16(), hn::Lanes(QuarterTagF16())), hn::ResizeBitCast(TagF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(QuarterTagF16(), hn::RebindToUnsigned<HalfTagBF16>(), halfFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(QuarterTagF16(), HalfTagBF16(), halfFromPortBF16(a))
@@ -25312,7 +25574,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i64 vectorZeroExtendingResizingQuarterB
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorZeroExtendingResizingQuarterBF16ToF32(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortF32(hn::ZeroExtendResizeBitCast(TagF32(), QuarterTagBF16(), quarterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorZeroExtendingResizingQuarterBF16ToF64(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortF64(hn::ZeroExtendResizeBitCast(TagF64(), QuarterTagBF16(), quarterFromPortBF16(a))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_f16 vectorZeroExtendingResizingQuarterBF16ToF16(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(TagF16(), hn::RebindToUnsigned<QuarterTagBF16>(), quarterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(TagF16(), QuarterTagBF16(), quarterFromPortBF16(a))
@@ -25340,14 +25602,14 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 resizedHalfVectorZeroExtendingResiz
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorZeroExtendingResizingQuarterBF16ToF64(cvectorization_ops_raw_quarter_vector_bf16 a) { return halfToPortF64(hn::ZeroExtendResizeBitCast(HalfTagF64(), QuarterTagBF16(), quarterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 resizedHalfVectorZeroExtendingResizingQuarterBF16ToF64(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortF64(hn::IfThenElseZero(hn::FirstN(TagF64(), hn::Lanes(HalfTagF64())), hn::ResizeBitCast(TagF64(), hn::ZeroExtendResizeBitCast(HalfTagF64(), QuarterTagBF16(), quarterFromPortBF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_f16 halfVectorZeroExtendingResizingQuarterBF16ToF16(cvectorization_ops_raw_quarter_vector_bf16 a) { return halfToPortF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(HalfTagF16(), hn::RebindToUnsigned<QuarterTagBF16>(), quarterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(HalfTagF16(), QuarterTagBF16(), quarterFromPortBF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 resizedHalfVectorZeroExtendingResizingQuarterBF16ToF16(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortF16(hn::IfThenElseZero(hn::FirstN(TagF16(), hn::Lanes(HalfTagF16())), hn::ResizeBitCast(TagF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(HalfTagF16(), hn::RebindToUnsigned<QuarterTagBF16>(), quarterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(HalfTagF16(), QuarterTagBF16(), quarterFromPortBF16(a))
@@ -25364,14 +25626,14 @@ HWY_INLINE cvectorization_ops_raw_vector_i8 resizedQuarterVectorZeroExtendingRes
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorZeroExtendingResizingQuarterBF16ToI16(cvectorization_ops_raw_quarter_vector_bf16 a) { return quarterToPortI16(hn::ZeroExtendResizeBitCast(QuarterTagI16(), QuarterTagBF16(), quarterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_i16 resizedQuarterVectorZeroExtendingResizingQuarterBF16ToI16(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortI16(hn::IfThenElseZero(hn::FirstN(TagI16(), hn::Lanes(QuarterTagI16())), hn::ResizeBitCast(TagI16(), hn::ZeroExtendResizeBitCast(QuarterTagI16(), QuarterTagBF16(), quarterFromPortBF16(a))))); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_f16 quarterVectorZeroExtendingResizingQuarterBF16ToF16(cvectorization_ops_raw_quarter_vector_bf16 a) { return quarterToPortF16(
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(QuarterTagF16(), hn::RebindToUnsigned<QuarterTagBF16>(), quarterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(QuarterTagF16(), QuarterTagBF16(), quarterFromPortBF16(a))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 resizedQuarterVectorZeroExtendingResizingQuarterBF16ToF16(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortF16(hn::IfThenElseZero(hn::FirstN(TagF16(), hn::Lanes(QuarterTagF16())), hn::ResizeBitCast(TagF16(), 
-#if HWY_TARGET == HWY_SVE2_128
+#if HWY_TARGET_IS_SVE
 hn::ZeroExtendResizeBitCast(QuarterTagF16(), hn::RebindToUnsigned<QuarterTagBF16>(), quarterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
 #else
 hn::ZeroExtendResizeBitCast(QuarterTagF16(), QuarterTagBF16(), quarterFromPortBF16(a))

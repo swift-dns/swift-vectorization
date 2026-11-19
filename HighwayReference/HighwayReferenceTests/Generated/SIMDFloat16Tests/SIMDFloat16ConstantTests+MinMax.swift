@@ -113,7 +113,7 @@ extension SIMDFloat16ConstantTests {
 
     @Test func minimumConstantSplatNaN() {
         withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+            "On SVE with a constant operand the compiler orders the operands of the destructive minimum or maximum instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
         ) {
             checkMinimumConstantA(.nan)
             checkMinimumConstantB(.nan)
@@ -126,7 +126,7 @@ extension SIMDFloat16ConstantTests {
 
     @Test func minimumConstantSplatMinusNaN() {
         withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+            "On SVE with a constant operand the compiler orders the operands of the destructive minimum or maximum instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
         ) {
             checkMinimumConstantA(-.nan)
             checkMinimumConstantB(-.nan)
@@ -139,7 +139,7 @@ extension SIMDFloat16ConstantTests {
 
     @Test func minimumConstantSplatPayloadNaN() {
         withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+            "On SVE with a constant operand the compiler orders the operands of the destructive minimum or maximum instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
         ) {
             checkMinimumConstantA(Lane(nan: 1, signaling: false))
             checkMinimumConstantB(Lane(nan: 1, signaling: false))
@@ -152,7 +152,7 @@ extension SIMDFloat16ConstantTests {
 
     @Test func minimumConstantSplatSignalingNaN() {
         withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+            "On SVE with a constant operand the compiler orders the operands of the destructive minimum or maximum instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
         ) {
             checkMinimumConstantA(.signalingNaN)
             checkMinimumConstantB(.signalingNaN)
@@ -165,7 +165,7 @@ extension SIMDFloat16ConstantTests {
 
     @Test func minimumConstantSplatMinusSignalingNaN() {
         withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+            "On SVE with a constant operand the compiler orders the operands of the destructive minimum or maximum instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
         ) {
             checkMinimumConstantA(-.signalingNaN)
             checkMinimumConstantB(-.signalingNaN)
@@ -292,7 +292,7 @@ extension SIMDFloat16ConstantTests {
 
     @Test func maximumConstantSplatNaN() {
         withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+            "On SVE with a constant operand the compiler orders the operands of the destructive minimum or maximum instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
         ) {
             checkMaximumConstantA(.nan)
             checkMaximumConstantB(.nan)
@@ -305,7 +305,7 @@ extension SIMDFloat16ConstantTests {
 
     @Test func maximumConstantSplatMinusNaN() {
         withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+            "On SVE with a constant operand the compiler orders the operands of the destructive minimum or maximum instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
         ) {
             checkMaximumConstantA(-.nan)
             checkMaximumConstantB(-.nan)
@@ -318,7 +318,7 @@ extension SIMDFloat16ConstantTests {
 
     @Test func maximumConstantSplatPayloadNaN() {
         withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+            "On SVE with a constant operand the compiler orders the operands of the destructive minimum or maximum instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
         ) {
             checkMaximumConstantA(Lane(nan: 1, signaling: false))
             checkMaximumConstantB(Lane(nan: 1, signaling: false))
@@ -331,7 +331,7 @@ extension SIMDFloat16ConstantTests {
 
     @Test func maximumConstantSplatSignalingNaN() {
         withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+            "On SVE with a constant operand the compiler orders the operands of the destructive minimum or maximum instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
         ) {
             checkMaximumConstantA(.signalingNaN)
             checkMaximumConstantB(.signalingNaN)
@@ -344,7 +344,7 @@ extension SIMDFloat16ConstantTests {
 
     @Test func maximumConstantSplatMinusSignalingNaN() {
         withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+            "On SVE with a constant operand the compiler orders the operands of the destructive minimum or maximum instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
         ) {
             checkMaximumConstantA(-.signalingNaN)
             checkMaximumConstantB(-.signalingNaN)
@@ -471,7 +471,7 @@ extension SIMDFloat16ConstantTests {
 
     @Test func minimumNumberConstantSplatNaN() {
         withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+            "On SVE with a constant operand the compiler orders the operands of the destructive minimum or maximum instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
         ) {
             checkMinimumNumberConstantA(.nan)
             checkMinimumNumberConstantB(.nan)
@@ -484,7 +484,7 @@ extension SIMDFloat16ConstantTests {
 
     @Test func minimumNumberConstantSplatMinusNaN() {
         withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+            "On SVE with a constant operand the compiler orders the operands of the destructive minimum or maximum instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
         ) {
             checkMinimumNumberConstantA(-.nan)
             checkMinimumNumberConstantB(-.nan)
@@ -497,7 +497,7 @@ extension SIMDFloat16ConstantTests {
 
     @Test func minimumNumberConstantSplatPayloadNaN() {
         withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+            "On SVE with a constant operand the compiler orders the operands of the destructive minimum or maximum instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
         ) {
             checkMinimumNumberConstantA(Lane(nan: 1, signaling: false))
             checkMinimumNumberConstantB(Lane(nan: 1, signaling: false))
@@ -510,7 +510,7 @@ extension SIMDFloat16ConstantTests {
 
     @Test func minimumNumberConstantSplatSignalingNaN() {
         withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+            "On SVE with a constant operand the compiler orders the operands of the destructive minimum or maximum instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
         ) {
             checkMinimumNumberConstantA(.signalingNaN)
             checkMinimumNumberConstantB(.signalingNaN)
@@ -523,7 +523,7 @@ extension SIMDFloat16ConstantTests {
 
     @Test func minimumNumberConstantSplatMinusSignalingNaN() {
         withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+            "On SVE with a constant operand the compiler orders the operands of the destructive minimum or maximum instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
         ) {
             checkMinimumNumberConstantA(-.signalingNaN)
             checkMinimumNumberConstantB(-.signalingNaN)
@@ -650,7 +650,7 @@ extension SIMDFloat16ConstantTests {
 
     @Test func maximumNumberConstantSplatNaN() {
         withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+            "On SVE with a constant operand the compiler orders the operands of the destructive minimum or maximum instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
         ) {
             checkMaximumNumberConstantA(.nan)
             checkMaximumNumberConstantB(.nan)
@@ -663,7 +663,7 @@ extension SIMDFloat16ConstantTests {
 
     @Test func maximumNumberConstantSplatMinusNaN() {
         withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+            "On SVE with a constant operand the compiler orders the operands of the destructive minimum or maximum instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
         ) {
             checkMaximumNumberConstantA(-.nan)
             checkMaximumNumberConstantB(-.nan)
@@ -676,7 +676,7 @@ extension SIMDFloat16ConstantTests {
 
     @Test func maximumNumberConstantSplatPayloadNaN() {
         withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+            "On SVE with a constant operand the compiler orders the operands of the destructive minimum or maximum instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
         ) {
             checkMaximumNumberConstantA(Lane(nan: 1, signaling: false))
             checkMaximumNumberConstantB(Lane(nan: 1, signaling: false))
@@ -689,7 +689,7 @@ extension SIMDFloat16ConstantTests {
 
     @Test func maximumNumberConstantSplatSignalingNaN() {
         withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+            "On SVE with a constant operand the compiler orders the operands of the destructive minimum or maximum instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
         ) {
             checkMaximumNumberConstantA(.signalingNaN)
             checkMaximumNumberConstantB(.signalingNaN)
@@ -702,7 +702,7 @@ extension SIMDFloat16ConstantTests {
 
     @Test func maximumNumberConstantSplatMinusSignalingNaN() {
         withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+            "On SVE with a constant operand the compiler orders the operands of the destructive minimum or maximum instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
         ) {
             checkMaximumNumberConstantA(-.signalingNaN)
             checkMaximumNumberConstantB(-.signalingNaN)

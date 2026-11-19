@@ -853,68 +853,28 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func absoluteDifferenceConstantSplatNaN() {
-        withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
-        ) {
-            checkAbsoluteDifferenceConstantA(.nan)
-            checkAbsoluteDifferenceConstantB(.nan)
-        } when: {
-            SIMDTarget.targetName == "SVE_256"
-                || ((SIMDTarget.targetName == "SVE" || SIMDTarget.targetName == "SVE2")
-                    && H.laneCount * MemoryLayout<Lane>.stride == 64)
-        }
+        checkAbsoluteDifferenceConstantA(.nan)
+        checkAbsoluteDifferenceConstantB(.nan)
     }
 
     @Test func absoluteDifferenceConstantSplatMinusNaN() {
-        withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
-        ) {
-            checkAbsoluteDifferenceConstantA(-.nan)
-            checkAbsoluteDifferenceConstantB(-.nan)
-        } when: {
-            SIMDTarget.targetName == "SVE_256"
-                || ((SIMDTarget.targetName == "SVE" || SIMDTarget.targetName == "SVE2")
-                    && H.laneCount * MemoryLayout<Lane>.stride == 64)
-        }
+        checkAbsoluteDifferenceConstantA(-.nan)
+        checkAbsoluteDifferenceConstantB(-.nan)
     }
 
     @Test func absoluteDifferenceConstantSplatPayloadNaN() {
-        withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
-        ) {
-            checkAbsoluteDifferenceConstantA(Lane(nan: 1, signaling: false))
-            checkAbsoluteDifferenceConstantB(Lane(nan: 1, signaling: false))
-        } when: {
-            SIMDTarget.targetName == "SVE_256"
-                || ((SIMDTarget.targetName == "SVE" || SIMDTarget.targetName == "SVE2")
-                    && H.laneCount * MemoryLayout<Lane>.stride == 64)
-        }
+        checkAbsoluteDifferenceConstantA(Lane(nan: 1, signaling: false))
+        checkAbsoluteDifferenceConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func absoluteDifferenceConstantSplatSignalingNaN() {
-        withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
-        ) {
-            checkAbsoluteDifferenceConstantA(.signalingNaN)
-            checkAbsoluteDifferenceConstantB(.signalingNaN)
-        } when: {
-            SIMDTarget.targetName == "SVE_256"
-                || ((SIMDTarget.targetName == "SVE" || SIMDTarget.targetName == "SVE2")
-                    && H.laneCount * MemoryLayout<Lane>.stride == 64)
-        }
+        checkAbsoluteDifferenceConstantA(.signalingNaN)
+        checkAbsoluteDifferenceConstantB(.signalingNaN)
     }
 
     @Test func absoluteDifferenceConstantSplatMinusSignalingNaN() {
-        withKnownIssue(
-            "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
-        ) {
-            checkAbsoluteDifferenceConstantA(-.signalingNaN)
-            checkAbsoluteDifferenceConstantB(-.signalingNaN)
-        } when: {
-            SIMDTarget.targetName == "SVE_256"
-                || ((SIMDTarget.targetName == "SVE" || SIMDTarget.targetName == "SVE2")
-                    && H.laneCount * MemoryLayout<Lane>.stride == 64)
-        }
+        checkAbsoluteDifferenceConstantA(-.signalingNaN)
+        checkAbsoluteDifferenceConstantB(-.signalingNaN)
     }
 
     @Test func absoluteDifferenceConstantSplatLeastNonzero() {
