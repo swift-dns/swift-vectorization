@@ -21687,6 +21687,21 @@ func sveInterleavedBlockHalves(upper: Bool, for element: Element) -> String {
         """
 }
 
+func sveInterleavedBlockHalves(
+    _ first: String,
+    _ second: String,
+    upper: Bool,
+    for element: Element
+) -> String {
+    let pairs = unsignedElement(bits: 64)
+    let halves = [first, second].map { name in
+        let operand = sveOperand(name, for: pairs)
+        let gathered = sveBuiltin(upper ? "uzp2" : "uzp1", [operand, operand], for: pairs)
+        return sveReinterpreted(gathered, from: pairs, to: element)
+    }
+    return sveResult(sveBuiltin("zip1", halves, for: element), for: element)
+}
+
 func sveConcatenatedHalves(upper: Bool, for element: Element) -> String {
     let lanes = unsignedElement(of: element)
     let (high, low) = (sveOperand("a", for: lanes), sveOperand("b", for: lanes))
@@ -32573,6 +32588,7 @@ enum MulBitsByteLookup {
 func mulBitsMultiRotatedRightLookup(
     _ target: MulBitsByteLookup,
     scalingByPowers: Bool = false,
+    sveShuffles: Bool = false,
     for element: Element
 ) -> String {
     let (bytes, words, lanes) = mulBitsByteVectors(for: element)
@@ -32590,6 +32606,12 @@ func mulBitsMultiRotatedRightLookup(
             }
         )
     }
+    func zippedBlocks(_ first: String, _ second: String, upper: Bool) -> String {
+        guard sveShuffles else {
+            return "__builtin_shufflevector(\(first), \(second), \(zipped(upper: upper)))"
+        }
+        return sveInterleavedBlockHalves(first, second, upper: upper, for: bytes)
+    }
     let packed = laneIndices(
         (0..<size / 16).flatMap { block in
             (0..<8).map { 16 * block + 2 * $0 } + (0..<8).map { size + 16 * block + 2 * $0 }
@@ -32597,20 +32619,52 @@ func mulBitsMultiRotatedRightLookup(
     )
     let duplicatedEven = laneIndices((0..<element.laneCount).map { $0 & ~1 })
     let duplicatedOdd = laneIndices((0..<element.laneCount).map { $0 | 1 })
+    func duplicatedLanes(odd: Bool) -> String {
+        guard sveShuffles else {
+            let indices = odd ? duplicatedOdd : duplicatedEven
+            return "__builtin_shufflevector(values, values, \(indices))"
+        }
+        return sveDuplicatedLanes("values", odd: odd, for: lanes)
+    }
+    func packedLanes() -> String {
+        guard sveShuffles else {
+            return vectorResult(
+                "__builtin_shufflevector((\(bytes.cVector))evenExtracted, (\(bytes.cVector))oddExtracted, \(packed))",
+                for: element
+            )
+        }
+        func concatenated(_ name: String) -> String {
+            let extracted = sveOperand("\(name)Extracted", for: bytes)
+            let operands = [extracted, sveOperand(bytesOf(0), for: bytes)]
+            let evens = sveResult(sveBuiltin("uzp1", operands, for: bytes), for: bytes)
+            return "const \(bytes.cVector) \(name)Lanes = \(evens);"
+        }
+        let joined = sveBuiltin(
+            "zip1",
+            ["even", "odd"].map { sveOperand("\($0)Lanes", for: lanes) },
+            for: lanes
+        )
+        return """
+            \(concatenated("even"))
+            \(concatenated("odd"))
+            \(vectorResult(sveResult(joined, for: lanes), for: element))
+            """
+    }
     let powers = compoundLiteral(
         bytes.cVector,
         (0..<size).map { $0 % 16 < 8 ? String(128 >> ($0 % 16)) : "0" }
     )
-    func segments(_ name: String, duplicated: String, upper: Bool) -> String {
+    func segments(_ name: String, odd: Bool) -> String {
         let extraction =
             scalingByPowers
             ? "((\(words.cVector))\(name)Segments * \(name)Counts) >> 7"
             : "(\(words.cVector))\(name)Segments >> \(name)Counts"
+        let counts = zippedBlocks(scalingByPowers ? "powers" : "bitCounts", bytesOf(0), upper: odd)
         return """
-            const \(bytes.cVector) \(name)Source = (\(bytes.cVector))__builtin_shufflevector(values, values, \(duplicated));
-            const \(bytes.cVector) \(name)Indices = __builtin_shufflevector(byteIndices, nextIndices, \(zipped(upper: upper)));
+            const \(bytes.cVector) \(name)Source = (\(bytes.cVector))\(duplicatedLanes(odd: odd));
+            const \(bytes.cVector) \(name)Indices = \(zippedBlocks("byteIndices", "nextIndices", upper: odd));
             const \(bytes.cVector) \(name)Segments = \(target.lookup("\(name)Source", "\(name)Indices", for: element));
-            const \(words.cVector) \(name)Counts = (\(words.cVector))__builtin_shufflevector(\(scalingByPowers ? "powers" : "bitCounts"), \(bytesOf(0)), \(zipped(upper: upper)));
+            const \(words.cVector) \(name)Counts = (\(words.cVector))\(counts);
             const \(words.cVector) \(name)Extracted = \(extraction);
             """
     }
@@ -32628,9 +32682,9 @@ func mulBitsMultiRotatedRightLookup(
         const \(bytes.cVector) byteIndices = masked >> 3;
         const \(bytes.cVector) nextIndices = byteIndices + \(bytesOf(1));
         const \(bytes.cVector) bitCounts = masked & \(bytesOf(7));
-        \(scaling)\(segments("even", duplicated: duplicatedEven, upper: false))
-        \(segments("odd", duplicated: duplicatedOdd, upper: true))
-        \(vectorResult("__builtin_shufflevector((\(bytes.cVector))evenExtracted, (\(bytes.cVector))oddExtracted, \(packed))", for: element))
+        \(scaling)\(segments("even", odd: false))
+        \(segments("odd", odd: true))
+        \(packedLanes())
         """
 }
 
@@ -32754,6 +32808,23 @@ func mulBitsByteIndexedOps(
     }
 }
 
+func mulBitsMultiRotatedRightFoldingConstants(for element: Element) -> String {
+    let bytes = unsignedElement(bits: 8)
+    let constants = [
+        "\(cFunctionName("sveConstant", element))(a)",
+        "\(cFunctionName("sveConstant", bytes))((\(bytes.cVector))b)",
+    ]
+    return sveFolding(
+        when: constants.joined(separator: " || "),
+        mulBitsMultiRotatedRightLookup(.wideSve(sve2: true), for: element),
+        otherwise: mulBitsMultiRotatedRightLookup(
+            .wideSve(sve2: true),
+            sveShuffles: true,
+            for: element
+        )
+    )
+}
+
 let mulBitsMultiRotatedRightOps = mulBitsByteIndexedOps(
     "multiRotatedRight",
     "MultiRotateRight",
@@ -32761,7 +32832,10 @@ let mulBitsMultiRotatedRightOps = mulBitsByteIndexedOps(
     targets: TargetBodies(
         neon: { element in mulBitsMultiRotatedRightLookup(.neon, for: element) },
         sve2_128: { element in mulBitsMultiRotatedRightLookup(.sve, for: element) },
-        sve: { element in mulBitsMultiRotatedRightLookup(.wideSve(sve2: false), for: element) },
+        sve: { element in
+            mulBitsMultiRotatedRightLookup(.wideSve(sve2: false), sveShuffles: true, for: element)
+        },
+        sve2: { element in mulBitsMultiRotatedRightFoldingConstants(for: element) },
         avx3dl: { element in mulBitsMultiRotatedRightX86Multishift(for: element) },
         avx3: { element in mulBitsMultiRotatedRightLookup(.x86, for: element) },
         avx2: { element in mulBitsMultiRotatedRightLookup(.x86, for: element) },

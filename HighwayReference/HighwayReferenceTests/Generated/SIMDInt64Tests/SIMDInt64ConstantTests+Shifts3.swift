@@ -745,4 +745,314 @@ extension SIMDInt64ConstantTests {
     @Test func rotatedRightConstantSplatMin() {
         checkRotatedRightConstantA(Lane.min)
     }
+
+    @inline(__always)
+    private func checkMultiRotatedRightByFromUInt8ConstantA(_ value: Lane) {
+        let mismatches = Mismatches("multiRotatedRightByFromUInt8 with a repeating \(hex(value))")
+        let bInputs = Inputs.byteIndices(SIMD<UInt8>.self, seed: 0x5E8D_FEA5_8A0A_2401)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI64(value)),
+            "repeating"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.multiRotatedRight(H.repeating(value), by: b),
+                H(raw: HighwayReference.multiRotatedRightByU8ToI64(H.repeating(value).raw, b.raw)),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkMultiRotatedRightByFromUInt8ConstantB(_ value: UInt8) {
+        let mismatches = Mismatches("multiRotatedRightByFromUInt8 with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x453B_78A5_7BE2_844F)
+        mismatches.check(
+            SIMD<UInt8>.repeating(value),
+            SIMD<UInt8>(raw: HighwayReference.repeatingU8(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.multiRotatedRight(a, by: SIMD<UInt8>.repeating(value)),
+                H(
+                    raw: HighwayReference.multiRotatedRightByU8ToI64(
+                        a.raw,
+                        SIMD<UInt8>.repeating(value).raw
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSplat0() {
+        checkMultiRotatedRightByFromUInt8ConstantA(0)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSplat1() {
+        checkMultiRotatedRightByFromUInt8ConstantA(1)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSplat15() {
+        checkMultiRotatedRightByFromUInt8ConstantA(15)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSplat16() {
+        checkMultiRotatedRightByFromUInt8ConstantA(16)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSplat26() {
+        checkMultiRotatedRightByFromUInt8ConstantA(26)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSplat127() {
+        checkMultiRotatedRightByFromUInt8ConstantA(127)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSplat128() {
+        checkMultiRotatedRightByFromUInt8ConstantA(128)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSplat255() {
+        checkMultiRotatedRightByFromUInt8ConstantA(255)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSplat256() {
+        checkMultiRotatedRightByFromUInt8ConstantA(256)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSplat257() {
+        checkMultiRotatedRightByFromUInt8ConstantA(257)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSplat65280() {
+        checkMultiRotatedRightByFromUInt8ConstantA(65280)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSplat65281() {
+        checkMultiRotatedRightByFromUInt8ConstantA(65281)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSplatMinus1() {
+        checkMultiRotatedRightByFromUInt8ConstantA(-1)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSplatMinus16() {
+        checkMultiRotatedRightByFromUInt8ConstantA(-16)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSplatMinus17() {
+        checkMultiRotatedRightByFromUInt8ConstantA(-17)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSplatMinus128() {
+        checkMultiRotatedRightByFromUInt8ConstantA(-128)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSplatMinus129() {
+        checkMultiRotatedRightByFromUInt8ConstantA(-129)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSplatMax() {
+        checkMultiRotatedRightByFromUInt8ConstantA(Lane.max)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSplatMin() {
+        checkMultiRotatedRightByFromUInt8ConstantA(Lane.min)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSIMDUInt8Splat0() {
+        checkMultiRotatedRightByFromUInt8ConstantB(0)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSIMDUInt8Splat1() {
+        checkMultiRotatedRightByFromUInt8ConstantB(1)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSIMDUInt8Splat15() {
+        checkMultiRotatedRightByFromUInt8ConstantB(15)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSIMDUInt8Splat16() {
+        checkMultiRotatedRightByFromUInt8ConstantB(16)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSIMDUInt8Splat26() {
+        checkMultiRotatedRightByFromUInt8ConstantB(26)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSIMDUInt8Splat127() {
+        checkMultiRotatedRightByFromUInt8ConstantB(127)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSIMDUInt8Splat128() {
+        checkMultiRotatedRightByFromUInt8ConstantB(128)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantSIMDUInt8Splat255() {
+        checkMultiRotatedRightByFromUInt8ConstantB(255)
+    }
+
+    @inline(__always)
+    private func checkMultiRotatedRightByFromInt8ConstantA(_ value: Lane) {
+        let mismatches = Mismatches("multiRotatedRightByFromInt8 with a repeating \(hex(value))")
+        let bInputs = Inputs.byteIndices(SIMD<Int8>.self, seed: 0x8E15_631D_BA4A_E16C)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI64(value)),
+            "repeating"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.multiRotatedRight(H.repeating(value), by: b),
+                H(raw: HighwayReference.multiRotatedRightByI8ToI64(H.repeating(value).raw, b.raw)),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkMultiRotatedRightByFromInt8ConstantB(_ value: Int8) {
+        let mismatches = Mismatches("multiRotatedRightByFromInt8 with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xA91A_E91D_C9E4_159E)
+        mismatches.check(
+            SIMD<Int8>.repeating(value),
+            SIMD<Int8>(raw: HighwayReference.repeatingI8(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.multiRotatedRight(a, by: SIMD<Int8>.repeating(value)),
+                H(
+                    raw: HighwayReference.multiRotatedRightByI8ToI64(
+                        a.raw,
+                        SIMD<Int8>.repeating(value).raw
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSplat0() {
+        checkMultiRotatedRightByFromInt8ConstantA(0)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSplat1() {
+        checkMultiRotatedRightByFromInt8ConstantA(1)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSplat15() {
+        checkMultiRotatedRightByFromInt8ConstantA(15)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSplat16() {
+        checkMultiRotatedRightByFromInt8ConstantA(16)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSplat26() {
+        checkMultiRotatedRightByFromInt8ConstantA(26)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSplat127() {
+        checkMultiRotatedRightByFromInt8ConstantA(127)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSplat128() {
+        checkMultiRotatedRightByFromInt8ConstantA(128)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSplat255() {
+        checkMultiRotatedRightByFromInt8ConstantA(255)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSplat256() {
+        checkMultiRotatedRightByFromInt8ConstantA(256)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSplat257() {
+        checkMultiRotatedRightByFromInt8ConstantA(257)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSplat65280() {
+        checkMultiRotatedRightByFromInt8ConstantA(65280)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSplat65281() {
+        checkMultiRotatedRightByFromInt8ConstantA(65281)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSplatMinus1() {
+        checkMultiRotatedRightByFromInt8ConstantA(-1)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSplatMinus16() {
+        checkMultiRotatedRightByFromInt8ConstantA(-16)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSplatMinus17() {
+        checkMultiRotatedRightByFromInt8ConstantA(-17)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSplatMinus128() {
+        checkMultiRotatedRightByFromInt8ConstantA(-128)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSplatMinus129() {
+        checkMultiRotatedRightByFromInt8ConstantA(-129)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSplatMax() {
+        checkMultiRotatedRightByFromInt8ConstantA(Lane.max)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSplatMin() {
+        checkMultiRotatedRightByFromInt8ConstantA(Lane.min)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSIMDInt8Splat0() {
+        checkMultiRotatedRightByFromInt8ConstantB(0)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSIMDInt8Splat1() {
+        checkMultiRotatedRightByFromInt8ConstantB(1)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSIMDInt8Splat15() {
+        checkMultiRotatedRightByFromInt8ConstantB(15)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSIMDInt8Splat16() {
+        checkMultiRotatedRightByFromInt8ConstantB(16)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSIMDInt8Splat26() {
+        checkMultiRotatedRightByFromInt8ConstantB(26)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSIMDInt8Splat127() {
+        checkMultiRotatedRightByFromInt8ConstantB(127)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSIMDInt8SplatMinus1() {
+        checkMultiRotatedRightByFromInt8ConstantB(-1)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSIMDInt8SplatMinus16() {
+        checkMultiRotatedRightByFromInt8ConstantB(-16)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSIMDInt8SplatMinus17() {
+        checkMultiRotatedRightByFromInt8ConstantB(-17)
+    }
+
+    @Test func multiRotatedRightByFromInt8ConstantSIMDInt8SplatMinus128() {
+        checkMultiRotatedRightByFromInt8ConstantB(-128)
+    }
 }
