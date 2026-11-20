@@ -11471,10 +11471,73 @@ func negatedLanes(_ operand: String, for element: Element) -> String {
     return "(\(element.cVector))(-\(unsignedBits(operand, of: element)))"
 }
 
-func alternatingLanes(_ evens: String, _ odds: String, for element: Element) -> String {
-    let lanes = element.laneCount
-    let indices = (0..<lanes).map { $0.isMultiple(of: 2) ? $0 : lanes + $0 }
-    return "__builtin_shufflevector(\(evens), \(odds), \(laneIndices(indices)))"
+enum AlternatingSelect {
+    case shuffle
+    case sve
+    case sve2
+}
+
+func sveOddEvenLanes(odd: String, even: String, sve2: Bool, for element: Element) -> String {
+    guard sve2 else {
+        let odds = sveOperand("(\(odd))", for: element)
+        let shifted = sveBuiltin("ext", [odds, odds, "1"], for: element)
+        let merged = sveBuiltin(
+            "trn1",
+            [sveOperand("(\(even))", for: element), shifted],
+            for: element
+        )
+        return sveResult(merged, for: element)
+    }
+    let lanes = unsignedElement(of: element)
+    let merged = sveBuiltin(
+        "eortb_n",
+        [sveOperand("(\(even))", for: lanes), sveOperand("(\(odd))", for: lanes), "0"],
+        for: lanes
+    )
+    return fromUnsignedBits(sveResult(merged, for: lanes), of: element)
+}
+
+func sveFoldingConstants(
+    of operands: [String],
+    _ folded: String,
+    otherwise body: String,
+    for element: Element
+) -> String {
+    guard !operands.isEmpty else { return body }
+    let constant = cFunctionName("sveConstant", element)
+    let condition = operands.map { "\(constant)(\($0))" }.joined(separator: " || ")
+    return """
+        if (\(condition)) {
+        \(indented(folded))
+        }
+        \(body)
+        """
+}
+
+func alternatingLanes(
+    _ evens: String,
+    _ odds: String,
+    using select: AlternatingSelect = .shuffle,
+    for element: Element
+) -> String {
+    switch select {
+    case .shuffle:
+        let lanes = element.laneCount
+        let indices = (0..<lanes).map { $0.isMultiple(of: 2) ? $0 : lanes + $0 }
+        return "__builtin_shufflevector(\(evens), \(odds), \(laneIndices(indices)))"
+    case .sve, .sve2:
+        return sveOddEvenLanes(odd: odds, even: evens, sve2: select == .sve2, for: element)
+    }
+}
+
+func complexConjugating(
+    using select: AlternatingSelect = .shuffle,
+    for element: Element
+) -> String {
+    """
+    const \(element.cVector) negated = \(negatedLanes("a", for: element));
+    \(vectorResult(alternatingLanes("a", "negated", using: select, for: element), for: element))
+    """
 }
 
 func emulatedAddingSubtracting(for element: Element) -> String {
@@ -11501,10 +11564,13 @@ func emulatedAddingSubtracting(for element: Element) -> String {
         """
 }
 
-func vectorAddingSubtracting(for element: Element) -> String {
+func vectorAddingSubtracting(
+    using select: AlternatingSelect = .shuffle,
+    for element: Element
+) -> String {
     """
     const \(element.cVector) negated = \(negatedLanes("b", for: element));
-    const \(element.cVector) addend = \(alternatingLanes("negated", "b", for: element));
+    const \(element.cVector) addend = \(alternatingLanes("negated", "b", using: select, for: element));
     \(vectorResult(arithmetic("+", "a", "addend", for: element), for: element))
     """
 }
@@ -11934,7 +12000,11 @@ func portableFusedMultiplication(_ form: FusedMultiplication, for element: Eleme
         : form.integer(element)
 }
 
-func alternatingAddend(negatingAll: Bool, for element: Element) -> String {
+func alternatingAddend(
+    negatingAll: Bool,
+    using select: AlternatingSelect = .shuffle,
+    for element: Element
+) -> String {
     var statements: [String] = []
     var odd = "c"
     if negatingAll {
@@ -11943,7 +12013,7 @@ func alternatingAddend(negatingAll: Bool, for element: Element) -> String {
     }
     statements += [
         "const \(element.cVector) negated = \(negatedLanes(odd, for: element));",
-        "const \(element.cVector) addend = \(alternatingLanes("negated", odd, for: element));",
+        "const \(element.cVector) addend = \(alternatingLanes("negated", odd, using: select, for: element));",
     ]
     return statements.joined(separator: "\n")
 }
@@ -11965,9 +12035,10 @@ func emulatedMultiplyAlternating(negatingAll: Bool, for element: Element) -> Str
 func portableMultiplyAlternating(
     negatingAll: Bool,
     fused: Bool,
+    using select: AlternatingSelect = .shuffle,
     for element: Element
 ) -> String {
-    let addend = alternatingAddend(negatingAll: negatingAll, for: element)
+    let addend = alternatingAddend(negatingAll: negatingAll, using: select, for: element)
     guard element.category == .float else {
         let product = multipliedLanes("a", "b", for: element)
         let sum = arithmetic("+", product, "addend", for: element)
@@ -12023,7 +12094,28 @@ func x86MultiplyAlternating(
 }
 
 func multiplyAlternatingTargets(negatingAll: Bool) -> TargetBodies<Element> {
-    TargetBodies(
+    func wide(_ select: AlternatingSelect) -> (Element) -> String? {
+        { element in
+            guard element.category != .float else {
+                return sveMultiplyAlternatingStatements(negatingAll: negatingAll, for: element)?
+                    .joined(separator: "\n")
+            }
+            return sveFoldingConstants(
+                of: ["c"],
+                portableMultiplyAlternating(negatingAll: negatingAll, fused: false, for: element),
+                otherwise: select == .sve2
+                    ? sveIntegerMultiplyAlternating(negatingAll: negatingAll, for: element)
+                    : portableMultiplyAlternating(
+                        negatingAll: negatingAll,
+                        fused: false,
+                        using: select,
+                        for: element
+                    ),
+                for: element
+            )
+        }
+    }
+    return TargetBodies(
         neon: { element in
             element.category == .float
                 ? portableMultiplyAlternating(negatingAll: negatingAll, fused: true, for: element)
@@ -12032,10 +12124,8 @@ func multiplyAlternatingTargets(negatingAll: Bool) -> TargetBodies<Element> {
         sve2_128Splat: { element in
             sveConstantMultiplyAlternating(negatingAll: negatingAll, for: element)
         },
-        sve: { element in
-            sveMultiplyAlternatingStatements(negatingAll: negatingAll, for: element)?
-                .joined(separator: "\n")
-        },
+        sve: wide(.sve),
+        sve2: wide(.sve2),
         avx3: { element in
             x86MultiplyAlternating(level: .avx3, negatingAll: negatingAll, for: element)
         },
@@ -12959,13 +13049,23 @@ func wordwiseEvenLanes(_ evens: String, _ odds: String, for element: Element) ->
     return "(\(element.cVector))((\(mask) & \(first)) | (~\(mask) & \(second)))"
 }
 
-func complexDuplicates(for element: Element) -> String {
+func sveDuplicatedLanes(_ operand: String, odd: Bool, for element: Element) -> String {
+    let lanes = sveOperand(operand, for: element)
+    return sveResult(sveBuiltin(odd ? "trn2" : "trn1", [lanes, lanes], for: element), for: element)
+}
+
+func complexDuplicates(using select: AlternatingSelect = .shuffle, for element: Element) -> String {
     let vector = element.cVector
+    func lanes(_ operand: String, odd: Bool) -> String {
+        select == .shuffle
+            ? complexLanes(operand, odd: odd, for: element)
+            : sveDuplicatedLanes(operand, odd: odd, for: element)
+    }
     return """
-        const \(vector) u = \(complexLanes("a", odd: false, for: element));
-        const \(vector) v = \(complexLanes("a", odd: true, for: element));
-        const \(vector) x = \(complexLanes("b", odd: false, for: element));
-        const \(vector) y = \(complexLanes("b", odd: true, for: element));
+        const \(vector) u = \(lanes("a", odd: false));
+        const \(vector) v = \(lanes("a", odd: true));
+        const \(vector) x = \(lanes("b", odd: false));
+        const \(vector) y = \(lanes("b", odd: true));
         """
 }
 
@@ -13002,6 +13102,7 @@ func complexMultiplyingBody(
     fused: Bool,
     selectingByMask: Bool = false,
     highwayOrder: Bool = false,
+    using select: AlternatingSelect = .shuffle,
     finishing: ((String) -> String)? = nil,
     for element: Element
 ) -> String {
@@ -13035,9 +13136,9 @@ func complexMultiplyingBody(
     let alternated =
         selectingByMask
         ? wordwiseEvenLanes("evens", "odds", for: element)
-        : alternatingLanes("evens", "odds", for: element)
+        : alternatingLanes("evens", "odds", using: select, for: element)
     let lanes =
-        ([complexDuplicates(for: element)] + accumulations + [
+        ([complexDuplicates(using: select, for: element)] + accumulations + [
             "const \(vector) odds = \(odds);",
             "const \(vector) evens = \(evens);",
             "const \(vector) multiplied = \(alternated);",
@@ -13118,10 +13219,40 @@ func complexMultiplyingTargets(conjugating: Bool, adding: Bool) -> TargetBodies<
                 for: element
             )
     }
+    func foldedOperands(of element: Element, _ select: AlternatingSelect) -> [String] {
+        var operands: [String] = []
+        if element.bits <= 32 && (select == .sve2 || !conjugating) { operands.append("a") }
+        if element.width == 32 && element.bits >= 32 { operands.append("b") }
+        return operands
+    }
+    func wide(_ select: AlternatingSelect) -> (Element) -> String? {
+        { element in
+            guard element.category != .float else {
+                return sveComplexMultiplying(conjugating: conjugating, adding: adding, for: element)
+            }
+            return sveFoldingConstants(
+                of: foldedOperands(of: element, select),
+                twoProductComplexMultiplyingBody(
+                    conjugating: conjugating,
+                    adding: adding,
+                    for: element
+                ),
+                otherwise: complexMultiplyingBody(
+                    conjugating: conjugating,
+                    adding: adding,
+                    fused: false,
+                    using: select,
+                    for: element
+                ),
+                for: element
+            )
+        }
+    }
     return TargetBodies(
         neon: fused,
         sve2_128: sve,
-        sve: sve,
+        sve: wide(.sve),
+        sve2: wide(.sve2),
         avx3dl: { element in
             element.bits == 8
                 ? twoProductComplexMultiplyingBody(
@@ -13243,6 +13374,22 @@ func sveMultiplyAlternatingStatements(negatingAll: Bool, for element: Element) -
         reversed, "const \(element.cVector) addend = \(sveResult(sum, for: element));",
         sveMultiplyAdding(adding: "addend", for: element),
     ]
+}
+
+func sveIntegerMultiplyAlternating(negatingAll: Bool, for element: Element) -> String {
+    let zero = sveBuiltin("dup_n", ["0"], for: element)
+    let (reversed, sum) = sveAlternatingSum(
+        of: zero,
+        reversing: negatingAll ? "negated" : "c",
+        for: element
+    )
+    let negated = "const \(element.cVector) negated = \(negatedLanes("c", for: element));"
+    let statements =
+        (negatingAll ? [negated] : []) + [
+            reversed, "const \(element.cVector) addend = \(sveResult(sum, for: element));",
+            sveMultiplyAdding(adding: "addend", for: element),
+        ]
+    return statements.joined(separator: "\n")
 }
 
 func sveConstantMultiplyAlternating(negatingAll: Bool, for element: Element) -> String? {
@@ -14149,7 +14296,14 @@ let basicOps: [Op] = [
             neon: { element in floatAddingSubtracting(for: element) },
             sve2_128: { element in sveAddingSubtracting(for: element) },
             sve: { element in
-                element.category == .float ? sveAddingSubtracting(for: element) : nil
+                element.category == .float
+                    ? sveAddingSubtracting(for: element)
+                    : sveFoldingConstants(
+                        of: ["b"],
+                        vectorAddingSubtracting(for: element),
+                        otherwise: vectorAddingSubtracting(using: .sve, for: element),
+                        for: element
+                    )
             },
             sve2: { element in sveAddingSubtracting(for: element) },
             avx3: { element in floatAddingSubtracting(for: element) },
@@ -14599,12 +14753,27 @@ let basicOps: [Op] = [
         [.vector],
         .vector,
         .signedOrFloat,
-        section: .complexNumberOperations
+        section: .complexNumberOperations,
+        targets: TargetBodies(
+            sve: { element in
+                sveFoldingConstants(
+                    of: ["a"],
+                    complexConjugating(for: element),
+                    otherwise: complexConjugating(using: .sve, for: element),
+                    for: element
+                )
+            },
+            sve2: { element in
+                sveFoldingConstants(
+                    of: ["a"],
+                    complexConjugating(for: element),
+                    otherwise: complexConjugating(using: .sve2, for: element),
+                    for: element
+                )
+            }
+        )
     ) { element in
-        """
-        const \(element.cVector) negated = \(negatedLanes("a", for: element));
-        \(vectorResult(alternatingLanes("a", "negated", for: element), for: element))
-        """
+        complexConjugating(for: element)
     },
     Op(
         "multiplyingComplex",
@@ -22147,6 +22316,18 @@ let fixedPermutations: [FixedPermutation] = [
         section: .otherFixedPatternPermutationsWithinBlocks,
         targets: TargetBodies(
             neon: { element in wordSelectedOddEven(for: element) },
+            sve: { element in
+                vectorResult(
+                    sveOddEvenLanes(odd: "a", even: "b", sve2: false, for: element),
+                    for: element
+                )
+            },
+            sve2: { element in
+                vectorResult(
+                    sveOddEvenLanes(odd: "a", even: "b", sve2: true, for: element),
+                    for: element
+                )
+            },
             sse4: { element in x86OddEvenLanes(level: .sse4, for: element) },
             ssse3: { element in x86OddEvenLanes(level: .ssse3, for: element) },
             sse2: { element in x86OddEvenLanes(level: .sse2, for: element) }
@@ -41832,9 +42013,9 @@ func x86Branches<Input: WidthScaled>(
 }
 
 let sve2OnlyBuiltins = [
-    "adalp_", "addp_", "bcax_", "bsl_", "cadd_s", "cadd_u", "eor3_", "logb_", "mlalb_", "mlalt_",
-    "movlb_", "movlt_", "mullb_", "mullt_", "qabs_", "qdmlalb_", "qneg_", "qrdmulh_", "qxtnb_",
-    "qxtnt_", "qxtunb_", "qxtunt_", "rhadd_", "rshl_", "rshr_", "tbl2_",
+    "adalp_", "addp_", "bcax_", "bsl_", "cadd_s", "cadd_u", "eor3_", "eortb_", "logb_", "mlalb_",
+    "mlalt_", "movlb_", "movlt_", "mullb_", "mullt_", "qabs_", "qdmlalb_", "qneg_", "qrdmulh_",
+    "qxtnb_", "qxtnt_", "qxtunb_", "qxtunt_", "rhadd_", "rshl_", "rshr_", "tbl2_",
 ]
 
 func sve1Checked(_ body: String) -> String {

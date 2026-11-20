@@ -163,6 +163,57 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
+    private func checkAddingSubtractingConstantB(_ value: Lane) {
+        let mismatches = Mismatches("addingSubtracting with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xF287_9B8C_5D48_2CF3)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU8(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.addingSubtracting(a, H.repeating(value)),
+                H(raw: HighwayReference.addingSubtractingU8(a.raw, H.repeating(value).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func addingSubtractingConstantSplat0() {
+        checkAddingSubtractingConstantB(0)
+    }
+
+    @Test func addingSubtractingConstantSplat1() {
+        checkAddingSubtractingConstantB(1)
+    }
+
+    @Test func addingSubtractingConstantSplat15() {
+        checkAddingSubtractingConstantB(15)
+    }
+
+    @Test func addingSubtractingConstantSplat16() {
+        checkAddingSubtractingConstantB(16)
+    }
+
+    @Test func addingSubtractingConstantSplat26() {
+        checkAddingSubtractingConstantB(26)
+    }
+
+    @Test func addingSubtractingConstantSplat127() {
+        checkAddingSubtractingConstantB(127)
+    }
+
+    @Test func addingSubtractingConstantSplat128() {
+        checkAddingSubtractingConstantB(128)
+    }
+
+    @Test func addingSubtractingConstantSplat255() {
+        checkAddingSubtractingConstantB(255)
+    }
+
+    @inline(__always)
     private func checkSaturatingAddingConstantA(_ value: Lane) {
         let mismatches = Mismatches("saturatingAdding with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x341F_1532_7B9B_47F3)

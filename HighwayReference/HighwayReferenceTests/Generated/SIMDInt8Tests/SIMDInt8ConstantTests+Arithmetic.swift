@@ -183,6 +183,65 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
+    private func checkAddingSubtractingConstantB(_ value: Lane) {
+        let mismatches = Mismatches("addingSubtracting with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x1DB7_7A85_7C99_EDF7)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI8(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.addingSubtracting(a, H.repeating(value)),
+                H(raw: HighwayReference.addingSubtractingI8(a.raw, H.repeating(value).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func addingSubtractingConstantSplat0() {
+        checkAddingSubtractingConstantB(0)
+    }
+
+    @Test func addingSubtractingConstantSplat1() {
+        checkAddingSubtractingConstantB(1)
+    }
+
+    @Test func addingSubtractingConstantSplat15() {
+        checkAddingSubtractingConstantB(15)
+    }
+
+    @Test func addingSubtractingConstantSplat16() {
+        checkAddingSubtractingConstantB(16)
+    }
+
+    @Test func addingSubtractingConstantSplat26() {
+        checkAddingSubtractingConstantB(26)
+    }
+
+    @Test func addingSubtractingConstantSplat127() {
+        checkAddingSubtractingConstantB(127)
+    }
+
+    @Test func addingSubtractingConstantSplatMinus1() {
+        checkAddingSubtractingConstantB(-1)
+    }
+
+    @Test func addingSubtractingConstantSplatMinus16() {
+        checkAddingSubtractingConstantB(-16)
+    }
+
+    @Test func addingSubtractingConstantSplatMinus17() {
+        checkAddingSubtractingConstantB(-17)
+    }
+
+    @Test func addingSubtractingConstantSplatMinus128() {
+        checkAddingSubtractingConstantB(-128)
+    }
+
+    @inline(__always)
     private func checkSaturatingAddingConstantA(_ value: Lane) {
         let mismatches = Mismatches("saturatingAdding with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x8DC2_26F3_FCA8_060F)

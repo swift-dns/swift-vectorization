@@ -365,4 +365,192 @@ extension SIMDInt16ConstantTests {
         checkNegatedMultiplySubtractingConstantB(Lane.min)
         checkNegatedMultiplySubtractingConstantC(Lane.min)
     }
+
+    @inline(__always)
+    private func checkMultiplyAddingSubtractingConstantC(_ value: Lane) {
+        let mismatches = Mismatches("multiplyAddingSubtracting with c repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x8B98_AB56_341C_F603)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8B98_AA56_341C_F450)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI16(value)),
+            "repeating"
+        )
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.multiplyAddingSubtracting(a, b, H.repeating(value)),
+                H(
+                    raw: HighwayReference.multiplyAddingSubtractingI16(
+                        a.raw,
+                        b.raw,
+                        H.repeating(value).raw
+                    )
+                ),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyAddingSubtractingConstantSplat0() {
+        checkMultiplyAddingSubtractingConstantC(0)
+    }
+
+    @Test func multiplyAddingSubtractingConstantSplat1() {
+        checkMultiplyAddingSubtractingConstantC(1)
+    }
+
+    @Test func multiplyAddingSubtractingConstantSplat15() {
+        checkMultiplyAddingSubtractingConstantC(15)
+    }
+
+    @Test func multiplyAddingSubtractingConstantSplat16() {
+        checkMultiplyAddingSubtractingConstantC(16)
+    }
+
+    @Test func multiplyAddingSubtractingConstantSplat26() {
+        checkMultiplyAddingSubtractingConstantC(26)
+    }
+
+    @Test func multiplyAddingSubtractingConstantSplat127() {
+        checkMultiplyAddingSubtractingConstantC(127)
+    }
+
+    @Test func multiplyAddingSubtractingConstantSplat128() {
+        checkMultiplyAddingSubtractingConstantC(128)
+    }
+
+    @Test func multiplyAddingSubtractingConstantSplat255() {
+        checkMultiplyAddingSubtractingConstantC(255)
+    }
+
+    @Test func multiplyAddingSubtractingConstantSplat256() {
+        checkMultiplyAddingSubtractingConstantC(256)
+    }
+
+    @Test func multiplyAddingSubtractingConstantSplat257() {
+        checkMultiplyAddingSubtractingConstantC(257)
+    }
+
+    @Test func multiplyAddingSubtractingConstantSplatMinus1() {
+        checkMultiplyAddingSubtractingConstantC(-1)
+    }
+
+    @Test func multiplyAddingSubtractingConstantSplatMinus16() {
+        checkMultiplyAddingSubtractingConstantC(-16)
+    }
+
+    @Test func multiplyAddingSubtractingConstantSplatMinus17() {
+        checkMultiplyAddingSubtractingConstantC(-17)
+    }
+
+    @Test func multiplyAddingSubtractingConstantSplatMinus128() {
+        checkMultiplyAddingSubtractingConstantC(-128)
+    }
+
+    @Test func multiplyAddingSubtractingConstantSplatMinus129() {
+        checkMultiplyAddingSubtractingConstantC(-129)
+    }
+
+    @Test func multiplyAddingSubtractingConstantSplatMax() {
+        checkMultiplyAddingSubtractingConstantC(Lane.max)
+    }
+
+    @Test func multiplyAddingSubtractingConstantSplatMin() {
+        checkMultiplyAddingSubtractingConstantC(Lane.min)
+    }
+
+    @inline(__always)
+    private func checkMultiplySubtractingAddingConstantC(_ value: Lane) {
+        let mismatches = Mismatches("multiplySubtractingAdding with c repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x50FA_449B_0183_DABD)
+        let bInputs = Inputs.vectors(H.self, seed: 0x50FA_439B_0183_D90A)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI16(value)),
+            "repeating"
+        )
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.multiplySubtractingAdding(a, b, H.repeating(value)),
+                H(
+                    raw: HighwayReference.multiplySubtractingAddingI16(
+                        a.raw,
+                        b.raw,
+                        H.repeating(value).raw
+                    )
+                ),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplySubtractingAddingConstantSplat0() {
+        checkMultiplySubtractingAddingConstantC(0)
+    }
+
+    @Test func multiplySubtractingAddingConstantSplat1() {
+        checkMultiplySubtractingAddingConstantC(1)
+    }
+
+    @Test func multiplySubtractingAddingConstantSplat15() {
+        checkMultiplySubtractingAddingConstantC(15)
+    }
+
+    @Test func multiplySubtractingAddingConstantSplat16() {
+        checkMultiplySubtractingAddingConstantC(16)
+    }
+
+    @Test func multiplySubtractingAddingConstantSplat26() {
+        checkMultiplySubtractingAddingConstantC(26)
+    }
+
+    @Test func multiplySubtractingAddingConstantSplat127() {
+        checkMultiplySubtractingAddingConstantC(127)
+    }
+
+    @Test func multiplySubtractingAddingConstantSplat128() {
+        checkMultiplySubtractingAddingConstantC(128)
+    }
+
+    @Test func multiplySubtractingAddingConstantSplat255() {
+        checkMultiplySubtractingAddingConstantC(255)
+    }
+
+    @Test func multiplySubtractingAddingConstantSplat256() {
+        checkMultiplySubtractingAddingConstantC(256)
+    }
+
+    @Test func multiplySubtractingAddingConstantSplat257() {
+        checkMultiplySubtractingAddingConstantC(257)
+    }
+
+    @Test func multiplySubtractingAddingConstantSplatMinus1() {
+        checkMultiplySubtractingAddingConstantC(-1)
+    }
+
+    @Test func multiplySubtractingAddingConstantSplatMinus16() {
+        checkMultiplySubtractingAddingConstantC(-16)
+    }
+
+    @Test func multiplySubtractingAddingConstantSplatMinus17() {
+        checkMultiplySubtractingAddingConstantC(-17)
+    }
+
+    @Test func multiplySubtractingAddingConstantSplatMinus128() {
+        checkMultiplySubtractingAddingConstantC(-128)
+    }
+
+    @Test func multiplySubtractingAddingConstantSplatMinus129() {
+        checkMultiplySubtractingAddingConstantC(-129)
+    }
+
+    @Test func multiplySubtractingAddingConstantSplatMax() {
+        checkMultiplySubtractingAddingConstantC(Lane.max)
+    }
+
+    @Test func multiplySubtractingAddingConstantSplatMin() {
+        checkMultiplySubtractingAddingConstantC(Lane.min)
+    }
 }

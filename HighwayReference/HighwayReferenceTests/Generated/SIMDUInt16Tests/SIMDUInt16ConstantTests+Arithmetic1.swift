@@ -213,6 +213,77 @@ extension SIMDUInt16ConstantTests {
     }
 
     @inline(__always)
+    private func checkAddingSubtractingConstantB(_ value: Lane) {
+        let mismatches = Mismatches("addingSubtracting with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x5332_CCAD_1C98_94CC)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU16(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.addingSubtracting(a, H.repeating(value)),
+                H(raw: HighwayReference.addingSubtractingU16(a.raw, H.repeating(value).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func addingSubtractingConstantSplat0() {
+        checkAddingSubtractingConstantB(0)
+    }
+
+    @Test func addingSubtractingConstantSplat1() {
+        checkAddingSubtractingConstantB(1)
+    }
+
+    @Test func addingSubtractingConstantSplat15() {
+        checkAddingSubtractingConstantB(15)
+    }
+
+    @Test func addingSubtractingConstantSplat16() {
+        checkAddingSubtractingConstantB(16)
+    }
+
+    @Test func addingSubtractingConstantSplat26() {
+        checkAddingSubtractingConstantB(26)
+    }
+
+    @Test func addingSubtractingConstantSplat127() {
+        checkAddingSubtractingConstantB(127)
+    }
+
+    @Test func addingSubtractingConstantSplat128() {
+        checkAddingSubtractingConstantB(128)
+    }
+
+    @Test func addingSubtractingConstantSplat255() {
+        checkAddingSubtractingConstantB(255)
+    }
+
+    @Test func addingSubtractingConstantSplat256() {
+        checkAddingSubtractingConstantB(256)
+    }
+
+    @Test func addingSubtractingConstantSplat257() {
+        checkAddingSubtractingConstantB(257)
+    }
+
+    @Test func addingSubtractingConstantSplat65280() {
+        checkAddingSubtractingConstantB(65280)
+    }
+
+    @Test func addingSubtractingConstantSplat65281() {
+        checkAddingSubtractingConstantB(65281)
+    }
+
+    @Test func addingSubtractingConstantSplatMax() {
+        checkAddingSubtractingConstantB(Lane.max)
+    }
+
+    @inline(__always)
     private func checkSaturatingAddingConstantA(_ value: Lane) {
         let mismatches = Mismatches("saturatingAdding with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x747F_5DAA_CA28_35EE)
