@@ -20501,14 +20501,65 @@ func sveFirstTrueIndex(for element: Element) -> String {
     """
 }
 
-func sveBitsOfMask(for element: Element) -> String? {
-    guard element.category == .float else { return nil }
+func sveBoolBytes(for element: Element) -> String {
+    let lanes = unsignedElement(of: element)
+    var width = element.bits
+    var statements = [
+        "const \(sveType(of: lanes)) bools\(width) = \(sveBuiltin("dup_n", ["active", "1"], for: lanes, predication: "z"));"
+    ]
+    while width > 8 {
+        let wider = unsignedElement(bits: width)
+        let narrower = unsignedElement(bits: width / 2)
+        let view = sveReinterpreted("bools\(width)", from: wider, to: narrower)
+        width /= 2
+        statements.append(
+            "const \(sveType(of: narrower)) bools\(width) = \(sveBuiltin("uzp1", [view, view], for: narrower));"
+        )
+    }
+    return statements.joined(separator: "\n")
+}
+
+func sveBitsFromBoolBytes() -> String {
+    let bytes = unsignedElement(bits: 8)
+    var previous = "bools8"
+    var statements: [String] = []
+    for (name, width, shift) in [("pairs", 16, 7), ("quads", 32, 14), ("octets", 64, 28)] {
+        let lanes = unsignedElement(bits: width)
+        let shifted = sveBuiltin(
+            "lsr_n",
+            [
+                sveAllLanes(of: lanes), sveReinterpreted(previous, from: bytes, to: lanes),
+                "\(shift)",
+            ],
+            for: lanes,
+            predication: "x"
+        )
+        let merged = sveBuiltin(
+            "orr",
+            [sveAllLanes(of: bytes), previous, sveReinterpreted(shifted, from: lanes, to: bytes)],
+            for: bytes,
+            predication: "x"
+        )
+        statements.append("const \(sveType(of: bytes)) \(name) = \(merged);")
+        previous = name
+    }
+    return statements.joined(separator: "\n")
+}
+
+func sveMaskOctets(for element: Element) -> String {
+    """
+    const __SVBool_t active = \(svePredicate(of: "mask", for: element));
+    \(sveBoolBytes(for: element))
+    \(sveBitsFromBoolBytes())
+    """
+}
+
+func sveSummedMaskBits(for element: Element) -> String {
     let unsigned = unsignedElement(of: element)
-    let all = sveAllLanes(of: element)
     let bits = sveBuiltin(
         "lsl",
         [
-            all, sveBuiltin("dup_n", ["1"], for: unsigned),
+            sveAllLanes(of: element), sveBuiltin("dup_n", ["1"], for: unsigned),
             sveBuiltin("index", ["0", "1"], for: unsigned),
         ],
         for: unsigned,
@@ -20517,6 +20568,116 @@ func sveBitsOfMask(for element: Element) -> String? {
     let sum = sveBuiltin("addv", [svePredicate(of: "mask", for: element), bits], for: unsigned)
     let valid = "0x\(String((1 << element.laneCount) - 1, radix: 16))"
     return "return \(sum) & \(valid);"
+}
+
+func sveBitsOfMask(for element: Element) -> String {
+    guard element.laneCount > element.bits else { return sveSummedMaskBits(for: element) }
+    let bytes = unsignedElement(bits: 8)
+    let words = unsignedElement(bits: 64)
+    let all = sveAllLanes(of: words)
+    let packed = sveBuiltin(
+        "and_n",
+        [all, sveReinterpreted("octets", from: bytes, to: words), "0xFF"],
+        for: words,
+        predication: "x"
+    )
+    let shifted = sveBuiltin(
+        "lsl",
+        [all, "packed", sveBuiltin("index", ["0", "8"], for: words)],
+        for: words,
+        predication: "x"
+    )
+    let sum = sveBuiltin("addv", [all, shifted], for: words)
+    let valid =
+        element.laneCount < 64 ? " & 0x\(String((1 << element.laneCount) - 1, radix: 16))" : ""
+    return """
+        \(sveMaskOctets(for: element))
+        const \(sveType(of: words)) packed = \(packed);
+        return \(sum)\(valid);
+        """
+}
+
+func sveStoredMask(for element: Element) -> String {
+    let words = unsignedElement(bits: 64)
+    let count = maskByteCount(for: element)
+    let stored = sveBuiltin(
+        "st1b",
+        [
+            sveActiveLanes("\(count)", for: words), "to",
+            sveReinterpreted("octets", from: unsignedElement(bits: 8), to: words),
+        ],
+        for: words
+    )
+    return """
+        \(sveMaskOctets(for: element))
+        \(stored);
+        return \(count);
+        """
+}
+
+func sveMaskBytesPerLane(for element: Element) -> String {
+    let bytes = unsignedElement(bits: 8)
+    let all = sveAllLanes(of: bytes)
+    let indices = sveBuiltin("index", ["0", "1"], for: bytes)
+    switch element.bits {
+    case 8:
+        let words = unsignedElement(bits: 64)
+        let loaded = sveReinterpreted(
+            sveBuiltin("ld1ub", [all, "from"], for: words),
+            from: words,
+            to: bytes
+        )
+        let selected = sveBuiltin("bic_n", [all, indices, "7"], for: bytes, predication: "x")
+        return sveBuiltin("tbl", [loaded, selected], for: bytes)
+    case 16, 32:
+        let lanes = unsignedElement(of: element)
+        let active = sveActiveLanes("\(maskByteCount(for: element))", for: bytes)
+        let loaded = sveBuiltin("ld1", [active, "from"], for: bytes)
+        let selected = sveBuiltin(
+            "lsr_n",
+            [all, indices, element.bits == 16 ? "4" : "5"],
+            for: bytes,
+            predication: "x"
+        )
+        return sveReinterpreted(
+            sveBuiltin("tbl", [loaded, selected], for: bytes),
+            from: bytes,
+            to: lanes
+        )
+    default:
+        return sveBuiltin("dup_n", ["from[0]"], for: unsignedElement(of: element))
+    }
+}
+
+func sveMaskLaneBits(for element: Element) -> String {
+    let unsigned = unsignedElement(of: element)
+    guard element.bits > 16 else {
+        let laneBits = (0..<element.blockLaneCount).map { "\(1 << ($0 % 8))" }
+        return sveBuiltin("dupq_n", laneBits, for: unsigned)
+    }
+    let all = sveAllLanes(of: element)
+    let indices = sveBuiltin("index", ["0", "1"], for: unsigned)
+    let counts =
+        element.bits == 32
+        ? sveBuiltin("and_n", [all, indices, "7"], for: unsigned, predication: "x") : indices
+    return sveBuiltin(
+        "lsl",
+        [all, sveBuiltin("dup_n", ["1"], for: unsigned), counts],
+        for: unsigned,
+        predication: "x"
+    )
+}
+
+func sveLoadMask(for element: Element) -> String {
+    let unsigned = unsignedElement(of: element)
+    let all = sveAllLanes(of: element)
+    let tested = sveBuiltin(
+        "and",
+        [all, sveMaskBytesPerLane(for: element), sveMaskLaneBits(for: element)],
+        for: unsigned,
+        predication: "x"
+    )
+    return sveMaskVector(sveBuiltin("cmpne_n", [all, tested, "0"], for: unsigned), for: element)
 }
 
 func sveSelectingByVector(for element: Element) -> String {
@@ -20638,6 +20799,7 @@ let maskOps: [Op] = [
         span: .maskBytes,
         targets: TargetBodies(
             neon: { element in vectorLoadMask(broadcasting: .quadwords, for: element) },
+            sve: { element in sveLoadMask(for: element) },
             avx3: { element in x86Avx3LoadMask(for: element) },
             avx2: { element in vectorLoadMask(for: element) },
             sse2: { element in vectorLoadMask(for: element) }
@@ -20668,7 +20830,8 @@ let maskOps: [Op] = [
         identifier: "bitsOfMask",
         targets: TargetBodies(
             neon: { element in neonBitsOfMask(for: element) },
-            sve2_128: { element in sveBitsOfMask(for: element) },
+            sve2_128: { element in element.category == .float ? sveBitsOfMask(for: element) : nil },
+            sve: { element in sveBitsOfMask(for: element) },
             avx3: { element in x86BitsOfMask(for: element) },
             avx2: { element in x86BitsOfMask(for: element) },
             sse2: { element in x86BitsOfMask(for: element) }
@@ -20686,6 +20849,10 @@ let maskOps: [Op] = [
         span: .maskBytes,
         targets: TargetBodies(
             neon: { element in storedMaskBits(for: element) },
+            sve: { element in
+                element.laneCount > element.bits
+                    ? sveStoredMask(for: element) : storedMaskBits(for: element)
+            },
             avx3: { element in storedMaskBits(for: element) },
             avx2: { element in storedMaskBits(for: element) },
             sse2: { element in storedMaskBits(for: element) }

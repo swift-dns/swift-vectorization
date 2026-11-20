@@ -11290,21 +11290,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u8 cvectorization_ops_repe
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u8 cvectorization_ops_load_mask_u8(const uint8_t* from) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int8_t lanes[32];
-  for (size_t i = 0; i < 32; ++i) {
-    lanes[i] = (from[i >> 3] & (1 << (i & 7))) != 0 ? -1 : 0;
-  }
-  cvectorization_ops_mask_u8 result;
-  __builtin_memcpy(&result, lanes, sizeof result);
-  return (cvectorization_ops_raw_mask_u8)(result);
+  return (cvectorization_ops_raw_mask_u8)((cvectorization_ops_mask_u8)(cvectorization_ops_sve_u8)__builtin_sve_svsel_u8(__builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svand_u8_x(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svtbl_u8(__builtin_sve_reinterpret_u8_u64(__builtin_sve_svld1ub_u64(__builtin_sve_svptrue_pat_b8(31), from)), __builtin_sve_svbic_n_u8_x(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svindex_u8(0, 1), 7)), __builtin_sve_svdupq_n_u8(1, 2, 4, 8, 16, 32, 64, 128, 1, 2, 4, 8, 16, 32, 64, 128)), 0), __builtin_sve_svdup_n_u8((uint8_t)-1), __builtin_sve_svdup_n_u8(0)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int8_t lanes[64];
-  for (size_t i = 0; i < 64; ++i) {
-    lanes[i] = (from[i >> 3] & (1 << (i & 7))) != 0 ? -1 : 0;
-  }
-  cvectorization_ops_mask_u8 result;
-  __builtin_memcpy(&result, lanes, sizeof result);
-  return (cvectorization_ops_raw_mask_u8)(result);
+  return (cvectorization_ops_raw_mask_u8)((cvectorization_ops_mask_u8)(cvectorization_ops_sve_u8)__builtin_sve_svsel_u8(__builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svand_u8_x(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svtbl_u8(__builtin_sve_reinterpret_u8_u64(__builtin_sve_svld1ub_u64(__builtin_sve_svptrue_pat_b8(31), from)), __builtin_sve_svbic_n_u8_x(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svindex_u8(0, 1), 7)), __builtin_sve_svdupq_n_u8(1, 2, 4, 8, 16, 32, 64, 128, 1, 2, 4, 8, 16, 32, 64, 128)), 0), __builtin_sve_svdup_n_u8((uint8_t)-1), __builtin_sve_svdup_n_u8(0)));
 #elif CVECTORIZATION_OPS_NEON
   uint64_t maskBits = 0;
   __builtin_memcpy(&maskBits, from, 2);
@@ -11359,17 +11347,21 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ve
 CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_bits_of_mask_u8(cvectorization_ops_raw_mask_u8 rawMask) {
   const cvectorization_ops_mask_u8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u8, cvectorization_ops_read_mask_u8, rawMask);
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint64_t bits = 0;
-  for (size_t i = 0; i < 32; ++i) {
-    bits |= mask[i] ? 1ull << i : 0;
-  }
-  return bits;
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  const __SVUint8_t bools8 = __builtin_sve_svdup_n_u8_z(active, 1);
+  const __SVUint8_t pairs = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), bools8, __builtin_sve_reinterpret_u8_u16(__builtin_sve_svlsr_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8(bools8), 7)));
+  const __SVUint8_t quads = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), pairs, __builtin_sve_reinterpret_u8_u32(__builtin_sve_svlsr_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u8(pairs), 14)));
+  const __SVUint8_t octets = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), quads, __builtin_sve_reinterpret_u8_u64(__builtin_sve_svlsr_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u8(quads), 28)));
+  const __SVUint64_t packed = __builtin_sve_svand_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u8(octets), 0xFF);
+  return __builtin_sve_svaddv_u64(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svlsl_u64_x(__builtin_sve_svptrue_pat_b64(31), packed, __builtin_sve_svindex_u64(0, 8))) & 0xffffffff;
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint64_t bits = 0;
-  for (size_t i = 0; i < 64; ++i) {
-    bits |= mask[i] ? 1ull << i : 0;
-  }
-  return bits;
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  const __SVUint8_t bools8 = __builtin_sve_svdup_n_u8_z(active, 1);
+  const __SVUint8_t pairs = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), bools8, __builtin_sve_reinterpret_u8_u16(__builtin_sve_svlsr_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8(bools8), 7)));
+  const __SVUint8_t quads = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), pairs, __builtin_sve_reinterpret_u8_u32(__builtin_sve_svlsr_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u8(pairs), 14)));
+  const __SVUint8_t octets = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), quads, __builtin_sve_reinterpret_u8_u64(__builtin_sve_svlsr_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u8(quads), 28)));
+  const __SVUint64_t packed = __builtin_sve_svand_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u8(octets), 0xFF);
+  return __builtin_sve_svaddv_u64(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svlsl_u64_x(__builtin_sve_svptrue_pat_b64(31), packed, __builtin_sve_svindex_u64(0, 8)));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u8 values = (cvectorization_ops_vector_u8)mask & (cvectorization_ops_vector_u8){1, 2, 4, 8, 16, 32, 64, 128, 1, 2, 4, 8, 16, 32, 64, 128};
   const cvectorization_ops_neon_i8 paired = (cvectorization_ops_neon_i8)__builtin_neon_vpaddq_v((cvectorization_ops_neon_i8)values, (cvectorization_ops_neon_i8)values, 48);
@@ -11394,34 +11386,20 @@ CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_bits_of_mask_u8(cvectoriza
 CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_store_mask_u8(cvectorization_ops_raw_mask_u8 rawMask, uint8_t* to) {
   const cvectorization_ops_mask_u8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u8, cvectorization_ops_read_mask_u8, rawMask);
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int8_t lanes[32];
-  __builtin_memcpy(lanes, &mask, sizeof lanes);
-  to[0] = 0;
-  to[1] = 0;
-  to[2] = 0;
-  to[3] = 0;
-  for (size_t i = 0; i < 32; ++i) {
-    if (lanes[i] != 0) {
-      to[i >> 3] = (uint8_t)(to[i >> 3] | (1 << (i & 7)));
-    }
-  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  const __SVUint8_t bools8 = __builtin_sve_svdup_n_u8_z(active, 1);
+  const __SVUint8_t pairs = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), bools8, __builtin_sve_reinterpret_u8_u16(__builtin_sve_svlsr_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8(bools8), 7)));
+  const __SVUint8_t quads = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), pairs, __builtin_sve_reinterpret_u8_u32(__builtin_sve_svlsr_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u8(pairs), 14)));
+  const __SVUint8_t octets = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), quads, __builtin_sve_reinterpret_u8_u64(__builtin_sve_svlsr_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u8(quads), 28)));
+  __builtin_sve_svst1b_u64(__builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(4)), to, __builtin_sve_reinterpret_u64_u8(octets));
   return 4;
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int8_t lanes[64];
-  __builtin_memcpy(lanes, &mask, sizeof lanes);
-  to[0] = 0;
-  to[1] = 0;
-  to[2] = 0;
-  to[3] = 0;
-  to[4] = 0;
-  to[5] = 0;
-  to[6] = 0;
-  to[7] = 0;
-  for (size_t i = 0; i < 64; ++i) {
-    if (lanes[i] != 0) {
-      to[i >> 3] = (uint8_t)(to[i >> 3] | (1 << (i & 7)));
-    }
-  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  const __SVUint8_t bools8 = __builtin_sve_svdup_n_u8_z(active, 1);
+  const __SVUint8_t pairs = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), bools8, __builtin_sve_reinterpret_u8_u16(__builtin_sve_svlsr_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8(bools8), 7)));
+  const __SVUint8_t quads = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), pairs, __builtin_sve_reinterpret_u8_u32(__builtin_sve_svlsr_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u8(pairs), 14)));
+  const __SVUint8_t octets = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), quads, __builtin_sve_reinterpret_u8_u64(__builtin_sve_svlsr_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u8(quads), 28)));
+  __builtin_sve_svst1b_u64(__builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(8)), to, __builtin_sve_reinterpret_u64_u8(octets));
   return 8;
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   const uint64_t bits = cvectorization_ops_bits_of_mask_u8(rawMask);
@@ -25555,21 +25533,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u16 cvectorization_ops_rep
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u16 cvectorization_ops_load_mask_u16(const uint8_t* from) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int16_t lanes[16];
-  for (size_t i = 0; i < 16; ++i) {
-    lanes[i] = (from[i >> 3] & (1 << (i & 7))) != 0 ? -1 : 0;
-  }
-  cvectorization_ops_mask_u16 result;
-  __builtin_memcpy(&result, lanes, sizeof result);
-  return (cvectorization_ops_raw_mask_u16)(result);
+  return (cvectorization_ops_raw_mask_u16)((cvectorization_ops_mask_u16)(cvectorization_ops_sve_u16)__builtin_sve_svsel_u16(__builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svand_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8(__builtin_sve_svtbl_u8(__builtin_sve_svld1_u8(__builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(2)), from), __builtin_sve_svlsr_n_u8_x(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svindex_u8(0, 1), 4))), __builtin_sve_svdupq_n_u16(1, 2, 4, 8, 16, 32, 64, 128)), 0), __builtin_sve_svdup_n_u16((uint16_t)-1), __builtin_sve_svdup_n_u16(0)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int16_t lanes[32];
-  for (size_t i = 0; i < 32; ++i) {
-    lanes[i] = (from[i >> 3] & (1 << (i & 7))) != 0 ? -1 : 0;
-  }
-  cvectorization_ops_mask_u16 result;
-  __builtin_memcpy(&result, lanes, sizeof result);
-  return (cvectorization_ops_raw_mask_u16)(result);
+  return (cvectorization_ops_raw_mask_u16)((cvectorization_ops_mask_u16)(cvectorization_ops_sve_u16)__builtin_sve_svsel_u16(__builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svand_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8(__builtin_sve_svtbl_u8(__builtin_sve_svld1_u8(__builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(4)), from), __builtin_sve_svlsr_n_u8_x(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svindex_u8(0, 1), 4))), __builtin_sve_svdupq_n_u16(1, 2, 4, 8, 16, 32, 64, 128)), 0), __builtin_sve_svdup_n_u16((uint16_t)-1), __builtin_sve_svdup_n_u16(0)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   unsigned int maskBits = 0;
   __builtin_memcpy(&maskBits, from, sizeof maskBits);
@@ -25609,17 +25575,16 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_bits_of_mask_u16(cvectorization_ops_raw_mask_u16 rawMask) {
   const cvectorization_ops_mask_u16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u16, cvectorization_ops_read_mask_u16, rawMask);
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint64_t bits = 0;
-  for (size_t i = 0; i < 16; ++i) {
-    bits |= mask[i] ? 1ull << i : 0;
-  }
-  return bits;
+  return __builtin_sve_svaddv_u16(__builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0), __builtin_sve_svlsl_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svdup_n_u16(1), __builtin_sve_svindex_u16(0, 1))) & 0xffff;
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint64_t bits = 0;
-  for (size_t i = 0; i < 32; ++i) {
-    bits |= mask[i] ? 1ull << i : 0;
-  }
-  return bits;
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  const __SVUint16_t bools16 = __builtin_sve_svdup_n_u16_z(active, 1);
+  const __SVUint8_t bools8 = __builtin_sve_svuzp1_u8(__builtin_sve_reinterpret_u8_u16(bools16), __builtin_sve_reinterpret_u8_u16(bools16));
+  const __SVUint8_t pairs = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), bools8, __builtin_sve_reinterpret_u8_u16(__builtin_sve_svlsr_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8(bools8), 7)));
+  const __SVUint8_t quads = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), pairs, __builtin_sve_reinterpret_u8_u32(__builtin_sve_svlsr_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u8(pairs), 14)));
+  const __SVUint8_t octets = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), quads, __builtin_sve_reinterpret_u8_u64(__builtin_sve_svlsr_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u8(quads), 28)));
+  const __SVUint64_t packed = __builtin_sve_svand_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u8(octets), 0xFF);
+  return __builtin_sve_svaddv_u64(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svlsl_u64_x(__builtin_sve_svptrue_pat_b64(31), packed, __builtin_sve_svindex_u64(0, 8))) & 0xffffffff;
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u16 values = (cvectorization_ops_vector_u16)mask & (cvectorization_ops_vector_u16){1, 2, 4, 8, 16, 32, 64, 128};
   return (uint64_t)__builtin_reduce_add(values) & 0xff;
@@ -25640,28 +25605,17 @@ CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_bits_of_mask_u16(cvectoriz
 CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_store_mask_u16(cvectorization_ops_raw_mask_u16 rawMask, uint8_t* to) {
   const cvectorization_ops_mask_u16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u16, cvectorization_ops_read_mask_u16, rawMask);
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int16_t lanes[16];
-  __builtin_memcpy(lanes, &mask, sizeof lanes);
-  to[0] = 0;
-  to[1] = 0;
-  for (size_t i = 0; i < 16; ++i) {
-    if (lanes[i] != 0) {
-      to[i >> 3] = (uint8_t)(to[i >> 3] | (1 << (i & 7)));
-    }
-  }
+  const uint64_t bits = cvectorization_ops_bits_of_mask_u16(rawMask);
+  __builtin_memcpy(to, &bits, 2);
   return 2;
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int16_t lanes[32];
-  __builtin_memcpy(lanes, &mask, sizeof lanes);
-  to[0] = 0;
-  to[1] = 0;
-  to[2] = 0;
-  to[3] = 0;
-  for (size_t i = 0; i < 32; ++i) {
-    if (lanes[i] != 0) {
-      to[i >> 3] = (uint8_t)(to[i >> 3] | (1 << (i & 7)));
-    }
-  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  const __SVUint16_t bools16 = __builtin_sve_svdup_n_u16_z(active, 1);
+  const __SVUint8_t bools8 = __builtin_sve_svuzp1_u8(__builtin_sve_reinterpret_u8_u16(bools16), __builtin_sve_reinterpret_u8_u16(bools16));
+  const __SVUint8_t pairs = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), bools8, __builtin_sve_reinterpret_u8_u16(__builtin_sve_svlsr_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8(bools8), 7)));
+  const __SVUint8_t quads = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), pairs, __builtin_sve_reinterpret_u8_u32(__builtin_sve_svlsr_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u8(pairs), 14)));
+  const __SVUint8_t octets = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), quads, __builtin_sve_reinterpret_u8_u64(__builtin_sve_svlsr_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u8(quads), 28)));
+  __builtin_sve_svst1b_u64(__builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(4)), to, __builtin_sve_reinterpret_u64_u8(octets));
   return 4;
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   const uint64_t bits = cvectorization_ops_bits_of_mask_u16(rawMask);
@@ -37625,21 +37579,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u32 cvectorization_ops_rep
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u32 cvectorization_ops_load_mask_u32(const uint8_t* from) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int32_t lanes[8];
-  for (size_t i = 0; i < 8; ++i) {
-    lanes[i] = (from[i >> 3] & (1 << (i & 7))) != 0 ? -1 : 0;
-  }
-  cvectorization_ops_mask_u32 result;
-  __builtin_memcpy(&result, lanes, sizeof result);
-  return (cvectorization_ops_raw_mask_u32)(result);
+  return (cvectorization_ops_raw_mask_u32)((cvectorization_ops_mask_u32)(cvectorization_ops_sve_u32)__builtin_sve_svsel_u32(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svand_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u8(__builtin_sve_svtbl_u8(__builtin_sve_svld1_u8(__builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(1)), from), __builtin_sve_svlsr_n_u8_x(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svindex_u8(0, 1), 5))), __builtin_sve_svlsl_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svdup_n_u32(1), __builtin_sve_svand_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svindex_u32(0, 1), 7))), 0), __builtin_sve_svdup_n_u32((uint32_t)-1), __builtin_sve_svdup_n_u32(0)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int32_t lanes[16];
-  for (size_t i = 0; i < 16; ++i) {
-    lanes[i] = (from[i >> 3] & (1 << (i & 7))) != 0 ? -1 : 0;
-  }
-  cvectorization_ops_mask_u32 result;
-  __builtin_memcpy(&result, lanes, sizeof result);
-  return (cvectorization_ops_raw_mask_u32)(result);
+  return (cvectorization_ops_raw_mask_u32)((cvectorization_ops_mask_u32)(cvectorization_ops_sve_u32)__builtin_sve_svsel_u32(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svand_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u8(__builtin_sve_svtbl_u8(__builtin_sve_svld1_u8(__builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(2)), from), __builtin_sve_svlsr_n_u8_x(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svindex_u8(0, 1), 5))), __builtin_sve_svlsl_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svdup_n_u32(1), __builtin_sve_svand_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svindex_u32(0, 1), 7))), 0), __builtin_sve_svdup_n_u32((uint32_t)-1), __builtin_sve_svdup_n_u32(0)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   unsigned short maskBits = 0;
   __builtin_memcpy(&maskBits, from, sizeof maskBits);
@@ -37679,17 +37621,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_bits_of_mask_u32(cvectorization_ops_raw_mask_u32 rawMask) {
   const cvectorization_ops_mask_u32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u32, cvectorization_ops_read_mask_u32, rawMask);
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint64_t bits = 0;
-  for (size_t i = 0; i < 8; ++i) {
-    bits |= mask[i] ? 1ull << i : 0;
-  }
-  return bits;
+  return __builtin_sve_svaddv_u32(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), __builtin_sve_svlsl_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svdup_n_u32(1), __builtin_sve_svindex_u32(0, 1))) & 0xff;
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint64_t bits = 0;
-  for (size_t i = 0; i < 16; ++i) {
-    bits |= mask[i] ? 1ull << i : 0;
-  }
-  return bits;
+  return __builtin_sve_svaddv_u32(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), __builtin_sve_svlsl_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svdup_n_u32(1), __builtin_sve_svindex_u32(0, 1))) & 0xffff;
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u32 values = (cvectorization_ops_vector_u32)mask & (cvectorization_ops_vector_u32){1, 2, 4, 8};
   return (uint64_t)__builtin_reduce_add(values) & 0xf;
@@ -37710,25 +37644,12 @@ CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_bits_of_mask_u32(cvectoriz
 CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_store_mask_u32(cvectorization_ops_raw_mask_u32 rawMask, uint8_t* to) {
   const cvectorization_ops_mask_u32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u32, cvectorization_ops_read_mask_u32, rawMask);
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int32_t lanes[8];
-  __builtin_memcpy(lanes, &mask, sizeof lanes);
-  to[0] = 0;
-  for (size_t i = 0; i < 8; ++i) {
-    if (lanes[i] != 0) {
-      to[i >> 3] = (uint8_t)(to[i >> 3] | (1 << (i & 7)));
-    }
-  }
+  const uint64_t bits = cvectorization_ops_bits_of_mask_u32(rawMask);
+  __builtin_memcpy(to, &bits, 1);
   return 1;
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int32_t lanes[16];
-  __builtin_memcpy(lanes, &mask, sizeof lanes);
-  to[0] = 0;
-  to[1] = 0;
-  for (size_t i = 0; i < 16; ++i) {
-    if (lanes[i] != 0) {
-      to[i >> 3] = (uint8_t)(to[i >> 3] | (1 << (i & 7)));
-    }
-  }
+  const uint64_t bits = cvectorization_ops_bits_of_mask_u32(rawMask);
+  __builtin_memcpy(to, &bits, 2);
   return 2;
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   const uint64_t bits = cvectorization_ops_bits_of_mask_u32(rawMask);
@@ -50785,21 +50706,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u64 cvectorization_ops_rep
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u64 cvectorization_ops_load_mask_u64(const uint8_t* from) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int64_t lanes[4];
-  for (size_t i = 0; i < 4; ++i) {
-    lanes[i] = (from[i >> 3] & (1 << (i & 7))) != 0 ? -1 : 0;
-  }
-  cvectorization_ops_mask_u64 result;
-  __builtin_memcpy(&result, lanes, sizeof result);
-  return (cvectorization_ops_raw_mask_u64)(result);
+  return (cvectorization_ops_raw_mask_u64)((cvectorization_ops_mask_u64)(cvectorization_ops_sve_u64)__builtin_sve_svsel_u64(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svand_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svdup_n_u64(from[0]), __builtin_sve_svlsl_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svdup_n_u64(1), __builtin_sve_svindex_u64(0, 1))), 0), __builtin_sve_svdup_n_u64((uint64_t)-1), __builtin_sve_svdup_n_u64(0)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int64_t lanes[8];
-  for (size_t i = 0; i < 8; ++i) {
-    lanes[i] = (from[i >> 3] & (1 << (i & 7))) != 0 ? -1 : 0;
-  }
-  cvectorization_ops_mask_u64 result;
-  __builtin_memcpy(&result, lanes, sizeof result);
-  return (cvectorization_ops_raw_mask_u64)(result);
+  return (cvectorization_ops_raw_mask_u64)((cvectorization_ops_mask_u64)(cvectorization_ops_sve_u64)__builtin_sve_svsel_u64(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svand_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svdup_n_u64(from[0]), __builtin_sve_svlsl_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svdup_n_u64(1), __builtin_sve_svindex_u64(0, 1))), 0), __builtin_sve_svdup_n_u64((uint64_t)-1), __builtin_sve_svdup_n_u64(0)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   unsigned char maskBits = 0;
   __builtin_memcpy(&maskBits, from, sizeof maskBits);
@@ -50839,17 +50748,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_bits_of_mask_u64(cvectorization_ops_raw_mask_u64 rawMask) {
   const cvectorization_ops_mask_u64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u64, cvectorization_ops_read_mask_u64, rawMask);
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint64_t bits = 0;
-  for (size_t i = 0; i < 4; ++i) {
-    bits |= mask[i] ? 1ull << i : 0;
-  }
-  return bits;
+  return __builtin_sve_svaddv_u64(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), __builtin_sve_svlsl_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svdup_n_u64(1), __builtin_sve_svindex_u64(0, 1))) & 0xf;
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint64_t bits = 0;
-  for (size_t i = 0; i < 8; ++i) {
-    bits |= mask[i] ? 1ull << i : 0;
-  }
-  return bits;
+  return __builtin_sve_svaddv_u64(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), __builtin_sve_svlsl_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svdup_n_u64(1), __builtin_sve_svindex_u64(0, 1))) & 0xff;
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u64 values = (cvectorization_ops_vector_u64)mask & (cvectorization_ops_vector_u64){1, 2};
   return (uint64_t)__builtin_reduce_add(values) & 0x3;
@@ -50870,24 +50771,12 @@ CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_bits_of_mask_u64(cvectoriz
 CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_store_mask_u64(cvectorization_ops_raw_mask_u64 rawMask, uint8_t* to) {
   const cvectorization_ops_mask_u64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u64, cvectorization_ops_read_mask_u64, rawMask);
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int64_t lanes[4];
-  __builtin_memcpy(lanes, &mask, sizeof lanes);
-  to[0] = 0;
-  for (size_t i = 0; i < 4; ++i) {
-    if (lanes[i] != 0) {
-      to[i >> 3] = (uint8_t)(to[i >> 3] | (1 << (i & 7)));
-    }
-  }
+  const uint64_t bits = cvectorization_ops_bits_of_mask_u64(rawMask);
+  __builtin_memcpy(to, &bits, 1);
   return 1;
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int64_t lanes[8];
-  __builtin_memcpy(lanes, &mask, sizeof lanes);
-  to[0] = 0;
-  for (size_t i = 0; i < 8; ++i) {
-    if (lanes[i] != 0) {
-      to[i >> 3] = (uint8_t)(to[i >> 3] | (1 << (i & 7)));
-    }
-  }
+  const uint64_t bits = cvectorization_ops_bits_of_mask_u64(rawMask);
+  __builtin_memcpy(to, &bits, 1);
   return 1;
 #elif CVECTORIZATION_OPS_NEON || (CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 6)
   const uint64_t bits = cvectorization_ops_bits_of_mask_u64(rawMask);
@@ -65053,21 +64942,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i8 cvectorization_ops_repe
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i8 cvectorization_ops_load_mask_i8(const uint8_t* from) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int8_t lanes[32];
-  for (size_t i = 0; i < 32; ++i) {
-    lanes[i] = (from[i >> 3] & (1 << (i & 7))) != 0 ? -1 : 0;
-  }
-  cvectorization_ops_mask_i8 result;
-  __builtin_memcpy(&result, lanes, sizeof result);
-  return (cvectorization_ops_raw_mask_i8)(result);
+  return (cvectorization_ops_raw_mask_i8)((cvectorization_ops_mask_i8)(cvectorization_ops_sve_u8)__builtin_sve_svsel_u8(__builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svand_u8_x(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svtbl_u8(__builtin_sve_reinterpret_u8_u64(__builtin_sve_svld1ub_u64(__builtin_sve_svptrue_pat_b8(31), from)), __builtin_sve_svbic_n_u8_x(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svindex_u8(0, 1), 7)), __builtin_sve_svdupq_n_u8(1, 2, 4, 8, 16, 32, 64, 128, 1, 2, 4, 8, 16, 32, 64, 128)), 0), __builtin_sve_svdup_n_u8((uint8_t)-1), __builtin_sve_svdup_n_u8(0)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int8_t lanes[64];
-  for (size_t i = 0; i < 64; ++i) {
-    lanes[i] = (from[i >> 3] & (1 << (i & 7))) != 0 ? -1 : 0;
-  }
-  cvectorization_ops_mask_i8 result;
-  __builtin_memcpy(&result, lanes, sizeof result);
-  return (cvectorization_ops_raw_mask_i8)(result);
+  return (cvectorization_ops_raw_mask_i8)((cvectorization_ops_mask_i8)(cvectorization_ops_sve_u8)__builtin_sve_svsel_u8(__builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svand_u8_x(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svtbl_u8(__builtin_sve_reinterpret_u8_u64(__builtin_sve_svld1ub_u64(__builtin_sve_svptrue_pat_b8(31), from)), __builtin_sve_svbic_n_u8_x(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svindex_u8(0, 1), 7)), __builtin_sve_svdupq_n_u8(1, 2, 4, 8, 16, 32, 64, 128, 1, 2, 4, 8, 16, 32, 64, 128)), 0), __builtin_sve_svdup_n_u8((uint8_t)-1), __builtin_sve_svdup_n_u8(0)));
 #elif CVECTORIZATION_OPS_NEON
   uint64_t maskBits = 0;
   __builtin_memcpy(&maskBits, from, 2);
@@ -65122,17 +64999,21 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ve
 CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_bits_of_mask_i8(cvectorization_ops_raw_mask_i8 rawMask) {
   const cvectorization_ops_mask_i8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i8, cvectorization_ops_read_mask_i8, rawMask);
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint64_t bits = 0;
-  for (size_t i = 0; i < 32; ++i) {
-    bits |= mask[i] ? 1ull << i : 0;
-  }
-  return bits;
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  const __SVUint8_t bools8 = __builtin_sve_svdup_n_u8_z(active, 1);
+  const __SVUint8_t pairs = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), bools8, __builtin_sve_reinterpret_u8_u16(__builtin_sve_svlsr_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8(bools8), 7)));
+  const __SVUint8_t quads = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), pairs, __builtin_sve_reinterpret_u8_u32(__builtin_sve_svlsr_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u8(pairs), 14)));
+  const __SVUint8_t octets = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), quads, __builtin_sve_reinterpret_u8_u64(__builtin_sve_svlsr_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u8(quads), 28)));
+  const __SVUint64_t packed = __builtin_sve_svand_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u8(octets), 0xFF);
+  return __builtin_sve_svaddv_u64(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svlsl_u64_x(__builtin_sve_svptrue_pat_b64(31), packed, __builtin_sve_svindex_u64(0, 8))) & 0xffffffff;
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint64_t bits = 0;
-  for (size_t i = 0; i < 64; ++i) {
-    bits |= mask[i] ? 1ull << i : 0;
-  }
-  return bits;
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  const __SVUint8_t bools8 = __builtin_sve_svdup_n_u8_z(active, 1);
+  const __SVUint8_t pairs = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), bools8, __builtin_sve_reinterpret_u8_u16(__builtin_sve_svlsr_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8(bools8), 7)));
+  const __SVUint8_t quads = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), pairs, __builtin_sve_reinterpret_u8_u32(__builtin_sve_svlsr_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u8(pairs), 14)));
+  const __SVUint8_t octets = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), quads, __builtin_sve_reinterpret_u8_u64(__builtin_sve_svlsr_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u8(quads), 28)));
+  const __SVUint64_t packed = __builtin_sve_svand_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u8(octets), 0xFF);
+  return __builtin_sve_svaddv_u64(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svlsl_u64_x(__builtin_sve_svptrue_pat_b64(31), packed, __builtin_sve_svindex_u64(0, 8)));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u8 values = (cvectorization_ops_vector_u8)mask & (cvectorization_ops_vector_u8){1, 2, 4, 8, 16, 32, 64, 128, 1, 2, 4, 8, 16, 32, 64, 128};
   const cvectorization_ops_neon_i8 paired = (cvectorization_ops_neon_i8)__builtin_neon_vpaddq_v((cvectorization_ops_neon_i8)values, (cvectorization_ops_neon_i8)values, 48);
@@ -65157,34 +65038,20 @@ CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_bits_of_mask_i8(cvectoriza
 CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_store_mask_i8(cvectorization_ops_raw_mask_i8 rawMask, uint8_t* to) {
   const cvectorization_ops_mask_i8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i8, cvectorization_ops_read_mask_i8, rawMask);
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int8_t lanes[32];
-  __builtin_memcpy(lanes, &mask, sizeof lanes);
-  to[0] = 0;
-  to[1] = 0;
-  to[2] = 0;
-  to[3] = 0;
-  for (size_t i = 0; i < 32; ++i) {
-    if (lanes[i] != 0) {
-      to[i >> 3] = (uint8_t)(to[i >> 3] | (1 << (i & 7)));
-    }
-  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  const __SVUint8_t bools8 = __builtin_sve_svdup_n_u8_z(active, 1);
+  const __SVUint8_t pairs = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), bools8, __builtin_sve_reinterpret_u8_u16(__builtin_sve_svlsr_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8(bools8), 7)));
+  const __SVUint8_t quads = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), pairs, __builtin_sve_reinterpret_u8_u32(__builtin_sve_svlsr_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u8(pairs), 14)));
+  const __SVUint8_t octets = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), quads, __builtin_sve_reinterpret_u8_u64(__builtin_sve_svlsr_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u8(quads), 28)));
+  __builtin_sve_svst1b_u64(__builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(4)), to, __builtin_sve_reinterpret_u64_u8(octets));
   return 4;
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int8_t lanes[64];
-  __builtin_memcpy(lanes, &mask, sizeof lanes);
-  to[0] = 0;
-  to[1] = 0;
-  to[2] = 0;
-  to[3] = 0;
-  to[4] = 0;
-  to[5] = 0;
-  to[6] = 0;
-  to[7] = 0;
-  for (size_t i = 0; i < 64; ++i) {
-    if (lanes[i] != 0) {
-      to[i >> 3] = (uint8_t)(to[i >> 3] | (1 << (i & 7)));
-    }
-  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  const __SVUint8_t bools8 = __builtin_sve_svdup_n_u8_z(active, 1);
+  const __SVUint8_t pairs = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), bools8, __builtin_sve_reinterpret_u8_u16(__builtin_sve_svlsr_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8(bools8), 7)));
+  const __SVUint8_t quads = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), pairs, __builtin_sve_reinterpret_u8_u32(__builtin_sve_svlsr_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u8(pairs), 14)));
+  const __SVUint8_t octets = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), quads, __builtin_sve_reinterpret_u8_u64(__builtin_sve_svlsr_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u8(quads), 28)));
+  __builtin_sve_svst1b_u64(__builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(8)), to, __builtin_sve_reinterpret_u64_u8(octets));
   return 8;
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   const uint64_t bits = cvectorization_ops_bits_of_mask_i8(rawMask);
@@ -79516,21 +79383,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i16 cvectorization_ops_rep
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i16 cvectorization_ops_load_mask_i16(const uint8_t* from) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int16_t lanes[16];
-  for (size_t i = 0; i < 16; ++i) {
-    lanes[i] = (from[i >> 3] & (1 << (i & 7))) != 0 ? -1 : 0;
-  }
-  cvectorization_ops_mask_i16 result;
-  __builtin_memcpy(&result, lanes, sizeof result);
-  return (cvectorization_ops_raw_mask_i16)(result);
+  return (cvectorization_ops_raw_mask_i16)((cvectorization_ops_mask_i16)(cvectorization_ops_sve_u16)__builtin_sve_svsel_u16(__builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svand_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8(__builtin_sve_svtbl_u8(__builtin_sve_svld1_u8(__builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(2)), from), __builtin_sve_svlsr_n_u8_x(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svindex_u8(0, 1), 4))), __builtin_sve_svdupq_n_u16(1, 2, 4, 8, 16, 32, 64, 128)), 0), __builtin_sve_svdup_n_u16((uint16_t)-1), __builtin_sve_svdup_n_u16(0)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int16_t lanes[32];
-  for (size_t i = 0; i < 32; ++i) {
-    lanes[i] = (from[i >> 3] & (1 << (i & 7))) != 0 ? -1 : 0;
-  }
-  cvectorization_ops_mask_i16 result;
-  __builtin_memcpy(&result, lanes, sizeof result);
-  return (cvectorization_ops_raw_mask_i16)(result);
+  return (cvectorization_ops_raw_mask_i16)((cvectorization_ops_mask_i16)(cvectorization_ops_sve_u16)__builtin_sve_svsel_u16(__builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svand_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8(__builtin_sve_svtbl_u8(__builtin_sve_svld1_u8(__builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(4)), from), __builtin_sve_svlsr_n_u8_x(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svindex_u8(0, 1), 4))), __builtin_sve_svdupq_n_u16(1, 2, 4, 8, 16, 32, 64, 128)), 0), __builtin_sve_svdup_n_u16((uint16_t)-1), __builtin_sve_svdup_n_u16(0)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   unsigned int maskBits = 0;
   __builtin_memcpy(&maskBits, from, sizeof maskBits);
@@ -79570,17 +79425,16 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_bits_of_mask_i16(cvectorization_ops_raw_mask_i16 rawMask) {
   const cvectorization_ops_mask_i16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i16, cvectorization_ops_read_mask_i16, rawMask);
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint64_t bits = 0;
-  for (size_t i = 0; i < 16; ++i) {
-    bits |= mask[i] ? 1ull << i : 0;
-  }
-  return bits;
+  return __builtin_sve_svaddv_u16(__builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0), __builtin_sve_svlsl_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svdup_n_u16(1), __builtin_sve_svindex_u16(0, 1))) & 0xffff;
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint64_t bits = 0;
-  for (size_t i = 0; i < 32; ++i) {
-    bits |= mask[i] ? 1ull << i : 0;
-  }
-  return bits;
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  const __SVUint16_t bools16 = __builtin_sve_svdup_n_u16_z(active, 1);
+  const __SVUint8_t bools8 = __builtin_sve_svuzp1_u8(__builtin_sve_reinterpret_u8_u16(bools16), __builtin_sve_reinterpret_u8_u16(bools16));
+  const __SVUint8_t pairs = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), bools8, __builtin_sve_reinterpret_u8_u16(__builtin_sve_svlsr_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8(bools8), 7)));
+  const __SVUint8_t quads = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), pairs, __builtin_sve_reinterpret_u8_u32(__builtin_sve_svlsr_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u8(pairs), 14)));
+  const __SVUint8_t octets = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), quads, __builtin_sve_reinterpret_u8_u64(__builtin_sve_svlsr_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u8(quads), 28)));
+  const __SVUint64_t packed = __builtin_sve_svand_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u8(octets), 0xFF);
+  return __builtin_sve_svaddv_u64(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svlsl_u64_x(__builtin_sve_svptrue_pat_b64(31), packed, __builtin_sve_svindex_u64(0, 8))) & 0xffffffff;
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u16 values = (cvectorization_ops_vector_u16)mask & (cvectorization_ops_vector_u16){1, 2, 4, 8, 16, 32, 64, 128};
   return (uint64_t)__builtin_reduce_add(values) & 0xff;
@@ -79601,28 +79455,17 @@ CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_bits_of_mask_i16(cvectoriz
 CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_store_mask_i16(cvectorization_ops_raw_mask_i16 rawMask, uint8_t* to) {
   const cvectorization_ops_mask_i16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i16, cvectorization_ops_read_mask_i16, rawMask);
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int16_t lanes[16];
-  __builtin_memcpy(lanes, &mask, sizeof lanes);
-  to[0] = 0;
-  to[1] = 0;
-  for (size_t i = 0; i < 16; ++i) {
-    if (lanes[i] != 0) {
-      to[i >> 3] = (uint8_t)(to[i >> 3] | (1 << (i & 7)));
-    }
-  }
+  const uint64_t bits = cvectorization_ops_bits_of_mask_i16(rawMask);
+  __builtin_memcpy(to, &bits, 2);
   return 2;
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int16_t lanes[32];
-  __builtin_memcpy(lanes, &mask, sizeof lanes);
-  to[0] = 0;
-  to[1] = 0;
-  to[2] = 0;
-  to[3] = 0;
-  for (size_t i = 0; i < 32; ++i) {
-    if (lanes[i] != 0) {
-      to[i >> 3] = (uint8_t)(to[i >> 3] | (1 << (i & 7)));
-    }
-  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  const __SVUint16_t bools16 = __builtin_sve_svdup_n_u16_z(active, 1);
+  const __SVUint8_t bools8 = __builtin_sve_svuzp1_u8(__builtin_sve_reinterpret_u8_u16(bools16), __builtin_sve_reinterpret_u8_u16(bools16));
+  const __SVUint8_t pairs = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), bools8, __builtin_sve_reinterpret_u8_u16(__builtin_sve_svlsr_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8(bools8), 7)));
+  const __SVUint8_t quads = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), pairs, __builtin_sve_reinterpret_u8_u32(__builtin_sve_svlsr_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u8(pairs), 14)));
+  const __SVUint8_t octets = __builtin_sve_svorr_u8_x(__builtin_sve_svptrue_pat_b8(31), quads, __builtin_sve_reinterpret_u8_u64(__builtin_sve_svlsr_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u8(quads), 28)));
+  __builtin_sve_svst1b_u64(__builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(4)), to, __builtin_sve_reinterpret_u64_u8(octets));
   return 4;
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   const uint64_t bits = cvectorization_ops_bits_of_mask_i16(rawMask);
@@ -91904,21 +91747,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i32 cvectorization_ops_rep
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i32 cvectorization_ops_load_mask_i32(const uint8_t* from) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int32_t lanes[8];
-  for (size_t i = 0; i < 8; ++i) {
-    lanes[i] = (from[i >> 3] & (1 << (i & 7))) != 0 ? -1 : 0;
-  }
-  cvectorization_ops_mask_i32 result;
-  __builtin_memcpy(&result, lanes, sizeof result);
-  return (cvectorization_ops_raw_mask_i32)(result);
+  return (cvectorization_ops_raw_mask_i32)((cvectorization_ops_mask_i32)(cvectorization_ops_sve_u32)__builtin_sve_svsel_u32(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svand_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u8(__builtin_sve_svtbl_u8(__builtin_sve_svld1_u8(__builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(1)), from), __builtin_sve_svlsr_n_u8_x(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svindex_u8(0, 1), 5))), __builtin_sve_svlsl_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svdup_n_u32(1), __builtin_sve_svand_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svindex_u32(0, 1), 7))), 0), __builtin_sve_svdup_n_u32((uint32_t)-1), __builtin_sve_svdup_n_u32(0)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int32_t lanes[16];
-  for (size_t i = 0; i < 16; ++i) {
-    lanes[i] = (from[i >> 3] & (1 << (i & 7))) != 0 ? -1 : 0;
-  }
-  cvectorization_ops_mask_i32 result;
-  __builtin_memcpy(&result, lanes, sizeof result);
-  return (cvectorization_ops_raw_mask_i32)(result);
+  return (cvectorization_ops_raw_mask_i32)((cvectorization_ops_mask_i32)(cvectorization_ops_sve_u32)__builtin_sve_svsel_u32(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svand_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u8(__builtin_sve_svtbl_u8(__builtin_sve_svld1_u8(__builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(2)), from), __builtin_sve_svlsr_n_u8_x(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svindex_u8(0, 1), 5))), __builtin_sve_svlsl_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svdup_n_u32(1), __builtin_sve_svand_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svindex_u32(0, 1), 7))), 0), __builtin_sve_svdup_n_u32((uint32_t)-1), __builtin_sve_svdup_n_u32(0)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   unsigned short maskBits = 0;
   __builtin_memcpy(&maskBits, from, sizeof maskBits);
@@ -91958,17 +91789,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_bits_of_mask_i32(cvectorization_ops_raw_mask_i32 rawMask) {
   const cvectorization_ops_mask_i32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i32, cvectorization_ops_read_mask_i32, rawMask);
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint64_t bits = 0;
-  for (size_t i = 0; i < 8; ++i) {
-    bits |= mask[i] ? 1ull << i : 0;
-  }
-  return bits;
+  return __builtin_sve_svaddv_u32(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), __builtin_sve_svlsl_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svdup_n_u32(1), __builtin_sve_svindex_u32(0, 1))) & 0xff;
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint64_t bits = 0;
-  for (size_t i = 0; i < 16; ++i) {
-    bits |= mask[i] ? 1ull << i : 0;
-  }
-  return bits;
+  return __builtin_sve_svaddv_u32(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), __builtin_sve_svlsl_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svdup_n_u32(1), __builtin_sve_svindex_u32(0, 1))) & 0xffff;
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u32 values = (cvectorization_ops_vector_u32)mask & (cvectorization_ops_vector_u32){1, 2, 4, 8};
   return (uint64_t)__builtin_reduce_add(values) & 0xf;
@@ -91989,25 +91812,12 @@ CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_bits_of_mask_i32(cvectoriz
 CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_store_mask_i32(cvectorization_ops_raw_mask_i32 rawMask, uint8_t* to) {
   const cvectorization_ops_mask_i32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i32, cvectorization_ops_read_mask_i32, rawMask);
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int32_t lanes[8];
-  __builtin_memcpy(lanes, &mask, sizeof lanes);
-  to[0] = 0;
-  for (size_t i = 0; i < 8; ++i) {
-    if (lanes[i] != 0) {
-      to[i >> 3] = (uint8_t)(to[i >> 3] | (1 << (i & 7)));
-    }
-  }
+  const uint64_t bits = cvectorization_ops_bits_of_mask_i32(rawMask);
+  __builtin_memcpy(to, &bits, 1);
   return 1;
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int32_t lanes[16];
-  __builtin_memcpy(lanes, &mask, sizeof lanes);
-  to[0] = 0;
-  to[1] = 0;
-  for (size_t i = 0; i < 16; ++i) {
-    if (lanes[i] != 0) {
-      to[i >> 3] = (uint8_t)(to[i >> 3] | (1 << (i & 7)));
-    }
-  }
+  const uint64_t bits = cvectorization_ops_bits_of_mask_i32(rawMask);
+  __builtin_memcpy(to, &bits, 2);
   return 2;
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   const uint64_t bits = cvectorization_ops_bits_of_mask_i32(rawMask);
@@ -104558,21 +104368,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i64 cvectorization_ops_rep
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i64 cvectorization_ops_load_mask_i64(const uint8_t* from) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int64_t lanes[4];
-  for (size_t i = 0; i < 4; ++i) {
-    lanes[i] = (from[i >> 3] & (1 << (i & 7))) != 0 ? -1 : 0;
-  }
-  cvectorization_ops_mask_i64 result;
-  __builtin_memcpy(&result, lanes, sizeof result);
-  return (cvectorization_ops_raw_mask_i64)(result);
+  return (cvectorization_ops_raw_mask_i64)((cvectorization_ops_mask_i64)(cvectorization_ops_sve_u64)__builtin_sve_svsel_u64(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svand_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svdup_n_u64(from[0]), __builtin_sve_svlsl_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svdup_n_u64(1), __builtin_sve_svindex_u64(0, 1))), 0), __builtin_sve_svdup_n_u64((uint64_t)-1), __builtin_sve_svdup_n_u64(0)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int64_t lanes[8];
-  for (size_t i = 0; i < 8; ++i) {
-    lanes[i] = (from[i >> 3] & (1 << (i & 7))) != 0 ? -1 : 0;
-  }
-  cvectorization_ops_mask_i64 result;
-  __builtin_memcpy(&result, lanes, sizeof result);
-  return (cvectorization_ops_raw_mask_i64)(result);
+  return (cvectorization_ops_raw_mask_i64)((cvectorization_ops_mask_i64)(cvectorization_ops_sve_u64)__builtin_sve_svsel_u64(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svand_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svdup_n_u64(from[0]), __builtin_sve_svlsl_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svdup_n_u64(1), __builtin_sve_svindex_u64(0, 1))), 0), __builtin_sve_svdup_n_u64((uint64_t)-1), __builtin_sve_svdup_n_u64(0)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   unsigned char maskBits = 0;
   __builtin_memcpy(&maskBits, from, sizeof maskBits);
@@ -104612,17 +104410,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_bits_of_mask_i64(cvectorization_ops_raw_mask_i64 rawMask) {
   const cvectorization_ops_mask_i64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i64, cvectorization_ops_read_mask_i64, rawMask);
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint64_t bits = 0;
-  for (size_t i = 0; i < 4; ++i) {
-    bits |= mask[i] ? 1ull << i : 0;
-  }
-  return bits;
+  return __builtin_sve_svaddv_u64(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), __builtin_sve_svlsl_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svdup_n_u64(1), __builtin_sve_svindex_u64(0, 1))) & 0xf;
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint64_t bits = 0;
-  for (size_t i = 0; i < 8; ++i) {
-    bits |= mask[i] ? 1ull << i : 0;
-  }
-  return bits;
+  return __builtin_sve_svaddv_u64(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), __builtin_sve_svlsl_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svdup_n_u64(1), __builtin_sve_svindex_u64(0, 1))) & 0xff;
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u64 values = (cvectorization_ops_vector_u64)mask & (cvectorization_ops_vector_u64){1, 2};
   return (uint64_t)__builtin_reduce_add(values) & 0x3;
@@ -104643,24 +104433,12 @@ CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_bits_of_mask_i64(cvectoriz
 CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_store_mask_i64(cvectorization_ops_raw_mask_i64 rawMask, uint8_t* to) {
   const cvectorization_ops_mask_i64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i64, cvectorization_ops_read_mask_i64, rawMask);
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int64_t lanes[4];
-  __builtin_memcpy(lanes, &mask, sizeof lanes);
-  to[0] = 0;
-  for (size_t i = 0; i < 4; ++i) {
-    if (lanes[i] != 0) {
-      to[i >> 3] = (uint8_t)(to[i >> 3] | (1 << (i & 7)));
-    }
-  }
+  const uint64_t bits = cvectorization_ops_bits_of_mask_i64(rawMask);
+  __builtin_memcpy(to, &bits, 1);
   return 1;
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int64_t lanes[8];
-  __builtin_memcpy(lanes, &mask, sizeof lanes);
-  to[0] = 0;
-  for (size_t i = 0; i < 8; ++i) {
-    if (lanes[i] != 0) {
-      to[i >> 3] = (uint8_t)(to[i >> 3] | (1 << (i & 7)));
-    }
-  }
+  const uint64_t bits = cvectorization_ops_bits_of_mask_i64(rawMask);
+  __builtin_memcpy(to, &bits, 1);
   return 1;
 #elif CVECTORIZATION_OPS_NEON || (CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 6)
   const uint64_t bits = cvectorization_ops_bits_of_mask_i64(rawMask);
@@ -116208,21 +115986,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f32 cvectorization_ops_rep
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f32 cvectorization_ops_load_mask_f32(const uint8_t* from) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int32_t lanes[8];
-  for (size_t i = 0; i < 8; ++i) {
-    lanes[i] = (from[i >> 3] & (1 << (i & 7))) != 0 ? -1 : 0;
-  }
-  cvectorization_ops_mask_f32 result;
-  __builtin_memcpy(&result, lanes, sizeof result);
-  return (cvectorization_ops_raw_mask_f32)(result);
+  return (cvectorization_ops_raw_mask_f32)((cvectorization_ops_mask_f32)(cvectorization_ops_sve_u32)__builtin_sve_svsel_u32(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svand_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u8(__builtin_sve_svtbl_u8(__builtin_sve_svld1_u8(__builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(1)), from), __builtin_sve_svlsr_n_u8_x(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svindex_u8(0, 1), 5))), __builtin_sve_svlsl_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svdup_n_u32(1), __builtin_sve_svand_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svindex_u32(0, 1), 7))), 0), __builtin_sve_svdup_n_u32((uint32_t)-1), __builtin_sve_svdup_n_u32(0)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int32_t lanes[16];
-  for (size_t i = 0; i < 16; ++i) {
-    lanes[i] = (from[i >> 3] & (1 << (i & 7))) != 0 ? -1 : 0;
-  }
-  cvectorization_ops_mask_f32 result;
-  __builtin_memcpy(&result, lanes, sizeof result);
-  return (cvectorization_ops_raw_mask_f32)(result);
+  return (cvectorization_ops_raw_mask_f32)((cvectorization_ops_mask_f32)(cvectorization_ops_sve_u32)__builtin_sve_svsel_u32(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svand_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u8(__builtin_sve_svtbl_u8(__builtin_sve_svld1_u8(__builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(2)), from), __builtin_sve_svlsr_n_u8_x(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svindex_u8(0, 1), 5))), __builtin_sve_svlsl_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svdup_n_u32(1), __builtin_sve_svand_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svindex_u32(0, 1), 7))), 0), __builtin_sve_svdup_n_u32((uint32_t)-1), __builtin_sve_svdup_n_u32(0)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   unsigned short maskBits = 0;
   __builtin_memcpy(&maskBits, from, sizeof maskBits);
@@ -116264,17 +116030,9 @@ CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_bits_of_mask_f32(cvectoriz
 #if CVECTORIZATION_OPS_NEON == 2
   return __builtin_sve_svaddv_u32(__builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0), __builtin_sve_svlsl_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svdup_n_u32(1), __builtin_sve_svindex_u32(0, 1))) & 0xf;
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint64_t bits = 0;
-  for (size_t i = 0; i < 8; ++i) {
-    bits |= mask[i] ? 1ull << i : 0;
-  }
-  return bits;
+  return __builtin_sve_svaddv_u32(__builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0), __builtin_sve_svlsl_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svdup_n_u32(1), __builtin_sve_svindex_u32(0, 1))) & 0xff;
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint64_t bits = 0;
-  for (size_t i = 0; i < 16; ++i) {
-    bits |= mask[i] ? 1ull << i : 0;
-  }
-  return bits;
+  return __builtin_sve_svaddv_u32(__builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0), __builtin_sve_svlsl_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svdup_n_u32(1), __builtin_sve_svindex_u32(0, 1))) & 0xffff;
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u32 values = (cvectorization_ops_vector_u32)mask & (cvectorization_ops_vector_u32){1, 2, 4, 8};
   return (uint64_t)__builtin_reduce_add(values) & 0xf;
@@ -116295,25 +116053,12 @@ CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_bits_of_mask_f32(cvectoriz
 CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_store_mask_f32(cvectorization_ops_raw_mask_f32 rawMask, uint8_t* to) {
   const cvectorization_ops_mask_f32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_f32, cvectorization_ops_read_mask_f32, rawMask);
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int32_t lanes[8];
-  __builtin_memcpy(lanes, &mask, sizeof lanes);
-  to[0] = 0;
-  for (size_t i = 0; i < 8; ++i) {
-    if (lanes[i] != 0) {
-      to[i >> 3] = (uint8_t)(to[i >> 3] | (1 << (i & 7)));
-    }
-  }
+  const uint64_t bits = cvectorization_ops_bits_of_mask_f32(rawMask);
+  __builtin_memcpy(to, &bits, 1);
   return 1;
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int32_t lanes[16];
-  __builtin_memcpy(lanes, &mask, sizeof lanes);
-  to[0] = 0;
-  to[1] = 0;
-  for (size_t i = 0; i < 16; ++i) {
-    if (lanes[i] != 0) {
-      to[i >> 3] = (uint8_t)(to[i >> 3] | (1 << (i & 7)));
-    }
-  }
+  const uint64_t bits = cvectorization_ops_bits_of_mask_f32(rawMask);
+  __builtin_memcpy(to, &bits, 2);
   return 2;
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   const uint64_t bits = cvectorization_ops_bits_of_mask_f32(rawMask);
@@ -127589,21 +127334,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f64 cvectorization_ops_rep
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f64 cvectorization_ops_load_mask_f64(const uint8_t* from) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int64_t lanes[4];
-  for (size_t i = 0; i < 4; ++i) {
-    lanes[i] = (from[i >> 3] & (1 << (i & 7))) != 0 ? -1 : 0;
-  }
-  cvectorization_ops_mask_f64 result;
-  __builtin_memcpy(&result, lanes, sizeof result);
-  return (cvectorization_ops_raw_mask_f64)(result);
+  return (cvectorization_ops_raw_mask_f64)((cvectorization_ops_mask_f64)(cvectorization_ops_sve_u64)__builtin_sve_svsel_u64(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svand_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svdup_n_u64(from[0]), __builtin_sve_svlsl_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svdup_n_u64(1), __builtin_sve_svindex_u64(0, 1))), 0), __builtin_sve_svdup_n_u64((uint64_t)-1), __builtin_sve_svdup_n_u64(0)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int64_t lanes[8];
-  for (size_t i = 0; i < 8; ++i) {
-    lanes[i] = (from[i >> 3] & (1 << (i & 7))) != 0 ? -1 : 0;
-  }
-  cvectorization_ops_mask_f64 result;
-  __builtin_memcpy(&result, lanes, sizeof result);
-  return (cvectorization_ops_raw_mask_f64)(result);
+  return (cvectorization_ops_raw_mask_f64)((cvectorization_ops_mask_f64)(cvectorization_ops_sve_u64)__builtin_sve_svsel_u64(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svand_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svdup_n_u64(from[0]), __builtin_sve_svlsl_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svdup_n_u64(1), __builtin_sve_svindex_u64(0, 1))), 0), __builtin_sve_svdup_n_u64((uint64_t)-1), __builtin_sve_svdup_n_u64(0)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   unsigned char maskBits = 0;
   __builtin_memcpy(&maskBits, from, sizeof maskBits);
@@ -127645,17 +127378,9 @@ CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_bits_of_mask_f64(cvectoriz
 #if CVECTORIZATION_OPS_NEON == 2
   return __builtin_sve_svaddv_u64(__builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0), __builtin_sve_svlsl_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svdup_n_u64(1), __builtin_sve_svindex_u64(0, 1))) & 0x3;
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint64_t bits = 0;
-  for (size_t i = 0; i < 4; ++i) {
-    bits |= mask[i] ? 1ull << i : 0;
-  }
-  return bits;
+  return __builtin_sve_svaddv_u64(__builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0), __builtin_sve_svlsl_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svdup_n_u64(1), __builtin_sve_svindex_u64(0, 1))) & 0xf;
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint64_t bits = 0;
-  for (size_t i = 0; i < 8; ++i) {
-    bits |= mask[i] ? 1ull << i : 0;
-  }
-  return bits;
+  return __builtin_sve_svaddv_u64(__builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0), __builtin_sve_svlsl_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svdup_n_u64(1), __builtin_sve_svindex_u64(0, 1))) & 0xff;
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u64 values = (cvectorization_ops_vector_u64)mask & (cvectorization_ops_vector_u64){1, 2};
   return (uint64_t)__builtin_reduce_add(values) & 0x3;
@@ -127676,24 +127401,12 @@ CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_bits_of_mask_f64(cvectoriz
 CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_store_mask_f64(cvectorization_ops_raw_mask_f64 rawMask, uint8_t* to) {
   const cvectorization_ops_mask_f64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_f64, cvectorization_ops_read_mask_f64, rawMask);
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int64_t lanes[4];
-  __builtin_memcpy(lanes, &mask, sizeof lanes);
-  to[0] = 0;
-  for (size_t i = 0; i < 4; ++i) {
-    if (lanes[i] != 0) {
-      to[i >> 3] = (uint8_t)(to[i >> 3] | (1 << (i & 7)));
-    }
-  }
+  const uint64_t bits = cvectorization_ops_bits_of_mask_f64(rawMask);
+  __builtin_memcpy(to, &bits, 1);
   return 1;
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int64_t lanes[8];
-  __builtin_memcpy(lanes, &mask, sizeof lanes);
-  to[0] = 0;
-  for (size_t i = 0; i < 8; ++i) {
-    if (lanes[i] != 0) {
-      to[i >> 3] = (uint8_t)(to[i >> 3] | (1 << (i & 7)));
-    }
-  }
+  const uint64_t bits = cvectorization_ops_bits_of_mask_f64(rawMask);
+  __builtin_memcpy(to, &bits, 1);
   return 1;
 #elif CVECTORIZATION_OPS_NEON || (CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 6)
   const uint64_t bits = cvectorization_ops_bits_of_mask_f64(rawMask);
