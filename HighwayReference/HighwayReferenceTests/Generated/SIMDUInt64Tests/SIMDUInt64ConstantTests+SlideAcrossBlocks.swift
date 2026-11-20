@@ -334,6 +334,77 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
+    private func checkSlideDownLanesConstantA(_ value: Lane) {
+        let mismatches = Mismatches("slideDownLanes with a repeating \(hex(value))")
+        let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for lanes in lanesInputs {
+            mismatches.check(
+                H.slideDownLanes(H.repeating(value), by: lanes),
+                H(raw: HighwayReference.slideDownLanesU64(H.repeating(value).raw, lanes)),
+                "lanes: \(lanes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func slideDownLanesConstantSplat0() {
+        checkSlideDownLanesConstantA(0)
+    }
+
+    @Test func slideDownLanesConstantSplat1() {
+        checkSlideDownLanesConstantA(1)
+    }
+
+    @Test func slideDownLanesConstantSplat15() {
+        checkSlideDownLanesConstantA(15)
+    }
+
+    @Test func slideDownLanesConstantSplat16() {
+        checkSlideDownLanesConstantA(16)
+    }
+
+    @Test func slideDownLanesConstantSplat26() {
+        checkSlideDownLanesConstantA(26)
+    }
+
+    @Test func slideDownLanesConstantSplat127() {
+        checkSlideDownLanesConstantA(127)
+    }
+
+    @Test func slideDownLanesConstantSplat128() {
+        checkSlideDownLanesConstantA(128)
+    }
+
+    @Test func slideDownLanesConstantSplat255() {
+        checkSlideDownLanesConstantA(255)
+    }
+
+    @Test func slideDownLanesConstantSplat256() {
+        checkSlideDownLanesConstantA(256)
+    }
+
+    @Test func slideDownLanesConstantSplat257() {
+        checkSlideDownLanesConstantA(257)
+    }
+
+    @Test func slideDownLanesConstantSplat65280() {
+        checkSlideDownLanesConstantA(65280)
+    }
+
+    @Test func slideDownLanesConstantSplat65281() {
+        checkSlideDownLanesConstantA(65281)
+    }
+
+    @Test func slideDownLanesConstantSplatMax() {
+        checkSlideDownLanesConstantA(Lane.max)
+    }
+
+    @inline(__always)
     private func checkSlideDownLanesFillingWithConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("slideDownLanesFillingWith with lanes \(lanes)")
         let fillInputs = Inputs.vectors(H.self, seed: 0xD6A4_5883_4A6B_C76C)
@@ -378,6 +449,401 @@ extension SIMDUInt64ConstantTests {
 
     @Test(.enabled(if: 7 < H.laneCount)) func slideDownLanesFillingWithConstantLanes7() {
         checkSlideDownLanesFillingWithConstantLanes(7)
+    }
+
+    @inline(__always)
+    private func checkSlideDownLanesFillingWithConstantFill(_ value: Lane) {
+        let mismatches = Mismatches("slideDownLanesFillingWith with fill repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x525A_B164_0CBA_5121)
+        let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for (a, lanes) in everyPair(aInputs, lanesInputs) {
+            mismatches.check(
+                H.slideDownLanes(a, by: lanes, fillingWith: H.repeating(value)),
+                H(
+                    raw: HighwayReference.slideDownLanesFillingWithU64(
+                        H.repeating(value).raw,
+                        a.raw,
+                        lanes
+                    )
+                ),
+                "a: \(describe(a)), lanes: \(lanes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkSlideDownLanesFillingWithConstantA(_ value: Lane) {
+        let mismatches = Mismatches("slideDownLanesFillingWith with a repeating \(hex(value))")
+        let fillInputs = Inputs.vectors(H.self, seed: 0x847F_79CC_0885_6E2C)
+        let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for (fill, lanes) in everyPair(fillInputs, lanesInputs) {
+            mismatches.check(
+                H.slideDownLanes(H.repeating(value), by: lanes, fillingWith: fill),
+                H(
+                    raw: HighwayReference.slideDownLanesFillingWithU64(
+                        fill.raw,
+                        H.repeating(value).raw,
+                        lanes
+                    )
+                ),
+                "fill: \(describe(fill)), lanes: \(lanes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func slideDownLanesFillingWithConstantSplat0() {
+        checkSlideDownLanesFillingWithConstantFill(0)
+        checkSlideDownLanesFillingWithConstantA(0)
+    }
+
+    @Test func slideDownLanesFillingWithConstantSplat1() {
+        checkSlideDownLanesFillingWithConstantFill(1)
+        checkSlideDownLanesFillingWithConstantA(1)
+    }
+
+    @Test func slideDownLanesFillingWithConstantSplat15() {
+        checkSlideDownLanesFillingWithConstantFill(15)
+        checkSlideDownLanesFillingWithConstantA(15)
+    }
+
+    @Test func slideDownLanesFillingWithConstantSplat16() {
+        checkSlideDownLanesFillingWithConstantFill(16)
+        checkSlideDownLanesFillingWithConstantA(16)
+    }
+
+    @Test func slideDownLanesFillingWithConstantSplat26() {
+        checkSlideDownLanesFillingWithConstantFill(26)
+        checkSlideDownLanesFillingWithConstantA(26)
+    }
+
+    @Test func slideDownLanesFillingWithConstantSplat127() {
+        checkSlideDownLanesFillingWithConstantFill(127)
+        checkSlideDownLanesFillingWithConstantA(127)
+    }
+
+    @Test func slideDownLanesFillingWithConstantSplat128() {
+        checkSlideDownLanesFillingWithConstantFill(128)
+        checkSlideDownLanesFillingWithConstantA(128)
+    }
+
+    @Test func slideDownLanesFillingWithConstantSplat255() {
+        checkSlideDownLanesFillingWithConstantFill(255)
+        checkSlideDownLanesFillingWithConstantA(255)
+    }
+
+    @Test func slideDownLanesFillingWithConstantSplat256() {
+        checkSlideDownLanesFillingWithConstantFill(256)
+        checkSlideDownLanesFillingWithConstantA(256)
+    }
+
+    @Test func slideDownLanesFillingWithConstantSplat257() {
+        checkSlideDownLanesFillingWithConstantFill(257)
+        checkSlideDownLanesFillingWithConstantA(257)
+    }
+
+    @Test func slideDownLanesFillingWithConstantSplat65280() {
+        checkSlideDownLanesFillingWithConstantFill(65280)
+        checkSlideDownLanesFillingWithConstantA(65280)
+    }
+
+    @Test func slideDownLanesFillingWithConstantSplat65281() {
+        checkSlideDownLanesFillingWithConstantFill(65281)
+        checkSlideDownLanesFillingWithConstantA(65281)
+    }
+
+    @Test func slideDownLanesFillingWithConstantSplatMax() {
+        checkSlideDownLanesFillingWithConstantFill(Lane.max)
+        checkSlideDownLanesFillingWithConstantA(Lane.max)
+    }
+
+    @inline(__always)
+    private func checkSlide1UpConstantA(_ value: Lane) {
+        let mismatches = Mismatches("slide1Up with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.slide1Up(H.repeating(value)),
+            H(raw: HighwayReference.slide1UpU64(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func slide1UpConstantSplat0() {
+        checkSlide1UpConstantA(0)
+    }
+
+    @Test func slide1UpConstantSplat1() {
+        checkSlide1UpConstantA(1)
+    }
+
+    @Test func slide1UpConstantSplat15() {
+        checkSlide1UpConstantA(15)
+    }
+
+    @Test func slide1UpConstantSplat16() {
+        checkSlide1UpConstantA(16)
+    }
+
+    @Test func slide1UpConstantSplat26() {
+        checkSlide1UpConstantA(26)
+    }
+
+    @Test func slide1UpConstantSplat127() {
+        checkSlide1UpConstantA(127)
+    }
+
+    @Test func slide1UpConstantSplat128() {
+        checkSlide1UpConstantA(128)
+    }
+
+    @Test func slide1UpConstantSplat255() {
+        checkSlide1UpConstantA(255)
+    }
+
+    @Test func slide1UpConstantSplat256() {
+        checkSlide1UpConstantA(256)
+    }
+
+    @Test func slide1UpConstantSplat257() {
+        checkSlide1UpConstantA(257)
+    }
+
+    @Test func slide1UpConstantSplat65280() {
+        checkSlide1UpConstantA(65280)
+    }
+
+    @Test func slide1UpConstantSplat65281() {
+        checkSlide1UpConstantA(65281)
+    }
+
+    @Test func slide1UpConstantSplatMax() {
+        checkSlide1UpConstantA(Lane.max)
+    }
+
+    @inline(__always)
+    private func checkSlide1UpFillingWithConstantA(_ value: Lane) {
+        let mismatches = Mismatches("slide1UpFillingWith with a repeating \(hex(value))")
+        let fillInputs = Inputs.lanes(Lane.self, seed: 0x7E52_B520_EDEE_4A3D)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for fill in fillInputs {
+            mismatches.check(
+                H.slide1Up(H.repeating(value), fillingWith: fill),
+                H(raw: HighwayReference.slide1UpFillingWithU64(fill, H.repeating(value).raw)),
+                "fill: \(hex(fill))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func slide1UpFillingWithConstantSplat0() {
+        checkSlide1UpFillingWithConstantA(0)
+    }
+
+    @Test func slide1UpFillingWithConstantSplat1() {
+        checkSlide1UpFillingWithConstantA(1)
+    }
+
+    @Test func slide1UpFillingWithConstantSplat15() {
+        checkSlide1UpFillingWithConstantA(15)
+    }
+
+    @Test func slide1UpFillingWithConstantSplat16() {
+        checkSlide1UpFillingWithConstantA(16)
+    }
+
+    @Test func slide1UpFillingWithConstantSplat26() {
+        checkSlide1UpFillingWithConstantA(26)
+    }
+
+    @Test func slide1UpFillingWithConstantSplat127() {
+        checkSlide1UpFillingWithConstantA(127)
+    }
+
+    @Test func slide1UpFillingWithConstantSplat128() {
+        checkSlide1UpFillingWithConstantA(128)
+    }
+
+    @Test func slide1UpFillingWithConstantSplat255() {
+        checkSlide1UpFillingWithConstantA(255)
+    }
+
+    @Test func slide1UpFillingWithConstantSplat256() {
+        checkSlide1UpFillingWithConstantA(256)
+    }
+
+    @Test func slide1UpFillingWithConstantSplat257() {
+        checkSlide1UpFillingWithConstantA(257)
+    }
+
+    @Test func slide1UpFillingWithConstantSplat65280() {
+        checkSlide1UpFillingWithConstantA(65280)
+    }
+
+    @Test func slide1UpFillingWithConstantSplat65281() {
+        checkSlide1UpFillingWithConstantA(65281)
+    }
+
+    @Test func slide1UpFillingWithConstantSplatMax() {
+        checkSlide1UpFillingWithConstantA(Lane.max)
+    }
+
+    @inline(__always)
+    private func checkSlide1DownConstantA(_ value: Lane) {
+        let mismatches = Mismatches("slide1Down with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.slide1Down(H.repeating(value)),
+            H(raw: HighwayReference.slide1DownU64(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func slide1DownConstantSplat0() {
+        checkSlide1DownConstantA(0)
+    }
+
+    @Test func slide1DownConstantSplat1() {
+        checkSlide1DownConstantA(1)
+    }
+
+    @Test func slide1DownConstantSplat15() {
+        checkSlide1DownConstantA(15)
+    }
+
+    @Test func slide1DownConstantSplat16() {
+        checkSlide1DownConstantA(16)
+    }
+
+    @Test func slide1DownConstantSplat26() {
+        checkSlide1DownConstantA(26)
+    }
+
+    @Test func slide1DownConstantSplat127() {
+        checkSlide1DownConstantA(127)
+    }
+
+    @Test func slide1DownConstantSplat128() {
+        checkSlide1DownConstantA(128)
+    }
+
+    @Test func slide1DownConstantSplat255() {
+        checkSlide1DownConstantA(255)
+    }
+
+    @Test func slide1DownConstantSplat256() {
+        checkSlide1DownConstantA(256)
+    }
+
+    @Test func slide1DownConstantSplat257() {
+        checkSlide1DownConstantA(257)
+    }
+
+    @Test func slide1DownConstantSplat65280() {
+        checkSlide1DownConstantA(65280)
+    }
+
+    @Test func slide1DownConstantSplat65281() {
+        checkSlide1DownConstantA(65281)
+    }
+
+    @Test func slide1DownConstantSplatMax() {
+        checkSlide1DownConstantA(Lane.max)
+    }
+
+    @inline(__always)
+    private func checkSlide1DownFillingWithConstantA(_ value: Lane) {
+        let mismatches = Mismatches("slide1DownFillingWith with a repeating \(hex(value))")
+        let fillInputs = Inputs.lanes(Lane.self, seed: 0x1D76_4302_CE81_428C)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for fill in fillInputs {
+            mismatches.check(
+                H.slide1Down(H.repeating(value), fillingWith: fill),
+                H(raw: HighwayReference.slide1DownFillingWithU64(fill, H.repeating(value).raw)),
+                "fill: \(hex(fill))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func slide1DownFillingWithConstantSplat0() {
+        checkSlide1DownFillingWithConstantA(0)
+    }
+
+    @Test func slide1DownFillingWithConstantSplat1() {
+        checkSlide1DownFillingWithConstantA(1)
+    }
+
+    @Test func slide1DownFillingWithConstantSplat15() {
+        checkSlide1DownFillingWithConstantA(15)
+    }
+
+    @Test func slide1DownFillingWithConstantSplat16() {
+        checkSlide1DownFillingWithConstantA(16)
+    }
+
+    @Test func slide1DownFillingWithConstantSplat26() {
+        checkSlide1DownFillingWithConstantA(26)
+    }
+
+    @Test func slide1DownFillingWithConstantSplat127() {
+        checkSlide1DownFillingWithConstantA(127)
+    }
+
+    @Test func slide1DownFillingWithConstantSplat128() {
+        checkSlide1DownFillingWithConstantA(128)
+    }
+
+    @Test func slide1DownFillingWithConstantSplat255() {
+        checkSlide1DownFillingWithConstantA(255)
+    }
+
+    @Test func slide1DownFillingWithConstantSplat256() {
+        checkSlide1DownFillingWithConstantA(256)
+    }
+
+    @Test func slide1DownFillingWithConstantSplat257() {
+        checkSlide1DownFillingWithConstantA(257)
+    }
+
+    @Test func slide1DownFillingWithConstantSplat65280() {
+        checkSlide1DownFillingWithConstantA(65280)
+    }
+
+    @Test func slide1DownFillingWithConstantSplat65281() {
+        checkSlide1DownFillingWithConstantA(65281)
+    }
+
+    @Test func slide1DownFillingWithConstantSplatMax() {
+        checkSlide1DownFillingWithConstantA(Lane.max)
     }
 
     @inline(__always)

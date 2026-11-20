@@ -321,6 +321,284 @@ extension SIMDUInt32ConstantTests {
     }
 
     @inline(__always)
+    private func checkSlide1UpConstantA(_ value: Lane) {
+        let mismatches = Mismatches("slide1Up with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU32(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.slide1Up(H.repeating(value)),
+            H(raw: HighwayReference.slide1UpU32(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func slide1UpConstantSplat0() {
+        checkSlide1UpConstantA(0)
+    }
+
+    @Test func slide1UpConstantSplat1() {
+        checkSlide1UpConstantA(1)
+    }
+
+    @Test func slide1UpConstantSplat15() {
+        checkSlide1UpConstantA(15)
+    }
+
+    @Test func slide1UpConstantSplat16() {
+        checkSlide1UpConstantA(16)
+    }
+
+    @Test func slide1UpConstantSplat26() {
+        checkSlide1UpConstantA(26)
+    }
+
+    @Test func slide1UpConstantSplat127() {
+        checkSlide1UpConstantA(127)
+    }
+
+    @Test func slide1UpConstantSplat128() {
+        checkSlide1UpConstantA(128)
+    }
+
+    @Test func slide1UpConstantSplat255() {
+        checkSlide1UpConstantA(255)
+    }
+
+    @Test func slide1UpConstantSplat256() {
+        checkSlide1UpConstantA(256)
+    }
+
+    @Test func slide1UpConstantSplat257() {
+        checkSlide1UpConstantA(257)
+    }
+
+    @Test func slide1UpConstantSplat65280() {
+        checkSlide1UpConstantA(65280)
+    }
+
+    @Test func slide1UpConstantSplat65281() {
+        checkSlide1UpConstantA(65281)
+    }
+
+    @Test func slide1UpConstantSplatMax() {
+        checkSlide1UpConstantA(Lane.max)
+    }
+
+    @inline(__always)
+    private func checkSlide1UpFillingWithConstantA(_ value: Lane) {
+        let mismatches = Mismatches("slide1UpFillingWith with a repeating \(hex(value))")
+        let fillInputs = Inputs.lanes(Lane.self, seed: 0xDDBE_E9FB_4414_CC1A)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU32(value)),
+            "repeating"
+        )
+        for fill in fillInputs {
+            mismatches.check(
+                H.slide1Up(H.repeating(value), fillingWith: fill),
+                H(raw: HighwayReference.slide1UpFillingWithU32(fill, H.repeating(value).raw)),
+                "fill: \(hex(fill))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func slide1UpFillingWithConstantSplat0() {
+        checkSlide1UpFillingWithConstantA(0)
+    }
+
+    @Test func slide1UpFillingWithConstantSplat1() {
+        checkSlide1UpFillingWithConstantA(1)
+    }
+
+    @Test func slide1UpFillingWithConstantSplat15() {
+        checkSlide1UpFillingWithConstantA(15)
+    }
+
+    @Test func slide1UpFillingWithConstantSplat16() {
+        checkSlide1UpFillingWithConstantA(16)
+    }
+
+    @Test func slide1UpFillingWithConstantSplat26() {
+        checkSlide1UpFillingWithConstantA(26)
+    }
+
+    @Test func slide1UpFillingWithConstantSplat127() {
+        checkSlide1UpFillingWithConstantA(127)
+    }
+
+    @Test func slide1UpFillingWithConstantSplat128() {
+        checkSlide1UpFillingWithConstantA(128)
+    }
+
+    @Test func slide1UpFillingWithConstantSplat255() {
+        checkSlide1UpFillingWithConstantA(255)
+    }
+
+    @Test func slide1UpFillingWithConstantSplat256() {
+        checkSlide1UpFillingWithConstantA(256)
+    }
+
+    @Test func slide1UpFillingWithConstantSplat257() {
+        checkSlide1UpFillingWithConstantA(257)
+    }
+
+    @Test func slide1UpFillingWithConstantSplat65280() {
+        checkSlide1UpFillingWithConstantA(65280)
+    }
+
+    @Test func slide1UpFillingWithConstantSplat65281() {
+        checkSlide1UpFillingWithConstantA(65281)
+    }
+
+    @Test func slide1UpFillingWithConstantSplatMax() {
+        checkSlide1UpFillingWithConstantA(Lane.max)
+    }
+
+    @inline(__always)
+    private func checkSlide1DownConstantA(_ value: Lane) {
+        let mismatches = Mismatches("slide1Down with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU32(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.slide1Down(H.repeating(value)),
+            H(raw: HighwayReference.slide1DownU32(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func slide1DownConstantSplat0() {
+        checkSlide1DownConstantA(0)
+    }
+
+    @Test func slide1DownConstantSplat1() {
+        checkSlide1DownConstantA(1)
+    }
+
+    @Test func slide1DownConstantSplat15() {
+        checkSlide1DownConstantA(15)
+    }
+
+    @Test func slide1DownConstantSplat16() {
+        checkSlide1DownConstantA(16)
+    }
+
+    @Test func slide1DownConstantSplat26() {
+        checkSlide1DownConstantA(26)
+    }
+
+    @Test func slide1DownConstantSplat127() {
+        checkSlide1DownConstantA(127)
+    }
+
+    @Test func slide1DownConstantSplat128() {
+        checkSlide1DownConstantA(128)
+    }
+
+    @Test func slide1DownConstantSplat255() {
+        checkSlide1DownConstantA(255)
+    }
+
+    @Test func slide1DownConstantSplat256() {
+        checkSlide1DownConstantA(256)
+    }
+
+    @Test func slide1DownConstantSplat257() {
+        checkSlide1DownConstantA(257)
+    }
+
+    @Test func slide1DownConstantSplat65280() {
+        checkSlide1DownConstantA(65280)
+    }
+
+    @Test func slide1DownConstantSplat65281() {
+        checkSlide1DownConstantA(65281)
+    }
+
+    @Test func slide1DownConstantSplatMax() {
+        checkSlide1DownConstantA(Lane.max)
+    }
+
+    @inline(__always)
+    private func checkSlide1DownFillingWithConstantA(_ value: Lane) {
+        let mismatches = Mismatches("slide1DownFillingWith with a repeating \(hex(value))")
+        let fillInputs = Inputs.lanes(Lane.self, seed: 0xB252_AEA1_AC2E_C753)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU32(value)),
+            "repeating"
+        )
+        for fill in fillInputs {
+            mismatches.check(
+                H.slide1Down(H.repeating(value), fillingWith: fill),
+                H(raw: HighwayReference.slide1DownFillingWithU32(fill, H.repeating(value).raw)),
+                "fill: \(hex(fill))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func slide1DownFillingWithConstantSplat0() {
+        checkSlide1DownFillingWithConstantA(0)
+    }
+
+    @Test func slide1DownFillingWithConstantSplat1() {
+        checkSlide1DownFillingWithConstantA(1)
+    }
+
+    @Test func slide1DownFillingWithConstantSplat15() {
+        checkSlide1DownFillingWithConstantA(15)
+    }
+
+    @Test func slide1DownFillingWithConstantSplat16() {
+        checkSlide1DownFillingWithConstantA(16)
+    }
+
+    @Test func slide1DownFillingWithConstantSplat26() {
+        checkSlide1DownFillingWithConstantA(26)
+    }
+
+    @Test func slide1DownFillingWithConstantSplat127() {
+        checkSlide1DownFillingWithConstantA(127)
+    }
+
+    @Test func slide1DownFillingWithConstantSplat128() {
+        checkSlide1DownFillingWithConstantA(128)
+    }
+
+    @Test func slide1DownFillingWithConstantSplat255() {
+        checkSlide1DownFillingWithConstantA(255)
+    }
+
+    @Test func slide1DownFillingWithConstantSplat256() {
+        checkSlide1DownFillingWithConstantA(256)
+    }
+
+    @Test func slide1DownFillingWithConstantSplat257() {
+        checkSlide1DownFillingWithConstantA(257)
+    }
+
+    @Test func slide1DownFillingWithConstantSplat65280() {
+        checkSlide1DownFillingWithConstantA(65280)
+    }
+
+    @Test func slide1DownFillingWithConstantSplat65281() {
+        checkSlide1DownFillingWithConstantA(65281)
+    }
+
+    @Test func slide1DownFillingWithConstantSplatMax() {
+        checkSlide1DownFillingWithConstantA(Lane.max)
+    }
+
+    @inline(__always)
     private func checkSlideUpBlocksConstantBlocks(_ blocks: Int) {
         let mismatches = Mismatches("slideUpBlocks with blocks \(blocks)")
         let aInputs = Inputs.vectors(H.self, seed: 0xC9FF_82E9_E896_8E31)

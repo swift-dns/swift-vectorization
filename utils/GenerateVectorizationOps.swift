@@ -2958,16 +2958,94 @@ func sveFirstLanes(for element: Element) -> String {
     return maskResult("(\(element.cMask))(\(sveVector(unsigned.cSuffix)))\(selected)", for: element)
 }
 
-func sveSlideUp(filling: Bool, for element: Element) -> String {
-    let fill =
-        filling
-        ? sveOperand("fill", for: element, splat: true) : sveBuiltin("dup_n", ["0"], for: element)
-    let slid = sveBuiltin(
-        "splice",
-        [sveActiveLanes("lanes", for: element), fill, sveOperand("a", for: element, splat: true)],
+func sveSlideFill(_ fill: SlideFill, for element: Element) -> String {
+    switch fill {
+    case .zeros: return sveBuiltin("dup_n", ["0"], for: element)
+    case .vector: return sveOperand("fill", for: element, splat: true)
+    case .lane: return sveBuiltin("dup_n", ["fill"], for: element)
+    }
+}
+
+func sveSlideBuiltin(
+    _ direction: SlideDirection,
+    _ fill: SlideFill,
+    by amount: String = "lanes",
+    of operand: String,
+    for element: Element
+) -> String {
+    switch direction {
+    case .up:
+        return sveBuiltin(
+            "splice",
+            [sveActiveLanes(amount, for: element), sveSlideFill(fill, for: element), operand],
+            for: element
+        )
+    case .down:
+        let unsigned = unsignedElement(of: element)
+        let indices = sveBuiltin("index", ["(\(unsigned.cType))(\(amount))", "1"], for: unsigned)
+        return sveBuiltin(
+            "sel",
+            [
+                sveActiveLanes("\(element.laneCount) - (\(amount))", for: element),
+                sveBuiltin("tbl", [operand, indices], for: element),
+                sveSlideFill(fill, for: element),
+            ],
+            for: element
+        )
+    }
+}
+
+func sveSlide(
+    _ direction: SlideDirection,
+    _ fill: SlideFill,
+    by amount: String = "lanes",
+    for element: Element
+) -> String {
+    let operand = sveOperand("a", for: element, splat: true)
+    let slid = sveSlideBuiltin(direction, fill, by: amount, of: operand, for: element)
+    return vectorResult(sveResult(slid, for: element), for: element)
+}
+
+func sveSlidMask(
+    _ direction: SlideDirection,
+    by lanes: String? = nil,
+    for element: Element
+) -> String {
+    let unsigned = unsignedElement(of: element).at(width: element.width)
+    let operand = sveOperand("((\(unsigned.cVector))mask)", for: unsigned)
+    let slid = sveSlideBuiltin(direction, .zeros, by: lanes ?? "1", of: operand, for: unsigned)
+    return maskResult("(\(element.cMask))\(sveResult(slid, for: unsigned))", for: element)
+}
+
+func slidesByConstantAmountPortably(_ direction: SlideDirection, for element: Element) -> Bool {
+    switch direction {
+    case .up: return element.width == 32
+    case .down: return element.width == 64 && element.bits == 64
+    }
+}
+
+func sveSlideLanes(_ direction: SlideDirection, for element: Element) -> String {
+    let slid = sveSlide(direction, .zeros, for: element)
+    guard slidesByConstantAmountPortably(direction, for: element) else { return slid }
+    return """
+        if (__builtin_constant_p(lanes)) {
+        \(indented(portableSlide(direction, for: element)))
+        }
+        \(slid)
+        """
+}
+
+func sveSlide1(_ direction: SlideDirection, _ fill: SlideFill, for element: Element) -> String? {
+    guard !slidesByConstantAmountPortably(direction, for: element) else { return nil }
+    let portable =
+        fill == .zeros
+        ? portableSlide1(direction, for: element) : slide1Filling(direction, for: element)
+    return sveFoldingConstants(
+        of: ["a"],
+        portable,
+        otherwise: sveSlide(direction, fill, by: "1", for: element),
         for: element
     )
-    return vectorResult(sveResult(slid, for: element), for: element)
 }
 
 func sveIota(for element: Element) -> String? {
@@ -3093,6 +3171,12 @@ enum X86Level: Int, CaseIterable, Comparable {
 enum SlideDirection: String {
     case up
     case down
+}
+
+enum SlideFill {
+    case zeros
+    case vector
+    case lane
 }
 
 enum Reduction {
@@ -7096,7 +7180,8 @@ func slideTargets(_ direction: SlideDirection) -> TargetBodies<Element> {
             \(vectorResult(neonTableLookup("a", "indices", for: element), for: element))
             """
         },
-        sve2_128: direction == .up ? { element in sveSlideUp(filling: false, for: element) } : nil,
+        sve2_128: direction == .up ? { element in sveSlide(.up, .zeros, for: element) } : nil,
+        sve: { element in sveSlideLanes(direction, for: element) },
         avx3dl: { element in x86Avx3Slide(direction, level: .avx3dl, for: element) },
         avx3: { element in x86Avx3Slide(direction, level: .avx3, for: element) },
         avx2: { element in
@@ -7201,6 +7286,7 @@ func slide1Targets(_ direction: SlideDirection) -> TargetBodies<Element> {
     }
     return TargetBodies(
         neon: { element in shuffledSlide1(direction, for: element) },
+        sve: { element in sveSlide1(direction, .zeros, for: element) },
         avx3dl: avx3(.avx3dl),
         avx3: avx3(.avx3),
         avx2: { element in x86WideSlideBytes(direction, by: element.bits / 8, for: element) },
@@ -7296,7 +7382,8 @@ func x86SlideLanes(_ direction: SlideDirection, for element: Element) -> String 
 func slideFillingTargets(_ direction: SlideDirection) -> TargetBodies<Element> {
     TargetBodies(
         neon: { element in neonSlideFilling(direction, for: element) },
-        sve2_128: direction == .up ? { element in sveSlideUp(filling: true, for: element) } : nil,
+        sve2_128: direction == .up ? { element in sveSlide(.up, .vector, for: element) } : nil,
+        sve: { element in sveSlide(direction, .vector, for: element) },
         avx3dl: { element in x86Avx3SlideFilling(direction, level: .avx3dl, for: element) },
         avx3: { element in x86Avx3SlideFilling(direction, level: .avx3, for: element) },
         sse4: { element in
@@ -7380,6 +7467,7 @@ func x86WideSlide1Filling(_ direction: SlideDirection, for element: Element) -> 
 
 func slide1FillingTargets(_ direction: SlideDirection) -> TargetBodies<Element> {
     TargetBodies(
+        sve: { element in sveSlide1(direction, .lane, for: element) },
         avx3: { element in x86Avx3Slide1(direction, filling: true, for: element) },
         avx2: { element in x86WideSlide1Filling(direction, for: element) },
         sse4: { element in x86Slide1Filling(direction, level: .sse4, for: element) },
@@ -20547,6 +20635,7 @@ let maskOps: [Op] = [
         section: .slideMaskAcrossBlocks,
         identifier: "slideMaskUpLanes",
         targets: TargetBodies(
+            sve: { element in sveSlidMask(.up, by: "lanes", for: element) },
             avx3: { element in x86Avx3SlidMask(.up, by: "lanes", for: element) }
         )
     ) { element in
@@ -20561,6 +20650,7 @@ let maskOps: [Op] = [
         section: .slideMaskAcrossBlocks,
         identifier: "slideMaskDownLanes",
         targets: TargetBodies(
+            sve: { element in sveSlidMask(.down, by: "lanes", for: element) },
             avx3: { element in x86Avx3SlidMask(.down, by: "lanes", for: element) }
         )
     ) { element in
@@ -20574,7 +20664,10 @@ let maskOps: [Op] = [
         .all,
         section: .slideMaskAcrossBlocks,
         identifier: "slideMask1Up",
-        targets: TargetBodies(avx3: { element in x86Avx3SlidMask(.up, for: element) })
+        targets: TargetBodies(
+            sve: { element in sveSlidMask(.up, for: element) },
+            avx3: { element in x86Avx3SlidMask(.up, for: element) }
+        )
     ) { element in
         slidMask(.up, for: element)
     },
@@ -20586,7 +20679,10 @@ let maskOps: [Op] = [
         .all,
         section: .slideMaskAcrossBlocks,
         identifier: "slideMask1Down",
-        targets: TargetBodies(avx3: { element in x86Avx3SlidMask(.down, for: element) })
+        targets: TargetBodies(
+            sve: { element in sveSlidMask(.down, for: element) },
+            avx3: { element in x86Avx3SlidMask(.down, for: element) }
+        )
     ) { element in
         slidMask(.down, for: element)
     },
