@@ -1644,6 +1644,21 @@ func reducedExtremumOrNaN(_ name: String, isNaN: String, for element: Element) -
     return "return \(hasNoNaN) ? \(extremum)(\(rawName("a"))) : \(scalarNaN(of: element));"
 }
 
+func sveReducedExtremumOrNaN(_ name: String, for element: Element) -> String {
+    let all = sveAllLanes(of: element)
+    let operand = sveOperand("a", for: element)
+    let nans = sveBuiltin("cmpne", [all, operand, operand], for: element)
+    let extremum = cFunctionName(name, element)
+    let reduced =
+        "return !__builtin_sve_svptest_any(\(all), \(nans)) ? \(extremum)(\(rawName("a"))) : \(scalarNaN(of: element));"
+    return sveFoldingConstants(
+        of: ["a"],
+        reducedExtremumOrNaN(name, isNaN: "(\(element.cMask))(a != a)", for: element),
+        otherwise: reduced,
+        for: element
+    )
+}
+
 func assumedAligned(_ pointer: String, for element: Element) -> String {
     "__builtin_assume_aligned(\(pointer), \(element.width))"
 }
@@ -2493,8 +2508,27 @@ func sveComparisonSplat(_ name: String, mirrored: String, for element: Element) 
     ].joined(separator: "\n")
 }
 
-func sveAllFalse(for element: Element) -> String? {
-    guard element.bits == 64 else { return nil }
+func portableAllTrue(for element: Element) -> String {
+    """
+    \(element.cMaskLane) andSum = -1;
+    for (size_t i = 0; i < \(element.laneCount); ++i) {
+      andSum &= mask[i];
+    }
+    return andSum == -1;
+    """
+}
+
+func portableAllFalse(for element: Element) -> String {
+    """
+    \(element.cMaskLane) orSum = 0;
+    for (size_t i = 0; i < \(element.laneCount); ++i) {
+      orSum |= mask[i];
+    }
+    return orSum == 0;
+    """
+}
+
+func sveAllFalse(for element: Element) -> String {
     let all = sveAllLanes(of: element)
     return "return !__builtin_sve_svptest_any(\(all), \(svePredicate(of: "mask", for: element)));"
 }
@@ -11602,6 +11636,19 @@ func sveFoldingConstants(
         """
 }
 
+func sveFoldingConstantMask(
+    _ folded: String,
+    otherwise body: String,
+    for element: Element
+) -> String {
+    sveFoldingConstants(
+        of: ["(\(element.cVector))mask"],
+        folded,
+        otherwise: body,
+        for: element
+    )
+}
+
 func alternatingLanes(
     _ evens: String,
     _ odds: String,
@@ -16069,19 +16116,20 @@ let basicOps: [Op] = [
         section: .testMask,
         targets: TargetBodies(
             neon: { _ in "\(neonNibbles)\nreturn nibbles == ~0ull;" },
-            sve2_128: { element in sveAllTrue(for: element) },
+            sve2_128: { element in element.category == .float ? sveAllTrue(for: element) : nil },
+            sve: { element in
+                sveFoldingConstantMask(
+                    portableAllTrue(for: element),
+                    otherwise: sveAllTrue(for: element),
+                    for: element
+                )
+            },
             avx3: { element in x86AllTrue(for: element) },
             avx2: { element in x86AllTrue(for: element) },
             sse2: { element in x86AllTrue(for: element) }
         )
     ) { element in
-        """
-        \(element.cMaskLane) andSum = -1;
-        for (size_t i = 0; i < \(element.laneCount); ++i) {
-          andSum &= mask[i];
-        }
-        return andSum == -1;
-        """
+        portableAllTrue(for: element)
     },
     Op(
         "allFalse",
@@ -16092,20 +16140,20 @@ let basicOps: [Op] = [
         section: .testMask,
         targets: TargetBodies(
             neon: { _ in "\(neonNibbles)\nreturn nibbles == 0;" },
-            sve2_128: { element in sveAllFalse(for: element) },
-            sve: { element in sveAllFalse(for: element) },
+            sve2_128: { element in element.bits == 64 ? sveAllFalse(for: element) : nil },
+            sve: { element in
+                sveFoldingConstantMask(
+                    portableAllFalse(for: element),
+                    otherwise: sveAllFalse(for: element),
+                    for: element
+                )
+            },
             avx3: { element in "return \(x86MaskBits(for: element)) == 0;" },
             avx2: { element in "return \(x86MaskBits(for: element)) == 0;" },
             sse2: { element in "return \(x86MaskBits(for: element)) == 0;" }
         )
     ) { element in
-        """
-        \(element.cMaskLane) orSum = 0;
-        for (size_t i = 0; i < \(element.laneCount); ++i) {
-          orSum |= mask[i];
-        }
-        return orSum == 0;
-        """
+        portableAllFalse(for: element)
     },
     Op(
         "allBitsSet",
@@ -16239,11 +16287,8 @@ let basicOps: [Op] = [
                 return (size_t)-(int64_t)__builtin_reduce_add(raw);
                 """
             },
-            sve2_128: { element in
-                let predicate = svePredicate(of: "mask", for: element)
-                return
-                    "return __builtin_sve_svcntp_b\(element.bits)(\(sveAllLanes(of: element)), \(predicate));"
-            },
+            sve2_128: { element in sveTrueCount(for: element) },
+            sve: { element in sveTrueCount(for: element) },
             avx3: { element in x86TrueCount(for: element) },
             avx2: { element in x86TrueCount(for: element) },
             sse2: { element in x86TrueCount(for: element) }
@@ -16266,6 +16311,7 @@ let basicOps: [Op] = [
         section: .testMask,
         targets: TargetBodies(
             neon: { element in neonFirstTrueIndex(for: element) },
+            sve: { element in sveFirstTrueIndex(for: element) },
             avx3: { element in x86TrueLane(.first, known: false, for: element) },
             avx2: { element in
                 element.bits == 16
@@ -16350,6 +16396,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonReduction("vminvq", for: element) },
             sve2_128: { element in neonReducedExtremumOrNaN("vminvq", for: element) },
+            sve: { element in sveReducedExtremumOrNaN("smallest", for: element) },
             avx3: { element in
                 reducedExtremumOrNaN("smallest", isNaN: x86Avx3IsNaN(for: element), for: element)
             },
@@ -16402,6 +16449,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonReduction("vmaxvq", for: element) },
             sve2_128: { element in neonReducedExtremumOrNaN("vmaxvq", for: element) },
+            sve: { element in sveReducedExtremumOrNaN("largest", for: element) },
             avx3: { element in
                 reducedExtremumOrNaN("largest", isNaN: x86Avx3IsNaN(for: element), for: element)
             },
@@ -20427,11 +20475,28 @@ func sveLastTrue(for element: Element) -> String? {
         """
 }
 
-func sveAllTrue(for element: Element) -> String? {
-    guard element.category == .float else { return nil }
+func sveCountedTrue(for element: Element) -> String {
     let active = svePredicate(of: "mask", for: element)
-    let count = "__builtin_sve_svcntp_b\(element.bits)(\(sveAllLanes(of: element)), \(active))"
-    return "return \(count) == \(element.laneCount);"
+    return "__builtin_sve_svcntp_b\(element.bits)(\(sveAllLanes(of: element)), \(active))"
+}
+
+func sveTrueCount(for element: Element) -> String {
+    "return \(sveCountedTrue(for: element));"
+}
+
+func sveAllTrue(for element: Element) -> String {
+    "return \(sveCountedTrue(for: element)) == \(element.laneCount);"
+}
+
+func sveFirstTrueIndex(for element: Element) -> String {
+    """
+    const __SVBool_t active = \(svePredicate(of: "mask", for: element));
+    const __SVBool_t lanes = \(sveVectorLanes(for: element));
+    if (!__builtin_sve_svptest_any(lanes, active)) {
+      return -1;
+    }
+    return (intptr_t)__builtin_sve_svcntp_b\(element.bits)(lanes, __builtin_sve_svbrkb_b_z(lanes, active));
+    """
 }
 
 func sveBitsOfMask(for element: Element) -> String? {
@@ -51729,6 +51794,7 @@ func constantType(
 {
     switch parameter {
     case .flag: return "Bool"
+    case .mask: return "H.Mask"
     case .roundConstant: return "UInt8"
     case _ where parameter.isPointerIndices: return signedElement(of: element).swiftType
     case _ where isConstantVector(parameter): return lane
@@ -51737,6 +51803,27 @@ func constantType(
 }
 
 let indexSplats = integerConstants([0, 1])
+
+func constantMask(repeating value: Bool, except lane: String? = nil) -> String {
+    let uniform = "H.Mask.SIMDType(repeating: \(value))"
+    guard let lane else { return "H.Mask(\(uniform))" }
+    return "{ var simd = \(uniform); simd[\(lane)] = \(!value); return H.Mask(simd) }()"
+}
+
+let constantMasks = [
+    ConstantValue(name: "AllFalse", literal: constantMask(repeating: false)),
+    ConstantValue(name: "AllTrue", literal: constantMask(repeating: true)),
+    ConstantValue(name: "OnlyFirst", literal: constantMask(repeating: false, except: "0")),
+    ConstantValue(
+        name: "OnlyLast",
+        literal: constantMask(repeating: false, except: "H.laneCount - 1")
+    ),
+    ConstantValue(name: "AllButFirst", literal: constantMask(repeating: true, except: "0")),
+    ConstantValue(
+        name: "AllButLast",
+        literal: constantMask(repeating: true, except: "H.laneCount - 1")
+    ),
+]
 
 func constantHelper(
     of op: Op,
@@ -51829,7 +51916,9 @@ func constantHelper(
     let describedValue =
         alternating
         ? "alternating \\(hex(even)), \\(hex(odd))"
-        : isSplat ? "repeating \\(hex(value))" : "\\(\(value))"
+        : isSplat
+            ? "repeating \\(hex(value))"
+            : op.parameters[index] == .mask ? "\\(describe(\(value)))" : "\\(\(value))"
     let suffix = guarded ? " before a guard page" : ""
     let knownIssue =
         alternating
@@ -51980,6 +52069,8 @@ func constantTests(of op: Op, for element: Element) -> [String] {
                 ConstantValue(name: "False", literal: "false"),
                 ConstantValue(name: "True", literal: "true"),
             ]
+        case .mask:
+            values = constantMasks
         default:
             fatalError("\(op.identifier) branches on \(binding.swiftName), which nothing covers")
         }
