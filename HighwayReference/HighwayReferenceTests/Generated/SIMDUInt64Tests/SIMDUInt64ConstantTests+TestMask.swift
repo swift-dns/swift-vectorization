@@ -115,4 +115,114 @@ extension SIMDUInt64ConstantTests {
             }()
         )
     }
+
+    @inline(__always)
+    private func checkTrueCountConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("trueCount with mask \(describe(mask))")
+        mismatches.check(H.trueCount(mask), HighwayReference.trueCountU64(mask.raw), "")
+        mismatches.record()
+    }
+
+    @Test func trueCountConstantMaskAllFalse() {
+        checkTrueCountConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func trueCountConstantMaskAllTrue() {
+        checkTrueCountConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func trueCountConstantMaskOnlyFirst() {
+        checkTrueCountConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func trueCountConstantMaskOnlyLast() {
+        checkTrueCountConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func trueCountConstantMaskAllButFirst() {
+        checkTrueCountConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func trueCountConstantMaskAllButLast() {
+        checkTrueCountConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
+    private func checkFirstTrueIndexConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("firstTrueIndex with mask \(describe(mask))")
+        mismatches.check(H.firstTrueIndex(mask), HighwayReference.firstTrueIndexU64(mask.raw), "")
+        mismatches.record()
+    }
+
+    @Test func firstTrueIndexConstantMaskAllFalse() {
+        checkFirstTrueIndexConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func firstTrueIndexConstantMaskAllTrue() {
+        checkFirstTrueIndexConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func firstTrueIndexConstantMaskOnlyFirst() {
+        checkFirstTrueIndexConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func firstTrueIndexConstantMaskOnlyLast() {
+        checkFirstTrueIndexConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func firstTrueIndexConstantMaskAllButFirst() {
+        checkFirstTrueIndexConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func firstTrueIndexConstantMaskAllButLast() {
+        checkFirstTrueIndexConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
 }

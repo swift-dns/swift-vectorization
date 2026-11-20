@@ -3063,12 +3063,11 @@ func slidesByConstantAmountPortably(_ direction: SlideDirection, for element: El
 func sveSlideLanes(_ direction: SlideDirection, for element: Element) -> String {
     let slid = sveSlide(direction, .zeros, for: element)
     guard slidesByConstantAmountPortably(direction, for: element) else { return slid }
-    return """
-        if (__builtin_constant_p(lanes)) {
-        \(indented(portableSlide(direction, for: element)))
-        }
-        \(slid)
-        """
+    return sveFolding(
+        when: "__builtin_constant_p(lanes)",
+        portableSlide(direction, for: element),
+        otherwise: slid
+    )
 }
 
 func sveSlide1(_ direction: SlideDirection, _ fill: SlideFill, for element: Element) -> String? {
@@ -7265,19 +7264,24 @@ func portableSlideCopy(
     return "__builtin_memcpy(\(destination), \(source), \(size));"
 }
 
-func portableSlide(_ direction: SlideDirection, for element: Element) -> String {
+func portableSlide(
+    _ direction: SlideDirection,
+    masked: Bool = false,
+    for element: Element
+) -> String {
     let lanes = element.laneCount
     let (destination, source, size) = portableSlideOperands(direction, by: "clamped", for: element)
+    let type = masked ? element.cMask : element.cVector
     return """
-        \(element.cVector) result;
-        const \(element.cVector) source = a;
+        \(type) result;
+        const \(type) source = \(masked ? "mask" : "a");
         const size_t clamped = lanes < \(lanes) ? lanes : \(lanes);
         void *const destination = \(destination);
         const void *const origin = \(source);
         const size_t size = \(size);
         __builtin_memset(&result, 0, sizeof result);
         __builtin_memcpy(destination, origin, size);
-        \(vectorResult("result", for: element))
+        \(masked ? maskResult("result", for: element) : vectorResult("result", for: element))
         """
 }
 
@@ -7296,16 +7300,21 @@ func bytewiseSlide1(_ direction: SlideDirection, for element: Element) -> String
     }
 }
 
-func portableSlide1(_ direction: SlideDirection, for element: Element) -> String {
-    if element.bits == 32 && element.width == 16 && element.category != .float {
+func portableSlide1(
+    _ direction: SlideDirection,
+    masked: Bool = false,
+    for element: Element
+) -> String {
+    if !masked && element.bits == 32 && element.width == 16 && element.category != .float {
         return vectorResult(bytewiseSlide1(direction, for: element), for: element)
     }
+    let type = masked ? element.cMask : element.cVector
     return """
-        \(element.cVector) result;
-        const \(element.cVector) source = a;
-        result = (\(element.cVector)){0};
+        \(type) result;
+        const \(type) source = \(masked ? "mask" : "a");
+        result = (\(type)){0};
         \(portableSlideCopy(direction, by: "1", for: element))
-        \(vectorResult("result", for: element))
+        \(masked ? maskResult("result", for: element) : vectorResult("result", for: element))
         """
 }
 
@@ -11621,6 +11630,15 @@ func sveOddEvenLanes(odd: String, even: String, sve2: Bool, for element: Element
     return fromUnsignedBits(sveResult(merged, for: lanes), of: element)
 }
 
+func sveFolding(when condition: String, _ folded: String, otherwise body: String) -> String {
+    """
+    if (\(condition)) {
+    \(indented(folded))
+    }
+    \(body)
+    """
+}
+
 func sveFoldingConstants(
     of operands: [String],
     _ folded: String,
@@ -11630,25 +11648,18 @@ func sveFoldingConstants(
     guard !operands.isEmpty else { return body }
     let constant = cFunctionName("sveConstant", element)
     let condition = operands.map { "\(constant)(\($0))" }.joined(separator: " || ")
-    return """
-        if (\(condition)) {
-        \(indented(folded))
-        }
-        \(body)
-        """
+    return sveFolding(when: condition, folded, otherwise: body)
 }
 
 func sveFoldingConstantMask(
     _ folded: String,
     otherwise body: String,
+    withConstant amount: String? = nil,
     for element: Element
 ) -> String {
-    sveFoldingConstants(
-        of: ["(\(element.cVector))mask"],
-        folded,
-        otherwise: body,
-        for: element
-    )
+    let mask = "\(cFunctionName("sveConstant", element))((\(element.cVector))mask)"
+    let conditions = [mask] + (amount.map { ["__builtin_constant_p(\($0))"] } ?? [])
+    return sveFolding(when: conditions.joined(separator: " && "), folded, otherwise: body)
 }
 
 func alternatingLanes(
@@ -16290,19 +16301,21 @@ let basicOps: [Op] = [
                 """
             },
             sve2_128: { element in sveTrueCount(for: element) },
-            sve: { element in sveTrueCount(for: element) },
+            sve: { element in
+                element.laneCount > 32
+                    ? sveTrueCount(for: element)
+                    : sveFoldingConstantMask(
+                        portableTrueCount(for: element),
+                        otherwise: sveTrueCount(for: element),
+                        for: element
+                    )
+            },
             avx3: { element in x86TrueCount(for: element) },
             avx2: { element in x86TrueCount(for: element) },
             sse2: { element in x86TrueCount(for: element) }
         )
     ) { element in
-        """
-        size_t count = 0;
-        for (size_t i = 0; i < \(element.laneCount); ++i) {
-          count += mask[i] != 0;
-        }
-        return count;
-        """
+        portableTrueCount(for: element)
     },
     Op(
         "firstTrueIndex",
@@ -16313,7 +16326,13 @@ let basicOps: [Op] = [
         section: .testMask,
         targets: TargetBodies(
             neon: { element in neonFirstTrueIndex(for: element) },
-            sve: { element in sveFirstTrueIndex(for: element) },
+            sve: { element in
+                sveFoldingConstantMask(
+                    portableTrueLane(.first, known: false, for: element),
+                    otherwise: sveFirstTrueIndex(for: element),
+                    for: element
+                )
+            },
             avx3: { element in x86TrueLane(.first, known: false, for: element) },
             avx2: { element in
                 element.bits == 16
@@ -16323,13 +16342,7 @@ let basicOps: [Op] = [
             sse2: { element in x86FirstTrueIndex(for: element) }
         )
     ) { element in
-        let checks = (0..<element.laneCount).map { lane in
-            "if (mask[\(lane)]) {\n  return \(lane);\n}"
-        }
-        return """
-            \(checks.joined(separator: "\n"))
-            return -1;
-            """
+        portableTrueLane(.first, known: false, for: element)
     },
 
     Op(
@@ -20119,6 +20132,16 @@ func x86MaskSuffix(lanes: Int) -> String {
     }
 }
 
+func portableTrueCount(for element: Element) -> String {
+    """
+    size_t count = 0;
+    for (size_t i = 0; i < \(element.laneCount); ++i) {
+      count += mask[i] != 0;
+    }
+    return count;
+    """
+}
+
 func portableTrueLane(_ search: TrueLane, known: Bool, for element: Element) -> String {
     let lanes = Array(0..<element.laneCount)
     let order = search == .first ? lanes : lanes.reversed()
@@ -20831,7 +20854,13 @@ let maskOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonBitsOfMask(for: element) },
             sve2_128: { element in element.category == .float ? sveBitsOfMask(for: element) : nil },
-            sve: { element in sveBitsOfMask(for: element) },
+            sve: { element in
+                sveFoldingConstantMask(
+                    portableBitsOfMask(for: element),
+                    otherwise: sveBitsOfMask(for: element),
+                    for: element
+                )
+            },
             avx3: { element in x86BitsOfMask(for: element) },
             avx2: { element in x86BitsOfMask(for: element) },
             sse2: { element in x86BitsOfMask(for: element) }
@@ -20869,7 +20898,14 @@ let maskOps: [Op] = [
         section: .slideMaskAcrossBlocks,
         identifier: "slideMaskUpLanes",
         targets: TargetBodies(
-            sve: { element in sveSlidMask(.up, by: "lanes", for: element) },
+            sve: { element in
+                sveFoldingConstantMask(
+                    portableSlide(.up, masked: true, for: element),
+                    otherwise: sveSlidMask(.up, by: "lanes", for: element),
+                    withConstant: "lanes",
+                    for: element
+                )
+            },
             avx3: { element in x86Avx3SlidMask(.up, by: "lanes", for: element) }
         )
     ) { element in
@@ -20884,7 +20920,14 @@ let maskOps: [Op] = [
         section: .slideMaskAcrossBlocks,
         identifier: "slideMaskDownLanes",
         targets: TargetBodies(
-            sve: { element in sveSlidMask(.down, by: "lanes", for: element) },
+            sve: { element in
+                sveFoldingConstantMask(
+                    portableSlide(.down, masked: true, for: element),
+                    otherwise: sveSlidMask(.down, by: "lanes", for: element),
+                    withConstant: "lanes",
+                    for: element
+                )
+            },
             avx3: { element in x86Avx3SlidMask(.down, by: "lanes", for: element) }
         )
     ) { element in
@@ -20899,7 +20942,13 @@ let maskOps: [Op] = [
         section: .slideMaskAcrossBlocks,
         identifier: "slideMask1Up",
         targets: TargetBodies(
-            sve: { element in sveSlidMask(.up, for: element) },
+            sve: { element in
+                sveFoldingConstantMask(
+                    portableSlide1(.up, masked: true, for: element),
+                    otherwise: sveSlidMask(.up, for: element),
+                    for: element
+                )
+            },
             avx3: { element in x86Avx3SlidMask(.up, for: element) }
         )
     ) { element in
@@ -20914,7 +20963,13 @@ let maskOps: [Op] = [
         section: .slideMaskAcrossBlocks,
         identifier: "slideMask1Down",
         targets: TargetBodies(
-            sve: { element in sveSlidMask(.down, for: element) },
+            sve: { element in
+                sveFoldingConstantMask(
+                    portableSlide1(.down, masked: true, for: element),
+                    otherwise: sveSlidMask(.down, for: element),
+                    for: element
+                )
+            },
             avx3: { element in x86Avx3SlidMask(.down, for: element) }
         )
     ) { element in
@@ -52134,6 +52189,55 @@ func constantTest(
         """
 }
 
+/// A helper that takes the mask and the lane amount of an op, which only fold into the constant
+/// path of the op when both are constants, and the tests that call it with every constant mask and
+/// the amounts that are lanes of some vector.
+func maskAmountConstantTests(of op: Op, for element: Element) -> [String] {
+    let name = "check\(uppercasedFirst(op.testIdentifier))ConstantMaskLanes"
+    let parameterBindings = bindings(of: op, for: element)
+    let names = zip(parameterBindings, op.parameters)
+        .filter { $0.1 == .mask || $0.1 == .laneAmount }
+        .map(\.0.swiftName)
+    let inputs = referenceInputs(of: op, for: element, test: name, inContract: true)
+        .filter { !names.contains($0.name) }
+    let calls = referenceCalls(
+        of: op,
+        for: element,
+        pointer: referencePointer(of: op, guarded: false),
+        destination: referenceDestination(of: op, guarded: false)
+    )
+    let (declarations, statements) = referenceStatements(
+        of: op,
+        for: element,
+        inputs: inputs,
+        guarded: false,
+        calls: calls
+    )
+    var members = [
+        referenceTestFunction(
+            name,
+            label: "\(op.testIdentifier) with mask \\(describe(mask)), lanes \\(lanes)",
+            for: element,
+            inputs: inputs,
+            declarations: declarations,
+            signature: "@inline(__always)\nprivate func \(name)(_ mask: H.Mask, _ lanes: Int) {",
+            statements: statements
+        )
+    ]
+    for mask in constantMasks {
+        for lanes in [0, 1, 2, 3, 7, 15, 31, 63] {
+            members.append(
+                constantTest(
+                    "\(op.testIdentifier)ConstantMask\(mask.name)Lanes\(lanes)",
+                    enabledIf: "\(lanes) < H.laneCount",
+                    calls: ["\(name)(\(mask.literal), \(lanes))"]
+                )
+            )
+        }
+    }
+    return members
+}
+
 func isOutOfContractSplat(_ value: ConstantValue, of op: Op, for element: Element) -> Bool {
     guard op.parameters.contains(.shiftCounts) else { return false }
     guard let count = Int(value.literal) else { return true }
@@ -52260,6 +52364,12 @@ func constantTests(of op: Op, for element: Element) -> [String] {
                 )
             }
         }
+    }
+
+    if indices.contains(where: { op.parameters[$0] == .mask })
+        && indices.contains(where: { op.parameters[$0] == .laneAmount })
+    {
+        members += maskAmountConstantTests(of: op, for: element)
     }
 
     if indices.contains(where: { op.parameters[$0] == .immediate }) {
