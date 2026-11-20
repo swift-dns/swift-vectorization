@@ -3017,11 +3017,13 @@ func sveSlideBuiltin(
     case .down:
         let unsigned = unsignedElement(of: element)
         let indices = sveBuiltin("index", ["(\(unsigned.cType))(\(amount))", "1"], for: unsigned)
+        let slid = sveBuiltin("tbl", [operand, indices], for: element)
+        guard fill != .zeros else { return slid }
         return sveBuiltin(
             "sel",
             [
                 sveActiveLanes("\(element.laneCount) - (\(amount))", for: element),
-                sveBuiltin("tbl", [operand, indices], for: element),
+                slid,
                 sveSlideFill(fill, for: element),
             ],
             for: element
