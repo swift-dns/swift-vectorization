@@ -53050,33 +53050,25 @@ func writeSections(
         }
         return
     }
-    var files: [(name: String, contents: String)] = []
-    for section in Section.allCases {
+    for (ordinal, section) in Section.allCases.enumerated() {
         let sectionMembers = populated(section)
         guard !sectionMembers.isEmpty else { continue }
         let parts = partitioned(sectionMembers)
         for (index, part) in parts.enumerated() {
             let number = parts.count == 1 ? "" : String(index + 1)
-            files.append(
-                (
-                    name: "\(name)+\(section.rawValue)\(number).swift",
-                    contents: sectionFile(
-                        part,
-                        imports: imports,
-                        extending: type,
-                        for: element,
-                        testing: testing
-                    )
-                )
+            let partDirectory =
+                partCount == 1 ? directory : "\(directory)\((ordinal + index) % partCount + 1)"
+            try write(
+                sectionFile(
+                    part,
+                    imports: imports,
+                    extending: type,
+                    for: element,
+                    testing: testing
+                ),
+                to: "\(partDirectory)/\(name)+\(section.rawValue)\(number).swift"
             )
         }
-    }
-    var loads = [Int](repeating: 0, count: partCount)
-    for file in files {
-        let part = loads.indices.min { loads[$0] < loads[$1] } ?? 0
-        loads[part] += file.contents.utf8.count { $0 > 0x20 }
-        let partDirectory = partCount == 1 ? directory : "\(directory)\(part + 1)"
-        try write(file.contents, to: "\(partDirectory)/\(file.name)")
     }
 }
 
