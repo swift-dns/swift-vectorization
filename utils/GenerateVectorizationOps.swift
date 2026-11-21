@@ -52917,6 +52917,8 @@ let maximumUnformattedFileLines = 1000
 
 let maximumUnformattedMembersFileLines = 2000
 
+let constantTestParts = 3
+
 func balanced(_ members: [SectionMember]) -> [[SectionMember]] {
     let lines = members.reduce(0) { $0 + $1.lineCount }
     let count = max(
@@ -53023,7 +53025,8 @@ func writeSections(
     extending type: String,
     for element: Element? = nil,
     testing: Bool = false,
-    balancing: Bool = false
+    balancing: Bool = false,
+    inParts partCount: Int = 1
 ) throws {
     func populated(_ section: Section) -> [SectionMember] {
         members.filter {
@@ -53047,23 +53050,33 @@ func writeSections(
         }
         return
     }
+    var files: [(name: String, contents: String)] = []
     for section in Section.allCases {
         let sectionMembers = populated(section)
         guard !sectionMembers.isEmpty else { continue }
         let parts = partitioned(sectionMembers)
         for (index, part) in parts.enumerated() {
             let number = parts.count == 1 ? "" : String(index + 1)
-            try write(
-                sectionFile(
-                    part,
-                    imports: imports,
-                    extending: type,
-                    for: element,
-                    testing: testing
-                ),
-                to: "\(directory)/\(name)+\(section.rawValue)\(number).swift"
+            files.append(
+                (
+                    name: "\(name)+\(section.rawValue)\(number).swift",
+                    contents: sectionFile(
+                        part,
+                        imports: imports,
+                        extending: type,
+                        for: element,
+                        testing: testing
+                    )
+                )
             )
         }
+    }
+    var loads = [Int](repeating: 0, count: partCount)
+    for file in files {
+        let part = loads.indices.min { loads[$0] < loads[$1] } ?? 0
+        loads[part] += file.contents.utf8.count { $0 > 0x20 }
+        let partDirectory = partCount == 1 ? directory : "\(directory)\(part + 1)"
+        try write(file.contents, to: "\(partDirectory)/\(file.name)")
     }
 }
 
@@ -53141,6 +53154,16 @@ let referencePackage = try String(
 let unlistedElements = elements.map(\.namespace).filter { !referencePackage.contains("\"\($0)\"") }
 guard unlistedElements.isEmpty else {
     let message = "add \(unlistedElements) to elementNames in HighwayReference/Package.swift"
+    FileHandle.standardError.write(Data("** ERROR: \(message)\n".utf8))
+    exit(1)
+}
+let listedConstantTestParts = (1...).lazy.prefix {
+    referencePackage.contains("\"ConstantTests\($0)\"")
+}.count
+guard listedConstantTestParts == constantTestParts else {
+    let message =
+        "list ConstantTests1 to ConstantTests\(constantTestParts) in testSuites in "
+        + "HighwayReference/Package.swift, which lists \(listedConstantTestParts)"
     FileHandle.standardError.write(Data("** ERROR: \(message)\n".utf8))
     exit(1)
 }
@@ -53263,59 +53286,64 @@ for element in elements {
         balancing: true
     )
 
-    let testsDirectory = "\(generatedReferenceTestsRoot)/\(element.namespace)Tests"
     let referenceTestsName = "\(element.namespace)ReferenceTests"
+    let referenceTestsDirectory = "\(generatedReferenceTestsRoot)/\(referenceTestsName)"
     try write(
         conditioned(generateReferenceTests(element), for: element),
-        to: "\(testsDirectory)/\(referenceTestsName).swift"
+        to: "\(referenceTestsDirectory)/\(referenceTestsName).swift"
     )
     try writeSections(
         generateReferenceTestMembers(element, by: testedKeys),
         named: referenceTestsName,
-        in: testsDirectory,
+        in: referenceTestsDirectory,
         imports: referenceTestImports,
         extending: referenceTestsName,
         for: element,
         testing: true
     )
     let codegenTestsName = "\(element.namespace)CodegenTests"
+    let codegenTestsDirectory = "\(generatedReferenceTestsRoot)/\(codegenTestsName)"
     try write(
         conditioned(generateCodegenTests(element), for: element),
-        to: "\(testsDirectory)/\(codegenTestsName).swift"
+        to: "\(codegenTestsDirectory)/\(codegenTestsName).swift"
     )
     try writeSections(
         generateCodegenTestMembers(element, by: testedKeys),
         named: codegenTestsName,
-        in: testsDirectory,
+        in: codegenTestsDirectory,
         imports: codegenTestImports,
         extending: codegenTestsName,
         for: element,
         testing: true
     )
     let constantTestsName = "\(element.namespace)ConstantTests"
-    try write(
-        conditioned(generateConstantTests(element), for: element),
-        to: "\(testsDirectory)/\(constantTestsName).swift"
-    )
+    let constantTestsDirectory = "\(generatedReferenceTestsRoot)/\(constantTestsName)"
+    for part in 1...constantTestParts {
+        try write(
+            conditioned(generateConstantTests(element), for: element),
+            to: "\(constantTestsDirectory)\(part)/\(constantTestsName).swift"
+        )
+    }
     try writeSections(
         generateConstantTestMembers(element, by: testedKeys),
         named: constantTestsName,
-        in: testsDirectory,
+        in: constantTestsDirectory,
         imports: constantTestImports,
         extending: constantTestsName,
         for: element,
-        testing: true
+        testing: true,
+        inParts: constantTestParts
     )
 
     let linkTestsName = "\(element.namespace)LinkTests"
     try write(
         conditioned(generateLinkTests(element), for: element),
-        to: "\(testsDirectory)/\(linkTestsName).swift"
+        to: "\(referenceTestsDirectory)/\(linkTestsName).swift"
     )
     try writeSections(
         linkTestMembers(for: element),
         named: linkTestsName,
-        in: testsDirectory,
+        in: referenceTestsDirectory,
         imports: referenceTestImports,
         extending: linkTestsName,
         for: element,
