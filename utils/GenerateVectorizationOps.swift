@@ -20577,20 +20577,23 @@ func sveMaskOctets(for element: Element) -> String {
     """
 }
 
-func sveSummedMaskBits(for element: Element) -> String {
+func sveSummedMask(startingAt first: Int, for element: Element) -> String {
     let unsigned = unsignedElement(of: element)
     let bits = sveBuiltin(
         "lsl",
         [
             sveAllLanes(of: element), sveBuiltin("dup_n", ["1"], for: unsigned),
-            sveBuiltin("index", ["0", "1"], for: unsigned),
+            sveBuiltin("index", ["\(first)", "1"], for: unsigned),
         ],
         for: unsigned,
         predication: "x"
     )
-    let sum = sveBuiltin("addv", [svePredicate(of: "mask", for: element), bits], for: unsigned)
+    return sveBuiltin("addv", [svePredicate(of: "mask", for: element), bits], for: unsigned)
+}
+
+func sveSummedMaskBits(for element: Element) -> String {
     let valid = "0x\(String((1 << element.laneCount) - 1, radix: 16))"
-    return "return \(sum) & \(valid);"
+    return "return \(sveSummedMask(startingAt: 0, for: element)) & \(valid);"
 }
 
 func sveBitsOfMask(for element: Element) -> String {
@@ -21478,16 +21481,37 @@ func sveSplicedPairs(not: Bool, for element: Element) -> String {
         """
 }
 
-func sveExpandTableName(for element: Element) -> String {
-    "cvectorization_ops_sve_expand_table_16x8_\(tableSuffix(of: element))"
+func sveExpandTableName(_ name: String, for element: Element) -> String {
+    "cvectorization_ops_sve_expand_\(name)_\(tableSuffix(of: element))"
 }
 
 func sveExpandHelpers(for element: Element) -> String? {
     let neon = neonExpandHelpers(for: element)
     guard element.bits == 16 else { return neon }
     let rows = expandTableRows(lanes: 8) { [$0] }
-    let table = neonTable(named: sveExpandTableName(for: element), rows, isInternal: true)
+    let name = sveExpandTableName("table_16x8", for: element)
+    let table = neonTable(named: name, rows, isInternal: true)
     return [neon, table].compactMap { $0 }.joined()
+}
+
+func sveExpandedHelpers(for element: Element) -> String? {
+    switch (element.bits, element.width) {
+    case (64, 32):
+        let rows = expandTableRows(lanes: 4, zero: 255) { [$0] }
+        let name = sveExpandTableName("table_64x4", for: element)
+        return neonTable(named: name, rows, lane: "uint64_t", isInternal: true)
+    case (32, 32):
+        let rows = expandTableRows(lanes: 8, zero: 15) { [$0] }
+        let packed = stride(from: 0, to: rows.count, by: 8).map { start in
+            (0..<8).reduce(0) { $0 | rows[start + $1] << (4 * $1) }
+        }
+        let name = sveExpandTableName("packed_table_32x8", for: element)
+        return neonTable(named: name, packed, lane: "uint32_t", isInternal: true)
+    default:
+        let rows = expandTableRows(lanes: 8) { [$0] }
+        let name = sveExpandTableName("table_\(element.bits)x8", for: element)
+        return neonTable(named: name, rows, isInternal: true)
+    }
 }
 
 func sveExpanded(for element: Element) -> String? {
@@ -21504,21 +21528,8 @@ func sveExpanded(for element: Element) -> String? {
             """
     case 16:
         let unsigned = unsignedElement(of: element)
-        let weights = sveBuiltin(
-            "lsl",
-            [
-                sveAllLanes(of: element), sveBuiltin("dup_n", ["1"], for: unsigned),
-                sveBuiltin("index", ["3", "1"], for: unsigned),
-            ],
-            for: unsigned,
-            predication: "x"
-        )
-        let offset = sveBuiltin(
-            "addv",
-            [svePredicate(of: "mask", for: element), weights],
-            for: unsigned
-        )
-        let row = "\(sveExpandTableName(for: element))() + offset"
+        let offset = sveSummedMask(startingAt: 3, for: element)
+        let row = "\(sveExpandTableName("table_16x8", for: element))() + offset"
         let indices = "__builtin_sve_svld1ub_u16(\(sveVectorLanes(for: element)), \(row))"
         let lookup = sveBuiltin("tbl", [sveOperand("a", for: unsigned), indices], for: unsigned)
         return """
@@ -21527,6 +21538,88 @@ func sveExpanded(for element: Element) -> String? {
             """
     default:
         return nil
+    }
+}
+
+func sveExpandedQuads(for element: Element) -> String {
+    let table = sveExpandTableName("table_64x4", for: element)
+    return sveTableIndicesLookup(table, at: sveQuadsOffset(for: element), for: element)
+}
+
+func sveExpandedOctets(for element: Element) -> String {
+    let unsigned = unsignedElement(of: element)
+    let all = sveAllLanes(of: element)
+    let table = sveExpandTableName("packed_table_32x8", for: element)
+    let code = "\(sveSummedMask(startingAt: 0, for: element)) & 255"
+    let packed = sveBuiltin("dup_n", ["\(table)()[\(code)]"], for: unsigned)
+    let shifted = sveBuiltin(
+        "lsr",
+        [all, packed, sveBuiltin("index", ["0", "4"], for: unsigned)],
+        for: unsigned,
+        predication: "x"
+    )
+    let indices = sveBuiltin("and_n", [all, shifted, "0xF"], for: unsigned, predication: "x")
+    let lookup = sveBuiltin("tbl", [sveOperand("a", for: element), indices], for: element)
+    return vectorResult(sveResult(lookup, for: element), for: element)
+}
+
+func sveExpandedLoop(for element: Element) -> String {
+    let unsigned = unsignedElement(of: element)
+    let type = sveType(of: element)
+    let all = sveAllLanes(of: element)
+    let table = sveExpandTableName("table_\(element.bits)x8", for: element)
+    let eight = "__builtin_sve_svptrue_pat_b\(element.bits)(\(svePattern(lanes: 8)))"
+    let groups = element.laneCount / 8
+    let readsStoredBytes = element.bits <= 16
+    var statements =
+        readsStoredBytes
+        ? [
+            "uint8_t octets[\(groups)];",
+            "\(cFunctionName("storeMask", element))(rawMask, octets);",
+        ] : ["const uint64_t bits = \(cFunctionName("bitsOfMask", element))(rawMask);"]
+    statements.append("const \(type) source = \(sveOperand("a", for: element));")
+    if groups > 1 {
+        let iota = sveBuiltin("index", ["0", "1"], for: unsigned)
+        statements.append("const \(sveType(of: unsigned)) iota = \(iota);")
+        statements.append("uint64_t consumed = 0;")
+    }
+    for group in 0..<groups {
+        let octet = "octet\(group)"
+        let bits = group == 0 ? "bits" : "(bits >> \(8 * group))"
+        let loaded = readsStoredBytes ? "octets[\(group)]" : "\(bits) & 0xFF"
+        let row = "\(table)() + 8 * \(octet)"
+        let indices = sveBuiltin(element.bits == 8 ? "ld1" : "ld1ub", [eight, row], for: unsigned)
+        let rotated = group == 0 ? "source" : "rotated\(group)"
+        let expanded = sveBuiltin("tbl", [rotated, indices], for: element)
+        statements.append("const uint64_t \(octet) = \(loaded);")
+        if group > 0 {
+            let spliced = sveBuiltin("splice", ["next", "source", "source"], for: element)
+            statements.append("const \(type) rotated\(group) = \(spliced);")
+            let slid = sveBuiltin(
+                "splice",
+                [sveActiveLanes("\(8 * group)", for: element), "result", expanded],
+                for: element
+            )
+            statements.append("result = \(slid);")
+        } else {
+            statements.append("\(type) result = \(expanded);")
+        }
+        if group < groups - 1 {
+            let consumed = "(\(unsigned.cType))consumed"
+            let next = sveBuiltin("cmpge_n", [all, "iota", consumed], for: unsigned)
+            statements.append("consumed += __builtin_popcountll(\(octet));")
+            statements.append("\(group == 0 ? "__SVBool_t " : "")next = \(next);")
+        }
+    }
+    statements.append(vectorResult(sveResult("result", for: element), for: element))
+    return statements.joined(separator: "\n")
+}
+
+func sveExpandedWide(for element: Element) -> String {
+    switch (element.bits, element.width) {
+    case (64, 32): return sveExpandedQuads(for: element)
+    case (32, 32): return sveExpandedOctets(for: element)
+    default: return sveExpandedLoop(for: element)
     }
 }
 
@@ -23163,8 +23256,8 @@ func neonMaskBits(bits: Int) -> String {
     return "__builtin_reduce_add((\(unsigned.cVector))mask & \(weights))"
 }
 
-func expandTableRows(lanes: Int, entry: (Int) -> [Int]) -> [Int] {
-    let zeroing = entry(0).map { _ in Int(zeroedByte) }
+func expandTableRows(lanes: Int, zero: Int = Int(zeroedByte), entry: (Int) -> [Int]) -> [Int] {
+    let zeroing = entry(0).map { _ in zero }
     return (0..<1 << lanes).flatMap { bits in
         var position = 0
         return (0..<lanes).flatMap { lane -> [Int] in
@@ -24764,20 +24857,13 @@ func sveTableIndicesLookup(_ table: String, at offset: String, for element: Elem
     return vectorResult(sveResult(lookup, for: element), for: element)
 }
 
+func sveQuadsOffset(for element: Element) -> String {
+    "\(sveSummedMask(startingAt: 2, for: element)) & \(4 * 15)"
+}
+
 func sveCompressedQuads(not: Bool, for element: Element) -> String {
-    let unsigned = unsignedElement(of: element)
-    let bits = sveBuiltin(
-        "lsl",
-        [
-            sveAllLanes(of: element), sveBuiltin("dup_n", ["1"], for: unsigned),
-            sveBuiltin("index", ["2", "1"], for: unsigned),
-        ],
-        for: unsigned,
-        predication: "x"
-    )
-    let sum = sveBuiltin("addv", [svePredicate(of: "mask", for: element), bits], for: unsigned)
     let table = sveCompressTableName("table_64x4", not: not, for: element)
-    return sveTableIndicesLookup(table, at: "\(sum) & \(4 * 15)", for: element)
+    return sveTableIndicesLookup(table, at: sveQuadsOffset(for: element), for: element)
 }
 
 func sveCompressedBlocksNot(for element: Element) -> String? {
@@ -24900,6 +24986,13 @@ let compressOps: [Op] = [
         targets: TargetBodies(
             neon: { neonExpanded(for: $0) },
             sve2_128: { sveExpanded(for: $0) },
+            sve: { element in
+                sveFoldingConstantMask(
+                    portableExpanded(for: element),
+                    otherwise: sveExpandedWide(for: element),
+                    for: element
+                )
+            },
             avx3dl: { x86Avx3Expanded(level: .avx3dl, for: $0) },
             avx3: { x86Avx3Expanded(level: .avx3, for: $0) },
             avx2: { x86Avx2Expanded(for: $0) },
@@ -24909,6 +25002,7 @@ let compressOps: [Op] = [
         helpers: TargetBodies(
             neon: { neonExpandHelpers(for: $0) },
             sve2_128: { sveExpandHelpers(for: $0) },
+            sve: { sveExpandedHelpers(for: $0) },
             avx3: { x86Avx3ExpandHelpers(for: $0) },
             avx2: { x86Avx2ExpandHelpers(for: $0) },
             sse2: { x86ExpandHelpers(for: $0) }
@@ -27923,6 +28017,15 @@ func expandedLoadTargets(otherwise: Bool) -> TargetBodies<Element> {
     TargetBodies(
         neon: { element in registeredExpandedLoad(otherwise: otherwise, for: element) },
         sve2_128: { element in sveExpandedLoad(otherwise: otherwise, for: element) },
+        sve: { element in
+            otherwise
+                ? nil
+                : sveFoldingConstantMask(
+                    expandedLoad(otherwise: false, for: element),
+                    otherwise: registeredExpandedLoad(otherwise: false, for: element),
+                    for: element
+                )
+        },
         avx3dl: { element in x86Avx3ExpandLoad(otherwise: otherwise, for: element) },
         avx3: { element in
             x86Avx3IsNative(.avx3, for: element)
@@ -42701,16 +42804,17 @@ func x86Helpers() -> String {
 func neonTable(
     named name: String,
     _ bytes: [Int],
+    lane: String = "uint8_t",
     alignment: Int = 16,
     isInternal: Bool = false,
     isHidden: Bool = false
 ) -> String {
     cFunction(
-        returns: "const uint8_t*",
+        returns: "const \(lane)*",
         name: name,
         parameters: [],
         body: """
-            static const uint8_t table[\(bytes.count)] __attribute__((aligned(\(alignment)))) = {\(bytes.map(String.init).joined(separator: ", "))};
+            static const \(lane) table[\(bytes.count)] __attribute__((aligned(\(alignment)))) = {\(bytes.map(String.init).joined(separator: ", "))};
             return table;
             """,
         specifiers: isInternal
@@ -52092,7 +52196,7 @@ func constantType(
 {
     switch parameter {
     case .flag: return "Bool"
-    case .mask: return "H.Mask"
+    case .mask, .whereMask: return "H.Mask"
     case .roundConstant: return "UInt8"
     case _ where parameter.isPointerIndices: return signedElement(of: element).swiftType
     case _ where isConstantVector(parameter): return lane
@@ -52216,7 +52320,8 @@ func constantHelper(
         ? "alternating \\(hex(even)), \\(hex(odd))"
         : isSplat
             ? "repeating \\(hex(value))"
-            : op.parameters[index] == .mask ? "\\(describe(\(value)))" : "\\(\(value))"
+            : [.mask, .whereMask].contains(op.parameters[index])
+                ? "\\(describe(\(value)))" : "\\(\(value))"
     let suffix = guarded ? " before a guard page" : ""
     let knownIssue =
         alternating
@@ -52416,7 +52521,7 @@ func constantTests(of op: Op, for element: Element) -> [String] {
                 ConstantValue(name: "False", literal: "false"),
                 ConstantValue(name: "True", literal: "true"),
             ]
-        case .mask:
+        case .mask, .whereMask:
             values = constantMasks
         default:
             fatalError("\(op.identifier) branches on \(binding.swiftName), which nothing covers")

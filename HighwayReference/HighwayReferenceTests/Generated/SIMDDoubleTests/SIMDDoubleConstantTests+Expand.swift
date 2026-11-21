@@ -7,6 +7,68 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
+    private func checkExpandedConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("expanded with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xEC76_0530_CFD4_C696)
+        for a in aInputs {
+            mismatches.check(
+                H.expanded(a, where: mask),
+                H(raw: HighwayReference.expandedF64(a.raw, mask.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func expandedConstantMaskAllFalse() {
+        checkExpandedConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func expandedConstantMaskAllTrue() {
+        checkExpandedConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func expandedConstantMaskOnlyFirst() {
+        checkExpandedConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func expandedConstantMaskOnlyLast() {
+        checkExpandedConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func expandedConstantMaskAllButFirst() {
+        checkExpandedConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func expandedConstantMaskAllButLast() {
+        checkExpandedConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
     private func checkExpandedConstantA(_ value: Lane) {
         let mismatches = Mismatches("expanded with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xCD35_5583_69CC_CB68)
@@ -99,6 +161,138 @@ extension SIMDDoubleConstantTests {
 
     @Test func expandedConstantSplatGreatest() {
         checkExpandedConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkLoadExpandedWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("loadExpandedWhere with mask \(describe(mask))")
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xF57B_58D7_3A97_959C)
+        for from in fromInputs {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe H.loadExpanded(from: source.baseAddress!, where: mask),
+                    unsafe H(
+                        raw: HighwayReference.loadExpandedWhereF64(mask.raw, source.baseAddress!)
+                    )
+                )
+            }
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadExpandedWhereConstantMaskAllFalse() {
+        checkLoadExpandedWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func loadExpandedWhereConstantMaskAllTrue() {
+        checkLoadExpandedWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func loadExpandedWhereConstantMaskOnlyFirst() {
+        checkLoadExpandedWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func loadExpandedWhereConstantMaskOnlyLast() {
+        checkLoadExpandedWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func loadExpandedWhereConstantMaskAllButFirst() {
+        checkLoadExpandedWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func loadExpandedWhereConstantMaskAllButLast() {
+        checkLoadExpandedWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
+    private func checkLoadExpandedWhereConstantMaskBeforeGuardPage(_ mask: H.Mask) {
+        let mismatches = Mismatches(
+            "loadExpandedWhere with mask \(describe(mask)) before a guard page"
+        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xF7F7_C856_FD21_4327)
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe H.loadExpanded(from: source, where: mask),
+                    unsafe H(raw: HighwayReference.loadExpandedWhereF64(mask.raw, source))
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadExpandedWhereConstantMaskAllFalseBeforeGuardPage() {
+        checkLoadExpandedWhereConstantMaskBeforeGuardPage(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func loadExpandedWhereConstantMaskAllTrueBeforeGuardPage() {
+        checkLoadExpandedWhereConstantMaskBeforeGuardPage(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func loadExpandedWhereConstantMaskOnlyFirstBeforeGuardPage() {
+        checkLoadExpandedWhereConstantMaskBeforeGuardPage(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func loadExpandedWhereConstantMaskOnlyLastBeforeGuardPage() {
+        checkLoadExpandedWhereConstantMaskBeforeGuardPage(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func loadExpandedWhereConstantMaskAllButFirstBeforeGuardPage() {
+        checkLoadExpandedWhereConstantMaskBeforeGuardPage(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func loadExpandedWhereConstantMaskAllButLastBeforeGuardPage() {
+        checkLoadExpandedWhereConstantMaskBeforeGuardPage(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
     }
 
     @inline(__always)
