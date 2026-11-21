@@ -175,4 +175,97 @@ extension SIMDUInt16ConstantTests {
     @Test func repeatingMaskConstantValueTrue() {
         checkRepeatingMaskConstantValue(true)
     }
+
+    @inline(__always)
+    private func checkLoadMaskConstantFrom(_ from: UInt64) {
+        let mismatches = Mismatches("loadMask with from \(hex(from))")
+        let portResult = withUnsafeBytes(of: from) { source in
+            unsafe H.loadMask(from: source.baseAddress!.assumingMemoryBound(to: UInt8.self))
+        }
+        let referenceResult = withUnsafeBytes(of: (from, UInt64(0))) { padded in
+            unsafe H.Mask(
+                raw: HighwayReference.loadMaskU16(
+                    padded.baseAddress!.assumingMemoryBound(to: UInt8.self)
+                )
+            )
+        }
+        mismatches.check(portResult, referenceResult, "")
+        mismatches.record()
+    }
+
+    @Test func loadMaskConstantFromAllFalse() {
+        checkLoadMaskConstantFrom(0x0000_0000_0000_0000)
+    }
+
+    @Test func loadMaskConstantFromAllTrue() {
+        checkLoadMaskConstantFrom(0xFFFF_FFFF_FFFF_FFFF)
+    }
+
+    @Test func loadMaskConstantFromBit0() {
+        checkLoadMaskConstantFrom(0x0101_0101_0101_0101)
+    }
+
+    @Test func loadMaskConstantFromBit1() {
+        checkLoadMaskConstantFrom(0x0202_0202_0202_0202)
+    }
+
+    @Test func loadMaskConstantFromBit2() {
+        checkLoadMaskConstantFrom(0x0404_0404_0404_0404)
+    }
+
+    @Test func loadMaskConstantFromBit3() {
+        checkLoadMaskConstantFrom(0x0808_0808_0808_0808)
+    }
+
+    @Test func loadMaskConstantFromBit4() {
+        checkLoadMaskConstantFrom(0x1010_1010_1010_1010)
+    }
+
+    @Test func loadMaskConstantFromBit5() {
+        checkLoadMaskConstantFrom(0x2020_2020_2020_2020)
+    }
+
+    @Test func loadMaskConstantFromBit6() {
+        checkLoadMaskConstantFrom(0x4040_4040_4040_4040)
+    }
+
+    @Test func loadMaskConstantFromBit7() {
+        checkLoadMaskConstantFrom(0x8080_8080_8080_8080)
+    }
+
+    @Test func loadMaskConstantFromOnlyByte0() {
+        checkLoadMaskConstantFrom(0x0000_0000_0000_00FF)
+    }
+
+    @Test func loadMaskConstantFromOnlyByte1() {
+        checkLoadMaskConstantFrom(0x0000_0000_0000_FF00)
+    }
+
+    @Test func loadMaskConstantFromOnlyByte2() {
+        checkLoadMaskConstantFrom(0x0000_0000_00FF_0000)
+    }
+
+    @Test func loadMaskConstantFromOnlyByte3() {
+        checkLoadMaskConstantFrom(0x0000_0000_FF00_0000)
+    }
+
+    @Test func loadMaskConstantFromOnlyByte4() {
+        checkLoadMaskConstantFrom(0x0000_00FF_0000_0000)
+    }
+
+    @Test func loadMaskConstantFromOnlyByte5() {
+        checkLoadMaskConstantFrom(0x0000_FF00_0000_0000)
+    }
+
+    @Test func loadMaskConstantFromOnlyByte6() {
+        checkLoadMaskConstantFrom(0x00FF_0000_0000_0000)
+    }
+
+    @Test func loadMaskConstantFromOnlyByte7() {
+        checkLoadMaskConstantFrom(0xFF00_0000_0000_0000)
+    }
+
+    @Test func loadMaskConstantFromDistinct() {
+        checkLoadMaskConstantFrom(0x6817_E24B_D1A6_3C95)
+    }
 }

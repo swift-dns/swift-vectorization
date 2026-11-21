@@ -11662,6 +11662,15 @@ func sveFoldingConstantMask(
     return sveFolding(when: conditions.joined(separator: " && "), folded, otherwise: body)
 }
 
+func sveFoldingConstantMaskBytes(
+    _ folded: String,
+    otherwise body: String,
+    for element: Element
+) -> String {
+    let conditions = (0..<maskByteCount(for: element)).map { "__builtin_constant_p(from[\($0)])" }
+    return sveFolding(when: conditions.joined(separator: " && "), folded, otherwise: body)
+}
+
 func alternatingLanes(
     _ evens: String,
     _ odds: String,
@@ -20657,8 +20666,14 @@ func sveMaskBytesPerLane(for element: Element) -> String {
         return sveBuiltin("tbl", [loaded, selected], for: bytes)
     case 16, 32:
         let lanes = unsignedElement(of: element)
-        let active = sveActiveLanes("\(maskByteCount(for: element))", for: bytes)
-        let loaded = sveBuiltin("ld1", [active, "from"], for: bytes)
+        guard let word = sveMaskWord(for: element) else {
+            return sveBuiltin("dup_n", ["from[0]"], for: lanes)
+        }
+        let loaded = sveReinterpreted(
+            sveBuiltin("dup_n", ["maskBits"], for: word),
+            from: word,
+            to: bytes
+        )
         let selected = sveBuiltin(
             "lsr_n",
             [all, indices, element.bits == 16 ? "4" : "5"],
@@ -20673,6 +20688,12 @@ func sveMaskBytesPerLane(for element: Element) -> String {
     default:
         return sveBuiltin("dup_n", ["from[0]"], for: unsignedElement(of: element))
     }
+}
+
+func sveMaskWord(for element: Element) -> Element? {
+    let count = maskByteCount(for: element)
+    guard element.bits == 16 || element.bits == 32, count > 1 else { return nil }
+    return unsignedElement(bits: 8 * count)
 }
 
 func sveMaskLaneBits(for element: Element) -> String {
@@ -20703,7 +20724,12 @@ func sveLoadMask(for element: Element) -> String {
         for: unsigned,
         predication: "x"
     )
-    return sveMaskVector(sveBuiltin("cmpne_n", [all, tested, "0"], for: unsigned), for: element)
+    let declaration =
+        sveMaskWord(for: element).map {
+            "\($0.cType) maskBits;\n__builtin_memcpy(&maskBits, from, sizeof maskBits);\n"
+        } ?? ""
+    return declaration
+        + sveMaskVector(sveBuiltin("cmpne_n", [all, tested, "0"], for: unsigned), for: element)
 }
 
 func sveSelectingByVector(for element: Element) -> String {
@@ -20825,7 +20851,13 @@ let maskOps: [Op] = [
         span: .maskBytes,
         targets: TargetBodies(
             neon: { element in vectorLoadMask(broadcasting: .quadwords, for: element) },
-            sve: { element in sveLoadMask(for: element) },
+            sve: { element in
+                sveFoldingConstantMaskBytes(
+                    portableLoadMask(for: element),
+                    otherwise: sveLoadMask(for: element),
+                    for: element
+                )
+            },
             avx3: { element in x86Avx3LoadMask(for: element) },
             avx2: { element in vectorLoadMask(for: element) },
             sse2: { element in vectorLoadMask(for: element) }
@@ -52197,6 +52229,7 @@ func constantType(
     switch parameter {
     case .flag: return "Bool"
     case .mask, .whereMask: return "H.Mask"
+    case .constBytePointer: return "UInt64"
     case .roundConstant: return "UInt8"
     case _ where parameter.isPointerIndices: return signedElement(of: element).swiftType
     case _ where isConstantVector(parameter): return lane
@@ -52226,6 +52259,33 @@ let constantMasks = [
         literal: constantMask(repeating: true, except: "H.laneCount - 1")
     ),
 ]
+
+func constantBytePattern(_ name: String, _ bytes: [UInt8]) -> ConstantValue {
+    let value = bytes.enumerated().reduce(UInt64(0)) {
+        $0 | UInt64($1.element) << UInt64(8 * $1.offset)
+    }
+    return ConstantValue(name: name, literal: String(format: "0x%016llX", value))
+}
+
+let constantBytePatterns: [ConstantValue] = {
+    var patterns = [
+        constantBytePattern("AllFalse", Array(repeating: 0x00, count: 8)),
+        constantBytePattern("AllTrue", Array(repeating: 0xFF, count: 8)),
+    ]
+    for bit in 0..<8 {
+        patterns.append(
+            constantBytePattern("Bit\(bit)", Array(repeating: UInt8(1 << bit), count: 8))
+        )
+    }
+    for byte in 0..<8 {
+        let bytes = (0..<8).map { $0 == byte ? UInt8(0xFF) : UInt8(0x00) }
+        patterns.append(constantBytePattern("OnlyByte\(byte)", bytes))
+    }
+    patterns.append(
+        constantBytePattern("Distinct", [0x95, 0x3C, 0xA6, 0xD1, 0x4B, 0xE2, 0x17, 0x68])
+    )
+    return patterns
+}()
 
 func constantHelper(
     of op: Op,
@@ -52417,6 +52477,47 @@ func maskAmountConstantTests(of op: Op, for element: Element) -> [String] {
     return members
 }
 
+/// A helper that takes the bytes of a mask load by value, whose load only folds into the constant
+/// path of the op when they are constants, and the tests that call it with every byte pattern. The
+/// port reads only the bytes of its lanes of the eight, and Highway is given eight more.
+func maskBytesConstantTests(of op: Op, for element: Element, parameter index: Int) -> [String] {
+    let binding = bindings(of: op, for: element)[index]
+    let name = constantHelperName(of: op, parameter: binding, guarded: false)
+    let calls = referenceCalls(
+        of: op,
+        for: element,
+        pointer: "source.baseAddress!.assumingMemoryBound(to: UInt8.self)",
+        referencePointer: "padded.baseAddress!.assumingMemoryBound(to: UInt8.self)"
+    )
+    var members = [
+        referenceTestFunction(
+            name,
+            label: "\(op.testIdentifier) with \(binding.swiftName) \\(hex(\(binding.swiftName)))",
+            for: element,
+            inputs: [],
+            signature: constantHelperSignature(
+                name,
+                [binding.swiftName],
+                constantType(of: op.parameters[index], for: element)
+            ),
+            statements: """
+                let portResult = withUnsafeBytes(of: \(binding.swiftName)) { source in \(calls.port) }
+                let referenceResult = withUnsafeBytes(of: (\(binding.swiftName), UInt64(0))) { padded in \(calls.reference) }
+                mismatches.check(portResult, referenceResult, "")
+                """
+        )
+    ]
+    for pattern in constantBytePatterns {
+        members.append(
+            constantTest(
+                "\(op.testIdentifier)Constant\(uppercasedFirst(binding.swiftName))\(pattern.name)",
+                calls: ["\(name)(\(pattern.literal))"]
+            )
+        )
+    }
+    return members
+}
+
 func isOutOfContractSplat(_ value: ConstantValue, of op: Op, for element: Element) -> Bool {
     guard op.parameters.contains(.shiftCounts) else { return false }
     guard let count = Int(value.literal) else { return true }
@@ -52502,7 +52603,9 @@ func constantTests(of op: Op, for element: Element) -> [String] {
     var members: [String] = []
 
     for index in indices
-    where !isConstantVector(op.parameters[index]) && op.parameters[index] != .immediate {
+    where !isConstantVector(op.parameters[index]) && op.parameters[index] != .immediate
+        && op.parameters[index] != .constBytePointer
+    {
         let binding = parameterBindings[index]
         let values: [ConstantValue]
         switch op.parameters[index] {
@@ -52549,6 +52652,10 @@ func constantTests(of op: Op, for element: Element) -> [String] {
         && indices.contains(where: { op.parameters[$0] == .laneAmount })
     {
         members += maskAmountConstantTests(of: op, for: element)
+    }
+
+    for index in indices where op.parameters[index] == .constBytePointer {
+        members += maskBytesConstantTests(of: op, for: element, parameter: index)
     }
 
     if indices.contains(where: { op.parameters[$0] == .immediate }) {
