@@ -1644,6 +1644,21 @@ func reducedExtremumOrNaN(_ name: String, isNaN: String, for element: Element) -
     return "return \(hasNoNaN) ? \(extremum)(\(rawName("a"))) : \(scalarNaN(of: element));"
 }
 
+func sveReducedExtremumOrNaN(_ name: String, for element: Element) -> String {
+    let all = sveAllLanes(of: element)
+    let operand = sveOperand("a", for: element)
+    let nans = sveBuiltin("cmpne", [all, operand, operand], for: element)
+    let extremum = cFunctionName(name, element)
+    let reduced =
+        "return !__builtin_sve_svptest_any(\(all), \(nans)) ? \(extremum)(\(rawName("a"))) : \(scalarNaN(of: element));"
+    return sveFoldingConstants(
+        of: ["a"],
+        reducedExtremumOrNaN(name, isNaN: "(\(element.cMask))(a != a)", for: element),
+        otherwise: reduced,
+        for: element
+    )
+}
+
 func assumedAligned(_ pointer: String, for element: Element) -> String {
     "__builtin_assume_aligned(\(pointer), \(element.width))"
 }
@@ -2493,8 +2508,27 @@ func sveComparisonSplat(_ name: String, mirrored: String, for element: Element) 
     ].joined(separator: "\n")
 }
 
-func sveAllFalse(for element: Element) -> String? {
-    guard element.bits == 64 else { return nil }
+func portableAllTrue(for element: Element) -> String {
+    """
+    \(element.cMaskLane) andSum = -1;
+    for (size_t i = 0; i < \(element.laneCount); ++i) {
+      andSum &= mask[i];
+    }
+    return andSum == -1;
+    """
+}
+
+func portableAllFalse(for element: Element) -> String {
+    """
+    \(element.cMaskLane) orSum = 0;
+    for (size_t i = 0; i < \(element.laneCount); ++i) {
+      orSum |= mask[i];
+    }
+    return orSum == 0;
+    """
+}
+
+func sveAllFalse(for element: Element) -> String {
     let all = sveAllLanes(of: element)
     return "return !__builtin_sve_svptest_any(\(all), \(svePredicate(of: "mask", for: element)));"
 }
@@ -2958,16 +2992,95 @@ func sveFirstLanes(for element: Element) -> String {
     return maskResult("(\(element.cMask))(\(sveVector(unsigned.cSuffix)))\(selected)", for: element)
 }
 
-func sveSlideUp(filling: Bool, for element: Element) -> String {
-    let fill =
-        filling
-        ? sveOperand("fill", for: element, splat: true) : sveBuiltin("dup_n", ["0"], for: element)
-    let slid = sveBuiltin(
-        "splice",
-        [sveActiveLanes("lanes", for: element), fill, sveOperand("a", for: element, splat: true)],
+func sveSlideFill(_ fill: SlideFill, for element: Element) -> String {
+    switch fill {
+    case .zeros: return sveBuiltin("dup_n", ["0"], for: element)
+    case .vector: return sveOperand("fill", for: element, splat: true)
+    case .lane: return sveBuiltin("dup_n", ["fill"], for: element)
+    }
+}
+
+func sveSlideBuiltin(
+    _ direction: SlideDirection,
+    _ fill: SlideFill,
+    by amount: String = "lanes",
+    of operand: String,
+    for element: Element
+) -> String {
+    switch direction {
+    case .up:
+        return sveBuiltin(
+            "splice",
+            [sveActiveLanes(amount, for: element), sveSlideFill(fill, for: element), operand],
+            for: element
+        )
+    case .down:
+        let unsigned = unsignedElement(of: element)
+        let indices = sveBuiltin("index", ["(\(unsigned.cType))(\(amount))", "1"], for: unsigned)
+        let slid = sveBuiltin("tbl", [operand, indices], for: element)
+        guard fill != .zeros else { return slid }
+        return sveBuiltin(
+            "sel",
+            [
+                sveActiveLanes("\(element.laneCount) - (\(amount))", for: element),
+                slid,
+                sveSlideFill(fill, for: element),
+            ],
+            for: element
+        )
+    }
+}
+
+func sveSlide(
+    _ direction: SlideDirection,
+    _ fill: SlideFill,
+    by amount: String = "lanes",
+    for element: Element
+) -> String {
+    let operand = sveOperand("a", for: element, splat: true)
+    let slid = sveSlideBuiltin(direction, fill, by: amount, of: operand, for: element)
+    return vectorResult(sveResult(slid, for: element), for: element)
+}
+
+func sveSlidMask(
+    _ direction: SlideDirection,
+    by lanes: String? = nil,
+    for element: Element
+) -> String {
+    let unsigned = unsignedElement(of: element).at(width: element.width)
+    let operand = sveOperand("((\(unsigned.cVector))mask)", for: unsigned)
+    let slid = sveSlideBuiltin(direction, .zeros, by: lanes ?? "1", of: operand, for: unsigned)
+    return maskResult("(\(element.cMask))\(sveResult(slid, for: unsigned))", for: element)
+}
+
+func slidesByConstantAmountPortably(_ direction: SlideDirection, for element: Element) -> Bool {
+    switch direction {
+    case .up: return element.width == 32
+    case .down: return element.width == 64 && element.bits == 64
+    }
+}
+
+func sveSlideLanes(_ direction: SlideDirection, for element: Element) -> String {
+    let slid = sveSlide(direction, .zeros, for: element)
+    guard slidesByConstantAmountPortably(direction, for: element) else { return slid }
+    return sveFolding(
+        when: "__builtin_constant_p(lanes)",
+        portableSlide(direction, for: element),
+        otherwise: slid
+    )
+}
+
+func sveSlide1(_ direction: SlideDirection, _ fill: SlideFill, for element: Element) -> String? {
+    guard !slidesByConstantAmountPortably(direction, for: element) else { return nil }
+    let portable =
+        fill == .zeros
+        ? portableSlide1(direction, for: element) : slide1Filling(direction, for: element)
+    return sveFoldingConstants(
+        of: ["a"],
+        portable,
+        otherwise: sveSlide(direction, fill, by: "1", for: element),
         for: element
     )
-    return vectorResult(sveResult(slid, for: element), for: element)
 }
 
 func sveIota(for element: Element) -> String? {
@@ -3093,6 +3206,12 @@ enum X86Level: Int, CaseIterable, Comparable {
 enum SlideDirection: String {
     case up
     case down
+}
+
+enum SlideFill {
+    case zeros
+    case vector
+    case lane
 }
 
 enum Reduction {
@@ -7096,7 +7215,8 @@ func slideTargets(_ direction: SlideDirection) -> TargetBodies<Element> {
             \(vectorResult(neonTableLookup("a", "indices", for: element), for: element))
             """
         },
-        sve2_128: direction == .up ? { element in sveSlideUp(filling: false, for: element) } : nil,
+        sve2_128: direction == .up ? { element in sveSlide(.up, .zeros, for: element) } : nil,
+        sve: { element in sveSlideLanes(direction, for: element) },
         avx3dl: { element in x86Avx3Slide(direction, level: .avx3dl, for: element) },
         avx3: { element in x86Avx3Slide(direction, level: .avx3, for: element) },
         avx2: { element in
@@ -7144,19 +7264,24 @@ func portableSlideCopy(
     return "__builtin_memcpy(\(destination), \(source), \(size));"
 }
 
-func portableSlide(_ direction: SlideDirection, for element: Element) -> String {
+func portableSlide(
+    _ direction: SlideDirection,
+    masked: Bool = false,
+    for element: Element
+) -> String {
     let lanes = element.laneCount
     let (destination, source, size) = portableSlideOperands(direction, by: "clamped", for: element)
+    let type = masked ? element.cMask : element.cVector
     return """
-        \(element.cVector) result;
-        const \(element.cVector) source = a;
+        \(type) result;
+        const \(type) source = \(masked ? "mask" : "a");
         const size_t clamped = lanes < \(lanes) ? lanes : \(lanes);
         void *const destination = \(destination);
         const void *const origin = \(source);
         const size_t size = \(size);
         __builtin_memset(&result, 0, sizeof result);
         __builtin_memcpy(destination, origin, size);
-        \(vectorResult("result", for: element))
+        \(masked ? maskResult("result", for: element) : vectorResult("result", for: element))
         """
 }
 
@@ -7175,16 +7300,21 @@ func bytewiseSlide1(_ direction: SlideDirection, for element: Element) -> String
     }
 }
 
-func portableSlide1(_ direction: SlideDirection, for element: Element) -> String {
-    if element.bits == 32 && element.width == 16 && element.category != .float {
+func portableSlide1(
+    _ direction: SlideDirection,
+    masked: Bool = false,
+    for element: Element
+) -> String {
+    if !masked && element.bits == 32 && element.width == 16 && element.category != .float {
         return vectorResult(bytewiseSlide1(direction, for: element), for: element)
     }
+    let type = masked ? element.cMask : element.cVector
     return """
-        \(element.cVector) result;
-        const \(element.cVector) source = a;
-        result = (\(element.cVector)){0};
+        \(type) result;
+        const \(type) source = \(masked ? "mask" : "a");
+        result = (\(type)){0};
         \(portableSlideCopy(direction, by: "1", for: element))
-        \(vectorResult("result", for: element))
+        \(masked ? maskResult("result", for: element) : vectorResult("result", for: element))
         """
 }
 
@@ -7201,6 +7331,7 @@ func slide1Targets(_ direction: SlideDirection) -> TargetBodies<Element> {
     }
     return TargetBodies(
         neon: { element in shuffledSlide1(direction, for: element) },
+        sve: { element in sveSlide1(direction, .zeros, for: element) },
         avx3dl: avx3(.avx3dl),
         avx3: avx3(.avx3),
         avx2: { element in x86WideSlideBytes(direction, by: element.bits / 8, for: element) },
@@ -7296,7 +7427,8 @@ func x86SlideLanes(_ direction: SlideDirection, for element: Element) -> String 
 func slideFillingTargets(_ direction: SlideDirection) -> TargetBodies<Element> {
     TargetBodies(
         neon: { element in neonSlideFilling(direction, for: element) },
-        sve2_128: direction == .up ? { element in sveSlideUp(filling: true, for: element) } : nil,
+        sve2_128: direction == .up ? { element in sveSlide(.up, .vector, for: element) } : nil,
+        sve: { element in sveSlide(direction, .vector, for: element) },
         avx3dl: { element in x86Avx3SlideFilling(direction, level: .avx3dl, for: element) },
         avx3: { element in x86Avx3SlideFilling(direction, level: .avx3, for: element) },
         sse4: { element in
@@ -7380,6 +7512,7 @@ func x86WideSlide1Filling(_ direction: SlideDirection, for element: Element) -> 
 
 func slide1FillingTargets(_ direction: SlideDirection) -> TargetBodies<Element> {
     TargetBodies(
+        sve: { element in sveSlide1(direction, .lane, for: element) },
         avx3: { element in x86Avx3Slide1(direction, filling: true, for: element) },
         avx2: { element in x86WideSlide1Filling(direction, for: element) },
         sse4: { element in x86Slide1Filling(direction, level: .sse4, for: element) },
@@ -11471,10 +11604,97 @@ func negatedLanes(_ operand: String, for element: Element) -> String {
     return "(\(element.cVector))(-\(unsignedBits(operand, of: element)))"
 }
 
-func alternatingLanes(_ evens: String, _ odds: String, for element: Element) -> String {
-    let lanes = element.laneCount
-    let indices = (0..<lanes).map { $0.isMultiple(of: 2) ? $0 : lanes + $0 }
-    return "__builtin_shufflevector(\(evens), \(odds), \(laneIndices(indices)))"
+enum AlternatingSelect {
+    case shuffle
+    case sve
+    case sve2
+}
+
+func sveOddEvenLanes(odd: String, even: String, sve2: Bool, for element: Element) -> String {
+    guard sve2 else {
+        let odds = sveOperand("(\(odd))", for: element)
+        let shifted = sveBuiltin("ext", [odds, odds, "1"], for: element)
+        let merged = sveBuiltin(
+            "trn1",
+            [sveOperand("(\(even))", for: element), shifted],
+            for: element
+        )
+        return sveResult(merged, for: element)
+    }
+    let lanes = unsignedElement(of: element)
+    let merged = sveBuiltin(
+        "eortb_n",
+        [sveOperand("(\(even))", for: lanes), sveOperand("(\(odd))", for: lanes), "0"],
+        for: lanes
+    )
+    return fromUnsignedBits(sveResult(merged, for: lanes), of: element)
+}
+
+func sveFolding(when condition: String, _ folded: String, otherwise body: String) -> String {
+    """
+    if (\(condition)) {
+    \(indented(folded))
+    }
+    \(body)
+    """
+}
+
+func sveFoldingConstants(
+    of operands: [String],
+    _ folded: String,
+    otherwise body: String,
+    for element: Element
+) -> String {
+    guard !operands.isEmpty else { return body }
+    let constant = cFunctionName("sveConstant", element)
+    let condition = operands.map { "\(constant)(\($0))" }.joined(separator: " || ")
+    return sveFolding(when: condition, folded, otherwise: body)
+}
+
+func sveFoldingConstantMask(
+    _ folded: String,
+    otherwise body: String,
+    withConstant amount: String? = nil,
+    for element: Element
+) -> String {
+    let mask = "\(cFunctionName("sveConstant", element))((\(element.cVector))mask)"
+    let conditions = [mask] + (amount.map { ["__builtin_constant_p(\($0))"] } ?? [])
+    return sveFolding(when: conditions.joined(separator: " && "), folded, otherwise: body)
+}
+
+func sveFoldingConstantMaskBytes(
+    _ folded: String,
+    otherwise body: String,
+    for element: Element
+) -> String {
+    let conditions = (0..<maskByteCount(for: element)).map { "__builtin_constant_p(from[\($0)])" }
+    return sveFolding(when: conditions.joined(separator: " && "), folded, otherwise: body)
+}
+
+func alternatingLanes(
+    _ evens: String,
+    _ odds: String,
+    using select: AlternatingSelect = .shuffle,
+    for element: Element
+) -> String {
+    switch select {
+    case .shuffle:
+        let lanes = element.laneCount
+        let indices = (0..<lanes).map { $0.isMultiple(of: 2) ? $0 : lanes + $0 }
+        return "__builtin_shufflevector(\(evens), \(odds), \(laneIndices(indices)))"
+    case .sve, .sve2:
+        return sveOddEvenLanes(odd: odds, even: evens, sve2: select == .sve2, for: element)
+    }
+}
+
+func complexConjugating(
+    using select: AlternatingSelect = .shuffle,
+    for element: Element
+) -> String {
+    """
+    const \(element.cVector) negated = \(negatedLanes("a", for: element));
+    \(vectorResult(alternatingLanes("a", "negated", using: select, for: element), for: element))
+    """
 }
 
 func emulatedAddingSubtracting(for element: Element) -> String {
@@ -11501,10 +11721,13 @@ func emulatedAddingSubtracting(for element: Element) -> String {
         """
 }
 
-func vectorAddingSubtracting(for element: Element) -> String {
+func vectorAddingSubtracting(
+    using select: AlternatingSelect = .shuffle,
+    for element: Element
+) -> String {
     """
     const \(element.cVector) negated = \(negatedLanes("b", for: element));
-    const \(element.cVector) addend = \(alternatingLanes("negated", "b", for: element));
+    const \(element.cVector) addend = \(alternatingLanes("negated", "b", using: select, for: element));
     \(vectorResult(arithmetic("+", "a", "addend", for: element), for: element))
     """
 }
@@ -11934,7 +12157,11 @@ func portableFusedMultiplication(_ form: FusedMultiplication, for element: Eleme
         : form.integer(element)
 }
 
-func alternatingAddend(negatingAll: Bool, for element: Element) -> String {
+func alternatingAddend(
+    negatingAll: Bool,
+    using select: AlternatingSelect = .shuffle,
+    for element: Element
+) -> String {
     var statements: [String] = []
     var odd = "c"
     if negatingAll {
@@ -11943,7 +12170,7 @@ func alternatingAddend(negatingAll: Bool, for element: Element) -> String {
     }
     statements += [
         "const \(element.cVector) negated = \(negatedLanes(odd, for: element));",
-        "const \(element.cVector) addend = \(alternatingLanes("negated", odd, for: element));",
+        "const \(element.cVector) addend = \(alternatingLanes("negated", odd, using: select, for: element));",
     ]
     return statements.joined(separator: "\n")
 }
@@ -11965,9 +12192,10 @@ func emulatedMultiplyAlternating(negatingAll: Bool, for element: Element) -> Str
 func portableMultiplyAlternating(
     negatingAll: Bool,
     fused: Bool,
+    using select: AlternatingSelect = .shuffle,
     for element: Element
 ) -> String {
-    let addend = alternatingAddend(negatingAll: negatingAll, for: element)
+    let addend = alternatingAddend(negatingAll: negatingAll, using: select, for: element)
     guard element.category == .float else {
         let product = multipliedLanes("a", "b", for: element)
         let sum = arithmetic("+", product, "addend", for: element)
@@ -12023,7 +12251,28 @@ func x86MultiplyAlternating(
 }
 
 func multiplyAlternatingTargets(negatingAll: Bool) -> TargetBodies<Element> {
-    TargetBodies(
+    func wide(_ select: AlternatingSelect) -> (Element) -> String? {
+        { element in
+            guard element.category != .float else {
+                return sveMultiplyAlternatingStatements(negatingAll: negatingAll, for: element)?
+                    .joined(separator: "\n")
+            }
+            return sveFoldingConstants(
+                of: ["c"],
+                portableMultiplyAlternating(negatingAll: negatingAll, fused: false, for: element),
+                otherwise: select == .sve2
+                    ? sveIntegerMultiplyAlternating(negatingAll: negatingAll, for: element)
+                    : portableMultiplyAlternating(
+                        negatingAll: negatingAll,
+                        fused: false,
+                        using: select,
+                        for: element
+                    ),
+                for: element
+            )
+        }
+    }
+    return TargetBodies(
         neon: { element in
             element.category == .float
                 ? portableMultiplyAlternating(negatingAll: negatingAll, fused: true, for: element)
@@ -12032,10 +12281,8 @@ func multiplyAlternatingTargets(negatingAll: Bool) -> TargetBodies<Element> {
         sve2_128Splat: { element in
             sveConstantMultiplyAlternating(negatingAll: negatingAll, for: element)
         },
-        sve: { element in
-            sveMultiplyAlternatingStatements(negatingAll: negatingAll, for: element)?
-                .joined(separator: "\n")
-        },
+        sve: wide(.sve),
+        sve2: wide(.sve2),
         avx3: { element in
             x86MultiplyAlternating(level: .avx3, negatingAll: negatingAll, for: element)
         },
@@ -12959,13 +13206,23 @@ func wordwiseEvenLanes(_ evens: String, _ odds: String, for element: Element) ->
     return "(\(element.cVector))((\(mask) & \(first)) | (~\(mask) & \(second)))"
 }
 
-func complexDuplicates(for element: Element) -> String {
+func sveDuplicatedLanes(_ operand: String, odd: Bool, for element: Element) -> String {
+    let lanes = sveOperand(operand, for: element)
+    return sveResult(sveBuiltin(odd ? "trn2" : "trn1", [lanes, lanes], for: element), for: element)
+}
+
+func complexDuplicates(using select: AlternatingSelect = .shuffle, for element: Element) -> String {
     let vector = element.cVector
+    func lanes(_ operand: String, odd: Bool) -> String {
+        select == .shuffle
+            ? complexLanes(operand, odd: odd, for: element)
+            : sveDuplicatedLanes(operand, odd: odd, for: element)
+    }
     return """
-        const \(vector) u = \(complexLanes("a", odd: false, for: element));
-        const \(vector) v = \(complexLanes("a", odd: true, for: element));
-        const \(vector) x = \(complexLanes("b", odd: false, for: element));
-        const \(vector) y = \(complexLanes("b", odd: true, for: element));
+        const \(vector) u = \(lanes("a", odd: false));
+        const \(vector) v = \(lanes("a", odd: true));
+        const \(vector) x = \(lanes("b", odd: false));
+        const \(vector) y = \(lanes("b", odd: true));
         """
 }
 
@@ -13002,6 +13259,7 @@ func complexMultiplyingBody(
     fused: Bool,
     selectingByMask: Bool = false,
     highwayOrder: Bool = false,
+    using select: AlternatingSelect = .shuffle,
     finishing: ((String) -> String)? = nil,
     for element: Element
 ) -> String {
@@ -13035,9 +13293,9 @@ func complexMultiplyingBody(
     let alternated =
         selectingByMask
         ? wordwiseEvenLanes("evens", "odds", for: element)
-        : alternatingLanes("evens", "odds", for: element)
+        : alternatingLanes("evens", "odds", using: select, for: element)
     let lanes =
-        ([complexDuplicates(for: element)] + accumulations + [
+        ([complexDuplicates(using: select, for: element)] + accumulations + [
             "const \(vector) odds = \(odds);",
             "const \(vector) evens = \(evens);",
             "const \(vector) multiplied = \(alternated);",
@@ -13118,10 +13376,40 @@ func complexMultiplyingTargets(conjugating: Bool, adding: Bool) -> TargetBodies<
                 for: element
             )
     }
+    func foldedOperands(of element: Element, _ select: AlternatingSelect) -> [String] {
+        var operands: [String] = []
+        if element.bits <= 32 && (select == .sve2 || !conjugating) { operands.append("a") }
+        if element.width == 32 && element.bits >= 32 { operands.append("b") }
+        return operands
+    }
+    func wide(_ select: AlternatingSelect) -> (Element) -> String? {
+        { element in
+            guard element.category != .float else {
+                return sveComplexMultiplying(conjugating: conjugating, adding: adding, for: element)
+            }
+            return sveFoldingConstants(
+                of: foldedOperands(of: element, select),
+                twoProductComplexMultiplyingBody(
+                    conjugating: conjugating,
+                    adding: adding,
+                    for: element
+                ),
+                otherwise: complexMultiplyingBody(
+                    conjugating: conjugating,
+                    adding: adding,
+                    fused: false,
+                    using: select,
+                    for: element
+                ),
+                for: element
+            )
+        }
+    }
     return TargetBodies(
         neon: fused,
         sve2_128: sve,
-        sve: sve,
+        sve: wide(.sve),
+        sve2: wide(.sve2),
         avx3dl: { element in
             element.bits == 8
                 ? twoProductComplexMultiplyingBody(
@@ -13243,6 +13531,22 @@ func sveMultiplyAlternatingStatements(negatingAll: Bool, for element: Element) -
         reversed, "const \(element.cVector) addend = \(sveResult(sum, for: element));",
         sveMultiplyAdding(adding: "addend", for: element),
     ]
+}
+
+func sveIntegerMultiplyAlternating(negatingAll: Bool, for element: Element) -> String {
+    let zero = sveBuiltin("dup_n", ["0"], for: element)
+    let (reversed, sum) = sveAlternatingSum(
+        of: zero,
+        reversing: negatingAll ? "negated" : "c",
+        for: element
+    )
+    let negated = "const \(element.cVector) negated = \(negatedLanes("c", for: element));"
+    let statements =
+        (negatingAll ? [negated] : []) + [
+            reversed, "const \(element.cVector) addend = \(sveResult(sum, for: element));",
+            sveMultiplyAdding(adding: "addend", for: element),
+        ]
+    return statements.joined(separator: "\n")
 }
 
 func sveConstantMultiplyAlternating(negatingAll: Bool, for element: Element) -> String? {
@@ -14149,7 +14453,14 @@ let basicOps: [Op] = [
             neon: { element in floatAddingSubtracting(for: element) },
             sve2_128: { element in sveAddingSubtracting(for: element) },
             sve: { element in
-                element.category == .float ? sveAddingSubtracting(for: element) : nil
+                element.category == .float
+                    ? sveAddingSubtracting(for: element)
+                    : sveFoldingConstants(
+                        of: ["b"],
+                        vectorAddingSubtracting(for: element),
+                        otherwise: vectorAddingSubtracting(using: .sve, for: element),
+                        for: element
+                    )
             },
             sve2: { element in sveAddingSubtracting(for: element) },
             avx3: { element in floatAddingSubtracting(for: element) },
@@ -14599,12 +14910,27 @@ let basicOps: [Op] = [
         [.vector],
         .vector,
         .signedOrFloat,
-        section: .complexNumberOperations
+        section: .complexNumberOperations,
+        targets: TargetBodies(
+            sve: { element in
+                sveFoldingConstants(
+                    of: ["a"],
+                    complexConjugating(for: element),
+                    otherwise: complexConjugating(using: .sve, for: element),
+                    for: element
+                )
+            },
+            sve2: { element in
+                sveFoldingConstants(
+                    of: ["a"],
+                    complexConjugating(for: element),
+                    otherwise: complexConjugating(using: .sve2, for: element),
+                    for: element
+                )
+            }
+        )
     ) { element in
-        """
-        const \(element.cVector) negated = \(negatedLanes("a", for: element));
-        \(vectorResult(alternatingLanes("a", "negated", for: element), for: element))
-        """
+        complexConjugating(for: element)
     },
     Op(
         "multiplyingComplex",
@@ -15812,19 +16138,20 @@ let basicOps: [Op] = [
         section: .testMask,
         targets: TargetBodies(
             neon: { _ in "\(neonNibbles)\nreturn nibbles == ~0ull;" },
-            sve2_128: { element in sveAllTrue(for: element) },
+            sve2_128: { element in element.category == .float ? sveAllTrue(for: element) : nil },
+            sve: { element in
+                sveFoldingConstantMask(
+                    portableAllTrue(for: element),
+                    otherwise: sveAllTrue(for: element),
+                    for: element
+                )
+            },
             avx3: { element in x86AllTrue(for: element) },
             avx2: { element in x86AllTrue(for: element) },
             sse2: { element in x86AllTrue(for: element) }
         )
     ) { element in
-        """
-        \(element.cMaskLane) andSum = -1;
-        for (size_t i = 0; i < \(element.laneCount); ++i) {
-          andSum &= mask[i];
-        }
-        return andSum == -1;
-        """
+        portableAllTrue(for: element)
     },
     Op(
         "allFalse",
@@ -15835,20 +16162,20 @@ let basicOps: [Op] = [
         section: .testMask,
         targets: TargetBodies(
             neon: { _ in "\(neonNibbles)\nreturn nibbles == 0;" },
-            sve2_128: { element in sveAllFalse(for: element) },
-            sve: { element in sveAllFalse(for: element) },
+            sve2_128: { element in element.bits == 64 ? sveAllFalse(for: element) : nil },
+            sve: { element in
+                sveFoldingConstantMask(
+                    portableAllFalse(for: element),
+                    otherwise: sveAllFalse(for: element),
+                    for: element
+                )
+            },
             avx3: { element in "return \(x86MaskBits(for: element)) == 0;" },
             avx2: { element in "return \(x86MaskBits(for: element)) == 0;" },
             sse2: { element in "return \(x86MaskBits(for: element)) == 0;" }
         )
     ) { element in
-        """
-        \(element.cMaskLane) orSum = 0;
-        for (size_t i = 0; i < \(element.laneCount); ++i) {
-          orSum |= mask[i];
-        }
-        return orSum == 0;
-        """
+        portableAllFalse(for: element)
     },
     Op(
         "allBitsSet",
@@ -15982,23 +16309,22 @@ let basicOps: [Op] = [
                 return (size_t)-(int64_t)__builtin_reduce_add(raw);
                 """
             },
-            sve2_128: { element in
-                let predicate = svePredicate(of: "mask", for: element)
-                return
-                    "return __builtin_sve_svcntp_b\(element.bits)(\(sveAllLanes(of: element)), \(predicate));"
+            sve2_128: { element in sveTrueCount(for: element) },
+            sve: { element in
+                element.laneCount > 32
+                    ? sveTrueCount(for: element)
+                    : sveFoldingConstantMask(
+                        portableTrueCount(for: element),
+                        otherwise: sveTrueCount(for: element),
+                        for: element
+                    )
             },
             avx3: { element in x86TrueCount(for: element) },
             avx2: { element in x86TrueCount(for: element) },
             sse2: { element in x86TrueCount(for: element) }
         )
     ) { element in
-        """
-        size_t count = 0;
-        for (size_t i = 0; i < \(element.laneCount); ++i) {
-          count += mask[i] != 0;
-        }
-        return count;
-        """
+        portableTrueCount(for: element)
     },
     Op(
         "firstTrueIndex",
@@ -16009,6 +16335,13 @@ let basicOps: [Op] = [
         section: .testMask,
         targets: TargetBodies(
             neon: { element in neonFirstTrueIndex(for: element) },
+            sve: { element in
+                sveFoldingConstantMask(
+                    portableTrueLane(.first, known: false, for: element),
+                    otherwise: sveFirstTrueIndex(for: element),
+                    for: element
+                )
+            },
             avx3: { element in x86TrueLane(.first, known: false, for: element) },
             avx2: { element in
                 element.bits == 16
@@ -16018,13 +16351,7 @@ let basicOps: [Op] = [
             sse2: { element in x86FirstTrueIndex(for: element) }
         )
     ) { element in
-        let checks = (0..<element.laneCount).map { lane in
-            "if (mask[\(lane)]) {\n  return \(lane);\n}"
-        }
-        return """
-            \(checks.joined(separator: "\n"))
-            return -1;
-            """
+        portableTrueLane(.first, known: false, for: element)
     },
 
     Op(
@@ -16093,6 +16420,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonReduction("vminvq", for: element) },
             sve2_128: { element in neonReducedExtremumOrNaN("vminvq", for: element) },
+            sve: { element in sveReducedExtremumOrNaN("smallest", for: element) },
             avx3: { element in
                 reducedExtremumOrNaN("smallest", isNaN: x86Avx3IsNaN(for: element), for: element)
             },
@@ -16145,6 +16473,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonReduction("vmaxvq", for: element) },
             sve2_128: { element in neonReducedExtremumOrNaN("vmaxvq", for: element) },
+            sve: { element in sveReducedExtremumOrNaN("largest", for: element) },
             avx3: { element in
                 reducedExtremumOrNaN("largest", isNaN: x86Avx3IsNaN(for: element), for: element)
             },
@@ -19812,6 +20141,16 @@ func x86MaskSuffix(lanes: Int) -> String {
     }
 }
 
+func portableTrueCount(for element: Element) -> String {
+    """
+    size_t count = 0;
+    for (size_t i = 0; i < \(element.laneCount); ++i) {
+      count += mask[i] != 0;
+    }
+    return count;
+    """
+}
+
 func portableTrueLane(_ search: TrueLane, known: Bool, for element: Element) -> String {
     let lanes = Array(0..<element.laneCount)
     let order = search == .first ? lanes : lanes.reversed()
@@ -20170,29 +20509,227 @@ func sveLastTrue(for element: Element) -> String? {
         """
 }
 
-func sveAllTrue(for element: Element) -> String? {
-    guard element.category == .float else { return nil }
+func sveCountedTrue(for element: Element) -> String {
     let active = svePredicate(of: "mask", for: element)
-    let count = "__builtin_sve_svcntp_b\(element.bits)(\(sveAllLanes(of: element)), \(active))"
-    return "return \(count) == \(element.laneCount);"
+    return "__builtin_sve_svcntp_b\(element.bits)(\(sveAllLanes(of: element)), \(active))"
 }
 
-func sveBitsOfMask(for element: Element) -> String? {
-    guard element.category == .float else { return nil }
+func sveTrueCount(for element: Element) -> String {
+    "return \(sveCountedTrue(for: element));"
+}
+
+func sveAllTrue(for element: Element) -> String {
+    "return \(sveCountedTrue(for: element)) == \(element.laneCount);"
+}
+
+func sveFirstTrueIndex(for element: Element) -> String {
+    """
+    const __SVBool_t active = \(svePredicate(of: "mask", for: element));
+    const __SVBool_t lanes = \(sveVectorLanes(for: element));
+    if (!__builtin_sve_svptest_any(lanes, active)) {
+      return -1;
+    }
+    return (intptr_t)__builtin_sve_svcntp_b\(element.bits)(lanes, __builtin_sve_svbrkb_b_z(lanes, active));
+    """
+}
+
+func sveBoolBytes(for element: Element) -> String {
+    let lanes = unsignedElement(of: element)
+    var width = element.bits
+    var statements = [
+        "const \(sveType(of: lanes)) bools\(width) = \(sveBuiltin("dup_n", ["active", "1"], for: lanes, predication: "z"));"
+    ]
+    while width > 8 {
+        let wider = unsignedElement(bits: width)
+        let narrower = unsignedElement(bits: width / 2)
+        let view = sveReinterpreted("bools\(width)", from: wider, to: narrower)
+        width /= 2
+        statements.append(
+            "const \(sveType(of: narrower)) bools\(width) = \(sveBuiltin("uzp1", [view, view], for: narrower));"
+        )
+    }
+    return statements.joined(separator: "\n")
+}
+
+func sveBitsFromBoolBytes() -> String {
+    let bytes = unsignedElement(bits: 8)
+    var previous = "bools8"
+    var statements: [String] = []
+    for (name, width, shift) in [("pairs", 16, 7), ("quads", 32, 14), ("octets", 64, 28)] {
+        let lanes = unsignedElement(bits: width)
+        let shifted = sveBuiltin(
+            "lsr_n",
+            [
+                sveAllLanes(of: lanes), sveReinterpreted(previous, from: bytes, to: lanes),
+                "\(shift)",
+            ],
+            for: lanes,
+            predication: "x"
+        )
+        let merged = sveBuiltin(
+            "orr",
+            [sveAllLanes(of: bytes), previous, sveReinterpreted(shifted, from: lanes, to: bytes)],
+            for: bytes,
+            predication: "x"
+        )
+        statements.append("const \(sveType(of: bytes)) \(name) = \(merged);")
+        previous = name
+    }
+    return statements.joined(separator: "\n")
+}
+
+func sveMaskOctets(for element: Element) -> String {
+    """
+    const __SVBool_t active = \(svePredicate(of: "mask", for: element));
+    \(sveBoolBytes(for: element))
+    \(sveBitsFromBoolBytes())
+    """
+}
+
+func sveSummedMask(startingAt first: Int, for element: Element) -> String {
     let unsigned = unsignedElement(of: element)
-    let all = sveAllLanes(of: element)
     let bits = sveBuiltin(
         "lsl",
         [
-            all, sveBuiltin("dup_n", ["1"], for: unsigned),
-            sveBuiltin("index", ["0", "1"], for: unsigned),
+            sveAllLanes(of: element), sveBuiltin("dup_n", ["1"], for: unsigned),
+            sveBuiltin("index", ["\(first)", "1"], for: unsigned),
         ],
         for: unsigned,
         predication: "x"
     )
-    let sum = sveBuiltin("addv", [svePredicate(of: "mask", for: element), bits], for: unsigned)
+    return sveBuiltin("addv", [svePredicate(of: "mask", for: element), bits], for: unsigned)
+}
+
+func sveSummedMaskBits(for element: Element) -> String {
     let valid = "0x\(String((1 << element.laneCount) - 1, radix: 16))"
-    return "return \(sum) & \(valid);"
+    return "return \(sveSummedMask(startingAt: 0, for: element)) & \(valid);"
+}
+
+func sveBitsOfMask(for element: Element) -> String {
+    guard element.laneCount > element.bits else { return sveSummedMaskBits(for: element) }
+    let bytes = unsignedElement(bits: 8)
+    let words = unsignedElement(bits: 64)
+    let all = sveAllLanes(of: words)
+    let packed = sveBuiltin(
+        "and_n",
+        [all, sveReinterpreted("octets", from: bytes, to: words), "0xFF"],
+        for: words,
+        predication: "x"
+    )
+    let shifted = sveBuiltin(
+        "lsl",
+        [all, "packed", sveBuiltin("index", ["0", "8"], for: words)],
+        for: words,
+        predication: "x"
+    )
+    let sum = sveBuiltin("addv", [all, shifted], for: words)
+    let valid =
+        element.laneCount < 64 ? " & 0x\(String((1 << element.laneCount) - 1, radix: 16))" : ""
+    return """
+        \(sveMaskOctets(for: element))
+        const \(sveType(of: words)) packed = \(packed);
+        return \(sum)\(valid);
+        """
+}
+
+func sveStoredMask(for element: Element) -> String {
+    let words = unsignedElement(bits: 64)
+    let count = maskByteCount(for: element)
+    let stored = sveBuiltin(
+        "st1b",
+        [
+            sveActiveLanes("\(count)", for: words), "to",
+            sveReinterpreted("octets", from: unsignedElement(bits: 8), to: words),
+        ],
+        for: words
+    )
+    return """
+        \(sveMaskOctets(for: element))
+        \(stored);
+        return \(count);
+        """
+}
+
+func sveMaskBytesPerLane(for element: Element) -> String {
+    let bytes = unsignedElement(bits: 8)
+    let all = sveAllLanes(of: bytes)
+    let indices = sveBuiltin("index", ["0", "1"], for: bytes)
+    switch element.bits {
+    case 8:
+        let words = unsignedElement(bits: 64)
+        let loaded = sveReinterpreted(
+            sveBuiltin("ld1ub", [all, "from"], for: words),
+            from: words,
+            to: bytes
+        )
+        let selected = sveBuiltin("bic_n", [all, indices, "7"], for: bytes, predication: "x")
+        return sveBuiltin("tbl", [loaded, selected], for: bytes)
+    case 16, 32:
+        let lanes = unsignedElement(of: element)
+        guard let word = sveMaskWord(for: element) else {
+            return sveBuiltin("dup_n", ["from[0]"], for: lanes)
+        }
+        let loaded = sveReinterpreted(
+            sveBuiltin("dup_n", ["maskBits"], for: word),
+            from: word,
+            to: bytes
+        )
+        let selected = sveBuiltin(
+            "lsr_n",
+            [all, indices, element.bits == 16 ? "4" : "5"],
+            for: bytes,
+            predication: "x"
+        )
+        return sveReinterpreted(
+            sveBuiltin("tbl", [loaded, selected], for: bytes),
+            from: bytes,
+            to: lanes
+        )
+    default:
+        return sveBuiltin("dup_n", ["from[0]"], for: unsignedElement(of: element))
+    }
+}
+
+func sveMaskWord(for element: Element) -> Element? {
+    let count = maskByteCount(for: element)
+    guard element.bits == 16 || element.bits == 32, count > 1 else { return nil }
+    return unsignedElement(bits: 8 * count)
+}
+
+func sveMaskLaneBits(for element: Element) -> String {
+    let unsigned = unsignedElement(of: element)
+    guard element.bits > 16 else {
+        let laneBits = (0..<element.blockLaneCount).map { "\(1 << ($0 % 8))" }
+        return sveBuiltin("dupq_n", laneBits, for: unsigned)
+    }
+    let all = sveAllLanes(of: element)
+    let indices = sveBuiltin("index", ["0", "1"], for: unsigned)
+    let counts =
+        element.bits == 32
+        ? sveBuiltin("and_n", [all, indices, "7"], for: unsigned, predication: "x") : indices
+    return sveBuiltin(
+        "lsl",
+        [all, sveBuiltin("dup_n", ["1"], for: unsigned), counts],
+        for: unsigned,
+        predication: "x"
+    )
+}
+
+func sveLoadMask(for element: Element) -> String {
+    let unsigned = unsignedElement(of: element)
+    let all = sveAllLanes(of: element)
+    let tested = sveBuiltin(
+        "and",
+        [all, sveMaskBytesPerLane(for: element), sveMaskLaneBits(for: element)],
+        for: unsigned,
+        predication: "x"
+    )
+    let declaration =
+        sveMaskWord(for: element).map {
+            "\($0.cType) maskBits;\n__builtin_memcpy(&maskBits, from, sizeof maskBits);\n"
+        } ?? ""
+    return declaration
+        + sveMaskVector(sveBuiltin("cmpne_n", [all, tested, "0"], for: unsigned), for: element)
 }
 
 func sveSelectingByVector(for element: Element) -> String {
@@ -20314,6 +20851,13 @@ let maskOps: [Op] = [
         span: .maskBytes,
         targets: TargetBodies(
             neon: { element in vectorLoadMask(broadcasting: .quadwords, for: element) },
+            sve: { element in
+                sveFoldingConstantMaskBytes(
+                    portableLoadMask(for: element),
+                    otherwise: sveLoadMask(for: element),
+                    for: element
+                )
+            },
             avx3: { element in x86Avx3LoadMask(for: element) },
             avx2: { element in vectorLoadMask(for: element) },
             sse2: { element in vectorLoadMask(for: element) }
@@ -20344,7 +20888,14 @@ let maskOps: [Op] = [
         identifier: "bitsOfMask",
         targets: TargetBodies(
             neon: { element in neonBitsOfMask(for: element) },
-            sve2_128: { element in sveBitsOfMask(for: element) },
+            sve2_128: { element in element.category == .float ? sveBitsOfMask(for: element) : nil },
+            sve: { element in
+                sveFoldingConstantMask(
+                    portableBitsOfMask(for: element),
+                    otherwise: sveBitsOfMask(for: element),
+                    for: element
+                )
+            },
             avx3: { element in x86BitsOfMask(for: element) },
             avx2: { element in x86BitsOfMask(for: element) },
             sse2: { element in x86BitsOfMask(for: element) }
@@ -20362,6 +20913,10 @@ let maskOps: [Op] = [
         span: .maskBytes,
         targets: TargetBodies(
             neon: { element in storedMaskBits(for: element) },
+            sve: { element in
+                element.laneCount > element.bits
+                    ? sveStoredMask(for: element) : storedMaskBits(for: element)
+            },
             avx3: { element in storedMaskBits(for: element) },
             avx2: { element in storedMaskBits(for: element) },
             sse2: { element in storedMaskBits(for: element) }
@@ -20378,6 +20933,14 @@ let maskOps: [Op] = [
         section: .slideMaskAcrossBlocks,
         identifier: "slideMaskUpLanes",
         targets: TargetBodies(
+            sve: { element in
+                sveFoldingConstantMask(
+                    portableSlide(.up, masked: true, for: element),
+                    otherwise: sveSlidMask(.up, by: "lanes", for: element),
+                    withConstant: "lanes",
+                    for: element
+                )
+            },
             avx3: { element in x86Avx3SlidMask(.up, by: "lanes", for: element) }
         )
     ) { element in
@@ -20392,6 +20955,14 @@ let maskOps: [Op] = [
         section: .slideMaskAcrossBlocks,
         identifier: "slideMaskDownLanes",
         targets: TargetBodies(
+            sve: { element in
+                sveFoldingConstantMask(
+                    portableSlide(.down, masked: true, for: element),
+                    otherwise: sveSlidMask(.down, by: "lanes", for: element),
+                    withConstant: "lanes",
+                    for: element
+                )
+            },
             avx3: { element in x86Avx3SlidMask(.down, by: "lanes", for: element) }
         )
     ) { element in
@@ -20405,7 +20976,16 @@ let maskOps: [Op] = [
         .all,
         section: .slideMaskAcrossBlocks,
         identifier: "slideMask1Up",
-        targets: TargetBodies(avx3: { element in x86Avx3SlidMask(.up, for: element) })
+        targets: TargetBodies(
+            sve: { element in
+                sveFoldingConstantMask(
+                    portableSlide1(.up, masked: true, for: element),
+                    otherwise: sveSlidMask(.up, for: element),
+                    for: element
+                )
+            },
+            avx3: { element in x86Avx3SlidMask(.up, for: element) }
+        )
     ) { element in
         slidMask(.up, for: element)
     },
@@ -20417,7 +20997,16 @@ let maskOps: [Op] = [
         .all,
         section: .slideMaskAcrossBlocks,
         identifier: "slideMask1Down",
-        targets: TargetBodies(avx3: { element in x86Avx3SlidMask(.down, for: element) })
+        targets: TargetBodies(
+            sve: { element in
+                sveFoldingConstantMask(
+                    portableSlide1(.down, masked: true, for: element),
+                    otherwise: sveSlidMask(.down, for: element),
+                    for: element
+                )
+            },
+            avx3: { element in x86Avx3SlidMask(.down, for: element) }
+        )
     ) { element in
         slidMask(.down, for: element)
     },
@@ -20924,16 +21513,37 @@ func sveSplicedPairs(not: Bool, for element: Element) -> String {
         """
 }
 
-func sveExpandTableName(for element: Element) -> String {
-    "cvectorization_ops_sve_expand_table_16x8_\(tableSuffix(of: element))"
+func sveExpandTableName(_ name: String, for element: Element) -> String {
+    "cvectorization_ops_sve_expand_\(name)_\(tableSuffix(of: element))"
 }
 
 func sveExpandHelpers(for element: Element) -> String? {
     let neon = neonExpandHelpers(for: element)
     guard element.bits == 16 else { return neon }
     let rows = expandTableRows(lanes: 8) { [$0] }
-    let table = neonTable(named: sveExpandTableName(for: element), rows, isInternal: true)
+    let name = sveExpandTableName("table_16x8", for: element)
+    let table = neonTable(named: name, rows, isInternal: true)
     return [neon, table].compactMap { $0 }.joined()
+}
+
+func sveExpandedHelpers(for element: Element) -> String? {
+    switch (element.bits, element.width) {
+    case (64, 32):
+        let rows = expandTableRows(lanes: 4, zero: 255) { [$0] }
+        let name = sveExpandTableName("table_64x4", for: element)
+        return neonTable(named: name, rows, lane: "uint64_t", isInternal: true)
+    case (32, 32):
+        let rows = expandTableRows(lanes: 8, zero: 15) { [$0] }
+        let packed = stride(from: 0, to: rows.count, by: 8).map { start in
+            (0..<8).reduce(0) { $0 | rows[start + $1] << (4 * $1) }
+        }
+        let name = sveExpandTableName("packed_table_32x8", for: element)
+        return neonTable(named: name, packed, lane: "uint32_t", isInternal: true)
+    default:
+        let rows = expandTableRows(lanes: 8) { [$0] }
+        let name = sveExpandTableName("table_\(element.bits)x8", for: element)
+        return neonTable(named: name, rows, isInternal: true)
+    }
 }
 
 func sveExpanded(for element: Element) -> String? {
@@ -20950,21 +21560,8 @@ func sveExpanded(for element: Element) -> String? {
             """
     case 16:
         let unsigned = unsignedElement(of: element)
-        let weights = sveBuiltin(
-            "lsl",
-            [
-                sveAllLanes(of: element), sveBuiltin("dup_n", ["1"], for: unsigned),
-                sveBuiltin("index", ["3", "1"], for: unsigned),
-            ],
-            for: unsigned,
-            predication: "x"
-        )
-        let offset = sveBuiltin(
-            "addv",
-            [svePredicate(of: "mask", for: element), weights],
-            for: unsigned
-        )
-        let row = "\(sveExpandTableName(for: element))() + offset"
+        let offset = sveSummedMask(startingAt: 3, for: element)
+        let row = "\(sveExpandTableName("table_16x8", for: element))() + offset"
         let indices = "__builtin_sve_svld1ub_u16(\(sveVectorLanes(for: element)), \(row))"
         let lookup = sveBuiltin("tbl", [sveOperand("a", for: unsigned), indices], for: unsigned)
         return """
@@ -20973,6 +21570,88 @@ func sveExpanded(for element: Element) -> String? {
             """
     default:
         return nil
+    }
+}
+
+func sveExpandedQuads(for element: Element) -> String {
+    let table = sveExpandTableName("table_64x4", for: element)
+    return sveTableIndicesLookup(table, at: sveQuadsOffset(for: element), for: element)
+}
+
+func sveExpandedOctets(for element: Element) -> String {
+    let unsigned = unsignedElement(of: element)
+    let all = sveAllLanes(of: element)
+    let table = sveExpandTableName("packed_table_32x8", for: element)
+    let code = "\(sveSummedMask(startingAt: 0, for: element)) & 255"
+    let packed = sveBuiltin("dup_n", ["\(table)()[\(code)]"], for: unsigned)
+    let shifted = sveBuiltin(
+        "lsr",
+        [all, packed, sveBuiltin("index", ["0", "4"], for: unsigned)],
+        for: unsigned,
+        predication: "x"
+    )
+    let indices = sveBuiltin("and_n", [all, shifted, "0xF"], for: unsigned, predication: "x")
+    let lookup = sveBuiltin("tbl", [sveOperand("a", for: element), indices], for: element)
+    return vectorResult(sveResult(lookup, for: element), for: element)
+}
+
+func sveExpandedLoop(for element: Element) -> String {
+    let unsigned = unsignedElement(of: element)
+    let type = sveType(of: element)
+    let all = sveAllLanes(of: element)
+    let table = sveExpandTableName("table_\(element.bits)x8", for: element)
+    let eight = "__builtin_sve_svptrue_pat_b\(element.bits)(\(svePattern(lanes: 8)))"
+    let groups = element.laneCount / 8
+    let readsStoredBytes = element.bits <= 16
+    var statements =
+        readsStoredBytes
+        ? [
+            "uint8_t octets[\(groups)];",
+            "\(cFunctionName("storeMask", element))(rawMask, octets);",
+        ] : ["const uint64_t bits = \(cFunctionName("bitsOfMask", element))(rawMask);"]
+    statements.append("const \(type) source = \(sveOperand("a", for: element));")
+    if groups > 1 {
+        let iota = sveBuiltin("index", ["0", "1"], for: unsigned)
+        statements.append("const \(sveType(of: unsigned)) iota = \(iota);")
+        statements.append("uint64_t consumed = 0;")
+    }
+    for group in 0..<groups {
+        let octet = "octet\(group)"
+        let bits = group == 0 ? "bits" : "(bits >> \(8 * group))"
+        let loaded = readsStoredBytes ? "octets[\(group)]" : "\(bits) & 0xFF"
+        let row = "\(table)() + 8 * \(octet)"
+        let indices = sveBuiltin(element.bits == 8 ? "ld1" : "ld1ub", [eight, row], for: unsigned)
+        let rotated = group == 0 ? "source" : "rotated\(group)"
+        let expanded = sveBuiltin("tbl", [rotated, indices], for: element)
+        statements.append("const uint64_t \(octet) = \(loaded);")
+        if group > 0 {
+            let spliced = sveBuiltin("splice", ["next", "source", "source"], for: element)
+            statements.append("const \(type) rotated\(group) = \(spliced);")
+            let slid = sveBuiltin(
+                "splice",
+                [sveActiveLanes("\(8 * group)", for: element), "result", expanded],
+                for: element
+            )
+            statements.append("result = \(slid);")
+        } else {
+            statements.append("\(type) result = \(expanded);")
+        }
+        if group < groups - 1 {
+            let consumed = "(\(unsigned.cType))consumed"
+            let next = sveBuiltin("cmpge_n", [all, "iota", consumed], for: unsigned)
+            statements.append("consumed += __builtin_popcountll(\(octet));")
+            statements.append("\(group == 0 ? "__SVBool_t " : "")next = \(next);")
+        }
+    }
+    statements.append(vectorResult(sveResult("result", for: element), for: element))
+    return statements.joined(separator: "\n")
+}
+
+func sveExpandedWide(for element: Element) -> String {
+    switch (element.bits, element.width) {
+    case (64, 32): return sveExpandedQuads(for: element)
+    case (32, 32): return sveExpandedOctets(for: element)
+    default: return sveExpandedLoop(for: element)
     }
 }
 
@@ -21131,6 +21810,21 @@ func sveInterleavedBlockHalves(upper: Bool, for element: Element) -> String {
         \(halves.joined(separator: "\n"))
         \(sveViewedResult(zipped, viewing: lanes, for: element))
         """
+}
+
+func sveInterleavedBlockHalves(
+    _ first: String,
+    _ second: String,
+    upper: Bool,
+    for element: Element
+) -> String {
+    let pairs = unsignedElement(bits: 64)
+    let halves = [first, second].map { name in
+        let operand = sveOperand(name, for: pairs)
+        let gathered = sveBuiltin(upper ? "uzp2" : "uzp1", [operand, operand], for: pairs)
+        return sveReinterpreted(gathered, from: pairs, to: element)
+    }
+    return sveResult(sveBuiltin("zip1", halves, for: element), for: element)
 }
 
 func sveConcatenatedHalves(upper: Bool, for element: Element) -> String {
@@ -22147,6 +22841,18 @@ let fixedPermutations: [FixedPermutation] = [
         section: .otherFixedPatternPermutationsWithinBlocks,
         targets: TargetBodies(
             neon: { element in wordSelectedOddEven(for: element) },
+            sve: { element in
+                vectorResult(
+                    sveOddEvenLanes(odd: "a", even: "b", sve2: false, for: element),
+                    for: element
+                )
+            },
+            sve2: { element in
+                vectorResult(
+                    sveOddEvenLanes(odd: "a", even: "b", sve2: true, for: element),
+                    for: element
+                )
+            },
             sse4: { element in x86OddEvenLanes(level: .sse4, for: element) },
             ssse3: { element in x86OddEvenLanes(level: .ssse3, for: element) },
             sse2: { element in x86OddEvenLanes(level: .sse2, for: element) }
@@ -22582,8 +23288,8 @@ func neonMaskBits(bits: Int) -> String {
     return "__builtin_reduce_add((\(unsigned.cVector))mask & \(weights))"
 }
 
-func expandTableRows(lanes: Int, entry: (Int) -> [Int]) -> [Int] {
-    let zeroing = entry(0).map { _ in Int(zeroedByte) }
+func expandTableRows(lanes: Int, zero: Int = Int(zeroedByte), entry: (Int) -> [Int]) -> [Int] {
+    let zeroing = entry(0).map { _ in zero }
     return (0..<1 << lanes).flatMap { bits in
         var position = 0
         return (0..<lanes).flatMap { lane -> [Int] in
@@ -24183,20 +24889,13 @@ func sveTableIndicesLookup(_ table: String, at offset: String, for element: Elem
     return vectorResult(sveResult(lookup, for: element), for: element)
 }
 
+func sveQuadsOffset(for element: Element) -> String {
+    "\(sveSummedMask(startingAt: 2, for: element)) & \(4 * 15)"
+}
+
 func sveCompressedQuads(not: Bool, for element: Element) -> String {
-    let unsigned = unsignedElement(of: element)
-    let bits = sveBuiltin(
-        "lsl",
-        [
-            sveAllLanes(of: element), sveBuiltin("dup_n", ["1"], for: unsigned),
-            sveBuiltin("index", ["2", "1"], for: unsigned),
-        ],
-        for: unsigned,
-        predication: "x"
-    )
-    let sum = sveBuiltin("addv", [svePredicate(of: "mask", for: element), bits], for: unsigned)
     let table = sveCompressTableName("table_64x4", not: not, for: element)
-    return sveTableIndicesLookup(table, at: "\(sum) & \(4 * 15)", for: element)
+    return sveTableIndicesLookup(table, at: sveQuadsOffset(for: element), for: element)
 }
 
 func sveCompressedBlocksNot(for element: Element) -> String? {
@@ -24319,6 +25018,13 @@ let compressOps: [Op] = [
         targets: TargetBodies(
             neon: { neonExpanded(for: $0) },
             sve2_128: { sveExpanded(for: $0) },
+            sve: { element in
+                sveFoldingConstantMask(
+                    portableExpanded(for: element),
+                    otherwise: sveExpandedWide(for: element),
+                    for: element
+                )
+            },
             avx3dl: { x86Avx3Expanded(level: .avx3dl, for: $0) },
             avx3: { x86Avx3Expanded(level: .avx3, for: $0) },
             avx2: { x86Avx2Expanded(for: $0) },
@@ -24328,6 +25034,7 @@ let compressOps: [Op] = [
         helpers: TargetBodies(
             neon: { neonExpandHelpers(for: $0) },
             sve2_128: { sveExpandHelpers(for: $0) },
+            sve: { sveExpandedHelpers(for: $0) },
             avx3: { x86Avx3ExpandHelpers(for: $0) },
             avx2: { x86Avx2ExpandHelpers(for: $0) },
             sse2: { x86ExpandHelpers(for: $0) }
@@ -27342,6 +28049,15 @@ func expandedLoadTargets(otherwise: Bool) -> TargetBodies<Element> {
     TargetBodies(
         neon: { element in registeredExpandedLoad(otherwise: otherwise, for: element) },
         sve2_128: { element in sveExpandedLoad(otherwise: otherwise, for: element) },
+        sve: { element in
+            otherwise
+                ? nil
+                : sveFoldingConstantMask(
+                    expandedLoad(otherwise: false, for: element),
+                    otherwise: registeredExpandedLoad(otherwise: false, for: element),
+                    for: element
+                )
+        },
         avx3dl: { element in x86Avx3ExpandLoad(otherwise: otherwise, for: element) },
         avx3: { element in
             x86Avx3IsNative(.avx3, for: element)
@@ -32007,6 +32723,7 @@ enum MulBitsByteLookup {
 func mulBitsMultiRotatedRightLookup(
     _ target: MulBitsByteLookup,
     scalingByPowers: Bool = false,
+    sveShuffles: Bool = false,
     for element: Element
 ) -> String {
     let (bytes, words, lanes) = mulBitsByteVectors(for: element)
@@ -32024,6 +32741,12 @@ func mulBitsMultiRotatedRightLookup(
             }
         )
     }
+    func zippedBlocks(_ first: String, _ second: String, upper: Bool) -> String {
+        guard sveShuffles else {
+            return "__builtin_shufflevector(\(first), \(second), \(zipped(upper: upper)))"
+        }
+        return sveInterleavedBlockHalves(first, second, upper: upper, for: bytes)
+    }
     let packed = laneIndices(
         (0..<size / 16).flatMap { block in
             (0..<8).map { 16 * block + 2 * $0 } + (0..<8).map { size + 16 * block + 2 * $0 }
@@ -32031,20 +32754,52 @@ func mulBitsMultiRotatedRightLookup(
     )
     let duplicatedEven = laneIndices((0..<element.laneCount).map { $0 & ~1 })
     let duplicatedOdd = laneIndices((0..<element.laneCount).map { $0 | 1 })
+    func duplicatedLanes(odd: Bool) -> String {
+        guard sveShuffles else {
+            let indices = odd ? duplicatedOdd : duplicatedEven
+            return "__builtin_shufflevector(values, values, \(indices))"
+        }
+        return sveDuplicatedLanes("values", odd: odd, for: lanes)
+    }
+    func packedLanes() -> String {
+        guard sveShuffles else {
+            return vectorResult(
+                "__builtin_shufflevector((\(bytes.cVector))evenExtracted, (\(bytes.cVector))oddExtracted, \(packed))",
+                for: element
+            )
+        }
+        func concatenated(_ name: String) -> String {
+            let extracted = sveOperand("\(name)Extracted", for: bytes)
+            let operands = [extracted, sveOperand(bytesOf(0), for: bytes)]
+            let evens = sveResult(sveBuiltin("uzp1", operands, for: bytes), for: bytes)
+            return "const \(bytes.cVector) \(name)Lanes = \(evens);"
+        }
+        let joined = sveBuiltin(
+            "zip1",
+            ["even", "odd"].map { sveOperand("\($0)Lanes", for: lanes) },
+            for: lanes
+        )
+        return """
+            \(concatenated("even"))
+            \(concatenated("odd"))
+            \(vectorResult(sveResult(joined, for: lanes), for: element))
+            """
+    }
     let powers = compoundLiteral(
         bytes.cVector,
         (0..<size).map { $0 % 16 < 8 ? String(128 >> ($0 % 16)) : "0" }
     )
-    func segments(_ name: String, duplicated: String, upper: Bool) -> String {
+    func segments(_ name: String, odd: Bool) -> String {
         let extraction =
             scalingByPowers
             ? "((\(words.cVector))\(name)Segments * \(name)Counts) >> 7"
             : "(\(words.cVector))\(name)Segments >> \(name)Counts"
+        let counts = zippedBlocks(scalingByPowers ? "powers" : "bitCounts", bytesOf(0), upper: odd)
         return """
-            const \(bytes.cVector) \(name)Source = (\(bytes.cVector))__builtin_shufflevector(values, values, \(duplicated));
-            const \(bytes.cVector) \(name)Indices = __builtin_shufflevector(byteIndices, nextIndices, \(zipped(upper: upper)));
+            const \(bytes.cVector) \(name)Source = (\(bytes.cVector))\(duplicatedLanes(odd: odd));
+            const \(bytes.cVector) \(name)Indices = \(zippedBlocks("byteIndices", "nextIndices", upper: odd));
             const \(bytes.cVector) \(name)Segments = \(target.lookup("\(name)Source", "\(name)Indices", for: element));
-            const \(words.cVector) \(name)Counts = (\(words.cVector))__builtin_shufflevector(\(scalingByPowers ? "powers" : "bitCounts"), \(bytesOf(0)), \(zipped(upper: upper)));
+            const \(words.cVector) \(name)Counts = (\(words.cVector))\(counts);
             const \(words.cVector) \(name)Extracted = \(extraction);
             """
     }
@@ -32062,9 +32817,9 @@ func mulBitsMultiRotatedRightLookup(
         const \(bytes.cVector) byteIndices = masked >> 3;
         const \(bytes.cVector) nextIndices = byteIndices + \(bytesOf(1));
         const \(bytes.cVector) bitCounts = masked & \(bytesOf(7));
-        \(scaling)\(segments("even", duplicated: duplicatedEven, upper: false))
-        \(segments("odd", duplicated: duplicatedOdd, upper: true))
-        \(vectorResult("__builtin_shufflevector((\(bytes.cVector))evenExtracted, (\(bytes.cVector))oddExtracted, \(packed))", for: element))
+        \(scaling)\(segments("even", odd: false))
+        \(segments("odd", odd: true))
+        \(packedLanes())
         """
 }
 
@@ -32188,6 +32943,23 @@ func mulBitsByteIndexedOps(
     }
 }
 
+func mulBitsMultiRotatedRightFoldingConstants(for element: Element) -> String {
+    let bytes = unsignedElement(bits: 8)
+    let constants = [
+        "\(cFunctionName("sveConstant", element))(a)",
+        "\(cFunctionName("sveConstant", bytes))((\(bytes.cVector))b)",
+    ]
+    return sveFolding(
+        when: constants.joined(separator: " || "),
+        mulBitsMultiRotatedRightLookup(.wideSve(sve2: true), for: element),
+        otherwise: mulBitsMultiRotatedRightLookup(
+            .wideSve(sve2: true),
+            sveShuffles: true,
+            for: element
+        )
+    )
+}
+
 let mulBitsMultiRotatedRightOps = mulBitsByteIndexedOps(
     "multiRotatedRight",
     "MultiRotateRight",
@@ -32195,7 +32967,10 @@ let mulBitsMultiRotatedRightOps = mulBitsByteIndexedOps(
     targets: TargetBodies(
         neon: { element in mulBitsMultiRotatedRightLookup(.neon, for: element) },
         sve2_128: { element in mulBitsMultiRotatedRightLookup(.sve, for: element) },
-        sve: { element in mulBitsMultiRotatedRightLookup(.wideSve(sve2: false), for: element) },
+        sve: { element in
+            mulBitsMultiRotatedRightLookup(.wideSve(sve2: false), sveShuffles: true, for: element)
+        },
+        sve2: { element in mulBitsMultiRotatedRightFoldingConstants(for: element) },
         avx3dl: { element in mulBitsMultiRotatedRightX86Multishift(for: element) },
         avx3: { element in mulBitsMultiRotatedRightLookup(.x86, for: element) },
         avx2: { element in mulBitsMultiRotatedRightLookup(.x86, for: element) },
@@ -36096,7 +36871,7 @@ func resizeOp(
             )
             let tags = arguments.dropLast().map { $0 == sourceTag ? unsignedTag : $0 }
             let viaUnsigned = "hn::\(name)(\((tags + [unsignedOperand]).joined(separator: ", ")))"
-            return "\n#if HWY_TARGET == HWY_SVE2_128\n\(viaUnsigned)\n#else\n\(direct)\n#endif\n"
+            return "\n#if HWY_TARGET_IS_SVE\n\(viaUnsigned)\n#else\n\(direct)\n#endif\n"
         },
         portable: { result in
             resultOf(expression, for: result)
@@ -40966,11 +41741,17 @@ func referenceMask(
     fromSigned vector: String,
     tag: String,
     of element: Element,
-    comparingFloat16: Bool = false
+    comparingFloat16: Bool = false,
+    keeping lanes: String? = nil
 ) -> String {
-    element.isHalfPrecision && !(comparingFloat16 && element.category == .float16)
-        ? "hn::RebindMask(\(tag)(), hn::MaskFromVec(\(vector)))"
-        : "hn::MaskFromVec(hn::BitCast(\(tag)(), \(vector)))"
+    let rebinds = element.isHalfPrecision && !(comparingFloat16 && element.category == .float16)
+    let compared = rebinds ? "hn::RebindToSigned<\(tag)>" : tag
+    let operand = rebinds ? vector : "hn::BitCast(\(tag)(), \(vector))"
+    let mask =
+        lanes.map {
+            "hn::MaskedNe(hn::FirstN(\(compared)(), \($0)), \(operand), hn::Zero(\(compared)()))"
+        } ?? "hn::MaskFromVec(\(operand))"
+    return rebinds ? "hn::RebindMask(\(tag)(), \(mask))" : mask
 }
 
 func referenceMaskReturn(fromSigned vector: String, tag: String, of element: Element) -> String {
@@ -41043,6 +41824,40 @@ func memoryPortConversions(of element: Element) -> String {
     output +=
         "hn::StoreU(\(referenceSignedVector(fromMask: "m", tag: element.tag, of: element)), di, "
     output += "reinterpret_cast<\(element.cMaskLane)*>(&port)); return port; }\n"
+    return output
+}
+
+func castFromPort(_ expression: String, tag: String) -> String {
+    let bytes = "hn::VFromD<hn::ScalableTag<uint8_t>>((\(sveVector("u8")))\(expression))"
+    return "hn::BitCast(\(tag)(), \(bytes))"
+}
+
+func castToPort(_ expression: String) -> String {
+    "(\(sveVector("u8")))hn::BitCast(hn::ScalableTag<uint8_t>(), \(expression))"
+}
+
+func castPortConversions(of element: Element) -> String {
+    let signedTag = "const hn::RebindToSigned<\(element.tag)> di;"
+    var output = ""
+    output += "HWY_INLINE \(element.vector) \(referenceFunctionName("fromPort", element))"
+    output += "(\(element.cRawVector) v) { return "
+    output += "\(castFromPort("v", tag: element.tag)); }\n"
+    output += "HWY_INLINE \(element.cRawVector) \(referenceFunctionName("toPort", element))"
+    output += "(\(element.vector) v) { return (\(element.cRawVector))"
+    output += "\(castToPort("v")); }\n"
+    output += "HWY_INLINE \(element.mask) \(referenceFunctionName("maskFromPort", element))"
+    output += "(\(element.cRawMask) m) { return "
+    output += referenceMask(
+        fromSigned: castFromPort("m", tag: "hn::RebindToSigned<\(element.tag)>"),
+        tag: element.tag,
+        of: element,
+        comparingFloat16: true
+    )
+    output += "; }\n"
+    output += "HWY_INLINE \(element.cRawMask) \(referenceFunctionName("maskToPort", element))"
+    output += "(\(element.mask) m) { \(signedTag) return (\(element.cRawMask))"
+    output += castToPort(referenceSignedVector(fromMask: "m", tag: element.tag, of: element))
+    output += "; }\n"
     return output
 }
 
@@ -41163,6 +41978,55 @@ func memoryNarrowMaskPortConversions(of element: Element, shape: Shape) -> Strin
     return output
 }
 
+func castNarrowPortConversions(of element: Element, shape: Shape) -> String {
+    let (raw, vector, tag) = (
+        element.cRawVector(of: shape), element.vector(of: shape), element.tag(of: shape)
+    )
+    let (wide, kept) = (element.cVector, element.cVector(of: shape))
+    var output = ""
+    output += "HWY_INLINE \(vector) \(referenceFunctionName(shape.conversion("fromPort"), element))"
+    output += "(\(raw) v) { return "
+    output += castFromPort("maskedZeroExtended<\(wide), sizeof(\(kept))>(v)", tag: tag)
+    output += "; }\n"
+    if shape.isPartial {
+        output += "HWY_INLINE \(vector) "
+        output += "\(referenceFunctionName(shape.conversion("registerFromPort"), element))"
+        output += "(\(raw) v) { return "
+        output += castFromPort("zeroExtended<\(wide), sizeof(\(raw))>(v)", tag: tag)
+        output += "; }\n"
+    }
+    output += "HWY_INLINE \(raw) \(referenceFunctionName(shape.conversion("toPort"), element))"
+    output += "(\(vector) v) { const \(wide) wide = (\(wide))"
+    output += castToPort("v")
+    output += "; \(raw) port; __builtin_memcpy(&port, &wide, sizeof(\(kept))); return port; }\n"
+    return output
+        + (shape.hasMask ? castNarrowMaskPortConversions(of: element, shape: shape) : "")
+}
+
+func castNarrowMaskPortConversions(of element: Element, shape: Shape) -> String {
+    let (raw, mask, tag) = (
+        element.cRawMask(of: shape), element.mask(of: shape), element.tag(of: shape)
+    )
+    let (wide, kept) = (element.cMask, element.cMask(of: shape))
+    var output = ""
+    output +=
+        "HWY_INLINE \(mask) \(referenceFunctionName(shape.conversion("maskFromPort"), element))"
+    output += "(\(raw) m) { return "
+    output += referenceMask(
+        fromSigned: castFromPort("widened<\(wide)>(m)", tag: "hn::RebindToSigned<\(tag)>"),
+        tag: tag,
+        of: element,
+        comparingFloat16: true,
+        keeping: "__builtin_vectorelements(\(kept))"
+    )
+    output += "; }\n"
+    output += "HWY_INLINE \(raw) \(referenceFunctionName(shape.conversion("maskToPort"), element))"
+    output += "(\(mask) m) { const hn::RebindToSigned<\(tag)> di; const \(wide) wide = (\(wide))"
+    output += castToPort(referenceSignedVector(fromMask: "m", tag: tag, of: element))
+    output += "; \(raw) port; __builtin_memcpy(&port, &wide, sizeof(\(kept))); return port; }\n"
+    return output
+}
+
 func narrowReferenceDeclarations(of element: Element) -> String {
     narrowShapes(of: element).map { shape in
         let mask =
@@ -41172,7 +42036,8 @@ func narrowReferenceDeclarations(of element: Element) -> String {
             using \(element.tag(of: shape)) = \(narrowReferenceTag(of: element, shape: shape));
             using \(element.vector(of: shape)) = hn::VFromD<\(element.tag(of: shape))>;
             \(mask)#if HWY_TARGET == HWY_SVE2_128
-            \(bridgedNarrowPortConversions(of: element, shape: shape))#else
+            \(bridgedNarrowPortConversions(of: element, shape: shape))#elif HWY_TARGET_IS_SVE
+            \(castNarrowPortConversions(of: element, shape: shape))#else
             \(memoryNarrowPortConversions(of: element, shape: shape))#endif
 
             """
@@ -41182,7 +42047,8 @@ func narrowReferenceDeclarations(of element: Element) -> String {
 func portConversions(of element: Element) -> String {
     """
     #if HWY_TARGET == HWY_SVE2_128
-    \(bridgedPortConversions(of: element))#else
+    \(bridgedPortConversions(of: element))#elif HWY_TARGET_IS_SVE
+    \(castPortConversions(of: element))#else
     \(memoryPortConversions(of: element))#endif
 
     """
@@ -41320,6 +42186,8 @@ func generateReferenceHeader() -> String {
         #include "hwy/highway.h"
         #if HWY_TARGET == HWY_SVE2_128
         #include <arm_neon_sve_bridge.h>
+        #elif HWY_TARGET_IS_SVE
+        #include <utility>
         #endif
 
         namespace hwy {
@@ -41349,6 +42217,50 @@ func generateReferenceHeader() -> String {
         HWY_INLINE size_t spanCount(size_t count, size_t lanes) {
           return HWY_TARGET_IS_SVE && count > lanes ? lanes : count;
         }
+
+        #if HWY_TARGET_IS_SVE && HWY_TARGET != HWY_SVE2_128
+        /// A narrow vector in the register of a `Wide` one, whose other bytes are unspecified.
+        template <typename Wide, typename Narrow, size_t... kLanes>
+        HWY_INLINE Wide widenedLanes(Narrow narrow, std::index_sequence<kLanes...>) {
+          return __builtin_shufflevector(
+              narrow, narrow,
+              (kLanes < __builtin_vectorelements(Narrow) ? static_cast<int>(kLanes) : -1)...);
+        }
+
+        template <typename Wide, typename Narrow>
+        HWY_INLINE Wide widened(Narrow narrow) {
+          return widenedLanes<Wide>(
+              narrow, std::make_index_sequence<__builtin_vectorelements(Wide)>());
+        }
+
+        /// The same with zeros after the first `kKeptBytes` bytes, which is what Highway's masked
+        /// load of a narrow vector leaves in the register. A shuffle with zeros costs nothing where
+        /// the register goes straight back to the port.
+        template <typename Wide, size_t kKeptBytes, typename Narrow, size_t... kLanes>
+        HWY_INLINE Wide zeroExtendedLanes(Narrow narrow, std::index_sequence<kLanes...>) {
+          constexpr size_t laneBytes = sizeof(Wide) / __builtin_vectorelements(Wide);
+          const Narrow zeros = {};
+          return __builtin_shufflevector(
+              narrow, zeros,
+              (kLanes * laneBytes < kKeptBytes ? static_cast<int>(kLanes)
+                                               : static_cast<int>(__builtin_vectorelements(Narrow)))...);
+        }
+
+        template <typename Wide, size_t kKeptBytes, typename Narrow>
+        HWY_INLINE Wide zeroExtended(Narrow narrow) {
+          return zeroExtendedLanes<Wide, kKeptBytes>(
+              narrow, std::make_index_sequence<__builtin_vectorelements(Wide)>());
+        }
+
+        /// The same with a select, which costs less where Highway reads the register.
+        template <typename Wide, size_t kKeptBytes, typename Narrow>
+        HWY_INLINE Wide maskedZeroExtended(Narrow narrow) {
+          const hn::ScalableTag<uint8_t> d;
+          const hn::VFromD<decltype(d)> bytes = (cvectorization_ops_sve_u8)widened<Wide>(narrow);
+          return (Wide)(cvectorization_ops_sve_u8)hn::IfThenElseZero(
+              hn::FirstN(d, kKeptBytes), bytes);
+        }
+        #endif
 
         /// Highway's BitsFromMask, which its scalable targets do not have, so there the bits come
         /// from StoreMaskBits, which gives the same ones.
@@ -41695,9 +42607,9 @@ func x86Branches<Input: WidthScaled>(
 }
 
 let sve2OnlyBuiltins = [
-    "adalp_", "addp_", "bcax_", "bsl_", "cadd_s", "cadd_u", "eor3_", "logb_", "mlalb_", "mlalt_",
-    "movlb_", "movlt_", "mullb_", "mullt_", "qabs_", "qdmlalb_", "qneg_", "qrdmulh_", "qxtnb_",
-    "qxtnt_", "qxtunb_", "qxtunt_", "rhadd_", "rshl_", "rshr_", "tbl2_",
+    "adalp_", "addp_", "bcax_", "bsl_", "cadd_s", "cadd_u", "eor3_", "eortb_", "logb_", "mlalb_",
+    "mlalt_", "movlb_", "movlt_", "mullb_", "mullt_", "qabs_", "qdmlalb_", "qneg_", "qrdmulh_",
+    "qxtnb_", "qxtnt_", "qxtunb_", "qxtunt_", "rhadd_", "rshl_", "rshr_", "tbl2_",
 ]
 
 func sve1Checked(_ body: String) -> String {
@@ -41924,16 +42836,17 @@ func x86Helpers() -> String {
 func neonTable(
     named name: String,
     _ bytes: [Int],
+    lane: String = "uint8_t",
     alignment: Int = 16,
     isInternal: Bool = false,
     isHidden: Bool = false
 ) -> String {
     cFunction(
-        returns: "const uint8_t*",
+        returns: "const \(lane)*",
         name: name,
         parameters: [],
         body: """
-            static const uint8_t table[\(bytes.count)] __attribute__((aligned(\(alignment)))) = {\(bytes.map(String.init).joined(separator: ", "))};
+            static const \(lane) table[\(bytes.count)] __attribute__((aligned(\(alignment)))) = {\(bytes.map(String.init).joined(separator: ", "))};
             return table;
             """,
         specifiers: isInternal
@@ -51180,7 +52093,7 @@ let sveFirstTrueSettingGaps = [
 }
 
 let sveNaNOperandOrderComment =
-    "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+    "On SVE with a constant operand the compiler orders the operands of the destructive minimum or maximum instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
 
 let sveAt512Condition =
     "(SIMDTarget.targetName == \"SVE\" || SIMDTarget.targetName == \"SVE2\") && H.laneCount * MemoryLayout<Lane>.stride == 64"
@@ -51207,22 +52120,17 @@ func constantSplatTests(_ groups: [(identifiers: [String], splats: [String])]) -
 
 let sveWideNaNOperandOrderTests: [String: [String]] = [
     "SIMDDoubleConstant": constantSplatTests([
-        (["absoluteDifference"], ["MinusNaN", "NaN", "PayloadNaN"]),
         (["maximum", "minimum", "minimumNumber"], sveNaNSplatsWithoutSignalingNaN),
         (["maximumNumber"], sveNaNSplats),
     ]),
     "SIMDFloat16Constant": constantSplatTests([
-        (
-            ["absoluteDifference", "maximum", "maximumNumber", "minimum", "minimumNumber"],
-            sveNaNSplats
-        )
+        (["maximum", "maximumNumber", "minimum", "minimumNumber"], sveNaNSplats)
     ]),
     "SIMDFloatConstant": constantSplatTests([
-        (["absoluteDifference"], sveNaNSplats),
         (
             ["maximum", "maximumNumber", "minimum", "minimumNumber"],
             sveNaNSplatsWithoutSignalingNaN
-        ),
+        )
     ]),
 ]
 
@@ -51320,6 +52228,8 @@ func constantType(
 {
     switch parameter {
     case .flag: return "Bool"
+    case .mask, .whereMask: return "H.Mask"
+    case .constBytePointer: return "UInt64"
     case .roundConstant: return "UInt8"
     case _ where parameter.isPointerIndices: return signedElement(of: element).swiftType
     case _ where isConstantVector(parameter): return lane
@@ -51328,6 +52238,54 @@ func constantType(
 }
 
 let indexSplats = integerConstants([0, 1])
+
+func constantMask(repeating value: Bool, except lane: String? = nil) -> String {
+    let uniform = "H.Mask.SIMDType(repeating: \(value))"
+    guard let lane else { return "H.Mask(\(uniform))" }
+    return "{ var simd = \(uniform); simd[\(lane)] = \(!value); return H.Mask(simd) }()"
+}
+
+let constantMasks = [
+    ConstantValue(name: "AllFalse", literal: constantMask(repeating: false)),
+    ConstantValue(name: "AllTrue", literal: constantMask(repeating: true)),
+    ConstantValue(name: "OnlyFirst", literal: constantMask(repeating: false, except: "0")),
+    ConstantValue(
+        name: "OnlyLast",
+        literal: constantMask(repeating: false, except: "H.laneCount - 1")
+    ),
+    ConstantValue(name: "AllButFirst", literal: constantMask(repeating: true, except: "0")),
+    ConstantValue(
+        name: "AllButLast",
+        literal: constantMask(repeating: true, except: "H.laneCount - 1")
+    ),
+]
+
+func constantBytePattern(_ name: String, _ bytes: [UInt8]) -> ConstantValue {
+    let value = bytes.enumerated().reduce(UInt64(0)) {
+        $0 | UInt64($1.element) << UInt64(8 * $1.offset)
+    }
+    return ConstantValue(name: name, literal: String(format: "0x%016llX", value))
+}
+
+let constantBytePatterns: [ConstantValue] = {
+    var patterns = [
+        constantBytePattern("AllFalse", Array(repeating: 0x00, count: 8)),
+        constantBytePattern("AllTrue", Array(repeating: 0xFF, count: 8)),
+    ]
+    for bit in 0..<8 {
+        patterns.append(
+            constantBytePattern("Bit\(bit)", Array(repeating: UInt8(1 << bit), count: 8))
+        )
+    }
+    for byte in 0..<8 {
+        let bytes = (0..<8).map { $0 == byte ? UInt8(0xFF) : UInt8(0x00) }
+        patterns.append(constantBytePattern("OnlyByte\(byte)", bytes))
+    }
+    patterns.append(
+        constantBytePattern("Distinct", [0x95, 0x3C, 0xA6, 0xD1, 0x4B, 0xE2, 0x17, 0x68])
+    )
+    return patterns
+}()
 
 func constantHelper(
     of op: Op,
@@ -51420,7 +52378,10 @@ func constantHelper(
     let describedValue =
         alternating
         ? "alternating \\(hex(even)), \\(hex(odd))"
-        : isSplat ? "repeating \\(hex(value))" : "\\(\(value))"
+        : isSplat
+            ? "repeating \\(hex(value))"
+            : [.mask, .whereMask].contains(op.parameters[index])
+                ? "\\(describe(\(value)))" : "\\(\(value))"
     let suffix = guarded ? " before a guard page" : ""
     let knownIssue =
         alternating
@@ -51465,6 +52426,96 @@ func constantTest(
         \(calls.joined(separator: "\n"))
         }
         """
+}
+
+/// A helper that takes the mask and the lane amount of an op, which only fold into the constant
+/// path of the op when both are constants, and the tests that call it with every constant mask and
+/// the amounts that are lanes of some vector.
+func maskAmountConstantTests(of op: Op, for element: Element) -> [String] {
+    let name = "check\(uppercasedFirst(op.testIdentifier))ConstantMaskLanes"
+    let parameterBindings = bindings(of: op, for: element)
+    let names = zip(parameterBindings, op.parameters)
+        .filter { $0.1 == .mask || $0.1 == .laneAmount }
+        .map(\.0.swiftName)
+    let inputs = referenceInputs(of: op, for: element, test: name, inContract: true)
+        .filter { !names.contains($0.name) }
+    let calls = referenceCalls(
+        of: op,
+        for: element,
+        pointer: referencePointer(of: op, guarded: false),
+        destination: referenceDestination(of: op, guarded: false)
+    )
+    let (declarations, statements) = referenceStatements(
+        of: op,
+        for: element,
+        inputs: inputs,
+        guarded: false,
+        calls: calls
+    )
+    var members = [
+        referenceTestFunction(
+            name,
+            label: "\(op.testIdentifier) with mask \\(describe(mask)), lanes \\(lanes)",
+            for: element,
+            inputs: inputs,
+            declarations: declarations,
+            signature: "@inline(__always)\nprivate func \(name)(_ mask: H.Mask, _ lanes: Int) {",
+            statements: statements
+        )
+    ]
+    for mask in constantMasks {
+        for lanes in [0, 1, 2, 3, 7, 15, 31, 63] {
+            members.append(
+                constantTest(
+                    "\(op.testIdentifier)ConstantMask\(mask.name)Lanes\(lanes)",
+                    enabledIf: "\(lanes) < H.laneCount",
+                    calls: ["\(name)(\(mask.literal), \(lanes))"]
+                )
+            )
+        }
+    }
+    return members
+}
+
+/// A helper that takes the bytes of a mask load by value, whose load only folds into the constant
+/// path of the op when they are constants, and the tests that call it with every byte pattern. The
+/// port reads only the bytes of its lanes of the eight, and Highway is given eight more.
+func maskBytesConstantTests(of op: Op, for element: Element, parameter index: Int) -> [String] {
+    let binding = bindings(of: op, for: element)[index]
+    let name = constantHelperName(of: op, parameter: binding, guarded: false)
+    let calls = referenceCalls(
+        of: op,
+        for: element,
+        pointer: "source.baseAddress!.assumingMemoryBound(to: UInt8.self)",
+        referencePointer: "padded.baseAddress!.assumingMemoryBound(to: UInt8.self)"
+    )
+    var members = [
+        referenceTestFunction(
+            name,
+            label: "\(op.testIdentifier) with \(binding.swiftName) \\(hex(\(binding.swiftName)))",
+            for: element,
+            inputs: [],
+            signature: constantHelperSignature(
+                name,
+                [binding.swiftName],
+                constantType(of: op.parameters[index], for: element)
+            ),
+            statements: """
+                let portResult = withUnsafeBytes(of: \(binding.swiftName)) { source in \(calls.port) }
+                let referenceResult = withUnsafeBytes(of: (\(binding.swiftName), UInt64(0))) { padded in \(calls.reference) }
+                mismatches.check(portResult, referenceResult, "")
+                """
+        )
+    ]
+    for pattern in constantBytePatterns {
+        members.append(
+            constantTest(
+                "\(op.testIdentifier)Constant\(uppercasedFirst(binding.swiftName))\(pattern.name)",
+                calls: ["\(name)(\(pattern.literal))"]
+            )
+        )
+    }
+    return members
 }
 
 func isOutOfContractSplat(_ value: ConstantValue, of op: Op, for element: Element) -> Bool {
@@ -51552,7 +52603,9 @@ func constantTests(of op: Op, for element: Element) -> [String] {
     var members: [String] = []
 
     for index in indices
-    where !isConstantVector(op.parameters[index]) && op.parameters[index] != .immediate {
+    where !isConstantVector(op.parameters[index]) && op.parameters[index] != .immediate
+        && op.parameters[index] != .constBytePointer
+    {
         let binding = parameterBindings[index]
         let values: [ConstantValue]
         switch op.parameters[index] {
@@ -51571,6 +52624,8 @@ func constantTests(of op: Op, for element: Element) -> [String] {
                 ConstantValue(name: "False", literal: "false"),
                 ConstantValue(name: "True", literal: "true"),
             ]
+        case .mask, .whereMask:
+            values = constantMasks
         default:
             fatalError("\(op.identifier) branches on \(binding.swiftName), which nothing covers")
         }
@@ -51591,6 +52646,16 @@ func constantTests(of op: Op, for element: Element) -> [String] {
                 )
             }
         }
+    }
+
+    if indices.contains(where: { op.parameters[$0] == .mask })
+        && indices.contains(where: { op.parameters[$0] == .laneAmount })
+    {
+        members += maskAmountConstantTests(of: op, for: element)
+    }
+
+    for index in indices where op.parameters[index] == .constBytePointer {
+        members += maskBytesConstantTests(of: op, for: element, parameter: index)
     }
 
     if indices.contains(where: { op.parameters[$0] == .immediate }) {
@@ -51852,6 +52917,8 @@ let maximumUnformattedFileLines = 1000
 
 let maximumUnformattedMembersFileLines = 2000
 
+let constantTestParts = 3
+
 func balanced(_ members: [SectionMember]) -> [[SectionMember]] {
     let lines = members.reduce(0) { $0 + $1.lineCount }
     let count = max(
@@ -51958,7 +53025,8 @@ func writeSections(
     extending type: String,
     for element: Element? = nil,
     testing: Bool = false,
-    balancing: Bool = false
+    balancing: Bool = false,
+    inParts partCount: Int = 1
 ) throws {
     func populated(_ section: Section) -> [SectionMember] {
         members.filter {
@@ -51982,23 +53050,33 @@ func writeSections(
         }
         return
     }
+    var files: [(name: String, contents: String)] = []
     for section in Section.allCases {
         let sectionMembers = populated(section)
         guard !sectionMembers.isEmpty else { continue }
         let parts = partitioned(sectionMembers)
         for (index, part) in parts.enumerated() {
             let number = parts.count == 1 ? "" : String(index + 1)
-            try write(
-                sectionFile(
-                    part,
-                    imports: imports,
-                    extending: type,
-                    for: element,
-                    testing: testing
-                ),
-                to: "\(directory)/\(name)+\(section.rawValue)\(number).swift"
+            files.append(
+                (
+                    name: "\(name)+\(section.rawValue)\(number).swift",
+                    contents: sectionFile(
+                        part,
+                        imports: imports,
+                        extending: type,
+                        for: element,
+                        testing: testing
+                    )
+                )
             )
         }
+    }
+    var loads = [Int](repeating: 0, count: partCount)
+    for file in files {
+        let part = loads.indices.min { loads[$0] < loads[$1] } ?? 0
+        loads[part] += file.contents.utf8.count { $0 > 0x20 }
+        let partDirectory = partCount == 1 ? directory : "\(directory)\(part + 1)"
+        try write(file.contents, to: "\(partDirectory)/\(file.name)")
     }
 }
 
@@ -52076,6 +53154,16 @@ let referencePackage = try String(
 let unlistedElements = elements.map(\.namespace).filter { !referencePackage.contains("\"\($0)\"") }
 guard unlistedElements.isEmpty else {
     let message = "add \(unlistedElements) to elementNames in HighwayReference/Package.swift"
+    FileHandle.standardError.write(Data("** ERROR: \(message)\n".utf8))
+    exit(1)
+}
+let listedConstantTestParts = (1...).lazy.prefix {
+    referencePackage.contains("\"ConstantTests\($0)\"")
+}.count
+guard listedConstantTestParts == constantTestParts else {
+    let message =
+        "list ConstantTests1 to ConstantTests\(constantTestParts) in testSuites in "
+        + "HighwayReference/Package.swift, which lists \(listedConstantTestParts)"
     FileHandle.standardError.write(Data("** ERROR: \(message)\n".utf8))
     exit(1)
 }
@@ -52198,59 +53286,64 @@ for element in elements {
         balancing: true
     )
 
-    let testsDirectory = "\(generatedReferenceTestsRoot)/\(element.namespace)Tests"
     let referenceTestsName = "\(element.namespace)ReferenceTests"
+    let referenceTestsDirectory = "\(generatedReferenceTestsRoot)/\(referenceTestsName)"
     try write(
         conditioned(generateReferenceTests(element), for: element),
-        to: "\(testsDirectory)/\(referenceTestsName).swift"
+        to: "\(referenceTestsDirectory)/\(referenceTestsName).swift"
     )
     try writeSections(
         generateReferenceTestMembers(element, by: testedKeys),
         named: referenceTestsName,
-        in: testsDirectory,
+        in: referenceTestsDirectory,
         imports: referenceTestImports,
         extending: referenceTestsName,
         for: element,
         testing: true
     )
     let codegenTestsName = "\(element.namespace)CodegenTests"
+    let codegenTestsDirectory = "\(generatedReferenceTestsRoot)/\(codegenTestsName)"
     try write(
         conditioned(generateCodegenTests(element), for: element),
-        to: "\(testsDirectory)/\(codegenTestsName).swift"
+        to: "\(codegenTestsDirectory)/\(codegenTestsName).swift"
     )
     try writeSections(
         generateCodegenTestMembers(element, by: testedKeys),
         named: codegenTestsName,
-        in: testsDirectory,
+        in: codegenTestsDirectory,
         imports: codegenTestImports,
         extending: codegenTestsName,
         for: element,
         testing: true
     )
     let constantTestsName = "\(element.namespace)ConstantTests"
-    try write(
-        conditioned(generateConstantTests(element), for: element),
-        to: "\(testsDirectory)/\(constantTestsName).swift"
-    )
+    let constantTestsDirectory = "\(generatedReferenceTestsRoot)/\(constantTestsName)"
+    for part in 1...constantTestParts {
+        try write(
+            conditioned(generateConstantTests(element), for: element),
+            to: "\(constantTestsDirectory)\(part)/\(constantTestsName).swift"
+        )
+    }
     try writeSections(
         generateConstantTestMembers(element, by: testedKeys),
         named: constantTestsName,
-        in: testsDirectory,
+        in: constantTestsDirectory,
         imports: constantTestImports,
         extending: constantTestsName,
         for: element,
-        testing: true
+        testing: true,
+        inParts: constantTestParts
     )
 
     let linkTestsName = "\(element.namespace)LinkTests"
     try write(
         conditioned(generateLinkTests(element), for: element),
-        to: "\(testsDirectory)/\(linkTestsName).swift"
+        to: "\(referenceTestsDirectory)/\(linkTestsName).swift"
     )
     try writeSections(
         linkTestMembers(for: element),
         named: linkTestsName,
-        in: testsDirectory,
+        in: referenceTestsDirectory,
         imports: referenceTestImports,
         extending: linkTestsName,
         for: element,
