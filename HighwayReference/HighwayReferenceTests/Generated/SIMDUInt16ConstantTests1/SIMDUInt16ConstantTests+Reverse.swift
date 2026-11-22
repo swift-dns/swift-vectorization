@@ -73,4 +73,72 @@ extension SIMDUInt16ConstantTests {
     @Test func reversedConstantSplatMax() {
         checkReversedConstantA(Lane.max)
     }
+
+    @inline(__always)
+    private func checkReversed4ConstantA(_ value: Lane) {
+        let mismatches = Mismatches("reversed4 with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU16(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.reversed4(H.repeating(value)),
+            H(raw: HighwayReference.reversed4U16(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func reversed4ConstantSplat0() {
+        checkReversed4ConstantA(0)
+    }
+
+    @Test func reversed4ConstantSplat1() {
+        checkReversed4ConstantA(1)
+    }
+
+    @Test func reversed4ConstantSplat15() {
+        checkReversed4ConstantA(15)
+    }
+
+    @Test func reversed4ConstantSplat16() {
+        checkReversed4ConstantA(16)
+    }
+
+    @Test func reversed4ConstantSplat26() {
+        checkReversed4ConstantA(26)
+    }
+
+    @Test func reversed4ConstantSplat127() {
+        checkReversed4ConstantA(127)
+    }
+
+    @Test func reversed4ConstantSplat128() {
+        checkReversed4ConstantA(128)
+    }
+
+    @Test func reversed4ConstantSplat255() {
+        checkReversed4ConstantA(255)
+    }
+
+    @Test func reversed4ConstantSplat256() {
+        checkReversed4ConstantA(256)
+    }
+
+    @Test func reversed4ConstantSplat257() {
+        checkReversed4ConstantA(257)
+    }
+
+    @Test func reversed4ConstantSplat65280() {
+        checkReversed4ConstantA(65280)
+    }
+
+    @Test func reversed4ConstantSplat65281() {
+        checkReversed4ConstantA(65281)
+    }
+
+    @Test func reversed4ConstantSplatMax() {
+        checkReversed4ConstantA(Lane.max)
+    }
 }

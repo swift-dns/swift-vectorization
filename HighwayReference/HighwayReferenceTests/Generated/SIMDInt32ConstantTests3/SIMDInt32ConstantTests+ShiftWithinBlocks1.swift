@@ -5,16 +5,16 @@ import HighwayReferenceTestSupport
 import Testing
 import Vectorization
 
-extension SIMDUInt16ConstantTests {
+extension SIMDInt32ConstantTests {
     @inline(__always)
     private func checkShiftedLeftBytesConstantBytes(_ bytes: Int) {
         let mismatches = Mismatches("shiftedLeftBytes with bytes \(bytes)")
-        let aInputs = Inputs.vectors(H.self, seed: 0x657B_99BF_A440_C265)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB1AE_CE6C_5E05_275B)
         for a in aInputs {
             mismatches.check(
                 H.shiftedLeftBytes(a, by: bytes),
                 H(
-                    raw: HighwayReference.shiftedLeftBytesU16(
+                    raw: HighwayReference.shiftedLeftBytesI32(
                         a.raw,
                         Int32(truncatingIfNeeded: bytes)
                     )
@@ -96,12 +96,12 @@ extension SIMDUInt16ConstantTests {
     @inline(__always)
     private func checkShiftedLeftBytesUncheckedConstantBytes(_ bytes: Int) {
         let mismatches = Mismatches("shiftedLeftBytes unchecked with bytes \(bytes)")
-        let aInputs = Inputs.vectors(H.self, seed: 0x464E_BAC4_1652_C4BB)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5723_FF64_4FF6_1B95)
         for a in aInputs {
             mismatches.check(
                 unsafe H.shiftedLeftBytes(a, byUnchecked: bytes),
                 H(
-                    raw: HighwayReference.shiftedLeftBytesU16(
+                    raw: HighwayReference.shiftedLeftBytesI32(
                         a.raw,
                         Int32(truncatingIfNeeded: bytes)
                     )
@@ -181,14 +181,114 @@ extension SIMDUInt16ConstantTests {
     }
 
     @inline(__always)
+    private func checkShiftedLeftBytesConstantA(_ value: Lane) {
+        let mismatches = Mismatches("shiftedLeftBytes with a repeating \(hex(value))")
+        let bytesInputs = Array(0...16)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI32(value)),
+            "repeating"
+        )
+        for bytes in bytesInputs {
+            mismatches.check(
+                H.shiftedLeftBytes(H.repeating(value), by: bytes),
+                H(
+                    raw: HighwayReference.shiftedLeftBytesI32(
+                        H.repeating(value).raw,
+                        Int32(truncatingIfNeeded: bytes)
+                    )
+                ),
+                "bytes: \(bytes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func shiftedLeftBytesConstantSplat0() {
+        checkShiftedLeftBytesConstantA(0)
+    }
+
+    @Test func shiftedLeftBytesConstantSplat1() {
+        checkShiftedLeftBytesConstantA(1)
+    }
+
+    @Test func shiftedLeftBytesConstantSplat15() {
+        checkShiftedLeftBytesConstantA(15)
+    }
+
+    @Test func shiftedLeftBytesConstantSplat16() {
+        checkShiftedLeftBytesConstantA(16)
+    }
+
+    @Test func shiftedLeftBytesConstantSplat26() {
+        checkShiftedLeftBytesConstantA(26)
+    }
+
+    @Test func shiftedLeftBytesConstantSplat127() {
+        checkShiftedLeftBytesConstantA(127)
+    }
+
+    @Test func shiftedLeftBytesConstantSplat128() {
+        checkShiftedLeftBytesConstantA(128)
+    }
+
+    @Test func shiftedLeftBytesConstantSplat255() {
+        checkShiftedLeftBytesConstantA(255)
+    }
+
+    @Test func shiftedLeftBytesConstantSplat256() {
+        checkShiftedLeftBytesConstantA(256)
+    }
+
+    @Test func shiftedLeftBytesConstantSplat257() {
+        checkShiftedLeftBytesConstantA(257)
+    }
+
+    @Test func shiftedLeftBytesConstantSplat65280() {
+        checkShiftedLeftBytesConstantA(65280)
+    }
+
+    @Test func shiftedLeftBytesConstantSplat65281() {
+        checkShiftedLeftBytesConstantA(65281)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatMinus1() {
+        checkShiftedLeftBytesConstantA(-1)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatMinus16() {
+        checkShiftedLeftBytesConstantA(-16)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatMinus17() {
+        checkShiftedLeftBytesConstantA(-17)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatMinus128() {
+        checkShiftedLeftBytesConstantA(-128)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatMinus129() {
+        checkShiftedLeftBytesConstantA(-129)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatMax() {
+        checkShiftedLeftBytesConstantA(Lane.max)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatMin() {
+        checkShiftedLeftBytesConstantA(Lane.min)
+    }
+
+    @inline(__always)
     private func checkShiftedRightBytesConstantBytes(_ bytes: Int) {
         let mismatches = Mismatches("shiftedRightBytes with bytes \(bytes)")
-        let aInputs = Inputs.vectors(H.self, seed: 0x089A_DC44_B547_FA7C)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEB1A_C0E0_18E8_5532)
         for a in aInputs {
             mismatches.check(
                 H.shiftedRightBytes(a, by: bytes),
                 H(
-                    raw: HighwayReference.shiftedRightBytesU16(
+                    raw: HighwayReference.shiftedRightBytesI32(
                         a.raw,
                         Int32(truncatingIfNeeded: bytes)
                     )
@@ -270,12 +370,12 @@ extension SIMDUInt16ConstantTests {
     @inline(__always)
     private func checkShiftedRightBytesUncheckedConstantBytes(_ bytes: Int) {
         let mismatches = Mismatches("shiftedRightBytes unchecked with bytes \(bytes)")
-        let aInputs = Inputs.vectors(H.self, seed: 0xC510_A289_B221_EF10)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCADD_F9DE_8CF1_7DD2)
         for a in aInputs {
             mismatches.check(
                 unsafe H.shiftedRightBytes(a, byUnchecked: bytes),
                 H(
-                    raw: HighwayReference.shiftedRightBytesU16(
+                    raw: HighwayReference.shiftedRightBytesI32(
                         a.raw,
                         Int32(truncatingIfNeeded: bytes)
                     )
@@ -355,14 +455,114 @@ extension SIMDUInt16ConstantTests {
     }
 
     @inline(__always)
+    private func checkShiftedRightBytesConstantA(_ value: Lane) {
+        let mismatches = Mismatches("shiftedRightBytes with a repeating \(hex(value))")
+        let bytesInputs = Array(0...16)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI32(value)),
+            "repeating"
+        )
+        for bytes in bytesInputs {
+            mismatches.check(
+                H.shiftedRightBytes(H.repeating(value), by: bytes),
+                H(
+                    raw: HighwayReference.shiftedRightBytesI32(
+                        H.repeating(value).raw,
+                        Int32(truncatingIfNeeded: bytes)
+                    )
+                ),
+                "bytes: \(bytes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func shiftedRightBytesConstantSplat0() {
+        checkShiftedRightBytesConstantA(0)
+    }
+
+    @Test func shiftedRightBytesConstantSplat1() {
+        checkShiftedRightBytesConstantA(1)
+    }
+
+    @Test func shiftedRightBytesConstantSplat15() {
+        checkShiftedRightBytesConstantA(15)
+    }
+
+    @Test func shiftedRightBytesConstantSplat16() {
+        checkShiftedRightBytesConstantA(16)
+    }
+
+    @Test func shiftedRightBytesConstantSplat26() {
+        checkShiftedRightBytesConstantA(26)
+    }
+
+    @Test func shiftedRightBytesConstantSplat127() {
+        checkShiftedRightBytesConstantA(127)
+    }
+
+    @Test func shiftedRightBytesConstantSplat128() {
+        checkShiftedRightBytesConstantA(128)
+    }
+
+    @Test func shiftedRightBytesConstantSplat255() {
+        checkShiftedRightBytesConstantA(255)
+    }
+
+    @Test func shiftedRightBytesConstantSplat256() {
+        checkShiftedRightBytesConstantA(256)
+    }
+
+    @Test func shiftedRightBytesConstantSplat257() {
+        checkShiftedRightBytesConstantA(257)
+    }
+
+    @Test func shiftedRightBytesConstantSplat65280() {
+        checkShiftedRightBytesConstantA(65280)
+    }
+
+    @Test func shiftedRightBytesConstantSplat65281() {
+        checkShiftedRightBytesConstantA(65281)
+    }
+
+    @Test func shiftedRightBytesConstantSplatMinus1() {
+        checkShiftedRightBytesConstantA(-1)
+    }
+
+    @Test func shiftedRightBytesConstantSplatMinus16() {
+        checkShiftedRightBytesConstantA(-16)
+    }
+
+    @Test func shiftedRightBytesConstantSplatMinus17() {
+        checkShiftedRightBytesConstantA(-17)
+    }
+
+    @Test func shiftedRightBytesConstantSplatMinus128() {
+        checkShiftedRightBytesConstantA(-128)
+    }
+
+    @Test func shiftedRightBytesConstantSplatMinus129() {
+        checkShiftedRightBytesConstantA(-129)
+    }
+
+    @Test func shiftedRightBytesConstantSplatMax() {
+        checkShiftedRightBytesConstantA(Lane.max)
+    }
+
+    @Test func shiftedRightBytesConstantSplatMin() {
+        checkShiftedRightBytesConstantA(Lane.min)
+    }
+
+    @inline(__always)
     private func checkShiftedLeftLanesConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("shiftedLeftLanes with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.self, seed: 0xD23C_7511_6199_0505)
+        let aInputs = Inputs.vectors(H.self, seed: 0x205C_D7EC_993B_5C83)
         for a in aInputs {
             mismatches.check(
                 H.shiftedLeftLanes(a, by: lanes),
                 H(
-                    raw: HighwayReference.shiftedLeftLanesU16(
+                    raw: HighwayReference.shiftedLeftLanesI32(
                         a.raw,
                         Int32(truncatingIfNeeded: lanes)
                     )
@@ -373,51 +573,35 @@ extension SIMDUInt16ConstantTests {
         mismatches.record()
     }
 
-    @Test(.enabled(if: 0 <= 8)) func shiftedLeftLanesConstantLanes0() {
+    @Test(.enabled(if: 0 <= 4)) func shiftedLeftLanesConstantLanes0() {
         checkShiftedLeftLanesConstantLanes(0)
     }
 
-    @Test(.enabled(if: 1 <= 8)) func shiftedLeftLanesConstantLanes1() {
+    @Test(.enabled(if: 1 <= 4)) func shiftedLeftLanesConstantLanes1() {
         checkShiftedLeftLanesConstantLanes(1)
     }
 
-    @Test(.enabled(if: 2 <= 8)) func shiftedLeftLanesConstantLanes2() {
+    @Test(.enabled(if: 2 <= 4)) func shiftedLeftLanesConstantLanes2() {
         checkShiftedLeftLanesConstantLanes(2)
     }
 
-    @Test(.enabled(if: 3 <= 8)) func shiftedLeftLanesConstantLanes3() {
+    @Test(.enabled(if: 3 <= 4)) func shiftedLeftLanesConstantLanes3() {
         checkShiftedLeftLanesConstantLanes(3)
     }
 
-    @Test(.enabled(if: 4 <= 8)) func shiftedLeftLanesConstantLanes4() {
+    @Test(.enabled(if: 4 <= 4)) func shiftedLeftLanesConstantLanes4() {
         checkShiftedLeftLanesConstantLanes(4)
-    }
-
-    @Test(.enabled(if: 5 <= 8)) func shiftedLeftLanesConstantLanes5() {
-        checkShiftedLeftLanesConstantLanes(5)
-    }
-
-    @Test(.enabled(if: 6 <= 8)) func shiftedLeftLanesConstantLanes6() {
-        checkShiftedLeftLanesConstantLanes(6)
-    }
-
-    @Test(.enabled(if: 7 <= 8)) func shiftedLeftLanesConstantLanes7() {
-        checkShiftedLeftLanesConstantLanes(7)
-    }
-
-    @Test(.enabled(if: 8 <= 8)) func shiftedLeftLanesConstantLanes8() {
-        checkShiftedLeftLanesConstantLanes(8)
     }
 
     @inline(__always)
     private func checkShiftedLeftLanesUncheckedConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("shiftedLeftLanes unchecked with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.self, seed: 0xF6F0_1413_209B_E4E3)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6BA3_5CCA_6E69_9C35)
         for a in aInputs {
             mismatches.check(
                 unsafe H.shiftedLeftLanes(a, byUnchecked: lanes),
                 H(
-                    raw: HighwayReference.shiftedLeftLanesU16(
+                    raw: HighwayReference.shiftedLeftLanesI32(
                         a.raw,
                         Int32(truncatingIfNeeded: lanes)
                     )
@@ -428,51 +612,35 @@ extension SIMDUInt16ConstantTests {
         mismatches.record()
     }
 
-    @Test(.enabled(if: 0 <= 8)) func shiftedLeftLanesUncheckedConstantLanes0() {
+    @Test(.enabled(if: 0 <= 4)) func shiftedLeftLanesUncheckedConstantLanes0() {
         checkShiftedLeftLanesUncheckedConstantLanes(0)
     }
 
-    @Test(.enabled(if: 1 <= 8)) func shiftedLeftLanesUncheckedConstantLanes1() {
+    @Test(.enabled(if: 1 <= 4)) func shiftedLeftLanesUncheckedConstantLanes1() {
         checkShiftedLeftLanesUncheckedConstantLanes(1)
     }
 
-    @Test(.enabled(if: 2 <= 8)) func shiftedLeftLanesUncheckedConstantLanes2() {
+    @Test(.enabled(if: 2 <= 4)) func shiftedLeftLanesUncheckedConstantLanes2() {
         checkShiftedLeftLanesUncheckedConstantLanes(2)
     }
 
-    @Test(.enabled(if: 3 <= 8)) func shiftedLeftLanesUncheckedConstantLanes3() {
+    @Test(.enabled(if: 3 <= 4)) func shiftedLeftLanesUncheckedConstantLanes3() {
         checkShiftedLeftLanesUncheckedConstantLanes(3)
     }
 
-    @Test(.enabled(if: 4 <= 8)) func shiftedLeftLanesUncheckedConstantLanes4() {
+    @Test(.enabled(if: 4 <= 4)) func shiftedLeftLanesUncheckedConstantLanes4() {
         checkShiftedLeftLanesUncheckedConstantLanes(4)
-    }
-
-    @Test(.enabled(if: 5 <= 8)) func shiftedLeftLanesUncheckedConstantLanes5() {
-        checkShiftedLeftLanesUncheckedConstantLanes(5)
-    }
-
-    @Test(.enabled(if: 6 <= 8)) func shiftedLeftLanesUncheckedConstantLanes6() {
-        checkShiftedLeftLanesUncheckedConstantLanes(6)
-    }
-
-    @Test(.enabled(if: 7 <= 8)) func shiftedLeftLanesUncheckedConstantLanes7() {
-        checkShiftedLeftLanesUncheckedConstantLanes(7)
-    }
-
-    @Test(.enabled(if: 8 <= 8)) func shiftedLeftLanesUncheckedConstantLanes8() {
-        checkShiftedLeftLanesUncheckedConstantLanes(8)
     }
 
     @inline(__always)
     private func checkShiftedRightLanesConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("shiftedRightLanes with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.self, seed: 0xE2EB_5D8E_3812_B124)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDEAF_12E6_8426_6E3A)
         for a in aInputs {
             mismatches.check(
                 H.shiftedRightLanes(a, by: lanes),
                 H(
-                    raw: HighwayReference.shiftedRightLanesU16(
+                    raw: HighwayReference.shiftedRightLanesI32(
                         a.raw,
                         Int32(truncatingIfNeeded: lanes)
                     )
@@ -483,51 +651,35 @@ extension SIMDUInt16ConstantTests {
         mismatches.record()
     }
 
-    @Test(.enabled(if: 0 <= 8)) func shiftedRightLanesConstantLanes0() {
+    @Test(.enabled(if: 0 <= 4)) func shiftedRightLanesConstantLanes0() {
         checkShiftedRightLanesConstantLanes(0)
     }
 
-    @Test(.enabled(if: 1 <= 8)) func shiftedRightLanesConstantLanes1() {
+    @Test(.enabled(if: 1 <= 4)) func shiftedRightLanesConstantLanes1() {
         checkShiftedRightLanesConstantLanes(1)
     }
 
-    @Test(.enabled(if: 2 <= 8)) func shiftedRightLanesConstantLanes2() {
+    @Test(.enabled(if: 2 <= 4)) func shiftedRightLanesConstantLanes2() {
         checkShiftedRightLanesConstantLanes(2)
     }
 
-    @Test(.enabled(if: 3 <= 8)) func shiftedRightLanesConstantLanes3() {
+    @Test(.enabled(if: 3 <= 4)) func shiftedRightLanesConstantLanes3() {
         checkShiftedRightLanesConstantLanes(3)
     }
 
-    @Test(.enabled(if: 4 <= 8)) func shiftedRightLanesConstantLanes4() {
+    @Test(.enabled(if: 4 <= 4)) func shiftedRightLanesConstantLanes4() {
         checkShiftedRightLanesConstantLanes(4)
-    }
-
-    @Test(.enabled(if: 5 <= 8)) func shiftedRightLanesConstantLanes5() {
-        checkShiftedRightLanesConstantLanes(5)
-    }
-
-    @Test(.enabled(if: 6 <= 8)) func shiftedRightLanesConstantLanes6() {
-        checkShiftedRightLanesConstantLanes(6)
-    }
-
-    @Test(.enabled(if: 7 <= 8)) func shiftedRightLanesConstantLanes7() {
-        checkShiftedRightLanesConstantLanes(7)
-    }
-
-    @Test(.enabled(if: 8 <= 8)) func shiftedRightLanesConstantLanes8() {
-        checkShiftedRightLanesConstantLanes(8)
     }
 
     @inline(__always)
     private func checkShiftedRightLanesUncheckedConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("shiftedRightLanes unchecked with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.self, seed: 0xFCB5_0DA9_D345_DE70)
+        let aInputs = Inputs.vectors(H.self, seed: 0x11CD_033B_4730_339A)
         for a in aInputs {
             mismatches.check(
                 unsafe H.shiftedRightLanes(a, byUnchecked: lanes),
                 H(
-                    raw: HighwayReference.shiftedRightLanesU16(
+                    raw: HighwayReference.shiftedRightLanesI32(
                         a.raw,
                         Int32(truncatingIfNeeded: lanes)
                     )
@@ -538,52 +690,36 @@ extension SIMDUInt16ConstantTests {
         mismatches.record()
     }
 
-    @Test(.enabled(if: 0 <= 8)) func shiftedRightLanesUncheckedConstantLanes0() {
+    @Test(.enabled(if: 0 <= 4)) func shiftedRightLanesUncheckedConstantLanes0() {
         checkShiftedRightLanesUncheckedConstantLanes(0)
     }
 
-    @Test(.enabled(if: 1 <= 8)) func shiftedRightLanesUncheckedConstantLanes1() {
+    @Test(.enabled(if: 1 <= 4)) func shiftedRightLanesUncheckedConstantLanes1() {
         checkShiftedRightLanesUncheckedConstantLanes(1)
     }
 
-    @Test(.enabled(if: 2 <= 8)) func shiftedRightLanesUncheckedConstantLanes2() {
+    @Test(.enabled(if: 2 <= 4)) func shiftedRightLanesUncheckedConstantLanes2() {
         checkShiftedRightLanesUncheckedConstantLanes(2)
     }
 
-    @Test(.enabled(if: 3 <= 8)) func shiftedRightLanesUncheckedConstantLanes3() {
+    @Test(.enabled(if: 3 <= 4)) func shiftedRightLanesUncheckedConstantLanes3() {
         checkShiftedRightLanesUncheckedConstantLanes(3)
     }
 
-    @Test(.enabled(if: 4 <= 8)) func shiftedRightLanesUncheckedConstantLanes4() {
+    @Test(.enabled(if: 4 <= 4)) func shiftedRightLanesUncheckedConstantLanes4() {
         checkShiftedRightLanesUncheckedConstantLanes(4)
-    }
-
-    @Test(.enabled(if: 5 <= 8)) func shiftedRightLanesUncheckedConstantLanes5() {
-        checkShiftedRightLanesUncheckedConstantLanes(5)
-    }
-
-    @Test(.enabled(if: 6 <= 8)) func shiftedRightLanesUncheckedConstantLanes6() {
-        checkShiftedRightLanesUncheckedConstantLanes(6)
-    }
-
-    @Test(.enabled(if: 7 <= 8)) func shiftedRightLanesUncheckedConstantLanes7() {
-        checkShiftedRightLanesUncheckedConstantLanes(7)
-    }
-
-    @Test(.enabled(if: 8 <= 8)) func shiftedRightLanesUncheckedConstantLanes8() {
-        checkShiftedRightLanesUncheckedConstantLanes(8)
     }
 
     @inline(__always)
     private func checkCombinedShiftedRightBytesConstantBytes(_ bytes: Int) {
         let mismatches = Mismatches("combinedShiftedRightBytes with bytes \(bytes)")
-        let aInputs = Inputs.vectors(H.self, seed: 0x1A30_1E77_A68F_16CB)
-        let bInputs = Inputs.vectors(H.self, seed: 0x1A30_1D77_A68F_1518)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB7B5_3B8F_0D51_3091)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB7B5_3A8F_0D51_2EDE)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.combinedShiftedRightBytes(a, b, by: bytes),
                 H(
-                    raw: HighwayReference.combinedShiftedRightBytesU16(
+                    raw: HighwayReference.combinedShiftedRightBytesI32(
                         a.raw,
                         b.raw,
                         Int32(truncatingIfNeeded: bytes)
@@ -658,13 +794,13 @@ extension SIMDUInt16ConstantTests {
     @inline(__always)
     private func checkCombinedShiftedRightBytesUncheckedConstantBytes(_ bytes: Int) {
         let mismatches = Mismatches("combinedShiftedRightBytes unchecked with bytes \(bytes)")
-        let aInputs = Inputs.vectors(H.self, seed: 0x4B58_F98A_73E6_A7C5)
-        let bInputs = Inputs.vectors(H.self, seed: 0x4B58_F88A_73E6_A612)
+        let aInputs = Inputs.vectors(H.self, seed: 0x87FB_55B6_CDE0_5C17)
+        let bInputs = Inputs.vectors(H.self, seed: 0x87FB_54B6_CDE0_5A64)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 unsafe H.combinedShiftedRightBytes(a, b, byUnchecked: bytes),
                 H(
-                    raw: HighwayReference.combinedShiftedRightBytesU16(
+                    raw: HighwayReference.combinedShiftedRightBytesI32(
                         a.raw,
                         b.raw,
                         Int32(truncatingIfNeeded: bytes)
@@ -737,100 +873,149 @@ extension SIMDUInt16ConstantTests {
     }
 
     @inline(__always)
-    private func checkCombinedShiftedRightLanesConstantLanes(_ lanes: Int) {
-        let mismatches = Mismatches("combinedShiftedRightLanes with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.self, seed: 0xF0E7_32EA_D7F7_FFB3)
-        let bInputs = Inputs.vectors(H.self, seed: 0xF0E7_31EA_D7F7_FE00)
-        for (a, b) in everyPair(aInputs, bInputs) {
+    private func checkCombinedShiftedRightBytesConstantA(_ value: Lane) {
+        let mismatches = Mismatches("combinedShiftedRightBytes with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x3A3C_7EB3_21FA_8E8E)
+        let bytesInputs = Array(1...15)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI32(value)),
+            "repeating"
+        )
+        for (b, bytes) in everyPair(bInputs, bytesInputs) {
             mismatches.check(
-                H.combinedShiftedRightLanes(a, b, by: lanes),
+                H.combinedShiftedRightBytes(H.repeating(value), b, by: bytes),
                 H(
-                    raw: HighwayReference.combinedShiftedRightLanesU16(
-                        a.raw,
+                    raw: HighwayReference.combinedShiftedRightBytesI32(
+                        H.repeating(value).raw,
                         b.raw,
-                        Int32(truncatingIfNeeded: lanes)
+                        Int32(truncatingIfNeeded: bytes)
                     )
                 ),
-                "a: \(describe(a)), b: \(describe(b))"
+                "b: \(describe(b)), bytes: \(bytes)"
             )
         }
         mismatches.record()
-    }
-
-    @Test(.enabled(if: 1 <= 7)) func combinedShiftedRightLanesConstantLanes1() {
-        checkCombinedShiftedRightLanesConstantLanes(1)
-    }
-
-    @Test(.enabled(if: 2 <= 7)) func combinedShiftedRightLanesConstantLanes2() {
-        checkCombinedShiftedRightLanesConstantLanes(2)
-    }
-
-    @Test(.enabled(if: 3 <= 7)) func combinedShiftedRightLanesConstantLanes3() {
-        checkCombinedShiftedRightLanesConstantLanes(3)
-    }
-
-    @Test(.enabled(if: 4 <= 7)) func combinedShiftedRightLanesConstantLanes4() {
-        checkCombinedShiftedRightLanesConstantLanes(4)
-    }
-
-    @Test(.enabled(if: 5 <= 7)) func combinedShiftedRightLanesConstantLanes5() {
-        checkCombinedShiftedRightLanesConstantLanes(5)
-    }
-
-    @Test(.enabled(if: 6 <= 7)) func combinedShiftedRightLanesConstantLanes6() {
-        checkCombinedShiftedRightLanesConstantLanes(6)
-    }
-
-    @Test(.enabled(if: 7 <= 7)) func combinedShiftedRightLanesConstantLanes7() {
-        checkCombinedShiftedRightLanesConstantLanes(7)
     }
 
     @inline(__always)
-    private func checkCombinedShiftedRightLanesUncheckedConstantLanes(_ lanes: Int) {
-        let mismatches = Mismatches("combinedShiftedRightLanes unchecked with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.self, seed: 0x853C_E06C_45C7_CF65)
-        let bInputs = Inputs.vectors(H.self, seed: 0x853C_DF6C_45C7_CDB2)
-        for (a, b) in everyPair(aInputs, bInputs) {
+    private func checkCombinedShiftedRightBytesConstantB(_ value: Lane) {
+        let mismatches = Mismatches("combinedShiftedRightBytes with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x31A7_48B3_1D23_AE2C)
+        let bytesInputs = Array(1...15)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI32(value)),
+            "repeating"
+        )
+        for (a, bytes) in everyPair(aInputs, bytesInputs) {
             mismatches.check(
-                unsafe H.combinedShiftedRightLanes(a, b, byUnchecked: lanes),
+                H.combinedShiftedRightBytes(a, H.repeating(value), by: bytes),
                 H(
-                    raw: HighwayReference.combinedShiftedRightLanesU16(
+                    raw: HighwayReference.combinedShiftedRightBytesI32(
                         a.raw,
-                        b.raw,
-                        Int32(truncatingIfNeeded: lanes)
+                        H.repeating(value).raw,
+                        Int32(truncatingIfNeeded: bytes)
                     )
                 ),
-                "a: \(describe(a)), b: \(describe(b))"
+                "a: \(describe(a)), bytes: \(bytes)"
             )
         }
         mismatches.record()
     }
 
-    @Test(.enabled(if: 1 <= 7)) func combinedShiftedRightLanesUncheckedConstantLanes1() {
-        checkCombinedShiftedRightLanesUncheckedConstantLanes(1)
+    @Test func combinedShiftedRightBytesConstantSplat0() {
+        checkCombinedShiftedRightBytesConstantA(0)
+        checkCombinedShiftedRightBytesConstantB(0)
     }
 
-    @Test(.enabled(if: 2 <= 7)) func combinedShiftedRightLanesUncheckedConstantLanes2() {
-        checkCombinedShiftedRightLanesUncheckedConstantLanes(2)
+    @Test func combinedShiftedRightBytesConstantSplat1() {
+        checkCombinedShiftedRightBytesConstantA(1)
+        checkCombinedShiftedRightBytesConstantB(1)
     }
 
-    @Test(.enabled(if: 3 <= 7)) func combinedShiftedRightLanesUncheckedConstantLanes3() {
-        checkCombinedShiftedRightLanesUncheckedConstantLanes(3)
+    @Test func combinedShiftedRightBytesConstantSplat15() {
+        checkCombinedShiftedRightBytesConstantA(15)
+        checkCombinedShiftedRightBytesConstantB(15)
     }
 
-    @Test(.enabled(if: 4 <= 7)) func combinedShiftedRightLanesUncheckedConstantLanes4() {
-        checkCombinedShiftedRightLanesUncheckedConstantLanes(4)
+    @Test func combinedShiftedRightBytesConstantSplat16() {
+        checkCombinedShiftedRightBytesConstantA(16)
+        checkCombinedShiftedRightBytesConstantB(16)
     }
 
-    @Test(.enabled(if: 5 <= 7)) func combinedShiftedRightLanesUncheckedConstantLanes5() {
-        checkCombinedShiftedRightLanesUncheckedConstantLanes(5)
+    @Test func combinedShiftedRightBytesConstantSplat26() {
+        checkCombinedShiftedRightBytesConstantA(26)
+        checkCombinedShiftedRightBytesConstantB(26)
     }
 
-    @Test(.enabled(if: 6 <= 7)) func combinedShiftedRightLanesUncheckedConstantLanes6() {
-        checkCombinedShiftedRightLanesUncheckedConstantLanes(6)
+    @Test func combinedShiftedRightBytesConstantSplat127() {
+        checkCombinedShiftedRightBytesConstantA(127)
+        checkCombinedShiftedRightBytesConstantB(127)
     }
 
-    @Test(.enabled(if: 7 <= 7)) func combinedShiftedRightLanesUncheckedConstantLanes7() {
-        checkCombinedShiftedRightLanesUncheckedConstantLanes(7)
+    @Test func combinedShiftedRightBytesConstantSplat128() {
+        checkCombinedShiftedRightBytesConstantA(128)
+        checkCombinedShiftedRightBytesConstantB(128)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplat255() {
+        checkCombinedShiftedRightBytesConstantA(255)
+        checkCombinedShiftedRightBytesConstantB(255)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplat256() {
+        checkCombinedShiftedRightBytesConstantA(256)
+        checkCombinedShiftedRightBytesConstantB(256)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplat257() {
+        checkCombinedShiftedRightBytesConstantA(257)
+        checkCombinedShiftedRightBytesConstantB(257)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplat65280() {
+        checkCombinedShiftedRightBytesConstantA(65280)
+        checkCombinedShiftedRightBytesConstantB(65280)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplat65281() {
+        checkCombinedShiftedRightBytesConstantA(65281)
+        checkCombinedShiftedRightBytesConstantB(65281)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatMinus1() {
+        checkCombinedShiftedRightBytesConstantA(-1)
+        checkCombinedShiftedRightBytesConstantB(-1)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatMinus16() {
+        checkCombinedShiftedRightBytesConstantA(-16)
+        checkCombinedShiftedRightBytesConstantB(-16)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatMinus17() {
+        checkCombinedShiftedRightBytesConstantA(-17)
+        checkCombinedShiftedRightBytesConstantB(-17)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatMinus128() {
+        checkCombinedShiftedRightBytesConstantA(-128)
+        checkCombinedShiftedRightBytesConstantB(-128)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatMinus129() {
+        checkCombinedShiftedRightBytesConstantA(-129)
+        checkCombinedShiftedRightBytesConstantB(-129)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatMax() {
+        checkCombinedShiftedRightBytesConstantA(Lane.max)
+        checkCombinedShiftedRightBytesConstantB(Lane.max)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatMin() {
+        checkCombinedShiftedRightBytesConstantA(Lane.min)
+        checkCombinedShiftedRightBytesConstantB(Lane.min)
     }
 }

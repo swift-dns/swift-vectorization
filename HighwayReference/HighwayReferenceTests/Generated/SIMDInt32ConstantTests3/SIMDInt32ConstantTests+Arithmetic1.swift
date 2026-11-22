@@ -506,6 +506,179 @@ extension SIMDInt32ConstantTests {
     }
 
     @inline(__always)
+    private func checkAbsoluteDifferenceConstantAB(_ aValue: Lane, _ bValue: Lane) {
+        let mismatches = Mismatches(
+            "absoluteDifference with a repeating \(hex(aValue)), b repeating \(hex(bValue))"
+        )
+        mismatches.check(
+            H.repeating(aValue),
+            H(raw: HighwayReference.repeatingI32(aValue)),
+            "repeating"
+        )
+        mismatches.check(
+            H.repeating(bValue),
+            H(raw: HighwayReference.repeatingI32(bValue)),
+            "repeating"
+        )
+        mismatches.check(
+            H.absoluteDifference(H.repeating(aValue), H.repeating(bValue)),
+            H(
+                raw: HighwayReference.absoluteDifferenceI32(
+                    H.repeating(aValue).raw,
+                    H.repeating(bValue).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func absoluteDifferenceConstantA1B26() {
+        checkAbsoluteDifferenceConstantAB(1, 26)
+    }
+
+    @Test func absoluteDifferenceConstantA26B127() {
+        checkAbsoluteDifferenceConstantAB(26, 127)
+    }
+
+    @Test func absoluteDifferenceConstantA127B1() {
+        checkAbsoluteDifferenceConstantAB(127, 1)
+    }
+
+    @inline(__always)
+    private func checkAbsoluteDifferenceConstantA(_ value: Lane) {
+        let mismatches = Mismatches("absoluteDifference with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x370F_F91D_D5D0_E663)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI32(value)),
+            "repeating"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.absoluteDifference(H.repeating(value), b),
+                H(raw: HighwayReference.absoluteDifferenceI32(H.repeating(value).raw, b.raw)),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkAbsoluteDifferenceConstantB(_ value: Lane) {
+        let mismatches = Mismatches("absoluteDifference with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x4011_AF1D_DB03_BF25)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI32(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.absoluteDifference(a, H.repeating(value)),
+                H(raw: HighwayReference.absoluteDifferenceI32(a.raw, H.repeating(value).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func absoluteDifferenceConstantSplat0() {
+        checkAbsoluteDifferenceConstantA(0)
+        checkAbsoluteDifferenceConstantB(0)
+    }
+
+    @Test func absoluteDifferenceConstantSplat1() {
+        checkAbsoluteDifferenceConstantA(1)
+        checkAbsoluteDifferenceConstantB(1)
+    }
+
+    @Test func absoluteDifferenceConstantSplat15() {
+        checkAbsoluteDifferenceConstantA(15)
+        checkAbsoluteDifferenceConstantB(15)
+    }
+
+    @Test func absoluteDifferenceConstantSplat16() {
+        checkAbsoluteDifferenceConstantA(16)
+        checkAbsoluteDifferenceConstantB(16)
+    }
+
+    @Test func absoluteDifferenceConstantSplat26() {
+        checkAbsoluteDifferenceConstantA(26)
+        checkAbsoluteDifferenceConstantB(26)
+    }
+
+    @Test func absoluteDifferenceConstantSplat127() {
+        checkAbsoluteDifferenceConstantA(127)
+        checkAbsoluteDifferenceConstantB(127)
+    }
+
+    @Test func absoluteDifferenceConstantSplat128() {
+        checkAbsoluteDifferenceConstantA(128)
+        checkAbsoluteDifferenceConstantB(128)
+    }
+
+    @Test func absoluteDifferenceConstantSplat255() {
+        checkAbsoluteDifferenceConstantA(255)
+        checkAbsoluteDifferenceConstantB(255)
+    }
+
+    @Test func absoluteDifferenceConstantSplat256() {
+        checkAbsoluteDifferenceConstantA(256)
+        checkAbsoluteDifferenceConstantB(256)
+    }
+
+    @Test func absoluteDifferenceConstantSplat257() {
+        checkAbsoluteDifferenceConstantA(257)
+        checkAbsoluteDifferenceConstantB(257)
+    }
+
+    @Test func absoluteDifferenceConstantSplat65280() {
+        checkAbsoluteDifferenceConstantA(65280)
+        checkAbsoluteDifferenceConstantB(65280)
+    }
+
+    @Test func absoluteDifferenceConstantSplat65281() {
+        checkAbsoluteDifferenceConstantA(65281)
+        checkAbsoluteDifferenceConstantB(65281)
+    }
+
+    @Test func absoluteDifferenceConstantSplatMinus1() {
+        checkAbsoluteDifferenceConstantA(-1)
+        checkAbsoluteDifferenceConstantB(-1)
+    }
+
+    @Test func absoluteDifferenceConstantSplatMinus16() {
+        checkAbsoluteDifferenceConstantA(-16)
+        checkAbsoluteDifferenceConstantB(-16)
+    }
+
+    @Test func absoluteDifferenceConstantSplatMinus17() {
+        checkAbsoluteDifferenceConstantA(-17)
+        checkAbsoluteDifferenceConstantB(-17)
+    }
+
+    @Test func absoluteDifferenceConstantSplatMinus128() {
+        checkAbsoluteDifferenceConstantA(-128)
+        checkAbsoluteDifferenceConstantB(-128)
+    }
+
+    @Test func absoluteDifferenceConstantSplatMinus129() {
+        checkAbsoluteDifferenceConstantA(-129)
+        checkAbsoluteDifferenceConstantB(-129)
+    }
+
+    @Test func absoluteDifferenceConstantSplatMax() {
+        checkAbsoluteDifferenceConstantA(Lane.max)
+        checkAbsoluteDifferenceConstantB(Lane.max)
+    }
+
+    @Test func absoluteDifferenceConstantSplatMin() {
+        checkAbsoluteDifferenceConstantA(Lane.min)
+        checkAbsoluteDifferenceConstantB(Lane.min)
+    }
+
+    @inline(__always)
     private func checkSaturatingAddingConstantA(_ value: Lane) {
         let mismatches = Mismatches("saturatingAdding with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x5A72_9D57_407A_EB78)
@@ -734,6 +907,179 @@ extension SIMDInt32ConstantTests {
     }
 
     @inline(__always)
+    private func checkRoundedAverageConstantAB(_ aValue: Lane, _ bValue: Lane) {
+        let mismatches = Mismatches(
+            "roundedAverage with a repeating \(hex(aValue)), b repeating \(hex(bValue))"
+        )
+        mismatches.check(
+            H.repeating(aValue),
+            H(raw: HighwayReference.repeatingI32(aValue)),
+            "repeating"
+        )
+        mismatches.check(
+            H.repeating(bValue),
+            H(raw: HighwayReference.repeatingI32(bValue)),
+            "repeating"
+        )
+        mismatches.check(
+            H.roundedAverage(H.repeating(aValue), H.repeating(bValue)),
+            H(
+                raw: HighwayReference.roundedAverageI32(
+                    H.repeating(aValue).raw,
+                    H.repeating(bValue).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func roundedAverageConstantA1B26() {
+        checkRoundedAverageConstantAB(1, 26)
+    }
+
+    @Test func roundedAverageConstantA26B127() {
+        checkRoundedAverageConstantAB(26, 127)
+    }
+
+    @Test func roundedAverageConstantA127B1() {
+        checkRoundedAverageConstantAB(127, 1)
+    }
+
+    @inline(__always)
+    private func checkRoundedAverageConstantA(_ value: Lane) {
+        let mismatches = Mismatches("roundedAverage with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x4A92_07A0_F0AC_2AB1)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI32(value)),
+            "repeating"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.roundedAverage(H.repeating(value), b),
+                H(raw: HighwayReference.roundedAverageI32(H.repeating(value).raw, b.raw)),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkRoundedAverageConstantB(_ value: Lane) {
+        let mismatches = Mismatches("roundedAverage with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x313F_81A0_E284_8AFF)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI32(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.roundedAverage(a, H.repeating(value)),
+                H(raw: HighwayReference.roundedAverageI32(a.raw, H.repeating(value).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func roundedAverageConstantSplat0() {
+        checkRoundedAverageConstantA(0)
+        checkRoundedAverageConstantB(0)
+    }
+
+    @Test func roundedAverageConstantSplat1() {
+        checkRoundedAverageConstantA(1)
+        checkRoundedAverageConstantB(1)
+    }
+
+    @Test func roundedAverageConstantSplat15() {
+        checkRoundedAverageConstantA(15)
+        checkRoundedAverageConstantB(15)
+    }
+
+    @Test func roundedAverageConstantSplat16() {
+        checkRoundedAverageConstantA(16)
+        checkRoundedAverageConstantB(16)
+    }
+
+    @Test func roundedAverageConstantSplat26() {
+        checkRoundedAverageConstantA(26)
+        checkRoundedAverageConstantB(26)
+    }
+
+    @Test func roundedAverageConstantSplat127() {
+        checkRoundedAverageConstantA(127)
+        checkRoundedAverageConstantB(127)
+    }
+
+    @Test func roundedAverageConstantSplat128() {
+        checkRoundedAverageConstantA(128)
+        checkRoundedAverageConstantB(128)
+    }
+
+    @Test func roundedAverageConstantSplat255() {
+        checkRoundedAverageConstantA(255)
+        checkRoundedAverageConstantB(255)
+    }
+
+    @Test func roundedAverageConstantSplat256() {
+        checkRoundedAverageConstantA(256)
+        checkRoundedAverageConstantB(256)
+    }
+
+    @Test func roundedAverageConstantSplat257() {
+        checkRoundedAverageConstantA(257)
+        checkRoundedAverageConstantB(257)
+    }
+
+    @Test func roundedAverageConstantSplat65280() {
+        checkRoundedAverageConstantA(65280)
+        checkRoundedAverageConstantB(65280)
+    }
+
+    @Test func roundedAverageConstantSplat65281() {
+        checkRoundedAverageConstantA(65281)
+        checkRoundedAverageConstantB(65281)
+    }
+
+    @Test func roundedAverageConstantSplatMinus1() {
+        checkRoundedAverageConstantA(-1)
+        checkRoundedAverageConstantB(-1)
+    }
+
+    @Test func roundedAverageConstantSplatMinus16() {
+        checkRoundedAverageConstantA(-16)
+        checkRoundedAverageConstantB(-16)
+    }
+
+    @Test func roundedAverageConstantSplatMinus17() {
+        checkRoundedAverageConstantA(-17)
+        checkRoundedAverageConstantB(-17)
+    }
+
+    @Test func roundedAverageConstantSplatMinus128() {
+        checkRoundedAverageConstantA(-128)
+        checkRoundedAverageConstantB(-128)
+    }
+
+    @Test func roundedAverageConstantSplatMinus129() {
+        checkRoundedAverageConstantA(-129)
+        checkRoundedAverageConstantB(-129)
+    }
+
+    @Test func roundedAverageConstantSplatMax() {
+        checkRoundedAverageConstantA(Lane.max)
+        checkRoundedAverageConstantB(Lane.max)
+    }
+
+    @Test func roundedAverageConstantSplatMin() {
+        checkRoundedAverageConstantA(Lane.min)
+        checkRoundedAverageConstantB(Lane.min)
+    }
+
+    @inline(__always)
     private func checkSumsOf2FromInt16ConstantA(_ value: Int16) {
         let mismatches = Mismatches("sumsOf2FromInt16 with a repeating \(hex(value))")
         mismatches.check(
@@ -815,61 +1161,5 @@ extension SIMDInt32ConstantTests {
 
     @Test func sumsOf2FromInt16ConstantSplatMin() {
         checkSumsOf2FromInt16ConstantA(Int16.min)
-    }
-
-    @inline(__always)
-    private func checkSumsOf4FromInt8ConstantA(_ value: Int8) {
-        let mismatches = Mismatches("sumsOf4FromInt8 with a repeating \(hex(value))")
-        mismatches.check(
-            SIMD<Int8>.repeating(value),
-            SIMD<Int8>(raw: HighwayReference.repeatingI8(value)),
-            "repeating"
-        )
-        mismatches.check(
-            H.sumsOf4(SIMD<Int8>.repeating(value)),
-            H(raw: HighwayReference.sumsOf4I8ToI32(SIMD<Int8>.repeating(value).raw)),
-            ""
-        )
-        mismatches.record()
-    }
-
-    @Test func sumsOf4FromInt8ConstantSplat0() {
-        checkSumsOf4FromInt8ConstantA(0)
-    }
-
-    @Test func sumsOf4FromInt8ConstantSplat1() {
-        checkSumsOf4FromInt8ConstantA(1)
-    }
-
-    @Test func sumsOf4FromInt8ConstantSplat15() {
-        checkSumsOf4FromInt8ConstantA(15)
-    }
-
-    @Test func sumsOf4FromInt8ConstantSplat16() {
-        checkSumsOf4FromInt8ConstantA(16)
-    }
-
-    @Test func sumsOf4FromInt8ConstantSplat26() {
-        checkSumsOf4FromInt8ConstantA(26)
-    }
-
-    @Test func sumsOf4FromInt8ConstantSplat127() {
-        checkSumsOf4FromInt8ConstantA(127)
-    }
-
-    @Test func sumsOf4FromInt8ConstantSplatMinus1() {
-        checkSumsOf4FromInt8ConstantA(-1)
-    }
-
-    @Test func sumsOf4FromInt8ConstantSplatMinus16() {
-        checkSumsOf4FromInt8ConstantA(-16)
-    }
-
-    @Test func sumsOf4FromInt8ConstantSplatMinus17() {
-        checkSumsOf4FromInt8ConstantA(-17)
-    }
-
-    @Test func sumsOf4FromInt8ConstantSplatMinus128() {
-        checkSumsOf4FromInt8ConstantA(-128)
     }
 }

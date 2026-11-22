@@ -89,4 +89,88 @@ extension SIMDInt16ConstantTests {
     @Test func reversedConstantSplatMin() {
         checkReversedConstantA(Lane.min)
     }
+
+    @inline(__always)
+    private func checkReversed4ConstantA(_ value: Lane) {
+        let mismatches = Mismatches("reversed4 with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI16(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.reversed4(H.repeating(value)),
+            H(raw: HighwayReference.reversed4I16(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func reversed4ConstantSplat0() {
+        checkReversed4ConstantA(0)
+    }
+
+    @Test func reversed4ConstantSplat1() {
+        checkReversed4ConstantA(1)
+    }
+
+    @Test func reversed4ConstantSplat15() {
+        checkReversed4ConstantA(15)
+    }
+
+    @Test func reversed4ConstantSplat16() {
+        checkReversed4ConstantA(16)
+    }
+
+    @Test func reversed4ConstantSplat26() {
+        checkReversed4ConstantA(26)
+    }
+
+    @Test func reversed4ConstantSplat127() {
+        checkReversed4ConstantA(127)
+    }
+
+    @Test func reversed4ConstantSplat128() {
+        checkReversed4ConstantA(128)
+    }
+
+    @Test func reversed4ConstantSplat255() {
+        checkReversed4ConstantA(255)
+    }
+
+    @Test func reversed4ConstantSplat256() {
+        checkReversed4ConstantA(256)
+    }
+
+    @Test func reversed4ConstantSplat257() {
+        checkReversed4ConstantA(257)
+    }
+
+    @Test func reversed4ConstantSplatMinus1() {
+        checkReversed4ConstantA(-1)
+    }
+
+    @Test func reversed4ConstantSplatMinus16() {
+        checkReversed4ConstantA(-16)
+    }
+
+    @Test func reversed4ConstantSplatMinus17() {
+        checkReversed4ConstantA(-17)
+    }
+
+    @Test func reversed4ConstantSplatMinus128() {
+        checkReversed4ConstantA(-128)
+    }
+
+    @Test func reversed4ConstantSplatMinus129() {
+        checkReversed4ConstantA(-129)
+    }
+
+    @Test func reversed4ConstantSplatMax() {
+        checkReversed4ConstantA(Lane.max)
+    }
+
+    @Test func reversed4ConstantSplatMin() {
+        checkReversed4ConstantA(Lane.min)
+    }
 }

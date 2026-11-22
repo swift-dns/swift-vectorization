@@ -181,6 +181,82 @@ extension SIMDUInt32ConstantTests {
     }
 
     @inline(__always)
+    private func checkShiftedLeftBytesConstantA(_ value: Lane) {
+        let mismatches = Mismatches("shiftedLeftBytes with a repeating \(hex(value))")
+        let bytesInputs = Array(0...16)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU32(value)),
+            "repeating"
+        )
+        for bytes in bytesInputs {
+            mismatches.check(
+                H.shiftedLeftBytes(H.repeating(value), by: bytes),
+                H(
+                    raw: HighwayReference.shiftedLeftBytesU32(
+                        H.repeating(value).raw,
+                        Int32(truncatingIfNeeded: bytes)
+                    )
+                ),
+                "bytes: \(bytes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func shiftedLeftBytesConstantSplat0() {
+        checkShiftedLeftBytesConstantA(0)
+    }
+
+    @Test func shiftedLeftBytesConstantSplat1() {
+        checkShiftedLeftBytesConstantA(1)
+    }
+
+    @Test func shiftedLeftBytesConstantSplat15() {
+        checkShiftedLeftBytesConstantA(15)
+    }
+
+    @Test func shiftedLeftBytesConstantSplat16() {
+        checkShiftedLeftBytesConstantA(16)
+    }
+
+    @Test func shiftedLeftBytesConstantSplat26() {
+        checkShiftedLeftBytesConstantA(26)
+    }
+
+    @Test func shiftedLeftBytesConstantSplat127() {
+        checkShiftedLeftBytesConstantA(127)
+    }
+
+    @Test func shiftedLeftBytesConstantSplat128() {
+        checkShiftedLeftBytesConstantA(128)
+    }
+
+    @Test func shiftedLeftBytesConstantSplat255() {
+        checkShiftedLeftBytesConstantA(255)
+    }
+
+    @Test func shiftedLeftBytesConstantSplat256() {
+        checkShiftedLeftBytesConstantA(256)
+    }
+
+    @Test func shiftedLeftBytesConstantSplat257() {
+        checkShiftedLeftBytesConstantA(257)
+    }
+
+    @Test func shiftedLeftBytesConstantSplat65280() {
+        checkShiftedLeftBytesConstantA(65280)
+    }
+
+    @Test func shiftedLeftBytesConstantSplat65281() {
+        checkShiftedLeftBytesConstantA(65281)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatMax() {
+        checkShiftedLeftBytesConstantA(Lane.max)
+    }
+
+    @inline(__always)
     private func checkShiftedRightBytesConstantBytes(_ bytes: Int) {
         let mismatches = Mismatches("shiftedRightBytes with bytes \(bytes)")
         let aInputs = Inputs.vectors(H.self, seed: 0x771D_5252_DD43_167E)
@@ -352,6 +428,82 @@ extension SIMDUInt32ConstantTests {
 
     @Test func shiftedRightBytesUncheckedConstantBytes16() {
         checkShiftedRightBytesUncheckedConstantBytes(16)
+    }
+
+    @inline(__always)
+    private func checkShiftedRightBytesConstantA(_ value: Lane) {
+        let mismatches = Mismatches("shiftedRightBytes with a repeating \(hex(value))")
+        let bytesInputs = Array(0...16)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU32(value)),
+            "repeating"
+        )
+        for bytes in bytesInputs {
+            mismatches.check(
+                H.shiftedRightBytes(H.repeating(value), by: bytes),
+                H(
+                    raw: HighwayReference.shiftedRightBytesU32(
+                        H.repeating(value).raw,
+                        Int32(truncatingIfNeeded: bytes)
+                    )
+                ),
+                "bytes: \(bytes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func shiftedRightBytesConstantSplat0() {
+        checkShiftedRightBytesConstantA(0)
+    }
+
+    @Test func shiftedRightBytesConstantSplat1() {
+        checkShiftedRightBytesConstantA(1)
+    }
+
+    @Test func shiftedRightBytesConstantSplat15() {
+        checkShiftedRightBytesConstantA(15)
+    }
+
+    @Test func shiftedRightBytesConstantSplat16() {
+        checkShiftedRightBytesConstantA(16)
+    }
+
+    @Test func shiftedRightBytesConstantSplat26() {
+        checkShiftedRightBytesConstantA(26)
+    }
+
+    @Test func shiftedRightBytesConstantSplat127() {
+        checkShiftedRightBytesConstantA(127)
+    }
+
+    @Test func shiftedRightBytesConstantSplat128() {
+        checkShiftedRightBytesConstantA(128)
+    }
+
+    @Test func shiftedRightBytesConstantSplat255() {
+        checkShiftedRightBytesConstantA(255)
+    }
+
+    @Test func shiftedRightBytesConstantSplat256() {
+        checkShiftedRightBytesConstantA(256)
+    }
+
+    @Test func shiftedRightBytesConstantSplat257() {
+        checkShiftedRightBytesConstantA(257)
+    }
+
+    @Test func shiftedRightBytesConstantSplat65280() {
+        checkShiftedRightBytesConstantA(65280)
+    }
+
+    @Test func shiftedRightBytesConstantSplat65281() {
+        checkShiftedRightBytesConstantA(65281)
+    }
+
+    @Test func shiftedRightBytesConstantSplatMax() {
+        checkShiftedRightBytesConstantA(Lane.max)
     }
 
     @inline(__always)
@@ -673,6 +825,123 @@ extension SIMDUInt32ConstantTests {
     }
 
     @inline(__always)
+    private func checkCombinedShiftedRightBytesConstantA(_ value: Lane) {
+        let mismatches = Mismatches("combinedShiftedRightBytes with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x270C_7F0D_93B1_CD32)
+        let bytesInputs = Array(1...15)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU32(value)),
+            "repeating"
+        )
+        for (b, bytes) in everyPair(bInputs, bytesInputs) {
+            mismatches.check(
+                H.combinedShiftedRightBytes(H.repeating(value), b, by: bytes),
+                H(
+                    raw: HighwayReference.combinedShiftedRightBytesU32(
+                        H.repeating(value).raw,
+                        b.raw,
+                        Int32(truncatingIfNeeded: bytes)
+                    )
+                ),
+                "b: \(describe(b)), bytes: \(bytes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkCombinedShiftedRightBytesConstantB(_ value: Lane) {
+        let mismatches = Mismatches("combinedShiftedRightBytes with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x1E0A_C90D_8E7E_F470)
+        let bytesInputs = Array(1...15)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU32(value)),
+            "repeating"
+        )
+        for (a, bytes) in everyPair(aInputs, bytesInputs) {
+            mismatches.check(
+                H.combinedShiftedRightBytes(a, H.repeating(value), by: bytes),
+                H(
+                    raw: HighwayReference.combinedShiftedRightBytesU32(
+                        a.raw,
+                        H.repeating(value).raw,
+                        Int32(truncatingIfNeeded: bytes)
+                    )
+                ),
+                "a: \(describe(a)), bytes: \(bytes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplat0() {
+        checkCombinedShiftedRightBytesConstantA(0)
+        checkCombinedShiftedRightBytesConstantB(0)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplat1() {
+        checkCombinedShiftedRightBytesConstantA(1)
+        checkCombinedShiftedRightBytesConstantB(1)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplat15() {
+        checkCombinedShiftedRightBytesConstantA(15)
+        checkCombinedShiftedRightBytesConstantB(15)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplat16() {
+        checkCombinedShiftedRightBytesConstantA(16)
+        checkCombinedShiftedRightBytesConstantB(16)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplat26() {
+        checkCombinedShiftedRightBytesConstantA(26)
+        checkCombinedShiftedRightBytesConstantB(26)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplat127() {
+        checkCombinedShiftedRightBytesConstantA(127)
+        checkCombinedShiftedRightBytesConstantB(127)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplat128() {
+        checkCombinedShiftedRightBytesConstantA(128)
+        checkCombinedShiftedRightBytesConstantB(128)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplat255() {
+        checkCombinedShiftedRightBytesConstantA(255)
+        checkCombinedShiftedRightBytesConstantB(255)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplat256() {
+        checkCombinedShiftedRightBytesConstantA(256)
+        checkCombinedShiftedRightBytesConstantB(256)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplat257() {
+        checkCombinedShiftedRightBytesConstantA(257)
+        checkCombinedShiftedRightBytesConstantB(257)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplat65280() {
+        checkCombinedShiftedRightBytesConstantA(65280)
+        checkCombinedShiftedRightBytesConstantB(65280)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplat65281() {
+        checkCombinedShiftedRightBytesConstantA(65281)
+        checkCombinedShiftedRightBytesConstantB(65281)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatMax() {
+        checkCombinedShiftedRightBytesConstantA(Lane.max)
+        checkCombinedShiftedRightBytesConstantB(Lane.max)
+    }
+
+    @inline(__always)
     private func checkCombinedShiftedRightLanesConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("combinedShiftedRightLanes with lanes \(lanes)")
         let aInputs = Inputs.vectors(H.self, seed: 0x3F72_2A37_EFD1_2945)
@@ -736,5 +1005,122 @@ extension SIMDUInt32ConstantTests {
 
     @Test(.enabled(if: 3 <= 3)) func combinedShiftedRightLanesUncheckedConstantLanes3() {
         checkCombinedShiftedRightLanesUncheckedConstantLanes(3)
+    }
+
+    @inline(__always)
+    private func checkCombinedShiftedRightLanesConstantA(_ value: Lane) {
+        let mismatches = Mismatches("combinedShiftedRightLanes with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x91C9_41CC_BB77_8DFA)
+        let lanesInputs = Array(1...3)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU32(value)),
+            "repeating"
+        )
+        for (b, lanes) in everyPair(bInputs, lanesInputs) {
+            mismatches.check(
+                H.combinedShiftedRightLanes(H.repeating(value), b, by: lanes),
+                H(
+                    raw: HighwayReference.combinedShiftedRightLanesU32(
+                        H.repeating(value).raw,
+                        b.raw,
+                        Int32(truncatingIfNeeded: lanes)
+                    )
+                ),
+                "b: \(describe(b)), lanes: \(lanes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkCombinedShiftedRightLanesConstantB(_ value: Lane) {
+        let mismatches = Mismatches("combinedShiftedRightLanes with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x8A0D_8BCC_B759_77D8)
+        let lanesInputs = Array(1...3)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU32(value)),
+            "repeating"
+        )
+        for (a, lanes) in everyPair(aInputs, lanesInputs) {
+            mismatches.check(
+                H.combinedShiftedRightLanes(a, H.repeating(value), by: lanes),
+                H(
+                    raw: HighwayReference.combinedShiftedRightLanesU32(
+                        a.raw,
+                        H.repeating(value).raw,
+                        Int32(truncatingIfNeeded: lanes)
+                    )
+                ),
+                "a: \(describe(a)), lanes: \(lanes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func combinedShiftedRightLanesConstantSplat0() {
+        checkCombinedShiftedRightLanesConstantA(0)
+        checkCombinedShiftedRightLanesConstantB(0)
+    }
+
+    @Test func combinedShiftedRightLanesConstantSplat1() {
+        checkCombinedShiftedRightLanesConstantA(1)
+        checkCombinedShiftedRightLanesConstantB(1)
+    }
+
+    @Test func combinedShiftedRightLanesConstantSplat15() {
+        checkCombinedShiftedRightLanesConstantA(15)
+        checkCombinedShiftedRightLanesConstantB(15)
+    }
+
+    @Test func combinedShiftedRightLanesConstantSplat16() {
+        checkCombinedShiftedRightLanesConstantA(16)
+        checkCombinedShiftedRightLanesConstantB(16)
+    }
+
+    @Test func combinedShiftedRightLanesConstantSplat26() {
+        checkCombinedShiftedRightLanesConstantA(26)
+        checkCombinedShiftedRightLanesConstantB(26)
+    }
+
+    @Test func combinedShiftedRightLanesConstantSplat127() {
+        checkCombinedShiftedRightLanesConstantA(127)
+        checkCombinedShiftedRightLanesConstantB(127)
+    }
+
+    @Test func combinedShiftedRightLanesConstantSplat128() {
+        checkCombinedShiftedRightLanesConstantA(128)
+        checkCombinedShiftedRightLanesConstantB(128)
+    }
+
+    @Test func combinedShiftedRightLanesConstantSplat255() {
+        checkCombinedShiftedRightLanesConstantA(255)
+        checkCombinedShiftedRightLanesConstantB(255)
+    }
+
+    @Test func combinedShiftedRightLanesConstantSplat256() {
+        checkCombinedShiftedRightLanesConstantA(256)
+        checkCombinedShiftedRightLanesConstantB(256)
+    }
+
+    @Test func combinedShiftedRightLanesConstantSplat257() {
+        checkCombinedShiftedRightLanesConstantA(257)
+        checkCombinedShiftedRightLanesConstantB(257)
+    }
+
+    @Test func combinedShiftedRightLanesConstantSplat65280() {
+        checkCombinedShiftedRightLanesConstantA(65280)
+        checkCombinedShiftedRightLanesConstantB(65280)
+    }
+
+    @Test func combinedShiftedRightLanesConstantSplat65281() {
+        checkCombinedShiftedRightLanesConstantA(65281)
+        checkCombinedShiftedRightLanesConstantB(65281)
+    }
+
+    @Test func combinedShiftedRightLanesConstantSplatMax() {
+        checkCombinedShiftedRightLanesConstantA(Lane.max)
+        checkCombinedShiftedRightLanesConstantB(Lane.max)
     }
 }

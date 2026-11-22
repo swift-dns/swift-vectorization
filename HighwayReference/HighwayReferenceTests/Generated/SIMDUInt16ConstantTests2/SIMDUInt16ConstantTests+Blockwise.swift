@@ -7,6 +7,284 @@ import Vectorization
 
 extension SIMDUInt16ConstantTests {
     @inline(__always)
+    private func checkTableLookupBytesConstantA(_ value: Lane) {
+        let mismatches = Mismatches("tableLookupBytes with a repeating \(hex(value))")
+        let indicesInputs = Inputs.tableIndices(
+            H.self,
+            perByte: true,
+            count: 16,
+            seed: 0x11E5_1F75_5B99_190C,
+            inContract: true
+        )
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU16(value)),
+            "repeating"
+        )
+        for indices in indicesInputs {
+            mismatches.check(
+                H.tableLookupBytes(H.repeating(value), at: indices),
+                H(raw: HighwayReference.tableLookupBytesU16(H.repeating(value).raw, indices.raw)),
+                "indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupBytesConstantSplat0() {
+        checkTableLookupBytesConstantA(0)
+    }
+
+    @Test func tableLookupBytesConstantSplat1() {
+        checkTableLookupBytesConstantA(1)
+    }
+
+    @Test func tableLookupBytesConstantSplat15() {
+        checkTableLookupBytesConstantA(15)
+    }
+
+    @Test func tableLookupBytesConstantSplat16() {
+        checkTableLookupBytesConstantA(16)
+    }
+
+    @Test func tableLookupBytesConstantSplat26() {
+        checkTableLookupBytesConstantA(26)
+    }
+
+    @Test func tableLookupBytesConstantSplat127() {
+        checkTableLookupBytesConstantA(127)
+    }
+
+    @Test func tableLookupBytesConstantSplat128() {
+        checkTableLookupBytesConstantA(128)
+    }
+
+    @Test func tableLookupBytesConstantSplat255() {
+        checkTableLookupBytesConstantA(255)
+    }
+
+    @Test func tableLookupBytesConstantSplat256() {
+        checkTableLookupBytesConstantA(256)
+    }
+
+    @Test func tableLookupBytesConstantSplat257() {
+        checkTableLookupBytesConstantA(257)
+    }
+
+    @Test func tableLookupBytesConstantSplat65280() {
+        checkTableLookupBytesConstantA(65280)
+    }
+
+    @Test func tableLookupBytesConstantSplat65281() {
+        checkTableLookupBytesConstantA(65281)
+    }
+
+    @Test func tableLookupBytesConstantSplatMax() {
+        checkTableLookupBytesConstantA(Lane.max)
+    }
+
+    @inline(__always)
+    private func checkTableLookupBytesConstantIndices(_ value: Lane) {
+        let mismatches = Mismatches("tableLookupBytes with indices repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x0145_8BAD_5E0B_7941)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU16(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.tableLookupBytes(a, at: H.repeating(value)),
+                H(raw: HighwayReference.tableLookupBytesU16(a.raw, H.repeating(value).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupBytesConstantIndicesSplat0() {
+        checkTableLookupBytesConstantIndices(0)
+    }
+
+    @Test func tableLookupBytesConstantIndicesSplat1() {
+        checkTableLookupBytesConstantIndices(1)
+    }
+
+    @Test func tableLookupBytesConstantIndicesSplatRepeated1() {
+        checkTableLookupBytesConstantIndices(257)
+    }
+
+    @Test func tableLookupBytesConstantIndicesSplat3() {
+        checkTableLookupBytesConstantIndices(3)
+    }
+
+    @Test func tableLookupBytesConstantIndicesSplatRepeated3() {
+        checkTableLookupBytesConstantIndices(771)
+    }
+
+    @Test func tableLookupBytesConstantIndicesSplat15() {
+        checkTableLookupBytesConstantIndices(15)
+    }
+
+    @Test func tableLookupBytesConstantIndicesSplatRepeated15() {
+        checkTableLookupBytesConstantIndices(3855)
+    }
+
+    @inline(__always)
+    private func checkTableLookupBytesOrZeroConstantA(_ value: Lane) {
+        let mismatches = Mismatches("tableLookupBytesOrZero with a repeating \(hex(value))")
+        let indicesInputs = Inputs.tableIndices(
+            H.self,
+            offset: 128,
+            perByte: true,
+            count: 144,
+            seed: 0xFC27_7429_83DF_3F51,
+            inContract: true
+        )
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU16(value)),
+            "repeating"
+        )
+        for indices in indicesInputs {
+            mismatches.check(
+                H.tableLookupBytesOrZero(H.repeating(value), at: indices),
+                H(
+                    raw: HighwayReference.tableLookupBytesOrZeroU16(
+                        H.repeating(value).raw,
+                        indices.raw
+                    )
+                ),
+                "indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplat0() {
+        checkTableLookupBytesOrZeroConstantA(0)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplat1() {
+        checkTableLookupBytesOrZeroConstantA(1)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplat15() {
+        checkTableLookupBytesOrZeroConstantA(15)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplat16() {
+        checkTableLookupBytesOrZeroConstantA(16)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplat26() {
+        checkTableLookupBytesOrZeroConstantA(26)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplat127() {
+        checkTableLookupBytesOrZeroConstantA(127)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplat128() {
+        checkTableLookupBytesOrZeroConstantA(128)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplat255() {
+        checkTableLookupBytesOrZeroConstantA(255)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplat256() {
+        checkTableLookupBytesOrZeroConstantA(256)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplat257() {
+        checkTableLookupBytesOrZeroConstantA(257)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplat65280() {
+        checkTableLookupBytesOrZeroConstantA(65280)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplat65281() {
+        checkTableLookupBytesOrZeroConstantA(65281)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplatMax() {
+        checkTableLookupBytesOrZeroConstantA(Lane.max)
+    }
+
+    @inline(__always)
+    private func checkTableLookupBytesOrZeroConstantIndices(_ value: Lane) {
+        let mismatches = Mismatches("tableLookupBytesOrZero with indices repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x9D9D_6F5A_8418_4B90)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU16(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.tableLookupBytesOrZero(a, at: H.repeating(value)),
+                H(raw: HighwayReference.tableLookupBytesOrZeroU16(a.raw, H.repeating(value).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupBytesOrZeroConstantIndicesSplat0() {
+        checkTableLookupBytesOrZeroConstantIndices(0)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantIndicesSplat1() {
+        checkTableLookupBytesOrZeroConstantIndices(1)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantIndicesSplatRepeated1() {
+        checkTableLookupBytesOrZeroConstantIndices(257)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantIndicesSplat3() {
+        checkTableLookupBytesOrZeroConstantIndices(3)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantIndicesSplatRepeated3() {
+        checkTableLookupBytesOrZeroConstantIndices(771)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantIndicesSplat15() {
+        checkTableLookupBytesOrZeroConstantIndices(15)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantIndicesSplatRepeated15() {
+        checkTableLookupBytesOrZeroConstantIndices(3855)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantIndicesSplat128() {
+        checkTableLookupBytesOrZeroConstantIndices(128)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantIndicesSplatRepeated128() {
+        checkTableLookupBytesOrZeroConstantIndices(32896)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantIndicesSplat143() {
+        checkTableLookupBytesOrZeroConstantIndices(143)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantIndicesSplatRepeated143() {
+        checkTableLookupBytesOrZeroConstantIndices(36751)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantIndicesSplat255() {
+        checkTableLookupBytesOrZeroConstantIndices(255)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantIndicesSplatRepeated255() {
+        checkTableLookupBytesOrZeroConstantIndices(65535)
+    }
+
+    @inline(__always)
     private func checkBroadcastingInBlocksConstantLane(_ lane: Int) {
         let mismatches = Mismatches("broadcastingInBlocks with lane \(lane)")
         let aInputs = Inputs.vectors(H.self, seed: 0x8EFC_F379_C6C0_56B1)

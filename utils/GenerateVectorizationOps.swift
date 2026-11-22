@@ -2184,6 +2184,11 @@ func sveReinterpretedSplat(_ name: String, from source: Element, to target: Elem
     return sveReinterpreted(sveSplatOperand(view, for: words), from: words, to: target)
 }
 
+func sveViewedOperand(_ name: String, from element: Element, as view: Element) -> String {
+    guard view.bits != element.bits else { return sveOperand(name, for: view) }
+    return sveReinterpretedSplat(name, from: element, to: view)
+}
+
 func sveNegatedCounts(_ counts: String, for element: Element) -> String {
     let signed = signedElement(of: element)
     return sveBuiltin(
@@ -2411,14 +2416,34 @@ func sveReversed(for element: Element) -> String? {
     return vectorResult(sveResult(reversed, for: element), for: element)
 }
 
-func sveLaneIndices(for element: Element) -> String {
-    sveOperand("indices", for: unsignedElement(of: element))
+func sveLaneIndices(for element: Element, splatting: Bool = false) -> String {
+    let unsigned = unsignedElement(of: element)
+    guard splatting else { return sveOperand("indices", for: unsigned) }
+    return sveSplatOperand("((\(unsigned.cVector))indices)", for: unsigned)
 }
 
-func sveTableLookupLanes(for element: Element) -> String {
+func sveTableLookupLanes(for element: Element, splatting: Bool = false) -> String {
     let operands = [sveOperand("a", for: element), sveLaneIndices(for: element)]
-    let lookup = sveBuiltin("tbl", operands, for: element)
-    return vectorResult(sveResult(lookup, for: element), for: element)
+    let lookup = vectorResult(
+        sveResult(sveBuiltin("tbl", operands, for: element), for: element),
+        for: element
+    )
+    guard splatting else { return lookup }
+    let unsigned = unsignedElement(of: element)
+    let splats = [
+        sveSplatCondition("((\(unsigned.cVector))indices)", nil, for: unsigned),
+        sveSplatCondition("a", nil, for: element),
+    ]
+    let splatted = sveBuiltin(
+        "tbl",
+        [sveSplatOperand("a", for: element), sveLaneIndices(for: element, splatting: true)],
+        for: element
+    )
+    return sveFolding(
+        when: splats.joined(separator: " || "),
+        vectorResult(sveResult(splatted, for: element), for: element),
+        otherwise: lookup
+    )
 }
 
 func sveTableLookupBytes(for element: Element) -> String {
@@ -2436,16 +2461,20 @@ func sveBlockTableLookupBytes(zeroing: Bool, for element: Element) -> String {
     let offsets = sveBuiltin("bic_n", [all, iota, "15"], for: bytes, predication: "x")
     let indices = sveBuiltin(
         "add",
-        [all, sveOperand("indices", for: bytes), offsets],
+        [all, sveViewedOperand("indices", from: element, as: bytes), offsets],
         for: bytes,
         predication: "x"
     )
-    var lookup = sveBuiltin("tbl", [sveOperand("a", for: bytes), indices], for: bytes)
+    var lookup = sveBuiltin(
+        "tbl",
+        [sveViewedOperand("a", from: element, as: bytes), indices],
+        for: bytes
+    )
     if zeroing {
         let signed = signedElement(of: bytes)
         let negative = sveBuiltin(
             "cmplt_n",
-            [all, sveOperand("indices", for: signed), "0"],
+            [all, sveViewedOperand("indices", from: element, as: signed), "0"],
             for: signed
         )
         let zero = sveBuiltin("dup_n", ["0"], for: bytes)
@@ -4670,6 +4699,46 @@ func x86MinMax(_ reduction: Reduction, level: X86Level, for element: Element) ->
 
 func portableRoundedAverage(for element: Element) -> String {
     vectorResult(arithmetic("-", "(a | b)", "((a ^ b) >> 1)", for: element), for: element)
+}
+
+func sveRoundedAverage(for element: Element) -> String {
+    let all = sveAllLanes(of: element)
+    func combined(_ name: String, _ operands: [String]) -> String {
+        sveBuiltin(name, [all] + operands, for: element, predication: "x")
+    }
+    let shift = element.category == .signedInteger ? "asr_n" : "lsr_n"
+    let halved = combined(shift, [combined("eor", ["first", "second"]), "1"])
+    let average = combined("sub", [combined("orr", ["first", "second"]), halved])
+    let type = sveType(of: element)
+    let constant = cFunctionName("sveConstant", element)
+    let alone = [("a", "b"), ("b", "a")].map { splat, other in
+        let conditions = [
+            sveSplatCondition(splat, nil, for: element),
+            "!\(sveSplatCondition(other, nil, for: element))",
+            "!\(constant)(\(other))",
+        ]
+        return "(\(conditions.joined(separator: " && ")))"
+    }
+    return sveFolding(
+        when: alone.joined(separator: " || "),
+        """
+        const \(type) second = \(sveSplatOperand("b", for: element));
+        const \(type) first = \(sveSplatOperand("a", for: element));
+        \(vectorResult(sveResult(average, for: element), for: element))
+        """,
+        otherwise: portableRoundedAverage(for: element)
+    )
+}
+
+func sveWideRoundedAverage(for element: Element) -> String {
+    let average = sveBinary("rhadd", for: element)
+    guard !isInteger64(element) else { return average }
+    return sveFoldingConstants(
+        jointly: [["a", "b"]],
+        portableRoundedAverage(for: element),
+        otherwise: average,
+        for: element
+    )
 }
 
 func x86NarrowRoundedAverage(for element: Element) -> String {
@@ -13646,8 +13715,14 @@ func sveAbsoluteDifference(for element: Element) -> String? {
 }
 
 func sveWideAbsoluteDifference(for element: Element) -> String? {
-    element.category == .float
-        ? svePredicatedBinary("abd", for: element) : sveAbsoluteDifference(for: element)
+    let difference = svePredicatedBinary("abd", for: element)
+    guard element.category != .float, !isInteger64(element) else { return difference }
+    return sveFoldingConstants(
+        jointly: [["a", "b"]],
+        portableAbsoluteDifference(for: element),
+        otherwise: difference,
+        for: element
+    )
 }
 
 func sveConstantNaNAbsoluteDifference(for element: Element) -> String? {
@@ -15193,7 +15268,8 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in element.bits < 64 ? neonRoundedAverage(for: element) : nil },
             sve2_128: { element in isInteger64(element) ? sveBinary("rhadd", for: element) : nil },
-            sve2: { element in isInteger64(element) ? sveBinary("rhadd", for: element) : nil },
+            sve: { element in sveRoundedAverage(for: element) },
+            sve2: { element in sveWideRoundedAverage(for: element) },
             avx3: { element in x86RoundedAverage(level: .avx3, for: element) },
             avx2: { element in x86RoundedAverage(level: .avx2, for: element) },
             sse2: { element in x86RoundedAverage(level: .sse2, for: element) }
@@ -15672,9 +15748,6 @@ let basicOps: [Op] = [
             sve2_128Splat: { element in
                 sveComparisonSplat("cmplt", mirrored: "cmpgt", for: element)
             },
-            sveSplat: { element in
-                sveComparisonSplat("cmplt", mirrored: "cmpgt", for: element)
-            },
             avx3: { element in
                 element.category == .unsignedInteger
                     ? maskResult("(\(element.cMask))(b > a)", for: element) : nil
@@ -15707,9 +15780,6 @@ let basicOps: [Op] = [
         section: .comparisons,
         targets: TargetBodies(
             sve2_128Splat: { element in
-                sveComparisonSplat("cmpgt", mirrored: "cmplt", for: element)
-            },
-            sveSplat: { element in
                 sveComparisonSplat("cmpgt", mirrored: "cmplt", for: element)
             },
             avx2: { element in
@@ -16679,7 +16749,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonTableLookupLanes(for: element) },
             sve2_128: { element in sveTableLookupLanes(for: element) },
-            sve: { element in sveTableLookupLanes(for: element) },
+            sve: { element in sveTableLookupLanes(for: element, splatting: true) },
             avx3dl: { element in x86TableLookupLanes(level: .avx3dl, for: element) },
             avx3: { element in x86TableLookupLanes(level: .avx3, for: element) },
             avx2: { element in x86TableLookupLanes(level: .avx2, for: element) },
@@ -21826,10 +21896,13 @@ func sveInterleavedBlockHalves(upper: Bool, for element: Element) -> String {
     }
     let pairs = unsignedElement(bits: 64)
     let lanes = unsignedElement(of: element)
+    let views = ["b", "a"].map { operand in
+        "const \(sveType(of: pairs)) \(operand)Pairs = \(sveViewedOperand(operand, from: element, as: pairs));"
+    }
     let halves = ["a", "b"].map { operand in
         let gathered = sveBuiltin(
             upper ? "uzp2" : "uzp1",
-            [sveOperand(operand, for: pairs), sveOperand(operand, for: pairs)],
+            Array(repeating: "\(operand)Pairs", count: 2),
             for: pairs
         )
         return "const \(pairs.cVector) \(operand)Halves = \(sveResult(gathered, for: pairs));"
@@ -21840,6 +21913,7 @@ func sveInterleavedBlockHalves(upper: Bool, for element: Element) -> String {
         for: lanes
     )
     return """
+        \(views.joined(separator: "\n"))
         \(halves.joined(separator: "\n"))
         \(sveViewedResult(zipped, viewing: lanes, for: element))
         """
@@ -21901,7 +21975,7 @@ func sveReversedGroups(_ group: Int, for element: Element) -> String? {
         let groups = unsignedElement(bits: element.bits * group)
         let reversed = sveBuiltin(
             ["revb", "revh", "revw"][element.bits.trailingZeroBitCount - 3],
-            [sveAllLanes(of: groups), sveOperand("a", for: groups)],
+            [sveAllLanes(of: groups), sveViewedOperand("a", from: element, as: groups)],
             for: groups,
             predication: "x"
         )
@@ -25692,7 +25766,7 @@ func svePerBlockShift(
     for element: Element
 ) -> String {
     let view = sveUnsignedBlockView(unit: unit, for: element)
-    let operand = sveOperand("a", for: view)
+    let operand = sveViewedOperand("a", from: element, as: view)
     let zero = sveBuiltin("dup_n", ["0"], for: view)
     switch direction {
     case .left:
@@ -25866,7 +25940,10 @@ func sveBlockCombine(amount: String, unit: Int, for element: Element) -> String 
 
 func svePerBlockCombine(amount: String, unit: Int, for element: Element) -> String {
     let bytes = sveUnsignedBlockView(unit: 1, for: element)
-    let (high, low) = (sveOperand("a", for: bytes), sveOperand("b", for: bytes))
+    let (high, low) = (
+        sveViewedOperand("a", from: element, as: bytes),
+        sveViewedOperand("b", from: element, as: bytes)
+    )
     func combined(_ lowered: String, keeping kept: String) -> String {
         let raised = sveBuiltin(
             "splice",
@@ -52323,6 +52400,10 @@ func isConstantVector(_ parameter: Parameter) -> Bool {
     }
 }
 
+func isConstantIndices(_ parameter: Parameter) -> Bool {
+    parameter == .indices || parameter == .laneIndices
+}
+
 func constantNamespace(of operand: Element, for element: Element) -> String {
     operand.suffix == element.suffix ? "H" : operand.vectorType
 }
@@ -52344,12 +52425,59 @@ func constantType(
     case .constBytePointer: return "UInt64"
     case .roundConstant: return "UInt8"
     case _ where parameter.isPointerIndices: return signedElement(of: element).swiftType
-    case _ where isConstantVector(parameter): return lane
+    case _ where isConstantVector(parameter) || isConstantIndices(parameter): return lane
     default: return "Int"
     }
 }
 
 let indexSplats = integerConstants([0, 1])
+
+func constantIndexSplats(
+    of op: Op,
+    for element: Element
+) -> [(value: ConstantValue, condition: String?)] {
+    guard let contract = op.indexContract, contract.isPerByte || contract.offset == 0 else {
+        fatalError("\(op.identifier) takes index vectors whose contract nothing covers")
+    }
+    guard !contract.isPerByte else {
+        return constantByteIndexSplats(of: op, for: element).map { ($0, nil) }
+    }
+    let widest = element.at(width: 64).laneCount
+    let (limit, bound): (Int, String?) =
+        switch contract.count {
+        case .fixed(let count): (count, nil)
+        case .lanes(let multiple):
+            (multiple * widest, multiple == 1 ? "H.laneCount" : "\(multiple) * H.laneCount")
+        }
+    return [0, 1, 2, 3, 7, 15, 31, 63].filter { $0 < limit }.map { lane in
+        let value = ConstantValue(name: String(lane), literal: String(lane))
+        return (value, bound.map { "\(lane) < \($0)" })
+    }
+}
+
+func constantByteIndexSplats(of op: Op, for element: Element) -> [ConstantValue] {
+    guard let contract = op.indexContract, contract.isPerByte,
+        case .fixed(let count) = contract.count
+    else {
+        fatalError("\(op.identifier) takes index vectors whose contract nothing covers")
+    }
+    let bytes = (0..<256).filter { (($0 - contract.offset) & 255) < count }
+    let candidates = [0, 1, 3, 15, 128, 143, 255].filter { bytes.contains($0) }
+    let repeated = (0..<element.bits / 8).reduce(UInt64(0)) { value, _ in value << 8 | 1 }
+    return candidates.flatMap { byte in
+        [(String(byte), UInt64(byte))]
+            + (element.bits > 8 && byte != 0 ? [("Repeated\(byte)", UInt64(byte) * repeated)] : [])
+    }.map { name, value in
+        let literal =
+            switch element.category {
+            case .unsignedInteger: String(value)
+            case .signedInteger:
+                String(Int64(bitPattern: value << (64 - element.bits)) >> (64 - element.bits))
+            case .float, .float16, .bfloat16: "Lane(bitPattern: \(value))"
+            }
+        return ConstantValue(name: name, literal: literal)
+    }
+}
 
 func constantMask(repeating value: Bool, except lane: String? = nil) -> String {
     let uniform = "H.Mask.SIMDType(repeating: \(value))"
@@ -52408,7 +52536,7 @@ func constantHelper(
 ) -> String {
     let parameterBindings = bindings(of: op, for: element)
     let binding = parameterBindings[index]
-    let isSplat = isConstantVector(op.parameters[index])
+    let isSplat = isConstantVector(op.parameters[index]) || isConstantIndices(op.parameters[index])
     let operand = operandElement(of: op.parameters[index], for: element, source: op.source)
     let name =
         constantHelperName(of: op, parameter: binding, guarded: guarded)
@@ -52821,8 +52949,8 @@ func constantTests(of op: Op, for element: Element) -> [String] {
     var members: [String] = []
 
     for index in indices
-    where !isConstantVector(op.parameters[index]) && op.parameters[index] != .immediate
-        && op.parameters[index] != .constBytePointer
+    where !isConstantVector(op.parameters[index]) && !isConstantIndices(op.parameters[index])
+        && op.parameters[index] != .immediate && op.parameters[index] != .constBytePointer
     {
         let binding = parameterBindings[index]
         let values: [ConstantValue]
@@ -52944,6 +53072,20 @@ func constantTests(of op: Op, for element: Element) -> [String] {
             members.append(
                 constantTest(
                     "\(op.identifier)Constant\(uppercasedFirst(binding.swiftName))Splat\(value.name)",
+                    calls: ["\(helper)(\(value.literal))"]
+                )
+            )
+        }
+    }
+    for index in indices where isConstantIndices(op.parameters[index]) {
+        let binding = parameterBindings[index]
+        let helper = constantHelperName(of: op, parameter: binding, guarded: false)
+        members.append(constantHelper(of: op, for: element, parameter: index, guarded: false))
+        for (value, condition) in constantIndexSplats(of: op, for: element) {
+            members.append(
+                constantTest(
+                    "\(op.testIdentifier)Constant\(uppercasedFirst(binding.swiftName))Splat\(value.name)",
+                    enabledIf: condition,
                     calls: ["\(helper)(\(value.literal))"]
                 )
             )

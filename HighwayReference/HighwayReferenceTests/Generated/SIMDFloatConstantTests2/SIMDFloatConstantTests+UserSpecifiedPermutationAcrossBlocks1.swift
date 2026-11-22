@@ -107,6 +107,54 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
+    private func checkTableLookupLanesConstantIndices(_ value: Int32) {
+        let mismatches = Mismatches("tableLookupLanes with indices repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xAE49_A616_E97D_04A4)
+        mismatches.check(
+            SIMD<Int32>.repeating(value),
+            SIMD<Int32>(raw: HighwayReference.repeatingI32(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.tableLookupLanes(a, at: SIMD<Int32>.repeating(value)),
+                H(
+                    raw: HighwayReference.tableLookupLanesF32(
+                        a.raw,
+                        SIMD<Int32>.repeating(value).raw
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(.enabled(if: 0 < H.laneCount)) func tableLookupLanesConstantIndicesSplat0() {
+        checkTableLookupLanesConstantIndices(0)
+    }
+
+    @Test(.enabled(if: 1 < H.laneCount)) func tableLookupLanesConstantIndicesSplat1() {
+        checkTableLookupLanesConstantIndices(1)
+    }
+
+    @Test(.enabled(if: 2 < H.laneCount)) func tableLookupLanesConstantIndicesSplat2() {
+        checkTableLookupLanesConstantIndices(2)
+    }
+
+    @Test(.enabled(if: 3 < H.laneCount)) func tableLookupLanesConstantIndicesSplat3() {
+        checkTableLookupLanesConstantIndices(3)
+    }
+
+    @Test(.enabled(if: 7 < H.laneCount)) func tableLookupLanesConstantIndicesSplat7() {
+        checkTableLookupLanesConstantIndices(7)
+    }
+
+    @Test(.enabled(if: 15 < H.laneCount)) func tableLookupLanesConstantIndicesSplat15() {
+        checkTableLookupLanesConstantIndices(15)
+    }
+
+    @inline(__always)
     private func checkTwoTablesLookupLanesConstantA(_ value: Lane) {
         let mismatches = Mismatches("twoTablesLookupLanes with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x3DB4_AF6B_68DA_E3E6)

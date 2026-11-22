@@ -61,4 +61,116 @@ extension SIMDInt8ConstantTests {
     @Test func reversedConstantSplatMinus128() {
         checkReversedConstantA(-128)
     }
+
+    @inline(__always)
+    private func checkReversed4ConstantA(_ value: Lane) {
+        let mismatches = Mismatches("reversed4 with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI8(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.reversed4(H.repeating(value)),
+            H(raw: HighwayReference.reversed4I8(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func reversed4ConstantSplat0() {
+        checkReversed4ConstantA(0)
+    }
+
+    @Test func reversed4ConstantSplat1() {
+        checkReversed4ConstantA(1)
+    }
+
+    @Test func reversed4ConstantSplat15() {
+        checkReversed4ConstantA(15)
+    }
+
+    @Test func reversed4ConstantSplat16() {
+        checkReversed4ConstantA(16)
+    }
+
+    @Test func reversed4ConstantSplat26() {
+        checkReversed4ConstantA(26)
+    }
+
+    @Test func reversed4ConstantSplat127() {
+        checkReversed4ConstantA(127)
+    }
+
+    @Test func reversed4ConstantSplatMinus1() {
+        checkReversed4ConstantA(-1)
+    }
+
+    @Test func reversed4ConstantSplatMinus16() {
+        checkReversed4ConstantA(-16)
+    }
+
+    @Test func reversed4ConstantSplatMinus17() {
+        checkReversed4ConstantA(-17)
+    }
+
+    @Test func reversed4ConstantSplatMinus128() {
+        checkReversed4ConstantA(-128)
+    }
+
+    @inline(__always)
+    private func checkReversed8ConstantA(_ value: Lane) {
+        let mismatches = Mismatches("reversed8 with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI8(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.reversed8(H.repeating(value)),
+            H(raw: HighwayReference.reversed8I8(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func reversed8ConstantSplat0() {
+        checkReversed8ConstantA(0)
+    }
+
+    @Test func reversed8ConstantSplat1() {
+        checkReversed8ConstantA(1)
+    }
+
+    @Test func reversed8ConstantSplat15() {
+        checkReversed8ConstantA(15)
+    }
+
+    @Test func reversed8ConstantSplat16() {
+        checkReversed8ConstantA(16)
+    }
+
+    @Test func reversed8ConstantSplat26() {
+        checkReversed8ConstantA(26)
+    }
+
+    @Test func reversed8ConstantSplat127() {
+        checkReversed8ConstantA(127)
+    }
+
+    @Test func reversed8ConstantSplatMinus1() {
+        checkReversed8ConstantA(-1)
+    }
+
+    @Test func reversed8ConstantSplatMinus16() {
+        checkReversed8ConstantA(-16)
+    }
+
+    @Test func reversed8ConstantSplatMinus17() {
+        checkReversed8ConstantA(-17)
+    }
+
+    @Test func reversed8ConstantSplatMinus128() {
+        checkReversed8ConstantA(-128)
+    }
 }

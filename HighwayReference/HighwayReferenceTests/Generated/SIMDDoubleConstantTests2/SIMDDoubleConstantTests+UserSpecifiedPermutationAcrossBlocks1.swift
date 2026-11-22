@@ -107,6 +107,50 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
+    private func checkTableLookupLanesConstantIndices(_ value: Int64) {
+        let mismatches = Mismatches("tableLookupLanes with indices repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xAD29_0319_34B0_7A4D)
+        mismatches.check(
+            SIMD<Int64>.repeating(value),
+            SIMD<Int64>(raw: HighwayReference.repeatingI64(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.tableLookupLanes(a, at: SIMD<Int64>.repeating(value)),
+                H(
+                    raw: HighwayReference.tableLookupLanesF64(
+                        a.raw,
+                        SIMD<Int64>.repeating(value).raw
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(.enabled(if: 0 < H.laneCount)) func tableLookupLanesConstantIndicesSplat0() {
+        checkTableLookupLanesConstantIndices(0)
+    }
+
+    @Test(.enabled(if: 1 < H.laneCount)) func tableLookupLanesConstantIndicesSplat1() {
+        checkTableLookupLanesConstantIndices(1)
+    }
+
+    @Test(.enabled(if: 2 < H.laneCount)) func tableLookupLanesConstantIndicesSplat2() {
+        checkTableLookupLanesConstantIndices(2)
+    }
+
+    @Test(.enabled(if: 3 < H.laneCount)) func tableLookupLanesConstantIndicesSplat3() {
+        checkTableLookupLanesConstantIndices(3)
+    }
+
+    @Test(.enabled(if: 7 < H.laneCount)) func tableLookupLanesConstantIndicesSplat7() {
+        checkTableLookupLanesConstantIndices(7)
+    }
+
+    @inline(__always)
     private func checkTwoTablesLookupLanesConstantA(_ value: Lane) {
         let mismatches = Mismatches("twoTablesLookupLanes with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x47DB_5AD9_0428_C007)

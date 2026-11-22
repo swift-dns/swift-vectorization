@@ -53,4 +53,100 @@ extension SIMDUInt8ConstantTests {
     @Test func reversedConstantSplat255() {
         checkReversedConstantA(255)
     }
+
+    @inline(__always)
+    private func checkReversed4ConstantA(_ value: Lane) {
+        let mismatches = Mismatches("reversed4 with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU8(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.reversed4(H.repeating(value)),
+            H(raw: HighwayReference.reversed4U8(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func reversed4ConstantSplat0() {
+        checkReversed4ConstantA(0)
+    }
+
+    @Test func reversed4ConstantSplat1() {
+        checkReversed4ConstantA(1)
+    }
+
+    @Test func reversed4ConstantSplat15() {
+        checkReversed4ConstantA(15)
+    }
+
+    @Test func reversed4ConstantSplat16() {
+        checkReversed4ConstantA(16)
+    }
+
+    @Test func reversed4ConstantSplat26() {
+        checkReversed4ConstantA(26)
+    }
+
+    @Test func reversed4ConstantSplat127() {
+        checkReversed4ConstantA(127)
+    }
+
+    @Test func reversed4ConstantSplat128() {
+        checkReversed4ConstantA(128)
+    }
+
+    @Test func reversed4ConstantSplat255() {
+        checkReversed4ConstantA(255)
+    }
+
+    @inline(__always)
+    private func checkReversed8ConstantA(_ value: Lane) {
+        let mismatches = Mismatches("reversed8 with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU8(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.reversed8(H.repeating(value)),
+            H(raw: HighwayReference.reversed8U8(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func reversed8ConstantSplat0() {
+        checkReversed8ConstantA(0)
+    }
+
+    @Test func reversed8ConstantSplat1() {
+        checkReversed8ConstantA(1)
+    }
+
+    @Test func reversed8ConstantSplat15() {
+        checkReversed8ConstantA(15)
+    }
+
+    @Test func reversed8ConstantSplat16() {
+        checkReversed8ConstantA(16)
+    }
+
+    @Test func reversed8ConstantSplat26() {
+        checkReversed8ConstantA(26)
+    }
+
+    @Test func reversed8ConstantSplat127() {
+        checkReversed8ConstantA(127)
+    }
+
+    @Test func reversed8ConstantSplat128() {
+        checkReversed8ConstantA(128)
+    }
+
+    @Test func reversed8ConstantSplat255() {
+        checkReversed8ConstantA(255)
+    }
 }
