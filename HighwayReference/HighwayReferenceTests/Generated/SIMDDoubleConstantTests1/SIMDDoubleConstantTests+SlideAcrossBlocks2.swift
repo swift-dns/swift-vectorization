@@ -7,6 +7,193 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
+    private func checkSlide1UpConstantA(_ value: Lane) {
+        let mismatches = Mismatches("slide1Up with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.slide1Up(H.repeating(value)),
+            H(raw: HighwayReference.slide1UpF64(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func slide1UpConstantSplatZero() {
+        checkSlide1UpConstantA(0.0)
+    }
+
+    @Test func slide1UpConstantSplatNegativeZero() {
+        checkSlide1UpConstantA(-0.0)
+    }
+
+    @Test func slide1UpConstantSplatOne() {
+        checkSlide1UpConstantA(1.0)
+    }
+
+    @Test func slide1UpConstantSplatMinusOne() {
+        checkSlide1UpConstantA(-1.0)
+    }
+
+    @Test func slide1UpConstantSplatTwo() {
+        checkSlide1UpConstantA(2.0)
+    }
+
+    @Test func slide1UpConstantSplatHalf() {
+        checkSlide1UpConstantA(0.5)
+    }
+
+    @Test func slide1UpConstantSplatFour() {
+        checkSlide1UpConstantA(4.0)
+    }
+
+    @Test func slide1UpConstantSplatQuarter() {
+        checkSlide1UpConstantA(0.25)
+    }
+
+    @Test func slide1UpConstantSplatOnePointFive() {
+        checkSlide1UpConstantA(1.5)
+    }
+
+    @Test func slide1UpConstantSplatMinusTwoPointFive() {
+        checkSlide1UpConstantA(-2.5)
+    }
+
+    @Test func slide1UpConstantSplatInfinity() {
+        checkSlide1UpConstantA(.infinity)
+    }
+
+    @Test func slide1UpConstantSplatMinusInfinity() {
+        checkSlide1UpConstantA(-.infinity)
+    }
+
+    @Test func slide1UpConstantSplatNaN() {
+        checkSlide1UpConstantA(.nan)
+    }
+
+    @Test func slide1UpConstantSplatMinusNaN() {
+        checkSlide1UpConstantA(-.nan)
+    }
+
+    @Test func slide1UpConstantSplatPayloadNaN() {
+        checkSlide1UpConstantA(Lane(nan: 1, signaling: false))
+    }
+
+    @Test func slide1UpConstantSplatSignalingNaN() {
+        checkSlide1UpConstantA(.signalingNaN)
+    }
+
+    @Test func slide1UpConstantSplatMinusSignalingNaN() {
+        checkSlide1UpConstantA(-.signalingNaN)
+    }
+
+    @Test func slide1UpConstantSplatLeastNonzero() {
+        checkSlide1UpConstantA(.leastNonzeroMagnitude)
+    }
+
+    @Test func slide1UpConstantSplatGreatest() {
+        checkSlide1UpConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkSlide1UpFillingWithConstantA(_ value: Lane) {
+        let mismatches = Mismatches("slide1UpFillingWith with a repeating \(hex(value))")
+        let fillInputs = Inputs.lanes(Lane.self, seed: 0x4922_AA5D_0668_B128)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        for fill in fillInputs {
+            mismatches.check(
+                H.slide1Up(H.repeating(value), fillingWith: fill),
+                H(raw: HighwayReference.slide1UpFillingWithF64(fill, H.repeating(value).raw)),
+                "fill: \(hex(fill))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func slide1UpFillingWithConstantSplatZero() {
+        checkSlide1UpFillingWithConstantA(0.0)
+    }
+
+    @Test func slide1UpFillingWithConstantSplatNegativeZero() {
+        checkSlide1UpFillingWithConstantA(-0.0)
+    }
+
+    @Test func slide1UpFillingWithConstantSplatOne() {
+        checkSlide1UpFillingWithConstantA(1.0)
+    }
+
+    @Test func slide1UpFillingWithConstantSplatMinusOne() {
+        checkSlide1UpFillingWithConstantA(-1.0)
+    }
+
+    @Test func slide1UpFillingWithConstantSplatTwo() {
+        checkSlide1UpFillingWithConstantA(2.0)
+    }
+
+    @Test func slide1UpFillingWithConstantSplatHalf() {
+        checkSlide1UpFillingWithConstantA(0.5)
+    }
+
+    @Test func slide1UpFillingWithConstantSplatFour() {
+        checkSlide1UpFillingWithConstantA(4.0)
+    }
+
+    @Test func slide1UpFillingWithConstantSplatQuarter() {
+        checkSlide1UpFillingWithConstantA(0.25)
+    }
+
+    @Test func slide1UpFillingWithConstantSplatOnePointFive() {
+        checkSlide1UpFillingWithConstantA(1.5)
+    }
+
+    @Test func slide1UpFillingWithConstantSplatMinusTwoPointFive() {
+        checkSlide1UpFillingWithConstantA(-2.5)
+    }
+
+    @Test func slide1UpFillingWithConstantSplatInfinity() {
+        checkSlide1UpFillingWithConstantA(.infinity)
+    }
+
+    @Test func slide1UpFillingWithConstantSplatMinusInfinity() {
+        checkSlide1UpFillingWithConstantA(-.infinity)
+    }
+
+    @Test func slide1UpFillingWithConstantSplatNaN() {
+        checkSlide1UpFillingWithConstantA(.nan)
+    }
+
+    @Test func slide1UpFillingWithConstantSplatMinusNaN() {
+        checkSlide1UpFillingWithConstantA(-.nan)
+    }
+
+    @Test func slide1UpFillingWithConstantSplatPayloadNaN() {
+        checkSlide1UpFillingWithConstantA(Lane(nan: 1, signaling: false))
+    }
+
+    @Test func slide1UpFillingWithConstantSplatSignalingNaN() {
+        checkSlide1UpFillingWithConstantA(.signalingNaN)
+    }
+
+    @Test func slide1UpFillingWithConstantSplatMinusSignalingNaN() {
+        checkSlide1UpFillingWithConstantA(-.signalingNaN)
+    }
+
+    @Test func slide1UpFillingWithConstantSplatLeastNonzero() {
+        checkSlide1UpFillingWithConstantA(.leastNonzeroMagnitude)
+    }
+
+    @Test func slide1UpFillingWithConstantSplatGreatest() {
+        checkSlide1UpFillingWithConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
     private func checkSlide1DownConstantA(_ value: Lane) {
         let mismatches = Mismatches("slide1Down with a repeating \(hex(value))")
         mismatches.check(

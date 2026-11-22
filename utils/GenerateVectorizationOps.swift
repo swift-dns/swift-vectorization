@@ -3060,14 +3060,39 @@ func slidesByConstantAmountPortably(_ direction: SlideDirection, for element: El
     }
 }
 
+func sveSlidesNoneOrAllLanes(for element: Element) -> String {
+    "__builtin_constant_p(lanes) && (lanes == 0 || lanes >= \(element.laneCount))"
+}
+
 func sveSlideLanes(_ direction: SlideDirection, for element: Element) -> String {
     let slid = sveSlide(direction, .zeros, for: element)
+    let portable = portableSlide(direction, for: element)
+    guard !slidesByConstantAmountPortably(direction, for: element) else {
+        return sveFolding(when: "__builtin_constant_p(lanes)", portable, otherwise: slid)
+    }
     let constant = cFunctionName("sveConstant", element)
     return sveFolding(
-        when: slidesByConstantAmountPortably(direction, for: element)
-            ? "__builtin_constant_p(lanes)" : "\(constant)(a) && __builtin_constant_p(lanes)",
-        portableSlide(direction, for: element),
-        otherwise: slid
+        when: "\(constant)(a) && __builtin_constant_p(lanes)",
+        portable,
+        otherwise: sveFolding(
+            when: sveSlidesNoneOrAllLanes(for: element),
+            portable,
+            otherwise: slid
+        )
+    )
+}
+
+func sveSlideMaskLanes(_ direction: SlideDirection, for element: Element) -> String {
+    let portable = portableSlide(direction, masked: true, for: element)
+    return sveFoldingConstantMask(
+        portable,
+        otherwise: sveFolding(
+            when: sveSlidesNoneOrAllLanes(for: element),
+            portable,
+            otherwise: sveSlidMask(direction, by: "lanes", for: element)
+        ),
+        withConstant: "lanes",
+        for: element
     )
 }
 
@@ -20955,14 +20980,7 @@ let maskOps: [Op] = [
         section: .slideMaskAcrossBlocks,
         identifier: "slideMaskUpLanes",
         targets: TargetBodies(
-            sve: { element in
-                sveFoldingConstantMask(
-                    portableSlide(.up, masked: true, for: element),
-                    otherwise: sveSlidMask(.up, by: "lanes", for: element),
-                    withConstant: "lanes",
-                    for: element
-                )
-            },
+            sve: { element in sveSlideMaskLanes(.up, for: element) },
             avx3: { element in x86Avx3SlidMask(.up, by: "lanes", for: element) }
         )
     ) { element in
@@ -20977,14 +20995,7 @@ let maskOps: [Op] = [
         section: .slideMaskAcrossBlocks,
         identifier: "slideMaskDownLanes",
         targets: TargetBodies(
-            sve: { element in
-                sveFoldingConstantMask(
-                    portableSlide(.down, masked: true, for: element),
-                    otherwise: sveSlidMask(.down, by: "lanes", for: element),
-                    withConstant: "lanes",
-                    for: element
-                )
-            },
+            sve: { element in sveSlideMaskLanes(.down, for: element) },
             avx3: { element in x86Avx3SlidMask(.down, by: "lanes", for: element) }
         )
     ) { element in
@@ -52529,7 +52540,15 @@ func constantTest(
         """
 }
 
-let jointConstantAmounts = integerConstants([0, 1, 2, 3, 7, 15, 31, 63])
+let jointConstantAmounts = integerConstants([0, 1, 2, 3, 4, 7, 8, 15, 16, 31, 32, 63, 64])
+
+func constantLaneCondition(_ literal: String, of parameter: Parameter) -> String? {
+    switch parameter {
+    case .laneAmount: "\(literal) <= H.laneCount"
+    case .laneIndex: "\(literal) < H.laneCount"
+    default: nil
+    }
+}
 
 func jointConstantVectors(for operand: Element) -> [ConstantValue] {
     let names =
@@ -52661,8 +52680,9 @@ func jointConstantTests(of op: Op, for element: Element, parameters group: [Int]
                     )
                 ) : value
         }
-        let amounts = zip(group, values).filter { op.parameters[$0.0] == .laneAmount }
-            .map { "\($0.1.literal) < H.laneCount" }
+        let amounts = zip(group, values).compactMap {
+            constantLaneCondition($0.1.literal, of: op.parameters[$0.0])
+        }
         members.append(
             constantTest(
                 "\(op.testIdentifier)Constant"
@@ -52809,7 +52829,9 @@ func constantTests(of op: Op, for element: Element) -> [String] {
         switch op.parameters[index] {
         case .count:
             values = integerConstants(constantCounts(spanned: op.span != nil, for: element))
-        case .laneAmount, .laneIndex:
+        case .laneAmount:
+            values = integerConstants(Array(0...element.at(width: 64).laneCount))
+        case .laneIndex:
             values = integerConstants(Array(0..<element.at(width: 64).laneCount))
         case .tupleIndex:
             values = integerConstants(Array(0..<tupleCount(of: op)))
@@ -52836,9 +52858,7 @@ func constantTests(of op: Op, for element: Element) -> [String] {
                 members.append(
                     constantTest(
                         guardedTest,
-                        enabledIf: op.parameters[index] == .laneAmount
-                            || op.parameters[index] == .laneIndex
-                            ? "\(value.literal) < H.laneCount" : nil,
+                        enabledIf: constantLaneCondition(value.literal, of: op.parameters[index]),
                         calls: ["\(helper)(\(value.literal))"]
                     )
                 )

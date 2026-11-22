@@ -82,36 +82,40 @@ extension SIMDInt64ConstantTests {
         mismatches.record()
     }
 
-    @Test(.enabled(if: 0 < H.laneCount)) func slideMaskUpLanesConstantLanes0() {
+    @Test(.enabled(if: 0 <= H.laneCount)) func slideMaskUpLanesConstantLanes0() {
         checkSlideMaskUpLanesConstantLanes(0)
     }
 
-    @Test(.enabled(if: 1 < H.laneCount)) func slideMaskUpLanesConstantLanes1() {
+    @Test(.enabled(if: 1 <= H.laneCount)) func slideMaskUpLanesConstantLanes1() {
         checkSlideMaskUpLanesConstantLanes(1)
     }
 
-    @Test(.enabled(if: 2 < H.laneCount)) func slideMaskUpLanesConstantLanes2() {
+    @Test(.enabled(if: 2 <= H.laneCount)) func slideMaskUpLanesConstantLanes2() {
         checkSlideMaskUpLanesConstantLanes(2)
     }
 
-    @Test(.enabled(if: 3 < H.laneCount)) func slideMaskUpLanesConstantLanes3() {
+    @Test(.enabled(if: 3 <= H.laneCount)) func slideMaskUpLanesConstantLanes3() {
         checkSlideMaskUpLanesConstantLanes(3)
     }
 
-    @Test(.enabled(if: 4 < H.laneCount)) func slideMaskUpLanesConstantLanes4() {
+    @Test(.enabled(if: 4 <= H.laneCount)) func slideMaskUpLanesConstantLanes4() {
         checkSlideMaskUpLanesConstantLanes(4)
     }
 
-    @Test(.enabled(if: 5 < H.laneCount)) func slideMaskUpLanesConstantLanes5() {
+    @Test(.enabled(if: 5 <= H.laneCount)) func slideMaskUpLanesConstantLanes5() {
         checkSlideMaskUpLanesConstantLanes(5)
     }
 
-    @Test(.enabled(if: 6 < H.laneCount)) func slideMaskUpLanesConstantLanes6() {
+    @Test(.enabled(if: 6 <= H.laneCount)) func slideMaskUpLanesConstantLanes6() {
         checkSlideMaskUpLanesConstantLanes(6)
     }
 
-    @Test(.enabled(if: 7 < H.laneCount)) func slideMaskUpLanesConstantLanes7() {
+    @Test(.enabled(if: 7 <= H.laneCount)) func slideMaskUpLanesConstantLanes7() {
         checkSlideMaskUpLanesConstantLanes(7)
+    }
+
+    @Test(.enabled(if: 8 <= H.laneCount)) func slideMaskUpLanesConstantLanes8() {
+        checkSlideMaskUpLanesConstantLanes(8)
     }
 
     @inline(__always)
@@ -125,71 +129,111 @@ extension SIMDInt64ConstantTests {
         mismatches.record()
     }
 
-    @Test(.enabled(if: 0 < H.laneCount)) func slideMaskUpLanesConstantMaskAllFalseLanes0() {
+    @Test(.enabled(if: 0 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllFalseLanes0() {
         checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 0)
     }
 
-    @Test(.enabled(if: 1 < H.laneCount)) func slideMaskUpLanesConstantMaskAllFalseLanes1() {
+    @Test(.enabled(if: 1 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllFalseLanes1() {
         checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 1)
     }
 
-    @Test(.enabled(if: 2 < H.laneCount)) func slideMaskUpLanesConstantMaskAllFalseLanes2() {
+    @Test(.enabled(if: 2 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllFalseLanes2() {
         checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 2)
     }
 
-    @Test(.enabled(if: 3 < H.laneCount)) func slideMaskUpLanesConstantMaskAllFalseLanes3() {
+    @Test(.enabled(if: 3 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllFalseLanes3() {
         checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 3)
     }
 
-    @Test(.enabled(if: 7 < H.laneCount)) func slideMaskUpLanesConstantMaskAllFalseLanes7() {
+    @Test(.enabled(if: 4 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllFalseLanes4() {
+        checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 4)
+    }
+
+    @Test(.enabled(if: 7 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllFalseLanes7() {
         checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 7)
     }
 
-    @Test(.enabled(if: 15 < H.laneCount)) func slideMaskUpLanesConstantMaskAllFalseLanes15() {
+    @Test(.enabled(if: 8 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllFalseLanes8() {
+        checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 8)
+    }
+
+    @Test(.enabled(if: 15 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllFalseLanes15() {
         checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 15)
     }
 
-    @Test(.enabled(if: 31 < H.laneCount)) func slideMaskUpLanesConstantMaskAllFalseLanes31() {
+    @Test(.enabled(if: 16 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllFalseLanes16() {
+        checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 16)
+    }
+
+    @Test(.enabled(if: 31 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllFalseLanes31() {
         checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 31)
     }
 
-    @Test(.enabled(if: 63 < H.laneCount)) func slideMaskUpLanesConstantMaskAllFalseLanes63() {
+    @Test(.enabled(if: 32 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllFalseLanes32() {
+        checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 32)
+    }
+
+    @Test(.enabled(if: 63 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllFalseLanes63() {
         checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 63)
     }
 
-    @Test(.enabled(if: 0 < H.laneCount)) func slideMaskUpLanesConstantMaskAllTrueLanes0() {
+    @Test(.enabled(if: 64 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllFalseLanes64() {
+        checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 64)
+    }
+
+    @Test(.enabled(if: 0 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllTrueLanes0() {
         checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 0)
     }
 
-    @Test(.enabled(if: 1 < H.laneCount)) func slideMaskUpLanesConstantMaskAllTrueLanes1() {
+    @Test(.enabled(if: 1 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllTrueLanes1() {
         checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 1)
     }
 
-    @Test(.enabled(if: 2 < H.laneCount)) func slideMaskUpLanesConstantMaskAllTrueLanes2() {
+    @Test(.enabled(if: 2 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllTrueLanes2() {
         checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 2)
     }
 
-    @Test(.enabled(if: 3 < H.laneCount)) func slideMaskUpLanesConstantMaskAllTrueLanes3() {
+    @Test(.enabled(if: 3 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllTrueLanes3() {
         checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 3)
     }
 
-    @Test(.enabled(if: 7 < H.laneCount)) func slideMaskUpLanesConstantMaskAllTrueLanes7() {
+    @Test(.enabled(if: 4 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllTrueLanes4() {
+        checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 4)
+    }
+
+    @Test(.enabled(if: 7 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllTrueLanes7() {
         checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 7)
     }
 
-    @Test(.enabled(if: 15 < H.laneCount)) func slideMaskUpLanesConstantMaskAllTrueLanes15() {
+    @Test(.enabled(if: 8 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllTrueLanes8() {
+        checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 8)
+    }
+
+    @Test(.enabled(if: 15 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllTrueLanes15() {
         checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 15)
     }
 
-    @Test(.enabled(if: 31 < H.laneCount)) func slideMaskUpLanesConstantMaskAllTrueLanes31() {
+    @Test(.enabled(if: 16 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllTrueLanes16() {
+        checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 16)
+    }
+
+    @Test(.enabled(if: 31 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllTrueLanes31() {
         checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 31)
     }
 
-    @Test(.enabled(if: 63 < H.laneCount)) func slideMaskUpLanesConstantMaskAllTrueLanes63() {
+    @Test(.enabled(if: 32 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllTrueLanes32() {
+        checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 32)
+    }
+
+    @Test(.enabled(if: 63 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllTrueLanes63() {
         checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 63)
     }
 
-    @Test(.enabled(if: 0 < H.laneCount)) func slideMaskUpLanesConstantMaskOnlyFirstLanes0() {
+    @Test(.enabled(if: 64 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllTrueLanes64() {
+        checkSlideMaskUpLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 64)
+    }
+
+    @Test(.enabled(if: 0 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyFirstLanes0() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -200,7 +244,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 1 < H.laneCount)) func slideMaskUpLanesConstantMaskOnlyFirstLanes1() {
+    @Test(.enabled(if: 1 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyFirstLanes1() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -211,7 +255,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 2 < H.laneCount)) func slideMaskUpLanesConstantMaskOnlyFirstLanes2() {
+    @Test(.enabled(if: 2 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyFirstLanes2() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -222,7 +266,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 3 < H.laneCount)) func slideMaskUpLanesConstantMaskOnlyFirstLanes3() {
+    @Test(.enabled(if: 3 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyFirstLanes3() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -233,7 +277,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 7 < H.laneCount)) func slideMaskUpLanesConstantMaskOnlyFirstLanes7() {
+    @Test(.enabled(if: 4 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyFirstLanes4() {
+        checkSlideMaskUpLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }(),
+            4
+        )
+    }
+
+    @Test(.enabled(if: 7 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyFirstLanes7() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -244,7 +299,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 15 < H.laneCount)) func slideMaskUpLanesConstantMaskOnlyFirstLanes15() {
+    @Test(.enabled(if: 8 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyFirstLanes8() {
+        checkSlideMaskUpLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }(),
+            8
+        )
+    }
+
+    @Test(.enabled(if: 15 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyFirstLanes15() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -255,7 +321,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 31 < H.laneCount)) func slideMaskUpLanesConstantMaskOnlyFirstLanes31() {
+    @Test(.enabled(if: 16 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyFirstLanes16() {
+        checkSlideMaskUpLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }(),
+            16
+        )
+    }
+
+    @Test(.enabled(if: 31 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyFirstLanes31() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -266,7 +343,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 63 < H.laneCount)) func slideMaskUpLanesConstantMaskOnlyFirstLanes63() {
+    @Test(.enabled(if: 32 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyFirstLanes32() {
+        checkSlideMaskUpLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }(),
+            32
+        )
+    }
+
+    @Test(.enabled(if: 63 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyFirstLanes63() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -277,7 +365,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 0 < H.laneCount)) func slideMaskUpLanesConstantMaskOnlyLastLanes0() {
+    @Test(.enabled(if: 64 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyFirstLanes64() {
+        checkSlideMaskUpLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }(),
+            64
+        )
+    }
+
+    @Test(.enabled(if: 0 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyLastLanes0() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -288,7 +387,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 1 < H.laneCount)) func slideMaskUpLanesConstantMaskOnlyLastLanes1() {
+    @Test(.enabled(if: 1 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyLastLanes1() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -299,7 +398,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 2 < H.laneCount)) func slideMaskUpLanesConstantMaskOnlyLastLanes2() {
+    @Test(.enabled(if: 2 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyLastLanes2() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -310,7 +409,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 3 < H.laneCount)) func slideMaskUpLanesConstantMaskOnlyLastLanes3() {
+    @Test(.enabled(if: 3 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyLastLanes3() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -321,7 +420,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 7 < H.laneCount)) func slideMaskUpLanesConstantMaskOnlyLastLanes7() {
+    @Test(.enabled(if: 4 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyLastLanes4() {
+        checkSlideMaskUpLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }(),
+            4
+        )
+    }
+
+    @Test(.enabled(if: 7 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyLastLanes7() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -332,7 +442,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 15 < H.laneCount)) func slideMaskUpLanesConstantMaskOnlyLastLanes15() {
+    @Test(.enabled(if: 8 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyLastLanes8() {
+        checkSlideMaskUpLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }(),
+            8
+        )
+    }
+
+    @Test(.enabled(if: 15 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyLastLanes15() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -343,7 +464,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 31 < H.laneCount)) func slideMaskUpLanesConstantMaskOnlyLastLanes31() {
+    @Test(.enabled(if: 16 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyLastLanes16() {
+        checkSlideMaskUpLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }(),
+            16
+        )
+    }
+
+    @Test(.enabled(if: 31 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyLastLanes31() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -354,7 +486,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 63 < H.laneCount)) func slideMaskUpLanesConstantMaskOnlyLastLanes63() {
+    @Test(.enabled(if: 32 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyLastLanes32() {
+        checkSlideMaskUpLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }(),
+            32
+        )
+    }
+
+    @Test(.enabled(if: 63 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyLastLanes63() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -365,7 +508,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 0 < H.laneCount)) func slideMaskUpLanesConstantMaskAllButFirstLanes0() {
+    @Test(.enabled(if: 64 <= H.laneCount)) func slideMaskUpLanesConstantMaskOnlyLastLanes64() {
+        checkSlideMaskUpLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }(),
+            64
+        )
+    }
+
+    @Test(.enabled(if: 0 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButFirstLanes0() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -376,7 +530,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 1 < H.laneCount)) func slideMaskUpLanesConstantMaskAllButFirstLanes1() {
+    @Test(.enabled(if: 1 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButFirstLanes1() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -387,7 +541,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 2 < H.laneCount)) func slideMaskUpLanesConstantMaskAllButFirstLanes2() {
+    @Test(.enabled(if: 2 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButFirstLanes2() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -398,7 +552,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 3 < H.laneCount)) func slideMaskUpLanesConstantMaskAllButFirstLanes3() {
+    @Test(.enabled(if: 3 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButFirstLanes3() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -409,7 +563,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 7 < H.laneCount)) func slideMaskUpLanesConstantMaskAllButFirstLanes7() {
+    @Test(.enabled(if: 4 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButFirstLanes4() {
+        checkSlideMaskUpLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }(),
+            4
+        )
+    }
+
+    @Test(.enabled(if: 7 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButFirstLanes7() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -420,7 +585,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 15 < H.laneCount)) func slideMaskUpLanesConstantMaskAllButFirstLanes15() {
+    @Test(.enabled(if: 8 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButFirstLanes8() {
+        checkSlideMaskUpLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }(),
+            8
+        )
+    }
+
+    @Test(.enabled(if: 15 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButFirstLanes15() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -431,7 +607,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 31 < H.laneCount)) func slideMaskUpLanesConstantMaskAllButFirstLanes31() {
+    @Test(.enabled(if: 16 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButFirstLanes16() {
+        checkSlideMaskUpLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }(),
+            16
+        )
+    }
+
+    @Test(.enabled(if: 31 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButFirstLanes31() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -442,7 +629,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 63 < H.laneCount)) func slideMaskUpLanesConstantMaskAllButFirstLanes63() {
+    @Test(.enabled(if: 32 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButFirstLanes32() {
+        checkSlideMaskUpLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }(),
+            32
+        )
+    }
+
+    @Test(.enabled(if: 63 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButFirstLanes63() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -453,7 +651,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 0 < H.laneCount)) func slideMaskUpLanesConstantMaskAllButLastLanes0() {
+    @Test(.enabled(if: 64 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButFirstLanes64() {
+        checkSlideMaskUpLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }(),
+            64
+        )
+    }
+
+    @Test(.enabled(if: 0 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButLastLanes0() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -464,7 +673,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 1 < H.laneCount)) func slideMaskUpLanesConstantMaskAllButLastLanes1() {
+    @Test(.enabled(if: 1 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButLastLanes1() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -475,7 +684,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 2 < H.laneCount)) func slideMaskUpLanesConstantMaskAllButLastLanes2() {
+    @Test(.enabled(if: 2 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButLastLanes2() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -486,7 +695,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 3 < H.laneCount)) func slideMaskUpLanesConstantMaskAllButLastLanes3() {
+    @Test(.enabled(if: 3 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButLastLanes3() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -497,7 +706,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 7 < H.laneCount)) func slideMaskUpLanesConstantMaskAllButLastLanes7() {
+    @Test(.enabled(if: 4 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButLastLanes4() {
+        checkSlideMaskUpLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }(),
+            4
+        )
+    }
+
+    @Test(.enabled(if: 7 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButLastLanes7() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -508,7 +728,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 15 < H.laneCount)) func slideMaskUpLanesConstantMaskAllButLastLanes15() {
+    @Test(.enabled(if: 8 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButLastLanes8() {
+        checkSlideMaskUpLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }(),
+            8
+        )
+    }
+
+    @Test(.enabled(if: 15 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButLastLanes15() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -519,7 +750,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 31 < H.laneCount)) func slideMaskUpLanesConstantMaskAllButLastLanes31() {
+    @Test(.enabled(if: 16 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButLastLanes16() {
+        checkSlideMaskUpLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }(),
+            16
+        )
+    }
+
+    @Test(.enabled(if: 31 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButLastLanes31() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -530,7 +772,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 63 < H.laneCount)) func slideMaskUpLanesConstantMaskAllButLastLanes63() {
+    @Test(.enabled(if: 32 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButLastLanes32() {
+        checkSlideMaskUpLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }(),
+            32
+        )
+    }
+
+    @Test(.enabled(if: 63 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButLastLanes63() {
         checkSlideMaskUpLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -538,6 +791,17 @@ extension SIMDInt64ConstantTests {
                 return H.Mask(simd)
             }(),
             63
+        )
+    }
+
+    @Test(.enabled(if: 64 <= H.laneCount)) func slideMaskUpLanesConstantMaskAllButLastLanes64() {
+        checkSlideMaskUpLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }(),
+            64
         )
     }
 
@@ -617,36 +881,40 @@ extension SIMDInt64ConstantTests {
         mismatches.record()
     }
 
-    @Test(.enabled(if: 0 < H.laneCount)) func slideMaskDownLanesConstantLanes0() {
+    @Test(.enabled(if: 0 <= H.laneCount)) func slideMaskDownLanesConstantLanes0() {
         checkSlideMaskDownLanesConstantLanes(0)
     }
 
-    @Test(.enabled(if: 1 < H.laneCount)) func slideMaskDownLanesConstantLanes1() {
+    @Test(.enabled(if: 1 <= H.laneCount)) func slideMaskDownLanesConstantLanes1() {
         checkSlideMaskDownLanesConstantLanes(1)
     }
 
-    @Test(.enabled(if: 2 < H.laneCount)) func slideMaskDownLanesConstantLanes2() {
+    @Test(.enabled(if: 2 <= H.laneCount)) func slideMaskDownLanesConstantLanes2() {
         checkSlideMaskDownLanesConstantLanes(2)
     }
 
-    @Test(.enabled(if: 3 < H.laneCount)) func slideMaskDownLanesConstantLanes3() {
+    @Test(.enabled(if: 3 <= H.laneCount)) func slideMaskDownLanesConstantLanes3() {
         checkSlideMaskDownLanesConstantLanes(3)
     }
 
-    @Test(.enabled(if: 4 < H.laneCount)) func slideMaskDownLanesConstantLanes4() {
+    @Test(.enabled(if: 4 <= H.laneCount)) func slideMaskDownLanesConstantLanes4() {
         checkSlideMaskDownLanesConstantLanes(4)
     }
 
-    @Test(.enabled(if: 5 < H.laneCount)) func slideMaskDownLanesConstantLanes5() {
+    @Test(.enabled(if: 5 <= H.laneCount)) func slideMaskDownLanesConstantLanes5() {
         checkSlideMaskDownLanesConstantLanes(5)
     }
 
-    @Test(.enabled(if: 6 < H.laneCount)) func slideMaskDownLanesConstantLanes6() {
+    @Test(.enabled(if: 6 <= H.laneCount)) func slideMaskDownLanesConstantLanes6() {
         checkSlideMaskDownLanesConstantLanes(6)
     }
 
-    @Test(.enabled(if: 7 < H.laneCount)) func slideMaskDownLanesConstantLanes7() {
+    @Test(.enabled(if: 7 <= H.laneCount)) func slideMaskDownLanesConstantLanes7() {
         checkSlideMaskDownLanesConstantLanes(7)
+    }
+
+    @Test(.enabled(if: 8 <= H.laneCount)) func slideMaskDownLanesConstantLanes8() {
+        checkSlideMaskDownLanesConstantLanes(8)
     }
 
     @inline(__always)
@@ -662,71 +930,111 @@ extension SIMDInt64ConstantTests {
         mismatches.record()
     }
 
-    @Test(.enabled(if: 0 < H.laneCount)) func slideMaskDownLanesConstantMaskAllFalseLanes0() {
+    @Test(.enabled(if: 0 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllFalseLanes0() {
         checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 0)
     }
 
-    @Test(.enabled(if: 1 < H.laneCount)) func slideMaskDownLanesConstantMaskAllFalseLanes1() {
+    @Test(.enabled(if: 1 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllFalseLanes1() {
         checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 1)
     }
 
-    @Test(.enabled(if: 2 < H.laneCount)) func slideMaskDownLanesConstantMaskAllFalseLanes2() {
+    @Test(.enabled(if: 2 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllFalseLanes2() {
         checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 2)
     }
 
-    @Test(.enabled(if: 3 < H.laneCount)) func slideMaskDownLanesConstantMaskAllFalseLanes3() {
+    @Test(.enabled(if: 3 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllFalseLanes3() {
         checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 3)
     }
 
-    @Test(.enabled(if: 7 < H.laneCount)) func slideMaskDownLanesConstantMaskAllFalseLanes7() {
+    @Test(.enabled(if: 4 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllFalseLanes4() {
+        checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 4)
+    }
+
+    @Test(.enabled(if: 7 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllFalseLanes7() {
         checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 7)
     }
 
-    @Test(.enabled(if: 15 < H.laneCount)) func slideMaskDownLanesConstantMaskAllFalseLanes15() {
+    @Test(.enabled(if: 8 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllFalseLanes8() {
+        checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 8)
+    }
+
+    @Test(.enabled(if: 15 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllFalseLanes15() {
         checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 15)
     }
 
-    @Test(.enabled(if: 31 < H.laneCount)) func slideMaskDownLanesConstantMaskAllFalseLanes31() {
+    @Test(.enabled(if: 16 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllFalseLanes16() {
+        checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 16)
+    }
+
+    @Test(.enabled(if: 31 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllFalseLanes31() {
         checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 31)
     }
 
-    @Test(.enabled(if: 63 < H.laneCount)) func slideMaskDownLanesConstantMaskAllFalseLanes63() {
+    @Test(.enabled(if: 32 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllFalseLanes32() {
+        checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 32)
+    }
+
+    @Test(.enabled(if: 63 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllFalseLanes63() {
         checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 63)
     }
 
-    @Test(.enabled(if: 0 < H.laneCount)) func slideMaskDownLanesConstantMaskAllTrueLanes0() {
+    @Test(.enabled(if: 64 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllFalseLanes64() {
+        checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: false)), 64)
+    }
+
+    @Test(.enabled(if: 0 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllTrueLanes0() {
         checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 0)
     }
 
-    @Test(.enabled(if: 1 < H.laneCount)) func slideMaskDownLanesConstantMaskAllTrueLanes1() {
+    @Test(.enabled(if: 1 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllTrueLanes1() {
         checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 1)
     }
 
-    @Test(.enabled(if: 2 < H.laneCount)) func slideMaskDownLanesConstantMaskAllTrueLanes2() {
+    @Test(.enabled(if: 2 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllTrueLanes2() {
         checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 2)
     }
 
-    @Test(.enabled(if: 3 < H.laneCount)) func slideMaskDownLanesConstantMaskAllTrueLanes3() {
+    @Test(.enabled(if: 3 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllTrueLanes3() {
         checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 3)
     }
 
-    @Test(.enabled(if: 7 < H.laneCount)) func slideMaskDownLanesConstantMaskAllTrueLanes7() {
+    @Test(.enabled(if: 4 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllTrueLanes4() {
+        checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 4)
+    }
+
+    @Test(.enabled(if: 7 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllTrueLanes7() {
         checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 7)
     }
 
-    @Test(.enabled(if: 15 < H.laneCount)) func slideMaskDownLanesConstantMaskAllTrueLanes15() {
+    @Test(.enabled(if: 8 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllTrueLanes8() {
+        checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 8)
+    }
+
+    @Test(.enabled(if: 15 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllTrueLanes15() {
         checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 15)
     }
 
-    @Test(.enabled(if: 31 < H.laneCount)) func slideMaskDownLanesConstantMaskAllTrueLanes31() {
+    @Test(.enabled(if: 16 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllTrueLanes16() {
+        checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 16)
+    }
+
+    @Test(.enabled(if: 31 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllTrueLanes31() {
         checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 31)
     }
 
-    @Test(.enabled(if: 63 < H.laneCount)) func slideMaskDownLanesConstantMaskAllTrueLanes63() {
+    @Test(.enabled(if: 32 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllTrueLanes32() {
+        checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 32)
+    }
+
+    @Test(.enabled(if: 63 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllTrueLanes63() {
         checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 63)
     }
 
-    @Test(.enabled(if: 0 < H.laneCount)) func slideMaskDownLanesConstantMaskOnlyFirstLanes0() {
+    @Test(.enabled(if: 64 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllTrueLanes64() {
+        checkSlideMaskDownLanesConstantMaskLanes(H.Mask(H.Mask.SIMDType(repeating: true)), 64)
+    }
+
+    @Test(.enabled(if: 0 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyFirstLanes0() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -737,7 +1045,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 1 < H.laneCount)) func slideMaskDownLanesConstantMaskOnlyFirstLanes1() {
+    @Test(.enabled(if: 1 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyFirstLanes1() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -748,7 +1056,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 2 < H.laneCount)) func slideMaskDownLanesConstantMaskOnlyFirstLanes2() {
+    @Test(.enabled(if: 2 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyFirstLanes2() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -759,7 +1067,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 3 < H.laneCount)) func slideMaskDownLanesConstantMaskOnlyFirstLanes3() {
+    @Test(.enabled(if: 3 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyFirstLanes3() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -770,7 +1078,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 7 < H.laneCount)) func slideMaskDownLanesConstantMaskOnlyFirstLanes7() {
+    @Test(.enabled(if: 4 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyFirstLanes4() {
+        checkSlideMaskDownLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }(),
+            4
+        )
+    }
+
+    @Test(.enabled(if: 7 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyFirstLanes7() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -781,7 +1100,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 15 < H.laneCount)) func slideMaskDownLanesConstantMaskOnlyFirstLanes15() {
+    @Test(.enabled(if: 8 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyFirstLanes8() {
+        checkSlideMaskDownLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }(),
+            8
+        )
+    }
+
+    @Test(.enabled(if: 15 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyFirstLanes15() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -792,7 +1122,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 31 < H.laneCount)) func slideMaskDownLanesConstantMaskOnlyFirstLanes31() {
+    @Test(.enabled(if: 16 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyFirstLanes16() {
+        checkSlideMaskDownLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }(),
+            16
+        )
+    }
+
+    @Test(.enabled(if: 31 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyFirstLanes31() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -803,7 +1144,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 63 < H.laneCount)) func slideMaskDownLanesConstantMaskOnlyFirstLanes63() {
+    @Test(.enabled(if: 32 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyFirstLanes32() {
+        checkSlideMaskDownLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }(),
+            32
+        )
+    }
+
+    @Test(.enabled(if: 63 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyFirstLanes63() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -814,7 +1166,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 0 < H.laneCount)) func slideMaskDownLanesConstantMaskOnlyLastLanes0() {
+    @Test(.enabled(if: 64 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyFirstLanes64() {
+        checkSlideMaskDownLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }(),
+            64
+        )
+    }
+
+    @Test(.enabled(if: 0 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyLastLanes0() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -825,7 +1188,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 1 < H.laneCount)) func slideMaskDownLanesConstantMaskOnlyLastLanes1() {
+    @Test(.enabled(if: 1 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyLastLanes1() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -836,7 +1199,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 2 < H.laneCount)) func slideMaskDownLanesConstantMaskOnlyLastLanes2() {
+    @Test(.enabled(if: 2 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyLastLanes2() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -847,7 +1210,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 3 < H.laneCount)) func slideMaskDownLanesConstantMaskOnlyLastLanes3() {
+    @Test(.enabled(if: 3 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyLastLanes3() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -858,7 +1221,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 7 < H.laneCount)) func slideMaskDownLanesConstantMaskOnlyLastLanes7() {
+    @Test(.enabled(if: 4 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyLastLanes4() {
+        checkSlideMaskDownLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }(),
+            4
+        )
+    }
+
+    @Test(.enabled(if: 7 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyLastLanes7() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -869,7 +1243,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 15 < H.laneCount)) func slideMaskDownLanesConstantMaskOnlyLastLanes15() {
+    @Test(.enabled(if: 8 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyLastLanes8() {
+        checkSlideMaskDownLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }(),
+            8
+        )
+    }
+
+    @Test(.enabled(if: 15 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyLastLanes15() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -880,7 +1265,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 31 < H.laneCount)) func slideMaskDownLanesConstantMaskOnlyLastLanes31() {
+    @Test(.enabled(if: 16 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyLastLanes16() {
+        checkSlideMaskDownLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }(),
+            16
+        )
+    }
+
+    @Test(.enabled(if: 31 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyLastLanes31() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -891,7 +1287,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 63 < H.laneCount)) func slideMaskDownLanesConstantMaskOnlyLastLanes63() {
+    @Test(.enabled(if: 32 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyLastLanes32() {
+        checkSlideMaskDownLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }(),
+            32
+        )
+    }
+
+    @Test(.enabled(if: 63 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyLastLanes63() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: false)
@@ -902,7 +1309,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 0 < H.laneCount)) func slideMaskDownLanesConstantMaskAllButFirstLanes0() {
+    @Test(.enabled(if: 64 <= H.laneCount)) func slideMaskDownLanesConstantMaskOnlyLastLanes64() {
+        checkSlideMaskDownLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }(),
+            64
+        )
+    }
+
+    @Test(.enabled(if: 0 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButFirstLanes0() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -913,7 +1331,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 1 < H.laneCount)) func slideMaskDownLanesConstantMaskAllButFirstLanes1() {
+    @Test(.enabled(if: 1 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButFirstLanes1() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -924,7 +1342,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 2 < H.laneCount)) func slideMaskDownLanesConstantMaskAllButFirstLanes2() {
+    @Test(.enabled(if: 2 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButFirstLanes2() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -935,7 +1353,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 3 < H.laneCount)) func slideMaskDownLanesConstantMaskAllButFirstLanes3() {
+    @Test(.enabled(if: 3 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButFirstLanes3() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -946,7 +1364,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 7 < H.laneCount)) func slideMaskDownLanesConstantMaskAllButFirstLanes7() {
+    @Test(.enabled(if: 4 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButFirstLanes4() {
+        checkSlideMaskDownLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }(),
+            4
+        )
+    }
+
+    @Test(.enabled(if: 7 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButFirstLanes7() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -957,7 +1386,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 15 < H.laneCount)) func slideMaskDownLanesConstantMaskAllButFirstLanes15() {
+    @Test(.enabled(if: 8 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButFirstLanes8() {
+        checkSlideMaskDownLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }(),
+            8
+        )
+    }
+
+    @Test(.enabled(if: 15 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButFirstLanes15() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -968,7 +1408,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 31 < H.laneCount)) func slideMaskDownLanesConstantMaskAllButFirstLanes31() {
+    @Test(.enabled(if: 16 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButFirstLanes16() {
+        checkSlideMaskDownLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }(),
+            16
+        )
+    }
+
+    @Test(.enabled(if: 31 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButFirstLanes31() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -979,7 +1430,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 63 < H.laneCount)) func slideMaskDownLanesConstantMaskAllButFirstLanes63() {
+    @Test(.enabled(if: 32 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButFirstLanes32() {
+        checkSlideMaskDownLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }(),
+            32
+        )
+    }
+
+    @Test(.enabled(if: 63 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButFirstLanes63() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -990,7 +1452,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 0 < H.laneCount)) func slideMaskDownLanesConstantMaskAllButLastLanes0() {
+    @Test(.enabled(if: 64 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButFirstLanes64() {
+        checkSlideMaskDownLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }(),
+            64
+        )
+    }
+
+    @Test(.enabled(if: 0 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButLastLanes0() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -1001,7 +1474,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 1 < H.laneCount)) func slideMaskDownLanesConstantMaskAllButLastLanes1() {
+    @Test(.enabled(if: 1 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButLastLanes1() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -1012,7 +1485,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 2 < H.laneCount)) func slideMaskDownLanesConstantMaskAllButLastLanes2() {
+    @Test(.enabled(if: 2 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButLastLanes2() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -1023,7 +1496,7 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 3 < H.laneCount)) func slideMaskDownLanesConstantMaskAllButLastLanes3() {
+    @Test(.enabled(if: 3 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButLastLanes3() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -1034,7 +1507,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 7 < H.laneCount)) func slideMaskDownLanesConstantMaskAllButLastLanes7() {
+    @Test(.enabled(if: 4 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButLastLanes4() {
+        checkSlideMaskDownLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }(),
+            4
+        )
+    }
+
+    @Test(.enabled(if: 7 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButLastLanes7() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -1045,7 +1529,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 15 < H.laneCount)) func slideMaskDownLanesConstantMaskAllButLastLanes15() {
+    @Test(.enabled(if: 8 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButLastLanes8() {
+        checkSlideMaskDownLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }(),
+            8
+        )
+    }
+
+    @Test(.enabled(if: 15 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButLastLanes15() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -1056,7 +1551,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 31 < H.laneCount)) func slideMaskDownLanesConstantMaskAllButLastLanes31() {
+    @Test(.enabled(if: 16 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButLastLanes16() {
+        checkSlideMaskDownLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }(),
+            16
+        )
+    }
+
+    @Test(.enabled(if: 31 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButLastLanes31() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -1067,7 +1573,18 @@ extension SIMDInt64ConstantTests {
         )
     }
 
-    @Test(.enabled(if: 63 < H.laneCount)) func slideMaskDownLanesConstantMaskAllButLastLanes63() {
+    @Test(.enabled(if: 32 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButLastLanes32() {
+        checkSlideMaskDownLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }(),
+            32
+        )
+    }
+
+    @Test(.enabled(if: 63 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButLastLanes63() {
         checkSlideMaskDownLanesConstantMaskLanes(
             {
                 var simd = H.Mask.SIMDType(repeating: true)
@@ -1075,6 +1592,17 @@ extension SIMDInt64ConstantTests {
                 return H.Mask(simd)
             }(),
             63
+        )
+    }
+
+    @Test(.enabled(if: 64 <= H.laneCount)) func slideMaskDownLanesConstantMaskAllButLastLanes64() {
+        checkSlideMaskDownLanesConstantMaskLanes(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }(),
+            64
         )
     }
 

@@ -7,6 +7,136 @@ import Vectorization
 
 extension SIMDInt8ConstantTests {
     @inline(__always)
+    private func checkSlideUpBlocksConstantBlocks(_ blocks: Int) {
+        let mismatches = Mismatches("slideUpBlocks with blocks \(blocks)")
+        let aInputs = Inputs.vectors(H.self, seed: 0xEF00_EBAF_F7E8_4992)
+        for a in aInputs {
+            mismatches.check(
+                H.slideUpBlocks(a, by: blocks),
+                H(raw: HighwayReference.slideUpBlocksI8(a.raw, Int32(truncatingIfNeeded: blocks))),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(.enabled(if: 0 <= H.laneCount / 16 - 1)) func slideUpBlocksConstantBlocks0() {
+        checkSlideUpBlocksConstantBlocks(0)
+    }
+
+    @Test(.enabled(if: 1 <= H.laneCount / 16 - 1)) func slideUpBlocksConstantBlocks1() {
+        checkSlideUpBlocksConstantBlocks(1)
+    }
+
+    @Test(.enabled(if: 2 <= H.laneCount / 16 - 1)) func slideUpBlocksConstantBlocks2() {
+        checkSlideUpBlocksConstantBlocks(2)
+    }
+
+    @Test(.enabled(if: 3 <= H.laneCount / 16 - 1)) func slideUpBlocksConstantBlocks3() {
+        checkSlideUpBlocksConstantBlocks(3)
+    }
+
+    @inline(__always)
+    private func checkSlideUpBlocksUncheckedConstantBlocks(_ blocks: Int) {
+        let mismatches = Mismatches("slideUpBlocks unchecked with blocks \(blocks)")
+        let aInputs = Inputs.vectors(H.self, seed: 0x1653_7835_4C6B_1908)
+        for a in aInputs {
+            mismatches.check(
+                unsafe H.slideUpBlocks(a, byUnchecked: blocks),
+                H(raw: HighwayReference.slideUpBlocksI8(a.raw, Int32(truncatingIfNeeded: blocks))),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(.enabled(if: 0 <= H.laneCount / 16 - 1)) func slideUpBlocksUncheckedConstantBlocks0() {
+        checkSlideUpBlocksUncheckedConstantBlocks(0)
+    }
+
+    @Test(.enabled(if: 1 <= H.laneCount / 16 - 1)) func slideUpBlocksUncheckedConstantBlocks1() {
+        checkSlideUpBlocksUncheckedConstantBlocks(1)
+    }
+
+    @Test(.enabled(if: 2 <= H.laneCount / 16 - 1)) func slideUpBlocksUncheckedConstantBlocks2() {
+        checkSlideUpBlocksUncheckedConstantBlocks(2)
+    }
+
+    @Test(.enabled(if: 3 <= H.laneCount / 16 - 1)) func slideUpBlocksUncheckedConstantBlocks3() {
+        checkSlideUpBlocksUncheckedConstantBlocks(3)
+    }
+
+    @inline(__always)
+    private func checkSlideDownBlocksConstantBlocks(_ blocks: Int) {
+        let mismatches = Mismatches("slideDownBlocks with blocks \(blocks)")
+        let aInputs = Inputs.vectors(H.self, seed: 0xCC57_3176_0723_AB5F)
+        for a in aInputs {
+            mismatches.check(
+                H.slideDownBlocks(a, by: blocks),
+                H(
+                    raw: HighwayReference.slideDownBlocksI8(
+                        a.raw,
+                        Int32(truncatingIfNeeded: blocks)
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(.enabled(if: 0 <= H.laneCount / 16 - 1)) func slideDownBlocksConstantBlocks0() {
+        checkSlideDownBlocksConstantBlocks(0)
+    }
+
+    @Test(.enabled(if: 1 <= H.laneCount / 16 - 1)) func slideDownBlocksConstantBlocks1() {
+        checkSlideDownBlocksConstantBlocks(1)
+    }
+
+    @Test(.enabled(if: 2 <= H.laneCount / 16 - 1)) func slideDownBlocksConstantBlocks2() {
+        checkSlideDownBlocksConstantBlocks(2)
+    }
+
+    @Test(.enabled(if: 3 <= H.laneCount / 16 - 1)) func slideDownBlocksConstantBlocks3() {
+        checkSlideDownBlocksConstantBlocks(3)
+    }
+
+    @inline(__always)
+    private func checkSlideDownBlocksUncheckedConstantBlocks(_ blocks: Int) {
+        let mismatches = Mismatches("slideDownBlocks unchecked with blocks \(blocks)")
+        let aInputs = Inputs.vectors(H.self, seed: 0xA06A_C530_B113_515F)
+        for a in aInputs {
+            mismatches.check(
+                unsafe H.slideDownBlocks(a, byUnchecked: blocks),
+                H(
+                    raw: HighwayReference.slideDownBlocksI8(
+                        a.raw,
+                        Int32(truncatingIfNeeded: blocks)
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(.enabled(if: 0 <= H.laneCount / 16 - 1)) func slideDownBlocksUncheckedConstantBlocks0() {
+        checkSlideDownBlocksUncheckedConstantBlocks(0)
+    }
+
+    @Test(.enabled(if: 1 <= H.laneCount / 16 - 1)) func slideDownBlocksUncheckedConstantBlocks1() {
+        checkSlideDownBlocksUncheckedConstantBlocks(1)
+    }
+
+    @Test(.enabled(if: 2 <= H.laneCount / 16 - 1)) func slideDownBlocksUncheckedConstantBlocks2() {
+        checkSlideDownBlocksUncheckedConstantBlocks(2)
+    }
+
+    @Test(.enabled(if: 3 <= H.laneCount / 16 - 1)) func slideDownBlocksUncheckedConstantBlocks3() {
+        checkSlideDownBlocksUncheckedConstantBlocks(3)
+    }
+
+    @inline(__always)
     private func checkCombinedSlideDownLanesConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("combinedSlideDownLanes with lanes \(lanes)")
         let aInputs = Inputs.vectors(H.self, seed: 0xB993_B61F_CE6E_D51C)
