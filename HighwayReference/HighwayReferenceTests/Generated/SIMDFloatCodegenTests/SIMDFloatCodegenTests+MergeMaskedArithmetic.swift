@@ -666,130 +666,103 @@ extension SIMDFloatCodegenTests {
     }
 
     @Test func multiplySubtractingWhereOtherwise() {
-        withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
-            isIntermittent: SIMDTarget.targetName != "AVX2"
-        ) {
-            let mismatches = Mismatches("portMultiplySubtractingWhereOtherwiseF32")
-            let otherwiseInputs = Inputs.vectors(H.self, seed: 0x88DB_2C44_BAC6_22BF)
-            let maskInputs = Inputs.masks(H.Mask.self, seed: 0x88DB_2B44_BAC6_210C)
-            let aInputs = Inputs.vectors(H.self, seed: 0x88DB_2E44_BAC6_2625)
-            let bInputs = Inputs.vectors(H.self, seed: 0x88DB_2D44_BAC6_2472)
-            let cInputs = Inputs.vectors(H.self, seed: 0x88DB_2844_BAC6_1BF3)
-            for (otherwise, mask, a, b, c) in mixedQuintuples(
-                otherwiseInputs,
-                maskInputs,
-                aInputs,
-                bInputs,
-                cInputs,
-                seed: 0x18CD_B644_B4C2_3159
-            ) where !hasUnorderedNaNs(multiplying: a.simd, b.simd, adding: c.simd) {
-                mismatches.check(
-                    portMultiplySubtractingWhereOtherwiseF32(
-                        a,
-                        b,
-                        c,
-                        where: mask,
-                        otherwise: otherwise
-                    ),
-                    highwayMultiplySubtractingWhereOtherwiseF32(
-                        a,
-                        b,
-                        c,
-                        where: mask,
-                        otherwise: otherwise
-                    ),
-                    "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
-                )
-            }
-            mismatches.record()
-        } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
-                && assertionsAreEnabled
+        let mismatches = Mismatches("portMultiplySubtractingWhereOtherwiseF32")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x88DB_2C44_BAC6_22BF)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x88DB_2B44_BAC6_210C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x88DB_2E44_BAC6_2625)
+        let bInputs = Inputs.vectors(H.self, seed: 0x88DB_2D44_BAC6_2472)
+        let cInputs = Inputs.vectors(H.self, seed: 0x88DB_2844_BAC6_1BF3)
+        for (otherwise, mask, a, b, c) in mixedQuintuples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            bInputs,
+            cInputs,
+            seed: 0x18CD_B644_B4C2_3159
+        ) where !hasUnorderedNaNs(multiplying: a.simd, b.simd, adding: c.simd) {
+            mismatches.check(
+                portMultiplySubtractingWhereOtherwiseF32(
+                    a,
+                    b,
+                    c,
+                    where: mask,
+                    otherwise: otherwise
+                ),
+                highwayMultiplySubtractingWhereOtherwiseF32(
+                    a,
+                    b,
+                    c,
+                    where: mask,
+                    otherwise: otherwise
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
         }
+        mismatches.record()
     }
 
     @Test func multiplySubtractingWhereOtherwiseConstantA() {
-        withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
-            isIntermittent: SIMDTarget.targetName != "AVX2"
-        ) {
-            let mismatches = Mismatches("portMultiplySubtractingWhereOtherwiseF32ConstantA")
-            let otherwiseInputs = Inputs.vectors(H.self, seed: 0x040A_170F_3FBC_ACD8)
-            let maskInputs = Inputs.masks(H.Mask.self, seed: 0x040A_180F_3FBC_AE8B)
-            let bInputs = Inputs.vectors(H.self, seed: 0x040A_1A0F_3FBC_B1F1)
-            let cInputs = Inputs.vectors(H.self, seed: 0x040A_1B0F_3FBC_B3A4)
-            for (otherwise, mask, b, c) in mixedQuadruples(
-                otherwiseInputs,
-                maskInputs,
-                bInputs,
-                cInputs,
-                seed: 0xBCDB_9A27_24A7_DB94
-            ) where !hasUnorderedNaNs(b.simd, negatedLanes(of: c.simd)) {
-                mismatches.check(
-                    portMultiplySubtractingWhereOtherwiseF32ConstantA(
-                        b,
-                        c,
-                        where: mask,
-                        otherwise: otherwise
-                    ),
-                    highwayMultiplySubtractingWhereOtherwiseF32ConstantA(
-                        b,
-                        c,
-                        where: mask,
-                        otherwise: otherwise
-                    ),
-                    "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
-                )
-            }
-            mismatches.record()
-        } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
-                && assertionsAreEnabled
+        let mismatches = Mismatches("portMultiplySubtractingWhereOtherwiseF32ConstantA")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x040A_170F_3FBC_ACD8)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x040A_180F_3FBC_AE8B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x040A_1A0F_3FBC_B1F1)
+        let cInputs = Inputs.vectors(H.self, seed: 0x040A_1B0F_3FBC_B3A4)
+        for (otherwise, mask, b, c) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            bInputs,
+            cInputs,
+            seed: 0xBCDB_9A27_24A7_DB94
+        ) where !hasUnorderedNaNs(b.simd, negatedLanes(of: c.simd)) {
+            mismatches.check(
+                portMultiplySubtractingWhereOtherwiseF32ConstantA(
+                    b,
+                    c,
+                    where: mask,
+                    otherwise: otherwise
+                ),
+                highwayMultiplySubtractingWhereOtherwiseF32ConstantA(
+                    b,
+                    c,
+                    where: mask,
+                    otherwise: otherwise
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
+            )
         }
+        mismatches.record()
     }
 
     @Test func multiplySubtractingWhereOtherwiseConstantB() {
-        withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
-            isIntermittent: SIMDTarget.targetName != "AVX2"
-        ) {
-            let mismatches = Mismatches("portMultiplySubtractingWhereOtherwiseF32ConstantB")
-            let otherwiseInputs = Inputs.vectors(H.self, seed: 0x0BC5_CE0F_43DA_C4AD)
-            let maskInputs = Inputs.masks(H.Mask.self, seed: 0x0BC5_CD0F_43DA_C2FA)
-            let aInputs = Inputs.vectors(H.self, seed: 0x0BC5_CC0F_43DA_C147)
-            let cInputs = Inputs.vectors(H.self, seed: 0x0BC5_CA0F_43DA_BDE1)
-            for (otherwise, mask, a, c) in mixedQuadruples(
-                otherwiseInputs,
-                maskInputs,
-                aInputs,
-                cInputs,
-                seed: 0x9A15_94B0_96B8_287F
-            ) where !hasUnorderedNaNs(a.simd, negatedLanes(of: c.simd)) {
-                mismatches.check(
-                    portMultiplySubtractingWhereOtherwiseF32ConstantB(
-                        a,
-                        c,
-                        where: mask,
-                        otherwise: otherwise
-                    ),
-                    highwayMultiplySubtractingWhereOtherwiseF32ConstantB(
-                        a,
-                        c,
-                        where: mask,
-                        otherwise: otherwise
-                    ),
-                    "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
-                )
-            }
-            mismatches.record()
-        } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
-                && assertionsAreEnabled
+        let mismatches = Mismatches("portMultiplySubtractingWhereOtherwiseF32ConstantB")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x0BC5_CE0F_43DA_C4AD)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x0BC5_CD0F_43DA_C2FA)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0BC5_CC0F_43DA_C147)
+        let cInputs = Inputs.vectors(H.self, seed: 0x0BC5_CA0F_43DA_BDE1)
+        for (otherwise, mask, a, c) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            cInputs,
+            seed: 0x9A15_94B0_96B8_287F
+        ) where !hasUnorderedNaNs(a.simd, negatedLanes(of: c.simd)) {
+            mismatches.check(
+                portMultiplySubtractingWhereOtherwiseF32ConstantB(
+                    a,
+                    c,
+                    where: mask,
+                    otherwise: otherwise
+                ),
+                highwayMultiplySubtractingWhereOtherwiseF32ConstantB(
+                    a,
+                    c,
+                    where: mask,
+                    otherwise: otherwise
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
+            )
         }
+        mismatches.record()
     }
 
     @Test func multiplySubtractingWhereOtherwiseConstantC() {
@@ -825,39 +798,25 @@ extension SIMDFloatCodegenTests {
     }
 
     @Test func multiplySubtractingWhereOtherwiseConstantOtherwise() {
-        withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
-            isIntermittent: SIMDTarget.targetName != "AVX2"
-        ) {
-            let mismatches = Mismatches("portMultiplySubtractingWhereOtherwiseF32ConstantOtherwise")
-            let maskInputs = Inputs.masks(H.Mask.self, seed: 0x681C_81CA_6F37_AFA6)
-            let aInputs = Inputs.vectors(H.self, seed: 0x681C_80CA_6F37_ADF3)
-            let bInputs = Inputs.vectors(H.self, seed: 0x681C_7FCA_6F37_AC40)
-            let cInputs = Inputs.vectors(H.self, seed: 0x681C_86CA_6F37_B825)
-            for (mask, a, b, c) in mixedQuadruples(
-                maskInputs,
-                aInputs,
-                bInputs,
-                cInputs,
-                seed: 0x67D1_89C4_9C5A_4B13
-            ) where !hasUnorderedNaNs(multiplying: a.simd, b.simd, adding: c.simd) {
-                mismatches.check(
-                    portMultiplySubtractingWhereOtherwiseF32ConstantOtherwise(a, b, c, where: mask),
-                    highwayMultiplySubtractingWhereOtherwiseF32ConstantOtherwise(
-                        a,
-                        b,
-                        c,
-                        where: mask
-                    ),
-                    "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
-                )
-            }
-            mismatches.record()
-        } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
-                && assertionsAreEnabled
+        let mismatches = Mismatches("portMultiplySubtractingWhereOtherwiseF32ConstantOtherwise")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x681C_81CA_6F37_AFA6)
+        let aInputs = Inputs.vectors(H.self, seed: 0x681C_80CA_6F37_ADF3)
+        let bInputs = Inputs.vectors(H.self, seed: 0x681C_7FCA_6F37_AC40)
+        let cInputs = Inputs.vectors(H.self, seed: 0x681C_86CA_6F37_B825)
+        for (mask, a, b, c) in mixedQuadruples(
+            maskInputs,
+            aInputs,
+            bInputs,
+            cInputs,
+            seed: 0x67D1_89C4_9C5A_4B13
+        ) where !hasUnorderedNaNs(multiplying: a.simd, b.simd, adding: c.simd) {
+            mismatches.check(
+                portMultiplySubtractingWhereOtherwiseF32ConstantOtherwise(a, b, c, where: mask),
+                highwayMultiplySubtractingWhereOtherwiseF32ConstantOtherwise(a, b, c, where: mask),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
         }
+        mismatches.record()
     }
 
     @Test func negatedMultiplyAddingWhereOtherwise() {
@@ -1020,130 +979,103 @@ extension SIMDFloatCodegenTests {
     }
 
     @Test func negatedMultiplySubtractingWhereOtherwise() {
-        withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
-            isIntermittent: SIMDTarget.targetName != "AVX2"
-        ) {
-            let mismatches = Mismatches("portNegatedMultiplySubtractingWhereOtherwiseF32")
-            let otherwiseInputs = Inputs.vectors(H.self, seed: 0x3443_926E_D00F_703F)
-            let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3443_916E_D00F_6E8C)
-            let aInputs = Inputs.vectors(H.self, seed: 0x3443_946E_D00F_73A5)
-            let bInputs = Inputs.vectors(H.self, seed: 0x3443_936E_D00F_71F2)
-            let cInputs = Inputs.vectors(H.self, seed: 0x3443_8E6E_D00F_6973)
-            for (otherwise, mask, a, b, c) in mixedQuintuples(
-                otherwiseInputs,
-                maskInputs,
-                aInputs,
-                bInputs,
-                cInputs,
-                seed: 0xF727_7894_BBE3_85D9
-            ) where !hasUnorderedNaNs(negating: a.simd, b.simd, adding: c.simd) {
-                mismatches.check(
-                    portNegatedMultiplySubtractingWhereOtherwiseF32(
-                        a,
-                        b,
-                        c,
-                        where: mask,
-                        otherwise: otherwise
-                    ),
-                    highwayNegatedMultiplySubtractingWhereOtherwiseF32(
-                        a,
-                        b,
-                        c,
-                        where: mask,
-                        otherwise: otherwise
-                    ),
-                    "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
-                )
-            }
-            mismatches.record()
-        } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
-                && assertionsAreEnabled
+        let mismatches = Mismatches("portNegatedMultiplySubtractingWhereOtherwiseF32")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x3443_926E_D00F_703F)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3443_916E_D00F_6E8C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3443_946E_D00F_73A5)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3443_936E_D00F_71F2)
+        let cInputs = Inputs.vectors(H.self, seed: 0x3443_8E6E_D00F_6973)
+        for (otherwise, mask, a, b, c) in mixedQuintuples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            bInputs,
+            cInputs,
+            seed: 0xF727_7894_BBE3_85D9
+        ) where !hasUnorderedNaNs(negating: a.simd, b.simd, adding: c.simd) {
+            mismatches.check(
+                portNegatedMultiplySubtractingWhereOtherwiseF32(
+                    a,
+                    b,
+                    c,
+                    where: mask,
+                    otherwise: otherwise
+                ),
+                highwayNegatedMultiplySubtractingWhereOtherwiseF32(
+                    a,
+                    b,
+                    c,
+                    where: mask,
+                    otherwise: otherwise
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
         }
+        mismatches.record()
     }
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantA() {
-        withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
-            isIntermittent: SIMDTarget.targetName != "AVX2"
-        ) {
-            let mismatches = Mismatches("portNegatedMultiplySubtractingWhereOtherwiseF32ConstantA")
-            let otherwiseInputs = Inputs.vectors(H.self, seed: 0x81F1_F309_E3A6_6D58)
-            let maskInputs = Inputs.masks(H.Mask.self, seed: 0x81F1_F409_E3A6_6F0B)
-            let bInputs = Inputs.vectors(H.self, seed: 0x81F1_F609_E3A6_7271)
-            let cInputs = Inputs.vectors(H.self, seed: 0x81F1_F709_E3A6_7424)
-            for (otherwise, mask, b, c) in mixedQuadruples(
-                otherwiseInputs,
-                maskInputs,
-                bInputs,
-                cInputs,
-                seed: 0xCBAB_AE58_8854_2114
-            ) where !hasNaNs(negating: b.simd) {
-                mismatches.check(
-                    portNegatedMultiplySubtractingWhereOtherwiseF32ConstantA(
-                        b,
-                        c,
-                        where: mask,
-                        otherwise: otherwise
-                    ),
-                    highwayNegatedMultiplySubtractingWhereOtherwiseF32ConstantA(
-                        b,
-                        c,
-                        where: mask,
-                        otherwise: otherwise
-                    ),
-                    "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
-                )
-            }
-            mismatches.record()
-        } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
-                && assertionsAreEnabled
+        let mismatches = Mismatches("portNegatedMultiplySubtractingWhereOtherwiseF32ConstantA")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x81F1_F309_E3A6_6D58)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x81F1_F409_E3A6_6F0B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x81F1_F609_E3A6_7271)
+        let cInputs = Inputs.vectors(H.self, seed: 0x81F1_F709_E3A6_7424)
+        for (otherwise, mask, b, c) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            bInputs,
+            cInputs,
+            seed: 0xCBAB_AE58_8854_2114
+        ) where !hasNaNs(negating: b.simd) {
+            mismatches.check(
+                portNegatedMultiplySubtractingWhereOtherwiseF32ConstantA(
+                    b,
+                    c,
+                    where: mask,
+                    otherwise: otherwise
+                ),
+                highwayNegatedMultiplySubtractingWhereOtherwiseF32ConstantA(
+                    b,
+                    c,
+                    where: mask,
+                    otherwise: otherwise
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
+            )
         }
+        mismatches.record()
     }
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantB() {
-        withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
-            isIntermittent: SIMDTarget.targetName != "AVX2"
-        ) {
-            let mismatches = Mismatches("portNegatedMultiplySubtractingWhereOtherwiseF32ConstantB")
-            let otherwiseInputs = Inputs.vectors(H.self, seed: 0x89AD_AA09_E7C4_852D)
-            let maskInputs = Inputs.masks(H.Mask.self, seed: 0x89AD_A909_E7C4_837A)
-            let aInputs = Inputs.vectors(H.self, seed: 0x89AD_A809_E7C4_81C7)
-            let cInputs = Inputs.vectors(H.self, seed: 0x89AD_A609_E7C4_7E61)
-            for (otherwise, mask, a, c) in mixedQuadruples(
-                otherwiseInputs,
-                maskInputs,
-                aInputs,
-                cInputs,
-                seed: 0xA8E5_A8E1_FA64_6DFF
-            ) where !hasNaNs(negating: a.simd) {
-                mismatches.check(
-                    portNegatedMultiplySubtractingWhereOtherwiseF32ConstantB(
-                        a,
-                        c,
-                        where: mask,
-                        otherwise: otherwise
-                    ),
-                    highwayNegatedMultiplySubtractingWhereOtherwiseF32ConstantB(
-                        a,
-                        c,
-                        where: mask,
-                        otherwise: otherwise
-                    ),
-                    "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
-                )
-            }
-            mismatches.record()
-        } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
-                && assertionsAreEnabled
+        let mismatches = Mismatches("portNegatedMultiplySubtractingWhereOtherwiseF32ConstantB")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x89AD_AA09_E7C4_852D)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x89AD_A909_E7C4_837A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x89AD_A809_E7C4_81C7)
+        let cInputs = Inputs.vectors(H.self, seed: 0x89AD_A609_E7C4_7E61)
+        for (otherwise, mask, a, c) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            cInputs,
+            seed: 0xA8E5_A8E1_FA64_6DFF
+        ) where !hasNaNs(negating: a.simd) {
+            mismatches.check(
+                portNegatedMultiplySubtractingWhereOtherwiseF32ConstantB(
+                    a,
+                    c,
+                    where: mask,
+                    otherwise: otherwise
+                ),
+                highwayNegatedMultiplySubtractingWhereOtherwiseF32ConstantB(
+                    a,
+                    c,
+                    where: mask,
+                    otherwise: otherwise
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
+            )
         }
+        mismatches.record()
     }
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantC() {
@@ -1179,45 +1111,36 @@ extension SIMDFloatCodegenTests {
     }
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantOtherwise() {
-        withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
-            isIntermittent: SIMDTarget.targetName != "AVX2"
-        ) {
-            let mismatches = Mismatches(
-                "portNegatedMultiplySubtractingWhereOtherwiseF32ConstantOtherwise"
+        let mismatches = Mismatches(
+            "portNegatedMultiplySubtractingWhereOtherwiseF32ConstantOtherwise"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x46D7_BDBA_D97E_8026)
+        let aInputs = Inputs.vectors(H.self, seed: 0x46D7_BCBA_D97E_7E73)
+        let bInputs = Inputs.vectors(H.self, seed: 0x46D7_BBBA_D97E_7CC0)
+        let cInputs = Inputs.vectors(H.self, seed: 0x46D7_C2BA_D97E_88A5)
+        for (mask, a, b, c) in mixedQuadruples(
+            maskInputs,
+            aInputs,
+            bInputs,
+            cInputs,
+            seed: 0x8890_24FE_2426_4093
+        ) where !hasUnorderedNaNs(negating: a.simd, b.simd, adding: c.simd) {
+            mismatches.check(
+                portNegatedMultiplySubtractingWhereOtherwiseF32ConstantOtherwise(
+                    a,
+                    b,
+                    c,
+                    where: mask
+                ),
+                highwayNegatedMultiplySubtractingWhereOtherwiseF32ConstantOtherwise(
+                    a,
+                    b,
+                    c,
+                    where: mask
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
-            let maskInputs = Inputs.masks(H.Mask.self, seed: 0x46D7_BDBA_D97E_8026)
-            let aInputs = Inputs.vectors(H.self, seed: 0x46D7_BCBA_D97E_7E73)
-            let bInputs = Inputs.vectors(H.self, seed: 0x46D7_BBBA_D97E_7CC0)
-            let cInputs = Inputs.vectors(H.self, seed: 0x46D7_C2BA_D97E_88A5)
-            for (mask, a, b, c) in mixedQuadruples(
-                maskInputs,
-                aInputs,
-                bInputs,
-                cInputs,
-                seed: 0x8890_24FE_2426_4093
-            ) where !hasUnorderedNaNs(negating: a.simd, b.simd, adding: c.simd) {
-                mismatches.check(
-                    portNegatedMultiplySubtractingWhereOtherwiseF32ConstantOtherwise(
-                        a,
-                        b,
-                        c,
-                        where: mask
-                    ),
-                    highwayNegatedMultiplySubtractingWhereOtherwiseF32ConstantOtherwise(
-                        a,
-                        b,
-                        c,
-                        where: mask
-                    ),
-                    "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
-                )
-            }
-            mismatches.record()
-        } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
-                && assertionsAreEnabled
         }
+        mismatches.record()
     }
 }

@@ -31,7 +31,8 @@ jobs:
         # it pads SVE ops with `ptrue` and `sel` the C compiler would not.
         # Highway's NEON_BF16 target requires AES, FP16, DOTPROD, BF16 and I8MM but no SVE, which
         # `-march=armv8.6-a+aes+fp16` turns on. Clang 21 cannot compile Highway's casts between
-        # bf16 and f16 vectors there with optimizations on, so that row tests in debug only.
+        # bf16 and f16 vectors there with optimizations on, so that row tests in debug only, with
+        # `-Onone` for the codegen kernels too, which every other build optimizes.
         # Clang 21 marks Highway's SVE, SVE_256 and SVE2 targets broken, so the wide SVE rows lift
         # that.
         target:
@@ -48,7 +49,7 @@ jobs:
           - name: NEON_BF16
             expected-target: NEON_BF16
             runner: ubuntu-24.04-arm
-            flags: "-Xcc -march=armv8.6-a+aes+fp16"
+            flags: "-Xcc -march=armv8.6-a+aes+fp16 -Xswiftc -Onone"
             compare-codegen: false
             debug-tests: true
             release-tests: false

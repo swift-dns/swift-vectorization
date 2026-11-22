@@ -51844,37 +51844,8 @@ let linuxAvx2AndAvx512IntermittentNaNSign = KnownIssue(
 )
 
 let knownGapTests: [String: [String]] = [
-    "SIMDDoubleCodegen": [
-        "approximateReciprocalSquareRoot", "approximateReciprocalSquareRootWhere",
-        "multiplySubtracting", "multiplySubtractingConstantA", "multiplySubtractingConstantB",
-        "multiplySubtractingWhere", "multiplySubtractingWhereConstantA",
-        "multiplySubtractingWhereConstantB", "multiplySubtractingWhereOtherwise",
-        "multiplySubtractingWhereOtherwiseConstantA",
-        "multiplySubtractingWhereOtherwiseConstantB",
-        "multiplySubtractingWhereOtherwiseConstantOtherwise", "negatedMultiplySubtracting",
-        "negatedMultiplySubtractingConstantA", "negatedMultiplySubtractingConstantB",
-        "negatedMultiplySubtractingWhere", "negatedMultiplySubtractingWhereConstantA",
-        "negatedMultiplySubtractingWhereConstantB", "negatedMultiplySubtractingWhereOtherwise",
-        "negatedMultiplySubtractingWhereOtherwiseConstantA",
-        "negatedMultiplySubtractingWhereOtherwiseConstantB",
-        "negatedMultiplySubtractingWhereOtherwiseConstantOtherwise",
-    ],
     "SIMDDoubleReference": [
         "multiplySubtractingAdding"
-    ],
-    "SIMDFloatCodegen": [
-        "multiplySubtracting", "multiplySubtractingConstantA", "multiplySubtractingConstantB",
-        "multiplySubtractingWhere", "multiplySubtractingWhereConstantA",
-        "multiplySubtractingWhereConstantB", "multiplySubtractingWhereOtherwise",
-        "multiplySubtractingWhereOtherwiseConstantA",
-        "multiplySubtractingWhereOtherwiseConstantB",
-        "multiplySubtractingWhereOtherwiseConstantOtherwise", "negatedMultiplySubtracting",
-        "negatedMultiplySubtractingConstantA", "negatedMultiplySubtractingConstantB",
-        "negatedMultiplySubtractingWhere", "negatedMultiplySubtractingWhereConstantA",
-        "negatedMultiplySubtractingWhereConstantB", "negatedMultiplySubtractingWhereOtherwise",
-        "negatedMultiplySubtractingWhereOtherwiseConstantA",
-        "negatedMultiplySubtractingWhereOtherwiseConstantB",
-        "negatedMultiplySubtractingWhereOtherwiseConstantOtherwise",
     ],
     "SIMDFloatReference": [
         "multiplySubtractingAdding"
@@ -51953,6 +51924,30 @@ let maskedZeroSignTests: [String: [String]] = [
     "SIMDFloatCodegen": ["negatedMultiplySubtractingWhereConstantC"],
     "SIMDFloatConstant": negatedMultiplySubtractingWhereConstantSplatTests,
     "SIMDFloatReference": ["negatedMultiplySubtractingWhere"],
+]
+
+let emu128Float16NaNSign = KnownIssue(
+    comment:
+        "Under Linux on EMU128 the compiler folds the negated addend of Highway's unrolled lanes into a subtraction, which returns a NaN addend with its sign, where the port's vector negation returns it with the opposite sign",
+    condition: "!isDarwin && SIMDTarget.targetName == \"EMU128\""
+)
+
+let emu128Float16NaNSignTests: [String: [String]] = [
+    "SIMDFloat16Codegen": [
+        "multiplyAddingSubtracting", "multiplyAddingSubtractingConstantA",
+        "multiplyAddingSubtractingConstantB", "multiplySubtractingAdding",
+        "multiplySubtractingAddingConstantA", "multiplySubtractingAddingConstantB",
+    ]
+]
+
+let emu128Arm64Float16NaNSign = KnownIssue(
+    comment:
+        "Under Linux on EMU128 on arm64 the compiler negates the product of Highway's scalar lanes after multiplying, which gives the NaN of an invalid product the opposite sign to the port's lanes, whose multiplicand is negated first",
+    condition: "!isAmd64 && !isDarwin && SIMDTarget.targetName == \"EMU128\""
+)
+
+let emu128Arm64Float16NaNSignTests: [String: [String]] = [
+    "SIMDFloat16Codegen": ["negatedMultiplySubtracting", "negatedMultiplySubtractingWhere"]
 ]
 
 let linuxAvx3SprFloat16OrderedComparison = KnownIssue(
@@ -52143,6 +52138,8 @@ let knownGaps: [(issue: KnownIssue, tests: [String: [String]])] =
         (linuxAvx2AndAvx512NaNSign, knownGapTests),
         (linuxAvx2AndAvx512IntermittentNaNSign, intermittentNaNSignTests),
         (linuxAvx512MaskedZeroSign, maskedZeroSignTests),
+        (emu128Float16NaNSign, emu128Float16NaNSignTests),
+        (emu128Arm64Float16NaNSign, emu128Arm64Float16NaNSignTests),
         (linuxAvx3SprFloat16OrderedComparison, float16OrderedComparisonTests),
         (darwinEmu128Folding, emu128FoldedConstantTests),
         (sveWideNaNOperandOrder, sveWideNaNOperandOrderTests),

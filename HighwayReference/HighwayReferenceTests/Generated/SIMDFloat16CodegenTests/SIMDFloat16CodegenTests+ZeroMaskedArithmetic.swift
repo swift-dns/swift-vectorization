@@ -466,25 +466,31 @@ extension SIMDFloat16CodegenTests {
     }
 
     @Test func negatedMultiplySubtractingWhere() {
-        let mismatches = Mismatches("portNegatedMultiplySubtractingWhereF16")
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF204_69E2_D8A5_6C93)
-        let aInputs = Inputs.vectors(H.self, seed: 0xF204_68E2_D8A5_6AE0)
-        let bInputs = Inputs.vectors(H.self, seed: 0xF204_6BE2_D8A5_6FF9)
-        let cInputs = Inputs.vectors(H.self, seed: 0xF204_6AE2_D8A5_6E46)
-        for (mask, a, b, c) in mixedQuadruples(
-            maskInputs,
-            aInputs,
-            bInputs,
-            cInputs,
-            seed: 0x6E77_87C3_B5CA_10D5
-        ) where !hasUnorderedNaNs(negating: a.simd, b.simd, adding: c.simd) {
-            mismatches.check(
-                portNegatedMultiplySubtractingWhereF16(a, b, c, where: mask),
-                highwayNegatedMultiplySubtractingWhereF16(a, b, c, where: mask),
-                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
-            )
+        withKnownIssue(
+            "Under Linux on EMU128 on arm64 the compiler negates the product of Highway's scalar lanes after multiplying, which gives the NaN of an invalid product the opposite sign to the port's lanes, whose multiplicand is negated first"
+        ) {
+            let mismatches = Mismatches("portNegatedMultiplySubtractingWhereF16")
+            let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF204_69E2_D8A5_6C93)
+            let aInputs = Inputs.vectors(H.self, seed: 0xF204_68E2_D8A5_6AE0)
+            let bInputs = Inputs.vectors(H.self, seed: 0xF204_6BE2_D8A5_6FF9)
+            let cInputs = Inputs.vectors(H.self, seed: 0xF204_6AE2_D8A5_6E46)
+            for (mask, a, b, c) in mixedQuadruples(
+                maskInputs,
+                aInputs,
+                bInputs,
+                cInputs,
+                seed: 0x6E77_87C3_B5CA_10D5
+            ) where !hasUnorderedNaNs(negating: a.simd, b.simd, adding: c.simd) {
+                mismatches.check(
+                    portNegatedMultiplySubtractingWhereF16(a, b, c, where: mask),
+                    highwayNegatedMultiplySubtractingWhereF16(a, b, c, where: mask),
+                    "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+                )
+            }
+            mismatches.record()
+        } when: {
+            !isAmd64 && !isDarwin && SIMDTarget.targetName == "EMU128"
         }
-        mismatches.record()
     }
 
     @Test func negatedMultiplySubtractingWhereConstantA() {

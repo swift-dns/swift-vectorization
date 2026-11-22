@@ -80,7 +80,7 @@ package.targets += [
         name: "HighwayReferenceCodegen",
         dependencies: ["CHighwayReference", "Vectorization"],
         path: "HighwayReferenceCodegen",
-        swiftSettings: settings + [.interoperabilityMode(.Cxx)]
+        swiftSettings: settings + [.interoperabilityMode(.Cxx), .unsafeFlags(["-O"])]
     ),
 ]
 

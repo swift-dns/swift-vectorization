@@ -312,25 +312,16 @@ extension SIMDDoubleCodegenTests {
     }
 
     @Test func approximateReciprocalSquareRoot() {
-        withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
-            isIntermittent: SIMDTarget.targetName != "AVX2"
-        ) {
-            let mismatches = Mismatches("portApproximateReciprocalSquareRootF64")
-            let aInputs = Inputs.vectors(H.self, seed: 0x7FBC_3978_D475_679A)
-            for a in aInputs {
-                mismatches.check(
-                    portApproximateReciprocalSquareRootF64(a),
-                    highwayApproximateReciprocalSquareRootF64(a),
-                    "a: \(describe(a))"
-                )
-            }
-            mismatches.record()
-        } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
-                && assertionsAreEnabled
+        let mismatches = Mismatches("portApproximateReciprocalSquareRootF64")
+        let aInputs = Inputs.vectors(H.self, seed: 0x7FBC_3978_D475_679A)
+        for a in aInputs {
+            mismatches.check(
+                portApproximateReciprocalSquareRootF64(a),
+                highwayApproximateReciprocalSquareRootF64(a),
+                "a: \(describe(a))"
+            )
         }
+        mismatches.record()
     }
 
     @Test func approximateReciprocalSquareRootConstantA() {
