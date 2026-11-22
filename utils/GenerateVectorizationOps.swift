@@ -3062,9 +3062,10 @@ func slidesByConstantAmountPortably(_ direction: SlideDirection, for element: El
 
 func sveSlideLanes(_ direction: SlideDirection, for element: Element) -> String {
     let slid = sveSlide(direction, .zeros, for: element)
-    guard slidesByConstantAmountPortably(direction, for: element) else { return slid }
+    let constant = cFunctionName("sveConstant", element)
     return sveFolding(
-        when: "__builtin_constant_p(lanes)",
+        when: slidesByConstantAmountPortably(direction, for: element)
+            ? "__builtin_constant_p(lanes)" : "\(constant)(a) && __builtin_constant_p(lanes)",
         portableSlide(direction, for: element),
         otherwise: slid
     )
@@ -11630,6 +11631,18 @@ func sveOddEvenLanes(odd: String, even: String, sve2: Bool, for element: Element
     return fromUnsignedBits(sveResult(merged, for: lanes), of: element)
 }
 
+func sveFoldingOddEven(sve2: Bool, for element: Element) -> String {
+    sveFoldingConstants(
+        jointly: [["a", "b"]],
+        shuffled("a", "b", oddEvenLanes(for: element), for: element),
+        otherwise: vectorResult(
+            sveOddEvenLanes(odd: "a", even: "b", sve2: sve2, for: element),
+            for: element
+        ),
+        for: element
+    )
+}
+
 func sveFolding(when condition: String, _ folded: String, otherwise body: String) -> String {
     """
     if (\(condition)) {
@@ -11640,15 +11653,21 @@ func sveFolding(when condition: String, _ folded: String, otherwise body: String
 }
 
 func sveFoldingConstants(
-    of operands: [String],
+    of operands: [String] = [],
+    jointly groups: [[String]] = [],
     _ folded: String,
     otherwise body: String,
     for element: Element
 ) -> String {
-    guard !operands.isEmpty else { return body }
     let constant = cFunctionName("sveConstant", element)
-    let condition = operands.map { "\(constant)(\($0))" }.joined(separator: " || ")
-    return sveFolding(when: condition, folded, otherwise: body)
+    let terms =
+        operands.map { "\(constant)(\($0))" }
+        + groups.map { group in
+            let joined = group.map { "\(constant)(\($0))" }.joined(separator: " && ")
+            return operands.isEmpty && groups.count == 1 ? joined : "(\(joined))"
+        }
+    guard !terms.isEmpty else { return body }
+    return sveFolding(when: terms.joined(separator: " || "), folded, otherwise: body)
 }
 
 func sveFoldingConstantMask(
@@ -12259,6 +12278,7 @@ func multiplyAlternatingTargets(negatingAll: Bool) -> TargetBodies<Element> {
             }
             return sveFoldingConstants(
                 of: ["c"],
+                jointly: select == .sve2 && negatingAll ? [["a", "b"]] : [],
                 portableMultiplyAlternating(negatingAll: negatingAll, fused: false, for: element),
                 otherwise: select == .sve2
                     ? sveIntegerMultiplyAlternating(negatingAll: negatingAll, for: element)
@@ -13387,8 +13407,10 @@ func complexMultiplyingTargets(conjugating: Bool, adding: Bool) -> TargetBodies<
             guard element.category != .float else {
                 return sveComplexMultiplying(conjugating: conjugating, adding: adding, for: element)
             }
+            let singles = foldedOperands(of: element, select)
             return sveFoldingConstants(
-                of: foldedOperands(of: element, select),
+                of: singles,
+                jointly: singles.isEmpty && select == .sve ? [["a", "b"]] : [],
                 twoProductComplexMultiplyingBody(
                     conjugating: conjugating,
                     adding: adding,
@@ -22414,6 +22436,11 @@ func interleavedLanes(parity: Int, for element: Element) -> [Int] {
     return (0..<lanes / 2).flatMap { [2 * $0 + parity, lanes + 2 * $0 + parity] }
 }
 
+func oddEvenLanes(for element: Element) -> [Int] {
+    let lanes = element.laneCount
+    return (0..<lanes).map { $0 % 2 == 1 ? $0 : lanes + $0 }
+}
+
 func wholeInterleavedLanes(upper: Bool, for element: Element) -> [Int] {
     let lanes = element.laneCount
     let start = upper ? lanes / 2 : 0
@@ -22841,24 +22868,14 @@ let fixedPermutations: [FixedPermutation] = [
         section: .otherFixedPatternPermutationsWithinBlocks,
         targets: TargetBodies(
             neon: { element in wordSelectedOddEven(for: element) },
-            sve: { element in
-                vectorResult(
-                    sveOddEvenLanes(odd: "a", even: "b", sve2: false, for: element),
-                    for: element
-                )
-            },
-            sve2: { element in
-                vectorResult(
-                    sveOddEvenLanes(odd: "a", even: "b", sve2: true, for: element),
-                    for: element
-                )
-            },
+            sve: { element in sveFoldingOddEven(sve2: false, for: element) },
+            sve2: { element in sveFoldingOddEven(sve2: true, for: element) },
             sse4: { element in x86OddEvenLanes(level: .sse4, for: element) },
             ssse3: { element in x86OddEvenLanes(level: .ssse3, for: element) },
             sse2: { element in x86OddEvenLanes(level: .sse2, for: element) }
         )
     ) { element in
-        (0..<element.laneCount).map { $0 % 2 == 1 ? $0 : element.laneCount + $0 }
+        oddEvenLanes(for: element)
     },
     FixedPermutation(
         swiftName: "duplicatingEven",
@@ -51719,6 +51736,93 @@ func constantParameters(of op: Op, for element: Element) -> [Int] {
     }
 }
 
+func topLevelParts(of text: Substring, separatedBy separator: String) -> [Substring] {
+    var parts: [Substring] = []
+    var depth = 0
+    var start = text.startIndex
+    var index = text.startIndex
+    while index < text.endIndex {
+        switch text[index] {
+        case "(":
+            depth += 1
+        case ")":
+            depth -= 1
+        default:
+            if depth == 0 && text[index...].hasPrefix(separator) {
+                parts.append(text[start..<index])
+                index = text.index(index, offsetBy: separator.count)
+                start = index
+                continue
+            }
+        }
+        index = text.index(after: index)
+    }
+    parts.append(text[start...])
+    return parts
+}
+
+func constantConjunctions(in condition: Substring) -> [Set<String>] {
+    var conjunctions: [Set<String>] = []
+    for disjunct in topLevelParts(of: condition, separatedBy: "||") {
+        var alternatives: [Set<String>] = [[]]
+        for part in topLevelParts(of: disjunct, separatedBy: "&&") {
+            let term = part.trimmingCharacters(in: .whitespaces)[...]
+            let terms: [Set<String>]
+            if term.hasPrefix("!") {
+                terms = [[]]
+            } else if term.hasPrefix("("),
+                let (inner, rest) = parenthesizedArgument(in: term.dropFirst()), rest.isEmpty
+            {
+                terms = constantConjunctions(in: inner)
+            } else {
+                terms = [constantIdentifiers(in: String(term))]
+            }
+            alternatives = alternatives.flatMap { alternative in
+                terms.map { alternative.union($0) }
+            }
+        }
+        conjunctions += alternatives
+    }
+    return conjunctions
+}
+
+func constantConditions(in source: String) -> [Substring] {
+    var conditions: [Substring] = []
+    var remainder = source[...]
+    while let range = remainder.range(of: "if (") {
+        remainder = remainder[range.upperBound...]
+        guard let (argument, rest) = parenthesizedArgument(in: remainder) else { break }
+        conditions.append(argument)
+        remainder = rest
+    }
+    return conditions
+}
+
+func constantGroups(of op: Op, for element: Element) -> [[Int]] {
+    let functions =
+        [cFunctionName(of: op, for: element)]
+        + (op.template == nil ? [] : [templatedHelperName(of: op, for: element)])
+    let names = bindings(of: op, for: element).map(\.swiftName)
+    let source = functions.map(constantSource(ofFunctionNamed:)).joined()
+    var groups: Set<[Int]> = []
+    for condition in constantConditions(in: source) {
+        let conjunctions = constantConjunctions(in: condition).map { conjunction in
+            Set(names.indices.filter { !names[$0].isEmpty && conjunction.contains(names[$0]) })
+        }
+        for conjunction in conjunctions where conjunction.count > 1 {
+            let isAbsorbed = conjunctions.contains {
+                $0.count < conjunction.count && $0.isSubset(of: conjunction)
+            }
+            if !isAbsorbed {
+                groups.insert(conjunction.sorted())
+            }
+        }
+    }
+    return groups.filter { group in
+        !group.contains { [.immediate, .constBytePointer].contains(op.parameters[$0]) }
+    }.sorted { $0.lexicographicallyPrecedes($1) }
+}
+
 func constantCounts(spanned: Bool, for element: Element) -> [Int] {
     let laneCounts = [16, 32, 64].map { element.at(width: $0).laneCount }
     let beyond32Bits = laneCounts.flatMap { [1 << 32, (1 << 32) + 1, (1 << 32) + $0] }
@@ -52425,22 +52529,78 @@ func constantTest(
         """
 }
 
-/// A helper that takes the mask and the lane amount of an op, which only fold into the constant
-/// path of the op when both are constants, and the tests that call it with every constant mask and
-/// the amounts that are lanes of some vector.
-func maskAmountConstantTests(of op: Op, for element: Element) -> [String] {
-    let name = "check\(uppercasedFirst(op.testIdentifier))ConstantMaskLanes"
+let jointConstantAmounts = integerConstants([0, 1, 2, 3, 7, 15, 31, 63])
+
+func jointConstantVectors(for operand: Element) -> [ConstantValue] {
+    let names =
+        operand.category == .float || operand.isHalfPrecision
+        ? ["One", "MinusTwoPointFive", "Half"] : ["1", "26", "127"]
+    let splats = constantSplats(for: operand)
+    return names.compactMap { name in splats.first { $0.name == name } }
+}
+
+/// A helper that takes all parameters of a gate condition of an op, which only fold into the
+/// constant path of the op when all of them are constants, and the tests that call it with every
+/// constant mask, the amounts that are lanes of some vector and splat vectors that differ from one
+/// another, each vector taking every value in turn.
+func jointConstantTests(of op: Op, for element: Element, parameters group: [Int]) -> [String] {
     let parameterBindings = bindings(of: op, for: element)
-    let names = zip(parameterBindings, op.parameters)
-        .filter { $0.1 == .mask || $0.1 == .laneAmount }
-        .map(\.0.swiftName)
+    let names = group.map { parameterBindings[$0].swiftName }
+    let name =
+        "check\(uppercasedFirst(op.testIdentifier))Constant\(names.map(uppercasedFirst).joined())"
+    func isVector(_ index: Int) -> Bool { isConstantVector(op.parameters[index]) }
+    func operand(_ index: Int) -> Element {
+        operandElement(of: op.parameters[index], for: element, source: op.source)
+    }
+    func argument(_ index: Int) -> String {
+        let name = parameterBindings[index].swiftName
+        return isVector(index) ? "\(name)Value" : name
+    }
+    let vectors = group.filter(isVector)
+    let vectorValues = vectors.map { jointConstantVectors(for: operand($0)) }
+    let rotations = (0..<(vectorValues.first?.count ?? 0)).map { rotation in
+        Dictionary(
+            uniqueKeysWithValues: vectors.indices.map { position in
+                let values = vectorValues[position]
+                return (vectors[position], values[(rotation + position) % values.count])
+            }
+        )
+    }
+    var combinations: [[Int: ConstantValue]] = [[:]]
+    for index in group where !isVector(index) || index == vectors.first {
+        let dimension: [[Int: ConstantValue]]
+        switch op.parameters[index] {
+        case _ where isVector(index): dimension = rotations
+        case .mask, .whereMask: dimension = constantMasks.map { [index: $0] }
+        case .laneAmount: dimension = jointConstantAmounts.map { [index: $0] }
+        default:
+            fatalError(
+                "\(op.identifier) branches on \(names.joined(separator: " and ")) together, which nothing covers"
+            )
+        }
+        combinations = combinations.flatMap { combination in
+            dimension.map { combination.merging($0) { $1 } }
+        }
+    }
     let inputs = referenceInputs(of: op, for: element, test: name, inContract: true)
         .filter { !names.contains($0.name) }
+    func repeated(_ index: Int) -> String {
+        portCall(
+            "repeating",
+            [argument(index)],
+            on: constantNamespace(of: operand(index), for: element)
+        )
+    }
     let calls = referenceCalls(
         of: op,
         for: element,
         pointer: referencePointer(of: op, guarded: false),
-        destination: referenceDestination(of: op, guarded: false)
+        destination: referenceDestination(of: op, guarded: false),
+        constants: Dictionary(
+            uniqueKeysWithValues: vectors.map {
+                (parameterBindings[$0].swiftName, (port: repeated($0), reference: repeated($0)))
+            }
+        )
     )
     let (declarations, statements) = referenceStatements(
         of: op,
@@ -52449,27 +52609,68 @@ func maskAmountConstantTests(of op: Op, for element: Element) -> [String] {
         guarded: false,
         calls: calls
     )
+    let splatDeclarations = vectors.map { index in
+        let highwaySplat = referenceResult(
+            referenceCall(
+                referenceFunctionName("repeating", operand(index)),
+                [argument(index)].map(operand(index).swiftScalarArgument)
+            ),
+            returning: .vector,
+            for: operand(index),
+            on: constantNamespace(of: operand(index), for: element)
+        )
+        return "mismatches.check(\(repeated(index)), \(highwaySplat), \"repeating\")"
+    }
+    let descriptions = group.map { index in
+        let described =
+            isVector(index)
+            ? "repeating \\(hex(\(argument(index))))"
+            : [.mask, .whereMask].contains(op.parameters[index])
+                ? "\\(describe(\(argument(index))))" : "\\(\(argument(index)))"
+        return "\(parameterBindings[index].swiftName) \(described)"
+    }
+    let parameters = group.map { index in
+        let type = constantType(
+            of: op.parameters[index],
+            for: element,
+            lane: constantLane(of: operand(index), for: element)
+        )
+        return "_ \(argument(index)): \(type)"
+    }
     var members = [
         referenceTestFunction(
             name,
-            label: "\(op.testIdentifier) with mask \\(describe(mask)), lanes \\(lanes)",
+            label: "\(op.testIdentifier) with \(descriptions.joined(separator: ", "))",
             for: element,
             inputs: inputs,
-            declarations: declarations,
-            signature: "@inline(__always)\nprivate func \(name)(_ mask: H.Mask, _ lanes: Int) {",
+            declarations: splatDeclarations + declarations,
+            signature:
+                "@inline(__always)\nprivate func \(name)(\(parameters.joined(separator: ", "))) {",
             statements: statements
         )
     ]
-    for mask in constantMasks {
-        for lanes in [0, 1, 2, 3, 7, 15, 31, 63] {
-            members.append(
-                constantTest(
-                    "\(op.testIdentifier)ConstantMask\(mask.name)Lanes\(lanes)",
-                    enabledIf: "\(lanes) < H.laneCount",
-                    calls: ["\(name)(\(mask.literal), \(lanes))"]
-                )
-            )
+    for combination in combinations {
+        let values = group.map { index in
+            let value = combination[index]!
+            return isVector(index)
+                ? ConstantValue(
+                    name: value.name,
+                    literal: value.literal.replacingOccurrences(
+                        of: "Lane",
+                        with: constantLane(of: operand(index), for: element)
+                    )
+                ) : value
         }
+        let amounts = zip(group, values).filter { op.parameters[$0.0] == .laneAmount }
+            .map { "\($0.1.literal) < H.laneCount" }
+        members.append(
+            constantTest(
+                "\(op.testIdentifier)Constant"
+                    + zip(names, values).map { uppercasedFirst($0.0) + $0.1.name }.joined(),
+                enabledIf: amounts.isEmpty ? nil : amounts.joined(separator: " && "),
+                calls: ["\(name)(\(values.map(\.literal).joined(separator: ", ")))"]
+            )
+        )
     }
     return members
 }
@@ -52645,10 +52846,8 @@ func constantTests(of op: Op, for element: Element) -> [String] {
         }
     }
 
-    if indices.contains(where: { op.parameters[$0] == .mask })
-        && indices.contains(where: { op.parameters[$0] == .laneAmount })
-    {
-        members += maskAmountConstantTests(of: op, for: element)
+    for group in constantGroups(of: op, for: element) {
+        members += jointConstantTests(of: op, for: element, parameters: group)
     }
 
     for index in indices where op.parameters[index] == .constBytePointer {

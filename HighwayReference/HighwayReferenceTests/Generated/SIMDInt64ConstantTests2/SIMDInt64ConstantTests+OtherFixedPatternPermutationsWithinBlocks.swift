@@ -7,6 +7,174 @@ import Vectorization
 
 extension SIMDInt64ConstantTests {
     @inline(__always)
+    private func checkOddEvenConstantAB(_ aValue: Lane, _ bValue: Lane) {
+        let mismatches = Mismatches(
+            "oddEven with a repeating \(hex(aValue)), b repeating \(hex(bValue))"
+        )
+        mismatches.check(
+            H.repeating(aValue),
+            H(raw: HighwayReference.repeatingI64(aValue)),
+            "repeating"
+        )
+        mismatches.check(
+            H.repeating(bValue),
+            H(raw: HighwayReference.repeatingI64(bValue)),
+            "repeating"
+        )
+        mismatches.check(
+            H.oddEven(H.repeating(aValue), H.repeating(bValue)),
+            H(raw: HighwayReference.oddEvenI64(H.repeating(aValue).raw, H.repeating(bValue).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func oddEvenConstantA1B26() {
+        checkOddEvenConstantAB(1, 26)
+    }
+
+    @Test func oddEvenConstantA26B127() {
+        checkOddEvenConstantAB(26, 127)
+    }
+
+    @Test func oddEvenConstantA127B1() {
+        checkOddEvenConstantAB(127, 1)
+    }
+
+    @inline(__always)
+    private func checkOddEvenConstantA(_ value: Lane) {
+        let mismatches = Mismatches("oddEven with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.self, seed: 0xA6D4_D8E9_B4F0_E1C9)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI64(value)),
+            "repeating"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.oddEven(H.repeating(value), b),
+                H(raw: HighwayReference.oddEvenI64(H.repeating(value).raw, b.raw)),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkOddEvenConstantB(_ value: Lane) {
+        let mismatches = Mismatches("oddEven with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x8D15_72E9_A66C_A697)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI64(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.oddEven(a, H.repeating(value)),
+                H(raw: HighwayReference.oddEvenI64(a.raw, H.repeating(value).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func oddEvenConstantSplat0() {
+        checkOddEvenConstantA(0)
+        checkOddEvenConstantB(0)
+    }
+
+    @Test func oddEvenConstantSplat1() {
+        checkOddEvenConstantA(1)
+        checkOddEvenConstantB(1)
+    }
+
+    @Test func oddEvenConstantSplat15() {
+        checkOddEvenConstantA(15)
+        checkOddEvenConstantB(15)
+    }
+
+    @Test func oddEvenConstantSplat16() {
+        checkOddEvenConstantA(16)
+        checkOddEvenConstantB(16)
+    }
+
+    @Test func oddEvenConstantSplat26() {
+        checkOddEvenConstantA(26)
+        checkOddEvenConstantB(26)
+    }
+
+    @Test func oddEvenConstantSplat127() {
+        checkOddEvenConstantA(127)
+        checkOddEvenConstantB(127)
+    }
+
+    @Test func oddEvenConstantSplat128() {
+        checkOddEvenConstantA(128)
+        checkOddEvenConstantB(128)
+    }
+
+    @Test func oddEvenConstantSplat255() {
+        checkOddEvenConstantA(255)
+        checkOddEvenConstantB(255)
+    }
+
+    @Test func oddEvenConstantSplat256() {
+        checkOddEvenConstantA(256)
+        checkOddEvenConstantB(256)
+    }
+
+    @Test func oddEvenConstantSplat257() {
+        checkOddEvenConstantA(257)
+        checkOddEvenConstantB(257)
+    }
+
+    @Test func oddEvenConstantSplat65280() {
+        checkOddEvenConstantA(65280)
+        checkOddEvenConstantB(65280)
+    }
+
+    @Test func oddEvenConstantSplat65281() {
+        checkOddEvenConstantA(65281)
+        checkOddEvenConstantB(65281)
+    }
+
+    @Test func oddEvenConstantSplatMinus1() {
+        checkOddEvenConstantA(-1)
+        checkOddEvenConstantB(-1)
+    }
+
+    @Test func oddEvenConstantSplatMinus16() {
+        checkOddEvenConstantA(-16)
+        checkOddEvenConstantB(-16)
+    }
+
+    @Test func oddEvenConstantSplatMinus17() {
+        checkOddEvenConstantA(-17)
+        checkOddEvenConstantB(-17)
+    }
+
+    @Test func oddEvenConstantSplatMinus128() {
+        checkOddEvenConstantA(-128)
+        checkOddEvenConstantB(-128)
+    }
+
+    @Test func oddEvenConstantSplatMinus129() {
+        checkOddEvenConstantA(-129)
+        checkOddEvenConstantB(-129)
+    }
+
+    @Test func oddEvenConstantSplatMax() {
+        checkOddEvenConstantA(Lane.max)
+        checkOddEvenConstantB(Lane.max)
+    }
+
+    @Test func oddEvenConstantSplatMin() {
+        checkOddEvenConstantA(Lane.min)
+        checkOddEvenConstantB(Lane.min)
+    }
+
+    @inline(__always)
     private func checkDuplicatingEvenConstantA(_ value: Lane) {
         let mismatches = Mismatches("duplicatingEven with a repeating \(hex(value))")
         mismatches.check(

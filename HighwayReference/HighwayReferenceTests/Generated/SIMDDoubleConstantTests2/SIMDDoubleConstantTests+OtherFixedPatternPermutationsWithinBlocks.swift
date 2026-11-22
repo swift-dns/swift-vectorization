@@ -7,6 +7,41 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
+    private func checkOddEvenConstantAB(_ aValue: Lane, _ bValue: Lane) {
+        let mismatches = Mismatches(
+            "oddEven with a repeating \(hex(aValue)), b repeating \(hex(bValue))"
+        )
+        mismatches.check(
+            H.repeating(aValue),
+            H(raw: HighwayReference.repeatingF64(aValue)),
+            "repeating"
+        )
+        mismatches.check(
+            H.repeating(bValue),
+            H(raw: HighwayReference.repeatingF64(bValue)),
+            "repeating"
+        )
+        mismatches.check(
+            H.oddEven(H.repeating(aValue), H.repeating(bValue)),
+            H(raw: HighwayReference.oddEvenF64(H.repeating(aValue).raw, H.repeating(bValue).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func oddEvenConstantAOneBMinusTwoPointFive() {
+        checkOddEvenConstantAB(1.0, -2.5)
+    }
+
+    @Test func oddEvenConstantAMinusTwoPointFiveBHalf() {
+        checkOddEvenConstantAB(-2.5, 0.5)
+    }
+
+    @Test func oddEvenConstantAHalfBOne() {
+        checkOddEvenConstantAB(0.5, 1.0)
+    }
+
+    @inline(__always)
     private func checkOddEvenConstantA(_ value: Lane) {
         let mismatches = Mismatches("oddEven with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0xBE5E_EEA0_51CD_F6C0)

@@ -110,6 +110,46 @@ extension SIMDUInt32ConstantTests {
     }
 
     @inline(__always)
+    private func checkMultiplyingComplexConjugateConstantAB(_ aValue: Lane, _ bValue: Lane) {
+        let mismatches = Mismatches(
+            "multiplyingComplexConjugate with a repeating \(hex(aValue)), b repeating \(hex(bValue))"
+        )
+        mismatches.check(
+            H.repeating(aValue),
+            H(raw: HighwayReference.repeatingU32(aValue)),
+            "repeating"
+        )
+        mismatches.check(
+            H.repeating(bValue),
+            H(raw: HighwayReference.repeatingU32(bValue)),
+            "repeating"
+        )
+        mismatches.check(
+            H.multiplyingComplexConjugate(H.repeating(aValue), H.repeating(bValue)),
+            H(
+                raw: HighwayReference.multiplyingComplexConjugateU32(
+                    H.repeating(aValue).raw,
+                    H.repeating(bValue).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func multiplyingComplexConjugateConstantA1B26() {
+        checkMultiplyingComplexConjugateConstantAB(1, 26)
+    }
+
+    @Test func multiplyingComplexConjugateConstantA26B127() {
+        checkMultiplyingComplexConjugateConstantAB(26, 127)
+    }
+
+    @Test func multiplyingComplexConjugateConstantA127B1() {
+        checkMultiplyingComplexConjugateConstantAB(127, 1)
+    }
+
+    @inline(__always)
     private func checkMultiplyingComplexConjugateConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyingComplexConjugate with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0xC86F_9C51_F3C5_445B)
@@ -337,6 +377,50 @@ extension SIMDUInt32ConstantTests {
     @Test func multiplyAddingComplexConstantSplatMax() {
         checkMultiplyAddingComplexConstantA(Lane.max)
         checkMultiplyAddingComplexConstantB(Lane.max)
+    }
+
+    @inline(__always)
+    private func checkMultiplyAddingComplexConjugateConstantAB(_ aValue: Lane, _ bValue: Lane) {
+        let mismatches = Mismatches(
+            "multiplyAddingComplexConjugate with a repeating \(hex(aValue)), b repeating \(hex(bValue))"
+        )
+        let cInputs = Inputs.vectors(H.self, seed: 0x13D0_2651_F4CB_257F)
+        mismatches.check(
+            H.repeating(aValue),
+            H(raw: HighwayReference.repeatingU32(aValue)),
+            "repeating"
+        )
+        mismatches.check(
+            H.repeating(bValue),
+            H(raw: HighwayReference.repeatingU32(bValue)),
+            "repeating"
+        )
+        for c in cInputs {
+            mismatches.check(
+                H.multiplyAddingComplexConjugate(H.repeating(aValue), H.repeating(bValue), c),
+                H(
+                    raw: HighwayReference.multiplyAddingComplexConjugateU32(
+                        H.repeating(aValue).raw,
+                        H.repeating(bValue).raw,
+                        c.raw
+                    )
+                ),
+                "c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyAddingComplexConjugateConstantA1B26() {
+        checkMultiplyAddingComplexConjugateConstantAB(1, 26)
+    }
+
+    @Test func multiplyAddingComplexConjugateConstantA26B127() {
+        checkMultiplyAddingComplexConjugateConstantAB(26, 127)
+    }
+
+    @Test func multiplyAddingComplexConjugateConstantA127B1() {
+        checkMultiplyAddingComplexConjugateConstantAB(127, 1)
     }
 
     @inline(__always)

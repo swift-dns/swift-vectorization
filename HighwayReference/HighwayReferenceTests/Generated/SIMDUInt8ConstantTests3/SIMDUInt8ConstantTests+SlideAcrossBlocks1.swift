@@ -277,6 +277,169 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
+    private func checkSlideUpLanesConstantALanes(_ aValue: Lane, _ lanes: Int) {
+        let mismatches = Mismatches("slideUpLanes with a repeating \(hex(aValue)), lanes \(lanes)")
+        mismatches.check(
+            H.repeating(aValue),
+            H(raw: HighwayReference.repeatingU8(aValue)),
+            "repeating"
+        )
+        mismatches.check(
+            H.slideUpLanes(H.repeating(aValue), by: lanes),
+            H(raw: HighwayReference.slideUpLanesU8(H.repeating(aValue).raw, lanes)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test(.enabled(if: 0 < H.laneCount)) func slideUpLanesConstantA1Lanes0() {
+        checkSlideUpLanesConstantALanes(1, 0)
+    }
+
+    @Test(.enabled(if: 1 < H.laneCount)) func slideUpLanesConstantA1Lanes1() {
+        checkSlideUpLanesConstantALanes(1, 1)
+    }
+
+    @Test(.enabled(if: 2 < H.laneCount)) func slideUpLanesConstantA1Lanes2() {
+        checkSlideUpLanesConstantALanes(1, 2)
+    }
+
+    @Test(.enabled(if: 3 < H.laneCount)) func slideUpLanesConstantA1Lanes3() {
+        checkSlideUpLanesConstantALanes(1, 3)
+    }
+
+    @Test(.enabled(if: 7 < H.laneCount)) func slideUpLanesConstantA1Lanes7() {
+        checkSlideUpLanesConstantALanes(1, 7)
+    }
+
+    @Test(.enabled(if: 15 < H.laneCount)) func slideUpLanesConstantA1Lanes15() {
+        checkSlideUpLanesConstantALanes(1, 15)
+    }
+
+    @Test(.enabled(if: 31 < H.laneCount)) func slideUpLanesConstantA1Lanes31() {
+        checkSlideUpLanesConstantALanes(1, 31)
+    }
+
+    @Test(.enabled(if: 63 < H.laneCount)) func slideUpLanesConstantA1Lanes63() {
+        checkSlideUpLanesConstantALanes(1, 63)
+    }
+
+    @Test(.enabled(if: 0 < H.laneCount)) func slideUpLanesConstantA26Lanes0() {
+        checkSlideUpLanesConstantALanes(26, 0)
+    }
+
+    @Test(.enabled(if: 1 < H.laneCount)) func slideUpLanesConstantA26Lanes1() {
+        checkSlideUpLanesConstantALanes(26, 1)
+    }
+
+    @Test(.enabled(if: 2 < H.laneCount)) func slideUpLanesConstantA26Lanes2() {
+        checkSlideUpLanesConstantALanes(26, 2)
+    }
+
+    @Test(.enabled(if: 3 < H.laneCount)) func slideUpLanesConstantA26Lanes3() {
+        checkSlideUpLanesConstantALanes(26, 3)
+    }
+
+    @Test(.enabled(if: 7 < H.laneCount)) func slideUpLanesConstantA26Lanes7() {
+        checkSlideUpLanesConstantALanes(26, 7)
+    }
+
+    @Test(.enabled(if: 15 < H.laneCount)) func slideUpLanesConstantA26Lanes15() {
+        checkSlideUpLanesConstantALanes(26, 15)
+    }
+
+    @Test(.enabled(if: 31 < H.laneCount)) func slideUpLanesConstantA26Lanes31() {
+        checkSlideUpLanesConstantALanes(26, 31)
+    }
+
+    @Test(.enabled(if: 63 < H.laneCount)) func slideUpLanesConstantA26Lanes63() {
+        checkSlideUpLanesConstantALanes(26, 63)
+    }
+
+    @Test(.enabled(if: 0 < H.laneCount)) func slideUpLanesConstantA127Lanes0() {
+        checkSlideUpLanesConstantALanes(127, 0)
+    }
+
+    @Test(.enabled(if: 1 < H.laneCount)) func slideUpLanesConstantA127Lanes1() {
+        checkSlideUpLanesConstantALanes(127, 1)
+    }
+
+    @Test(.enabled(if: 2 < H.laneCount)) func slideUpLanesConstantA127Lanes2() {
+        checkSlideUpLanesConstantALanes(127, 2)
+    }
+
+    @Test(.enabled(if: 3 < H.laneCount)) func slideUpLanesConstantA127Lanes3() {
+        checkSlideUpLanesConstantALanes(127, 3)
+    }
+
+    @Test(.enabled(if: 7 < H.laneCount)) func slideUpLanesConstantA127Lanes7() {
+        checkSlideUpLanesConstantALanes(127, 7)
+    }
+
+    @Test(.enabled(if: 15 < H.laneCount)) func slideUpLanesConstantA127Lanes15() {
+        checkSlideUpLanesConstantALanes(127, 15)
+    }
+
+    @Test(.enabled(if: 31 < H.laneCount)) func slideUpLanesConstantA127Lanes31() {
+        checkSlideUpLanesConstantALanes(127, 31)
+    }
+
+    @Test(.enabled(if: 63 < H.laneCount)) func slideUpLanesConstantA127Lanes63() {
+        checkSlideUpLanesConstantALanes(127, 63)
+    }
+
+    @inline(__always)
+    private func checkSlideUpLanesConstantA(_ value: Lane) {
+        let mismatches = Mismatches("slideUpLanes with a repeating \(hex(value))")
+        let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU8(value)),
+            "repeating"
+        )
+        for lanes in lanesInputs {
+            mismatches.check(
+                H.slideUpLanes(H.repeating(value), by: lanes),
+                H(raw: HighwayReference.slideUpLanesU8(H.repeating(value).raw, lanes)),
+                "lanes: \(lanes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func slideUpLanesConstantSplat0() {
+        checkSlideUpLanesConstantA(0)
+    }
+
+    @Test func slideUpLanesConstantSplat1() {
+        checkSlideUpLanesConstantA(1)
+    }
+
+    @Test func slideUpLanesConstantSplat15() {
+        checkSlideUpLanesConstantA(15)
+    }
+
+    @Test func slideUpLanesConstantSplat16() {
+        checkSlideUpLanesConstantA(16)
+    }
+
+    @Test func slideUpLanesConstantSplat26() {
+        checkSlideUpLanesConstantA(26)
+    }
+
+    @Test func slideUpLanesConstantSplat127() {
+        checkSlideUpLanesConstantA(127)
+    }
+
+    @Test func slideUpLanesConstantSplat128() {
+        checkSlideUpLanesConstantA(128)
+    }
+
+    @Test func slideUpLanesConstantSplat255() {
+        checkSlideUpLanesConstantA(255)
+    }
+
+    @inline(__always)
     private func checkSlideUpLanesFillingWithConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("slideUpLanesFillingWith with lanes \(lanes)")
         let fillInputs = Inputs.vectors(H.self, seed: 0x5FCD_85E8_928D_B0A5)
@@ -545,275 +708,5 @@ extension SIMDUInt8ConstantTests {
 
     @Test(.enabled(if: 63 < H.laneCount)) func slideUpLanesFillingWithConstantLanes63() {
         checkSlideUpLanesFillingWithConstantLanes(63)
-    }
-
-    @inline(__always)
-    private func checkSlideDownLanesConstantLanes(_ lanes: Int) {
-        let mismatches = Mismatches("slideDownLanes with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.self, seed: 0x155E_423D_2DBC_B681)
-        for a in aInputs {
-            mismatches.check(
-                H.slideDownLanes(a, by: lanes),
-                H(raw: HighwayReference.slideDownLanesU8(a.raw, lanes)),
-                "a: \(describe(a))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test(.enabled(if: 0 < H.laneCount)) func slideDownLanesConstantLanes0() {
-        checkSlideDownLanesConstantLanes(0)
-    }
-
-    @Test(.enabled(if: 1 < H.laneCount)) func slideDownLanesConstantLanes1() {
-        checkSlideDownLanesConstantLanes(1)
-    }
-
-    @Test(.enabled(if: 2 < H.laneCount)) func slideDownLanesConstantLanes2() {
-        checkSlideDownLanesConstantLanes(2)
-    }
-
-    @Test(.enabled(if: 3 < H.laneCount)) func slideDownLanesConstantLanes3() {
-        checkSlideDownLanesConstantLanes(3)
-    }
-
-    @Test(.enabled(if: 4 < H.laneCount)) func slideDownLanesConstantLanes4() {
-        checkSlideDownLanesConstantLanes(4)
-    }
-
-    @Test(.enabled(if: 5 < H.laneCount)) func slideDownLanesConstantLanes5() {
-        checkSlideDownLanesConstantLanes(5)
-    }
-
-    @Test(.enabled(if: 6 < H.laneCount)) func slideDownLanesConstantLanes6() {
-        checkSlideDownLanesConstantLanes(6)
-    }
-
-    @Test(.enabled(if: 7 < H.laneCount)) func slideDownLanesConstantLanes7() {
-        checkSlideDownLanesConstantLanes(7)
-    }
-
-    @Test(.enabled(if: 8 < H.laneCount)) func slideDownLanesConstantLanes8() {
-        checkSlideDownLanesConstantLanes(8)
-    }
-
-    @Test(.enabled(if: 9 < H.laneCount)) func slideDownLanesConstantLanes9() {
-        checkSlideDownLanesConstantLanes(9)
-    }
-
-    @Test(.enabled(if: 10 < H.laneCount)) func slideDownLanesConstantLanes10() {
-        checkSlideDownLanesConstantLanes(10)
-    }
-
-    @Test(.enabled(if: 11 < H.laneCount)) func slideDownLanesConstantLanes11() {
-        checkSlideDownLanesConstantLanes(11)
-    }
-
-    @Test(.enabled(if: 12 < H.laneCount)) func slideDownLanesConstantLanes12() {
-        checkSlideDownLanesConstantLanes(12)
-    }
-
-    @Test(.enabled(if: 13 < H.laneCount)) func slideDownLanesConstantLanes13() {
-        checkSlideDownLanesConstantLanes(13)
-    }
-
-    @Test(.enabled(if: 14 < H.laneCount)) func slideDownLanesConstantLanes14() {
-        checkSlideDownLanesConstantLanes(14)
-    }
-
-    @Test(.enabled(if: 15 < H.laneCount)) func slideDownLanesConstantLanes15() {
-        checkSlideDownLanesConstantLanes(15)
-    }
-
-    @Test(.enabled(if: 16 < H.laneCount)) func slideDownLanesConstantLanes16() {
-        checkSlideDownLanesConstantLanes(16)
-    }
-
-    @Test(.enabled(if: 17 < H.laneCount)) func slideDownLanesConstantLanes17() {
-        checkSlideDownLanesConstantLanes(17)
-    }
-
-    @Test(.enabled(if: 18 < H.laneCount)) func slideDownLanesConstantLanes18() {
-        checkSlideDownLanesConstantLanes(18)
-    }
-
-    @Test(.enabled(if: 19 < H.laneCount)) func slideDownLanesConstantLanes19() {
-        checkSlideDownLanesConstantLanes(19)
-    }
-
-    @Test(.enabled(if: 20 < H.laneCount)) func slideDownLanesConstantLanes20() {
-        checkSlideDownLanesConstantLanes(20)
-    }
-
-    @Test(.enabled(if: 21 < H.laneCount)) func slideDownLanesConstantLanes21() {
-        checkSlideDownLanesConstantLanes(21)
-    }
-
-    @Test(.enabled(if: 22 < H.laneCount)) func slideDownLanesConstantLanes22() {
-        checkSlideDownLanesConstantLanes(22)
-    }
-
-    @Test(.enabled(if: 23 < H.laneCount)) func slideDownLanesConstantLanes23() {
-        checkSlideDownLanesConstantLanes(23)
-    }
-
-    @Test(.enabled(if: 24 < H.laneCount)) func slideDownLanesConstantLanes24() {
-        checkSlideDownLanesConstantLanes(24)
-    }
-
-    @Test(.enabled(if: 25 < H.laneCount)) func slideDownLanesConstantLanes25() {
-        checkSlideDownLanesConstantLanes(25)
-    }
-
-    @Test(.enabled(if: 26 < H.laneCount)) func slideDownLanesConstantLanes26() {
-        checkSlideDownLanesConstantLanes(26)
-    }
-
-    @Test(.enabled(if: 27 < H.laneCount)) func slideDownLanesConstantLanes27() {
-        checkSlideDownLanesConstantLanes(27)
-    }
-
-    @Test(.enabled(if: 28 < H.laneCount)) func slideDownLanesConstantLanes28() {
-        checkSlideDownLanesConstantLanes(28)
-    }
-
-    @Test(.enabled(if: 29 < H.laneCount)) func slideDownLanesConstantLanes29() {
-        checkSlideDownLanesConstantLanes(29)
-    }
-
-    @Test(.enabled(if: 30 < H.laneCount)) func slideDownLanesConstantLanes30() {
-        checkSlideDownLanesConstantLanes(30)
-    }
-
-    @Test(.enabled(if: 31 < H.laneCount)) func slideDownLanesConstantLanes31() {
-        checkSlideDownLanesConstantLanes(31)
-    }
-
-    @Test(.enabled(if: 32 < H.laneCount)) func slideDownLanesConstantLanes32() {
-        checkSlideDownLanesConstantLanes(32)
-    }
-
-    @Test(.enabled(if: 33 < H.laneCount)) func slideDownLanesConstantLanes33() {
-        checkSlideDownLanesConstantLanes(33)
-    }
-
-    @Test(.enabled(if: 34 < H.laneCount)) func slideDownLanesConstantLanes34() {
-        checkSlideDownLanesConstantLanes(34)
-    }
-
-    @Test(.enabled(if: 35 < H.laneCount)) func slideDownLanesConstantLanes35() {
-        checkSlideDownLanesConstantLanes(35)
-    }
-
-    @Test(.enabled(if: 36 < H.laneCount)) func slideDownLanesConstantLanes36() {
-        checkSlideDownLanesConstantLanes(36)
-    }
-
-    @Test(.enabled(if: 37 < H.laneCount)) func slideDownLanesConstantLanes37() {
-        checkSlideDownLanesConstantLanes(37)
-    }
-
-    @Test(.enabled(if: 38 < H.laneCount)) func slideDownLanesConstantLanes38() {
-        checkSlideDownLanesConstantLanes(38)
-    }
-
-    @Test(.enabled(if: 39 < H.laneCount)) func slideDownLanesConstantLanes39() {
-        checkSlideDownLanesConstantLanes(39)
-    }
-
-    @Test(.enabled(if: 40 < H.laneCount)) func slideDownLanesConstantLanes40() {
-        checkSlideDownLanesConstantLanes(40)
-    }
-
-    @Test(.enabled(if: 41 < H.laneCount)) func slideDownLanesConstantLanes41() {
-        checkSlideDownLanesConstantLanes(41)
-    }
-
-    @Test(.enabled(if: 42 < H.laneCount)) func slideDownLanesConstantLanes42() {
-        checkSlideDownLanesConstantLanes(42)
-    }
-
-    @Test(.enabled(if: 43 < H.laneCount)) func slideDownLanesConstantLanes43() {
-        checkSlideDownLanesConstantLanes(43)
-    }
-
-    @Test(.enabled(if: 44 < H.laneCount)) func slideDownLanesConstantLanes44() {
-        checkSlideDownLanesConstantLanes(44)
-    }
-
-    @Test(.enabled(if: 45 < H.laneCount)) func slideDownLanesConstantLanes45() {
-        checkSlideDownLanesConstantLanes(45)
-    }
-
-    @Test(.enabled(if: 46 < H.laneCount)) func slideDownLanesConstantLanes46() {
-        checkSlideDownLanesConstantLanes(46)
-    }
-
-    @Test(.enabled(if: 47 < H.laneCount)) func slideDownLanesConstantLanes47() {
-        checkSlideDownLanesConstantLanes(47)
-    }
-
-    @Test(.enabled(if: 48 < H.laneCount)) func slideDownLanesConstantLanes48() {
-        checkSlideDownLanesConstantLanes(48)
-    }
-
-    @Test(.enabled(if: 49 < H.laneCount)) func slideDownLanesConstantLanes49() {
-        checkSlideDownLanesConstantLanes(49)
-    }
-
-    @Test(.enabled(if: 50 < H.laneCount)) func slideDownLanesConstantLanes50() {
-        checkSlideDownLanesConstantLanes(50)
-    }
-
-    @Test(.enabled(if: 51 < H.laneCount)) func slideDownLanesConstantLanes51() {
-        checkSlideDownLanesConstantLanes(51)
-    }
-
-    @Test(.enabled(if: 52 < H.laneCount)) func slideDownLanesConstantLanes52() {
-        checkSlideDownLanesConstantLanes(52)
-    }
-
-    @Test(.enabled(if: 53 < H.laneCount)) func slideDownLanesConstantLanes53() {
-        checkSlideDownLanesConstantLanes(53)
-    }
-
-    @Test(.enabled(if: 54 < H.laneCount)) func slideDownLanesConstantLanes54() {
-        checkSlideDownLanesConstantLanes(54)
-    }
-
-    @Test(.enabled(if: 55 < H.laneCount)) func slideDownLanesConstantLanes55() {
-        checkSlideDownLanesConstantLanes(55)
-    }
-
-    @Test(.enabled(if: 56 < H.laneCount)) func slideDownLanesConstantLanes56() {
-        checkSlideDownLanesConstantLanes(56)
-    }
-
-    @Test(.enabled(if: 57 < H.laneCount)) func slideDownLanesConstantLanes57() {
-        checkSlideDownLanesConstantLanes(57)
-    }
-
-    @Test(.enabled(if: 58 < H.laneCount)) func slideDownLanesConstantLanes58() {
-        checkSlideDownLanesConstantLanes(58)
-    }
-
-    @Test(.enabled(if: 59 < H.laneCount)) func slideDownLanesConstantLanes59() {
-        checkSlideDownLanesConstantLanes(59)
-    }
-
-    @Test(.enabled(if: 60 < H.laneCount)) func slideDownLanesConstantLanes60() {
-        checkSlideDownLanesConstantLanes(60)
-    }
-
-    @Test(.enabled(if: 61 < H.laneCount)) func slideDownLanesConstantLanes61() {
-        checkSlideDownLanesConstantLanes(61)
-    }
-
-    @Test(.enabled(if: 62 < H.laneCount)) func slideDownLanesConstantLanes62() {
-        checkSlideDownLanesConstantLanes(62)
-    }
-
-    @Test(.enabled(if: 63 < H.laneCount)) func slideDownLanesConstantLanes63() {
-        checkSlideDownLanesConstantLanes(63)
     }
 }
