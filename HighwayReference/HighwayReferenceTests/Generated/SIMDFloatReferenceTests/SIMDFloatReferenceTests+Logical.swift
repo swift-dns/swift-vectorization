@@ -452,7 +452,19 @@ extension SIMDFloatReferenceTests {
 
     @Test func allBitsSet() {
         let mismatches = Mismatches("allBitsSet")
-        let aInputs = Inputs.vectors(H.self, seed: 0xC83D_692C_0A4F_0827)
+        let aInputs =
+            Inputs.vectors(H.self, seed: 0xC83D_692C_0A4F_0827)
+            + (0..<H.laneCount).flatMap { lane in
+                [UInt32.zero, ~UInt32.zero].map { uniform in
+                    H(
+                        H.SIMDType(
+                            (0..<H.laneCount).map {
+                                Lane(bitPattern: $0 == lane ? uniform ^ 1 : uniform)
+                            }
+                        )
+                    )
+                }
+            }
         for a in aInputs {
             mismatches.check(
                 H.allBitsSet(a),
@@ -465,7 +477,19 @@ extension SIMDFloatReferenceTests {
 
     @Test func allBitsClear() {
         let mismatches = Mismatches("allBitsClear")
-        let aInputs = Inputs.vectors(H.self, seed: 0x820D_EAE1_D2A1_7DC2)
+        let aInputs =
+            Inputs.vectors(H.self, seed: 0x820D_EAE1_D2A1_7DC2)
+            + (0..<H.laneCount).flatMap { lane in
+                [UInt32.zero, ~UInt32.zero].map { uniform in
+                    H(
+                        H.SIMDType(
+                            (0..<H.laneCount).map {
+                                Lane(bitPattern: $0 == lane ? uniform ^ 1 : uniform)
+                            }
+                        )
+                    )
+                }
+            }
         for a in aInputs {
             mismatches.check(
                 H.allBitsClear(a),

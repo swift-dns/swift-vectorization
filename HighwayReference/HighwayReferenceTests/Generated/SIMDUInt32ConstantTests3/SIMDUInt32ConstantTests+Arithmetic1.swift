@@ -432,6 +432,54 @@ extension SIMDUInt32ConstantTests {
     }
 
     @inline(__always)
+    private func checkAbsoluteDifferenceConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "absoluteDifference with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(aEven, aOdd, aEven, aOdd),
+            H(raw: HighwayReference.repeatingBlockU32(aEven, aOdd, aEven, aOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(bEven, bOdd, bEven, bOdd),
+            H(raw: HighwayReference.repeatingBlockU32(bEven, bOdd, bEven, bOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.absoluteDifference(
+                H.repeatingBlock(aEven, aOdd, aEven, aOdd),
+                H.repeatingBlock(bEven, bOdd, bEven, bOdd)
+            ),
+            H(
+                raw: HighwayReference.absoluteDifferenceU32(
+                    H.repeatingBlock(aEven, aOdd, aEven, aOdd).raw,
+                    H.repeatingBlock(bEven, bOdd, bEven, bOdd).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func absoluteDifferenceConstantA1And26B26And127() {
+        checkAbsoluteDifferenceConstantABAlternating(1, 26, 26, 127)
+    }
+
+    @Test func absoluteDifferenceConstantA26And127B127And1() {
+        checkAbsoluteDifferenceConstantABAlternating(26, 127, 127, 1)
+    }
+
+    @Test func absoluteDifferenceConstantA127And1B1And26() {
+        checkAbsoluteDifferenceConstantABAlternating(127, 1, 1, 26)
+    }
+
+    @inline(__always)
     private func checkAbsoluteDifferenceConstantA(_ value: Lane) {
         let mismatches = Mismatches("absoluteDifference with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0xF3A5_333E_2A30_E6B7)
@@ -572,6 +620,54 @@ extension SIMDUInt32ConstantTests {
 
     @Test func saturatingAddingConstantA127B1() {
         checkSaturatingAddingConstantAB(127, 1)
+    }
+
+    @inline(__always)
+    private func checkSaturatingAddingConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "saturatingAdding with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(aEven, aOdd, aEven, aOdd),
+            H(raw: HighwayReference.repeatingBlockU32(aEven, aOdd, aEven, aOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(bEven, bOdd, bEven, bOdd),
+            H(raw: HighwayReference.repeatingBlockU32(bEven, bOdd, bEven, bOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.saturatingAdding(
+                H.repeatingBlock(aEven, aOdd, aEven, aOdd),
+                H.repeatingBlock(bEven, bOdd, bEven, bOdd)
+            ),
+            H(
+                raw: HighwayReference.saturatingAddingU32(
+                    H.repeatingBlock(aEven, aOdd, aEven, aOdd).raw,
+                    H.repeatingBlock(bEven, bOdd, bEven, bOdd).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func saturatingAddingConstantA1And26B26And127() {
+        checkSaturatingAddingConstantABAlternating(1, 26, 26, 127)
+    }
+
+    @Test func saturatingAddingConstantA26And127B127And1() {
+        checkSaturatingAddingConstantABAlternating(26, 127, 127, 1)
+    }
+
+    @Test func saturatingAddingConstantA127And1B1And26() {
+        checkSaturatingAddingConstantABAlternating(127, 1, 1, 26)
     }
 
     @inline(__always)
@@ -718,6 +814,54 @@ extension SIMDUInt32ConstantTests {
     }
 
     @inline(__always)
+    private func checkSaturatingSubtractingConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "saturatingSubtracting with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(aEven, aOdd, aEven, aOdd),
+            H(raw: HighwayReference.repeatingBlockU32(aEven, aOdd, aEven, aOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(bEven, bOdd, bEven, bOdd),
+            H(raw: HighwayReference.repeatingBlockU32(bEven, bOdd, bEven, bOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.saturatingSubtracting(
+                H.repeatingBlock(aEven, aOdd, aEven, aOdd),
+                H.repeatingBlock(bEven, bOdd, bEven, bOdd)
+            ),
+            H(
+                raw: HighwayReference.saturatingSubtractingU32(
+                    H.repeatingBlock(aEven, aOdd, aEven, aOdd).raw,
+                    H.repeatingBlock(bEven, bOdd, bEven, bOdd).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func saturatingSubtractingConstantA1And26B26And127() {
+        checkSaturatingSubtractingConstantABAlternating(1, 26, 26, 127)
+    }
+
+    @Test func saturatingSubtractingConstantA26And127B127And1() {
+        checkSaturatingSubtractingConstantABAlternating(26, 127, 127, 1)
+    }
+
+    @Test func saturatingSubtractingConstantA127And1B1And26() {
+        checkSaturatingSubtractingConstantABAlternating(127, 1, 1, 26)
+    }
+
+    @inline(__always)
     private func checkSaturatingSubtractingConstantA(_ value: Lane) {
         let mismatches = Mismatches("saturatingSubtracting with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x2CE0_A766_0932_58E3)
@@ -858,6 +1002,54 @@ extension SIMDUInt32ConstantTests {
 
     @Test func roundedAverageConstantA127B1() {
         checkRoundedAverageConstantAB(127, 1)
+    }
+
+    @inline(__always)
+    private func checkRoundedAverageConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "roundedAverage with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(aEven, aOdd, aEven, aOdd),
+            H(raw: HighwayReference.repeatingBlockU32(aEven, aOdd, aEven, aOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(bEven, bOdd, bEven, bOdd),
+            H(raw: HighwayReference.repeatingBlockU32(bEven, bOdd, bEven, bOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.roundedAverage(
+                H.repeatingBlock(aEven, aOdd, aEven, aOdd),
+                H.repeatingBlock(bEven, bOdd, bEven, bOdd)
+            ),
+            H(
+                raw: HighwayReference.roundedAverageU32(
+                    H.repeatingBlock(aEven, aOdd, aEven, aOdd).raw,
+                    H.repeatingBlock(bEven, bOdd, bEven, bOdd).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func roundedAverageConstantA1And26B26And127() {
+        checkRoundedAverageConstantABAlternating(1, 26, 26, 127)
+    }
+
+    @Test func roundedAverageConstantA26And127B127And1() {
+        checkRoundedAverageConstantABAlternating(26, 127, 127, 1)
+    }
+
+    @Test func roundedAverageConstantA127And1B1And26() {
+        checkRoundedAverageConstantABAlternating(127, 1, 1, 26)
     }
 
     @inline(__always)
@@ -1077,97 +1269,5 @@ extension SIMDUInt32ConstantTests {
 
     @Test func sumsOf4FromUInt8ConstantSplat255() {
         checkSumsOf4FromUInt8ConstantA(255)
-    }
-
-    @inline(__always)
-    private func checkBiasedExponentFromFloatConstantA(_ value: Float) {
-        let mismatches = Mismatches("biasedExponentFromFloat with a repeating \(hex(value))")
-        mismatches.check(
-            SIMD<Float>.repeating(value),
-            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
-            "repeating"
-        )
-        mismatches.check(
-            H.biasedExponent(SIMD<Float>.repeating(value)),
-            H(raw: HighwayReference.biasedExponentF32ToU32(SIMD<Float>.repeating(value).raw)),
-            ""
-        )
-        mismatches.record()
-    }
-
-    @Test func biasedExponentFromFloatConstantSplatZero() {
-        checkBiasedExponentFromFloatConstantA(0.0)
-    }
-
-    @Test func biasedExponentFromFloatConstantSplatNegativeZero() {
-        checkBiasedExponentFromFloatConstantA(-0.0)
-    }
-
-    @Test func biasedExponentFromFloatConstantSplatOne() {
-        checkBiasedExponentFromFloatConstantA(1.0)
-    }
-
-    @Test func biasedExponentFromFloatConstantSplatMinusOne() {
-        checkBiasedExponentFromFloatConstantA(-1.0)
-    }
-
-    @Test func biasedExponentFromFloatConstantSplatTwo() {
-        checkBiasedExponentFromFloatConstantA(2.0)
-    }
-
-    @Test func biasedExponentFromFloatConstantSplatHalf() {
-        checkBiasedExponentFromFloatConstantA(0.5)
-    }
-
-    @Test func biasedExponentFromFloatConstantSplatFour() {
-        checkBiasedExponentFromFloatConstantA(4.0)
-    }
-
-    @Test func biasedExponentFromFloatConstantSplatQuarter() {
-        checkBiasedExponentFromFloatConstantA(0.25)
-    }
-
-    @Test func biasedExponentFromFloatConstantSplatOnePointFive() {
-        checkBiasedExponentFromFloatConstantA(1.5)
-    }
-
-    @Test func biasedExponentFromFloatConstantSplatMinusTwoPointFive() {
-        checkBiasedExponentFromFloatConstantA(-2.5)
-    }
-
-    @Test func biasedExponentFromFloatConstantSplatInfinity() {
-        checkBiasedExponentFromFloatConstantA(.infinity)
-    }
-
-    @Test func biasedExponentFromFloatConstantSplatMinusInfinity() {
-        checkBiasedExponentFromFloatConstantA(-.infinity)
-    }
-
-    @Test func biasedExponentFromFloatConstantSplatNaN() {
-        checkBiasedExponentFromFloatConstantA(.nan)
-    }
-
-    @Test func biasedExponentFromFloatConstantSplatMinusNaN() {
-        checkBiasedExponentFromFloatConstantA(-.nan)
-    }
-
-    @Test func biasedExponentFromFloatConstantSplatPayloadNaN() {
-        checkBiasedExponentFromFloatConstantA(Float(nan: 1, signaling: false))
-    }
-
-    @Test func biasedExponentFromFloatConstantSplatSignalingNaN() {
-        checkBiasedExponentFromFloatConstantA(.signalingNaN)
-    }
-
-    @Test func biasedExponentFromFloatConstantSplatMinusSignalingNaN() {
-        checkBiasedExponentFromFloatConstantA(-.signalingNaN)
-    }
-
-    @Test func biasedExponentFromFloatConstantSplatLeastNonzero() {
-        checkBiasedExponentFromFloatConstantA(.leastNonzeroMagnitude)
-    }
-
-    @Test func biasedExponentFromFloatConstantSplatGreatest() {
-        checkBiasedExponentFromFloatConstantA(.greatestFiniteMagnitude)
     }
 }

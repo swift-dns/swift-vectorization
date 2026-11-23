@@ -7,6 +7,62 @@ import Vectorization
 
 extension SIMDInt16ConstantTests {
     @inline(__always)
+    private func checkSumsOf2FromInt8ConstantA(_ value: Int8) {
+        let mismatches = Mismatches("sumsOf2FromInt8 with a repeating \(hex(value))")
+        mismatches.check(
+            SIMD<Int8>.repeating(value),
+            SIMD<Int8>(raw: HighwayReference.repeatingI8(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.sumsOf2(SIMD<Int8>.repeating(value)),
+            H(raw: HighwayReference.sumsOf2I8ToI16(SIMD<Int8>.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func sumsOf2FromInt8ConstantSplat0() {
+        checkSumsOf2FromInt8ConstantA(0)
+    }
+
+    @Test func sumsOf2FromInt8ConstantSplat1() {
+        checkSumsOf2FromInt8ConstantA(1)
+    }
+
+    @Test func sumsOf2FromInt8ConstantSplat15() {
+        checkSumsOf2FromInt8ConstantA(15)
+    }
+
+    @Test func sumsOf2FromInt8ConstantSplat16() {
+        checkSumsOf2FromInt8ConstantA(16)
+    }
+
+    @Test func sumsOf2FromInt8ConstantSplat26() {
+        checkSumsOf2FromInt8ConstantA(26)
+    }
+
+    @Test func sumsOf2FromInt8ConstantSplat127() {
+        checkSumsOf2FromInt8ConstantA(127)
+    }
+
+    @Test func sumsOf2FromInt8ConstantSplatMinus1() {
+        checkSumsOf2FromInt8ConstantA(-1)
+    }
+
+    @Test func sumsOf2FromInt8ConstantSplatMinus16() {
+        checkSumsOf2FromInt8ConstantA(-16)
+    }
+
+    @Test func sumsOf2FromInt8ConstantSplatMinus17() {
+        checkSumsOf2FromInt8ConstantA(-17)
+    }
+
+    @Test func sumsOf2FromInt8ConstantSplatMinus128() {
+        checkSumsOf2FromInt8ConstantA(-128)
+    }
+
+    @inline(__always)
     private func checkSumsOfAdjacentQuadAbsoluteDifferencesFromInt8ConstantAAOffsetBOffset(
         _ aValue: Int8,
         _ aOffset: Int,

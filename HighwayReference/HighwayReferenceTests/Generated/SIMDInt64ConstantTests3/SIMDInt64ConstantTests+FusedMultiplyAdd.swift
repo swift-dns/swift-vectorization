@@ -993,6 +993,59 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
+    private func checkMultiplySubtractingAddingConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "multiplySubtractingAdding with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        let cInputs = Inputs.vectors(H.self, seed: 0x41F8_D9BB_1BCC_972B)
+        mismatches.check(
+            H.repeatingBlock(aEven, aOdd),
+            H(raw: HighwayReference.repeatingBlockI64(aEven, aOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(bEven, bOdd),
+            H(raw: HighwayReference.repeatingBlockI64(bEven, bOdd)),
+            "repeatingBlock"
+        )
+        for c in cInputs {
+            mismatches.check(
+                H.multiplySubtractingAdding(
+                    H.repeatingBlock(aEven, aOdd),
+                    H.repeatingBlock(bEven, bOdd),
+                    c
+                ),
+                H(
+                    raw: HighwayReference.multiplySubtractingAddingI64(
+                        H.repeatingBlock(aEven, aOdd).raw,
+                        H.repeatingBlock(bEven, bOdd).raw,
+                        c.raw
+                    )
+                ),
+                "c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplySubtractingAddingConstantA1And26B26And127() {
+        checkMultiplySubtractingAddingConstantABAlternating(1, 26, 26, 127)
+    }
+
+    @Test func multiplySubtractingAddingConstantA26And127B127And1() {
+        checkMultiplySubtractingAddingConstantABAlternating(26, 127, 127, 1)
+    }
+
+    @Test func multiplySubtractingAddingConstantA127And1B1And26() {
+        checkMultiplySubtractingAddingConstantABAlternating(127, 1, 1, 26)
+    }
+
+    @inline(__always)
     private func checkMultiplySubtractingAddingConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplySubtractingAdding with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x1CFA_D297_8DD9_D1BD)

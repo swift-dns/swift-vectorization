@@ -957,7 +957,19 @@ extension SIMDDoubleCodegenTests {
 
     @Test func allBitsSet() {
         let mismatches = Mismatches("portAllBitsSetF64")
-        let aInputs = Inputs.vectors(H.self, seed: 0x7C3F_3F28_0D4F_4CDE)
+        let aInputs =
+            Inputs.vectors(H.self, seed: 0x7C3F_3F28_0D4F_4CDE)
+            + (0..<H.laneCount).flatMap { lane in
+                [UInt64.zero, ~UInt64.zero].map { uniform in
+                    H(
+                        H.SIMDType(
+                            (0..<H.laneCount).map {
+                                Lane(bitPattern: $0 == lane ? uniform ^ 1 : uniform)
+                            }
+                        )
+                    )
+                }
+            }
         for a in aInputs {
             mismatches.check(portAllBitsSetF64(a), highwayAllBitsSetF64(a), "a: \(describe(a))")
         }
@@ -972,7 +984,19 @@ extension SIMDDoubleCodegenTests {
 
     @Test func allBitsClear() {
         let mismatches = Mismatches("portAllBitsClearF64")
-        let aInputs = Inputs.vectors(H.self, seed: 0xCBEE_732C_EEA4_1A3B)
+        let aInputs =
+            Inputs.vectors(H.self, seed: 0xCBEE_732C_EEA4_1A3B)
+            + (0..<H.laneCount).flatMap { lane in
+                [UInt64.zero, ~UInt64.zero].map { uniform in
+                    H(
+                        H.SIMDType(
+                            (0..<H.laneCount).map {
+                                Lane(bitPattern: $0 == lane ? uniform ^ 1 : uniform)
+                            }
+                        )
+                    )
+                }
+            }
         for a in aInputs {
             mismatches.check(portAllBitsClearF64(a), highwayAllBitsClearF64(a), "a: \(describe(a))")
         }

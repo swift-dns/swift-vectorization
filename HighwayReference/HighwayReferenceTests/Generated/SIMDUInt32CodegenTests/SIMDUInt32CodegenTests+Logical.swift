@@ -892,7 +892,13 @@ extension SIMDUInt32CodegenTests {
 
     @Test func allBitsSet() {
         let mismatches = Mismatches("portAllBitsSetU32")
-        let aInputs = Inputs.vectors(H.self, seed: 0xC44B_8F31_BD5D_6044)
+        let aInputs =
+            Inputs.vectors(H.self, seed: 0xC44B_8F31_BD5D_6044)
+            + (0..<H.laneCount).flatMap { lane in
+                [Lane.zero, ~Lane.zero].map { uniform in
+                    H(H.SIMDType((0..<H.laneCount).map { $0 == lane ? uniform ^ 1 : uniform }))
+                }
+            }
         for a in aInputs {
             mismatches.check(portAllBitsSetU32(a), highwayAllBitsSetU32(a), "a: \(describe(a))")
         }
@@ -907,7 +913,13 @@ extension SIMDUInt32CodegenTests {
 
     @Test func allBitsClear() {
         let mismatches = Mismatches("portAllBitsClearU32")
-        let aInputs = Inputs.vectors(H.self, seed: 0xD6FD_1A8B_1EAE_09BD)
+        let aInputs =
+            Inputs.vectors(H.self, seed: 0xD6FD_1A8B_1EAE_09BD)
+            + (0..<H.laneCount).flatMap { lane in
+                [Lane.zero, ~Lane.zero].map { uniform in
+                    H(H.SIMDType((0..<H.laneCount).map { $0 == lane ? uniform ^ 1 : uniform }))
+                }
+            }
         for a in aInputs {
             mismatches.check(portAllBitsClearU32(a), highwayAllBitsClearU32(a), "a: \(describe(a))")
         }

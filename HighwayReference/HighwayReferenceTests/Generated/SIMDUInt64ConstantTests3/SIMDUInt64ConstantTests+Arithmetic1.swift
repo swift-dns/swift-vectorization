@@ -567,6 +567,51 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
+    private func checkSaturatingAddingConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "saturatingAdding with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(aEven, aOdd),
+            H(raw: HighwayReference.repeatingBlockU64(aEven, aOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(bEven, bOdd),
+            H(raw: HighwayReference.repeatingBlockU64(bEven, bOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.saturatingAdding(H.repeatingBlock(aEven, aOdd), H.repeatingBlock(bEven, bOdd)),
+            H(
+                raw: HighwayReference.saturatingAddingU64(
+                    H.repeatingBlock(aEven, aOdd).raw,
+                    H.repeatingBlock(bEven, bOdd).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func saturatingAddingConstantA1And26B26And127() {
+        checkSaturatingAddingConstantABAlternating(1, 26, 26, 127)
+    }
+
+    @Test func saturatingAddingConstantA26And127B127And1() {
+        checkSaturatingAddingConstantABAlternating(26, 127, 127, 1)
+    }
+
+    @Test func saturatingAddingConstantA127And1B1And26() {
+        checkSaturatingAddingConstantABAlternating(127, 1, 1, 26)
+    }
+
+    @inline(__always)
     private func checkSaturatingAddingConstantA(_ value: Lane) {
         let mismatches = Mismatches("saturatingAdding with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x843C_3878_521F_A041)
@@ -707,6 +752,51 @@ extension SIMDUInt64ConstantTests {
 
     @Test func saturatingSubtractingConstantA127B1() {
         checkSaturatingSubtractingConstantAB(127, 1)
+    }
+
+    @inline(__always)
+    private func checkSaturatingSubtractingConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "saturatingSubtracting with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(aEven, aOdd),
+            H(raw: HighwayReference.repeatingBlockU64(aEven, aOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(bEven, bOdd),
+            H(raw: HighwayReference.repeatingBlockU64(bEven, bOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.saturatingSubtracting(H.repeatingBlock(aEven, aOdd), H.repeatingBlock(bEven, bOdd)),
+            H(
+                raw: HighwayReference.saturatingSubtractingU64(
+                    H.repeatingBlock(aEven, aOdd).raw,
+                    H.repeatingBlock(bEven, bOdd).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func saturatingSubtractingConstantA1And26B26And127() {
+        checkSaturatingSubtractingConstantABAlternating(1, 26, 26, 127)
+    }
+
+    @Test func saturatingSubtractingConstantA26And127B127And1() {
+        checkSaturatingSubtractingConstantABAlternating(26, 127, 127, 1)
+    }
+
+    @Test func saturatingSubtractingConstantA127And1B1And26() {
+        checkSaturatingSubtractingConstantABAlternating(127, 1, 1, 26)
     }
 
     @inline(__always)
@@ -1119,73 +1209,5 @@ extension SIMDUInt64ConstantTests {
     @Test func pairwiseSubtractingConstantSplatMax() {
         checkPairwiseSubtractingConstantA(Lane.max)
         checkPairwiseSubtractingConstantB(Lane.max)
-    }
-
-    @inline(__always)
-    private func checkSumsOf2FromUInt32ConstantA(_ value: UInt32) {
-        let mismatches = Mismatches("sumsOf2FromUInt32 with a repeating \(hex(value))")
-        mismatches.check(
-            SIMD<UInt32>.repeating(value),
-            SIMD<UInt32>(raw: HighwayReference.repeatingU32(value)),
-            "repeating"
-        )
-        mismatches.check(
-            H.sumsOf2(SIMD<UInt32>.repeating(value)),
-            H(raw: HighwayReference.sumsOf2U32ToU64(SIMD<UInt32>.repeating(value).raw)),
-            ""
-        )
-        mismatches.record()
-    }
-
-    @Test func sumsOf2FromUInt32ConstantSplat0() {
-        checkSumsOf2FromUInt32ConstantA(0)
-    }
-
-    @Test func sumsOf2FromUInt32ConstantSplat1() {
-        checkSumsOf2FromUInt32ConstantA(1)
-    }
-
-    @Test func sumsOf2FromUInt32ConstantSplat15() {
-        checkSumsOf2FromUInt32ConstantA(15)
-    }
-
-    @Test func sumsOf2FromUInt32ConstantSplat16() {
-        checkSumsOf2FromUInt32ConstantA(16)
-    }
-
-    @Test func sumsOf2FromUInt32ConstantSplat26() {
-        checkSumsOf2FromUInt32ConstantA(26)
-    }
-
-    @Test func sumsOf2FromUInt32ConstantSplat127() {
-        checkSumsOf2FromUInt32ConstantA(127)
-    }
-
-    @Test func sumsOf2FromUInt32ConstantSplat128() {
-        checkSumsOf2FromUInt32ConstantA(128)
-    }
-
-    @Test func sumsOf2FromUInt32ConstantSplat255() {
-        checkSumsOf2FromUInt32ConstantA(255)
-    }
-
-    @Test func sumsOf2FromUInt32ConstantSplat256() {
-        checkSumsOf2FromUInt32ConstantA(256)
-    }
-
-    @Test func sumsOf2FromUInt32ConstantSplat257() {
-        checkSumsOf2FromUInt32ConstantA(257)
-    }
-
-    @Test func sumsOf2FromUInt32ConstantSplat65280() {
-        checkSumsOf2FromUInt32ConstantA(65280)
-    }
-
-    @Test func sumsOf2FromUInt32ConstantSplat65281() {
-        checkSumsOf2FromUInt32ConstantA(65281)
-    }
-
-    @Test func sumsOf2FromUInt32ConstantSplatMax() {
-        checkSumsOf2FromUInt32ConstantA(UInt32.max)
     }
 }

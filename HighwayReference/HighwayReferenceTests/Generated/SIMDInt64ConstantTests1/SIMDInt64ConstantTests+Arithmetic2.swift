@@ -47,6 +47,51 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
+    private func checkSaturatingSubtractingConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "saturatingSubtracting with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(aEven, aOdd),
+            H(raw: HighwayReference.repeatingBlockI64(aEven, aOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(bEven, bOdd),
+            H(raw: HighwayReference.repeatingBlockI64(bEven, bOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.saturatingSubtracting(H.repeatingBlock(aEven, aOdd), H.repeatingBlock(bEven, bOdd)),
+            H(
+                raw: HighwayReference.saturatingSubtractingI64(
+                    H.repeatingBlock(aEven, aOdd).raw,
+                    H.repeatingBlock(bEven, bOdd).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func saturatingSubtractingConstantA1And26B26And127() {
+        checkSaturatingSubtractingConstantABAlternating(1, 26, 26, 127)
+    }
+
+    @Test func saturatingSubtractingConstantA26And127B127And1() {
+        checkSaturatingSubtractingConstantABAlternating(26, 127, 127, 1)
+    }
+
+    @Test func saturatingSubtractingConstantA127And1B1And26() {
+        checkSaturatingSubtractingConstantABAlternating(127, 1, 1, 26)
+    }
+
+    @inline(__always)
     private func checkSaturatingSubtractingConstantA(_ value: Lane) {
         let mismatches = Mismatches("saturatingSubtracting with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0xC1B3_3596_76CB_D510)

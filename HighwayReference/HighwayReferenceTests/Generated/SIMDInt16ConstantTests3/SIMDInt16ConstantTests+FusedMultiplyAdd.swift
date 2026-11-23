@@ -505,6 +505,81 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
+    private func checkMultiplySubtractingAddingConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "multiplySubtractingAdding with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        let cInputs = Inputs.vectors(H.self, seed: 0xDDF1_6B0F_6F12_817E)
+        mismatches.check(
+            H.repeatingBlock(aEven, aOdd, aEven, aOdd, aEven, aOdd, aEven, aOdd),
+            H(
+                raw: HighwayReference.repeatingBlockI16(
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd
+                )
+            ),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(bEven, bOdd, bEven, bOdd, bEven, bOdd, bEven, bOdd),
+            H(
+                raw: HighwayReference.repeatingBlockI16(
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd
+                )
+            ),
+            "repeatingBlock"
+        )
+        for c in cInputs {
+            mismatches.check(
+                H.multiplySubtractingAdding(
+                    H.repeatingBlock(aEven, aOdd, aEven, aOdd, aEven, aOdd, aEven, aOdd),
+                    H.repeatingBlock(bEven, bOdd, bEven, bOdd, bEven, bOdd, bEven, bOdd),
+                    c
+                ),
+                H(
+                    raw: HighwayReference.multiplySubtractingAddingI16(
+                        H.repeatingBlock(aEven, aOdd, aEven, aOdd, aEven, aOdd, aEven, aOdd).raw,
+                        H.repeatingBlock(bEven, bOdd, bEven, bOdd, bEven, bOdd, bEven, bOdd).raw,
+                        c.raw
+                    )
+                ),
+                "c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplySubtractingAddingConstantA1And26B26And127() {
+        checkMultiplySubtractingAddingConstantABAlternating(1, 26, 26, 127)
+    }
+
+    @Test func multiplySubtractingAddingConstantA26And127B127And1() {
+        checkMultiplySubtractingAddingConstantABAlternating(26, 127, 127, 1)
+    }
+
+    @Test func multiplySubtractingAddingConstantA127And1B1And26() {
+        checkMultiplySubtractingAddingConstantABAlternating(127, 1, 1, 26)
+    }
+
+    @inline(__always)
     private func checkMultiplySubtractingAddingConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplySubtractingAdding with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x40A9_D59A_F88F_B8A0)

@@ -42,6 +42,54 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
+    private func checkOddEvenConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "oddEven with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(aEven, aOdd, aEven, aOdd),
+            H(raw: HighwayReference.repeatingBlockF32(aEven, aOdd, aEven, aOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(bEven, bOdd, bEven, bOdd),
+            H(raw: HighwayReference.repeatingBlockF32(bEven, bOdd, bEven, bOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.oddEven(
+                H.repeatingBlock(aEven, aOdd, aEven, aOdd),
+                H.repeatingBlock(bEven, bOdd, bEven, bOdd)
+            ),
+            H(
+                raw: HighwayReference.oddEvenF32(
+                    H.repeatingBlock(aEven, aOdd, aEven, aOdd).raw,
+                    H.repeatingBlock(bEven, bOdd, bEven, bOdd).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func oddEvenConstantAOneAndMinusTwoPointFiveBMinusTwoPointFiveAndHalf() {
+        checkOddEvenConstantABAlternating(1.0, -2.5, -2.5, 0.5)
+    }
+
+    @Test func oddEvenConstantAMinusTwoPointFiveAndHalfBHalfAndOne() {
+        checkOddEvenConstantABAlternating(-2.5, 0.5, 0.5, 1.0)
+    }
+
+    @Test func oddEvenConstantAHalfAndOneBOneAndMinusTwoPointFive() {
+        checkOddEvenConstantABAlternating(0.5, 1.0, 1.0, -2.5)
+    }
+
+    @inline(__always)
     private func checkOddEvenConstantA(_ value: Lane) {
         let mismatches = Mismatches("oddEven with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x1AD8_0D95_1BD2_DCBB)

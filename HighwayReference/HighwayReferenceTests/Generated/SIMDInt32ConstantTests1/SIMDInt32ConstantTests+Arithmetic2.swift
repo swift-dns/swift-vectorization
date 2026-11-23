@@ -47,6 +47,54 @@ extension SIMDInt32ConstantTests {
     }
 
     @inline(__always)
+    private func checkRoundedAverageConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "roundedAverage with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(aEven, aOdd, aEven, aOdd),
+            H(raw: HighwayReference.repeatingBlockI32(aEven, aOdd, aEven, aOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(bEven, bOdd, bEven, bOdd),
+            H(raw: HighwayReference.repeatingBlockI32(bEven, bOdd, bEven, bOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.roundedAverage(
+                H.repeatingBlock(aEven, aOdd, aEven, aOdd),
+                H.repeatingBlock(bEven, bOdd, bEven, bOdd)
+            ),
+            H(
+                raw: HighwayReference.roundedAverageI32(
+                    H.repeatingBlock(aEven, aOdd, aEven, aOdd).raw,
+                    H.repeatingBlock(bEven, bOdd, bEven, bOdd).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func roundedAverageConstantA1And26B26And127() {
+        checkRoundedAverageConstantABAlternating(1, 26, 26, 127)
+    }
+
+    @Test func roundedAverageConstantA26And127B127And1() {
+        checkRoundedAverageConstantABAlternating(26, 127, 127, 1)
+    }
+
+    @Test func roundedAverageConstantA127And1B1And26() {
+        checkRoundedAverageConstantABAlternating(127, 1, 1, 26)
+    }
+
+    @inline(__always)
     private func checkRoundedAverageConstantA(_ value: Lane) {
         let mismatches = Mismatches("roundedAverage with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x4A92_07A0_F0AC_2AB1)

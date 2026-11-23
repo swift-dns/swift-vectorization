@@ -150,6 +150,54 @@ extension SIMDUInt32ConstantTests {
     }
 
     @inline(__always)
+    private func checkMultiplyingComplexConjugateConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "multiplyingComplexConjugate with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(aEven, aOdd, aEven, aOdd),
+            H(raw: HighwayReference.repeatingBlockU32(aEven, aOdd, aEven, aOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(bEven, bOdd, bEven, bOdd),
+            H(raw: HighwayReference.repeatingBlockU32(bEven, bOdd, bEven, bOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.multiplyingComplexConjugate(
+                H.repeatingBlock(aEven, aOdd, aEven, aOdd),
+                H.repeatingBlock(bEven, bOdd, bEven, bOdd)
+            ),
+            H(
+                raw: HighwayReference.multiplyingComplexConjugateU32(
+                    H.repeatingBlock(aEven, aOdd, aEven, aOdd).raw,
+                    H.repeatingBlock(bEven, bOdd, bEven, bOdd).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func multiplyingComplexConjugateConstantA1And26B26And127() {
+        checkMultiplyingComplexConjugateConstantABAlternating(1, 26, 26, 127)
+    }
+
+    @Test func multiplyingComplexConjugateConstantA26And127B127And1() {
+        checkMultiplyingComplexConjugateConstantABAlternating(26, 127, 127, 1)
+    }
+
+    @Test func multiplyingComplexConjugateConstantA127And1B1And26() {
+        checkMultiplyingComplexConjugateConstantABAlternating(127, 1, 1, 26)
+    }
+
+    @inline(__always)
     private func checkMultiplyingComplexConjugateConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyingComplexConjugate with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0xC86F_9C51_F3C5_445B)
@@ -421,6 +469,59 @@ extension SIMDUInt32ConstantTests {
 
     @Test func multiplyAddingComplexConjugateConstantA127B1() {
         checkMultiplyAddingComplexConjugateConstantAB(127, 1)
+    }
+
+    @inline(__always)
+    private func checkMultiplyAddingComplexConjugateConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "multiplyAddingComplexConjugate with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        let cInputs = Inputs.vectors(H.self, seed: 0x1118_F702_9BB2_1E2E)
+        mismatches.check(
+            H.repeatingBlock(aEven, aOdd, aEven, aOdd),
+            H(raw: HighwayReference.repeatingBlockU32(aEven, aOdd, aEven, aOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(bEven, bOdd, bEven, bOdd),
+            H(raw: HighwayReference.repeatingBlockU32(bEven, bOdd, bEven, bOdd)),
+            "repeatingBlock"
+        )
+        for c in cInputs {
+            mismatches.check(
+                H.multiplyAddingComplexConjugate(
+                    H.repeatingBlock(aEven, aOdd, aEven, aOdd),
+                    H.repeatingBlock(bEven, bOdd, bEven, bOdd),
+                    c
+                ),
+                H(
+                    raw: HighwayReference.multiplyAddingComplexConjugateU32(
+                        H.repeatingBlock(aEven, aOdd, aEven, aOdd).raw,
+                        H.repeatingBlock(bEven, bOdd, bEven, bOdd).raw,
+                        c.raw
+                    )
+                ),
+                "c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyAddingComplexConjugateConstantA1And26B26And127() {
+        checkMultiplyAddingComplexConjugateConstantABAlternating(1, 26, 26, 127)
+    }
+
+    @Test func multiplyAddingComplexConjugateConstantA26And127B127And1() {
+        checkMultiplyAddingComplexConjugateConstantABAlternating(26, 127, 127, 1)
+    }
+
+    @Test func multiplyAddingComplexConjugateConstantA127And1B1And26() {
+        checkMultiplyAddingComplexConjugateConstantABAlternating(127, 1, 1, 26)
     }
 
     @inline(__always)

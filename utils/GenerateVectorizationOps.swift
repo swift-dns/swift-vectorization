@@ -48761,6 +48761,19 @@ func byteSweepInputs(_ vectors: String) -> String {
     return "\(vectors) + (0..<256).map { start in H(H.SIMDType(\(lanes))) }"
 }
 
+func nearlyUniformInputs(_ vectors: String, for element: Element) -> String {
+    let bits = unsignedElement(of: element).swiftType
+    let differing = "$0 == lane ? uniform ^ 1 : uniform"
+    let lanes =
+        element.category == .float
+        ? "(0..<H.laneCount).map { Lane(bitPattern: \(differing)) }"
+        : "(0..<H.laneCount).map { \(differing) }"
+    let uniforms =
+        element.category == .float ? "[\(bits).zero, ~\(bits).zero]" : "[Lane.zero, ~Lane.zero]"
+    let nearly = "\(uniforms).map { uniform in H(H.SIMDType(\(lanes))) }"
+    return "\(vectors) + (0..<H.laneCount).flatMap { lane in \(nearly) }"
+}
+
 func immediate(named name: String, of op: Op) -> ImmediateArgument {
     guard let immediate = op.immediates.first(where: { $0.name == name }) else {
         fatalError("\(op.identifier) has no immediate named \(name)")
@@ -48836,6 +48849,9 @@ func referenceInputs(
             }
             if op.section == .crypto && element.bits == 8 && inputs.isEmpty {
                 values = byteSweepInputs(values)
+            }
+            if op.returns == .boolean && !element.isHalfPrecision {
+                values = nearlyUniformInputs(values, for: element)
             }
         case .indices, .laneIndices, .lookupIndices, .indexVector:
             values = indexInputs(of: op, parameter, seed: seed, inContract: inContract)
@@ -53308,32 +53324,58 @@ func jointConstantVectors(for operand: Element) -> [ConstantValue] {
 /// A helper that takes all parameters of a gate condition of an op, which only fold into the
 /// constant path of the op when all of them are constants, and the tests that call it with every
 /// constant mask, the amounts that are lanes of some vector and splat vectors that differ from one
-/// another, each vector taking every value in turn.
-func jointConstantTests(of op: Op, for element: Element, parameters group: [Int]) -> [String] {
+/// another, each vector taking every value in turn. With `alternating` the lanes of each vector
+/// alternate between two of the values, which reaches a constant path that comes after a test for
+/// a splat.
+func jointConstantTests(
+    of op: Op,
+    for element: Element,
+    parameters group: [Int],
+    alternating: Bool = false
+) -> [String] {
     let parameterBindings = bindings(of: op, for: element)
     let names = group.map { parameterBindings[$0].swiftName }
     let name =
         "check\(uppercasedFirst(op.testIdentifier))Constant\(names.map(uppercasedFirst).joined())"
+        + (alternating ? "Alternating" : "")
     func isVector(_ index: Int) -> Bool { isConstantVector(op.parameters[index]) }
     func operand(_ index: Int) -> Element {
         operandElement(of: op.parameters[index], for: element, source: op.source)
     }
-    func argument(_ index: Int) -> String {
+    func arguments(_ index: Int) -> [String] {
         let name = parameterBindings[index].swiftName
-        return isVector(index) ? "\(name)Value" : name
+        guard isVector(index) else { return [name] }
+        return alternating ? ["\(name)Even", "\(name)Odd"] : ["\(name)Value"]
     }
+    func lanes(_ index: Int) -> [String] {
+        let values = arguments(index)
+        return alternating
+            ? (0..<operand(index).blockLaneCount).map { values[$0 % values.count] } : values
+    }
+    let constructor = alternating ? repeatingBlockName : "repeating"
     func immediate(at index: Int) -> ImmediateArgument {
         op.immediates[op.parameters[..<index].filter { $0 == .immediate }.count]
     }
     let vectors = group.filter(isVector)
     let vectorValues = vectors.map { jointConstantVectors(for: operand($0)) }
     let hasImmediates = group.contains { op.parameters[$0] == .immediate }
-    let rotationCount = hasImmediates ? 1 : (vectorValues.first?.count ?? 0)
+    let rotationCount =
+        hasImmediates || (alternating && vectors.count < group.count)
+        ? 1 : (vectorValues.first?.count ?? 0)
     let rotations = (0..<rotationCount).map { rotation in
         Dictionary(
             uniqueKeysWithValues: vectors.indices.map { position in
                 let values = vectorValues[position]
-                return (vectors[position], values[(rotation + position) % values.count])
+                let even = values[(rotation + position) % values.count]
+                guard alternating else { return (vectors[position], even) }
+                let odd = values[(rotation + position + 1) % values.count]
+                return (
+                    vectors[position],
+                    ConstantValue(
+                        name: "\(even.name)And\(odd.name)",
+                        literal: "\(even.literal), \(odd.literal)"
+                    )
+                )
             }
         )
     }
@@ -53362,8 +53404,8 @@ func jointConstantTests(of op: Op, for element: Element, parameters group: [Int]
         .filter { !names.contains($0.name) }
     func repeated(_ index: Int) -> String {
         portCall(
-            "repeating",
-            [argument(index)],
+            constructor,
+            lanes(index),
             on: constantNamespace(of: operand(index), for: element)
         )
     }
@@ -53388,30 +53430,32 @@ func jointConstantTests(of op: Op, for element: Element, parameters group: [Int]
     let splatDeclarations = vectors.map { index in
         let highwaySplat = referenceResult(
             referenceCall(
-                referenceFunctionName("repeating", operand(index)),
-                [argument(index)].map(operand(index).swiftScalarArgument)
+                referenceFunctionName(constructor, operand(index)),
+                lanes(index).map(operand(index).swiftScalarArgument)
             ),
             returning: .vector,
             for: operand(index),
             on: constantNamespace(of: operand(index), for: element)
         )
-        return "mismatches.check(\(repeated(index)), \(highwaySplat), \"repeating\")"
+        return "mismatches.check(\(repeated(index)), \(highwaySplat), \"\(constructor)\")"
     }
     let descriptions = group.map { index in
+        let values = arguments(index)
         let described =
             isVector(index)
-            ? "repeating \\(hex(\(argument(index))))"
+            ? (alternating ? "alternating " : "repeating ")
+                + values.map { "\\(hex(\($0)))" }.joined(separator: ", ")
             : [.mask, .whereMask].contains(op.parameters[index])
-                ? "\\(describe(\(argument(index))))" : "\\(\(argument(index)))"
+                ? "\\(describe(\(values[0])))" : "\\(\(values[0]))"
         return "\(parameterBindings[index].swiftName) \(described)"
     }
-    let parameters = group.map { index in
+    let parameters = group.flatMap { index in
         let type = constantType(
             of: op.parameters[index],
             for: element,
             lane: constantLane(of: operand(index), for: element)
         )
-        return "_ \(argument(index)): \(type)"
+        return arguments(index).map { "_ \($0): \(type)" }
     }
     var members = [
         referenceTestFunction(
@@ -53635,6 +53679,16 @@ func constantTests(of op: Op, for element: Element) -> [String] {
 
     for group in constantGroups(of: op, for: element) {
         members += jointConstantTests(of: op, for: element, parameters: group)
+        if group.contains(where: { isConstantVector(op.parameters[$0]) })
+            && !group.contains(where: { op.parameters[$0] == .immediate })
+        {
+            members += jointConstantTests(
+                of: op,
+                for: element,
+                parameters: group,
+                alternating: true
+            )
+        }
     }
 
     for index in indices where op.parameters[index] == .constBytePointer {

@@ -42,6 +42,51 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
+    private func checkOddEvenConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "oddEven with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(aEven, aOdd),
+            H(raw: HighwayReference.repeatingBlockU64(aEven, aOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(bEven, bOdd),
+            H(raw: HighwayReference.repeatingBlockU64(bEven, bOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.oddEven(H.repeatingBlock(aEven, aOdd), H.repeatingBlock(bEven, bOdd)),
+            H(
+                raw: HighwayReference.oddEvenU64(
+                    H.repeatingBlock(aEven, aOdd).raw,
+                    H.repeatingBlock(bEven, bOdd).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func oddEvenConstantA1And26B26And127() {
+        checkOddEvenConstantABAlternating(1, 26, 26, 127)
+    }
+
+    @Test func oddEvenConstantA26And127B127And1() {
+        checkOddEvenConstantABAlternating(26, 127, 127, 1)
+    }
+
+    @Test func oddEvenConstantA127And1B1And26() {
+        checkOddEvenConstantABAlternating(127, 1, 1, 26)
+    }
+
+    @inline(__always)
     private func checkOddEvenConstantA(_ value: Lane) {
         let mismatches = Mismatches("oddEven with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x368D_3FC4_21B7_B64D)

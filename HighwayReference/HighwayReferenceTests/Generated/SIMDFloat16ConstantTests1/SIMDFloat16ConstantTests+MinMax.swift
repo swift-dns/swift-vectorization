@@ -764,6 +764,76 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
+    private func checkMinimumMagnitudeConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "minimumMagnitude with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(aEven, aOdd, aEven, aOdd, aEven, aOdd, aEven, aOdd),
+            H(
+                raw: HighwayReference.repeatingBlockF16(
+                    aEven.bitPattern,
+                    aOdd.bitPattern,
+                    aEven.bitPattern,
+                    aOdd.bitPattern,
+                    aEven.bitPattern,
+                    aOdd.bitPattern,
+                    aEven.bitPattern,
+                    aOdd.bitPattern
+                )
+            ),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(bEven, bOdd, bEven, bOdd, bEven, bOdd, bEven, bOdd),
+            H(
+                raw: HighwayReference.repeatingBlockF16(
+                    bEven.bitPattern,
+                    bOdd.bitPattern,
+                    bEven.bitPattern,
+                    bOdd.bitPattern,
+                    bEven.bitPattern,
+                    bOdd.bitPattern,
+                    bEven.bitPattern,
+                    bOdd.bitPattern
+                )
+            ),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.minimumMagnitude(
+                H.repeatingBlock(aEven, aOdd, aEven, aOdd, aEven, aOdd, aEven, aOdd),
+                H.repeatingBlock(bEven, bOdd, bEven, bOdd, bEven, bOdd, bEven, bOdd)
+            ),
+            H(
+                raw: HighwayReference.minimumMagnitudeF16(
+                    H.repeatingBlock(aEven, aOdd, aEven, aOdd, aEven, aOdd, aEven, aOdd).raw,
+                    H.repeatingBlock(bEven, bOdd, bEven, bOdd, bEven, bOdd, bEven, bOdd).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func minimumMagnitudeConstantAOneAndMinusTwoPointFiveBMinusTwoPointFiveAndHalf() {
+        checkMinimumMagnitudeConstantABAlternating(1.0, -2.5, -2.5, 0.5)
+    }
+
+    @Test func minimumMagnitudeConstantAMinusTwoPointFiveAndHalfBHalfAndOne() {
+        checkMinimumMagnitudeConstantABAlternating(-2.5, 0.5, 0.5, 1.0)
+    }
+
+    @Test func minimumMagnitudeConstantAHalfAndOneBOneAndMinusTwoPointFive() {
+        checkMinimumMagnitudeConstantABAlternating(0.5, 1.0, 1.0, -2.5)
+    }
+
+    @inline(__always)
     private func checkMinimumMagnitudeConstantA(_ value: Lane) {
         let mismatches = Mismatches("minimumMagnitude with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x38FD_91EF_CE50_86A6)
@@ -934,6 +1004,76 @@ extension SIMDFloat16ConstantTests {
 
     @Test func maximumMagnitudeConstantAHalfBOne() {
         checkMaximumMagnitudeConstantAB(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkMaximumMagnitudeConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "maximumMagnitude with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(aEven, aOdd, aEven, aOdd, aEven, aOdd, aEven, aOdd),
+            H(
+                raw: HighwayReference.repeatingBlockF16(
+                    aEven.bitPattern,
+                    aOdd.bitPattern,
+                    aEven.bitPattern,
+                    aOdd.bitPattern,
+                    aEven.bitPattern,
+                    aOdd.bitPattern,
+                    aEven.bitPattern,
+                    aOdd.bitPattern
+                )
+            ),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(bEven, bOdd, bEven, bOdd, bEven, bOdd, bEven, bOdd),
+            H(
+                raw: HighwayReference.repeatingBlockF16(
+                    bEven.bitPattern,
+                    bOdd.bitPattern,
+                    bEven.bitPattern,
+                    bOdd.bitPattern,
+                    bEven.bitPattern,
+                    bOdd.bitPattern,
+                    bEven.bitPattern,
+                    bOdd.bitPattern
+                )
+            ),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.maximumMagnitude(
+                H.repeatingBlock(aEven, aOdd, aEven, aOdd, aEven, aOdd, aEven, aOdd),
+                H.repeatingBlock(bEven, bOdd, bEven, bOdd, bEven, bOdd, bEven, bOdd)
+            ),
+            H(
+                raw: HighwayReference.maximumMagnitudeF16(
+                    H.repeatingBlock(aEven, aOdd, aEven, aOdd, aEven, aOdd, aEven, aOdd).raw,
+                    H.repeatingBlock(bEven, bOdd, bEven, bOdd, bEven, bOdd, bEven, bOdd).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func maximumMagnitudeConstantAOneAndMinusTwoPointFiveBMinusTwoPointFiveAndHalf() {
+        checkMaximumMagnitudeConstantABAlternating(1.0, -2.5, -2.5, 0.5)
+    }
+
+    @Test func maximumMagnitudeConstantAMinusTwoPointFiveAndHalfBHalfAndOne() {
+        checkMaximumMagnitudeConstantABAlternating(-2.5, 0.5, 0.5, 1.0)
+    }
+
+    @Test func maximumMagnitudeConstantAHalfAndOneBOneAndMinusTwoPointFive() {
+        checkMaximumMagnitudeConstantABAlternating(0.5, 1.0, 1.0, -2.5)
     }
 
     @inline(__always)

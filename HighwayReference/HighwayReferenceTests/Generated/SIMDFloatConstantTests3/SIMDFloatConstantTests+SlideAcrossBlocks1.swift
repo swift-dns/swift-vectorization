@@ -261,6 +261,98 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
+    private func checkSlideUpLanesConstantALanesAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ lanes: Int
+    ) {
+        let mismatches = Mismatches(
+            "slideUpLanes with a alternating \(hex(aEven)), \(hex(aOdd)), lanes \(lanes)"
+        )
+        mismatches.check(
+            H.repeatingBlock(aEven, aOdd, aEven, aOdd),
+            H(raw: HighwayReference.repeatingBlockF32(aEven, aOdd, aEven, aOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.slideUpLanes(H.repeatingBlock(aEven, aOdd, aEven, aOdd), by: lanes),
+            H(
+                raw: HighwayReference.slideUpLanesF32(
+                    H.repeatingBlock(aEven, aOdd, aEven, aOdd).raw,
+                    lanes
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test(.enabled(if: 0 <= H.laneCount)) func slideUpLanesConstantAOneAndMinusTwoPointFiveLanes0()
+    {
+        checkSlideUpLanesConstantALanesAlternating(1.0, -2.5, 0)
+    }
+
+    @Test(.enabled(if: 1 <= H.laneCount)) func slideUpLanesConstantAOneAndMinusTwoPointFiveLanes1()
+    {
+        checkSlideUpLanesConstantALanesAlternating(1.0, -2.5, 1)
+    }
+
+    @Test(.enabled(if: 2 <= H.laneCount)) func slideUpLanesConstantAOneAndMinusTwoPointFiveLanes2()
+    {
+        checkSlideUpLanesConstantALanesAlternating(1.0, -2.5, 2)
+    }
+
+    @Test(.enabled(if: 3 <= H.laneCount)) func slideUpLanesConstantAOneAndMinusTwoPointFiveLanes3()
+    {
+        checkSlideUpLanesConstantALanesAlternating(1.0, -2.5, 3)
+    }
+
+    @Test(.enabled(if: 4 <= H.laneCount)) func slideUpLanesConstantAOneAndMinusTwoPointFiveLanes4()
+    {
+        checkSlideUpLanesConstantALanesAlternating(1.0, -2.5, 4)
+    }
+
+    @Test(.enabled(if: 7 <= H.laneCount)) func slideUpLanesConstantAOneAndMinusTwoPointFiveLanes7()
+    {
+        checkSlideUpLanesConstantALanesAlternating(1.0, -2.5, 7)
+    }
+
+    @Test(.enabled(if: 8 <= H.laneCount)) func slideUpLanesConstantAOneAndMinusTwoPointFiveLanes8()
+    {
+        checkSlideUpLanesConstantALanesAlternating(1.0, -2.5, 8)
+    }
+
+    @Test(.enabled(if: 15 <= H.laneCount))
+    func slideUpLanesConstantAOneAndMinusTwoPointFiveLanes15() {
+        checkSlideUpLanesConstantALanesAlternating(1.0, -2.5, 15)
+    }
+
+    @Test(.enabled(if: 16 <= H.laneCount))
+    func slideUpLanesConstantAOneAndMinusTwoPointFiveLanes16() {
+        checkSlideUpLanesConstantALanesAlternating(1.0, -2.5, 16)
+    }
+
+    @Test(.enabled(if: 31 <= H.laneCount))
+    func slideUpLanesConstantAOneAndMinusTwoPointFiveLanes31() {
+        checkSlideUpLanesConstantALanesAlternating(1.0, -2.5, 31)
+    }
+
+    @Test(.enabled(if: 32 <= H.laneCount))
+    func slideUpLanesConstantAOneAndMinusTwoPointFiveLanes32() {
+        checkSlideUpLanesConstantALanesAlternating(1.0, -2.5, 32)
+    }
+
+    @Test(.enabled(if: 63 <= H.laneCount))
+    func slideUpLanesConstantAOneAndMinusTwoPointFiveLanes63() {
+        checkSlideUpLanesConstantALanesAlternating(1.0, -2.5, 63)
+    }
+
+    @Test(.enabled(if: 64 <= H.laneCount))
+    func slideUpLanesConstantAOneAndMinusTwoPointFiveLanes64() {
+        checkSlideUpLanesConstantALanesAlternating(1.0, -2.5, 64)
+    }
+
+    @inline(__always)
     private func checkSlideUpLanesConstantA(_ value: Lane) {
         let mismatches = Mismatches("slideUpLanes with a repeating \(hex(value))")
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
@@ -839,6 +931,98 @@ extension SIMDFloatConstantTests {
 
     @Test(.enabled(if: 64 <= H.laneCount)) func slideDownLanesConstantAHalfLanes64() {
         checkSlideDownLanesConstantALanes(0.5, 64)
+    }
+
+    @inline(__always)
+    private func checkSlideDownLanesConstantALanesAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ lanes: Int
+    ) {
+        let mismatches = Mismatches(
+            "slideDownLanes with a alternating \(hex(aEven)), \(hex(aOdd)), lanes \(lanes)"
+        )
+        mismatches.check(
+            H.repeatingBlock(aEven, aOdd, aEven, aOdd),
+            H(raw: HighwayReference.repeatingBlockF32(aEven, aOdd, aEven, aOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.slideDownLanes(H.repeatingBlock(aEven, aOdd, aEven, aOdd), by: lanes),
+            H(
+                raw: HighwayReference.slideDownLanesF32(
+                    H.repeatingBlock(aEven, aOdd, aEven, aOdd).raw,
+                    lanes
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test(.enabled(if: 0 <= H.laneCount))
+    func slideDownLanesConstantAOneAndMinusTwoPointFiveLanes0() {
+        checkSlideDownLanesConstantALanesAlternating(1.0, -2.5, 0)
+    }
+
+    @Test(.enabled(if: 1 <= H.laneCount))
+    func slideDownLanesConstantAOneAndMinusTwoPointFiveLanes1() {
+        checkSlideDownLanesConstantALanesAlternating(1.0, -2.5, 1)
+    }
+
+    @Test(.enabled(if: 2 <= H.laneCount))
+    func slideDownLanesConstantAOneAndMinusTwoPointFiveLanes2() {
+        checkSlideDownLanesConstantALanesAlternating(1.0, -2.5, 2)
+    }
+
+    @Test(.enabled(if: 3 <= H.laneCount))
+    func slideDownLanesConstantAOneAndMinusTwoPointFiveLanes3() {
+        checkSlideDownLanesConstantALanesAlternating(1.0, -2.5, 3)
+    }
+
+    @Test(.enabled(if: 4 <= H.laneCount))
+    func slideDownLanesConstantAOneAndMinusTwoPointFiveLanes4() {
+        checkSlideDownLanesConstantALanesAlternating(1.0, -2.5, 4)
+    }
+
+    @Test(.enabled(if: 7 <= H.laneCount))
+    func slideDownLanesConstantAOneAndMinusTwoPointFiveLanes7() {
+        checkSlideDownLanesConstantALanesAlternating(1.0, -2.5, 7)
+    }
+
+    @Test(.enabled(if: 8 <= H.laneCount))
+    func slideDownLanesConstantAOneAndMinusTwoPointFiveLanes8() {
+        checkSlideDownLanesConstantALanesAlternating(1.0, -2.5, 8)
+    }
+
+    @Test(.enabled(if: 15 <= H.laneCount))
+    func slideDownLanesConstantAOneAndMinusTwoPointFiveLanes15() {
+        checkSlideDownLanesConstantALanesAlternating(1.0, -2.5, 15)
+    }
+
+    @Test(.enabled(if: 16 <= H.laneCount))
+    func slideDownLanesConstantAOneAndMinusTwoPointFiveLanes16() {
+        checkSlideDownLanesConstantALanesAlternating(1.0, -2.5, 16)
+    }
+
+    @Test(.enabled(if: 31 <= H.laneCount))
+    func slideDownLanesConstantAOneAndMinusTwoPointFiveLanes31() {
+        checkSlideDownLanesConstantALanesAlternating(1.0, -2.5, 31)
+    }
+
+    @Test(.enabled(if: 32 <= H.laneCount))
+    func slideDownLanesConstantAOneAndMinusTwoPointFiveLanes32() {
+        checkSlideDownLanesConstantALanesAlternating(1.0, -2.5, 32)
+    }
+
+    @Test(.enabled(if: 63 <= H.laneCount))
+    func slideDownLanesConstantAOneAndMinusTwoPointFiveLanes63() {
+        checkSlideDownLanesConstantALanesAlternating(1.0, -2.5, 63)
+    }
+
+    @Test(.enabled(if: 64 <= H.laneCount))
+    func slideDownLanesConstantAOneAndMinusTwoPointFiveLanes64() {
+        checkSlideDownLanesConstantALanesAlternating(1.0, -2.5, 64)
     }
 
     @inline(__always)

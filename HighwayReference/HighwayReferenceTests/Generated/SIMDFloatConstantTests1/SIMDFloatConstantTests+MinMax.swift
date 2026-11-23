@@ -714,6 +714,54 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
+    private func checkMinimumMagnitudeConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "minimumMagnitude with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(aEven, aOdd, aEven, aOdd),
+            H(raw: HighwayReference.repeatingBlockF32(aEven, aOdd, aEven, aOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(bEven, bOdd, bEven, bOdd),
+            H(raw: HighwayReference.repeatingBlockF32(bEven, bOdd, bEven, bOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.minimumMagnitude(
+                H.repeatingBlock(aEven, aOdd, aEven, aOdd),
+                H.repeatingBlock(bEven, bOdd, bEven, bOdd)
+            ),
+            H(
+                raw: HighwayReference.minimumMagnitudeF32(
+                    H.repeatingBlock(aEven, aOdd, aEven, aOdd).raw,
+                    H.repeatingBlock(bEven, bOdd, bEven, bOdd).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func minimumMagnitudeConstantAOneAndMinusTwoPointFiveBMinusTwoPointFiveAndHalf() {
+        checkMinimumMagnitudeConstantABAlternating(1.0, -2.5, -2.5, 0.5)
+    }
+
+    @Test func minimumMagnitudeConstantAMinusTwoPointFiveAndHalfBHalfAndOne() {
+        checkMinimumMagnitudeConstantABAlternating(-2.5, 0.5, 0.5, 1.0)
+    }
+
+    @Test func minimumMagnitudeConstantAHalfAndOneBOneAndMinusTwoPointFive() {
+        checkMinimumMagnitudeConstantABAlternating(0.5, 1.0, 1.0, -2.5)
+    }
+
+    @inline(__always)
     private func checkMinimumMagnitudeConstantA(_ value: Lane) {
         let mismatches = Mismatches("minimumMagnitude with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x4CAA_459D_EB04_9A58)
@@ -884,6 +932,54 @@ extension SIMDFloatConstantTests {
 
     @Test func maximumMagnitudeConstantAHalfBOne() {
         checkMaximumMagnitudeConstantAB(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkMaximumMagnitudeConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "maximumMagnitude with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(aEven, aOdd, aEven, aOdd),
+            H(raw: HighwayReference.repeatingBlockF32(aEven, aOdd, aEven, aOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(bEven, bOdd, bEven, bOdd),
+            H(raw: HighwayReference.repeatingBlockF32(bEven, bOdd, bEven, bOdd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.maximumMagnitude(
+                H.repeatingBlock(aEven, aOdd, aEven, aOdd),
+                H.repeatingBlock(bEven, bOdd, bEven, bOdd)
+            ),
+            H(
+                raw: HighwayReference.maximumMagnitudeF32(
+                    H.repeatingBlock(aEven, aOdd, aEven, aOdd).raw,
+                    H.repeatingBlock(bEven, bOdd, bEven, bOdd).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func maximumMagnitudeConstantAOneAndMinusTwoPointFiveBMinusTwoPointFiveAndHalf() {
+        checkMaximumMagnitudeConstantABAlternating(1.0, -2.5, -2.5, 0.5)
+    }
+
+    @Test func maximumMagnitudeConstantAMinusTwoPointFiveAndHalfBHalfAndOne() {
+        checkMaximumMagnitudeConstantABAlternating(-2.5, 0.5, 0.5, 1.0)
+    }
+
+    @Test func maximumMagnitudeConstantAHalfAndOneBOneAndMinusTwoPointFive() {
+        checkMaximumMagnitudeConstantABAlternating(0.5, 1.0, 1.0, -2.5)
     }
 
     @inline(__always)

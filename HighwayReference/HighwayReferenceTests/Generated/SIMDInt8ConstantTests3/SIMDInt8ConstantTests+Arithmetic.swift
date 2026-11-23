@@ -282,6 +282,194 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
+    private func checkAbsoluteDifferenceConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "absoluteDifference with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd
+            ),
+            H(
+                raw: HighwayReference.repeatingBlockI8(
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd
+                )
+            ),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd
+            ),
+            H(
+                raw: HighwayReference.repeatingBlockI8(
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd
+                )
+            ),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.absoluteDifference(
+                H.repeatingBlock(
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd
+                ),
+                H.repeatingBlock(
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd
+                )
+            ),
+            H(
+                raw: HighwayReference.absoluteDifferenceI8(
+                    H.repeatingBlock(
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd
+                    ).raw,
+                    H.repeatingBlock(
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd
+                    ).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func absoluteDifferenceConstantA1And26B26And127() {
+        checkAbsoluteDifferenceConstantABAlternating(1, 26, 26, 127)
+    }
+
+    @Test func absoluteDifferenceConstantA26And127B127And1() {
+        checkAbsoluteDifferenceConstantABAlternating(26, 127, 127, 1)
+    }
+
+    @Test func absoluteDifferenceConstantA127And1B1And26() {
+        checkAbsoluteDifferenceConstantABAlternating(127, 1, 1, 26)
+    }
+
+    @inline(__always)
     private func checkAbsoluteDifferenceConstantA(_ value: Lane) {
         let mismatches = Mismatches("absoluteDifference with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x7F54_1A00_72E1_6CA0)
@@ -466,6 +654,194 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
+    private func checkSaturatingAddingConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "saturatingAdding with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd
+            ),
+            H(
+                raw: HighwayReference.repeatingBlockI8(
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd
+                )
+            ),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd
+            ),
+            H(
+                raw: HighwayReference.repeatingBlockI8(
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd
+                )
+            ),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.saturatingAdding(
+                H.repeatingBlock(
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd
+                ),
+                H.repeatingBlock(
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd
+                )
+            ),
+            H(
+                raw: HighwayReference.saturatingAddingI8(
+                    H.repeatingBlock(
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd
+                    ).raw,
+                    H.repeatingBlock(
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd
+                    ).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func saturatingAddingConstantA1And26B26And127() {
+        checkSaturatingAddingConstantABAlternating(1, 26, 26, 127)
+    }
+
+    @Test func saturatingAddingConstantA26And127B127And1() {
+        checkSaturatingAddingConstantABAlternating(26, 127, 127, 1)
+    }
+
+    @Test func saturatingAddingConstantA127And1B1And26() {
+        checkSaturatingAddingConstantABAlternating(127, 1, 1, 26)
+    }
+
+    @inline(__always)
     private func checkSaturatingAddingConstantA(_ value: Lane) {
         let mismatches = Mismatches("saturatingAdding with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x8DC2_26F3_FCA8_060F)
@@ -594,6 +970,194 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
+    private func checkSaturatingSubtractingConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "saturatingSubtracting with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd
+            ),
+            H(
+                raw: HighwayReference.repeatingBlockI8(
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd
+                )
+            ),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd
+            ),
+            H(
+                raw: HighwayReference.repeatingBlockI8(
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd
+                )
+            ),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.saturatingSubtracting(
+                H.repeatingBlock(
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd
+                ),
+                H.repeatingBlock(
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd
+                )
+            ),
+            H(
+                raw: HighwayReference.saturatingSubtractingI8(
+                    H.repeatingBlock(
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd
+                    ).raw,
+                    H.repeatingBlock(
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd
+                    ).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func saturatingSubtractingConstantA1And26B26And127() {
+        checkSaturatingSubtractingConstantABAlternating(1, 26, 26, 127)
+    }
+
+    @Test func saturatingSubtractingConstantA26And127B127And1() {
+        checkSaturatingSubtractingConstantABAlternating(26, 127, 127, 1)
+    }
+
+    @Test func saturatingSubtractingConstantA127And1B1And26() {
+        checkSaturatingSubtractingConstantABAlternating(127, 1, 1, 26)
+    }
+
+    @inline(__always)
     private func checkSaturatingSubtractingConstantA(_ value: Lane) {
         let mismatches = Mismatches("saturatingSubtracting with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x5EFF_B0D9_2715_C636)
@@ -719,6 +1283,194 @@ extension SIMDInt8ConstantTests {
 
     @Test func roundedAverageConstantA127B1() {
         checkRoundedAverageConstantAB(127, 1)
+    }
+
+    @inline(__always)
+    private func checkRoundedAverageConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "roundedAverage with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd,
+                aEven,
+                aOdd
+            ),
+            H(
+                raw: HighwayReference.repeatingBlockI8(
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd
+                )
+            ),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd,
+                bEven,
+                bOdd
+            ),
+            H(
+                raw: HighwayReference.repeatingBlockI8(
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd
+                )
+            ),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.roundedAverage(
+                H.repeatingBlock(
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd
+                ),
+                H.repeatingBlock(
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd
+                )
+            ),
+            H(
+                raw: HighwayReference.roundedAverageI8(
+                    H.repeatingBlock(
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd,
+                        aEven,
+                        aOdd
+                    ).raw,
+                    H.repeatingBlock(
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd,
+                        bEven,
+                        bOdd
+                    ).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func roundedAverageConstantA1And26B26And127() {
+        checkRoundedAverageConstantABAlternating(1, 26, 26, 127)
+    }
+
+    @Test func roundedAverageConstantA26And127B127And1() {
+        checkRoundedAverageConstantABAlternating(26, 127, 127, 1)
+    }
+
+    @Test func roundedAverageConstantA127And1B1And26() {
+        checkRoundedAverageConstantABAlternating(127, 1, 1, 26)
     }
 
     @inline(__always)
