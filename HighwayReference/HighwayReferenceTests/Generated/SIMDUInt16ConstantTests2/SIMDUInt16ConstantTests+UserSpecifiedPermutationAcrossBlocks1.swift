@@ -151,23 +151,28 @@ extension SIMDUInt16ConstantTests {
         mismatches.record()
     }
 
-    @Test func lookup8ConstantIndicesSplat0() {
+    @Test(.disabled(if: !H.canLookup8, "Highway's lookup needs more lanes than this target has"))
+    func lookup8ConstantIndicesSplat0() {
         checkLookup8ConstantIndices(0)
     }
 
-    @Test func lookup8ConstantIndicesSplat1() {
+    @Test(.disabled(if: !H.canLookup8, "Highway's lookup needs more lanes than this target has"))
+    func lookup8ConstantIndicesSplat1() {
         checkLookup8ConstantIndices(1)
     }
 
-    @Test func lookup8ConstantIndicesSplat2() {
+    @Test(.disabled(if: !H.canLookup8, "Highway's lookup needs more lanes than this target has"))
+    func lookup8ConstantIndicesSplat2() {
         checkLookup8ConstantIndices(2)
     }
 
-    @Test func lookup8ConstantIndicesSplat3() {
+    @Test(.disabled(if: !H.canLookup8, "Highway's lookup needs more lanes than this target has"))
+    func lookup8ConstantIndicesSplat3() {
         checkLookup8ConstantIndices(3)
     }
 
-    @Test func lookup8ConstantIndicesSplat7() {
+    @Test(.disabled(if: !H.canLookup8, "Highway's lookup needs more lanes than this target has"))
+    func lookup8ConstantIndicesSplat7() {
         checkLookup8ConstantIndices(7)
     }
 
@@ -193,27 +198,33 @@ extension SIMDUInt16ConstantTests {
         mismatches.record()
     }
 
-    @Test func lookup16ConstantIndicesSplat0() {
+    @Test(.disabled(if: !H.canLookup16, "Highway's lookup needs more lanes than this target has"))
+    func lookup16ConstantIndicesSplat0() {
         checkLookup16ConstantIndices(0)
     }
 
-    @Test func lookup16ConstantIndicesSplat1() {
+    @Test(.disabled(if: !H.canLookup16, "Highway's lookup needs more lanes than this target has"))
+    func lookup16ConstantIndicesSplat1() {
         checkLookup16ConstantIndices(1)
     }
 
-    @Test func lookup16ConstantIndicesSplat2() {
+    @Test(.disabled(if: !H.canLookup16, "Highway's lookup needs more lanes than this target has"))
+    func lookup16ConstantIndicesSplat2() {
         checkLookup16ConstantIndices(2)
     }
 
-    @Test func lookup16ConstantIndicesSplat3() {
+    @Test(.disabled(if: !H.canLookup16, "Highway's lookup needs more lanes than this target has"))
+    func lookup16ConstantIndicesSplat3() {
         checkLookup16ConstantIndices(3)
     }
 
-    @Test func lookup16ConstantIndicesSplat7() {
+    @Test(.disabled(if: !H.canLookup16, "Highway's lookup needs more lanes than this target has"))
+    func lookup16ConstantIndicesSplat7() {
         checkLookup16ConstantIndices(7)
     }
 
-    @Test func lookup16ConstantIndicesSplat15() {
+    @Test(.disabled(if: !H.canLookup16, "Highway's lookup needs more lanes than this target has"))
+    func lookup16ConstantIndicesSplat15() {
         checkLookup16ConstantIndices(15)
     }
 }

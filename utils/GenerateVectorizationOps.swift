@@ -53779,6 +53779,7 @@ func constantTests(of op: Op, for element: Element) -> [String] {
                 constantTest(
                     "\(op.testIdentifier)Constant\(uppercasedFirst(binding.swiftName))Splat\(value.name)",
                     enabledIf: condition,
+                    disabling: laneCapabilityDisabling(of: op, for: element),
                     calls: ["\(helper)(\(value.literal))"]
                 )
             )

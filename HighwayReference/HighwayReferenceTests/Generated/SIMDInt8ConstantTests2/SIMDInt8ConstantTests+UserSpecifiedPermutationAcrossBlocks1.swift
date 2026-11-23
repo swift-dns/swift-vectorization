@@ -143,35 +143,43 @@ extension SIMDInt8ConstantTests {
         mismatches.record()
     }
 
-    @Test func lookup64ConstantIndicesSplat0() {
+    @Test(.disabled(if: !H.canLookup64, "Highway's lookup needs more lanes than this target has"))
+    func lookup64ConstantIndicesSplat0() {
         checkLookup64ConstantIndices(0)
     }
 
-    @Test func lookup64ConstantIndicesSplat1() {
+    @Test(.disabled(if: !H.canLookup64, "Highway's lookup needs more lanes than this target has"))
+    func lookup64ConstantIndicesSplat1() {
         checkLookup64ConstantIndices(1)
     }
 
-    @Test func lookup64ConstantIndicesSplat2() {
+    @Test(.disabled(if: !H.canLookup64, "Highway's lookup needs more lanes than this target has"))
+    func lookup64ConstantIndicesSplat2() {
         checkLookup64ConstantIndices(2)
     }
 
-    @Test func lookup64ConstantIndicesSplat3() {
+    @Test(.disabled(if: !H.canLookup64, "Highway's lookup needs more lanes than this target has"))
+    func lookup64ConstantIndicesSplat3() {
         checkLookup64ConstantIndices(3)
     }
 
-    @Test func lookup64ConstantIndicesSplat7() {
+    @Test(.disabled(if: !H.canLookup64, "Highway's lookup needs more lanes than this target has"))
+    func lookup64ConstantIndicesSplat7() {
         checkLookup64ConstantIndices(7)
     }
 
-    @Test func lookup64ConstantIndicesSplat15() {
+    @Test(.disabled(if: !H.canLookup64, "Highway's lookup needs more lanes than this target has"))
+    func lookup64ConstantIndicesSplat15() {
         checkLookup64ConstantIndices(15)
     }
 
-    @Test func lookup64ConstantIndicesSplat31() {
+    @Test(.disabled(if: !H.canLookup64, "Highway's lookup needs more lanes than this target has"))
+    func lookup64ConstantIndicesSplat31() {
         checkLookup64ConstantIndices(31)
     }
 
-    @Test func lookup64ConstantIndicesSplat63() {
+    @Test(.disabled(if: !H.canLookup64, "Highway's lookup needs more lanes than this target has"))
+    func lookup64ConstantIndicesSplat63() {
         checkLookup64ConstantIndices(63)
     }
 }
