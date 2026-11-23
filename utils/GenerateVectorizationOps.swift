@@ -16070,9 +16070,7 @@ let basicOps: [Op] = [
             sve2_128Splat: { element in
                 sveBitwiseSplat("and", operands: ("mask", "a"), splattingFirst: false, for: element)
             },
-            sveSplat: { element in
-                sveBitwiseSplat("and", operands: ("mask", "a"), splattingFirst: false, for: element)
-            },
+            sveSplat: { element in sveSplatSelecting(zeroing: false, for: element) },
             avx3: { element in x86Avx3ZeroMasked("a", for: element) }
         )
     ) { element in
@@ -16095,6 +16093,7 @@ let basicOps: [Op] = [
                     for: element
                 )
             },
+            sveSplat: { element in sveSplatSelecting(zeroing: true, for: element) },
             avx3: { element in
                 vectorResult(
                     x86Avx3Selecting("mask", x86Avx3Zeros(for: element), "a", for: element),
@@ -20536,6 +20535,32 @@ func sveSelecting(_ yes: String, _ no: String, for element: Element) -> String? 
         for: element
     )
     return vectorResult(sveResult(selected, for: element), for: element)
+}
+
+func sveCanonicalMaskCondition(_ name: String, for element: Element) -> String {
+    "__builtin_constant_p(__builtin_reduce_and(\(name) == (\(name) >> \(element.bits - 1))))"
+}
+
+func sveSplatSelecting(zeroing: Bool, for element: Element) -> String? {
+    guard element.bits == 8 || element.bits == 64 else { return nil }
+    let predicate = svePredicate(of: "mask", for: element)
+    let lane = sveFirstLane("a", for: element)
+    let duplicated = sveBuiltin("dup_n", [lane], for: element)
+    let selected: String
+    if zeroing {
+        selected = sveBuiltin("sel", [predicate, sveZeros(for: element), duplicated], for: element)
+    } else if element.category == .float {
+        selected = sveBuiltin("sel", [predicate, duplicated, sveZeros(for: element)], for: element)
+    } else {
+        selected = sveBuiltin("dup_n", [predicate, lane], for: element, predication: "z")
+    }
+    let condition =
+        "\(sveSplatCondition("a", nil, for: element)) && !\(sveCanonicalMaskCondition(rawName("mask"), for: element))"
+    return """
+        if (\(condition)) {
+          \(vectorResult(sveResult(selected, for: element), for: element))
+        }
+        """
 }
 
 func sveMaskLanes(_ predicate: String, for element: Element) -> String {
@@ -44749,16 +44774,38 @@ func cMaskReads(of element: Element) -> String {
         let nonzero =
             element.category == .float
             ? "(\(lanes))v != (\(lanes)){0}" : "(\(mask))v != 0"
-        let sve = { (_: Element) in
+        let sve2_128 = { (_: Element) in
             guard element.category == .float16 else { return "return (\(mask))(\(nonzero));" }
             return """
                 typedef _Float16 native_vector __attribute__((vector_size(sizeof v)));
                 return (\(mask))((native_vector)v != (native_vector){0});
                 """
         }
+        let sve = { (_: Element) in
+            guard full, element.isFloatingPoint else { return sve2_128(element) }
+            let signed = signedElement(of: element)
+            let reinterpreted = sveReinterpreted(
+                "(\(sveVector(signed.cSuffix)))v",
+                from: signed,
+                to: element
+            )
+            let floats = element.category == .float16 ? "native_vector" : lanes
+            let typedef =
+                element.category == .float16
+                ? "typedef _Float16 native_vector __attribute__((vector_size(sizeof v)));\n" : ""
+            return typedef
+                + sveFolding(
+                    when: sveCanonicalMaskCondition("v", for: element),
+                    "return (\(mask))((\(floats))v != (\(floats)){0});",
+                    otherwise: """
+                        const \(floats) lanes = (\(floats))(\(sveVector(element.cSuffix)))\(reinterpreted);
+                        return (\(mask))(lanes != (\(floats)){0});
+                        """
+                )
+        }
         let body = cBody(
             TargetBodies(
-                sve2_128: sve,
+                sve2_128: sve2_128,
                 sve: sve,
                 avx3: { element in "return (\(mask))v >> \(element.bits - 1);" }
             ),
@@ -44882,7 +44929,10 @@ func float16MaskTargets(
             let body = targets.sve2_128?(element) ?? splat ?? fallback
             return (prologue(element) + [body]).joined(separator: "\n")
         },
-        sve: { _ in delegation }
+        sve: { element in
+            guard case .narrowMask = op.returns else { return delegation }
+            return (prologue(element) + [op.portable(element)]).joined(separator: "\n")
+        }
     )
 }
 
@@ -51904,6 +51954,8 @@ struct ConstantValue {
     let literal: String
 }
 
+let constantMaskReaders: Set<String> = ["selecting", "selectingOrZero", "zeroingSelected"]
+
 let constantMarkers = [
     "__builtin_constant_p(",
     "cvectorization_ops_sve_splat_",
@@ -51996,8 +52048,11 @@ func constantParameters(of op: Op, for element: Element) -> [Int] {
             (operand.category == .float || operand.isHalfPrecision) && isConstantVector(pair.1)
             && !pair.1.isPointerIndices
         let isTemplated = op.template != nil && pair.1 == .shiftAmount
-        return isFloatOperand || isTemplated
-            || (!pair.1.isTag && identifiers.contains(pair.0.swiftName))
+        let readsMask = constantMaskReaders.contains(op.identifier) && pair.1 == .mask
+        return isFloatOperand || isTemplated || readsMask
+            || (!pair.1.isTag
+                && (identifiers.contains(pair.0.swiftName)
+                    || identifiers.contains(rawName(pair.0.swiftName))))
             ? index : nil
     }
 }

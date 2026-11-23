@@ -7,6 +7,193 @@ import Vectorization
 
 extension SIMDInt32ConstantTests {
     @inline(__always)
+    private func checkSelectingConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("selecting with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xFE1E_F150_0AA1_D8A2)
+        let bInputs = Inputs.vectors(H.self, seed: 0xFE1E_F050_0AA1_D6EF)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.selecting(mask, a, b),
+                H(raw: HighwayReference.selectingI32(mask.raw, a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func selectingConstantMaskAllFalse() {
+        checkSelectingConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func selectingConstantMaskAllTrue() {
+        checkSelectingConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func selectingConstantMaskOnlyFirst() {
+        checkSelectingConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func selectingConstantMaskOnlyLast() {
+        checkSelectingConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func selectingConstantMaskAllButFirst() {
+        checkSelectingConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func selectingConstantMaskAllButLast() {
+        checkSelectingConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
+    private func checkSelectingOrZeroConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("selectingOrZero with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x12D7_3E64_EE95_4575)
+        for a in aInputs {
+            mismatches.check(
+                H.selectingOrZero(mask, a),
+                H(raw: HighwayReference.selectingOrZeroI32(mask.raw, a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func selectingOrZeroConstantMaskAllFalse() {
+        checkSelectingOrZeroConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func selectingOrZeroConstantMaskAllTrue() {
+        checkSelectingOrZeroConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func selectingOrZeroConstantMaskOnlyFirst() {
+        checkSelectingOrZeroConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func selectingOrZeroConstantMaskOnlyLast() {
+        checkSelectingOrZeroConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func selectingOrZeroConstantMaskAllButFirst() {
+        checkSelectingOrZeroConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func selectingOrZeroConstantMaskAllButLast() {
+        checkSelectingOrZeroConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
+    private func checkZeroingSelectedConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("zeroingSelected with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x0568_D5F2_457C_4B79)
+        for a in aInputs {
+            mismatches.check(
+                H.zeroingSelected(mask, a),
+                H(raw: HighwayReference.zeroingSelectedI32(mask.raw, a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func zeroingSelectedConstantMaskAllFalse() {
+        checkZeroingSelectedConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func zeroingSelectedConstantMaskAllTrue() {
+        checkZeroingSelectedConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func zeroingSelectedConstantMaskOnlyFirst() {
+        checkZeroingSelectedConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func zeroingSelectedConstantMaskOnlyLast() {
+        checkZeroingSelectedConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func zeroingSelectedConstantMaskAllButFirst() {
+        checkZeroingSelectedConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func zeroingSelectedConstantMaskAllButLast() {
+        checkZeroingSelectedConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
     private func checkSelectingByVectorConstantA(_ value: Lane) {
         let mismatches = Mismatches("selectingByVector with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0xC271_83B7_EEEA_1BA3)
