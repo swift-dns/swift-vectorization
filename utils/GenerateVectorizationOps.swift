@@ -25751,8 +25751,12 @@ func sveFirstLanesPerBlock(_ count: String, for view: Element) -> String {
     )
 }
 
+func sveViewed(_ call: String, view: Element, for element: Element) -> String {
+    "(\(element.cVector))\(sveResult(call, for: view))"
+}
+
 func sveViewResult(_ call: String, view: Element, for element: Element) -> String {
-    vectorResult("(\(element.cVector))\(sveResult(call, for: view))", for: element)
+    vectorResult(sveViewed(call, view: view, for: element), for: element)
 }
 
 func sveInactiveLanes(_ count: String, for view: Element) -> String {
@@ -26113,10 +26117,11 @@ func blockCombineOp(_ swiftName: String, _ highwayName: String, bytewise: Bool) 
 func constantSwitch(
     on key: String,
     knowing names: [String],
+    alongside terms: [String] = [],
     _ cases: [(amount: Int, body: String)]
 ) -> String {
     let lines = cases.map { "case \($0.amount): \($0.body)" }
-    let known = names.map { "__builtin_constant_p(\($0))" }.joined(separator: " && ")
+    let known = (terms + names.map { "__builtin_constant_p(\($0))" }).joined(separator: " && ")
     return """
         if (\(known)) {
           switch (\(key)) {
@@ -31504,44 +31509,148 @@ func sumsShuffledQuadTarget(
     }
 }
 
+enum SumsShuffle {
+    case vector
+    case table
+}
+
+func sumsSveLookup(
+    _ operand: String,
+    _ indices: [Int],
+    view: Element,
+    as element: Element
+) -> String {
+    let table = compoundLiteral(view.cVector, indices.map(String.init))
+    let lookup = sveBuiltin(
+        "tbl",
+        [sveOperand(operand, for: view), sveOperand(table, for: view)],
+        for: view
+    )
+    return sveViewed(lookup, view: view, for: element)
+}
+
+func sumsSveAdjacentQuadTarget(from source: Element) -> (Element) -> String {
+    let stages: [(constant: String?, a: SumsShuffle, b: SumsShuffle)] = [
+        ("a", .vector, .vector), ("b", .table, .vector), (nil, .table, .table),
+    ]
+    return sourced(source) { source, result in
+        let operands = sumsOperands(for: source, biasing: false)
+        let switches = stages.map { stage in
+            constantSwitch(
+                on: "aOffset * 4 + bOffset",
+                knowing: ["aOffset", "bOffset"],
+                alongside: stage.constant.map { ["\(cFunctionName("sveConstant", source))(\($0))"] }
+                    ?? [],
+                (0..<8).map {
+                    (
+                        amount: $0,
+                        body: sumsAdjacentQuadVectors(
+                            aOffset: $0 / 4,
+                            bOffset: $0 % 4,
+                            operands: operands,
+                            pairs: sumsBitwisePairs,
+                            shuffling: stage.a,
+                            and: stage.b,
+                            to: result
+                        )
+                    )
+                }
+            )
+        }
+        return sumsImmediatesBody(
+            operands: operands,
+            cases: switches.joined(separator: "\n"),
+            runtime: sumsAdjacentQuadPortable(from: source, to: result)
+        )
+    }
+}
+
+func sumsSveShuffledQuadTarget(from source: Element) -> (Element) -> String {
+    let stages: [(constant: String?, shuffle: SumsShuffle)] = [("a", .vector), (nil, .table)]
+    return sourced(source) { source, result in
+        let operands = sumsOperands(for: source, biasing: false)
+        let switches = stages.map { stage in
+            constantSwitch(
+                on: "((i3 * 4u + i2) * 4u + i1) * 4u + i0",
+                knowing: ["i3", "i2", "i1", "i0"],
+                alongside: stage.constant.map { ["\(cFunctionName("sveConstant", source))(\($0))"] }
+                    ?? [],
+                per4Tuples().map {
+                    (
+                        amount: per4Key($0),
+                        body: sumsShuffledQuadVectors(
+                            tuple: $0,
+                            operands: operands,
+                            shuffling: stage.shuffle,
+                            to: result
+                        )
+                    )
+                }
+            )
+        }
+        return sumsImmediatesBody(
+            operands: operands,
+            cases: switches.joined(separator: "\n"),
+            runtime: sumsShuffledQuadPortable(from: source, to: result)
+        )
+    }
+}
+
 func sumsAdjacentQuadVectors(
     aOffset: Int,
     bOffset: Int,
     operands: SumsOperands,
     pairs: SumsPairs,
+    shuffling a: SumsShuffle = .vector,
+    and b: SumsShuffle = .vector,
     to result: Element
 ) -> String {
     let source = operands.element
-    let blocks = source.width / 16
-    let words = unsignedElement(bits: 16).at(width: source.width)
-    let bytes = unsignedElement(of: source).at(width: source.width)
-    let sums = unsignedElement(of: result).at(width: source.width)
+    let width = source.width
+    let words = unsignedElement(bits: 16).at(width: width)
+    let bytes = unsignedElement(of: source).at(width: width)
+    let sums = unsignedElement(of: result).at(width: width)
+    let lower = unpackIndices(lanes: 16, upper: false, blocks: width / 16)
+    let upper = unpackIndices(lanes: 16, upper: true, blocks: width / 16)
     func combined(_ amount: Int) -> String {
-        let indices = blockCombineIndices(bytes: amount, width: source.width)
-        return "__builtin_shufflevector(lower, upper, \(laneIndices(indices)))"
+        let indices = blockCombineIndices(bytes: amount, width: width)
+        switch a {
+        case .vector:
+            return "__builtin_shufflevector(lower, upper, \(laneIndices(indices)))"
+        case .table:
+            let gathered = indices.map { ($0 < width ? lower[$0] : upper[$0 - width]) % width }
+            return sumsSveLookup(operands.first, gathered, view: bytes, as: source)
+        }
     }
     func broadcast(_ lane: Int) -> String {
         let indices = broadcastIndices(lane: lane, for: words)
-        let vector = "(\(words.cVector))\(operands.second)"
-        return "__builtin_shufflevector(\(vector), \(vector), \(laneIndices(indices)))"
+        switch b {
+        case .vector:
+            let vector = "(\(words.cVector))\(operands.second)"
+            let shuffled = "__builtin_shufflevector(\(vector), \(vector), \(laneIndices(indices)))"
+            return "(\(source.cVector))\(shuffled)"
+        case .table:
+            return sumsSveLookup(operands.second, indices, view: words, as: source)
+        }
     }
     func sum(_ first: String, _ second: String) -> String {
         pairs(sumsAbsoluteDifferences(of: first, second, from: source), bytes, sums)
     }
-    let lower = unpackIndices(lanes: 16, upper: false, blocks: blocks)
-    let upper = unpackIndices(lanes: 16, upper: true, blocks: blocks)
     let interleave = "\(operands.first), \(operands.first)"
-    return """
-        {
-          const \(source.cVector) lower = __builtin_shufflevector(\(interleave), \(laneIndices(lower)));
-          const \(source.cVector) upper = __builtin_shufflevector(\(interleave), \(laneIndices(upper)));
-          const \(source.cVector) a01 = \(combined(aOffset * 8 + 1));
-          const \(source.cVector) a23 = \(combined(aOffset * 8 + 5));
-          const \(source.cVector) b01 = (\(source.cVector))\(broadcast(bOffset * 2));
-          const \(source.cVector) b23 = (\(source.cVector))\(broadcast(bOffset * 2 + 1));
-          \(vectorResult("\(sum("a01", "b01")) + \(sum("a23", "b23"))", for: result))
-        }
-        """
+    var statements =
+        a == .vector
+        ? [
+            "const \(source.cVector) lower = __builtin_shufflevector(\(interleave), \(laneIndices(lower)));",
+            "const \(source.cVector) upper = __builtin_shufflevector(\(interleave), \(laneIndices(upper)));",
+        ] : []
+    statements += [
+        "const \(source.cVector) a01 = \(combined(aOffset * 8 + 1));",
+        "const \(source.cVector) a23 = \(combined(aOffset * 8 + 5));",
+        "const \(source.cVector) b01 = \(broadcast(bOffset * 2));",
+        "const \(source.cVector) b23 = \(broadcast(bOffset * 2 + 1));",
+        vectorResult("\(sum("a01", "b01")) + \(sum("a23", "b23"))", for: result),
+    ]
+    return "{\n\(indented(statements.joined(separator: "\n")))\n}"
 }
 
 func sumsShuffledQuadSumsName(from source: Element, to result: Element) -> String {
@@ -31610,16 +31719,28 @@ func sumsShuffledQuadSums(
     )
 }
 
-func sumsShuffledQuadVectors(tuple: [Int], operands: SumsOperands, to result: Element) -> String {
+func sumsShuffledQuadVectors(
+    tuple: [Int],
+    operands: SumsOperands,
+    shuffling shuffle: SumsShuffle = .vector,
+    to result: Element
+) -> String {
     let selections = Array(tuple.reversed())
+    let source = operands.element
     func shuffled(_ parity: Int) -> String {
-        let indices = (0..<operands.source.width).map { position in
+        let indices = (0..<source.width).map { position in
             let quad = position % 16 / 4
             let start = quad / 2 * 8 + quad % 2 * 2 + parity + position % 4
             return position / 16 * 16 + selections[start / 4] * 4 + start % 4
         }
-        return
-            "__builtin_shufflevector(\(operands.first), \(operands.first), \(laneIndices(indices)))"
+        switch shuffle {
+        case .vector:
+            return
+                "__builtin_shufflevector(\(operands.first), \(operands.first), \(laneIndices(indices)))"
+        case .table:
+            let bytes = unsignedElement(of: source).at(width: source.width)
+            return sumsSveLookup(operands.first, indices, view: bytes, as: source)
+        }
     }
     let name = sumsShuffledQuadSumsName(from: operands.source, to: result)
     return "return \(name)(\(shuffled(0)), \(shuffled(1)), \(operands.second));"
@@ -32042,7 +32163,7 @@ let sumsAdjacentQuadOps = sourcedOps(accepting: sumsAccepts(bits: [8], factor: 2
         source: source,
         targets: TargetBodies(
             neon: vectors(biasing: false, pairs: sumsNeonPairs),
-            sve: vectors(biasing: false, pairs: sumsBitwisePairs),
+            sve: sumsSveAdjacentQuadTarget(from: source),
             sve2: vectors(biasing: false, pairs: sumsSvePairs),
             avx3: sumsAdjacentQuadTarget(from: source, biasing: true) {
                 aOffset,
@@ -32095,7 +32216,8 @@ let sumsShuffledQuadOps = sourcedOps(accepting: sumsAccepts(bits: [8], factor: 2
         source: source,
         targets: TargetBodies(
             neon: vectors(biasing: false),
-            sve: vectors(biasing: false),
+            sve: sumsSveShuffledQuadTarget(from: source),
+            sve2: vectors(biasing: false),
             avx3: sumsShuffledQuadTarget(from: source, biasing: true) { tuple, operands, result in
                 sumsX86Avx3ShuffledQuad(tuple: tuple, operands: operands, to: result)
             },
@@ -51907,7 +52029,8 @@ func constantGroups(of op: Op, for element: Element) -> [[Int]] {
         }
     }
     return groups.filter { group in
-        !group.contains { [.immediate, .constBytePointer].contains(op.parameters[$0]) }
+        !group.contains { op.parameters[$0] == .constBytePointer }
+            && !group.allSatisfy { op.parameters[$0] == .immediate }
     }.sorted { $0.lexicographicallyPrecedes($1) }
 }
 
@@ -52703,9 +52826,14 @@ func jointConstantTests(of op: Op, for element: Element, parameters group: [Int]
         let name = parameterBindings[index].swiftName
         return isVector(index) ? "\(name)Value" : name
     }
+    func immediate(at index: Int) -> ImmediateArgument {
+        op.immediates[op.parameters[..<index].filter { $0 == .immediate }.count]
+    }
     let vectors = group.filter(isVector)
     let vectorValues = vectors.map { jointConstantVectors(for: operand($0)) }
-    let rotations = (0..<(vectorValues.first?.count ?? 0)).map { rotation in
+    let hasImmediates = group.contains { op.parameters[$0] == .immediate }
+    let rotationCount = hasImmediates ? 1 : (vectorValues.first?.count ?? 0)
+    let rotations = (0..<rotationCount).map { rotation in
         Dictionary(
             uniqueKeysWithValues: vectors.indices.map { position in
                 let values = vectorValues[position]
@@ -52720,6 +52848,11 @@ func jointConstantTests(of op: Op, for element: Element, parameters group: [Int]
         case _ where isVector(index): dimension = rotations
         case .mask, .whereMask: dimension = constantMasks.map { [index: $0] }
         case .laneAmount: dimension = jointConstantAmounts.map { [index: $0] }
+        case .immediate:
+            let widest = element.at(width: X86Level.avx3.width)
+            dimension = integerConstants(Array(immediate(at: index).values(for: widest))).map {
+                [index: $0]
+            }
         default:
             fatalError(
                 "\(op.identifier) branches on \(names.joined(separator: " and ")) together, which nothing covers"
@@ -52808,8 +52941,10 @@ func jointConstantTests(of op: Op, for element: Element, parameters group: [Int]
                     )
                 ) : value
         }
-        let amounts = zip(group, values).compactMap {
-            constantLaneCondition($0.1.literal, of: op.parameters[$0.0])
+        let amounts = zip(group, values).compactMap { index, value in
+            op.parameters[index] == .immediate
+                ? immediateCondition(immediate(at: index), value: value.literal, for: element)
+                : constantLaneCondition(value.literal, of: op.parameters[index])
         }
         members.append(
             constantTest(
@@ -52870,6 +53005,16 @@ func isOutOfContractSplat(_ value: ConstantValue, of op: Op, for element: Elemen
     return !(0..<element.bits).contains(count)
 }
 
+func immediateCondition(
+    _ immediate: ImmediateArgument,
+    value: String,
+    for element: Element
+) -> String? {
+    if case .fixed = immediate.upperBound { return nil }
+    let upper = immediate.upperBound.expression(for: element, laneCount: "H.laneCount")
+    return "\(value) <= \(upper)"
+}
+
 func immediateConstantName(of op: Op) -> String {
     op.immediates.count == 1 ? uppercasedFirst(op.immediates[0].name) : "Immediates"
 }
@@ -52927,10 +53072,8 @@ func immediateConstantTests(
     }
     for tuple in tuples {
         let suffix = tuple.map(String.init).joined()
-        let conditions = zip(op.immediates, tuple).compactMap { immediate, value -> String? in
-            if case .fixed = immediate.upperBound { return nil }
-            let upper = immediate.upperBound.expression(for: element, laneCount: "H.laneCount")
-            return "\(value) <= \(upper)"
+        let conditions = zip(op.immediates, tuple).compactMap { immediate, value in
+            immediateCondition(immediate, value: String(value), for: element)
         }
         members.append(
             constantTest(

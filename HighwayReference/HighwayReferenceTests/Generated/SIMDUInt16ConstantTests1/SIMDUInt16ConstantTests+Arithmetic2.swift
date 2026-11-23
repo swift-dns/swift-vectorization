@@ -7,6 +7,1073 @@ import Vectorization
 
 extension SIMDUInt16ConstantTests {
     @inline(__always)
+    private func checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(
+        _ aValue: UInt8,
+        _ i3: Int,
+        _ i2: Int,
+        _ i1: Int,
+        _ i0: Int
+    ) {
+        let mismatches = Mismatches(
+            "sumsOfShuffledQuadAbsoluteDifferencesFromUInt8 with a repeating \(hex(aValue)), i3 \(i3), i2 \(i2), i1 \(i1), i0 \(i0)"
+        )
+        let bInputs = Inputs.conversions(SIMD<UInt8>.self, seed: 0xB7AB_2BC2_4EBF_9A7F)
+        mismatches.check(
+            SIMD<UInt8>.repeating(aValue),
+            SIMD<UInt8>(raw: HighwayReference.repeatingU8(aValue)),
+            "repeating"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.sumsOfShuffledQuadAbsoluteDifferences(
+                    SIMD<UInt8>.repeating(aValue),
+                    b,
+                    i3,
+                    i2,
+                    i1,
+                    i0
+                ),
+                H(
+                    raw: HighwayReference.sumsOfShuffledQuadAbsoluteDifferencesU8ToU16(
+                        SIMD<UInt8>.repeating(aValue).raw,
+                        b.raw,
+                        Int32(truncatingIfNeeded: i3),
+                        Int32(truncatingIfNeeded: i2),
+                        Int32(truncatingIfNeeded: i1),
+                        Int32(truncatingIfNeeded: i0)
+                    )
+                ),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I20I10I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 0, 0, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I20I10I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 0, 0, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I20I10I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 0, 0, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I20I10I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 0, 0, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I20I11I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 0, 1, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I20I11I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 0, 1, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I20I11I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 0, 1, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I20I11I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 0, 1, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I20I12I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 0, 2, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I20I12I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 0, 2, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I20I12I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 0, 2, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I20I12I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 0, 2, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I20I13I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 0, 3, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I20I13I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 0, 3, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I20I13I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 0, 3, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I20I13I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 0, 3, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I21I10I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 1, 0, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I21I10I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 1, 0, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I21I10I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 1, 0, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I21I10I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 1, 0, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I21I11I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 1, 1, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I21I11I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 1, 1, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I21I11I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 1, 1, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I21I11I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 1, 1, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I21I12I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 1, 2, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I21I12I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 1, 2, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I21I12I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 1, 2, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I21I12I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 1, 2, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I21I13I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 1, 3, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I21I13I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 1, 3, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I21I13I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 1, 3, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I21I13I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 1, 3, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I22I10I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 2, 0, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I22I10I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 2, 0, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I22I10I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 2, 0, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I22I10I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 2, 0, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I22I11I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 2, 1, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I22I11I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 2, 1, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I22I11I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 2, 1, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I22I11I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 2, 1, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I22I12I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 2, 2, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I22I12I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 2, 2, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I22I12I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 2, 2, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I22I12I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 2, 2, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I22I13I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 2, 3, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I22I13I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 2, 3, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I22I13I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 2, 3, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I22I13I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 2, 3, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I23I10I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 3, 0, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I23I10I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 3, 0, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I23I10I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 3, 0, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I23I10I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 3, 0, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I23I11I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 3, 1, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I23I11I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 3, 1, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I23I11I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 3, 1, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I23I11I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 3, 1, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I23I12I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 3, 2, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I23I12I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 3, 2, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I23I12I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 3, 2, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I23I12I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 3, 2, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I23I13I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 3, 3, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I23I13I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 3, 3, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I23I13I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 3, 3, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I30I23I13I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 0, 3, 3, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I20I10I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 0, 0, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I20I10I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 0, 0, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I20I10I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 0, 0, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I20I10I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 0, 0, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I20I11I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 0, 1, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I20I11I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 0, 1, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I20I11I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 0, 1, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I20I11I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 0, 1, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I20I12I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 0, 2, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I20I12I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 0, 2, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I20I12I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 0, 2, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I20I12I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 0, 2, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I20I13I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 0, 3, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I20I13I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 0, 3, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I20I13I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 0, 3, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I20I13I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 0, 3, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I21I10I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 1, 0, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I21I10I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 1, 0, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I21I10I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 1, 0, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I21I10I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 1, 0, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I21I11I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 1, 1, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I21I11I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 1, 1, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I21I11I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 1, 1, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I21I11I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 1, 1, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I21I12I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 1, 2, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I21I12I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 1, 2, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I21I12I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 1, 2, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I21I12I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 1, 2, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I21I13I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 1, 3, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I21I13I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 1, 3, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I21I13I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 1, 3, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I21I13I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 1, 3, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I22I10I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 2, 0, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I22I10I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 2, 0, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I22I10I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 2, 0, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I22I10I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 2, 0, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I22I11I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 2, 1, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I22I11I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 2, 1, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I22I11I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 2, 1, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I22I11I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 2, 1, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I22I12I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 2, 2, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I22I12I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 2, 2, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I22I12I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 2, 2, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I22I12I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 2, 2, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I22I13I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 2, 3, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I22I13I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 2, 3, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I22I13I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 2, 3, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I22I13I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 2, 3, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I23I10I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 3, 0, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I23I10I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 3, 0, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I23I10I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 3, 0, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I23I10I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 3, 0, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I23I11I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 3, 1, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I23I11I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 3, 1, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I23I11I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 3, 1, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I23I11I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 3, 1, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I23I12I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 3, 2, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I23I12I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 3, 2, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I23I12I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 3, 2, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I23I12I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 3, 2, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I23I13I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 3, 3, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I23I13I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 3, 3, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I23I13I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 3, 3, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I31I23I13I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 1, 3, 3, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I20I10I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 0, 0, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I20I10I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 0, 0, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I20I10I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 0, 0, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I20I10I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 0, 0, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I20I11I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 0, 1, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I20I11I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 0, 1, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I20I11I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 0, 1, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I20I11I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 0, 1, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I20I12I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 0, 2, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I20I12I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 0, 2, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I20I12I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 0, 2, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I20I12I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 0, 2, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I20I13I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 0, 3, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I20I13I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 0, 3, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I20I13I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 0, 3, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I20I13I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 0, 3, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I21I10I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 1, 0, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I21I10I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 1, 0, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I21I10I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 1, 0, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I21I10I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 1, 0, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I21I11I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 1, 1, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I21I11I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 1, 1, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I21I11I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 1, 1, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I21I11I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 1, 1, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I21I12I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 1, 2, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I21I12I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 1, 2, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I21I12I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 1, 2, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I21I12I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 1, 2, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I21I13I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 1, 3, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I21I13I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 1, 3, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I21I13I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 1, 3, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I21I13I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 1, 3, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I22I10I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 2, 0, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I22I10I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 2, 0, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I22I10I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 2, 0, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I22I10I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 2, 0, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I22I11I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 2, 1, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I22I11I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 2, 1, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I22I11I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 2, 1, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I22I11I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 2, 1, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I22I12I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 2, 2, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I22I12I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 2, 2, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I22I12I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 2, 2, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I22I12I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 2, 2, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I22I13I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 2, 3, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I22I13I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 2, 3, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I22I13I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 2, 3, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I22I13I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 2, 3, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I23I10I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 3, 0, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I23I10I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 3, 0, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I23I10I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 3, 0, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I23I10I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 3, 0, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I23I11I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 3, 1, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I23I11I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 3, 1, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I23I11I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 3, 1, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I23I11I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 3, 1, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I23I12I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 3, 2, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I23I12I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 3, 2, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I23I12I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 3, 2, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I23I12I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 3, 2, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I23I13I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 3, 3, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I23I13I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 3, 3, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I23I13I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 3, 3, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I32I23I13I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 2, 3, 3, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I20I10I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 0, 0, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I20I10I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 0, 0, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I20I10I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 0, 0, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I20I10I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 0, 0, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I20I11I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 0, 1, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I20I11I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 0, 1, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I20I11I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 0, 1, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I20I11I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 0, 1, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I20I12I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 0, 2, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I20I12I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 0, 2, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I20I12I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 0, 2, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I20I12I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 0, 2, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I20I13I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 0, 3, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I20I13I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 0, 3, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I20I13I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 0, 3, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I20I13I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 0, 3, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I21I10I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 1, 0, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I21I10I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 1, 0, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I21I10I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 1, 0, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I21I10I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 1, 0, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I21I11I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 1, 1, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I21I11I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 1, 1, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I21I11I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 1, 1, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I21I11I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 1, 1, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I21I12I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 1, 2, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I21I12I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 1, 2, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I21I12I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 1, 2, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I21I12I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 1, 2, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I21I13I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 1, 3, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I21I13I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 1, 3, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I21I13I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 1, 3, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I21I13I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 1, 3, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I22I10I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 2, 0, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I22I10I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 2, 0, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I22I10I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 2, 0, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I22I10I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 2, 0, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I22I11I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 2, 1, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I22I11I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 2, 1, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I22I11I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 2, 1, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I22I11I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 2, 1, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I22I12I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 2, 2, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I22I12I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 2, 2, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I22I12I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 2, 2, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I22I12I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 2, 2, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I22I13I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 2, 3, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I22I13I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 2, 3, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I22I13I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 2, 3, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I22I13I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 2, 3, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I23I10I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 3, 0, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I23I10I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 3, 0, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I23I10I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 3, 0, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I23I10I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 3, 0, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I23I11I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 3, 1, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I23I11I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 3, 1, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I23I11I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 3, 1, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I23I11I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 3, 1, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I23I12I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 3, 2, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I23I12I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 3, 2, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I23I12I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 3, 2, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I23I12I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 3, 2, 3)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I23I13I00() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 3, 3, 0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I23I13I01() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 3, 3, 1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I23I13I02() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 3, 3, 2)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA1I33I23I13I03() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantAI3I2I1I0(1, 3, 3, 3, 3)
+    }
+
+    @inline(__always)
     private func checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantImmediates(
         _ i3: Int,
         _ i2: Int,
@@ -2114,5 +3181,85 @@ extension SIMDUInt16ConstantTests {
 
     @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8UncheckedConstantImmediates3333() {
         checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8UncheckedConstantImmediates(3, 3, 3, 3)
+    }
+
+    @inline(__always)
+    private func checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA(_ value: UInt8) {
+        let mismatches = Mismatches(
+            "sumsOfShuffledQuadAbsoluteDifferencesFromUInt8 with a repeating \(hex(value))"
+        )
+        let bInputs = Inputs.conversions(SIMD<UInt8>.self, seed: 0xBF3A_3076_7F68_C263)
+        let i3Inputs = Array(0...3)
+        let i2Inputs = Array(0...3)
+        let i1Inputs = Array(0...3)
+        let i0Inputs = Array(0...3)
+        mismatches.check(
+            SIMD<UInt8>.repeating(value),
+            SIMD<UInt8>(raw: HighwayReference.repeatingU8(value)),
+            "repeating"
+        )
+        for (b, i3, i2, i1, i0) in mixedQuintuples(
+            bInputs,
+            i3Inputs,
+            i2Inputs,
+            i1Inputs,
+            i0Inputs,
+            seed: 0x3C18_584F_87A8_2A6C
+        ) {
+            mismatches.check(
+                H.sumsOfShuffledQuadAbsoluteDifferences(
+                    SIMD<UInt8>.repeating(value),
+                    b,
+                    i3,
+                    i2,
+                    i1,
+                    i0
+                ),
+                H(
+                    raw: HighwayReference.sumsOfShuffledQuadAbsoluteDifferencesU8ToU16(
+                        SIMD<UInt8>.repeating(value).raw,
+                        b.raw,
+                        Int32(truncatingIfNeeded: i3),
+                        Int32(truncatingIfNeeded: i2),
+                        Int32(truncatingIfNeeded: i1),
+                        Int32(truncatingIfNeeded: i0)
+                    )
+                ),
+                "b: \(describe(b)), i3: \(i3), i2: \(i2), i1: \(i1), i0: \(i0)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantSplat0() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA(0)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantSplat1() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA(1)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantSplat15() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA(15)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantSplat16() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA(16)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantSplat26() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA(26)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantSplat127() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA(127)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantSplat128() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA(128)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantSplat255() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromUInt8ConstantA(255)
     }
 }
