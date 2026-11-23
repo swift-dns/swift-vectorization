@@ -25298,6 +25298,60 @@ let swizzleOps: [Op] =
         }
     ]
 
+func sveTupleBlock(_ vector: String, _ block: Int, for element: Element) -> String {
+    let lanes = laneIndices(block * element.blockLaneCount..<(block + 1) * element.blockLaneCount)
+    return "__builtin_shufflevector(\(vector), \(vector), \(lanes))"
+}
+
+func sveTupleMember(_ count: Int, for element: Element) -> String? {
+    guard count == 2 else { return nil }
+    let blocks = 0..<element.width / 16
+    let type = "__typeof__(\(sveTupleBlock("tuple.v0", 0, for: element)))"
+    let declarations = blocks.map { block in
+        let members = (0..<count).map { sveTupleBlock("tuple.v\($0)", block, for: element) }
+        return "const \(type) block\(block) = index == 0 ? \(members[0]) : \(members[1]);"
+    }
+    return """
+        \(declarations.joined(separator: "\n"))
+        return \(concatenatedBlocks(blocks.map { "block\($0)" }, lanes: element.blockLaneCount));
+        """
+}
+
+func sveTupleMasks(for element: Element) -> String {
+    let lane = "uint\(element.bits)_t"
+    return """
+        typedef \(lane) tuple_mask __attribute__((vector_size(16)));
+        const tuple_mask mask = (tuple_mask){0} + (\(lane))-(\(lane))(index == 0);
+        """
+}
+
+func sveTupleReplacement(_ count: Int, for element: Element) -> String? {
+    guard count == 2, element.width == 32 else { return nil }
+    let blocks = 0..<element.width / 16
+    let type = "__typeof__(\(sveTupleBlock("tuple.v0", 0, for: element)))"
+    let declarations = (0..<count).flatMap { member in
+        blocks.map { block in
+            let kept = "(tuple_mask)\(sveTupleBlock("tuple.v\(member)", block, for: element))"
+            let replaced = "(tuple_mask)\(sveTupleBlock(rawName("a"), block, for: element))"
+            let mask = member == 0 ? "mask" : "~mask"
+            let selected = "\(kept) ^ ((\(kept) ^ \(replaced)) & \(mask))"
+            return "const \(type) member\(member)_\(block) = (\(type))(\(selected));"
+        }
+    }
+    let members = (0..<count).map { member in
+        concatenatedBlocks(blocks.map { "member\(member)_\($0)" }, lanes: element.blockLaneCount)
+    }
+    return sveFolding(
+        when: "__builtin_constant_p(index)",
+        tupleReplacement(count, x86: false, for: element),
+        otherwise: """
+            \(sveTupleMasks(for: element))
+            \(declarations.joined(separator: "\n"))
+            return (\(element.cTuple(count))){\(members.joined(separator: ", "))};
+            """
+    )
+}
+
 func tupleOps(count: Int) -> [Op] {
     let vectors = Array(repeating: Parameter.vector, count: count)
     let splatCreation = { (element: Element) -> String? in
@@ -25324,6 +25378,7 @@ func tupleOps(count: Int) -> [Op] {
             .all,
             section: .tuples,
             targets: TargetBodies(
+                sve: { element in sveTupleMember(count, for: element) },
                 avx3: { element in tupleMember(count, x86: true, for: element) },
                 avx2: { element in tupleMember(count, x86: true, for: element) }
             )
@@ -25339,6 +25394,7 @@ func tupleOps(count: Int) -> [Op] {
             section: .tuples,
             vectorLabels: ["to"],
             targets: TargetBodies(
+                sve: { element in sveTupleReplacement(count, for: element) },
                 avx3: { element in tupleReplacement(count, x86: true, for: element) },
                 avx2: { element in tupleReplacement(count, x86: true, for: element) }
             )

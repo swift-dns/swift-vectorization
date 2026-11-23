@@ -142,6 +142,42 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
+    private func checkSet2ConstantIndex(_ index: Int) {
+        let mismatches = Mismatches("set2 with index \(index)")
+        let tupleInputs = Inputs.tuples2(of: Inputs.vectors(H.self, seed: 0xDA08_B8D1_7E63_FC68))
+        let aInputs = Inputs.vectors(H.self, seed: 0xDA08_BAD1_7E63_FFCE)
+        for (tuple, a) in everyPair(tupleInputs, aInputs) {
+            let port = H.set2(tuple, at: index, to: a)
+            let reference = { tuple in (H(raw: tuple.v0), H(raw: tuple.v1)) }(
+                HighwayReference.set2F32(
+                    cvectorization_ops_tuple2_f32(v0: tuple.0.raw, v1: tuple.1.raw),
+                    index,
+                    a.raw
+                )
+            )
+            mismatches.check(
+                port.0,
+                reference.0,
+                "tuple: \([describe(tuple.0), describe(tuple.1)].joined(separator: ", ")), a: \(describe(a))"
+            )
+            mismatches.check(
+                port.1,
+                reference.1,
+                "tuple: \([describe(tuple.0), describe(tuple.1)].joined(separator: ", ")), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func set2ConstantIndex0() {
+        checkSet2ConstantIndex(0)
+    }
+
+    @Test func set2ConstantIndex1() {
+        checkSet2ConstantIndex(1)
+    }
+
+    @inline(__always)
     private func checkSet2ConstantA(_ value: Lane) {
         let mismatches = Mismatches("set2 with a repeating \(hex(value))")
         let tupleInputs = Inputs.tuples2(of: Inputs.vectors(H.self, seed: 0xE1CD_92FA_26E2_E8D7))

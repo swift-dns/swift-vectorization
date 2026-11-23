@@ -142,6 +142,42 @@ extension SIMDInt32ConstantTests {
     }
 
     @inline(__always)
+    private func checkSet2ConstantIndex(_ index: Int) {
+        let mismatches = Mismatches("set2 with index \(index)")
+        let tupleInputs = Inputs.tuples2(of: Inputs.vectors(H.self, seed: 0xE7F5_AEA1_B69D_5833))
+        let aInputs = Inputs.vectors(H.self, seed: 0xE7F5_B0A1_B69D_5B99)
+        for (tuple, a) in everyPair(tupleInputs, aInputs) {
+            let port = H.set2(tuple, at: index, to: a)
+            let reference = { tuple in (H(raw: tuple.v0), H(raw: tuple.v1)) }(
+                HighwayReference.set2I32(
+                    cvectorization_ops_tuple2_i32(v0: tuple.0.raw, v1: tuple.1.raw),
+                    index,
+                    a.raw
+                )
+            )
+            mismatches.check(
+                port.0,
+                reference.0,
+                "tuple: \([describe(tuple.0), describe(tuple.1)].joined(separator: ", ")), a: \(describe(a))"
+            )
+            mismatches.check(
+                port.1,
+                reference.1,
+                "tuple: \([describe(tuple.0), describe(tuple.1)].joined(separator: ", ")), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func set2ConstantIndex0() {
+        checkSet2ConstantIndex(0)
+    }
+
+    @Test func set2ConstantIndex1() {
+        checkSet2ConstantIndex(1)
+    }
+
+    @inline(__always)
     private func checkCreate3ConstantA(_ value: Lane) {
         let mismatches = Mismatches("create3 with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x4F98_B7C0_49F6_F68A)

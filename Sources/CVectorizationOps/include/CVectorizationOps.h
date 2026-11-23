@@ -13492,7 +13492,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_tuple2_u8 cvectorization_ops_create
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_get2_u8(cvectorization_ops_tuple2_u8 tuple, size_t index) {
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) block0 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15) : __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) block1 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31) : __builtin_shufflevector(tuple.v1, tuple.v1, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
+  return __builtin_shufflevector(block0, block1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) block0 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15) : __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) block1 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31) : __builtin_shufflevector(tuple.v1, tuple.v1, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) block2 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47) : __builtin_shufflevector(tuple.v1, tuple.v1, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) block3 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63) : __builtin_shufflevector(tuple.v1, tuple.v1, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63);
+  return __builtin_shufflevector(__builtin_shufflevector(block0, block1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31), __builtin_shufflevector(block2, block3, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block0, block1, block2, block3;
   switch (index) {
   case 0: block0 = __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1); block1 = __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3); block2 = __builtin_shufflevector(tuple.v0, tuple.v0, 4, 5); block3 = __builtin_shufflevector(tuple.v0, tuple.v0, 6, 7); break;
@@ -13515,7 +13525,21 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ge
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_tuple2_u8 cvectorization_ops_set2_u8(cvectorization_ops_tuple2_u8 tuple, size_t index, cvectorization_ops_raw_vector_u8 rawA) {
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
-#if CVECTORIZATION_OPS_X86 == 4
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(index)) {
+    switch (index) {
+    case 0: return (cvectorization_ops_tuple2_u8){rawA, tuple.v1};
+    default: return (cvectorization_ops_tuple2_u8){tuple.v0, rawA};
+    }
+  }
+  typedef uint8_t tuple_mask __attribute__((vector_size(16)));
+  const tuple_mask mask = (tuple_mask){0} + (uint8_t)-(uint8_t)(index == 0);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) member0_0 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)))((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15) ^ (((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) & mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) member0_1 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)))((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31) ^ (((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31)) & mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) member1_0 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)))((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15) ^ (((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) & ~mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) member1_1 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)))((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31) ^ (((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31)) & ~mask));
+  return (cvectorization_ops_tuple2_u8){__builtin_shufflevector(member0_0, member0_1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31), __builtin_shufflevector(member1_0, member1_1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31)};
+#elif CVECTORIZATION_OPS_X86 == 4
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_1 = index == 0 ? __builtin_shufflevector(tuple.v1, tuple.v1, 2, 3) : __builtin_shufflevector(rawA, rawA, 2, 3);
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_0 = index == 0 ? __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1) : __builtin_shufflevector(rawA, rawA, 0, 1);
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member0_1 = index == 0 ? __builtin_shufflevector(rawA, rawA, 2, 3) : __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3);
@@ -28163,7 +28187,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_tuple2_u16 cvectorization_ops_creat
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_get2_u16(cvectorization_ops_tuple2_u16 tuple, size_t index) {
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)) block0 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7) : __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3, 4, 5, 6, 7);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)) block1 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 8, 9, 10, 11, 12, 13, 14, 15) : __builtin_shufflevector(tuple.v1, tuple.v1, 8, 9, 10, 11, 12, 13, 14, 15);
+  return __builtin_shufflevector(block0, block1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)) block0 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7) : __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3, 4, 5, 6, 7);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)) block1 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 8, 9, 10, 11, 12, 13, 14, 15) : __builtin_shufflevector(tuple.v1, tuple.v1, 8, 9, 10, 11, 12, 13, 14, 15);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)) block2 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 16, 17, 18, 19, 20, 21, 22, 23) : __builtin_shufflevector(tuple.v1, tuple.v1, 16, 17, 18, 19, 20, 21, 22, 23);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)) block3 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 24, 25, 26, 27, 28, 29, 30, 31) : __builtin_shufflevector(tuple.v1, tuple.v1, 24, 25, 26, 27, 28, 29, 30, 31);
+  return __builtin_shufflevector(__builtin_shufflevector(block0, block1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15), __builtin_shufflevector(block2, block3, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block0, block1, block2, block3;
   switch (index) {
   case 0: block0 = __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1); block1 = __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3); block2 = __builtin_shufflevector(tuple.v0, tuple.v0, 4, 5); block3 = __builtin_shufflevector(tuple.v0, tuple.v0, 6, 7); break;
@@ -28186,7 +28220,21 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_g
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_tuple2_u16 cvectorization_ops_set2_u16(cvectorization_ops_tuple2_u16 tuple, size_t index, cvectorization_ops_raw_vector_u16 rawA) {
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
-#if CVECTORIZATION_OPS_X86 == 4
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(index)) {
+    switch (index) {
+    case 0: return (cvectorization_ops_tuple2_u16){rawA, tuple.v1};
+    default: return (cvectorization_ops_tuple2_u16){tuple.v0, rawA};
+    }
+  }
+  typedef uint16_t tuple_mask __attribute__((vector_size(16)));
+  const tuple_mask mask = (tuple_mask){0} + (uint16_t)-(uint16_t)(index == 0);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)) member0_0 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)))((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7) ^ (((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 0, 1, 2, 3, 4, 5, 6, 7)) & mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)) member0_1 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)))((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 8, 9, 10, 11, 12, 13, 14, 15) ^ (((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 8, 9, 10, 11, 12, 13, 14, 15) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 8, 9, 10, 11, 12, 13, 14, 15)) & mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)) member1_0 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)))((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3, 4, 5, 6, 7) ^ (((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3, 4, 5, 6, 7) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 0, 1, 2, 3, 4, 5, 6, 7)) & ~mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)) member1_1 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)))((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 8, 9, 10, 11, 12, 13, 14, 15) ^ (((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 8, 9, 10, 11, 12, 13, 14, 15) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 8, 9, 10, 11, 12, 13, 14, 15)) & ~mask));
+  return (cvectorization_ops_tuple2_u16){__builtin_shufflevector(member0_0, member0_1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15), __builtin_shufflevector(member1_0, member1_1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)};
+#elif CVECTORIZATION_OPS_X86 == 4
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_1 = index == 0 ? __builtin_shufflevector(tuple.v1, tuple.v1, 2, 3) : __builtin_shufflevector(rawA, rawA, 2, 3);
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_0 = index == 0 ? __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1) : __builtin_shufflevector(rawA, rawA, 0, 1);
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member0_1 = index == 0 ? __builtin_shufflevector(rawA, rawA, 2, 3) : __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3);
@@ -40562,7 +40610,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_tuple2_u32 cvectorization_ops_creat
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_get2_u32(cvectorization_ops_tuple2_u32 tuple, size_t index) {
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) block0 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3) : __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) block1 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 4, 5, 6, 7) : __builtin_shufflevector(tuple.v1, tuple.v1, 4, 5, 6, 7);
+  return __builtin_shufflevector(block0, block1, 0, 1, 2, 3, 4, 5, 6, 7);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) block0 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3) : __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) block1 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 4, 5, 6, 7) : __builtin_shufflevector(tuple.v1, tuple.v1, 4, 5, 6, 7);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) block2 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 8, 9, 10, 11) : __builtin_shufflevector(tuple.v1, tuple.v1, 8, 9, 10, 11);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) block3 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 12, 13, 14, 15) : __builtin_shufflevector(tuple.v1, tuple.v1, 12, 13, 14, 15);
+  return __builtin_shufflevector(__builtin_shufflevector(block0, block1, 0, 1, 2, 3, 4, 5, 6, 7), __builtin_shufflevector(block2, block3, 0, 1, 2, 3, 4, 5, 6, 7), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block0, block1, block2, block3;
   switch (index) {
   case 0: block0 = __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1); block1 = __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3); block2 = __builtin_shufflevector(tuple.v0, tuple.v0, 4, 5); block3 = __builtin_shufflevector(tuple.v0, tuple.v0, 6, 7); break;
@@ -40585,7 +40643,21 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_g
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_tuple2_u32 cvectorization_ops_set2_u32(cvectorization_ops_tuple2_u32 tuple, size_t index, cvectorization_ops_raw_vector_u32 rawA) {
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
-#if CVECTORIZATION_OPS_X86 == 4
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(index)) {
+    switch (index) {
+    case 0: return (cvectorization_ops_tuple2_u32){rawA, tuple.v1};
+    default: return (cvectorization_ops_tuple2_u32){tuple.v0, rawA};
+    }
+  }
+  typedef uint32_t tuple_mask __attribute__((vector_size(16)));
+  const tuple_mask mask = (tuple_mask){0} + (uint32_t)-(uint32_t)(index == 0);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) member0_0 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)))((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3) ^ (((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 0, 1, 2, 3)) & mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) member0_1 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)))((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 4, 5, 6, 7) ^ (((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 4, 5, 6, 7) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 4, 5, 6, 7)) & mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) member1_0 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)))((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3) ^ (((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 0, 1, 2, 3)) & ~mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) member1_1 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)))((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 4, 5, 6, 7) ^ (((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 4, 5, 6, 7) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 4, 5, 6, 7)) & ~mask));
+  return (cvectorization_ops_tuple2_u32){__builtin_shufflevector(member0_0, member0_1, 0, 1, 2, 3, 4, 5, 6, 7), __builtin_shufflevector(member1_0, member1_1, 0, 1, 2, 3, 4, 5, 6, 7)};
+#elif CVECTORIZATION_OPS_X86 == 4
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_1 = index == 0 ? __builtin_shufflevector(tuple.v1, tuple.v1, 2, 3) : __builtin_shufflevector(rawA, rawA, 2, 3);
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_0 = index == 0 ? __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1) : __builtin_shufflevector(rawA, rawA, 0, 1);
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member0_1 = index == 0 ? __builtin_shufflevector(rawA, rawA, 2, 3) : __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3);
@@ -53880,7 +53952,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_tuple2_u64 cvectorization_ops_creat
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_get2_u64(cvectorization_ops_tuple2_u64 tuple, size_t index) {
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block0 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1) : __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block1 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3) : __builtin_shufflevector(tuple.v1, tuple.v1, 2, 3);
+  return __builtin_shufflevector(block0, block1, 0, 1, 2, 3);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block0 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1) : __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block1 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3) : __builtin_shufflevector(tuple.v1, tuple.v1, 2, 3);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block2 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 4, 5) : __builtin_shufflevector(tuple.v1, tuple.v1, 4, 5);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block3 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 6, 7) : __builtin_shufflevector(tuple.v1, tuple.v1, 6, 7);
+  return __builtin_shufflevector(__builtin_shufflevector(block0, block1, 0, 1, 2, 3), __builtin_shufflevector(block2, block3, 0, 1, 2, 3), 0, 1, 2, 3, 4, 5, 6, 7);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block0, block1, block2, block3;
   switch (index) {
   case 0: block0 = __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1); block1 = __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3); block2 = __builtin_shufflevector(tuple.v0, tuple.v0, 4, 5); block3 = __builtin_shufflevector(tuple.v0, tuple.v0, 6, 7); break;
@@ -53903,7 +53985,21 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_g
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_tuple2_u64 cvectorization_ops_set2_u64(cvectorization_ops_tuple2_u64 tuple, size_t index, cvectorization_ops_raw_vector_u64 rawA) {
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
-#if CVECTORIZATION_OPS_X86 == 4
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(index)) {
+    switch (index) {
+    case 0: return (cvectorization_ops_tuple2_u64){rawA, tuple.v1};
+    default: return (cvectorization_ops_tuple2_u64){tuple.v0, rawA};
+    }
+  }
+  typedef uint64_t tuple_mask __attribute__((vector_size(16)));
+  const tuple_mask mask = (tuple_mask){0} + (uint64_t)-(uint64_t)(index == 0);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member0_0 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)))((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1) ^ (((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 0, 1)) & mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member0_1 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)))((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 2, 3) ^ (((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 2, 3) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 2, 3)) & mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_0 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)))((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 0, 1) ^ (((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 0, 1) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 0, 1)) & ~mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_1 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)))((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 2, 3) ^ (((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 2, 3) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 2, 3)) & ~mask));
+  return (cvectorization_ops_tuple2_u64){__builtin_shufflevector(member0_0, member0_1, 0, 1, 2, 3), __builtin_shufflevector(member1_0, member1_1, 0, 1, 2, 3)};
+#elif CVECTORIZATION_OPS_X86 == 4
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_1 = index == 0 ? __builtin_shufflevector(tuple.v1, tuple.v1, 2, 3) : __builtin_shufflevector(rawA, rawA, 2, 3);
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_0 = index == 0 ? __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1) : __builtin_shufflevector(rawA, rawA, 0, 1);
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member0_1 = index == 0 ? __builtin_shufflevector(rawA, rawA, 2, 3) : __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3);
@@ -69100,7 +69196,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_tuple2_i8 cvectorization_ops_create
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_get2_i8(cvectorization_ops_tuple2_i8 tuple, size_t index) {
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) block0 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15) : __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) block1 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31) : __builtin_shufflevector(tuple.v1, tuple.v1, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
+  return __builtin_shufflevector(block0, block1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) block0 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15) : __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) block1 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31) : __builtin_shufflevector(tuple.v1, tuple.v1, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) block2 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47) : __builtin_shufflevector(tuple.v1, tuple.v1, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) block3 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63) : __builtin_shufflevector(tuple.v1, tuple.v1, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63);
+  return __builtin_shufflevector(__builtin_shufflevector(block0, block1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31), __builtin_shufflevector(block2, block3, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block0, block1, block2, block3;
   switch (index) {
   case 0: block0 = __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1); block1 = __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3); block2 = __builtin_shufflevector(tuple.v0, tuple.v0, 4, 5); block3 = __builtin_shufflevector(tuple.v0, tuple.v0, 6, 7); break;
@@ -69123,7 +69229,21 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ge
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_tuple2_i8 cvectorization_ops_set2_i8(cvectorization_ops_tuple2_i8 tuple, size_t index, cvectorization_ops_raw_vector_i8 rawA) {
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
-#if CVECTORIZATION_OPS_X86 == 4
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(index)) {
+    switch (index) {
+    case 0: return (cvectorization_ops_tuple2_i8){rawA, tuple.v1};
+    default: return (cvectorization_ops_tuple2_i8){tuple.v0, rawA};
+    }
+  }
+  typedef uint8_t tuple_mask __attribute__((vector_size(16)));
+  const tuple_mask mask = (tuple_mask){0} + (uint8_t)-(uint8_t)(index == 0);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) member0_0 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)))((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15) ^ (((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) & mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) member0_1 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)))((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31) ^ (((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31)) & mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) member1_0 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)))((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15) ^ (((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) & ~mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)) member1_1 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)))((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31) ^ (((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31)) & ~mask));
+  return (cvectorization_ops_tuple2_i8){__builtin_shufflevector(member0_0, member0_1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31), __builtin_shufflevector(member1_0, member1_1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31)};
+#elif CVECTORIZATION_OPS_X86 == 4
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_1 = index == 0 ? __builtin_shufflevector(tuple.v1, tuple.v1, 2, 3) : __builtin_shufflevector(rawA, rawA, 2, 3);
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_0 = index == 0 ? __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1) : __builtin_shufflevector(rawA, rawA, 0, 1);
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member0_1 = index == 0 ? __builtin_shufflevector(rawA, rawA, 2, 3) : __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3);
@@ -83969,7 +84089,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_tuple2_i16 cvectorization_ops_creat
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_get2_i16(cvectorization_ops_tuple2_i16 tuple, size_t index) {
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)) block0 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7) : __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3, 4, 5, 6, 7);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)) block1 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 8, 9, 10, 11, 12, 13, 14, 15) : __builtin_shufflevector(tuple.v1, tuple.v1, 8, 9, 10, 11, 12, 13, 14, 15);
+  return __builtin_shufflevector(block0, block1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)) block0 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7) : __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3, 4, 5, 6, 7);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)) block1 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 8, 9, 10, 11, 12, 13, 14, 15) : __builtin_shufflevector(tuple.v1, tuple.v1, 8, 9, 10, 11, 12, 13, 14, 15);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)) block2 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 16, 17, 18, 19, 20, 21, 22, 23) : __builtin_shufflevector(tuple.v1, tuple.v1, 16, 17, 18, 19, 20, 21, 22, 23);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)) block3 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 24, 25, 26, 27, 28, 29, 30, 31) : __builtin_shufflevector(tuple.v1, tuple.v1, 24, 25, 26, 27, 28, 29, 30, 31);
+  return __builtin_shufflevector(__builtin_shufflevector(block0, block1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15), __builtin_shufflevector(block2, block3, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block0, block1, block2, block3;
   switch (index) {
   case 0: block0 = __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1); block1 = __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3); block2 = __builtin_shufflevector(tuple.v0, tuple.v0, 4, 5); block3 = __builtin_shufflevector(tuple.v0, tuple.v0, 6, 7); break;
@@ -83992,7 +84122,21 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_g
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_tuple2_i16 cvectorization_ops_set2_i16(cvectorization_ops_tuple2_i16 tuple, size_t index, cvectorization_ops_raw_vector_i16 rawA) {
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
-#if CVECTORIZATION_OPS_X86 == 4
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(index)) {
+    switch (index) {
+    case 0: return (cvectorization_ops_tuple2_i16){rawA, tuple.v1};
+    default: return (cvectorization_ops_tuple2_i16){tuple.v0, rawA};
+    }
+  }
+  typedef uint16_t tuple_mask __attribute__((vector_size(16)));
+  const tuple_mask mask = (tuple_mask){0} + (uint16_t)-(uint16_t)(index == 0);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)) member0_0 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)))((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7) ^ (((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 0, 1, 2, 3, 4, 5, 6, 7)) & mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)) member0_1 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)))((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 8, 9, 10, 11, 12, 13, 14, 15) ^ (((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 8, 9, 10, 11, 12, 13, 14, 15) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 8, 9, 10, 11, 12, 13, 14, 15)) & mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)) member1_0 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)))((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3, 4, 5, 6, 7) ^ (((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3, 4, 5, 6, 7) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 0, 1, 2, 3, 4, 5, 6, 7)) & ~mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)) member1_1 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3, 4, 5, 6, 7)))((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 8, 9, 10, 11, 12, 13, 14, 15) ^ (((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 8, 9, 10, 11, 12, 13, 14, 15) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 8, 9, 10, 11, 12, 13, 14, 15)) & ~mask));
+  return (cvectorization_ops_tuple2_i16){__builtin_shufflevector(member0_0, member0_1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15), __builtin_shufflevector(member1_0, member1_1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)};
+#elif CVECTORIZATION_OPS_X86 == 4
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_1 = index == 0 ? __builtin_shufflevector(tuple.v1, tuple.v1, 2, 3) : __builtin_shufflevector(rawA, rawA, 2, 3);
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_0 = index == 0 ? __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1) : __builtin_shufflevector(rawA, rawA, 0, 1);
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member0_1 = index == 0 ? __builtin_shufflevector(rawA, rawA, 2, 3) : __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3);
@@ -96691,7 +96835,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_tuple2_i32 cvectorization_ops_creat
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_get2_i32(cvectorization_ops_tuple2_i32 tuple, size_t index) {
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) block0 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3) : __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) block1 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 4, 5, 6, 7) : __builtin_shufflevector(tuple.v1, tuple.v1, 4, 5, 6, 7);
+  return __builtin_shufflevector(block0, block1, 0, 1, 2, 3, 4, 5, 6, 7);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) block0 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3) : __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) block1 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 4, 5, 6, 7) : __builtin_shufflevector(tuple.v1, tuple.v1, 4, 5, 6, 7);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) block2 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 8, 9, 10, 11) : __builtin_shufflevector(tuple.v1, tuple.v1, 8, 9, 10, 11);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) block3 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 12, 13, 14, 15) : __builtin_shufflevector(tuple.v1, tuple.v1, 12, 13, 14, 15);
+  return __builtin_shufflevector(__builtin_shufflevector(block0, block1, 0, 1, 2, 3, 4, 5, 6, 7), __builtin_shufflevector(block2, block3, 0, 1, 2, 3, 4, 5, 6, 7), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block0, block1, block2, block3;
   switch (index) {
   case 0: block0 = __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1); block1 = __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3); block2 = __builtin_shufflevector(tuple.v0, tuple.v0, 4, 5); block3 = __builtin_shufflevector(tuple.v0, tuple.v0, 6, 7); break;
@@ -96714,7 +96868,21 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_g
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_tuple2_i32 cvectorization_ops_set2_i32(cvectorization_ops_tuple2_i32 tuple, size_t index, cvectorization_ops_raw_vector_i32 rawA) {
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
-#if CVECTORIZATION_OPS_X86 == 4
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(index)) {
+    switch (index) {
+    case 0: return (cvectorization_ops_tuple2_i32){rawA, tuple.v1};
+    default: return (cvectorization_ops_tuple2_i32){tuple.v0, rawA};
+    }
+  }
+  typedef uint32_t tuple_mask __attribute__((vector_size(16)));
+  const tuple_mask mask = (tuple_mask){0} + (uint32_t)-(uint32_t)(index == 0);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) member0_0 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)))((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3) ^ (((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 0, 1, 2, 3)) & mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) member0_1 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)))((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 4, 5, 6, 7) ^ (((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 4, 5, 6, 7) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 4, 5, 6, 7)) & mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) member1_0 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)))((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3) ^ (((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 0, 1, 2, 3)) & ~mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) member1_1 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)))((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 4, 5, 6, 7) ^ (((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 4, 5, 6, 7) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 4, 5, 6, 7)) & ~mask));
+  return (cvectorization_ops_tuple2_i32){__builtin_shufflevector(member0_0, member0_1, 0, 1, 2, 3, 4, 5, 6, 7), __builtin_shufflevector(member1_0, member1_1, 0, 1, 2, 3, 4, 5, 6, 7)};
+#elif CVECTORIZATION_OPS_X86 == 4
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_1 = index == 0 ? __builtin_shufflevector(tuple.v1, tuple.v1, 2, 3) : __builtin_shufflevector(rawA, rawA, 2, 3);
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_0 = index == 0 ? __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1) : __builtin_shufflevector(rawA, rawA, 0, 1);
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member0_1 = index == 0 ? __builtin_shufflevector(rawA, rawA, 2, 3) : __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3);
@@ -109503,7 +109671,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_tuple2_i64 cvectorization_ops_creat
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_get2_i64(cvectorization_ops_tuple2_i64 tuple, size_t index) {
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block0 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1) : __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block1 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3) : __builtin_shufflevector(tuple.v1, tuple.v1, 2, 3);
+  return __builtin_shufflevector(block0, block1, 0, 1, 2, 3);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block0 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1) : __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block1 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3) : __builtin_shufflevector(tuple.v1, tuple.v1, 2, 3);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block2 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 4, 5) : __builtin_shufflevector(tuple.v1, tuple.v1, 4, 5);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block3 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 6, 7) : __builtin_shufflevector(tuple.v1, tuple.v1, 6, 7);
+  return __builtin_shufflevector(__builtin_shufflevector(block0, block1, 0, 1, 2, 3), __builtin_shufflevector(block2, block3, 0, 1, 2, 3), 0, 1, 2, 3, 4, 5, 6, 7);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block0, block1, block2, block3;
   switch (index) {
   case 0: block0 = __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1); block1 = __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3); block2 = __builtin_shufflevector(tuple.v0, tuple.v0, 4, 5); block3 = __builtin_shufflevector(tuple.v0, tuple.v0, 6, 7); break;
@@ -109526,7 +109704,21 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_g
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_tuple2_i64 cvectorization_ops_set2_i64(cvectorization_ops_tuple2_i64 tuple, size_t index, cvectorization_ops_raw_vector_i64 rawA) {
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
-#if CVECTORIZATION_OPS_X86 == 4
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(index)) {
+    switch (index) {
+    case 0: return (cvectorization_ops_tuple2_i64){rawA, tuple.v1};
+    default: return (cvectorization_ops_tuple2_i64){tuple.v0, rawA};
+    }
+  }
+  typedef uint64_t tuple_mask __attribute__((vector_size(16)));
+  const tuple_mask mask = (tuple_mask){0} + (uint64_t)-(uint64_t)(index == 0);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member0_0 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)))((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1) ^ (((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 0, 1)) & mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member0_1 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)))((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 2, 3) ^ (((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 2, 3) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 2, 3)) & mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_0 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)))((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 0, 1) ^ (((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 0, 1) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 0, 1)) & ~mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_1 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)))((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 2, 3) ^ (((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 2, 3) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 2, 3)) & ~mask));
+  return (cvectorization_ops_tuple2_i64){__builtin_shufflevector(member0_0, member0_1, 0, 1, 2, 3), __builtin_shufflevector(member1_0, member1_1, 0, 1, 2, 3)};
+#elif CVECTORIZATION_OPS_X86 == 4
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_1 = index == 0 ? __builtin_shufflevector(tuple.v1, tuple.v1, 2, 3) : __builtin_shufflevector(rawA, rawA, 2, 3);
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_0 = index == 0 ? __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1) : __builtin_shufflevector(rawA, rawA, 0, 1);
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member0_1 = index == 0 ? __builtin_shufflevector(rawA, rawA, 2, 3) : __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3);
@@ -121566,7 +121758,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_tuple2_f32 cvectorization_ops_creat
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_get2_f32(cvectorization_ops_tuple2_f32 tuple, size_t index) {
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) block0 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3) : __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) block1 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 4, 5, 6, 7) : __builtin_shufflevector(tuple.v1, tuple.v1, 4, 5, 6, 7);
+  return __builtin_shufflevector(block0, block1, 0, 1, 2, 3, 4, 5, 6, 7);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) block0 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3) : __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) block1 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 4, 5, 6, 7) : __builtin_shufflevector(tuple.v1, tuple.v1, 4, 5, 6, 7);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) block2 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 8, 9, 10, 11) : __builtin_shufflevector(tuple.v1, tuple.v1, 8, 9, 10, 11);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) block3 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 12, 13, 14, 15) : __builtin_shufflevector(tuple.v1, tuple.v1, 12, 13, 14, 15);
+  return __builtin_shufflevector(__builtin_shufflevector(block0, block1, 0, 1, 2, 3, 4, 5, 6, 7), __builtin_shufflevector(block2, block3, 0, 1, 2, 3, 4, 5, 6, 7), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) block0, block1, block2, block3;
   switch (index) {
   case 0: block0 = __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3); block1 = __builtin_shufflevector(tuple.v0, tuple.v0, 4, 5, 6, 7); block2 = __builtin_shufflevector(tuple.v0, tuple.v0, 8, 9, 10, 11); block3 = __builtin_shufflevector(tuple.v0, tuple.v0, 12, 13, 14, 15); break;
@@ -121589,7 +121791,21 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_g
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_tuple2_f32 cvectorization_ops_set2_f32(cvectorization_ops_tuple2_f32 tuple, size_t index, cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
-#if CVECTORIZATION_OPS_X86 == 4
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(index)) {
+    switch (index) {
+    case 0: return (cvectorization_ops_tuple2_f32){rawA, tuple.v1};
+    default: return (cvectorization_ops_tuple2_f32){tuple.v0, rawA};
+    }
+  }
+  typedef uint32_t tuple_mask __attribute__((vector_size(16)));
+  const tuple_mask mask = (tuple_mask){0} + (uint32_t)-(uint32_t)(index == 0);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) member0_0 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)))((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3) ^ (((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 0, 1, 2, 3)) & mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) member0_1 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)))((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 4, 5, 6, 7) ^ (((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 4, 5, 6, 7) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 4, 5, 6, 7)) & mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) member1_0 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)))((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3) ^ (((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 0, 1, 2, 3)) & ~mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) member1_1 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)))((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 4, 5, 6, 7) ^ (((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 4, 5, 6, 7) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 4, 5, 6, 7)) & ~mask));
+  return (cvectorization_ops_tuple2_f32){__builtin_shufflevector(member0_0, member0_1, 0, 1, 2, 3, 4, 5, 6, 7), __builtin_shufflevector(member1_0, member1_1, 0, 1, 2, 3, 4, 5, 6, 7)};
+#elif CVECTORIZATION_OPS_X86 == 4
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) member1_1 = index == 0 ? __builtin_shufflevector(tuple.v1, tuple.v1, 4, 5, 6, 7) : __builtin_shufflevector(rawA, rawA, 4, 5, 6, 7);
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) member1_0 = index == 0 ? __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1, 2, 3) : __builtin_shufflevector(rawA, rawA, 0, 1, 2, 3);
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1, 2, 3)) member0_1 = index == 0 ? __builtin_shufflevector(rawA, rawA, 4, 5, 6, 7) : __builtin_shufflevector(tuple.v0, tuple.v0, 4, 5, 6, 7);
@@ -133110,7 +133326,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_tuple2_f64 cvectorization_ops_creat
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_get2_f64(cvectorization_ops_tuple2_f64 tuple, size_t index) {
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block0 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1) : __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block1 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3) : __builtin_shufflevector(tuple.v1, tuple.v1, 2, 3);
+  return __builtin_shufflevector(block0, block1, 0, 1, 2, 3);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block0 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1) : __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block1 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3) : __builtin_shufflevector(tuple.v1, tuple.v1, 2, 3);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block2 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 4, 5) : __builtin_shufflevector(tuple.v1, tuple.v1, 4, 5);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block3 = index == 0 ? __builtin_shufflevector(tuple.v0, tuple.v0, 6, 7) : __builtin_shufflevector(tuple.v1, tuple.v1, 6, 7);
+  return __builtin_shufflevector(__builtin_shufflevector(block0, block1, 0, 1, 2, 3), __builtin_shufflevector(block2, block3, 0, 1, 2, 3), 0, 1, 2, 3, 4, 5, 6, 7);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) block0, block1, block2, block3;
   switch (index) {
   case 0: block0 = __builtin_shufflevector(tuple.v0, tuple.v0, 0, 1); block1 = __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3); block2 = __builtin_shufflevector(tuple.v0, tuple.v0, 4, 5); block3 = __builtin_shufflevector(tuple.v0, tuple.v0, 6, 7); break;
@@ -133133,7 +133359,21 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_g
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_tuple2_f64 cvectorization_ops_set2_f64(cvectorization_ops_tuple2_f64 tuple, size_t index, cvectorization_ops_raw_vector_f64 rawA) {
   const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
-#if CVECTORIZATION_OPS_X86 == 4
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(index)) {
+    switch (index) {
+    case 0: return (cvectorization_ops_tuple2_f64){rawA, tuple.v1};
+    default: return (cvectorization_ops_tuple2_f64){tuple.v0, rawA};
+    }
+  }
+  typedef uint64_t tuple_mask __attribute__((vector_size(16)));
+  const tuple_mask mask = (tuple_mask){0} + (uint64_t)-(uint64_t)(index == 0);
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member0_0 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)))((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1) ^ (((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 0, 1)) & mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member0_1 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)))((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 2, 3) ^ (((tuple_mask)__builtin_shufflevector(tuple.v0, tuple.v0, 2, 3) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 2, 3)) & mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_0 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)))((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 0, 1) ^ (((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 0, 1) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 0, 1)) & ~mask));
+  const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_1 = (__typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)))((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 2, 3) ^ (((tuple_mask)__builtin_shufflevector(tuple.v1, tuple.v1, 2, 3) ^ (tuple_mask)__builtin_shufflevector(rawA, rawA, 2, 3)) & ~mask));
+  return (cvectorization_ops_tuple2_f64){__builtin_shufflevector(member0_0, member0_1, 0, 1, 2, 3), __builtin_shufflevector(member1_0, member1_1, 0, 1, 2, 3)};
+#elif CVECTORIZATION_OPS_X86 == 4
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_1 = index == 0 ? __builtin_shufflevector(tuple.v1, tuple.v1, 2, 3) : __builtin_shufflevector(rawA, rawA, 2, 3);
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member1_0 = index == 0 ? __builtin_shufflevector(tuple.v1, tuple.v1, 0, 1) : __builtin_shufflevector(rawA, rawA, 0, 1);
   const __typeof__(__builtin_shufflevector(tuple.v0, tuple.v0, 0, 1)) member0_1 = index == 0 ? __builtin_shufflevector(rawA, rawA, 2, 3) : __builtin_shufflevector(tuple.v0, tuple.v0, 2, 3);
