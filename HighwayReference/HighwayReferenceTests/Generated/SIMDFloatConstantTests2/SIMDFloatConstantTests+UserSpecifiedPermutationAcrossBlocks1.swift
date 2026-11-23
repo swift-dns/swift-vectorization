@@ -310,4 +310,96 @@ extension SIMDFloatConstantTests {
         checkTwoTablesLookupLanesConstantA(.greatestFiniteMagnitude)
         checkTwoTablesLookupLanesConstantB(.greatestFiniteMagnitude)
     }
+
+    @inline(__always)
+    private func checkLookup8ConstantIndices(_ value: Int32) {
+        let mismatches = Mismatches("lookup8 with indices repeating \(hex(value))")
+        let fromInputs = Inputs.buffers(Lane.self, count: 8, seed: 0xB591_C09E_AB74_D75F)
+        mismatches.check(
+            SIMD<Int32>.repeating(value),
+            SIMD<Int32>(raw: HighwayReference.repeatingI32(value)),
+            "repeating"
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withAlignedLanes(from, laneCount: 8) {
+                source in
+                (
+                    unsafe H.lookup8(at: SIMD<Int32>.repeating(value), from: source),
+                    unsafe H(
+                        raw: HighwayReference.lookup8F32(source, SIMD<Int32>.repeating(value).raw)
+                    )
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func lookup8ConstantIndicesSplat0() {
+        checkLookup8ConstantIndices(0)
+    }
+
+    @Test func lookup8ConstantIndicesSplat1() {
+        checkLookup8ConstantIndices(1)
+    }
+
+    @Test func lookup8ConstantIndicesSplat2() {
+        checkLookup8ConstantIndices(2)
+    }
+
+    @Test func lookup8ConstantIndicesSplat3() {
+        checkLookup8ConstantIndices(3)
+    }
+
+    @Test func lookup8ConstantIndicesSplat7() {
+        checkLookup8ConstantIndices(7)
+    }
+
+    @inline(__always)
+    private func checkLookup16ConstantIndices(_ value: Int32) {
+        let mismatches = Mismatches("lookup16 with indices repeating \(hex(value))")
+        let fromInputs = Inputs.buffers(Lane.self, count: 16, seed: 0x3DD9_353C_77AC_E57C)
+        mismatches.check(
+            SIMD<Int32>.repeating(value),
+            SIMD<Int32>(raw: HighwayReference.repeatingI32(value)),
+            "repeating"
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withAlignedLanes(from, laneCount: 16) {
+                source in
+                (
+                    unsafe H.lookup16(at: SIMD<Int32>.repeating(value), from: source),
+                    unsafe H(
+                        raw: HighwayReference.lookup16F32(source, SIMD<Int32>.repeating(value).raw)
+                    )
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func lookup16ConstantIndicesSplat0() {
+        checkLookup16ConstantIndices(0)
+    }
+
+    @Test func lookup16ConstantIndicesSplat1() {
+        checkLookup16ConstantIndices(1)
+    }
+
+    @Test func lookup16ConstantIndicesSplat2() {
+        checkLookup16ConstantIndices(2)
+    }
+
+    @Test func lookup16ConstantIndicesSplat3() {
+        checkLookup16ConstantIndices(3)
+    }
+
+    @Test func lookup16ConstantIndicesSplat7() {
+        checkLookup16ConstantIndices(7)
+    }
+
+    @Test func lookup16ConstantIndicesSplat15() {
+        checkLookup16ConstantIndices(15)
+    }
 }

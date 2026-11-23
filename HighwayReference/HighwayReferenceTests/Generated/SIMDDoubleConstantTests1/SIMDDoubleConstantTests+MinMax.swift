@@ -675,6 +675,46 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
+    private func checkMinimumMagnitudeConstantAB(_ aValue: Lane, _ bValue: Lane) {
+        let mismatches = Mismatches(
+            "minimumMagnitude with a repeating \(hex(aValue)), b repeating \(hex(bValue))"
+        )
+        mismatches.check(
+            H.repeating(aValue),
+            H(raw: HighwayReference.repeatingF64(aValue)),
+            "repeating"
+        )
+        mismatches.check(
+            H.repeating(bValue),
+            H(raw: HighwayReference.repeatingF64(bValue)),
+            "repeating"
+        )
+        mismatches.check(
+            H.minimumMagnitude(H.repeating(aValue), H.repeating(bValue)),
+            H(
+                raw: HighwayReference.minimumMagnitudeF64(
+                    H.repeating(aValue).raw,
+                    H.repeating(bValue).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func minimumMagnitudeConstantAOneBMinusTwoPointFive() {
+        checkMinimumMagnitudeConstantAB(1.0, -2.5)
+    }
+
+    @Test func minimumMagnitudeConstantAMinusTwoPointFiveBHalf() {
+        checkMinimumMagnitudeConstantAB(-2.5, 0.5)
+    }
+
+    @Test func minimumMagnitudeConstantAHalfBOne() {
+        checkMinimumMagnitudeConstantAB(0.5, 1.0)
+    }
+
+    @inline(__always)
     private func checkMinimumMagnitudeConstantA(_ value: Lane) {
         let mismatches = Mismatches("minimumMagnitude with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x0512_181C_B23F_84FD)
@@ -805,6 +845,46 @@ extension SIMDDoubleConstantTests {
     @Test func minimumMagnitudeConstantSplatGreatest() {
         checkMinimumMagnitudeConstantA(.greatestFiniteMagnitude)
         checkMinimumMagnitudeConstantB(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkMaximumMagnitudeConstantAB(_ aValue: Lane, _ bValue: Lane) {
+        let mismatches = Mismatches(
+            "maximumMagnitude with a repeating \(hex(aValue)), b repeating \(hex(bValue))"
+        )
+        mismatches.check(
+            H.repeating(aValue),
+            H(raw: HighwayReference.repeatingF64(aValue)),
+            "repeating"
+        )
+        mismatches.check(
+            H.repeating(bValue),
+            H(raw: HighwayReference.repeatingF64(bValue)),
+            "repeating"
+        )
+        mismatches.check(
+            H.maximumMagnitude(H.repeating(aValue), H.repeating(bValue)),
+            H(
+                raw: HighwayReference.maximumMagnitudeF64(
+                    H.repeating(aValue).raw,
+                    H.repeating(bValue).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func maximumMagnitudeConstantAOneBMinusTwoPointFive() {
+        checkMaximumMagnitudeConstantAB(1.0, -2.5)
+    }
+
+    @Test func maximumMagnitudeConstantAMinusTwoPointFiveBHalf() {
+        checkMaximumMagnitudeConstantAB(-2.5, 0.5)
+    }
+
+    @Test func maximumMagnitudeConstantAHalfBOne() {
+        checkMaximumMagnitudeConstantAB(0.5, 1.0)
     }
 
     @inline(__always)

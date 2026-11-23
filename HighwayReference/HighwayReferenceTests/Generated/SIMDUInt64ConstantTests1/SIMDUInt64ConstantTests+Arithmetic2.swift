@@ -7,6 +7,74 @@ import Vectorization
 
 extension SIMDUInt64ConstantTests {
     @inline(__always)
+    private func checkSumsOf4FromUInt16ConstantA(_ value: UInt16) {
+        let mismatches = Mismatches("sumsOf4FromUInt16 with a repeating \(hex(value))")
+        mismatches.check(
+            SIMD<UInt16>.repeating(value),
+            SIMD<UInt16>(raw: HighwayReference.repeatingU16(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.sumsOf4(SIMD<UInt16>.repeating(value)),
+            H(raw: HighwayReference.sumsOf4U16ToU64(SIMD<UInt16>.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func sumsOf4FromUInt16ConstantSplat0() {
+        checkSumsOf4FromUInt16ConstantA(0)
+    }
+
+    @Test func sumsOf4FromUInt16ConstantSplat1() {
+        checkSumsOf4FromUInt16ConstantA(1)
+    }
+
+    @Test func sumsOf4FromUInt16ConstantSplat15() {
+        checkSumsOf4FromUInt16ConstantA(15)
+    }
+
+    @Test func sumsOf4FromUInt16ConstantSplat16() {
+        checkSumsOf4FromUInt16ConstantA(16)
+    }
+
+    @Test func sumsOf4FromUInt16ConstantSplat26() {
+        checkSumsOf4FromUInt16ConstantA(26)
+    }
+
+    @Test func sumsOf4FromUInt16ConstantSplat127() {
+        checkSumsOf4FromUInt16ConstantA(127)
+    }
+
+    @Test func sumsOf4FromUInt16ConstantSplat128() {
+        checkSumsOf4FromUInt16ConstantA(128)
+    }
+
+    @Test func sumsOf4FromUInt16ConstantSplat255() {
+        checkSumsOf4FromUInt16ConstantA(255)
+    }
+
+    @Test func sumsOf4FromUInt16ConstantSplat256() {
+        checkSumsOf4FromUInt16ConstantA(256)
+    }
+
+    @Test func sumsOf4FromUInt16ConstantSplat257() {
+        checkSumsOf4FromUInt16ConstantA(257)
+    }
+
+    @Test func sumsOf4FromUInt16ConstantSplat65280() {
+        checkSumsOf4FromUInt16ConstantA(65280)
+    }
+
+    @Test func sumsOf4FromUInt16ConstantSplat65281() {
+        checkSumsOf4FromUInt16ConstantA(65281)
+    }
+
+    @Test func sumsOf4FromUInt16ConstantSplatMax() {
+        checkSumsOf4FromUInt16ConstantA(UInt16.max)
+    }
+
+    @inline(__always)
     private func checkSumsOf8FromUInt8ConstantA(_ value: UInt8) {
         let mismatches = Mismatches("sumsOf8FromUInt8 with a repeating \(hex(value))")
         mismatches.check(

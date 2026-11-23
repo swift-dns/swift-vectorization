@@ -319,6 +319,222 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
+    private func checkBitwiseXorAndNotConstantA(_ value: Lane) {
+        let mismatches = Mismatches("bitwiseXorAndNot with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.self, seed: 0xED6D_6AE6_EC78_C718)
+        let cInputs = Inputs.vectors(H.self, seed: 0xED6D_6DE6_EC78_CC31)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU8(value)),
+            "repeating"
+        )
+        for (b, c) in everyPair(bInputs, cInputs) {
+            mismatches.check(
+                H.bitwiseXorAndNot(H.repeating(value), b, c),
+                H(raw: HighwayReference.bitwiseXorAndNotU8(H.repeating(value).raw, b.raw, c.raw)),
+                "b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkBitwiseXorAndNotConstantB(_ value: Lane) {
+        let mismatches = Mismatches("bitwiseXorAndNot with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x06BF_F0E6_FAA0_66CA)
+        let cInputs = Inputs.vectors(H.self, seed: 0x06BF_EEE6_FAA0_6364)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU8(value)),
+            "repeating"
+        )
+        for (a, c) in everyPair(aInputs, cInputs) {
+            mismatches.check(
+                H.bitwiseXorAndNot(a, H.repeating(value), c),
+                H(raw: HighwayReference.bitwiseXorAndNotU8(a.raw, H.repeating(value).raw, c.raw)),
+                "a: \(describe(a)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkBitwiseXorAndNotConstantC(_ value: Lane) {
+        let mismatches = Mismatches("bitwiseXorAndNot with c repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xFE2B_39E6_F5CA_5E35)
+        let bInputs = Inputs.vectors(H.self, seed: 0xFE2B_38E6_F5CA_5C82)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU8(value)),
+            "repeating"
+        )
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.bitwiseXorAndNot(a, b, H.repeating(value)),
+                H(raw: HighwayReference.bitwiseXorAndNotU8(a.raw, b.raw, H.repeating(value).raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func bitwiseXorAndNotConstantSplat0() {
+        checkBitwiseXorAndNotConstantA(0)
+        checkBitwiseXorAndNotConstantB(0)
+        checkBitwiseXorAndNotConstantC(0)
+    }
+
+    @Test func bitwiseXorAndNotConstantSplat1() {
+        checkBitwiseXorAndNotConstantA(1)
+        checkBitwiseXorAndNotConstantB(1)
+        checkBitwiseXorAndNotConstantC(1)
+    }
+
+    @Test func bitwiseXorAndNotConstantSplat15() {
+        checkBitwiseXorAndNotConstantA(15)
+        checkBitwiseXorAndNotConstantB(15)
+        checkBitwiseXorAndNotConstantC(15)
+    }
+
+    @Test func bitwiseXorAndNotConstantSplat16() {
+        checkBitwiseXorAndNotConstantA(16)
+        checkBitwiseXorAndNotConstantB(16)
+        checkBitwiseXorAndNotConstantC(16)
+    }
+
+    @Test func bitwiseXorAndNotConstantSplat26() {
+        checkBitwiseXorAndNotConstantA(26)
+        checkBitwiseXorAndNotConstantB(26)
+        checkBitwiseXorAndNotConstantC(26)
+    }
+
+    @Test func bitwiseXorAndNotConstantSplat127() {
+        checkBitwiseXorAndNotConstantA(127)
+        checkBitwiseXorAndNotConstantB(127)
+        checkBitwiseXorAndNotConstantC(127)
+    }
+
+    @Test func bitwiseXorAndNotConstantSplat128() {
+        checkBitwiseXorAndNotConstantA(128)
+        checkBitwiseXorAndNotConstantB(128)
+        checkBitwiseXorAndNotConstantC(128)
+    }
+
+    @Test func bitwiseXorAndNotConstantSplat255() {
+        checkBitwiseXorAndNotConstantA(255)
+        checkBitwiseXorAndNotConstantB(255)
+        checkBitwiseXorAndNotConstantC(255)
+    }
+
+    @inline(__always)
+    private func checkBitwiseSelectingConstantA(_ value: Lane) {
+        let mismatches = Mismatches("bitwiseSelecting with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x7C28_95C1_39B7_8C45)
+        let cInputs = Inputs.vectors(H.self, seed: 0x7C28_92C1_39B7_872C)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU8(value)),
+            "repeating"
+        )
+        for (b, c) in everyPair(bInputs, cInputs) {
+            mismatches.check(
+                H.bitwiseSelecting(H.repeating(value), b, c),
+                H(raw: HighwayReference.bitwiseSelectingU8(H.repeating(value).raw, b.raw, c.raw)),
+                "b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkBitwiseSelectingConstantB(_ value: Lane) {
+        let mismatches = Mismatches("bitwiseSelecting with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x6269_0FC1_2B33_1AB3)
+        let cInputs = Inputs.vectors(H.self, seed: 0x6269_11C1_2B33_1E19)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU8(value)),
+            "repeating"
+        )
+        for (a, c) in everyPair(aInputs, cInputs) {
+            mismatches.check(
+                H.bitwiseSelecting(a, H.repeating(value), c),
+                H(raw: HighwayReference.bitwiseSelectingU8(a.raw, H.repeating(value).raw, c.raw)),
+                "a: \(describe(a)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkBitwiseSelectingConstantC(_ value: Lane) {
+        let mismatches = Mismatches("bitwiseSelecting with c repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x6BD7_C6C1_30C2_C708)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6BD7_C7C1_30C2_C8BB)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU8(value)),
+            "repeating"
+        )
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.bitwiseSelecting(a, b, H.repeating(value)),
+                H(raw: HighwayReference.bitwiseSelectingU8(a.raw, b.raw, H.repeating(value).raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func bitwiseSelectingConstantSplat0() {
+        checkBitwiseSelectingConstantA(0)
+        checkBitwiseSelectingConstantB(0)
+        checkBitwiseSelectingConstantC(0)
+    }
+
+    @Test func bitwiseSelectingConstantSplat1() {
+        checkBitwiseSelectingConstantA(1)
+        checkBitwiseSelectingConstantB(1)
+        checkBitwiseSelectingConstantC(1)
+    }
+
+    @Test func bitwiseSelectingConstantSplat15() {
+        checkBitwiseSelectingConstantA(15)
+        checkBitwiseSelectingConstantB(15)
+        checkBitwiseSelectingConstantC(15)
+    }
+
+    @Test func bitwiseSelectingConstantSplat16() {
+        checkBitwiseSelectingConstantA(16)
+        checkBitwiseSelectingConstantB(16)
+        checkBitwiseSelectingConstantC(16)
+    }
+
+    @Test func bitwiseSelectingConstantSplat26() {
+        checkBitwiseSelectingConstantA(26)
+        checkBitwiseSelectingConstantB(26)
+        checkBitwiseSelectingConstantC(26)
+    }
+
+    @Test func bitwiseSelectingConstantSplat127() {
+        checkBitwiseSelectingConstantA(127)
+        checkBitwiseSelectingConstantB(127)
+        checkBitwiseSelectingConstantC(127)
+    }
+
+    @Test func bitwiseSelectingConstantSplat128() {
+        checkBitwiseSelectingConstantA(128)
+        checkBitwiseSelectingConstantB(128)
+        checkBitwiseSelectingConstantC(128)
+    }
+
+    @Test func bitwiseSelectingConstantSplat255() {
+        checkBitwiseSelectingConstantA(255)
+        checkBitwiseSelectingConstantB(255)
+        checkBitwiseSelectingConstantC(255)
+    }
+
+    @inline(__always)
     private func checkBitwiseAndWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "bitwiseAndWhereOtherwise with otherwise repeating \(hex(value))"

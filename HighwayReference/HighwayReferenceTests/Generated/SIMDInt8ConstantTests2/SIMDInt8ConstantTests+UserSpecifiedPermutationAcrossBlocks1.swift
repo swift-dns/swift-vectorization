@@ -120,4 +120,58 @@ extension SIMDInt8ConstantTests {
     @Test(.enabled(if: 63 < H.laneCount)) func tableLookupLanesConstantIndicesSplat63() {
         checkTableLookupLanesConstantIndices(63)
     }
+
+    @inline(__always)
+    private func checkLookup64ConstantIndices(_ value: Lane) {
+        let mismatches = Mismatches("lookup64 with indices repeating \(hex(value))")
+        let fromInputs = Inputs.buffers(Lane.self, count: 64, seed: 0xCE5D_E908_C7F8_48EF)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI8(value)),
+            "repeating"
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withAlignedLanes(from, laneCount: 64) {
+                source in
+                (
+                    unsafe H.lookup64(at: H.repeating(value), from: source),
+                    unsafe H(raw: HighwayReference.lookup64I8(source, H.repeating(value).raw))
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func lookup64ConstantIndicesSplat0() {
+        checkLookup64ConstantIndices(0)
+    }
+
+    @Test func lookup64ConstantIndicesSplat1() {
+        checkLookup64ConstantIndices(1)
+    }
+
+    @Test func lookup64ConstantIndicesSplat2() {
+        checkLookup64ConstantIndices(2)
+    }
+
+    @Test func lookup64ConstantIndicesSplat3() {
+        checkLookup64ConstantIndices(3)
+    }
+
+    @Test func lookup64ConstantIndicesSplat7() {
+        checkLookup64ConstantIndices(7)
+    }
+
+    @Test func lookup64ConstantIndicesSplat15() {
+        checkLookup64ConstantIndices(15)
+    }
+
+    @Test func lookup64ConstantIndicesSplat31() {
+        checkLookup64ConstantIndices(31)
+    }
+
+    @Test func lookup64ConstantIndicesSplat63() {
+        checkLookup64ConstantIndices(63)
+    }
 }
