@@ -195,6 +195,82 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
+    private func checkMultiplyingComplexConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "multiplyingComplex with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let bInputs = Inputs.vectors(H.self, seed: 0x9989_B473_D303_4495)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.multiplyingComplex(H.repeatingBlock(even, odd), b),
+                H(
+                    raw: HighwayReference.multiplyingComplexU64(
+                        H.repeatingBlock(even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingComplexConstantAAlternating1And26() {
+        checkMultiplyingComplexConstantAAlternating(1, 26)
+    }
+
+    @Test func multiplyingComplexConstantAAlternating26And127() {
+        checkMultiplyingComplexConstantAAlternating(26, 127)
+    }
+
+    @Test func multiplyingComplexConstantAAlternating127And1() {
+        checkMultiplyingComplexConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkMultiplyingComplexConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "multiplyingComplex with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0xB96A_E64B_01D3_1721)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.multiplyingComplex(a, H.repeatingBlock(even, odd)),
+                H(
+                    raw: HighwayReference.multiplyingComplexU64(
+                        a.raw,
+                        H.repeatingBlock(even, odd).raw
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingComplexConstantBAlternating1And26() {
+        checkMultiplyingComplexConstantBAlternating(1, 26)
+    }
+
+    @Test func multiplyingComplexConstantBAlternating26And127() {
+        checkMultiplyingComplexConstantBAlternating(26, 127)
+    }
+
+    @Test func multiplyingComplexConstantBAlternating127And1() {
+        checkMultiplyingComplexConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
     private func checkMultiplyingComplexConjugateConstantAB(_ aValue: Lane, _ bValue: Lane) {
         let mismatches = Mismatches(
             "multiplyingComplexConjugate with a repeating \(hex(aValue)), b repeating \(hex(bValue))"
@@ -393,6 +469,82 @@ extension SIMDUInt64ConstantTests {
     @Test func multiplyingComplexConjugateConstantSplatMax() {
         checkMultiplyingComplexConjugateConstantA(Lane.max)
         checkMultiplyingComplexConjugateConstantB(Lane.max)
+    }
+
+    @inline(__always)
+    private func checkMultiplyingComplexConjugateConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "multiplyingComplexConjugate with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let bInputs = Inputs.vectors(H.self, seed: 0x06C0_E14C_579E_87FD)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.multiplyingComplexConjugate(H.repeatingBlock(even, odd), b),
+                H(
+                    raw: HighwayReference.multiplyingComplexConjugateU64(
+                        H.repeatingBlock(even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingComplexConjugateConstantAAlternating1And26() {
+        checkMultiplyingComplexConjugateConstantAAlternating(1, 26)
+    }
+
+    @Test func multiplyingComplexConjugateConstantAAlternating26And127() {
+        checkMultiplyingComplexConjugateConstantAAlternating(26, 127)
+    }
+
+    @Test func multiplyingComplexConjugateConstantAAlternating127And1() {
+        checkMultiplyingComplexConjugateConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkMultiplyingComplexConjugateConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "multiplyingComplexConjugate with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x63F3_AAFD_930C_1D69)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.multiplyingComplexConjugate(a, H.repeatingBlock(even, odd)),
+                H(
+                    raw: HighwayReference.multiplyingComplexConjugateU64(
+                        a.raw,
+                        H.repeatingBlock(even, odd).raw
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingComplexConjugateConstantBAlternating1And26() {
+        checkMultiplyingComplexConjugateConstantBAlternating(1, 26)
+    }
+
+    @Test func multiplyingComplexConjugateConstantBAlternating26And127() {
+        checkMultiplyingComplexConjugateConstantBAlternating(26, 127)
+    }
+
+    @Test func multiplyingComplexConjugateConstantBAlternating127And1() {
+        checkMultiplyingComplexConjugateConstantBAlternating(127, 1)
     }
 
     @inline(__always)
@@ -610,6 +762,86 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
+    private func checkMultiplyAddingComplexConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "multiplyAddingComplex with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let bInputs = Inputs.vectors(H.self, seed: 0xD2EF_7D20_CCAF_360C)
+        let cInputs = Inputs.vectors(H.self, seed: 0xD2EF_8020_CCAF_3B25)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for (b, c) in everyPair(bInputs, cInputs) {
+            mismatches.check(
+                H.multiplyAddingComplex(H.repeatingBlock(even, odd), b, c),
+                H(
+                    raw: HighwayReference.multiplyAddingComplexU64(
+                        H.repeatingBlock(even, odd).raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
+                "b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyAddingComplexConstantAAlternating1And26() {
+        checkMultiplyAddingComplexConstantAAlternating(1, 26)
+    }
+
+    @Test func multiplyAddingComplexConstantAAlternating26And127() {
+        checkMultiplyAddingComplexConstantAAlternating(26, 127)
+    }
+
+    @Test func multiplyAddingComplexConstantAAlternating127And1() {
+        checkMultiplyAddingComplexConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkMultiplyAddingComplexConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "multiplyAddingComplex with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0xF5F2_1D74_DFB8_3AEC)
+        let cInputs = Inputs.vectors(H.self, seed: 0xF5F2_1F74_DFB8_3E52)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for (a, c) in everyPair(aInputs, cInputs) {
+            mismatches.check(
+                H.multiplyAddingComplex(a, H.repeatingBlock(even, odd), c),
+                H(
+                    raw: HighwayReference.multiplyAddingComplexU64(
+                        a.raw,
+                        H.repeatingBlock(even, odd).raw,
+                        c.raw
+                    )
+                ),
+                "a: \(describe(a)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyAddingComplexConstantBAlternating1And26() {
+        checkMultiplyAddingComplexConstantBAlternating(1, 26)
+    }
+
+    @Test func multiplyAddingComplexConstantBAlternating26And127() {
+        checkMultiplyAddingComplexConstantBAlternating(26, 127)
+    }
+
+    @Test func multiplyAddingComplexConstantBAlternating127And1() {
+        checkMultiplyAddingComplexConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
     private func checkMultiplyAddingComplexConjugateConstantAB(_ aValue: Lane, _ bValue: Lane) {
         let mismatches = Mismatches(
             "multiplyAddingComplexConjugate with a repeating \(hex(aValue)), b repeating \(hex(bValue))"
@@ -821,5 +1053,87 @@ extension SIMDUInt64ConstantTests {
     @Test func multiplyAddingComplexConjugateConstantSplatMax() {
         checkMultiplyAddingComplexConjugateConstantA(Lane.max)
         checkMultiplyAddingComplexConjugateConstantB(Lane.max)
+    }
+
+    @inline(__always)
+    private func checkMultiplyAddingComplexConjugateConstantAAlternating(_ even: Lane, _ odd: Lane)
+    {
+        let mismatches = Mismatches(
+            "multiplyAddingComplexConjugate with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let bInputs = Inputs.vectors(H.self, seed: 0xA42D_A5DE_E2A6_5CCE)
+        let cInputs = Inputs.vectors(H.self, seed: 0xA42D_A4DE_E2A6_5B1B)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for (b, c) in everyPair(bInputs, cInputs) {
+            mismatches.check(
+                H.multiplyAddingComplexConjugate(H.repeatingBlock(even, odd), b, c),
+                H(
+                    raw: HighwayReference.multiplyAddingComplexConjugateU64(
+                        H.repeatingBlock(even, odd).raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
+                "b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyAddingComplexConjugateConstantAAlternating1And26() {
+        checkMultiplyAddingComplexConjugateConstantAAlternating(1, 26)
+    }
+
+    @Test func multiplyAddingComplexConjugateConstantAAlternating26And127() {
+        checkMultiplyAddingComplexConjugateConstantAAlternating(26, 127)
+    }
+
+    @Test func multiplyAddingComplexConjugateConstantAAlternating127And1() {
+        checkMultiplyAddingComplexConjugateConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkMultiplyAddingComplexConjugateConstantBAlternating(_ even: Lane, _ odd: Lane)
+    {
+        let mismatches = Mismatches(
+            "multiplyAddingComplexConjugate with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x911D_8ADC_7EA7_5B42)
+        let cInputs = Inputs.vectors(H.self, seed: 0x911D_88DC_7EA7_57DC)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for (a, c) in everyPair(aInputs, cInputs) {
+            mismatches.check(
+                H.multiplyAddingComplexConjugate(a, H.repeatingBlock(even, odd), c),
+                H(
+                    raw: HighwayReference.multiplyAddingComplexConjugateU64(
+                        a.raw,
+                        H.repeatingBlock(even, odd).raw,
+                        c.raw
+                    )
+                ),
+                "a: \(describe(a)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyAddingComplexConjugateConstantBAlternating1And26() {
+        checkMultiplyAddingComplexConjugateConstantBAlternating(1, 26)
+    }
+
+    @Test func multiplyAddingComplexConjugateConstantBAlternating26And127() {
+        checkMultiplyAddingComplexConjugateConstantBAlternating(26, 127)
+    }
+
+    @Test func multiplyAddingComplexConjugateConstantBAlternating127And1() {
+        checkMultiplyAddingComplexConjugateConstantBAlternating(127, 1)
     }
 }

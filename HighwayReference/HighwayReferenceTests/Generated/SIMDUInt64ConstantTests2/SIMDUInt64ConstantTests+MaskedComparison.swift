@@ -405,6 +405,82 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
+    private func checkLessThanWhereConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("lessThanWhere with a alternating \(hex(even)), \(hex(odd))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x24F9_08B9_AC0C_1A31)
+        let bInputs = Inputs.vectors(H.self, seed: 0x24F9_06B9_AC0C_16CB)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, b) in everyPair(maskInputs, bInputs) {
+            mismatches.check(
+                H.lessThan(H.repeatingBlock(even, odd), b, where: mask),
+                H.Mask(
+                    raw: HighwayReference.lessThanWhereU64(
+                        mask.raw,
+                        H.repeatingBlock(even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func lessThanWhereConstantAAlternating1And26() {
+        checkLessThanWhereConstantAAlternating(1, 26)
+    }
+
+    @Test func lessThanWhereConstantAAlternating26And127() {
+        checkLessThanWhereConstantAAlternating(26, 127)
+    }
+
+    @Test func lessThanWhereConstantAAlternating127And1() {
+        checkLessThanWhereConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkLessThanWhereConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("lessThanWhere with b alternating \(hex(even)), \(hex(odd))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE262_535F_6ED4_ED72)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE262_545F_6ED4_EF25)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.lessThan(a, H.repeatingBlock(even, odd), where: mask),
+                H.Mask(
+                    raw: HighwayReference.lessThanWhereU64(
+                        mask.raw,
+                        a.raw,
+                        H.repeatingBlock(even, odd).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func lessThanWhereConstantBAlternating1And26() {
+        checkLessThanWhereConstantBAlternating(1, 26)
+    }
+
+    @Test func lessThanWhereConstantBAlternating26And127() {
+        checkLessThanWhereConstantBAlternating(26, 127)
+    }
+
+    @Test func lessThanWhereConstantBAlternating127And1() {
+        checkLessThanWhereConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
     private func checkGreaterThanWhereConstantMask(_ mask: H.Mask) {
         let mismatches = Mismatches("greaterThanWhere with mask \(describe(mask))")
         let aInputs = Inputs.vectors(H.self, seed: 0x6AB3_6ED3_CF8A_3C7D)
@@ -582,6 +658,82 @@ extension SIMDUInt64ConstantTests {
     @Test func greaterThanWhereConstantSplatMax() {
         checkGreaterThanWhereConstantA(Lane.max)
         checkGreaterThanWhereConstantB(Lane.max)
+    }
+
+    @inline(__always)
+    private func checkGreaterThanWhereConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("greaterThanWhere with a alternating \(hex(even)), \(hex(odd))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xED96_67C0_F56C_DFE6)
+        let bInputs = Inputs.vectors(H.self, seed: 0xED96_65C0_F56C_DC80)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, b) in everyPair(maskInputs, bInputs) {
+            mismatches.check(
+                H.greaterThan(H.repeatingBlock(even, odd), b, where: mask),
+                H.Mask(
+                    raw: HighwayReference.greaterThanWhereU64(
+                        mask.raw,
+                        H.repeatingBlock(even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func greaterThanWhereConstantAAlternating1And26() {
+        checkGreaterThanWhereConstantAAlternating(1, 26)
+    }
+
+    @Test func greaterThanWhereConstantAAlternating26And127() {
+        checkGreaterThanWhereConstantAAlternating(26, 127)
+    }
+
+    @Test func greaterThanWhereConstantAAlternating127And1() {
+        checkGreaterThanWhereConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkGreaterThanWhereConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("greaterThanWhere with b alternating \(hex(even)), \(hex(odd))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xCD41_FB7B_3A7E_A865)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCD41_FA7B_3A7E_A6B2)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.greaterThan(a, H.repeatingBlock(even, odd), where: mask),
+                H.Mask(
+                    raw: HighwayReference.greaterThanWhereU64(
+                        mask.raw,
+                        a.raw,
+                        H.repeatingBlock(even, odd).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func greaterThanWhereConstantBAlternating1And26() {
+        checkGreaterThanWhereConstantBAlternating(1, 26)
+    }
+
+    @Test func greaterThanWhereConstantBAlternating26And127() {
+        checkGreaterThanWhereConstantBAlternating(26, 127)
+    }
+
+    @Test func greaterThanWhereConstantBAlternating127And1() {
+        checkGreaterThanWhereConstantBAlternating(127, 1)
     }
 
     @inline(__always)
@@ -765,6 +917,86 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
+    private func checkLessThanOrEqualToWhereConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "lessThanOrEqualToWhere with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6A73_BD28_5CDF_BC01)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6A73_BB28_5CDF_B89B)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, b) in everyPair(maskInputs, bInputs) {
+            mismatches.check(
+                H.lessThanOrEqualTo(H.repeatingBlock(even, odd), b, where: mask),
+                H.Mask(
+                    raw: HighwayReference.lessThanOrEqualToWhereU64(
+                        mask.raw,
+                        H.repeatingBlock(even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func lessThanOrEqualToWhereConstantAAlternating1And26() {
+        checkLessThanOrEqualToWhereConstantAAlternating(1, 26)
+    }
+
+    @Test func lessThanOrEqualToWhereConstantAAlternating26And127() {
+        checkLessThanOrEqualToWhereConstantAAlternating(26, 127)
+    }
+
+    @Test func lessThanOrEqualToWhereConstantAAlternating127And1() {
+        checkLessThanOrEqualToWhereConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkLessThanOrEqualToWhereConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "lessThanOrEqualToWhere with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x5763_A125_F8E0_B8C2)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5763_A225_F8E0_BA75)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.lessThanOrEqualTo(a, H.repeatingBlock(even, odd), where: mask),
+                H.Mask(
+                    raw: HighwayReference.lessThanOrEqualToWhereU64(
+                        mask.raw,
+                        a.raw,
+                        H.repeatingBlock(even, odd).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func lessThanOrEqualToWhereConstantBAlternating1And26() {
+        checkLessThanOrEqualToWhereConstantBAlternating(1, 26)
+    }
+
+    @Test func lessThanOrEqualToWhereConstantBAlternating26And127() {
+        checkLessThanOrEqualToWhereConstantBAlternating(26, 127)
+    }
+
+    @Test func lessThanOrEqualToWhereConstantBAlternating127And1() {
+        checkLessThanOrEqualToWhereConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
     private func checkGreaterThanOrEqualToWhereConstantMask(_ mask: H.Mask) {
         let mismatches = Mismatches("greaterThanOrEqualToWhere with mask \(describe(mask))")
         let aInputs = Inputs.vectors(H.self, seed: 0xFA49_6B62_5696_E4AB)
@@ -942,5 +1174,85 @@ extension SIMDUInt64ConstantTests {
     @Test func greaterThanOrEqualToWhereConstantSplatMax() {
         checkGreaterThanOrEqualToWhereConstantA(Lane.max)
         checkGreaterThanOrEqualToWhereConstantB(Lane.max)
+    }
+
+    @inline(__always)
+    private func checkGreaterThanOrEqualToWhereConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "greaterThanOrEqualToWhere with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7558_977B_388A_AF84)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7558_997B_388A_B2EA)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, b) in everyPair(maskInputs, bInputs) {
+            mismatches.check(
+                H.greaterThanOrEqualTo(H.repeatingBlock(even, odd), b, where: mask),
+                H.Mask(
+                    raw: HighwayReference.greaterThanOrEqualToWhereU64(
+                        mask.raw,
+                        H.repeatingBlock(even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func greaterThanOrEqualToWhereConstantAAlternating1And26() {
+        checkGreaterThanOrEqualToWhereConstantAAlternating(1, 26)
+    }
+
+    @Test func greaterThanOrEqualToWhereConstantAAlternating26And127() {
+        checkGreaterThanOrEqualToWhereConstantAAlternating(26, 127)
+    }
+
+    @Test func greaterThanOrEqualToWhereConstantAAlternating127And1() {
+        checkGreaterThanOrEqualToWhereConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkGreaterThanOrEqualToWhereConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "greaterThanOrEqualToWhere with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x41F3_19CB_BA84_BF17)
+        let aInputs = Inputs.vectors(H.self, seed: 0x41F3_18CB_BA84_BD64)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.greaterThanOrEqualTo(a, H.repeatingBlock(even, odd), where: mask),
+                H.Mask(
+                    raw: HighwayReference.greaterThanOrEqualToWhereU64(
+                        mask.raw,
+                        a.raw,
+                        H.repeatingBlock(even, odd).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func greaterThanOrEqualToWhereConstantBAlternating1And26() {
+        checkGreaterThanOrEqualToWhereConstantBAlternating(1, 26)
+    }
+
+    @Test func greaterThanOrEqualToWhereConstantBAlternating26And127() {
+        checkGreaterThanOrEqualToWhereConstantBAlternating(26, 127)
+    }
+
+    @Test func greaterThanOrEqualToWhereConstantBAlternating127And1() {
+        checkGreaterThanOrEqualToWhereConstantBAlternating(127, 1)
     }
 }

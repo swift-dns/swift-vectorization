@@ -7,6 +7,190 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
+    private func checkMagnitudeConstantA(_ value: Lane) {
+        let mismatches = Mismatches("magnitude with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.magnitude(H.repeating(value)),
+            H(raw: HighwayReference.magnitudeF64(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func magnitudeConstantSplatZero() {
+        checkMagnitudeConstantA(0.0)
+    }
+
+    @Test func magnitudeConstantSplatNegativeZero() {
+        checkMagnitudeConstantA(-0.0)
+    }
+
+    @Test func magnitudeConstantSplatOne() {
+        checkMagnitudeConstantA(1.0)
+    }
+
+    @Test func magnitudeConstantSplatMinusOne() {
+        checkMagnitudeConstantA(-1.0)
+    }
+
+    @Test func magnitudeConstantSplatTwo() {
+        checkMagnitudeConstantA(2.0)
+    }
+
+    @Test func magnitudeConstantSplatHalf() {
+        checkMagnitudeConstantA(0.5)
+    }
+
+    @Test func magnitudeConstantSplatFour() {
+        checkMagnitudeConstantA(4.0)
+    }
+
+    @Test func magnitudeConstantSplatQuarter() {
+        checkMagnitudeConstantA(0.25)
+    }
+
+    @Test func magnitudeConstantSplatOnePointFive() {
+        checkMagnitudeConstantA(1.5)
+    }
+
+    @Test func magnitudeConstantSplatMinusTwoPointFive() {
+        checkMagnitudeConstantA(-2.5)
+    }
+
+    @Test func magnitudeConstantSplatInfinity() {
+        checkMagnitudeConstantA(.infinity)
+    }
+
+    @Test func magnitudeConstantSplatMinusInfinity() {
+        checkMagnitudeConstantA(-.infinity)
+    }
+
+    @Test func magnitudeConstantSplatNaN() {
+        checkMagnitudeConstantA(.nan)
+    }
+
+    @Test func magnitudeConstantSplatMinusNaN() {
+        checkMagnitudeConstantA(-.nan)
+    }
+
+    @Test func magnitudeConstantSplatPayloadNaN() {
+        checkMagnitudeConstantA(Lane(nan: 1, signaling: false))
+    }
+
+    @Test func magnitudeConstantSplatSignalingNaN() {
+        checkMagnitudeConstantA(.signalingNaN)
+    }
+
+    @Test func magnitudeConstantSplatMinusSignalingNaN() {
+        checkMagnitudeConstantA(-.signalingNaN)
+    }
+
+    @Test func magnitudeConstantSplatLeastNonzero() {
+        checkMagnitudeConstantA(.leastNonzeroMagnitude)
+    }
+
+    @Test func magnitudeConstantSplatGreatest() {
+        checkMagnitudeConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkSquareRootConstantA(_ value: Lane) {
+        let mismatches = Mismatches("squareRoot with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.squareRoot(H.repeating(value)),
+            H(raw: HighwayReference.squareRootF64(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func squareRootConstantSplatZero() {
+        checkSquareRootConstantA(0.0)
+    }
+
+    @Test func squareRootConstantSplatNegativeZero() {
+        checkSquareRootConstantA(-0.0)
+    }
+
+    @Test func squareRootConstantSplatOne() {
+        checkSquareRootConstantA(1.0)
+    }
+
+    @Test func squareRootConstantSplatMinusOne() {
+        checkSquareRootConstantA(-1.0)
+    }
+
+    @Test func squareRootConstantSplatTwo() {
+        checkSquareRootConstantA(2.0)
+    }
+
+    @Test func squareRootConstantSplatHalf() {
+        checkSquareRootConstantA(0.5)
+    }
+
+    @Test func squareRootConstantSplatFour() {
+        checkSquareRootConstantA(4.0)
+    }
+
+    @Test func squareRootConstantSplatQuarter() {
+        checkSquareRootConstantA(0.25)
+    }
+
+    @Test func squareRootConstantSplatOnePointFive() {
+        checkSquareRootConstantA(1.5)
+    }
+
+    @Test func squareRootConstantSplatMinusTwoPointFive() {
+        checkSquareRootConstantA(-2.5)
+    }
+
+    @Test func squareRootConstantSplatInfinity() {
+        checkSquareRootConstantA(.infinity)
+    }
+
+    @Test func squareRootConstantSplatMinusInfinity() {
+        checkSquareRootConstantA(-.infinity)
+    }
+
+    @Test func squareRootConstantSplatNaN() {
+        checkSquareRootConstantA(.nan)
+    }
+
+    @Test func squareRootConstantSplatMinusNaN() {
+        checkSquareRootConstantA(-.nan)
+    }
+
+    @Test func squareRootConstantSplatPayloadNaN() {
+        checkSquareRootConstantA(Lane(nan: 1, signaling: false))
+    }
+
+    @Test func squareRootConstantSplatSignalingNaN() {
+        checkSquareRootConstantA(.signalingNaN)
+    }
+
+    @Test func squareRootConstantSplatMinusSignalingNaN() {
+        checkSquareRootConstantA(-.signalingNaN)
+    }
+
+    @Test func squareRootConstantSplatLeastNonzero() {
+        checkSquareRootConstantA(.leastNonzeroMagnitude)
+    }
+
+    @Test func squareRootConstantSplatGreatest() {
+        checkSquareRootConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
     private func checkApproximateReciprocalSquareRootConstantA(_ value: Lane) {
         let mismatches = Mismatches(
             "approximateReciprocalSquareRoot with a repeating \(hex(value))"
@@ -327,6 +511,34 @@ extension SIMDDoubleConstantTests {
 
     @Test func exponentConstantSplatGreatest() {
         checkExponentConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkExponentConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("exponent with a alternating \(hex(even)), \(hex(odd))")
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.exponent(H.repeatingBlock(even, odd)),
+            H(raw: HighwayReference.exponentF64(H.repeatingBlock(even, odd).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func exponentConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkExponentConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func exponentConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkExponentConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func exponentConstantAAlternatingHalfAndOne() {
+        checkExponentConstantAAlternating(0.5, 1.0)
     }
 
     @inline(__always)
@@ -777,229 +989,5 @@ extension SIMDDoubleConstantTests {
 
     @Test func sumsOf2FromFloatConstantSplatGreatest() {
         checkSumsOf2FromFloatConstantA(.greatestFiniteMagnitude)
-    }
-
-    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
-    @inline(__always)
-    private func checkSumsOf4FromFloat16ConstantA(_ value: Float16) {
-        let mismatches = Mismatches("sumsOf4FromFloat16 with a repeating \(hex(value))")
-        mismatches.check(
-            SIMD<Float16>.repeating(value),
-            SIMD<Float16>(raw: HighwayReference.repeatingF16(value.bitPattern)),
-            "repeating"
-        )
-        mismatches.check(
-            H.sumsOf4(SIMD<Float16>.repeating(value)),
-            H(raw: HighwayReference.sumsOf4F16ToF64(SIMD<Float16>.repeating(value).raw)),
-            ""
-        )
-        mismatches.record()
-    }
-    #endif
-
-    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
-    @Test func sumsOf4FromFloat16ConstantSplatZero() {
-        checkSumsOf4FromFloat16ConstantA(0.0)
-    }
-    #endif
-
-    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
-    @Test func sumsOf4FromFloat16ConstantSplatNegativeZero() {
-        checkSumsOf4FromFloat16ConstantA(-0.0)
-    }
-    #endif
-
-    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
-    @Test func sumsOf4FromFloat16ConstantSplatOne() {
-        checkSumsOf4FromFloat16ConstantA(1.0)
-    }
-    #endif
-
-    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
-    @Test func sumsOf4FromFloat16ConstantSplatMinusOne() {
-        checkSumsOf4FromFloat16ConstantA(-1.0)
-    }
-    #endif
-
-    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
-    @Test func sumsOf4FromFloat16ConstantSplatTwo() {
-        checkSumsOf4FromFloat16ConstantA(2.0)
-    }
-    #endif
-
-    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
-    @Test func sumsOf4FromFloat16ConstantSplatHalf() {
-        checkSumsOf4FromFloat16ConstantA(0.5)
-    }
-    #endif
-
-    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
-    @Test func sumsOf4FromFloat16ConstantSplatFour() {
-        checkSumsOf4FromFloat16ConstantA(4.0)
-    }
-    #endif
-
-    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
-    @Test func sumsOf4FromFloat16ConstantSplatQuarter() {
-        checkSumsOf4FromFloat16ConstantA(0.25)
-    }
-    #endif
-
-    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
-    @Test func sumsOf4FromFloat16ConstantSplatOnePointFive() {
-        checkSumsOf4FromFloat16ConstantA(1.5)
-    }
-    #endif
-
-    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
-    @Test func sumsOf4FromFloat16ConstantSplatMinusTwoPointFive() {
-        checkSumsOf4FromFloat16ConstantA(-2.5)
-    }
-    #endif
-
-    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
-    @Test func sumsOf4FromFloat16ConstantSplatInfinity() {
-        checkSumsOf4FromFloat16ConstantA(.infinity)
-    }
-    #endif
-
-    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
-    @Test func sumsOf4FromFloat16ConstantSplatMinusInfinity() {
-        checkSumsOf4FromFloat16ConstantA(-.infinity)
-    }
-    #endif
-
-    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
-    @Test func sumsOf4FromFloat16ConstantSplatNaN() {
-        checkSumsOf4FromFloat16ConstantA(.nan)
-    }
-    #endif
-
-    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
-    @Test func sumsOf4FromFloat16ConstantSplatMinusNaN() {
-        checkSumsOf4FromFloat16ConstantA(-.nan)
-    }
-    #endif
-
-    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
-    @Test func sumsOf4FromFloat16ConstantSplatPayloadNaN() {
-        checkSumsOf4FromFloat16ConstantA(Float16(nan: 1, signaling: false))
-    }
-    #endif
-
-    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
-    @Test func sumsOf4FromFloat16ConstantSplatSignalingNaN() {
-        checkSumsOf4FromFloat16ConstantA(.signalingNaN)
-    }
-    #endif
-
-    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
-    @Test func sumsOf4FromFloat16ConstantSplatMinusSignalingNaN() {
-        checkSumsOf4FromFloat16ConstantA(-.signalingNaN)
-    }
-    #endif
-
-    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
-    @Test func sumsOf4FromFloat16ConstantSplatLeastNonzero() {
-        checkSumsOf4FromFloat16ConstantA(.leastNonzeroMagnitude)
-    }
-    #endif
-
-    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
-    @Test func sumsOf4FromFloat16ConstantSplatGreatest() {
-        checkSumsOf4FromFloat16ConstantA(.greatestFiniteMagnitude)
-    }
-    #endif
-
-    @inline(__always)
-    private func checkSumsOf4FromBFloat16ConstantA(_ value: BFloat16) {
-        let mismatches = Mismatches("sumsOf4FromBFloat16 with a repeating \(hex(value))")
-        mismatches.check(
-            SIMD<BFloat16>.repeating(value),
-            SIMD<BFloat16>(raw: HighwayReference.repeatingBF16(value.bitPattern)),
-            "repeating"
-        )
-        mismatches.check(
-            H.sumsOf4(SIMD<BFloat16>.repeating(value)),
-            H(raw: HighwayReference.sumsOf4BF16ToF64(SIMD<BFloat16>.repeating(value).raw)),
-            ""
-        )
-        mismatches.record()
-    }
-
-    @Test func sumsOf4FromBFloat16ConstantSplatZero() {
-        checkSumsOf4FromBFloat16ConstantA(BFloat16(bitPattern: 0x0000))
-    }
-
-    @Test func sumsOf4FromBFloat16ConstantSplatNegativeZero() {
-        checkSumsOf4FromBFloat16ConstantA(BFloat16(bitPattern: 0x8000))
-    }
-
-    @Test func sumsOf4FromBFloat16ConstantSplatOne() {
-        checkSumsOf4FromBFloat16ConstantA(BFloat16(bitPattern: 0x3F80))
-    }
-
-    @Test func sumsOf4FromBFloat16ConstantSplatMinusOne() {
-        checkSumsOf4FromBFloat16ConstantA(BFloat16(bitPattern: 0xBF80))
-    }
-
-    @Test func sumsOf4FromBFloat16ConstantSplatTwo() {
-        checkSumsOf4FromBFloat16ConstantA(BFloat16(bitPattern: 0x4000))
-    }
-
-    @Test func sumsOf4FromBFloat16ConstantSplatHalf() {
-        checkSumsOf4FromBFloat16ConstantA(BFloat16(bitPattern: 0x3F00))
-    }
-
-    @Test func sumsOf4FromBFloat16ConstantSplatFour() {
-        checkSumsOf4FromBFloat16ConstantA(BFloat16(bitPattern: 0x4080))
-    }
-
-    @Test func sumsOf4FromBFloat16ConstantSplatQuarter() {
-        checkSumsOf4FromBFloat16ConstantA(BFloat16(bitPattern: 0x3E80))
-    }
-
-    @Test func sumsOf4FromBFloat16ConstantSplatOnePointFive() {
-        checkSumsOf4FromBFloat16ConstantA(BFloat16(bitPattern: 0x3FC0))
-    }
-
-    @Test func sumsOf4FromBFloat16ConstantSplatMinusTwoPointFive() {
-        checkSumsOf4FromBFloat16ConstantA(BFloat16(bitPattern: 0xC020))
-    }
-
-    @Test func sumsOf4FromBFloat16ConstantSplatInfinity() {
-        checkSumsOf4FromBFloat16ConstantA(BFloat16(bitPattern: 0x7F80))
-    }
-
-    @Test func sumsOf4FromBFloat16ConstantSplatMinusInfinity() {
-        checkSumsOf4FromBFloat16ConstantA(BFloat16(bitPattern: 0xFF80))
-    }
-
-    @Test func sumsOf4FromBFloat16ConstantSplatNaN() {
-        checkSumsOf4FromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC0))
-    }
-
-    @Test func sumsOf4FromBFloat16ConstantSplatMinusNaN() {
-        checkSumsOf4FromBFloat16ConstantA(BFloat16(bitPattern: 0xFFC0))
-    }
-
-    @Test func sumsOf4FromBFloat16ConstantSplatPayloadNaN() {
-        checkSumsOf4FromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC1))
-    }
-
-    @Test func sumsOf4FromBFloat16ConstantSplatSignalingNaN() {
-        checkSumsOf4FromBFloat16ConstantA(BFloat16(bitPattern: 0x7F81))
-    }
-
-    @Test func sumsOf4FromBFloat16ConstantSplatMinusSignalingNaN() {
-        checkSumsOf4FromBFloat16ConstantA(BFloat16(bitPattern: 0xFF81))
-    }
-
-    @Test func sumsOf4FromBFloat16ConstantSplatLeastNonzero() {
-        checkSumsOf4FromBFloat16ConstantA(BFloat16(bitPattern: 0x0001))
-    }
-
-    @Test func sumsOf4FromBFloat16ConstantSplatGreatest() {
-        checkSumsOf4FromBFloat16ConstantA(BFloat16(bitPattern: 0x7F7F))
     }
 }

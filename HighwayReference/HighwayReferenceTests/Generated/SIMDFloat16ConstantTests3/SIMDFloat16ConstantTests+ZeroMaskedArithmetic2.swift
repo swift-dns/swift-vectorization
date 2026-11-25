@@ -8,6 +8,464 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
+    private func checkMaximumWhereConstantA(_ value: Lane) {
+        let mismatches = Mismatches("maximumWhere with a repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB62B_00CD_FD13_A698)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB62B_02CD_FD13_A9FE)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
+            "repeating"
+        )
+        for (mask, b) in everyPair(maskInputs, bInputs)
+        where !hasUnorderedNaNs(H.repeating(value).simd, b.simd) {
+            mismatches.check(
+                H.maximum(H.repeating(value), b, where: mask),
+                H(raw: HighwayReference.maximumWhereF16(mask.raw, H.repeating(value).raw, b.raw)),
+                "mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkMaximumWhereConstantB(_ value: Lane) {
+        let mismatches = Mismatches("maximumWhere with b repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xBDE6_B7CE_0131_BE6D)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBDE6_B6CE_0131_BCBA)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
+            "repeating"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs)
+        where !hasUnorderedNaNs(a.simd, H.repeating(value).simd) {
+            mismatches.check(
+                H.maximum(a, H.repeating(value), where: mask),
+                H(raw: HighwayReference.maximumWhereF16(mask.raw, a.raw, H.repeating(value).raw)),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func maximumWhereConstantSplatZero() {
+        checkMaximumWhereConstantA(0.0)
+        checkMaximumWhereConstantB(0.0)
+    }
+
+    @Test func maximumWhereConstantSplatNegativeZero() {
+        withKnownIssue(
+            "Highway's emulated Set is opaque to the optimizer on Darwin, so Highway computes a constant operand at run time where the port folds it, which differs in the sign and payload of a NaN and in the sign of a zero that a minimum, a maximum or a clamp picks"
+        ) {
+            checkMaximumWhereConstantA(-0.0)
+            checkMaximumWhereConstantB(-0.0)
+        } when: {
+            isDarwin && SIMDTarget.targetName == "EMU128" && !assertionsAreEnabled
+        }
+    }
+
+    @Test func maximumWhereConstantSplatOne() {
+        checkMaximumWhereConstantA(1.0)
+        checkMaximumWhereConstantB(1.0)
+    }
+
+    @Test func maximumWhereConstantSplatMinusOne() {
+        checkMaximumWhereConstantA(-1.0)
+        checkMaximumWhereConstantB(-1.0)
+    }
+
+    @Test func maximumWhereConstantSplatTwo() {
+        checkMaximumWhereConstantA(2.0)
+        checkMaximumWhereConstantB(2.0)
+    }
+
+    @Test func maximumWhereConstantSplatHalf() {
+        checkMaximumWhereConstantA(0.5)
+        checkMaximumWhereConstantB(0.5)
+    }
+
+    @Test func maximumWhereConstantSplatFour() {
+        checkMaximumWhereConstantA(4.0)
+        checkMaximumWhereConstantB(4.0)
+    }
+
+    @Test func maximumWhereConstantSplatQuarter() {
+        checkMaximumWhereConstantA(0.25)
+        checkMaximumWhereConstantB(0.25)
+    }
+
+    @Test func maximumWhereConstantSplatOnePointFive() {
+        checkMaximumWhereConstantA(1.5)
+        checkMaximumWhereConstantB(1.5)
+    }
+
+    @Test func maximumWhereConstantSplatMinusTwoPointFive() {
+        checkMaximumWhereConstantA(-2.5)
+        checkMaximumWhereConstantB(-2.5)
+    }
+
+    @Test func maximumWhereConstantSplatInfinity() {
+        checkMaximumWhereConstantA(.infinity)
+        checkMaximumWhereConstantB(.infinity)
+    }
+
+    @Test func maximumWhereConstantSplatMinusInfinity() {
+        checkMaximumWhereConstantA(-.infinity)
+        checkMaximumWhereConstantB(-.infinity)
+    }
+
+    @Test func maximumWhereConstantSplatNaN() {
+        checkMaximumWhereConstantA(.nan)
+        checkMaximumWhereConstantB(.nan)
+    }
+
+    @Test func maximumWhereConstantSplatMinusNaN() {
+        checkMaximumWhereConstantA(-.nan)
+        checkMaximumWhereConstantB(-.nan)
+    }
+
+    @Test func maximumWhereConstantSplatPayloadNaN() {
+        checkMaximumWhereConstantA(Lane(nan: 1, signaling: false))
+        checkMaximumWhereConstantB(Lane(nan: 1, signaling: false))
+    }
+
+    @Test func maximumWhereConstantSplatSignalingNaN() {
+        checkMaximumWhereConstantA(.signalingNaN)
+        checkMaximumWhereConstantB(.signalingNaN)
+    }
+
+    @Test func maximumWhereConstantSplatMinusSignalingNaN() {
+        checkMaximumWhereConstantA(-.signalingNaN)
+        checkMaximumWhereConstantB(-.signalingNaN)
+    }
+
+    @Test func maximumWhereConstantSplatLeastNonzero() {
+        checkMaximumWhereConstantA(.leastNonzeroMagnitude)
+        checkMaximumWhereConstantB(.leastNonzeroMagnitude)
+    }
+
+    @Test func maximumWhereConstantSplatGreatest() {
+        checkMaximumWhereConstantA(.greatestFiniteMagnitude)
+        checkMaximumWhereConstantB(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkMaximumWhereConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("maximumWhere with a alternating \(hex(even)), \(hex(odd))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7AC4_667A_7834_42C3)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7AC4_687A_7834_4629)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(
+                raw: HighwayReference.repeatingBlockF16(
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern
+                )
+            ),
+            "repeatingBlock"
+        )
+        for (mask, b) in everyPair(maskInputs, bInputs)
+        where !hasUnorderedNaNs(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).simd,
+            b.simd
+        ) {
+            mismatches.check(
+                H.maximum(
+                    H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+                    b,
+                    where: mask
+                ),
+                H(
+                    raw: HighwayReference.maximumWhereF16(
+                        mask.raw,
+                        H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func maximumWhereConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkMaximumWhereConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func maximumWhereConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkMaximumWhereConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func maximumWhereConstantAAlternatingHalfAndOne() {
+        checkMaximumWhereConstantAAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkMaximumWhereConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("maximumWhere with b alternating \(hex(even)), \(hex(odd))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x4528_0115_E8AD_D0C0)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4528_0215_E8AD_D273)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(
+                raw: HighwayReference.repeatingBlockF16(
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern
+                )
+            ),
+            "repeatingBlock"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs)
+        where !hasUnorderedNaNs(
+            a.simd,
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).simd
+        ) {
+            mismatches.check(
+                H.maximum(
+                    a,
+                    H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+                    where: mask
+                ),
+                H(
+                    raw: HighwayReference.maximumWhereF16(
+                        mask.raw,
+                        a.raw,
+                        H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func maximumWhereConstantBAlternatingOneAndMinusTwoPointFive() {
+        checkMaximumWhereConstantBAlternating(1.0, -2.5)
+    }
+
+    @Test func maximumWhereConstantBAlternatingMinusTwoPointFiveAndHalf() {
+        checkMaximumWhereConstantBAlternating(-2.5, 0.5)
+    }
+
+    @Test func maximumWhereConstantBAlternatingHalfAndOne() {
+        checkMaximumWhereConstantBAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkMultiplyAddingWhereConstantA(_ value: Lane) {
+        let mismatches = Mismatches("multiplyAddingWhere with a repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xD7B8_AC87_EFFD_2835)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD7B8_AA87_EFFD_24CF)
+        let cInputs = Inputs.vectors(H.self, seed: 0xD7B8_A987_EFFD_231C)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
+            "repeating"
+        )
+        for (mask, b, c) in mixedTriples(maskInputs, bInputs, cInputs, seed: 0x9F45_882C_DA87_09E7)
+        where !hasUnorderedNaNs(multiplying: H.repeating(value).simd, b.simd, adding: c.simd) {
+            mismatches.check(
+                H.multiplyAdding(H.repeating(value), b, c, where: mask),
+                H(
+                    raw: HighwayReference.multiplyAddingWhereF16(
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
+                "mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkMultiplyAddingWhereConstantB(_ value: Lane) {
+        let mismatches = Mismatches("multiplyAddingWhere with b repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xCEB6_7587_EAC9_7440)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCEB6_7687_EAC9_75F3)
+        let cInputs = Inputs.vectors(H.self, seed: 0xCEB6_7887_EAC9_7959)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
+            "repeating"
+        )
+        for (mask, a, c) in mixedTriples(maskInputs, aInputs, cInputs, seed: 0xB763_9197_3E8F_C03C)
+        where !hasUnorderedNaNs(multiplying: a.simd, H.repeating(value).simd, adding: c.simd) {
+            mismatches.check(
+                H.multiplyAdding(a, H.repeating(value), c, where: mask),
+                H(
+                    raw: HighwayReference.multiplyAddingWhereF16(
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw,
+                        c.raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkMultiplyAddingWhereConstantC(_ value: Lane) {
+        let mismatches = Mismatches("multiplyAddingWhere with c repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC6FA_DE87_E6AB_92CB)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC6FA_DD87_E6AB_9118)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC6FA_E087_E6AB_9631)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
+            "repeating"
+        )
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x76FF_C684_DE8F_252D)
+        where !hasUnorderedNaNs(multiplying: a.simd, b.simd, adding: H.repeating(value).simd) {
+            mismatches.check(
+                H.multiplyAdding(a, b, H.repeating(value), where: mask),
+                H(
+                    raw: HighwayReference.multiplyAddingWhereF16(
+                        mask.raw,
+                        a.raw,
+                        b.raw,
+                        H.repeating(value).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyAddingWhereConstantSplatZero() {
+        checkMultiplyAddingWhereConstantA(0.0)
+        checkMultiplyAddingWhereConstantB(0.0)
+        checkMultiplyAddingWhereConstantC(0.0)
+    }
+
+    @Test func multiplyAddingWhereConstantSplatNegativeZero() {
+        checkMultiplyAddingWhereConstantA(-0.0)
+        checkMultiplyAddingWhereConstantB(-0.0)
+        checkMultiplyAddingWhereConstantC(-0.0)
+    }
+
+    @Test func multiplyAddingWhereConstantSplatOne() {
+        checkMultiplyAddingWhereConstantA(1.0)
+        checkMultiplyAddingWhereConstantB(1.0)
+        checkMultiplyAddingWhereConstantC(1.0)
+    }
+
+    @Test func multiplyAddingWhereConstantSplatMinusOne() {
+        checkMultiplyAddingWhereConstantA(-1.0)
+        checkMultiplyAddingWhereConstantB(-1.0)
+        checkMultiplyAddingWhereConstantC(-1.0)
+    }
+
+    @Test func multiplyAddingWhereConstantSplatTwo() {
+        checkMultiplyAddingWhereConstantA(2.0)
+        checkMultiplyAddingWhereConstantB(2.0)
+        checkMultiplyAddingWhereConstantC(2.0)
+    }
+
+    @Test func multiplyAddingWhereConstantSplatHalf() {
+        checkMultiplyAddingWhereConstantA(0.5)
+        checkMultiplyAddingWhereConstantB(0.5)
+        checkMultiplyAddingWhereConstantC(0.5)
+    }
+
+    @Test func multiplyAddingWhereConstantSplatFour() {
+        checkMultiplyAddingWhereConstantA(4.0)
+        checkMultiplyAddingWhereConstantB(4.0)
+        checkMultiplyAddingWhereConstantC(4.0)
+    }
+
+    @Test func multiplyAddingWhereConstantSplatQuarter() {
+        checkMultiplyAddingWhereConstantA(0.25)
+        checkMultiplyAddingWhereConstantB(0.25)
+        checkMultiplyAddingWhereConstantC(0.25)
+    }
+
+    @Test func multiplyAddingWhereConstantSplatOnePointFive() {
+        checkMultiplyAddingWhereConstantA(1.5)
+        checkMultiplyAddingWhereConstantB(1.5)
+        checkMultiplyAddingWhereConstantC(1.5)
+    }
+
+    @Test func multiplyAddingWhereConstantSplatMinusTwoPointFive() {
+        checkMultiplyAddingWhereConstantA(-2.5)
+        checkMultiplyAddingWhereConstantB(-2.5)
+        checkMultiplyAddingWhereConstantC(-2.5)
+    }
+
+    @Test func multiplyAddingWhereConstantSplatInfinity() {
+        checkMultiplyAddingWhereConstantA(.infinity)
+        checkMultiplyAddingWhereConstantB(.infinity)
+        checkMultiplyAddingWhereConstantC(.infinity)
+    }
+
+    @Test func multiplyAddingWhereConstantSplatMinusInfinity() {
+        checkMultiplyAddingWhereConstantA(-.infinity)
+        checkMultiplyAddingWhereConstantB(-.infinity)
+        checkMultiplyAddingWhereConstantC(-.infinity)
+    }
+
+    @Test func multiplyAddingWhereConstantSplatNaN() {
+        checkMultiplyAddingWhereConstantA(.nan)
+        checkMultiplyAddingWhereConstantB(.nan)
+        checkMultiplyAddingWhereConstantC(.nan)
+    }
+
+    @Test func multiplyAddingWhereConstantSplatMinusNaN() {
+        checkMultiplyAddingWhereConstantA(-.nan)
+        checkMultiplyAddingWhereConstantB(-.nan)
+        checkMultiplyAddingWhereConstantC(-.nan)
+    }
+
+    @Test func multiplyAddingWhereConstantSplatPayloadNaN() {
+        checkMultiplyAddingWhereConstantA(Lane(nan: 1, signaling: false))
+        checkMultiplyAddingWhereConstantB(Lane(nan: 1, signaling: false))
+        checkMultiplyAddingWhereConstantC(Lane(nan: 1, signaling: false))
+    }
+
+    @Test func multiplyAddingWhereConstantSplatSignalingNaN() {
+        checkMultiplyAddingWhereConstantA(.signalingNaN)
+        checkMultiplyAddingWhereConstantB(.signalingNaN)
+        checkMultiplyAddingWhereConstantC(.signalingNaN)
+    }
+
+    @Test func multiplyAddingWhereConstantSplatMinusSignalingNaN() {
+        checkMultiplyAddingWhereConstantA(-.signalingNaN)
+        checkMultiplyAddingWhereConstantB(-.signalingNaN)
+        checkMultiplyAddingWhereConstantC(-.signalingNaN)
+    }
+
+    @Test func multiplyAddingWhereConstantSplatLeastNonzero() {
+        checkMultiplyAddingWhereConstantA(.leastNonzeroMagnitude)
+        checkMultiplyAddingWhereConstantB(.leastNonzeroMagnitude)
+        checkMultiplyAddingWhereConstantC(.leastNonzeroMagnitude)
+    }
+
+    @Test func multiplyAddingWhereConstantSplatGreatest() {
+        checkMultiplyAddingWhereConstantA(.greatestFiniteMagnitude)
+        checkMultiplyAddingWhereConstantB(.greatestFiniteMagnitude)
+        checkMultiplyAddingWhereConstantC(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
     private func checkMultiplySubtractingWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplySubtractingWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x0C87_21B1_0EBC_0DDE)

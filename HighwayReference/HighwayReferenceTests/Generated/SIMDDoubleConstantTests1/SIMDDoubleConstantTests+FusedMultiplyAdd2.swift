@@ -371,4 +371,148 @@ extension SIMDDoubleConstantTests {
                 && assertionsAreEnabled
         }
     }
+
+    @inline(__always)
+    private func checkMultiplySubtractingAddingConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "multiplySubtractingAdding with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let bInputs = Inputs.vectors(H.self, seed: 0xE04A_B38D_ABEC_86AD)
+        let cInputs = Inputs.vectors(H.self, seed: 0xE04A_B08D_ABEC_8194)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for (b, c) in everyPair(bInputs, cInputs)
+        where !hasUnorderedNaNs(
+            multiplying: H.repeatingBlock(even, odd).simd,
+            b.simd,
+            adding: c.simd
+        ) {
+            mismatches.check(
+                H.multiplySubtractingAdding(H.repeatingBlock(even, odd), b, c),
+                H(
+                    raw: HighwayReference.multiplySubtractingAddingF64(
+                        H.repeatingBlock(even, odd).raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
+                "b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplySubtractingAddingConstantAAlternatingOneAndMinusTwoPointFive() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkMultiplySubtractingAddingConstantAAlternating(1.0, -2.5)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @Test func multiplySubtractingAddingConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkMultiplySubtractingAddingConstantAAlternating(-2.5, 0.5)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @Test func multiplySubtractingAddingConstantAAlternatingHalfAndOne() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkMultiplySubtractingAddingConstantAAlternating(0.5, 1.0)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @inline(__always)
+    private func checkMultiplySubtractingAddingConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "multiplySubtractingAdding with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0xF743_69F0_BB52_1ED9)
+        let cInputs = Inputs.vectors(H.self, seed: 0xF743_67F0_BB52_1B73)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for (a, c) in everyPair(aInputs, cInputs)
+        where !hasUnorderedNaNs(
+            multiplying: a.simd,
+            H.repeatingBlock(even, odd).simd,
+            adding: c.simd
+        ) {
+            mismatches.check(
+                H.multiplySubtractingAdding(a, H.repeatingBlock(even, odd), c),
+                H(
+                    raw: HighwayReference.multiplySubtractingAddingF64(
+                        a.raw,
+                        H.repeatingBlock(even, odd).raw,
+                        c.raw
+                    )
+                ),
+                "a: \(describe(a)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplySubtractingAddingConstantBAlternatingOneAndMinusTwoPointFive() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkMultiplySubtractingAddingConstantBAlternating(1.0, -2.5)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @Test func multiplySubtractingAddingConstantBAlternatingMinusTwoPointFiveAndHalf() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkMultiplySubtractingAddingConstantBAlternating(-2.5, 0.5)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @Test func multiplySubtractingAddingConstantBAlternatingHalfAndOne() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkMultiplySubtractingAddingConstantBAlternating(0.5, 1.0)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
 }

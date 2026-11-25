@@ -7,6 +7,148 @@ import Vectorization
 
 extension SIMDInt32ConstantTests {
     @inline(__always)
+    private func checkRotatedLeftConstantBits(_ bits: Int) {
+        let mismatches = Mismatches("rotatedLeft with bits \(bits)")
+        let aInputs = Inputs.vectors(H.self, seed: 0x5621_C672_FB92_81FD)
+        for a in aInputs {
+            mismatches.check(
+                H.rotatedLeft(a, by: bits),
+                H(raw: HighwayReference.rotatedLeftTemplateI32(a.raw, Int32(clamping: bits))),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func rotatedLeftConstantBits0() {
+        checkRotatedLeftConstantBits(0)
+    }
+
+    @Test func rotatedLeftConstantBits1() {
+        checkRotatedLeftConstantBits(1)
+    }
+
+    @Test func rotatedLeftConstantBits2() {
+        checkRotatedLeftConstantBits(2)
+    }
+
+    @Test func rotatedLeftConstantBits3() {
+        checkRotatedLeftConstantBits(3)
+    }
+
+    @Test func rotatedLeftConstantBits4() {
+        checkRotatedLeftConstantBits(4)
+    }
+
+    @Test func rotatedLeftConstantBits5() {
+        checkRotatedLeftConstantBits(5)
+    }
+
+    @Test func rotatedLeftConstantBits6() {
+        checkRotatedLeftConstantBits(6)
+    }
+
+    @Test func rotatedLeftConstantBits7() {
+        checkRotatedLeftConstantBits(7)
+    }
+
+    @Test func rotatedLeftConstantBits8() {
+        checkRotatedLeftConstantBits(8)
+    }
+
+    @Test func rotatedLeftConstantBits9() {
+        checkRotatedLeftConstantBits(9)
+    }
+
+    @Test func rotatedLeftConstantBits10() {
+        checkRotatedLeftConstantBits(10)
+    }
+
+    @Test func rotatedLeftConstantBits11() {
+        checkRotatedLeftConstantBits(11)
+    }
+
+    @Test func rotatedLeftConstantBits12() {
+        checkRotatedLeftConstantBits(12)
+    }
+
+    @Test func rotatedLeftConstantBits13() {
+        checkRotatedLeftConstantBits(13)
+    }
+
+    @Test func rotatedLeftConstantBits14() {
+        checkRotatedLeftConstantBits(14)
+    }
+
+    @Test func rotatedLeftConstantBits15() {
+        checkRotatedLeftConstantBits(15)
+    }
+
+    @Test func rotatedLeftConstantBits16() {
+        checkRotatedLeftConstantBits(16)
+    }
+
+    @Test func rotatedLeftConstantBits17() {
+        checkRotatedLeftConstantBits(17)
+    }
+
+    @Test func rotatedLeftConstantBits18() {
+        checkRotatedLeftConstantBits(18)
+    }
+
+    @Test func rotatedLeftConstantBits19() {
+        checkRotatedLeftConstantBits(19)
+    }
+
+    @Test func rotatedLeftConstantBits20() {
+        checkRotatedLeftConstantBits(20)
+    }
+
+    @Test func rotatedLeftConstantBits21() {
+        checkRotatedLeftConstantBits(21)
+    }
+
+    @Test func rotatedLeftConstantBits22() {
+        checkRotatedLeftConstantBits(22)
+    }
+
+    @Test func rotatedLeftConstantBits23() {
+        checkRotatedLeftConstantBits(23)
+    }
+
+    @Test func rotatedLeftConstantBits24() {
+        checkRotatedLeftConstantBits(24)
+    }
+
+    @Test func rotatedLeftConstantBits25() {
+        checkRotatedLeftConstantBits(25)
+    }
+
+    @Test func rotatedLeftConstantBits26() {
+        checkRotatedLeftConstantBits(26)
+    }
+
+    @Test func rotatedLeftConstantBits27() {
+        checkRotatedLeftConstantBits(27)
+    }
+
+    @Test func rotatedLeftConstantBits28() {
+        checkRotatedLeftConstantBits(28)
+    }
+
+    @Test func rotatedLeftConstantBits29() {
+        checkRotatedLeftConstantBits(29)
+    }
+
+    @Test func rotatedLeftConstantBits30() {
+        checkRotatedLeftConstantBits(30)
+    }
+
+    @Test func rotatedLeftConstantBits31() {
+        checkRotatedLeftConstantBits(31)
+    }
+
+    @inline(__always)
     private func checkRotatedRightConstantBits(_ bits: Int) {
         let mismatches = Mismatches("rotatedRight with bits \(bits)")
         let aInputs = Inputs.vectors(H.self, seed: 0x26A1_3969_52CC_55A0)

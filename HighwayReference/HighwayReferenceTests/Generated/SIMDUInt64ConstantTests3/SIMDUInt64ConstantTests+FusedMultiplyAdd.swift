@@ -769,6 +769,46 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
+    private func checkMultiplyAddingSubtractingConstantCAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "multiplyAddingSubtracting with c alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x90BA_8416_157A_69A5)
+        let bInputs = Inputs.vectors(H.self, seed: 0x90BA_8316_157A_67F2)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.multiplyAddingSubtracting(a, b, H.repeatingBlock(even, odd)),
+                H(
+                    raw: HighwayReference.multiplyAddingSubtractingU64(
+                        a.raw,
+                        b.raw,
+                        H.repeatingBlock(even, odd).raw
+                    )
+                ),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyAddingSubtractingConstantCAlternating1And26() {
+        checkMultiplyAddingSubtractingConstantCAlternating(1, 26)
+    }
+
+    @Test func multiplyAddingSubtractingConstantCAlternating26And127() {
+        checkMultiplyAddingSubtractingConstantCAlternating(26, 127)
+    }
+
+    @Test func multiplyAddingSubtractingConstantCAlternating127And1() {
+        checkMultiplyAddingSubtractingConstantCAlternating(127, 1)
+    }
+
+    @inline(__always)
     private func checkMultiplySubtractingAddingConstantAB(_ aValue: Lane, _ bValue: Lane) {
         let mismatches = Mismatches(
             "multiplySubtractingAdding with a repeating \(hex(aValue)), b repeating \(hex(bValue))"
@@ -1019,5 +1059,125 @@ extension SIMDUInt64ConstantTests {
         checkMultiplySubtractingAddingConstantA(Lane.max)
         checkMultiplySubtractingAddingConstantB(Lane.max)
         checkMultiplySubtractingAddingConstantC(Lane.max)
+    }
+
+    @inline(__always)
+    private func checkMultiplySubtractingAddingConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "multiplySubtractingAdding with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let bInputs = Inputs.vectors(H.self, seed: 0x63D5_4BC9_4246_8C0A)
+        let cInputs = Inputs.vectors(H.self, seed: 0x63D5_4AC9_4246_8A57)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for (b, c) in everyPair(bInputs, cInputs) {
+            mismatches.check(
+                H.multiplySubtractingAdding(H.repeatingBlock(even, odd), b, c),
+                H(
+                    raw: HighwayReference.multiplySubtractingAddingU64(
+                        H.repeatingBlock(even, odd).raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
+                "b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplySubtractingAddingConstantAAlternating1And26() {
+        checkMultiplySubtractingAddingConstantAAlternating(1, 26)
+    }
+
+    @Test func multiplySubtractingAddingConstantAAlternating26And127() {
+        checkMultiplySubtractingAddingConstantAAlternating(26, 127)
+    }
+
+    @Test func multiplySubtractingAddingConstantAAlternating127And1() {
+        checkMultiplySubtractingAddingConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkMultiplySubtractingAddingConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "multiplySubtractingAdding with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x0C75_160A_CB99_027E)
+        let cInputs = Inputs.vectors(H.self, seed: 0x0C75_140A_CB98_FF18)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for (a, c) in everyPair(aInputs, cInputs) {
+            mismatches.check(
+                H.multiplySubtractingAdding(a, H.repeatingBlock(even, odd), c),
+                H(
+                    raw: HighwayReference.multiplySubtractingAddingU64(
+                        a.raw,
+                        H.repeatingBlock(even, odd).raw,
+                        c.raw
+                    )
+                ),
+                "a: \(describe(a)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplySubtractingAddingConstantBAlternating1And26() {
+        checkMultiplySubtractingAddingConstantBAlternating(1, 26)
+    }
+
+    @Test func multiplySubtractingAddingConstantBAlternating26And127() {
+        checkMultiplySubtractingAddingConstantBAlternating(26, 127)
+    }
+
+    @Test func multiplySubtractingAddingConstantBAlternating127And1() {
+        checkMultiplySubtractingAddingConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkMultiplySubtractingAddingConstantCAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "multiplySubtractingAdding with c alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x02E2_B897_CED9_BE17)
+        let bInputs = Inputs.vectors(H.self, seed: 0x02E2_B797_CED9_BC64)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.multiplySubtractingAdding(a, b, H.repeatingBlock(even, odd)),
+                H(
+                    raw: HighwayReference.multiplySubtractingAddingU64(
+                        a.raw,
+                        b.raw,
+                        H.repeatingBlock(even, odd).raw
+                    )
+                ),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplySubtractingAddingConstantCAlternating1And26() {
+        checkMultiplySubtractingAddingConstantCAlternating(1, 26)
+    }
+
+    @Test func multiplySubtractingAddingConstantCAlternating26And127() {
+        checkMultiplySubtractingAddingConstantCAlternating(26, 127)
+    }
+
+    @Test func multiplySubtractingAddingConstantCAlternating127And1() {
+        checkMultiplySubtractingAddingConstantCAlternating(127, 1)
     }
 }

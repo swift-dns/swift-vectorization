@@ -7,6 +7,190 @@ import Vectorization
 
 extension SIMDFloatConstantTests {
     @inline(__always)
+    private func checkMagnitudeConstantA(_ value: Lane) {
+        let mismatches = Mismatches("magnitude with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.magnitude(H.repeating(value)),
+            H(raw: HighwayReference.magnitudeF32(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func magnitudeConstantSplatZero() {
+        checkMagnitudeConstantA(0.0)
+    }
+
+    @Test func magnitudeConstantSplatNegativeZero() {
+        checkMagnitudeConstantA(-0.0)
+    }
+
+    @Test func magnitudeConstantSplatOne() {
+        checkMagnitudeConstantA(1.0)
+    }
+
+    @Test func magnitudeConstantSplatMinusOne() {
+        checkMagnitudeConstantA(-1.0)
+    }
+
+    @Test func magnitudeConstantSplatTwo() {
+        checkMagnitudeConstantA(2.0)
+    }
+
+    @Test func magnitudeConstantSplatHalf() {
+        checkMagnitudeConstantA(0.5)
+    }
+
+    @Test func magnitudeConstantSplatFour() {
+        checkMagnitudeConstantA(4.0)
+    }
+
+    @Test func magnitudeConstantSplatQuarter() {
+        checkMagnitudeConstantA(0.25)
+    }
+
+    @Test func magnitudeConstantSplatOnePointFive() {
+        checkMagnitudeConstantA(1.5)
+    }
+
+    @Test func magnitudeConstantSplatMinusTwoPointFive() {
+        checkMagnitudeConstantA(-2.5)
+    }
+
+    @Test func magnitudeConstantSplatInfinity() {
+        checkMagnitudeConstantA(.infinity)
+    }
+
+    @Test func magnitudeConstantSplatMinusInfinity() {
+        checkMagnitudeConstantA(-.infinity)
+    }
+
+    @Test func magnitudeConstantSplatNaN() {
+        checkMagnitudeConstantA(.nan)
+    }
+
+    @Test func magnitudeConstantSplatMinusNaN() {
+        checkMagnitudeConstantA(-.nan)
+    }
+
+    @Test func magnitudeConstantSplatPayloadNaN() {
+        checkMagnitudeConstantA(Lane(nan: 1, signaling: false))
+    }
+
+    @Test func magnitudeConstantSplatSignalingNaN() {
+        checkMagnitudeConstantA(.signalingNaN)
+    }
+
+    @Test func magnitudeConstantSplatMinusSignalingNaN() {
+        checkMagnitudeConstantA(-.signalingNaN)
+    }
+
+    @Test func magnitudeConstantSplatLeastNonzero() {
+        checkMagnitudeConstantA(.leastNonzeroMagnitude)
+    }
+
+    @Test func magnitudeConstantSplatGreatest() {
+        checkMagnitudeConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkSquareRootConstantA(_ value: Lane) {
+        let mismatches = Mismatches("squareRoot with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.squareRoot(H.repeating(value)),
+            H(raw: HighwayReference.squareRootF32(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func squareRootConstantSplatZero() {
+        checkSquareRootConstantA(0.0)
+    }
+
+    @Test func squareRootConstantSplatNegativeZero() {
+        checkSquareRootConstantA(-0.0)
+    }
+
+    @Test func squareRootConstantSplatOne() {
+        checkSquareRootConstantA(1.0)
+    }
+
+    @Test func squareRootConstantSplatMinusOne() {
+        checkSquareRootConstantA(-1.0)
+    }
+
+    @Test func squareRootConstantSplatTwo() {
+        checkSquareRootConstantA(2.0)
+    }
+
+    @Test func squareRootConstantSplatHalf() {
+        checkSquareRootConstantA(0.5)
+    }
+
+    @Test func squareRootConstantSplatFour() {
+        checkSquareRootConstantA(4.0)
+    }
+
+    @Test func squareRootConstantSplatQuarter() {
+        checkSquareRootConstantA(0.25)
+    }
+
+    @Test func squareRootConstantSplatOnePointFive() {
+        checkSquareRootConstantA(1.5)
+    }
+
+    @Test func squareRootConstantSplatMinusTwoPointFive() {
+        checkSquareRootConstantA(-2.5)
+    }
+
+    @Test func squareRootConstantSplatInfinity() {
+        checkSquareRootConstantA(.infinity)
+    }
+
+    @Test func squareRootConstantSplatMinusInfinity() {
+        checkSquareRootConstantA(-.infinity)
+    }
+
+    @Test func squareRootConstantSplatNaN() {
+        checkSquareRootConstantA(.nan)
+    }
+
+    @Test func squareRootConstantSplatMinusNaN() {
+        checkSquareRootConstantA(-.nan)
+    }
+
+    @Test func squareRootConstantSplatPayloadNaN() {
+        checkSquareRootConstantA(Lane(nan: 1, signaling: false))
+    }
+
+    @Test func squareRootConstantSplatSignalingNaN() {
+        checkSquareRootConstantA(.signalingNaN)
+    }
+
+    @Test func squareRootConstantSplatMinusSignalingNaN() {
+        checkSquareRootConstantA(-.signalingNaN)
+    }
+
+    @Test func squareRootConstantSplatLeastNonzero() {
+        checkSquareRootConstantA(.leastNonzeroMagnitude)
+    }
+
+    @Test func squareRootConstantSplatGreatest() {
+        checkSquareRootConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
     private func checkApproximateReciprocalSquareRootConstantA(_ value: Lane) {
         let mismatches = Mismatches(
             "approximateReciprocalSquareRoot with a repeating \(hex(value))"
@@ -282,6 +466,34 @@ extension SIMDFloatConstantTests {
 
     @Test func exponentConstantSplatGreatest() {
         checkExponentConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkExponentConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("exponent with a alternating \(hex(even)), \(hex(odd))")
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockF32(even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.exponent(H.repeatingBlock(even, odd, even, odd)),
+            H(raw: HighwayReference.exponentF32(H.repeatingBlock(even, odd, even, odd).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func exponentConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkExponentConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func exponentConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkExponentConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func exponentConstantAAlternatingHalfAndOne() {
+        checkExponentConstantAAlternating(0.5, 1.0)
     }
 
     @inline(__always)

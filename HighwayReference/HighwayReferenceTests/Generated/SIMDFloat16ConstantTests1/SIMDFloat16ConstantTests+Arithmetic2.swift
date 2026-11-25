@@ -8,6 +8,141 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
+    private func checkAddingSubtractingConstantA(_ value: Lane) {
+        let mismatches = Mismatches("addingSubtracting with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x083C_95D6_E99C_3BF7)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
+            "repeating"
+        )
+        for b in bInputs
+        where !hasUnorderedNaNs(alternatingNegation: H.repeating(value).simd, b.simd) {
+            mismatches.check(
+                H.addingSubtracting(H.repeating(value), b),
+                H(raw: HighwayReference.addingSubtractingF16(H.repeating(value).raw, b.raw)),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkAddingSubtractingConstantB(_ value: Lane) {
+        let mismatches = Mismatches("addingSubtracting with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x10D1_ABD6_EE72_E5F9)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
+            "repeating"
+        )
+        for a in aInputs
+        where !hasUnorderedNaNs(alternatingNegation: a.simd, H.repeating(value).simd) {
+            mismatches.check(
+                H.addingSubtracting(a, H.repeating(value)),
+                H(raw: HighwayReference.addingSubtractingF16(a.raw, H.repeating(value).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func addingSubtractingConstantSplatZero() {
+        checkAddingSubtractingConstantA(0.0)
+        checkAddingSubtractingConstantB(0.0)
+    }
+
+    @Test func addingSubtractingConstantSplatNegativeZero() {
+        checkAddingSubtractingConstantA(-0.0)
+        checkAddingSubtractingConstantB(-0.0)
+    }
+
+    @Test func addingSubtractingConstantSplatOne() {
+        checkAddingSubtractingConstantA(1.0)
+        checkAddingSubtractingConstantB(1.0)
+    }
+
+    @Test func addingSubtractingConstantSplatMinusOne() {
+        checkAddingSubtractingConstantA(-1.0)
+        checkAddingSubtractingConstantB(-1.0)
+    }
+
+    @Test func addingSubtractingConstantSplatTwo() {
+        checkAddingSubtractingConstantA(2.0)
+        checkAddingSubtractingConstantB(2.0)
+    }
+
+    @Test func addingSubtractingConstantSplatHalf() {
+        checkAddingSubtractingConstantA(0.5)
+        checkAddingSubtractingConstantB(0.5)
+    }
+
+    @Test func addingSubtractingConstantSplatFour() {
+        checkAddingSubtractingConstantA(4.0)
+        checkAddingSubtractingConstantB(4.0)
+    }
+
+    @Test func addingSubtractingConstantSplatQuarter() {
+        checkAddingSubtractingConstantA(0.25)
+        checkAddingSubtractingConstantB(0.25)
+    }
+
+    @Test func addingSubtractingConstantSplatOnePointFive() {
+        checkAddingSubtractingConstantA(1.5)
+        checkAddingSubtractingConstantB(1.5)
+    }
+
+    @Test func addingSubtractingConstantSplatMinusTwoPointFive() {
+        checkAddingSubtractingConstantA(-2.5)
+        checkAddingSubtractingConstantB(-2.5)
+    }
+
+    @Test func addingSubtractingConstantSplatInfinity() {
+        checkAddingSubtractingConstantA(.infinity)
+        checkAddingSubtractingConstantB(.infinity)
+    }
+
+    @Test func addingSubtractingConstantSplatMinusInfinity() {
+        checkAddingSubtractingConstantA(-.infinity)
+        checkAddingSubtractingConstantB(-.infinity)
+    }
+
+    @Test func addingSubtractingConstantSplatNaN() {
+        checkAddingSubtractingConstantA(.nan)
+        checkAddingSubtractingConstantB(.nan)
+    }
+
+    @Test func addingSubtractingConstantSplatMinusNaN() {
+        checkAddingSubtractingConstantA(-.nan)
+        checkAddingSubtractingConstantB(-.nan)
+    }
+
+    @Test func addingSubtractingConstantSplatPayloadNaN() {
+        checkAddingSubtractingConstantA(Lane(nan: 1, signaling: false))
+        checkAddingSubtractingConstantB(Lane(nan: 1, signaling: false))
+    }
+
+    @Test func addingSubtractingConstantSplatSignalingNaN() {
+        checkAddingSubtractingConstantA(.signalingNaN)
+        checkAddingSubtractingConstantB(.signalingNaN)
+    }
+
+    @Test func addingSubtractingConstantSplatMinusSignalingNaN() {
+        checkAddingSubtractingConstantA(-.signalingNaN)
+        checkAddingSubtractingConstantB(-.signalingNaN)
+    }
+
+    @Test func addingSubtractingConstantSplatLeastNonzero() {
+        checkAddingSubtractingConstantA(.leastNonzeroMagnitude)
+        checkAddingSubtractingConstantB(.leastNonzeroMagnitude)
+    }
+
+    @Test func addingSubtractingConstantSplatGreatest() {
+        checkAddingSubtractingConstantA(.greatestFiniteMagnitude)
+        checkAddingSubtractingConstantB(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
     private func checkClampedConstantA(_ value: Lane) {
         let mismatches = Mismatches("clamped with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x5831_C07B_DAE7_5FFC)
@@ -738,6 +873,49 @@ extension SIMDFloat16ConstantTests {
 
     @Test func exponentConstantSplatGreatest() {
         checkExponentConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkExponentConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("exponent with a alternating \(hex(even)), \(hex(odd))")
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(
+                raw: HighwayReference.repeatingBlockF16(
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern
+                )
+            ),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.exponent(H.repeatingBlock(even, odd, even, odd, even, odd, even, odd)),
+            H(
+                raw: HighwayReference.exponentF16(
+                    H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func exponentConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkExponentConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func exponentConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkExponentConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func exponentConstantAAlternatingHalfAndOne() {
+        checkExponentConstantAAlternating(0.5, 1.0)
     }
 }
 #endif

@@ -8,6 +8,290 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
+    private func checkZeroingNegativeConstantA(_ value: Lane) {
+        let mismatches = Mismatches("zeroingNegative with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
+            "repeating"
+        )
+        mismatches.check(
+            H.zeroingNegative(H.repeating(value)),
+            H(raw: HighwayReference.zeroingNegativeF16(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func zeroingNegativeConstantSplatZero() {
+        checkZeroingNegativeConstantA(0.0)
+    }
+
+    @Test func zeroingNegativeConstantSplatNegativeZero() {
+        checkZeroingNegativeConstantA(-0.0)
+    }
+
+    @Test func zeroingNegativeConstantSplatOne() {
+        checkZeroingNegativeConstantA(1.0)
+    }
+
+    @Test func zeroingNegativeConstantSplatMinusOne() {
+        checkZeroingNegativeConstantA(-1.0)
+    }
+
+    @Test func zeroingNegativeConstantSplatTwo() {
+        checkZeroingNegativeConstantA(2.0)
+    }
+
+    @Test func zeroingNegativeConstantSplatHalf() {
+        checkZeroingNegativeConstantA(0.5)
+    }
+
+    @Test func zeroingNegativeConstantSplatFour() {
+        checkZeroingNegativeConstantA(4.0)
+    }
+
+    @Test func zeroingNegativeConstantSplatQuarter() {
+        checkZeroingNegativeConstantA(0.25)
+    }
+
+    @Test func zeroingNegativeConstantSplatOnePointFive() {
+        checkZeroingNegativeConstantA(1.5)
+    }
+
+    @Test func zeroingNegativeConstantSplatMinusTwoPointFive() {
+        checkZeroingNegativeConstantA(-2.5)
+    }
+
+    @Test func zeroingNegativeConstantSplatInfinity() {
+        checkZeroingNegativeConstantA(.infinity)
+    }
+
+    @Test func zeroingNegativeConstantSplatMinusInfinity() {
+        checkZeroingNegativeConstantA(-.infinity)
+    }
+
+    @Test func zeroingNegativeConstantSplatNaN() {
+        checkZeroingNegativeConstantA(.nan)
+    }
+
+    @Test func zeroingNegativeConstantSplatMinusNaN() {
+        checkZeroingNegativeConstantA(-.nan)
+    }
+
+    @Test func zeroingNegativeConstantSplatPayloadNaN() {
+        checkZeroingNegativeConstantA(Lane(nan: 1, signaling: false))
+    }
+
+    @Test func zeroingNegativeConstantSplatSignalingNaN() {
+        checkZeroingNegativeConstantA(.signalingNaN)
+    }
+
+    @Test func zeroingNegativeConstantSplatMinusSignalingNaN() {
+        checkZeroingNegativeConstantA(-.signalingNaN)
+    }
+
+    @Test func zeroingNegativeConstantSplatLeastNonzero() {
+        checkZeroingNegativeConstantA(.leastNonzeroMagnitude)
+    }
+
+    @Test func zeroingNegativeConstantSplatGreatest() {
+        checkZeroingNegativeConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkSelectingIfNegativeConstantA(_ value: Lane) {
+        let mismatches = Mismatches("selectingIfNegative with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x32EA_3E78_4635_AC92)
+        let cInputs = Inputs.vectors(H.self, seed: 0x32EA_3D78_4635_AADF)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
+            "repeating"
+        )
+        for (b, c) in everyPair(bInputs, cInputs) {
+            mismatches.check(
+                H.selectingIfNegative(H.repeating(value), b, c),
+                H(
+                    raw: HighwayReference.selectingIfNegativeF16(
+                        H.repeating(value).raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
+                "b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkSelectingIfNegativeConstantB(_ value: Lane) {
+        let mismatches = Mismatches("selectingIfNegative with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x29E8_8878_4102_D3D0)
+        let cInputs = Inputs.vectors(H.self, seed: 0x29E8_8A78_4102_D736)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
+            "repeating"
+        )
+        for (a, c) in everyPair(aInputs, cInputs) {
+            mismatches.check(
+                H.selectingIfNegative(a, H.repeating(value), c),
+                H(
+                    raw: HighwayReference.selectingIfNegativeF16(
+                        a.raw,
+                        H.repeating(value).raw,
+                        c.raw
+                    )
+                ),
+                "a: \(describe(a)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkSelectingIfNegativeConstantC(_ value: Lane) {
+        let mismatches = Mismatches("selectingIfNegative with c repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x2153_7178_3C2C_281B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2153_7078_3C2C_2668)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
+            "repeating"
+        )
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.selectingIfNegative(a, b, H.repeating(value)),
+                H(
+                    raw: HighwayReference.selectingIfNegativeF16(
+                        a.raw,
+                        b.raw,
+                        H.repeating(value).raw
+                    )
+                ),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func selectingIfNegativeConstantSplatZero() {
+        checkSelectingIfNegativeConstantA(0.0)
+        checkSelectingIfNegativeConstantB(0.0)
+        checkSelectingIfNegativeConstantC(0.0)
+    }
+
+    @Test func selectingIfNegativeConstantSplatNegativeZero() {
+        checkSelectingIfNegativeConstantA(-0.0)
+        checkSelectingIfNegativeConstantB(-0.0)
+        checkSelectingIfNegativeConstantC(-0.0)
+    }
+
+    @Test func selectingIfNegativeConstantSplatOne() {
+        checkSelectingIfNegativeConstantA(1.0)
+        checkSelectingIfNegativeConstantB(1.0)
+        checkSelectingIfNegativeConstantC(1.0)
+    }
+
+    @Test func selectingIfNegativeConstantSplatMinusOne() {
+        checkSelectingIfNegativeConstantA(-1.0)
+        checkSelectingIfNegativeConstantB(-1.0)
+        checkSelectingIfNegativeConstantC(-1.0)
+    }
+
+    @Test func selectingIfNegativeConstantSplatTwo() {
+        checkSelectingIfNegativeConstantA(2.0)
+        checkSelectingIfNegativeConstantB(2.0)
+        checkSelectingIfNegativeConstantC(2.0)
+    }
+
+    @Test func selectingIfNegativeConstantSplatHalf() {
+        checkSelectingIfNegativeConstantA(0.5)
+        checkSelectingIfNegativeConstantB(0.5)
+        checkSelectingIfNegativeConstantC(0.5)
+    }
+
+    @Test func selectingIfNegativeConstantSplatFour() {
+        checkSelectingIfNegativeConstantA(4.0)
+        checkSelectingIfNegativeConstantB(4.0)
+        checkSelectingIfNegativeConstantC(4.0)
+    }
+
+    @Test func selectingIfNegativeConstantSplatQuarter() {
+        checkSelectingIfNegativeConstantA(0.25)
+        checkSelectingIfNegativeConstantB(0.25)
+        checkSelectingIfNegativeConstantC(0.25)
+    }
+
+    @Test func selectingIfNegativeConstantSplatOnePointFive() {
+        checkSelectingIfNegativeConstantA(1.5)
+        checkSelectingIfNegativeConstantB(1.5)
+        checkSelectingIfNegativeConstantC(1.5)
+    }
+
+    @Test func selectingIfNegativeConstantSplatMinusTwoPointFive() {
+        checkSelectingIfNegativeConstantA(-2.5)
+        checkSelectingIfNegativeConstantB(-2.5)
+        checkSelectingIfNegativeConstantC(-2.5)
+    }
+
+    @Test func selectingIfNegativeConstantSplatInfinity() {
+        checkSelectingIfNegativeConstantA(.infinity)
+        checkSelectingIfNegativeConstantB(.infinity)
+        checkSelectingIfNegativeConstantC(.infinity)
+    }
+
+    @Test func selectingIfNegativeConstantSplatMinusInfinity() {
+        checkSelectingIfNegativeConstantA(-.infinity)
+        checkSelectingIfNegativeConstantB(-.infinity)
+        checkSelectingIfNegativeConstantC(-.infinity)
+    }
+
+    @Test func selectingIfNegativeConstantSplatNaN() {
+        checkSelectingIfNegativeConstantA(.nan)
+        checkSelectingIfNegativeConstantB(.nan)
+        checkSelectingIfNegativeConstantC(.nan)
+    }
+
+    @Test func selectingIfNegativeConstantSplatMinusNaN() {
+        checkSelectingIfNegativeConstantA(-.nan)
+        checkSelectingIfNegativeConstantB(-.nan)
+        checkSelectingIfNegativeConstantC(-.nan)
+    }
+
+    @Test func selectingIfNegativeConstantSplatPayloadNaN() {
+        checkSelectingIfNegativeConstantA(Lane(nan: 1, signaling: false))
+        checkSelectingIfNegativeConstantB(Lane(nan: 1, signaling: false))
+        checkSelectingIfNegativeConstantC(Lane(nan: 1, signaling: false))
+    }
+
+    @Test func selectingIfNegativeConstantSplatSignalingNaN() {
+        checkSelectingIfNegativeConstantA(.signalingNaN)
+        checkSelectingIfNegativeConstantB(.signalingNaN)
+        checkSelectingIfNegativeConstantC(.signalingNaN)
+    }
+
+    @Test func selectingIfNegativeConstantSplatMinusSignalingNaN() {
+        checkSelectingIfNegativeConstantA(-.signalingNaN)
+        checkSelectingIfNegativeConstantB(-.signalingNaN)
+        checkSelectingIfNegativeConstantC(-.signalingNaN)
+    }
+
+    @Test func selectingIfNegativeConstantSplatLeastNonzero() {
+        checkSelectingIfNegativeConstantA(.leastNonzeroMagnitude)
+        checkSelectingIfNegativeConstantB(.leastNonzeroMagnitude)
+        checkSelectingIfNegativeConstantC(.leastNonzeroMagnitude)
+    }
+
+    @Test func selectingIfNegativeConstantSplatGreatest() {
+        checkSelectingIfNegativeConstantA(.greatestFiniteMagnitude)
+        checkSelectingIfNegativeConstantB(.greatestFiniteMagnitude)
+        checkSelectingIfNegativeConstantC(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
     private func checkSelectingIfNegativeOrZeroConstantA(_ value: Lane) {
         let mismatches = Mismatches("selectingIfNegativeOrZero with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0xE865_E0EC_BEE3_7783)

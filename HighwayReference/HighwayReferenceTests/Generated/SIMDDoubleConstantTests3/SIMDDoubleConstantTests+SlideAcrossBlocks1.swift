@@ -411,6 +411,37 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
+    private func checkSlideUpLanesConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("slideUpLanes with a alternating \(hex(even)), \(hex(odd))")
+        let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for lanes in lanesInputs {
+            mismatches.check(
+                H.slideUpLanes(H.repeatingBlock(even, odd), by: lanes),
+                H(raw: HighwayReference.slideUpLanesF64(H.repeatingBlock(even, odd).raw, lanes)),
+                "lanes: \(lanes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func slideUpLanesConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkSlideUpLanesConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func slideUpLanesConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkSlideUpLanesConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func slideUpLanesConstantAAlternatingHalfAndOne() {
+        checkSlideUpLanesConstantAAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
     private func checkSlideUpLanesFillingWithConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("slideUpLanesFillingWith with lanes \(lanes)")
         let fillInputs = Inputs.vectors(H.self, seed: 0xFDFD_5269_8EC7_27C2)
@@ -1012,5 +1043,36 @@ extension SIMDDoubleConstantTests {
 
     @Test func slideDownLanesConstantSplatGreatest() {
         checkSlideDownLanesConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkSlideDownLanesConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("slideDownLanes with a alternating \(hex(even)), \(hex(odd))")
+        let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for lanes in lanesInputs {
+            mismatches.check(
+                H.slideDownLanes(H.repeatingBlock(even, odd), by: lanes),
+                H(raw: HighwayReference.slideDownLanesF64(H.repeatingBlock(even, odd).raw, lanes)),
+                "lanes: \(lanes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func slideDownLanesConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkSlideDownLanesConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func slideDownLanesConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkSlideDownLanesConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func slideDownLanesConstantAAlternatingHalfAndOne() {
+        checkSlideDownLanesConstantAAlternating(0.5, 1.0)
     }
 }

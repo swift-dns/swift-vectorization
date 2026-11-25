@@ -7,6 +7,212 @@ import Vectorization
 
 extension SIMDUInt64ConstantTests {
     @inline(__always)
+    private func checkPairwiseAddingConstantA(_ value: Lane) {
+        let mismatches = Mismatches("pairwiseAdding with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.self, seed: 0xD3E9_8267_F1FF_FC17)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.pairwiseAdding(H.repeating(value), b),
+                H(raw: HighwayReference.pairwiseAddingU64(H.repeating(value).raw, b.raw)),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkPairwiseAddingConstantB(_ value: Lane) {
+        let mismatches = Mismatches("pairwiseAdding with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xDC7E_9867_F6D6_A619)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.pairwiseAdding(a, H.repeating(value)),
+                H(raw: HighwayReference.pairwiseAddingU64(a.raw, H.repeating(value).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func pairwiseAddingConstantSplat0() {
+        checkPairwiseAddingConstantA(0)
+        checkPairwiseAddingConstantB(0)
+    }
+
+    @Test func pairwiseAddingConstantSplat1() {
+        checkPairwiseAddingConstantA(1)
+        checkPairwiseAddingConstantB(1)
+    }
+
+    @Test func pairwiseAddingConstantSplat15() {
+        checkPairwiseAddingConstantA(15)
+        checkPairwiseAddingConstantB(15)
+    }
+
+    @Test func pairwiseAddingConstantSplat16() {
+        checkPairwiseAddingConstantA(16)
+        checkPairwiseAddingConstantB(16)
+    }
+
+    @Test func pairwiseAddingConstantSplat26() {
+        checkPairwiseAddingConstantA(26)
+        checkPairwiseAddingConstantB(26)
+    }
+
+    @Test func pairwiseAddingConstantSplat127() {
+        checkPairwiseAddingConstantA(127)
+        checkPairwiseAddingConstantB(127)
+    }
+
+    @Test func pairwiseAddingConstantSplat128() {
+        checkPairwiseAddingConstantA(128)
+        checkPairwiseAddingConstantB(128)
+    }
+
+    @Test func pairwiseAddingConstantSplat255() {
+        checkPairwiseAddingConstantA(255)
+        checkPairwiseAddingConstantB(255)
+    }
+
+    @Test func pairwiseAddingConstantSplat256() {
+        checkPairwiseAddingConstantA(256)
+        checkPairwiseAddingConstantB(256)
+    }
+
+    @Test func pairwiseAddingConstantSplat257() {
+        checkPairwiseAddingConstantA(257)
+        checkPairwiseAddingConstantB(257)
+    }
+
+    @Test func pairwiseAddingConstantSplat65280() {
+        checkPairwiseAddingConstantA(65280)
+        checkPairwiseAddingConstantB(65280)
+    }
+
+    @Test func pairwiseAddingConstantSplat65281() {
+        checkPairwiseAddingConstantA(65281)
+        checkPairwiseAddingConstantB(65281)
+    }
+
+    @Test func pairwiseAddingConstantSplatMax() {
+        checkPairwiseAddingConstantA(Lane.max)
+        checkPairwiseAddingConstantB(Lane.max)
+    }
+
+    @inline(__always)
+    private func checkPairwiseSubtractingConstantA(_ value: Lane) {
+        let mismatches = Mismatches("pairwiseSubtracting with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x56B8_C2D2_C3B9_0A0E)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.pairwiseSubtracting(H.repeating(value), b),
+                H(raw: HighwayReference.pairwiseSubtractingU64(H.repeating(value).raw, b.raw)),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkPairwiseSubtractingConstantB(_ value: Lane) {
+        let mismatches = Mismatches("pairwiseSubtracting with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x4E23_8CD2_BEE2_29AC)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.pairwiseSubtracting(a, H.repeating(value)),
+                H(raw: HighwayReference.pairwiseSubtractingU64(a.raw, H.repeating(value).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func pairwiseSubtractingConstantSplat0() {
+        checkPairwiseSubtractingConstantA(0)
+        checkPairwiseSubtractingConstantB(0)
+    }
+
+    @Test func pairwiseSubtractingConstantSplat1() {
+        checkPairwiseSubtractingConstantA(1)
+        checkPairwiseSubtractingConstantB(1)
+    }
+
+    @Test func pairwiseSubtractingConstantSplat15() {
+        checkPairwiseSubtractingConstantA(15)
+        checkPairwiseSubtractingConstantB(15)
+    }
+
+    @Test func pairwiseSubtractingConstantSplat16() {
+        checkPairwiseSubtractingConstantA(16)
+        checkPairwiseSubtractingConstantB(16)
+    }
+
+    @Test func pairwiseSubtractingConstantSplat26() {
+        checkPairwiseSubtractingConstantA(26)
+        checkPairwiseSubtractingConstantB(26)
+    }
+
+    @Test func pairwiseSubtractingConstantSplat127() {
+        checkPairwiseSubtractingConstantA(127)
+        checkPairwiseSubtractingConstantB(127)
+    }
+
+    @Test func pairwiseSubtractingConstantSplat128() {
+        checkPairwiseSubtractingConstantA(128)
+        checkPairwiseSubtractingConstantB(128)
+    }
+
+    @Test func pairwiseSubtractingConstantSplat255() {
+        checkPairwiseSubtractingConstantA(255)
+        checkPairwiseSubtractingConstantB(255)
+    }
+
+    @Test func pairwiseSubtractingConstantSplat256() {
+        checkPairwiseSubtractingConstantA(256)
+        checkPairwiseSubtractingConstantB(256)
+    }
+
+    @Test func pairwiseSubtractingConstantSplat257() {
+        checkPairwiseSubtractingConstantA(257)
+        checkPairwiseSubtractingConstantB(257)
+    }
+
+    @Test func pairwiseSubtractingConstantSplat65280() {
+        checkPairwiseSubtractingConstantA(65280)
+        checkPairwiseSubtractingConstantB(65280)
+    }
+
+    @Test func pairwiseSubtractingConstantSplat65281() {
+        checkPairwiseSubtractingConstantA(65281)
+        checkPairwiseSubtractingConstantB(65281)
+    }
+
+    @Test func pairwiseSubtractingConstantSplatMax() {
+        checkPairwiseSubtractingConstantA(Lane.max)
+        checkPairwiseSubtractingConstantB(Lane.max)
+    }
+
+    @inline(__always)
     private func checkSumsOf2FromUInt32ConstantA(_ value: UInt32) {
         let mismatches = Mismatches("sumsOf2FromUInt32 with a repeating \(hex(value))")
         mismatches.check(

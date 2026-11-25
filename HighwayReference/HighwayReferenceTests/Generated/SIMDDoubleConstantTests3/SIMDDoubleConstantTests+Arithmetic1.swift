@@ -140,6 +140,68 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
+    private func checkAddingConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("adding with a alternating \(hex(even)), \(hex(odd))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x18B8_084D_2788_F601)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for b in bInputs where !hasUnorderedNaNs(H.repeatingBlock(even, odd).simd, b.simd) {
+            mismatches.check(
+                H.adding(H.repeatingBlock(even, odd), b),
+                H(raw: HighwayReference.addingF64(H.repeatingBlock(even, odd).raw, b.raw)),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func addingConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkAddingConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func addingConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkAddingConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func addingConstantAAlternatingHalfAndOne() {
+        checkAddingConstantAAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkAddingConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("adding with b alternating \(hex(even)), \(hex(odd))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x56A4_6E81_667F_AC0D)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for a in aInputs where !hasUnorderedNaNs(a.simd, H.repeatingBlock(even, odd).simd) {
+            mismatches.check(
+                H.adding(a, H.repeatingBlock(even, odd)),
+                H(raw: HighwayReference.addingF64(a.raw, H.repeatingBlock(even, odd).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func addingConstantBAlternatingOneAndMinusTwoPointFive() {
+        checkAddingConstantBAlternating(1.0, -2.5)
+    }
+
+    @Test func addingConstantBAlternatingMinusTwoPointFiveAndHalf() {
+        checkAddingConstantBAlternating(-2.5, 0.5)
+    }
+
+    @Test func addingConstantBAlternatingHalfAndOne() {
+        checkAddingConstantBAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
     private func checkSubtractingConstantA(_ value: Lane) {
         let mismatches = Mismatches("subtracting with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x7DE7_1DAD_F905_21F3)
@@ -270,6 +332,68 @@ extension SIMDDoubleConstantTests {
     @Test func subtractingConstantSplatGreatest() {
         checkSubtractingConstantA(.greatestFiniteMagnitude)
         checkSubtractingConstantB(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkSubtractingConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("subtracting with a alternating \(hex(even)), \(hex(odd))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x48AF_8B3D_D19A_2C48)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.subtracting(H.repeatingBlock(even, odd), b),
+                H(raw: HighwayReference.subtractingF64(H.repeatingBlock(even, odd).raw, b.raw)),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func subtractingConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkSubtractingConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func subtractingConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkSubtractingConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func subtractingConstantAAlternatingHalfAndOne() {
+        checkSubtractingConstantAAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkSubtractingConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("subtracting with b alternating \(hex(even)), \(hex(odd))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x5544_0627_C05B_D018)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.subtracting(a, H.repeatingBlock(even, odd)),
+                H(raw: HighwayReference.subtractingF64(a.raw, H.repeatingBlock(even, odd).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func subtractingConstantBAlternatingOneAndMinusTwoPointFive() {
+        checkSubtractingConstantBAlternating(1.0, -2.5)
+    }
+
+    @Test func subtractingConstantBAlternatingMinusTwoPointFiveAndHalf() {
+        checkSubtractingConstantBAlternating(-2.5, 0.5)
+    }
+
+    @Test func subtractingConstantBAlternatingHalfAndOne() {
+        checkSubtractingConstantBAlternating(0.5, 1.0)
     }
 
     @inline(__always)
@@ -538,6 +662,80 @@ extension SIMDDoubleConstantTests {
     @Test func dividingConstantSplatGreatest() {
         checkDividingConstantA(.greatestFiniteMagnitude)
         checkDividingConstantB(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkDividingConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("dividing with a alternating \(hex(even)), \(hex(odd))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x3D2F_D9EC_5D8B_C796)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.dividing(H.repeatingBlock(even, odd), b),
+                H(raw: HighwayReference.dividingF64(H.repeatingBlock(even, odd).raw, b.raw)),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func dividingConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkDividingConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func dividingConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkDividingConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func dividingConstantAAlternatingHalfAndOne() {
+        checkDividingConstantAAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkDividingConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("dividing with b alternating \(hex(even)), \(hex(odd))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x69CD_E35C_F6C5_E22A)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.dividing(a, H.repeatingBlock(even, odd)),
+                H(raw: HighwayReference.dividingF64(a.raw, H.repeatingBlock(even, odd).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func dividingConstantBAlternatingOneAndMinusTwoPointFive() {
+        withKnownIssue(
+            "In release builds on EMU128 Highway multiplies and divides lane by lane, so the compiler folds the lanes where a constant operand is one and returns a signaling NaN of the other operand as it is, which the port's vector operation quiets"
+        ) {
+            checkDividingConstantBAlternating(1.0, -2.5)
+        } when: {
+            SIMDTarget.targetName == "EMU128" && !assertionsAreEnabled
+        }
+    }
+
+    @Test func dividingConstantBAlternatingMinusTwoPointFiveAndHalf() {
+        checkDividingConstantBAlternating(-2.5, 0.5)
+    }
+
+    @Test func dividingConstantBAlternatingHalfAndOne() {
+        withKnownIssue(
+            "In release builds on EMU128 Highway multiplies and divides lane by lane, so the compiler folds the lanes where a constant operand is one and returns a signaling NaN of the other operand as it is, which the port's vector operation quiets"
+        ) {
+            checkDividingConstantBAlternating(0.5, 1.0)
+        } when: {
+            SIMDTarget.targetName == "EMU128" && !assertionsAreEnabled
+        }
     }
 
     @inline(__always)
@@ -940,189 +1138,5 @@ extension SIMDDoubleConstantTests {
 
     @Test func negatedConstantSplatGreatest() {
         checkNegatedConstantA(.greatestFiniteMagnitude)
-    }
-
-    @inline(__always)
-    private func checkMagnitudeConstantA(_ value: Lane) {
-        let mismatches = Mismatches("magnitude with a repeating \(hex(value))")
-        mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingF64(value)),
-            "repeating"
-        )
-        mismatches.check(
-            H.magnitude(H.repeating(value)),
-            H(raw: HighwayReference.magnitudeF64(H.repeating(value).raw)),
-            ""
-        )
-        mismatches.record()
-    }
-
-    @Test func magnitudeConstantSplatZero() {
-        checkMagnitudeConstantA(0.0)
-    }
-
-    @Test func magnitudeConstantSplatNegativeZero() {
-        checkMagnitudeConstantA(-0.0)
-    }
-
-    @Test func magnitudeConstantSplatOne() {
-        checkMagnitudeConstantA(1.0)
-    }
-
-    @Test func magnitudeConstantSplatMinusOne() {
-        checkMagnitudeConstantA(-1.0)
-    }
-
-    @Test func magnitudeConstantSplatTwo() {
-        checkMagnitudeConstantA(2.0)
-    }
-
-    @Test func magnitudeConstantSplatHalf() {
-        checkMagnitudeConstantA(0.5)
-    }
-
-    @Test func magnitudeConstantSplatFour() {
-        checkMagnitudeConstantA(4.0)
-    }
-
-    @Test func magnitudeConstantSplatQuarter() {
-        checkMagnitudeConstantA(0.25)
-    }
-
-    @Test func magnitudeConstantSplatOnePointFive() {
-        checkMagnitudeConstantA(1.5)
-    }
-
-    @Test func magnitudeConstantSplatMinusTwoPointFive() {
-        checkMagnitudeConstantA(-2.5)
-    }
-
-    @Test func magnitudeConstantSplatInfinity() {
-        checkMagnitudeConstantA(.infinity)
-    }
-
-    @Test func magnitudeConstantSplatMinusInfinity() {
-        checkMagnitudeConstantA(-.infinity)
-    }
-
-    @Test func magnitudeConstantSplatNaN() {
-        checkMagnitudeConstantA(.nan)
-    }
-
-    @Test func magnitudeConstantSplatMinusNaN() {
-        checkMagnitudeConstantA(-.nan)
-    }
-
-    @Test func magnitudeConstantSplatPayloadNaN() {
-        checkMagnitudeConstantA(Lane(nan: 1, signaling: false))
-    }
-
-    @Test func magnitudeConstantSplatSignalingNaN() {
-        checkMagnitudeConstantA(.signalingNaN)
-    }
-
-    @Test func magnitudeConstantSplatMinusSignalingNaN() {
-        checkMagnitudeConstantA(-.signalingNaN)
-    }
-
-    @Test func magnitudeConstantSplatLeastNonzero() {
-        checkMagnitudeConstantA(.leastNonzeroMagnitude)
-    }
-
-    @Test func magnitudeConstantSplatGreatest() {
-        checkMagnitudeConstantA(.greatestFiniteMagnitude)
-    }
-
-    @inline(__always)
-    private func checkSquareRootConstantA(_ value: Lane) {
-        let mismatches = Mismatches("squareRoot with a repeating \(hex(value))")
-        mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingF64(value)),
-            "repeating"
-        )
-        mismatches.check(
-            H.squareRoot(H.repeating(value)),
-            H(raw: HighwayReference.squareRootF64(H.repeating(value).raw)),
-            ""
-        )
-        mismatches.record()
-    }
-
-    @Test func squareRootConstantSplatZero() {
-        checkSquareRootConstantA(0.0)
-    }
-
-    @Test func squareRootConstantSplatNegativeZero() {
-        checkSquareRootConstantA(-0.0)
-    }
-
-    @Test func squareRootConstantSplatOne() {
-        checkSquareRootConstantA(1.0)
-    }
-
-    @Test func squareRootConstantSplatMinusOne() {
-        checkSquareRootConstantA(-1.0)
-    }
-
-    @Test func squareRootConstantSplatTwo() {
-        checkSquareRootConstantA(2.0)
-    }
-
-    @Test func squareRootConstantSplatHalf() {
-        checkSquareRootConstantA(0.5)
-    }
-
-    @Test func squareRootConstantSplatFour() {
-        checkSquareRootConstantA(4.0)
-    }
-
-    @Test func squareRootConstantSplatQuarter() {
-        checkSquareRootConstantA(0.25)
-    }
-
-    @Test func squareRootConstantSplatOnePointFive() {
-        checkSquareRootConstantA(1.5)
-    }
-
-    @Test func squareRootConstantSplatMinusTwoPointFive() {
-        checkSquareRootConstantA(-2.5)
-    }
-
-    @Test func squareRootConstantSplatInfinity() {
-        checkSquareRootConstantA(.infinity)
-    }
-
-    @Test func squareRootConstantSplatMinusInfinity() {
-        checkSquareRootConstantA(-.infinity)
-    }
-
-    @Test func squareRootConstantSplatNaN() {
-        checkSquareRootConstantA(.nan)
-    }
-
-    @Test func squareRootConstantSplatMinusNaN() {
-        checkSquareRootConstantA(-.nan)
-    }
-
-    @Test func squareRootConstantSplatPayloadNaN() {
-        checkSquareRootConstantA(Lane(nan: 1, signaling: false))
-    }
-
-    @Test func squareRootConstantSplatSignalingNaN() {
-        checkSquareRootConstantA(.signalingNaN)
-    }
-
-    @Test func squareRootConstantSplatMinusSignalingNaN() {
-        checkSquareRootConstantA(-.signalingNaN)
-    }
-
-    @Test func squareRootConstantSplatLeastNonzero() {
-        checkSquareRootConstantA(.leastNonzeroMagnitude)
-    }
-
-    @Test func squareRootConstantSplatGreatest() {
-        checkSquareRootConstantA(.greatestFiniteMagnitude)
     }
 }

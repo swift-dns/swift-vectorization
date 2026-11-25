@@ -339,6 +339,108 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
+    private func checkMultiplyingConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("multiplying with a alternating \(hex(even)), \(hex(odd))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x1895_1843_915C_9F67)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(
+                raw: HighwayReference.repeatingBlockF16(
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern
+                )
+            ),
+            "repeatingBlock"
+        )
+        for b in bInputs
+        where !hasUnorderedNaNs(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).simd,
+            b.simd
+        ) {
+            mismatches.check(
+                H.multiplying(H.repeatingBlock(even, odd, even, odd, even, odd, even, odd), b),
+                H(
+                    raw: HighwayReference.multiplyingF16(
+                        H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkMultiplyingConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func multiplyingConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkMultiplyingConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func multiplyingConstantAAlternatingHalfAndOne() {
+        checkMultiplyingConstantAAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkMultiplyingConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("multiplying with b alternating \(hex(even)), \(hex(odd))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xFF98_3577_BBB2_4147)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(
+                raw: HighwayReference.repeatingBlockF16(
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern
+                )
+            ),
+            "repeatingBlock"
+        )
+        for a in aInputs
+        where !hasUnorderedNaNs(
+            a.simd,
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).simd
+        ) {
+            mismatches.check(
+                H.multiplying(a, H.repeatingBlock(even, odd, even, odd, even, odd, even, odd)),
+                H(
+                    raw: HighwayReference.multiplyingF16(
+                        a.raw,
+                        H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingConstantBAlternatingOneAndMinusTwoPointFive() {
+        checkMultiplyingConstantBAlternating(1.0, -2.5)
+    }
+
+    @Test func multiplyingConstantBAlternatingMinusTwoPointFiveAndHalf() {
+        checkMultiplyingConstantBAlternating(-2.5, 0.5)
+    }
+
+    @Test func multiplyingConstantBAlternatingHalfAndOne() {
+        checkMultiplyingConstantBAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
     private func checkMultiplyingRoundedConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyingRounded with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x1436_2FFF_DCFE_EBF7)

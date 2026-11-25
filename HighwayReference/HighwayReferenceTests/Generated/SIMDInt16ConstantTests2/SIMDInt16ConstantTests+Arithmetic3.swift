@@ -3270,4 +3270,137 @@ extension SIMDInt16ConstantTests {
     @Test func sumsOfShuffledQuadAbsoluteDifferencesFromInt8ConstantSplatMinus128() {
         checkSumsOfShuffledQuadAbsoluteDifferencesFromInt8ConstantA(-128)
     }
+
+    @inline(__always)
+    private func checkSumsOfShuffledQuadAbsoluteDifferencesFromInt8ConstantAAlternating(
+        _ even: Int8,
+        _ odd: Int8
+    ) {
+        let mismatches = Mismatches(
+            "sumsOfShuffledQuadAbsoluteDifferencesFromInt8 with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let bInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0xDEDA_60A1_F634_422F)
+        let i3Inputs = Array(0...3)
+        let i2Inputs = Array(0...3)
+        let i1Inputs = Array(0...3)
+        let i0Inputs = Array(0...3)
+        mismatches.check(
+            SIMD<Int8>.repeatingBlock(
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd
+            ),
+            SIMD<Int8>(
+                raw: HighwayReference.repeatingBlockI8(
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd
+                )
+            ),
+            "repeatingBlock"
+        )
+        for (b, i3, i2, i1, i0) in mixedQuintuples(
+            bInputs,
+            i3Inputs,
+            i2Inputs,
+            i1Inputs,
+            i0Inputs,
+            seed: 0x0F32_7413_62E4_4150
+        ) {
+            mismatches.check(
+                H.sumsOfShuffledQuadAbsoluteDifferences(
+                    SIMD<Int8>.repeatingBlock(
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd
+                    ),
+                    b,
+                    i3,
+                    i2,
+                    i1,
+                    i0
+                ),
+                H(
+                    raw: HighwayReference.sumsOfShuffledQuadAbsoluteDifferencesI8ToI16(
+                        SIMD<Int8>.repeatingBlock(
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd
+                        ).raw,
+                        b.raw,
+                        Int32(truncatingIfNeeded: i3),
+                        Int32(truncatingIfNeeded: i2),
+                        Int32(truncatingIfNeeded: i1),
+                        Int32(truncatingIfNeeded: i0)
+                    )
+                ),
+                "b: \(describe(b)), i3: \(i3), i2: \(i2), i1: \(i1), i0: \(i0)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromInt8ConstantAAlternating1And26() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromInt8ConstantAAlternating(1, 26)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromInt8ConstantAAlternating26And127() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromInt8ConstantAAlternating(26, 127)
+    }
+
+    @Test func sumsOfShuffledQuadAbsoluteDifferencesFromInt8ConstantAAlternating127And1() {
+        checkSumsOfShuffledQuadAbsoluteDifferencesFromInt8ConstantAAlternating(127, 1)
+    }
 }

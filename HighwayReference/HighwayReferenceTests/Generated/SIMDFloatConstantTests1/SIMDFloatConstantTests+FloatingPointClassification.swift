@@ -99,6 +99,34 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
+    private func checkIsNaNConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("isNaN with a alternating \(hex(even)), \(hex(odd))")
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockF32(even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.isNaN(H.repeatingBlock(even, odd, even, odd)),
+            H.Mask(raw: HighwayReference.isNaNF32(H.repeatingBlock(even, odd, even, odd).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func isNaNConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkIsNaNConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func isNaNConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkIsNaNConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func isNaNConstantAAlternatingHalfAndOne() {
+        checkIsNaNConstantAAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
     private func checkIsEitherNaNConstantA(_ value: Lane) {
         let mismatches = Mismatches("isEitherNaN with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0xC263_9A69_5CB1_4712)

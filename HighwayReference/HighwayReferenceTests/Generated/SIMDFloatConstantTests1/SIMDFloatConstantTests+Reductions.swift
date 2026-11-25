@@ -283,6 +283,34 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
+    private func checkSmallestOrNaNConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("smallestOrNaN with a alternating \(hex(even)), \(hex(odd))")
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockF32(even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.smallestOrNaN(H.repeatingBlock(even, odd, even, odd)),
+            HighwayReference.smallestOrNaNF32(H.repeatingBlock(even, odd, even, odd).raw),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func smallestOrNaNConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkSmallestOrNaNConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func smallestOrNaNConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkSmallestOrNaNConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func smallestOrNaNConstantAAlternatingHalfAndOne() {
+        checkSmallestOrNaNConstantAAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
     private func checkLargestConstantA(_ value: Lane) {
         let mismatches = Mismatches("largest with a repeating \(hex(value))")
         mismatches.check(
@@ -464,6 +492,34 @@ extension SIMDFloatConstantTests {
 
     @Test func largestOrNaNConstantSplatGreatest() {
         checkLargestOrNaNConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkLargestOrNaNConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("largestOrNaN with a alternating \(hex(even)), \(hex(odd))")
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockF32(even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.largestOrNaN(H.repeatingBlock(even, odd, even, odd)),
+            HighwayReference.largestOrNaNF32(H.repeatingBlock(even, odd, even, odd).raw),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func largestOrNaNConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkLargestOrNaNConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func largestOrNaNConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkLargestOrNaNConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func largestOrNaNConstantAAlternatingHalfAndOne() {
+        checkLargestOrNaNConstantAAlternating(0.5, 1.0)
     }
 
     @inline(__always)

@@ -406,6 +406,44 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
+    private func checkAddingSubtractingConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "addingSubtracting with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0xD134_9032_9EA7_D3E0)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockI64(even, odd)),
+            "repeatingBlock"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.addingSubtracting(a, H.repeatingBlock(even, odd)),
+                H(
+                    raw: HighwayReference.addingSubtractingI64(
+                        a.raw,
+                        H.repeatingBlock(even, odd).raw
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func addingSubtractingConstantBAlternating1And26() {
+        checkAddingSubtractingConstantBAlternating(1, 26)
+    }
+
+    @Test func addingSubtractingConstantBAlternating26And127() {
+        checkAddingSubtractingConstantBAlternating(26, 127)
+    }
+
+    @Test func addingSubtractingConstantBAlternating127And1() {
+        checkAddingSubtractingConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
     private func checkDividingConstantA(_ value: Lane) {
         let mismatches = Mismatches("dividing with a repeating \(hex(value))")
         let bInputs =
@@ -769,6 +807,36 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
+    private func checkSaturatingNegatedConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "saturatingNegated with a alternating \(hex(even)), \(hex(odd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockI64(even, odd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.saturatingNegated(H.repeatingBlock(even, odd)),
+            H(raw: HighwayReference.saturatingNegatedI64(H.repeatingBlock(even, odd).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func saturatingNegatedConstantAAlternating1And26() {
+        checkSaturatingNegatedConstantAAlternating(1, 26)
+    }
+
+    @Test func saturatingNegatedConstantAAlternating26And127() {
+        checkSaturatingNegatedConstantAAlternating(26, 127)
+    }
+
+    @Test func saturatingNegatedConstantAAlternating127And1() {
+        checkSaturatingNegatedConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
     private func checkSaturatingMagnitudeConstantA(_ value: Lane) {
         let mismatches = Mismatches("saturatingMagnitude with a repeating \(hex(value))")
         mismatches.check(
@@ -858,223 +926,5 @@ extension SIMDInt64ConstantTests {
 
     @Test func saturatingMagnitudeConstantSplatMin() {
         checkSaturatingMagnitudeConstantA(Lane.min)
-    }
-
-    @inline(__always)
-    private func checkSaturatingAddingConstantAB(_ aValue: Lane, _ bValue: Lane) {
-        let mismatches = Mismatches(
-            "saturatingAdding with a repeating \(hex(aValue)), b repeating \(hex(bValue))"
-        )
-        mismatches.check(
-            H.repeating(aValue),
-            H(raw: HighwayReference.repeatingI64(aValue)),
-            "repeating"
-        )
-        mismatches.check(
-            H.repeating(bValue),
-            H(raw: HighwayReference.repeatingI64(bValue)),
-            "repeating"
-        )
-        mismatches.check(
-            H.saturatingAdding(H.repeating(aValue), H.repeating(bValue)),
-            H(
-                raw: HighwayReference.saturatingAddingI64(
-                    H.repeating(aValue).raw,
-                    H.repeating(bValue).raw
-                )
-            ),
-            ""
-        )
-        mismatches.record()
-    }
-
-    @Test func saturatingAddingConstantA1B26() {
-        checkSaturatingAddingConstantAB(1, 26)
-    }
-
-    @Test func saturatingAddingConstantA26B127() {
-        checkSaturatingAddingConstantAB(26, 127)
-    }
-
-    @Test func saturatingAddingConstantA127B1() {
-        checkSaturatingAddingConstantAB(127, 1)
-    }
-
-    @inline(__always)
-    private func checkSaturatingAddingConstantABAlternating(
-        _ aEven: Lane,
-        _ aOdd: Lane,
-        _ bEven: Lane,
-        _ bOdd: Lane
-    ) {
-        let mismatches = Mismatches(
-            "saturatingAdding with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
-        )
-        mismatches.check(
-            H.repeatingBlock(aEven, aOdd),
-            H(raw: HighwayReference.repeatingBlockI64(aEven, aOdd)),
-            "repeatingBlock"
-        )
-        mismatches.check(
-            H.repeatingBlock(bEven, bOdd),
-            H(raw: HighwayReference.repeatingBlockI64(bEven, bOdd)),
-            "repeatingBlock"
-        )
-        mismatches.check(
-            H.saturatingAdding(H.repeatingBlock(aEven, aOdd), H.repeatingBlock(bEven, bOdd)),
-            H(
-                raw: HighwayReference.saturatingAddingI64(
-                    H.repeatingBlock(aEven, aOdd).raw,
-                    H.repeatingBlock(bEven, bOdd).raw
-                )
-            ),
-            ""
-        )
-        mismatches.record()
-    }
-
-    @Test func saturatingAddingConstantA1And26B26And127() {
-        checkSaturatingAddingConstantABAlternating(1, 26, 26, 127)
-    }
-
-    @Test func saturatingAddingConstantA26And127B127And1() {
-        checkSaturatingAddingConstantABAlternating(26, 127, 127, 1)
-    }
-
-    @Test func saturatingAddingConstantA127And1B1And26() {
-        checkSaturatingAddingConstantABAlternating(127, 1, 1, 26)
-    }
-
-    @inline(__always)
-    private func checkSaturatingAddingConstantA(_ value: Lane) {
-        let mismatches = Mismatches("saturatingAdding with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.self, seed: 0xE893_88CD_D226_72E5)
-        mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingI64(value)),
-            "repeating"
-        )
-        for b in bInputs {
-            mismatches.check(
-                H.saturatingAdding(H.repeating(value), b),
-                H(raw: HighwayReference.saturatingAddingI64(H.repeating(value).raw, b.raw)),
-                "b: \(describe(b))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @inline(__always)
-    private func checkSaturatingAddingConstantB(_ value: Lane) {
-        let mismatches = Mismatches("saturatingAdding with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.self, seed: 0xCED4_82CD_C3A2_DAD3)
-        mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingI64(value)),
-            "repeating"
-        )
-        for a in aInputs {
-            mismatches.check(
-                H.saturatingAdding(a, H.repeating(value)),
-                H(raw: HighwayReference.saturatingAddingI64(a.raw, H.repeating(value).raw)),
-                "a: \(describe(a))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func saturatingAddingConstantSplat0() {
-        checkSaturatingAddingConstantA(0)
-        checkSaturatingAddingConstantB(0)
-    }
-
-    @Test func saturatingAddingConstantSplat1() {
-        checkSaturatingAddingConstantA(1)
-        checkSaturatingAddingConstantB(1)
-    }
-
-    @Test func saturatingAddingConstantSplat15() {
-        checkSaturatingAddingConstantA(15)
-        checkSaturatingAddingConstantB(15)
-    }
-
-    @Test func saturatingAddingConstantSplat16() {
-        checkSaturatingAddingConstantA(16)
-        checkSaturatingAddingConstantB(16)
-    }
-
-    @Test func saturatingAddingConstantSplat26() {
-        checkSaturatingAddingConstantA(26)
-        checkSaturatingAddingConstantB(26)
-    }
-
-    @Test func saturatingAddingConstantSplat127() {
-        checkSaturatingAddingConstantA(127)
-        checkSaturatingAddingConstantB(127)
-    }
-
-    @Test func saturatingAddingConstantSplat128() {
-        checkSaturatingAddingConstantA(128)
-        checkSaturatingAddingConstantB(128)
-    }
-
-    @Test func saturatingAddingConstantSplat255() {
-        checkSaturatingAddingConstantA(255)
-        checkSaturatingAddingConstantB(255)
-    }
-
-    @Test func saturatingAddingConstantSplat256() {
-        checkSaturatingAddingConstantA(256)
-        checkSaturatingAddingConstantB(256)
-    }
-
-    @Test func saturatingAddingConstantSplat257() {
-        checkSaturatingAddingConstantA(257)
-        checkSaturatingAddingConstantB(257)
-    }
-
-    @Test func saturatingAddingConstantSplat65280() {
-        checkSaturatingAddingConstantA(65280)
-        checkSaturatingAddingConstantB(65280)
-    }
-
-    @Test func saturatingAddingConstantSplat65281() {
-        checkSaturatingAddingConstantA(65281)
-        checkSaturatingAddingConstantB(65281)
-    }
-
-    @Test func saturatingAddingConstantSplatMinus1() {
-        checkSaturatingAddingConstantA(-1)
-        checkSaturatingAddingConstantB(-1)
-    }
-
-    @Test func saturatingAddingConstantSplatMinus16() {
-        checkSaturatingAddingConstantA(-16)
-        checkSaturatingAddingConstantB(-16)
-    }
-
-    @Test func saturatingAddingConstantSplatMinus17() {
-        checkSaturatingAddingConstantA(-17)
-        checkSaturatingAddingConstantB(-17)
-    }
-
-    @Test func saturatingAddingConstantSplatMinus128() {
-        checkSaturatingAddingConstantA(-128)
-        checkSaturatingAddingConstantB(-128)
-    }
-
-    @Test func saturatingAddingConstantSplatMinus129() {
-        checkSaturatingAddingConstantA(-129)
-        checkSaturatingAddingConstantB(-129)
-    }
-
-    @Test func saturatingAddingConstantSplatMax() {
-        checkSaturatingAddingConstantA(Lane.max)
-        checkSaturatingAddingConstantB(Lane.max)
-    }
-
-    @Test func saturatingAddingConstantSplatMin() {
-        checkSaturatingAddingConstantA(Lane.min)
-        checkSaturatingAddingConstantB(Lane.min)
     }
 }

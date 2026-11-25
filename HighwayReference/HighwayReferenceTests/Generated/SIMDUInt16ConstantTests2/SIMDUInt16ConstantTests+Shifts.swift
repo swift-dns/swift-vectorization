@@ -526,6 +526,62 @@ extension SIMDUInt16ConstantTests {
     }
 
     @inline(__always)
+    private func checkRoundingShiftedRightByConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "roundingShiftedRightBy with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x6A79_920F_7F26_378C)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockU16(even, odd, even, odd, even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.roundingShiftedRight(
+                    a,
+                    by: H.repeatingBlock(even, odd, even, odd, even, odd, even, odd)
+                ),
+                H(
+                    raw: HighwayReference.roundingShiftedRightByU16(
+                        a.raw,
+                        H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func roundingShiftedRightByConstantBAlternating1And26() {
+        checkRoundingShiftedRightByConstantBAlternating(1, 26)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func roundingShiftedRightByConstantBAlternating26And127() {
+        checkRoundingShiftedRightByConstantBAlternating(26, 127)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func roundingShiftedRightByConstantBAlternating127And1() {
+        checkRoundingShiftedRightByConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
     private func checkRoundingShiftedRightConstantBits(_ bits: Int) {
         let mismatches = Mismatches("roundingShiftedRight with bits \(bits)")
         let aInputs = Inputs.vectors(H.self, seed: 0x7EE9_C447_C0A1_75AE)

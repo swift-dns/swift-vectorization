@@ -7,6 +7,311 @@ import Vectorization
 
 extension SIMDInt16ConstantTests {
     @inline(__always)
+    private func checkRoundedAverageConstantAB(_ aValue: Lane, _ bValue: Lane) {
+        let mismatches = Mismatches(
+            "roundedAverage with a repeating \(hex(aValue)), b repeating \(hex(bValue))"
+        )
+        mismatches.check(
+            H.repeating(aValue),
+            H(raw: HighwayReference.repeatingI16(aValue)),
+            "repeating"
+        )
+        mismatches.check(
+            H.repeating(bValue),
+            H(raw: HighwayReference.repeatingI16(bValue)),
+            "repeating"
+        )
+        mismatches.check(
+            H.roundedAverage(H.repeating(aValue), H.repeating(bValue)),
+            H(
+                raw: HighwayReference.roundedAverageI16(
+                    H.repeating(aValue).raw,
+                    H.repeating(bValue).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func roundedAverageConstantA1B26() {
+        checkRoundedAverageConstantAB(1, 26)
+    }
+
+    @Test func roundedAverageConstantA26B127() {
+        checkRoundedAverageConstantAB(26, 127)
+    }
+
+    @Test func roundedAverageConstantA127B1() {
+        checkRoundedAverageConstantAB(127, 1)
+    }
+
+    @inline(__always)
+    private func checkRoundedAverageConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "roundedAverage with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(aEven, aOdd, aEven, aOdd, aEven, aOdd, aEven, aOdd),
+            H(
+                raw: HighwayReference.repeatingBlockI16(
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd
+                )
+            ),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(bEven, bOdd, bEven, bOdd, bEven, bOdd, bEven, bOdd),
+            H(
+                raw: HighwayReference.repeatingBlockI16(
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd
+                )
+            ),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.roundedAverage(
+                H.repeatingBlock(aEven, aOdd, aEven, aOdd, aEven, aOdd, aEven, aOdd),
+                H.repeatingBlock(bEven, bOdd, bEven, bOdd, bEven, bOdd, bEven, bOdd)
+            ),
+            H(
+                raw: HighwayReference.roundedAverageI16(
+                    H.repeatingBlock(aEven, aOdd, aEven, aOdd, aEven, aOdd, aEven, aOdd).raw,
+                    H.repeatingBlock(bEven, bOdd, bEven, bOdd, bEven, bOdd, bEven, bOdd).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func roundedAverageConstantA1And26B26And127() {
+        checkRoundedAverageConstantABAlternating(1, 26, 26, 127)
+    }
+
+    @Test func roundedAverageConstantA26And127B127And1() {
+        checkRoundedAverageConstantABAlternating(26, 127, 127, 1)
+    }
+
+    @Test func roundedAverageConstantA127And1B1And26() {
+        checkRoundedAverageConstantABAlternating(127, 1, 1, 26)
+    }
+
+    @inline(__always)
+    private func checkRoundedAverageConstantA(_ value: Lane) {
+        let mismatches = Mismatches("roundedAverage with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x329C_DAE1_1D11_C62B)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI16(value)),
+            "repeating"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.roundedAverage(H.repeating(value), b),
+                H(raw: HighwayReference.roundedAverageI16(H.repeating(value).raw, b.raw)),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkRoundedAverageConstantB(_ value: Lane) {
+        let mismatches = Mismatches("roundedAverage with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x3C0B_90E1_22A1_70CD)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI16(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.roundedAverage(a, H.repeating(value)),
+                H(raw: HighwayReference.roundedAverageI16(a.raw, H.repeating(value).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func roundedAverageConstantSplat0() {
+        checkRoundedAverageConstantA(0)
+        checkRoundedAverageConstantB(0)
+    }
+
+    @Test func roundedAverageConstantSplat1() {
+        checkRoundedAverageConstantA(1)
+        checkRoundedAverageConstantB(1)
+    }
+
+    @Test func roundedAverageConstantSplat15() {
+        checkRoundedAverageConstantA(15)
+        checkRoundedAverageConstantB(15)
+    }
+
+    @Test func roundedAverageConstantSplat16() {
+        checkRoundedAverageConstantA(16)
+        checkRoundedAverageConstantB(16)
+    }
+
+    @Test func roundedAverageConstantSplat26() {
+        checkRoundedAverageConstantA(26)
+        checkRoundedAverageConstantB(26)
+    }
+
+    @Test func roundedAverageConstantSplat127() {
+        checkRoundedAverageConstantA(127)
+        checkRoundedAverageConstantB(127)
+    }
+
+    @Test func roundedAverageConstantSplat128() {
+        checkRoundedAverageConstantA(128)
+        checkRoundedAverageConstantB(128)
+    }
+
+    @Test func roundedAverageConstantSplat255() {
+        checkRoundedAverageConstantA(255)
+        checkRoundedAverageConstantB(255)
+    }
+
+    @Test func roundedAverageConstantSplat256() {
+        checkRoundedAverageConstantA(256)
+        checkRoundedAverageConstantB(256)
+    }
+
+    @Test func roundedAverageConstantSplat257() {
+        checkRoundedAverageConstantA(257)
+        checkRoundedAverageConstantB(257)
+    }
+
+    @Test func roundedAverageConstantSplatMinus1() {
+        checkRoundedAverageConstantA(-1)
+        checkRoundedAverageConstantB(-1)
+    }
+
+    @Test func roundedAverageConstantSplatMinus16() {
+        checkRoundedAverageConstantA(-16)
+        checkRoundedAverageConstantB(-16)
+    }
+
+    @Test func roundedAverageConstantSplatMinus17() {
+        checkRoundedAverageConstantA(-17)
+        checkRoundedAverageConstantB(-17)
+    }
+
+    @Test func roundedAverageConstantSplatMinus128() {
+        checkRoundedAverageConstantA(-128)
+        checkRoundedAverageConstantB(-128)
+    }
+
+    @Test func roundedAverageConstantSplatMinus129() {
+        checkRoundedAverageConstantA(-129)
+        checkRoundedAverageConstantB(-129)
+    }
+
+    @Test func roundedAverageConstantSplatMax() {
+        checkRoundedAverageConstantA(Lane.max)
+        checkRoundedAverageConstantB(Lane.max)
+    }
+
+    @Test func roundedAverageConstantSplatMin() {
+        checkRoundedAverageConstantA(Lane.min)
+        checkRoundedAverageConstantB(Lane.min)
+    }
+
+    @inline(__always)
+    private func checkRoundedAverageConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("roundedAverage with a alternating \(hex(even)), \(hex(odd))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x0542_FB5D_D077_58B0)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockI16(even, odd, even, odd, even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.roundedAverage(H.repeatingBlock(even, odd, even, odd, even, odd, even, odd), b),
+                H(
+                    raw: HighwayReference.roundedAverageI16(
+                        H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func roundedAverageConstantAAlternating1And26() {
+        checkRoundedAverageConstantAAlternating(1, 26)
+    }
+
+    @Test func roundedAverageConstantAAlternating26And127() {
+        checkRoundedAverageConstantAAlternating(26, 127)
+    }
+
+    @Test func roundedAverageConstantAAlternating127And1() {
+        checkRoundedAverageConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkRoundedAverageConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("roundedAverage with b alternating \(hex(even)), \(hex(odd))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xDE81_5908_70AD_81E0)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockI16(even, odd, even, odd, even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.roundedAverage(a, H.repeatingBlock(even, odd, even, odd, even, odd, even, odd)),
+                H(
+                    raw: HighwayReference.roundedAverageI16(
+                        a.raw,
+                        H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func roundedAverageConstantBAlternating1And26() {
+        checkRoundedAverageConstantBAlternating(1, 26)
+    }
+
+    @Test func roundedAverageConstantBAlternating26And127() {
+        checkRoundedAverageConstantBAlternating(26, 127)
+    }
+
+    @Test func roundedAverageConstantBAlternating127And1() {
+        checkRoundedAverageConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
     private func checkSumsOf2FromInt8ConstantA(_ value: Int8) {
         let mismatches = Mismatches("sumsOf2FromInt8 with a repeating \(hex(value))")
         mismatches.check(
@@ -451,5 +756,255 @@ extension SIMDInt16ConstantTests {
     @Test func sumsOfAdjacentQuadAbsoluteDifferencesFromInt8ConstantSplatMinus128() {
         checkSumsOfAdjacentQuadAbsoluteDifferencesFromInt8ConstantA(-128)
         checkSumsOfAdjacentQuadAbsoluteDifferencesFromInt8ConstantB(-128)
+    }
+
+    @inline(__always)
+    private func checkSumsOfAdjacentQuadAbsoluteDifferencesFromInt8ConstantAAlternating(
+        _ even: Int8,
+        _ odd: Int8
+    ) {
+        let mismatches = Mismatches(
+            "sumsOfAdjacentQuadAbsoluteDifferencesFromInt8 with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let bInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x1162_5563_908A_D718)
+        let aOffsetInputs = Array(0...1)
+        let bOffsetInputs = Array(0...3)
+        mismatches.check(
+            SIMD<Int8>.repeatingBlock(
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd
+            ),
+            SIMD<Int8>(
+                raw: HighwayReference.repeatingBlockI8(
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd
+                )
+            ),
+            "repeatingBlock"
+        )
+        for (b, aOffset, bOffset) in mixedTriples(
+            bInputs,
+            aOffsetInputs,
+            bOffsetInputs,
+            seed: 0x111A_0568_3733_272D
+        ) {
+            mismatches.check(
+                H.sumsOfAdjacentQuadAbsoluteDifferences(
+                    SIMD<Int8>.repeatingBlock(
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd
+                    ),
+                    b,
+                    aOffset: aOffset,
+                    bOffset: bOffset
+                ),
+                H(
+                    raw: HighwayReference.sumsOfAdjacentQuadAbsoluteDifferencesI8ToI16(
+                        SIMD<Int8>.repeatingBlock(
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd
+                        ).raw,
+                        b.raw,
+                        Int32(truncatingIfNeeded: aOffset),
+                        Int32(truncatingIfNeeded: bOffset)
+                    )
+                ),
+                "b: \(describe(b)), aOffset: \(aOffset), bOffset: \(bOffset)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func sumsOfAdjacentQuadAbsoluteDifferencesFromInt8ConstantAAlternating1And26() {
+        checkSumsOfAdjacentQuadAbsoluteDifferencesFromInt8ConstantAAlternating(1, 26)
+    }
+
+    @Test func sumsOfAdjacentQuadAbsoluteDifferencesFromInt8ConstantAAlternating26And127() {
+        checkSumsOfAdjacentQuadAbsoluteDifferencesFromInt8ConstantAAlternating(26, 127)
+    }
+
+    @Test func sumsOfAdjacentQuadAbsoluteDifferencesFromInt8ConstantAAlternating127And1() {
+        checkSumsOfAdjacentQuadAbsoluteDifferencesFromInt8ConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkSumsOfAdjacentQuadAbsoluteDifferencesFromInt8ConstantBAlternating(
+        _ even: Int8,
+        _ odd: Int8
+    ) {
+        let mismatches = Mismatches(
+            "sumsOfAdjacentQuadAbsoluteDifferencesFromInt8 with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x242B_774C_0BA9_4428)
+        let aOffsetInputs = Array(0...1)
+        let bOffsetInputs = Array(0...3)
+        mismatches.check(
+            SIMD<Int8>.repeatingBlock(
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd
+            ),
+            SIMD<Int8>(
+                raw: HighwayReference.repeatingBlockI8(
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd
+                )
+            ),
+            "repeatingBlock"
+        )
+        for (a, aOffset, bOffset) in mixedTriples(
+            aInputs,
+            aOffsetInputs,
+            bOffsetInputs,
+            seed: 0x9D77_F6F2_B0EB_0EA4
+        ) {
+            mismatches.check(
+                H.sumsOfAdjacentQuadAbsoluteDifferences(
+                    a,
+                    SIMD<Int8>.repeatingBlock(
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd
+                    ),
+                    aOffset: aOffset,
+                    bOffset: bOffset
+                ),
+                H(
+                    raw: HighwayReference.sumsOfAdjacentQuadAbsoluteDifferencesI8ToI16(
+                        a.raw,
+                        SIMD<Int8>.repeatingBlock(
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd
+                        ).raw,
+                        Int32(truncatingIfNeeded: aOffset),
+                        Int32(truncatingIfNeeded: bOffset)
+                    )
+                ),
+                "a: \(describe(a)), aOffset: \(aOffset), bOffset: \(bOffset)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func sumsOfAdjacentQuadAbsoluteDifferencesFromInt8ConstantBAlternating1And26() {
+        checkSumsOfAdjacentQuadAbsoluteDifferencesFromInt8ConstantBAlternating(1, 26)
+    }
+
+    @Test func sumsOfAdjacentQuadAbsoluteDifferencesFromInt8ConstantBAlternating26And127() {
+        checkSumsOfAdjacentQuadAbsoluteDifferencesFromInt8ConstantBAlternating(26, 127)
+    }
+
+    @Test func sumsOfAdjacentQuadAbsoluteDifferencesFromInt8ConstantBAlternating127And1() {
+        checkSumsOfAdjacentQuadAbsoluteDifferencesFromInt8ConstantBAlternating(127, 1)
     }
 }

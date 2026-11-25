@@ -1054,4 +1054,154 @@ extension SIMDInt64ConstantTests {
     @Test func multiRotatedRightByFromUInt8ConstantSIMDUInt8Splat255() {
         checkMultiRotatedRightByFromUInt8ConstantB(255)
     }
+
+    @inline(__always)
+    private func checkMultiRotatedRightByFromUInt8ConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "multiRotatedRightByFromUInt8 with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let bInputs = Inputs.byteIndices(SIMD<UInt8>.self, seed: 0x2DB4_6770_3DCB_BCA2)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockI64(even, odd)),
+            "repeatingBlock"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.multiRotatedRight(H.repeatingBlock(even, odd), by: b),
+                H(
+                    raw: HighwayReference.multiRotatedRightByU8ToI64(
+                        H.repeatingBlock(even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantAAlternating1And26() {
+        checkMultiRotatedRightByFromUInt8ConstantAAlternating(1, 26)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantAAlternating26And127() {
+        checkMultiRotatedRightByFromUInt8ConstantAAlternating(26, 127)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantAAlternating127And1() {
+        checkMultiRotatedRightByFromUInt8ConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkMultiRotatedRightByFromUInt8ConstantBAlternating(_ even: UInt8, _ odd: UInt8)
+    {
+        let mismatches = Mismatches(
+            "multiRotatedRightByFromUInt8 with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x9815_C753_E1E4_73D6)
+        mismatches.check(
+            SIMD<UInt8>.repeatingBlock(
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd
+            ),
+            SIMD<UInt8>(
+                raw: HighwayReference.repeatingBlockU8(
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd
+                )
+            ),
+            "repeatingBlock"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.multiRotatedRight(
+                    a,
+                    by: SIMD<UInt8>.repeatingBlock(
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd
+                    )
+                ),
+                H(
+                    raw: HighwayReference.multiRotatedRightByU8ToI64(
+                        a.raw,
+                        SIMD<UInt8>.repeatingBlock(
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd
+                        ).raw
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantBAlternating1And26() {
+        checkMultiRotatedRightByFromUInt8ConstantBAlternating(1, 26)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantBAlternating26And127() {
+        checkMultiRotatedRightByFromUInt8ConstantBAlternating(26, 127)
+    }
+
+    @Test func multiRotatedRightByFromUInt8ConstantBAlternating127And1() {
+        checkMultiRotatedRightByFromUInt8ConstantBAlternating(127, 1)
+    }
 }

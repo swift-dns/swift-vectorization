@@ -340,6 +340,47 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
+    private func checkAddingSubtractingConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "addingSubtracting with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x5693_D283_C7E3_983B)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockI16(even, odd, even, odd, even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.addingSubtracting(
+                    a,
+                    H.repeatingBlock(even, odd, even, odd, even, odd, even, odd)
+                ),
+                H(
+                    raw: HighwayReference.addingSubtractingI16(
+                        a.raw,
+                        H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func addingSubtractingConstantBAlternating1And26() {
+        checkAddingSubtractingConstantBAlternating(1, 26)
+    }
+
+    @Test func addingSubtractingConstantBAlternating26And127() {
+        checkAddingSubtractingConstantBAlternating(26, 127)
+    }
+
+    @Test func addingSubtractingConstantBAlternating127And1() {
+        checkAddingSubtractingConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
     private func checkAbsoluteDifferenceConstantAB(_ aValue: Lane, _ bValue: Lane) {
         let mismatches = Mismatches(
             "absoluteDifference with a repeating \(hex(aValue)), b repeating \(hex(bValue))"
@@ -573,6 +614,88 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
+    private func checkAbsoluteDifferenceConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "absoluteDifference with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let bInputs = Inputs.vectors(H.self, seed: 0xB38D_49AC_9695_D3D6)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockI16(even, odd, even, odd, even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.absoluteDifference(
+                    H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+                    b
+                ),
+                H(
+                    raw: HighwayReference.absoluteDifferenceI16(
+                        H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func absoluteDifferenceConstantAAlternating1And26() {
+        checkAbsoluteDifferenceConstantAAlternating(1, 26)
+    }
+
+    @Test func absoluteDifferenceConstantAAlternating26And127() {
+        checkAbsoluteDifferenceConstantAAlternating(26, 127)
+    }
+
+    @Test func absoluteDifferenceConstantAAlternating127And1() {
+        checkAbsoluteDifferenceConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkAbsoluteDifferenceConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "absoluteDifference with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0xB3C7_F582_9BFE_296A)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockI16(even, odd, even, odd, even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.absoluteDifference(
+                    a,
+                    H.repeatingBlock(even, odd, even, odd, even, odd, even, odd)
+                ),
+                H(
+                    raw: HighwayReference.absoluteDifferenceI16(
+                        a.raw,
+                        H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func absoluteDifferenceConstantBAlternating1And26() {
+        checkAbsoluteDifferenceConstantBAlternating(1, 26)
+    }
+
+    @Test func absoluteDifferenceConstantBAlternating26And127() {
+        checkAbsoluteDifferenceConstantBAlternating(26, 127)
+    }
+
+    @Test func absoluteDifferenceConstantBAlternating127And1() {
+        checkAbsoluteDifferenceConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
     private func checkSaturatingNegatedConstantA(_ value: Lane) {
         let mismatches = Mismatches("saturatingNegated with a repeating \(hex(value))")
         mismatches.check(
@@ -654,6 +777,40 @@ extension SIMDInt16ConstantTests {
 
     @Test func saturatingNegatedConstantSplatMin() {
         checkSaturatingNegatedConstantA(Lane.min)
+    }
+
+    @inline(__always)
+    private func checkSaturatingNegatedConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "saturatingNegated with a alternating \(hex(even)), \(hex(odd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockI16(even, odd, even, odd, even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.saturatingNegated(H.repeatingBlock(even, odd, even, odd, even, odd, even, odd)),
+            H(
+                raw: HighwayReference.saturatingNegatedI16(
+                    H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func saturatingNegatedConstantAAlternating1And26() {
+        checkSaturatingNegatedConstantAAlternating(1, 26)
+    }
+
+    @Test func saturatingNegatedConstantAAlternating26And127() {
+        checkSaturatingNegatedConstantAAlternating(26, 127)
+    }
+
+    @Test func saturatingNegatedConstantAAlternating127And1() {
+        checkSaturatingNegatedConstantAAlternating(127, 1)
     }
 
     @inline(__always)
@@ -890,6 +1047,78 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
+    private func checkSaturatingAddingConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("saturatingAdding with a alternating \(hex(even)), \(hex(odd))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x0FE1_838B_4F81_0633)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockI16(even, odd, even, odd, even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.saturatingAdding(H.repeatingBlock(even, odd, even, odd, even, odd, even, odd), b),
+                H(
+                    raw: HighwayReference.saturatingAddingI16(
+                        H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func saturatingAddingConstantAAlternating1And26() {
+        checkSaturatingAddingConstantAAlternating(1, 26)
+    }
+
+    @Test func saturatingAddingConstantAAlternating26And127() {
+        checkSaturatingAddingConstantAAlternating(26, 127)
+    }
+
+    @Test func saturatingAddingConstantAAlternating127And1() {
+        checkSaturatingAddingConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkSaturatingAddingConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("saturatingAdding with b alternating \(hex(even)), \(hex(odd))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xB6DE_6AF4_6C29_9C83)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockI16(even, odd, even, odd, even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.saturatingAdding(a, H.repeatingBlock(even, odd, even, odd, even, odd, even, odd)),
+                H(
+                    raw: HighwayReference.saturatingAddingI16(
+                        a.raw,
+                        H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func saturatingAddingConstantBAlternating1And26() {
+        checkSaturatingAddingConstantBAlternating(1, 26)
+    }
+
+    @Test func saturatingAddingConstantBAlternating26And127() {
+        checkSaturatingAddingConstantBAlternating(26, 127)
+    }
+
+    @Test func saturatingAddingConstantBAlternating127And1() {
+        checkSaturatingAddingConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
     private func checkSaturatingSubtractingConstantAB(_ aValue: Lane, _ bValue: Lane) {
         let mismatches = Mismatches(
             "saturatingSubtracting with a repeating \(hex(aValue)), b repeating \(hex(bValue))"
@@ -1123,235 +1352,84 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
-    private func checkRoundedAverageConstantAB(_ aValue: Lane, _ bValue: Lane) {
+    private func checkSaturatingSubtractingConstantAAlternating(_ even: Lane, _ odd: Lane) {
         let mismatches = Mismatches(
-            "roundedAverage with a repeating \(hex(aValue)), b repeating \(hex(bValue))"
+            "saturatingSubtracting with a alternating \(hex(even)), \(hex(odd))"
         )
+        let bInputs = Inputs.vectors(H.self, seed: 0xBFCF_0851_47BC_820E)
         mismatches.check(
-            H.repeating(aValue),
-            H(raw: HighwayReference.repeatingI16(aValue)),
-            "repeating"
-        )
-        mismatches.check(
-            H.repeating(bValue),
-            H(raw: HighwayReference.repeatingI16(bValue)),
-            "repeating"
-        )
-        mismatches.check(
-            H.roundedAverage(H.repeating(aValue), H.repeating(bValue)),
-            H(
-                raw: HighwayReference.roundedAverageI16(
-                    H.repeating(aValue).raw,
-                    H.repeating(bValue).raw
-                )
-            ),
-            ""
-        )
-        mismatches.record()
-    }
-
-    @Test func roundedAverageConstantA1B26() {
-        checkRoundedAverageConstantAB(1, 26)
-    }
-
-    @Test func roundedAverageConstantA26B127() {
-        checkRoundedAverageConstantAB(26, 127)
-    }
-
-    @Test func roundedAverageConstantA127B1() {
-        checkRoundedAverageConstantAB(127, 1)
-    }
-
-    @inline(__always)
-    private func checkRoundedAverageConstantABAlternating(
-        _ aEven: Lane,
-        _ aOdd: Lane,
-        _ bEven: Lane,
-        _ bOdd: Lane
-    ) {
-        let mismatches = Mismatches(
-            "roundedAverage with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
-        )
-        mismatches.check(
-            H.repeatingBlock(aEven, aOdd, aEven, aOdd, aEven, aOdd, aEven, aOdd),
-            H(
-                raw: HighwayReference.repeatingBlockI16(
-                    aEven,
-                    aOdd,
-                    aEven,
-                    aOdd,
-                    aEven,
-                    aOdd,
-                    aEven,
-                    aOdd
-                )
-            ),
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockI16(even, odd, even, odd, even, odd, even, odd)),
             "repeatingBlock"
-        )
-        mismatches.check(
-            H.repeatingBlock(bEven, bOdd, bEven, bOdd, bEven, bOdd, bEven, bOdd),
-            H(
-                raw: HighwayReference.repeatingBlockI16(
-                    bEven,
-                    bOdd,
-                    bEven,
-                    bOdd,
-                    bEven,
-                    bOdd,
-                    bEven,
-                    bOdd
-                )
-            ),
-            "repeatingBlock"
-        )
-        mismatches.check(
-            H.roundedAverage(
-                H.repeatingBlock(aEven, aOdd, aEven, aOdd, aEven, aOdd, aEven, aOdd),
-                H.repeatingBlock(bEven, bOdd, bEven, bOdd, bEven, bOdd, bEven, bOdd)
-            ),
-            H(
-                raw: HighwayReference.roundedAverageI16(
-                    H.repeatingBlock(aEven, aOdd, aEven, aOdd, aEven, aOdd, aEven, aOdd).raw,
-                    H.repeatingBlock(bEven, bOdd, bEven, bOdd, bEven, bOdd, bEven, bOdd).raw
-                )
-            ),
-            ""
-        )
-        mismatches.record()
-    }
-
-    @Test func roundedAverageConstantA1And26B26And127() {
-        checkRoundedAverageConstantABAlternating(1, 26, 26, 127)
-    }
-
-    @Test func roundedAverageConstantA26And127B127And1() {
-        checkRoundedAverageConstantABAlternating(26, 127, 127, 1)
-    }
-
-    @Test func roundedAverageConstantA127And1B1And26() {
-        checkRoundedAverageConstantABAlternating(127, 1, 1, 26)
-    }
-
-    @inline(__always)
-    private func checkRoundedAverageConstantA(_ value: Lane) {
-        let mismatches = Mismatches("roundedAverage with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.self, seed: 0x329C_DAE1_1D11_C62B)
-        mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingI16(value)),
-            "repeating"
         )
         for b in bInputs {
             mismatches.check(
-                H.roundedAverage(H.repeating(value), b),
-                H(raw: HighwayReference.roundedAverageI16(H.repeating(value).raw, b.raw)),
+                H.saturatingSubtracting(
+                    H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+                    b
+                ),
+                H(
+                    raw: HighwayReference.saturatingSubtractingI16(
+                        H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw,
+                        b.raw
+                    )
+                ),
                 "b: \(describe(b))"
             )
         }
         mismatches.record()
     }
 
+    @Test func saturatingSubtractingConstantAAlternating1And26() {
+        checkSaturatingSubtractingConstantAAlternating(1, 26)
+    }
+
+    @Test func saturatingSubtractingConstantAAlternating26And127() {
+        checkSaturatingSubtractingConstantAAlternating(26, 127)
+    }
+
+    @Test func saturatingSubtractingConstantAAlternating127And1() {
+        checkSaturatingSubtractingConstantAAlternating(127, 1)
+    }
+
     @inline(__always)
-    private func checkRoundedAverageConstantB(_ value: Lane) {
-        let mismatches = Mismatches("roundedAverage with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.self, seed: 0x3C0B_90E1_22A1_70CD)
+    private func checkSaturatingSubtractingConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "saturatingSubtracting with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0xAAAC_BBBC_AD7F_E182)
         mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingI16(value)),
-            "repeating"
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockI16(even, odd, even, odd, even, odd, even, odd)),
+            "repeatingBlock"
         )
         for a in aInputs {
             mismatches.check(
-                H.roundedAverage(a, H.repeating(value)),
-                H(raw: HighwayReference.roundedAverageI16(a.raw, H.repeating(value).raw)),
+                H.saturatingSubtracting(
+                    a,
+                    H.repeatingBlock(even, odd, even, odd, even, odd, even, odd)
+                ),
+                H(
+                    raw: HighwayReference.saturatingSubtractingI16(
+                        a.raw,
+                        H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw
+                    )
+                ),
                 "a: \(describe(a))"
             )
         }
         mismatches.record()
     }
 
-    @Test func roundedAverageConstantSplat0() {
-        checkRoundedAverageConstantA(0)
-        checkRoundedAverageConstantB(0)
+    @Test func saturatingSubtractingConstantBAlternating1And26() {
+        checkSaturatingSubtractingConstantBAlternating(1, 26)
     }
 
-    @Test func roundedAverageConstantSplat1() {
-        checkRoundedAverageConstantA(1)
-        checkRoundedAverageConstantB(1)
+    @Test func saturatingSubtractingConstantBAlternating26And127() {
+        checkSaturatingSubtractingConstantBAlternating(26, 127)
     }
 
-    @Test func roundedAverageConstantSplat15() {
-        checkRoundedAverageConstantA(15)
-        checkRoundedAverageConstantB(15)
-    }
-
-    @Test func roundedAverageConstantSplat16() {
-        checkRoundedAverageConstantA(16)
-        checkRoundedAverageConstantB(16)
-    }
-
-    @Test func roundedAverageConstantSplat26() {
-        checkRoundedAverageConstantA(26)
-        checkRoundedAverageConstantB(26)
-    }
-
-    @Test func roundedAverageConstantSplat127() {
-        checkRoundedAverageConstantA(127)
-        checkRoundedAverageConstantB(127)
-    }
-
-    @Test func roundedAverageConstantSplat128() {
-        checkRoundedAverageConstantA(128)
-        checkRoundedAverageConstantB(128)
-    }
-
-    @Test func roundedAverageConstantSplat255() {
-        checkRoundedAverageConstantA(255)
-        checkRoundedAverageConstantB(255)
-    }
-
-    @Test func roundedAverageConstantSplat256() {
-        checkRoundedAverageConstantA(256)
-        checkRoundedAverageConstantB(256)
-    }
-
-    @Test func roundedAverageConstantSplat257() {
-        checkRoundedAverageConstantA(257)
-        checkRoundedAverageConstantB(257)
-    }
-
-    @Test func roundedAverageConstantSplatMinus1() {
-        checkRoundedAverageConstantA(-1)
-        checkRoundedAverageConstantB(-1)
-    }
-
-    @Test func roundedAverageConstantSplatMinus16() {
-        checkRoundedAverageConstantA(-16)
-        checkRoundedAverageConstantB(-16)
-    }
-
-    @Test func roundedAverageConstantSplatMinus17() {
-        checkRoundedAverageConstantA(-17)
-        checkRoundedAverageConstantB(-17)
-    }
-
-    @Test func roundedAverageConstantSplatMinus128() {
-        checkRoundedAverageConstantA(-128)
-        checkRoundedAverageConstantB(-128)
-    }
-
-    @Test func roundedAverageConstantSplatMinus129() {
-        checkRoundedAverageConstantA(-129)
-        checkRoundedAverageConstantB(-129)
-    }
-
-    @Test func roundedAverageConstantSplatMax() {
-        checkRoundedAverageConstantA(Lane.max)
-        checkRoundedAverageConstantB(Lane.max)
-    }
-
-    @Test func roundedAverageConstantSplatMin() {
-        checkRoundedAverageConstantA(Lane.min)
-        checkRoundedAverageConstantB(Lane.min)
+    @Test func saturatingSubtractingConstantBAlternating127And1() {
+        checkSaturatingSubtractingConstantBAlternating(127, 1)
     }
 }

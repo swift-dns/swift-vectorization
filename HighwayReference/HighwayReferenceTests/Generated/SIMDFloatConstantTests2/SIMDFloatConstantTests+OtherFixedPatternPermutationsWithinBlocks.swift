@@ -223,6 +223,78 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
+    private func checkOddEvenConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("oddEven with a alternating \(hex(even)), \(hex(odd))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x26CB_77B8_E96A_8E00)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockF32(even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.oddEven(H.repeatingBlock(even, odd, even, odd), b),
+                H(
+                    raw: HighwayReference.oddEvenF32(
+                        H.repeatingBlock(even, odd, even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func oddEvenConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkOddEvenConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func oddEvenConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkOddEvenConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func oddEvenConstantAAlternatingHalfAndOne() {
+        checkOddEvenConstantAAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkOddEvenConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("oddEven with b alternating \(hex(even)), \(hex(odd))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x87A8_0EDD_9103_B230)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockF32(even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.oddEven(a, H.repeatingBlock(even, odd, even, odd)),
+                H(
+                    raw: HighwayReference.oddEvenF32(
+                        a.raw,
+                        H.repeatingBlock(even, odd, even, odd).raw
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func oddEvenConstantBAlternatingOneAndMinusTwoPointFive() {
+        checkOddEvenConstantBAlternating(1.0, -2.5)
+    }
+
+    @Test func oddEvenConstantBAlternatingMinusTwoPointFiveAndHalf() {
+        checkOddEvenConstantBAlternating(-2.5, 0.5)
+    }
+
+    @Test func oddEvenConstantBAlternatingHalfAndOne() {
+        checkOddEvenConstantBAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
     private func checkDuplicatingEvenConstantA(_ value: Lane) {
         let mismatches = Mismatches("duplicatingEven with a repeating \(hex(value))")
         mismatches.check(

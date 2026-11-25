@@ -374,6 +374,37 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
+    private func checkSlideUpLanesConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("slideUpLanes with a alternating \(hex(even)), \(hex(odd))")
+        let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for lanes in lanesInputs {
+            mismatches.check(
+                H.slideUpLanes(H.repeatingBlock(even, odd), by: lanes),
+                H(raw: HighwayReference.slideUpLanesU64(H.repeatingBlock(even, odd).raw, lanes)),
+                "lanes: \(lanes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func slideUpLanesConstantAAlternating1And26() {
+        checkSlideUpLanesConstantAAlternating(1, 26)
+    }
+
+    @Test func slideUpLanesConstantAAlternating26And127() {
+        checkSlideUpLanesConstantAAlternating(26, 127)
+    }
+
+    @Test func slideUpLanesConstantAAlternating127And1() {
+        checkSlideUpLanesConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
     private func checkSlideUpLanesFillingWithConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("slideUpLanesFillingWith with lanes \(lanes)")
         let fillInputs = Inputs.vectors(H.self, seed: 0x0C78_AC83_38CF_21D3)
@@ -911,6 +942,37 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
+    private func checkSlideDownLanesConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("slideDownLanes with a alternating \(hex(even)), \(hex(odd))")
+        let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for lanes in lanesInputs {
+            mismatches.check(
+                H.slideDownLanes(H.repeatingBlock(even, odd), by: lanes),
+                H(raw: HighwayReference.slideDownLanesU64(H.repeatingBlock(even, odd).raw, lanes)),
+                "lanes: \(lanes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func slideDownLanesConstantAAlternating1And26() {
+        checkSlideDownLanesConstantAAlternating(1, 26)
+    }
+
+    @Test func slideDownLanesConstantAAlternating26And127() {
+        checkSlideDownLanesConstantAAlternating(26, 127)
+    }
+
+    @Test func slideDownLanesConstantAAlternating127And1() {
+        checkSlideDownLanesConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
     private func checkSlideDownLanesFillingWithConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("slideDownLanesFillingWith with lanes \(lanes)")
         let fillInputs = Inputs.vectors(H.self, seed: 0xD6A4_5883_4A6B_C76C)
@@ -1076,73 +1138,5 @@ extension SIMDUInt64ConstantTests {
     @Test func slideDownLanesFillingWithConstantSplatMax() {
         checkSlideDownLanesFillingWithConstantFill(Lane.max)
         checkSlideDownLanesFillingWithConstantA(Lane.max)
-    }
-
-    @inline(__always)
-    private func checkSlide1UpConstantA(_ value: Lane) {
-        let mismatches = Mismatches("slide1Up with a repeating \(hex(value))")
-        mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingU64(value)),
-            "repeating"
-        )
-        mismatches.check(
-            H.slide1Up(H.repeating(value)),
-            H(raw: HighwayReference.slide1UpU64(H.repeating(value).raw)),
-            ""
-        )
-        mismatches.record()
-    }
-
-    @Test func slide1UpConstantSplat0() {
-        checkSlide1UpConstantA(0)
-    }
-
-    @Test func slide1UpConstantSplat1() {
-        checkSlide1UpConstantA(1)
-    }
-
-    @Test func slide1UpConstantSplat15() {
-        checkSlide1UpConstantA(15)
-    }
-
-    @Test func slide1UpConstantSplat16() {
-        checkSlide1UpConstantA(16)
-    }
-
-    @Test func slide1UpConstantSplat26() {
-        checkSlide1UpConstantA(26)
-    }
-
-    @Test func slide1UpConstantSplat127() {
-        checkSlide1UpConstantA(127)
-    }
-
-    @Test func slide1UpConstantSplat128() {
-        checkSlide1UpConstantA(128)
-    }
-
-    @Test func slide1UpConstantSplat255() {
-        checkSlide1UpConstantA(255)
-    }
-
-    @Test func slide1UpConstantSplat256() {
-        checkSlide1UpConstantA(256)
-    }
-
-    @Test func slide1UpConstantSplat257() {
-        checkSlide1UpConstantA(257)
-    }
-
-    @Test func slide1UpConstantSplat65280() {
-        checkSlide1UpConstantA(65280)
-    }
-
-    @Test func slide1UpConstantSplat65281() {
-        checkSlide1UpConstantA(65281)
-    }
-
-    @Test func slide1UpConstantSplatMax() {
-        checkSlide1UpConstantA(Lane.max)
     }
 }

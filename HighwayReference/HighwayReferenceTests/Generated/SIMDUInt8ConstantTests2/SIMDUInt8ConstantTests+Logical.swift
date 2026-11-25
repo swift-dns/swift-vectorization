@@ -427,6 +427,230 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
+    private func checkBitwiseXorAndNotConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("bitwiseXorAndNot with a alternating \(hex(even)), \(hex(odd))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x1F2E_70E2_A2CF_B8A5)
+        let cInputs = Inputs.vectors(H.self, seed: 0x1F2E_6DE2_A2CF_B38C)
+        mismatches.check(
+            H.repeatingBlock(
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd
+            ),
+            H(
+                raw: HighwayReference.repeatingBlockU8(
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd
+                )
+            ),
+            "repeatingBlock"
+        )
+        for (b, c) in everyPair(bInputs, cInputs) {
+            mismatches.check(
+                H.bitwiseXorAndNot(
+                    H.repeatingBlock(
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd
+                    ),
+                    b,
+                    c
+                ),
+                H(
+                    raw: HighwayReference.bitwiseXorAndNotU8(
+                        H.repeatingBlock(
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd
+                        ).raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
+                "b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func bitwiseXorAndNotConstantAAlternating1And26() {
+        checkBitwiseXorAndNotConstantAAlternating(1, 26)
+    }
+
+    @Test func bitwiseXorAndNotConstantAAlternating26And127() {
+        checkBitwiseXorAndNotConstantAAlternating(26, 127)
+    }
+
+    @Test func bitwiseXorAndNotConstantAAlternating127And1() {
+        checkBitwiseXorAndNotConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkBitwiseXorAndNotConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("bitwiseXorAndNot with b alternating \(hex(even)), \(hex(odd))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x61C5_253C_E006_E3B1)
+        let cInputs = Inputs.vectors(H.self, seed: 0x61C5_233C_E006_E04B)
+        mismatches.check(
+            H.repeatingBlock(
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd
+            ),
+            H(
+                raw: HighwayReference.repeatingBlockU8(
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd
+                )
+            ),
+            "repeatingBlock"
+        )
+        for (a, c) in everyPair(aInputs, cInputs) {
+            mismatches.check(
+                H.bitwiseXorAndNot(
+                    a,
+                    H.repeatingBlock(
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd
+                    ),
+                    c
+                ),
+                H(
+                    raw: HighwayReference.bitwiseXorAndNotU8(
+                        a.raw,
+                        H.repeatingBlock(
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd
+                        ).raw,
+                        c.raw
+                    )
+                ),
+                "a: \(describe(a)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func bitwiseXorAndNotConstantBAlternating1And26() {
+        checkBitwiseXorAndNotConstantBAlternating(1, 26)
+    }
+
+    @Test func bitwiseXorAndNotConstantBAlternating26And127() {
+        checkBitwiseXorAndNotConstantBAlternating(26, 127)
+    }
+
+    @Test func bitwiseXorAndNotConstantBAlternating127And1() {
+        checkBitwiseXorAndNotConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
     private func checkBitwiseSelectingConstantA(_ value: Lane) {
         let mismatches = Mismatches("bitwiseSelecting with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x7C28_95C1_39B7_8C45)
@@ -532,6 +756,230 @@ extension SIMDUInt8ConstantTests {
         checkBitwiseSelectingConstantA(255)
         checkBitwiseSelectingConstantB(255)
         checkBitwiseSelectingConstantC(255)
+    }
+
+    @inline(__always)
+    private func checkBitwiseSelectingConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("bitwiseSelecting with b alternating \(hex(even)), \(hex(odd))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x0CAB_9F6D_808B_6E8A)
+        let cInputs = Inputs.vectors(H.self, seed: 0x0CAB_9D6D_808B_6B24)
+        mismatches.check(
+            H.repeatingBlock(
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd
+            ),
+            H(
+                raw: HighwayReference.repeatingBlockU8(
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd
+                )
+            ),
+            "repeatingBlock"
+        )
+        for (a, c) in everyPair(aInputs, cInputs) {
+            mismatches.check(
+                H.bitwiseSelecting(
+                    a,
+                    H.repeatingBlock(
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd
+                    ),
+                    c
+                ),
+                H(
+                    raw: HighwayReference.bitwiseSelectingU8(
+                        a.raw,
+                        H.repeatingBlock(
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd
+                        ).raw,
+                        c.raw
+                    )
+                ),
+                "a: \(describe(a)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func bitwiseSelectingConstantBAlternating1And26() {
+        checkBitwiseSelectingConstantBAlternating(1, 26)
+    }
+
+    @Test func bitwiseSelectingConstantBAlternating26And127() {
+        checkBitwiseSelectingConstantBAlternating(26, 127)
+    }
+
+    @Test func bitwiseSelectingConstantBAlternating127And1() {
+        checkBitwiseSelectingConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkBitwiseSelectingConstantCAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("bitwiseSelecting with c alternating \(hex(even)), \(hex(odd))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x868E_D2CC_6291_B3B3)
+        let bInputs = Inputs.vectors(H.self, seed: 0x868E_D1CC_6291_B200)
+        mismatches.check(
+            H.repeatingBlock(
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd
+            ),
+            H(
+                raw: HighwayReference.repeatingBlockU8(
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd
+                )
+            ),
+            "repeatingBlock"
+        )
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.bitwiseSelecting(
+                    a,
+                    b,
+                    H.repeatingBlock(
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd
+                    )
+                ),
+                H(
+                    raw: HighwayReference.bitwiseSelectingU8(
+                        a.raw,
+                        b.raw,
+                        H.repeatingBlock(
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd
+                        ).raw
+                    )
+                ),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func bitwiseSelectingConstantCAlternating1And26() {
+        checkBitwiseSelectingConstantCAlternating(1, 26)
+    }
+
+    @Test func bitwiseSelectingConstantCAlternating26And127() {
+        checkBitwiseSelectingConstantCAlternating(26, 127)
+    }
+
+    @Test func bitwiseSelectingConstantCAlternating127And1() {
+        checkBitwiseSelectingConstantCAlternating(127, 1)
     }
 
     @inline(__always)

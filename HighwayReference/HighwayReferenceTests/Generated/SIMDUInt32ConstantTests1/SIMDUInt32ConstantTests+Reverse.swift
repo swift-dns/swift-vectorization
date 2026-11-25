@@ -73,4 +73,32 @@ extension SIMDUInt32ConstantTests {
     @Test func reversedConstantSplatMax() {
         checkReversedConstantA(Lane.max)
     }
+
+    @inline(__always)
+    private func checkReversedConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("reversed with a alternating \(hex(even)), \(hex(odd))")
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockU32(even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.reversed(H.repeatingBlock(even, odd, even, odd)),
+            H(raw: HighwayReference.reversedU32(H.repeatingBlock(even, odd, even, odd).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func reversedConstantAAlternating1And26() {
+        checkReversedConstantAAlternating(1, 26)
+    }
+
+    @Test func reversedConstantAAlternating26And127() {
+        checkReversedConstantAAlternating(26, 127)
+    }
+
+    @Test func reversedConstantAAlternating127And1() {
+        checkReversedConstantAAlternating(127, 1)
+    }
 }

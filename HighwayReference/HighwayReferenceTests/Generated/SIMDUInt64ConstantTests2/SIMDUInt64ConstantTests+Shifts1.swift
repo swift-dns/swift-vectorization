@@ -1126,4 +1126,52 @@ extension SIMDUInt64ConstantTests {
         checkRoundingShiftedRightByConstantA(Lane.max)
         checkRoundingShiftedRightByConstantB(Lane.max)
     }
+
+    @inline(__always)
+    private func checkRoundingShiftedRightByConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "roundingShiftedRightBy with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x5E44_D5B2_48B2_D2B1)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.roundingShiftedRight(a, by: H.repeatingBlock(even, odd)),
+                H(
+                    raw: HighwayReference.roundingShiftedRightByU64(
+                        a.raw,
+                        H.repeatingBlock(even, odd).raw
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func roundingShiftedRightByConstantBAlternating1And26() {
+        checkRoundingShiftedRightByConstantBAlternating(1, 26)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func roundingShiftedRightByConstantBAlternating26And127() {
+        checkRoundingShiftedRightByConstantBAlternating(26, 127)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func roundingShiftedRightByConstantBAlternating127And1() {
+        checkRoundingShiftedRightByConstantBAlternating(127, 1)
+    }
 }

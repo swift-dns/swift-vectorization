@@ -99,6 +99,34 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
+    private func checkReversedConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("reversed with a alternating \(hex(even)), \(hex(odd))")
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockF32(even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.reversed(H.repeatingBlock(even, odd, even, odd)),
+            H(raw: HighwayReference.reversedF32(H.repeatingBlock(even, odd, even, odd).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func reversedConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkReversedConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func reversedConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkReversedConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func reversedConstantAAlternatingHalfAndOne() {
+        checkReversedConstantAAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
     private func checkByteSwappedConstantA(_ value: Lane) {
         let mismatches = Mismatches("byteSwapped with a repeating \(hex(value))")
         mismatches.check(

@@ -172,6 +172,68 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
+    private func checkMinimumConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("minimum with a alternating \(hex(even)), \(hex(odd))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x69C8_9885_B01B_BFF8)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.minimum(H.repeatingBlock(even, odd), b),
+                H(raw: HighwayReference.minimumF64(H.repeatingBlock(even, odd).raw, b.raw)),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func minimumConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkMinimumConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func minimumConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkMinimumConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func minimumConstantAAlternatingHalfAndOne() {
+        checkMinimumConstantAAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkMinimumConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("minimum with b alternating \(hex(even)), \(hex(odd))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xB387_5D56_B4F3_0908)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.minimum(a, H.repeatingBlock(even, odd)),
+                H(raw: HighwayReference.minimumF64(a.raw, H.repeatingBlock(even, odd).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func minimumConstantBAlternatingOneAndMinusTwoPointFive() {
+        checkMinimumConstantBAlternating(1.0, -2.5)
+    }
+
+    @Test func minimumConstantBAlternatingMinusTwoPointFiveAndHalf() {
+        checkMinimumConstantBAlternating(-2.5, 0.5)
+    }
+
+    @Test func minimumConstantBAlternatingHalfAndOne() {
+        checkMinimumConstantBAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
     private func checkMaximumConstantA(_ value: Lane) {
         let mismatches = Mismatches("maximum with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0xFE42_7CC0_8814_A141)
@@ -334,6 +396,68 @@ extension SIMDDoubleConstantTests {
     @Test func maximumConstantSplatGreatest() {
         checkMaximumConstantA(.greatestFiniteMagnitude)
         checkMaximumConstantB(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkMaximumConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("maximum with a alternating \(hex(even)), \(hex(odd))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x77B4_9AB4_5637_06E2)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.maximum(H.repeatingBlock(even, odd), b),
+                H(raw: HighwayReference.maximumF64(H.repeatingBlock(even, odd).raw, b.raw)),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func maximumConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkMaximumConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func maximumConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkMaximumConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func maximumConstantAAlternatingHalfAndOne() {
+        checkMaximumConstantAAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkMaximumConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("maximum with b alternating \(hex(even)), \(hex(odd))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x5CCA_0048_F33D_0D16)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.maximum(a, H.repeatingBlock(even, odd)),
+                H(raw: HighwayReference.maximumF64(a.raw, H.repeatingBlock(even, odd).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func maximumConstantBAlternatingOneAndMinusTwoPointFive() {
+        checkMaximumConstantBAlternating(1.0, -2.5)
+    }
+
+    @Test func maximumConstantBAlternatingMinusTwoPointFiveAndHalf() {
+        checkMaximumConstantBAlternating(-2.5, 0.5)
+    }
+
+    @Test func maximumConstantBAlternatingHalfAndOne() {
+        checkMaximumConstantBAlternating(0.5, 1.0)
     }
 
     @inline(__always)
@@ -893,220 +1017,74 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMaximumMagnitudeConstantAB(_ aValue: Lane, _ bValue: Lane) {
-        let mismatches = Mismatches(
-            "maximumMagnitude with a repeating \(hex(aValue)), b repeating \(hex(bValue))"
-        )
+    private func checkMinimumMagnitudeConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("minimumMagnitude with a alternating \(hex(even)), \(hex(odd))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x7312_60A9_F636_1B7E)
         mismatches.check(
-            H.repeating(aValue),
-            H(raw: HighwayReference.repeatingF64(aValue)),
-            "repeating"
-        )
-        mismatches.check(
-            H.repeating(bValue),
-            H(raw: HighwayReference.repeatingF64(bValue)),
-            "repeating"
-        )
-        mismatches.check(
-            H.maximumMagnitude(H.repeating(aValue), H.repeating(bValue)),
-            H(
-                raw: HighwayReference.maximumMagnitudeF64(
-                    H.repeating(aValue).raw,
-                    H.repeating(bValue).raw
-                )
-            ),
-            ""
-        )
-        mismatches.record()
-    }
-
-    @Test func maximumMagnitudeConstantAOneBMinusTwoPointFive() {
-        checkMaximumMagnitudeConstantAB(1.0, -2.5)
-    }
-
-    @Test func maximumMagnitudeConstantAMinusTwoPointFiveBHalf() {
-        checkMaximumMagnitudeConstantAB(-2.5, 0.5)
-    }
-
-    @Test func maximumMagnitudeConstantAHalfBOne() {
-        checkMaximumMagnitudeConstantAB(0.5, 1.0)
-    }
-
-    @inline(__always)
-    private func checkMaximumMagnitudeConstantABAlternating(
-        _ aEven: Lane,
-        _ aOdd: Lane,
-        _ bEven: Lane,
-        _ bOdd: Lane
-    ) {
-        let mismatches = Mismatches(
-            "maximumMagnitude with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
-        )
-        mismatches.check(
-            H.repeatingBlock(aEven, aOdd),
-            H(raw: HighwayReference.repeatingBlockF64(aEven, aOdd)),
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
             "repeatingBlock"
         )
-        mismatches.check(
-            H.repeatingBlock(bEven, bOdd),
-            H(raw: HighwayReference.repeatingBlockF64(bEven, bOdd)),
-            "repeatingBlock"
-        )
-        mismatches.check(
-            H.maximumMagnitude(H.repeatingBlock(aEven, aOdd), H.repeatingBlock(bEven, bOdd)),
-            H(
-                raw: HighwayReference.maximumMagnitudeF64(
-                    H.repeatingBlock(aEven, aOdd).raw,
-                    H.repeatingBlock(bEven, bOdd).raw
-                )
-            ),
-            ""
-        )
-        mismatches.record()
-    }
-
-    @Test func maximumMagnitudeConstantAOneAndMinusTwoPointFiveBMinusTwoPointFiveAndHalf() {
-        checkMaximumMagnitudeConstantABAlternating(1.0, -2.5, -2.5, 0.5)
-    }
-
-    @Test func maximumMagnitudeConstantAMinusTwoPointFiveAndHalfBHalfAndOne() {
-        checkMaximumMagnitudeConstantABAlternating(-2.5, 0.5, 0.5, 1.0)
-    }
-
-    @Test func maximumMagnitudeConstantAHalfAndOneBOneAndMinusTwoPointFive() {
-        checkMaximumMagnitudeConstantABAlternating(0.5, 1.0, 1.0, -2.5)
-    }
-
-    @inline(__always)
-    private func checkMaximumMagnitudeConstantA(_ value: Lane) {
-        let mismatches = Mismatches("maximumMagnitude with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.self, seed: 0x5348_6C60_A7F8_443F)
-        mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingF64(value)),
-            "repeating"
-        )
-        for b in bInputs where !hasUnorderedNaNs(H.repeating(value).simd, b.simd) {
+        for b in bInputs where !hasUnorderedNaNs(H.repeatingBlock(even, odd).simd, b.simd) {
             mismatches.check(
-                H.maximumMagnitude(H.repeating(value), b),
-                H(raw: HighwayReference.maximumMagnitudeF64(H.repeating(value).raw, b.raw)),
+                H.minimumMagnitude(H.repeatingBlock(even, odd), b),
+                H(
+                    raw: HighwayReference.minimumMagnitudeF64(
+                        H.repeatingBlock(even, odd).raw,
+                        b.raw
+                    )
+                ),
                 "b: \(describe(b))"
             )
         }
         mismatches.record()
     }
 
+    @Test func minimumMagnitudeConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkMinimumMagnitudeConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func minimumMagnitudeConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkMinimumMagnitudeConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func minimumMagnitudeConstantAAlternatingHalfAndOne() {
+        checkMinimumMagnitudeConstantAAlternating(0.5, 1.0)
+    }
+
     @inline(__always)
-    private func checkMaximumMagnitudeConstantB(_ value: Lane) {
-        let mismatches = Mismatches("maximumMagnitude with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.self, seed: 0x5BDD_A260_ACCF_24A1)
+    private func checkMinimumMagnitudeConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("minimumMagnitude with b alternating \(hex(even)), \(hex(odd))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x307B_AC4F_B8FE_F072)
         mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingF64(value)),
-            "repeating"
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
         )
-        for a in aInputs where !hasUnorderedNaNs(a.simd, H.repeating(value).simd) {
+        for a in aInputs where !hasUnorderedNaNs(a.simd, H.repeatingBlock(even, odd).simd) {
             mismatches.check(
-                H.maximumMagnitude(a, H.repeating(value)),
-                H(raw: HighwayReference.maximumMagnitudeF64(a.raw, H.repeating(value).raw)),
+                H.minimumMagnitude(a, H.repeatingBlock(even, odd)),
+                H(
+                    raw: HighwayReference.minimumMagnitudeF64(
+                        a.raw,
+                        H.repeatingBlock(even, odd).raw
+                    )
+                ),
                 "a: \(describe(a))"
             )
         }
         mismatches.record()
     }
 
-    @Test func maximumMagnitudeConstantSplatZero() {
-        checkMaximumMagnitudeConstantA(0.0)
-        checkMaximumMagnitudeConstantB(0.0)
+    @Test func minimumMagnitudeConstantBAlternatingOneAndMinusTwoPointFive() {
+        checkMinimumMagnitudeConstantBAlternating(1.0, -2.5)
     }
 
-    @Test func maximumMagnitudeConstantSplatNegativeZero() {
-        checkMaximumMagnitudeConstantA(-0.0)
-        checkMaximumMagnitudeConstantB(-0.0)
+    @Test func minimumMagnitudeConstantBAlternatingMinusTwoPointFiveAndHalf() {
+        checkMinimumMagnitudeConstantBAlternating(-2.5, 0.5)
     }
 
-    @Test func maximumMagnitudeConstantSplatOne() {
-        checkMaximumMagnitudeConstantA(1.0)
-        checkMaximumMagnitudeConstantB(1.0)
-    }
-
-    @Test func maximumMagnitudeConstantSplatMinusOne() {
-        checkMaximumMagnitudeConstantA(-1.0)
-        checkMaximumMagnitudeConstantB(-1.0)
-    }
-
-    @Test func maximumMagnitudeConstantSplatTwo() {
-        checkMaximumMagnitudeConstantA(2.0)
-        checkMaximumMagnitudeConstantB(2.0)
-    }
-
-    @Test func maximumMagnitudeConstantSplatHalf() {
-        checkMaximumMagnitudeConstantA(0.5)
-        checkMaximumMagnitudeConstantB(0.5)
-    }
-
-    @Test func maximumMagnitudeConstantSplatFour() {
-        checkMaximumMagnitudeConstantA(4.0)
-        checkMaximumMagnitudeConstantB(4.0)
-    }
-
-    @Test func maximumMagnitudeConstantSplatQuarter() {
-        checkMaximumMagnitudeConstantA(0.25)
-        checkMaximumMagnitudeConstantB(0.25)
-    }
-
-    @Test func maximumMagnitudeConstantSplatOnePointFive() {
-        checkMaximumMagnitudeConstantA(1.5)
-        checkMaximumMagnitudeConstantB(1.5)
-    }
-
-    @Test func maximumMagnitudeConstantSplatMinusTwoPointFive() {
-        checkMaximumMagnitudeConstantA(-2.5)
-        checkMaximumMagnitudeConstantB(-2.5)
-    }
-
-    @Test func maximumMagnitudeConstantSplatInfinity() {
-        checkMaximumMagnitudeConstantA(.infinity)
-        checkMaximumMagnitudeConstantB(.infinity)
-    }
-
-    @Test func maximumMagnitudeConstantSplatMinusInfinity() {
-        checkMaximumMagnitudeConstantA(-.infinity)
-        checkMaximumMagnitudeConstantB(-.infinity)
-    }
-
-    @Test func maximumMagnitudeConstantSplatNaN() {
-        checkMaximumMagnitudeConstantA(.nan)
-        checkMaximumMagnitudeConstantB(.nan)
-    }
-
-    @Test func maximumMagnitudeConstantSplatMinusNaN() {
-        checkMaximumMagnitudeConstantA(-.nan)
-        checkMaximumMagnitudeConstantB(-.nan)
-    }
-
-    @Test func maximumMagnitudeConstantSplatPayloadNaN() {
-        checkMaximumMagnitudeConstantA(Lane(nan: 1, signaling: false))
-        checkMaximumMagnitudeConstantB(Lane(nan: 1, signaling: false))
-    }
-
-    @Test func maximumMagnitudeConstantSplatSignalingNaN() {
-        checkMaximumMagnitudeConstantA(.signalingNaN)
-        checkMaximumMagnitudeConstantB(.signalingNaN)
-    }
-
-    @Test func maximumMagnitudeConstantSplatMinusSignalingNaN() {
-        checkMaximumMagnitudeConstantA(-.signalingNaN)
-        checkMaximumMagnitudeConstantB(-.signalingNaN)
-    }
-
-    @Test func maximumMagnitudeConstantSplatLeastNonzero() {
-        checkMaximumMagnitudeConstantA(.leastNonzeroMagnitude)
-        checkMaximumMagnitudeConstantB(.leastNonzeroMagnitude)
-    }
-
-    @Test func maximumMagnitudeConstantSplatGreatest() {
-        checkMaximumMagnitudeConstantA(.greatestFiniteMagnitude)
-        checkMaximumMagnitudeConstantB(.greatestFiniteMagnitude)
+    @Test func minimumMagnitudeConstantBAlternatingHalfAndOne() {
+        checkMinimumMagnitudeConstantBAlternating(0.5, 1.0)
     }
 }

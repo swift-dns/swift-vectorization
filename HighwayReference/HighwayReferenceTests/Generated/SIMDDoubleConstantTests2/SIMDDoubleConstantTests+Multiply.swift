@@ -140,6 +140,92 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
+    private func checkMultiplyingConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("multiplying with a alternating \(hex(even)), \(hex(odd))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x6F0F_877C_599C_C63C)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for b in bInputs where !hasUnorderedNaNs(H.repeatingBlock(even, odd).simd, b.simd) {
+            mismatches.check(
+                H.multiplying(H.repeatingBlock(even, odd), b),
+                H(raw: HighwayReference.multiplyingF64(H.repeatingBlock(even, odd).raw, b.raw)),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingConstantAAlternatingOneAndMinusTwoPointFive() {
+        withKnownIssue(
+            "In release builds on EMU128 Highway multiplies and divides lane by lane, so the compiler folds the lanes where a constant operand is one and returns a signaling NaN of the other operand as it is, which the port's vector operation quiets"
+        ) {
+            checkMultiplyingConstantAAlternating(1.0, -2.5)
+        } when: {
+            SIMDTarget.targetName == "EMU128" && !assertionsAreEnabled
+        }
+    }
+
+    @Test func multiplyingConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkMultiplyingConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func multiplyingConstantAAlternatingHalfAndOne() {
+        withKnownIssue(
+            "In release builds on EMU128 Highway multiplies and divides lane by lane, so the compiler folds the lanes where a constant operand is one and returns a signaling NaN of the other operand as it is, which the port's vector operation quiets"
+        ) {
+            checkMultiplyingConstantAAlternating(0.5, 1.0)
+        } when: {
+            SIMDTarget.targetName == "EMU128" && !assertionsAreEnabled
+        }
+    }
+
+    @inline(__always)
+    private func checkMultiplyingConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("multiplying with b alternating \(hex(even)), \(hex(odd))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x2EF2_A847_75FA_D95C)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for a in aInputs where !hasUnorderedNaNs(a.simd, H.repeatingBlock(even, odd).simd) {
+            mismatches.check(
+                H.multiplying(a, H.repeatingBlock(even, odd)),
+                H(raw: HighwayReference.multiplyingF64(a.raw, H.repeatingBlock(even, odd).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingConstantBAlternatingOneAndMinusTwoPointFive() {
+        withKnownIssue(
+            "In release builds on EMU128 Highway multiplies and divides lane by lane, so the compiler folds the lanes where a constant operand is one and returns a signaling NaN of the other operand as it is, which the port's vector operation quiets"
+        ) {
+            checkMultiplyingConstantBAlternating(1.0, -2.5)
+        } when: {
+            SIMDTarget.targetName == "EMU128" && !assertionsAreEnabled
+        }
+    }
+
+    @Test func multiplyingConstantBAlternatingMinusTwoPointFiveAndHalf() {
+        checkMultiplyingConstantBAlternating(-2.5, 0.5)
+    }
+
+    @Test func multiplyingConstantBAlternatingHalfAndOne() {
+        withKnownIssue(
+            "In release builds on EMU128 Highway multiplies and divides lane by lane, so the compiler folds the lanes where a constant operand is one and returns a signaling NaN of the other operand as it is, which the port's vector operation quiets"
+        ) {
+            checkMultiplyingConstantBAlternating(0.5, 1.0)
+        } when: {
+            SIMDTarget.targetName == "EMU128" && !assertionsAreEnabled
+        }
+    }
+
+    @inline(__always)
     private func checkMultiplyingRoundedConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyingRounded with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0x2F07_7228_0452_FFD0)
@@ -270,6 +356,82 @@ extension SIMDDoubleConstantTests {
     @Test func multiplyingRoundedConstantSplatGreatest() {
         checkMultiplyingRoundedConstantA(.greatestFiniteMagnitude)
         checkMultiplyingRoundedConstantB(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkMultiplyingRoundedConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "multiplyingRounded with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let bInputs = Inputs.vectors(H.self, seed: 0x6D80_D62E_AFB2_D50D)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for b in bInputs where !hasUnorderedNaNs(H.repeatingBlock(even, odd).simd, b.simd) {
+            mismatches.check(
+                H.multiplyingRounded(H.repeatingBlock(even, odd), b),
+                H(
+                    raw: HighwayReference.multiplyingRoundedF64(
+                        H.repeatingBlock(even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingRoundedConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkMultiplyingRoundedConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func multiplyingRoundedConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkMultiplyingRoundedConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func multiplyingRoundedConstantAAlternatingHalfAndOne() {
+        checkMultiplyingRoundedConstantAAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkMultiplyingRoundedConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "multiplyingRounded with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x0E75_9236_A52F_54B9)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for a in aInputs where !hasUnorderedNaNs(a.simd, H.repeatingBlock(even, odd).simd) {
+            mismatches.check(
+                H.multiplyingRounded(a, H.repeatingBlock(even, odd)),
+                H(
+                    raw: HighwayReference.multiplyingRoundedF64(
+                        a.raw,
+                        H.repeatingBlock(even, odd).raw
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingRoundedConstantBAlternatingOneAndMinusTwoPointFive() {
+        checkMultiplyingRoundedConstantBAlternating(1.0, -2.5)
+    }
+
+    @Test func multiplyingRoundedConstantBAlternatingMinusTwoPointFiveAndHalf() {
+        checkMultiplyingRoundedConstantBAlternating(-2.5, 0.5)
+    }
+
+    @Test func multiplyingRoundedConstantBAlternatingHalfAndOne() {
+        checkMultiplyingRoundedConstantBAlternating(0.5, 1.0)
     }
 
     @inline(__always)

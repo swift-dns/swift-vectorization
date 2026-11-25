@@ -386,4 +386,254 @@ extension SIMDUInt16ConstantTests {
         checkSumsOfAdjacentQuadAbsoluteDifferencesFromUInt8ConstantA(255)
         checkSumsOfAdjacentQuadAbsoluteDifferencesFromUInt8ConstantB(255)
     }
+
+    @inline(__always)
+    private func checkSumsOfAdjacentQuadAbsoluteDifferencesFromUInt8ConstantAAlternating(
+        _ even: UInt8,
+        _ odd: UInt8
+    ) {
+        let mismatches = Mismatches(
+            "sumsOfAdjacentQuadAbsoluteDifferencesFromUInt8 with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let bInputs = Inputs.conversions(SIMD<UInt8>.self, seed: 0xDE75_9BCE_D05A_B329)
+        let aOffsetInputs = Array(0...1)
+        let bOffsetInputs = Array(0...3)
+        mismatches.check(
+            SIMD<UInt8>.repeatingBlock(
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd
+            ),
+            SIMD<UInt8>(
+                raw: HighwayReference.repeatingBlockU8(
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd
+                )
+            ),
+            "repeatingBlock"
+        )
+        for (b, aOffset, bOffset) in mixedTriples(
+            bInputs,
+            aOffsetInputs,
+            bOffsetInputs,
+            seed: 0x2B18_C7EB_BDEF_0DF2
+        ) {
+            mismatches.check(
+                H.sumsOfAdjacentQuadAbsoluteDifferences(
+                    SIMD<UInt8>.repeatingBlock(
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd
+                    ),
+                    b,
+                    aOffset: aOffset,
+                    bOffset: bOffset
+                ),
+                H(
+                    raw: HighwayReference.sumsOfAdjacentQuadAbsoluteDifferencesU8ToU16(
+                        SIMD<UInt8>.repeatingBlock(
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd
+                        ).raw,
+                        b.raw,
+                        Int32(truncatingIfNeeded: aOffset),
+                        Int32(truncatingIfNeeded: bOffset)
+                    )
+                ),
+                "b: \(describe(b)), aOffset: \(aOffset), bOffset: \(bOffset)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func sumsOfAdjacentQuadAbsoluteDifferencesFromUInt8ConstantAAlternating1And26() {
+        checkSumsOfAdjacentQuadAbsoluteDifferencesFromUInt8ConstantAAlternating(1, 26)
+    }
+
+    @Test func sumsOfAdjacentQuadAbsoluteDifferencesFromUInt8ConstantAAlternating26And127() {
+        checkSumsOfAdjacentQuadAbsoluteDifferencesFromUInt8ConstantAAlternating(26, 127)
+    }
+
+    @Test func sumsOfAdjacentQuadAbsoluteDifferencesFromUInt8ConstantAAlternating127And1() {
+        checkSumsOfAdjacentQuadAbsoluteDifferencesFromUInt8ConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkSumsOfAdjacentQuadAbsoluteDifferencesFromUInt8ConstantBAlternating(
+        _ even: UInt8,
+        _ odd: UInt8
+    ) {
+        let mismatches = Mismatches(
+            "sumsOfAdjacentQuadAbsoluteDifferencesFromUInt8 with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.conversions(SIMD<UInt8>.self, seed: 0xAD2B_5B46_D5D6_67F5)
+        let aOffsetInputs = Array(0...1)
+        let bOffsetInputs = Array(0...3)
+        mismatches.check(
+            SIMD<UInt8>.repeatingBlock(
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd
+            ),
+            SIMD<UInt8>(
+                raw: HighwayReference.repeatingBlockU8(
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd
+                )
+            ),
+            "repeatingBlock"
+        )
+        for (a, aOffset, bOffset) in mixedTriples(
+            aInputs,
+            aOffsetInputs,
+            bOffsetInputs,
+            seed: 0xD929_93F7_4FC6_CB27
+        ) {
+            mismatches.check(
+                H.sumsOfAdjacentQuadAbsoluteDifferences(
+                    a,
+                    SIMD<UInt8>.repeatingBlock(
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd
+                    ),
+                    aOffset: aOffset,
+                    bOffset: bOffset
+                ),
+                H(
+                    raw: HighwayReference.sumsOfAdjacentQuadAbsoluteDifferencesU8ToU16(
+                        a.raw,
+                        SIMD<UInt8>.repeatingBlock(
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd
+                        ).raw,
+                        Int32(truncatingIfNeeded: aOffset),
+                        Int32(truncatingIfNeeded: bOffset)
+                    )
+                ),
+                "a: \(describe(a)), aOffset: \(aOffset), bOffset: \(bOffset)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func sumsOfAdjacentQuadAbsoluteDifferencesFromUInt8ConstantBAlternating1And26() {
+        checkSumsOfAdjacentQuadAbsoluteDifferencesFromUInt8ConstantBAlternating(1, 26)
+    }
+
+    @Test func sumsOfAdjacentQuadAbsoluteDifferencesFromUInt8ConstantBAlternating26And127() {
+        checkSumsOfAdjacentQuadAbsoluteDifferencesFromUInt8ConstantBAlternating(26, 127)
+    }
+
+    @Test func sumsOfAdjacentQuadAbsoluteDifferencesFromUInt8ConstantBAlternating127And1() {
+        checkSumsOfAdjacentQuadAbsoluteDifferencesFromUInt8ConstantBAlternating(127, 1)
+    }
 }

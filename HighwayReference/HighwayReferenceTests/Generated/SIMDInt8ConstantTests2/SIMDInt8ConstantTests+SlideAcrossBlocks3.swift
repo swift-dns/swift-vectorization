@@ -7,6 +7,166 @@ import Vectorization
 
 extension SIMDInt8ConstantTests {
     @inline(__always)
+    private func checkSlide1DownConstantA(_ value: Lane) {
+        let mismatches = Mismatches("slide1Down with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI8(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.slide1Down(H.repeating(value)),
+            H(raw: HighwayReference.slide1DownI8(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func slide1DownConstantSplat0() {
+        checkSlide1DownConstantA(0)
+    }
+
+    @Test func slide1DownConstantSplat1() {
+        checkSlide1DownConstantA(1)
+    }
+
+    @Test func slide1DownConstantSplat15() {
+        checkSlide1DownConstantA(15)
+    }
+
+    @Test func slide1DownConstantSplat16() {
+        checkSlide1DownConstantA(16)
+    }
+
+    @Test func slide1DownConstantSplat26() {
+        checkSlide1DownConstantA(26)
+    }
+
+    @Test func slide1DownConstantSplat127() {
+        checkSlide1DownConstantA(127)
+    }
+
+    @Test func slide1DownConstantSplatMinus1() {
+        checkSlide1DownConstantA(-1)
+    }
+
+    @Test func slide1DownConstantSplatMinus16() {
+        checkSlide1DownConstantA(-16)
+    }
+
+    @Test func slide1DownConstantSplatMinus17() {
+        checkSlide1DownConstantA(-17)
+    }
+
+    @Test func slide1DownConstantSplatMinus128() {
+        checkSlide1DownConstantA(-128)
+    }
+
+    @inline(__always)
+    private func checkSlide1DownConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("slide1Down with a alternating \(hex(even)), \(hex(odd))")
+        mismatches.check(
+            H.repeatingBlock(
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd
+            ),
+            H(
+                raw: HighwayReference.repeatingBlockI8(
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd
+                )
+            ),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.slide1Down(
+                H.repeatingBlock(
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd
+                )
+            ),
+            H(
+                raw: HighwayReference.slide1DownI8(
+                    H.repeatingBlock(
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd
+                    ).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func slide1DownConstantAAlternating1And26() {
+        checkSlide1DownConstantAAlternating(1, 26)
+    }
+
+    @Test func slide1DownConstantAAlternating26And127() {
+        checkSlide1DownConstantAAlternating(26, 127)
+    }
+
+    @Test func slide1DownConstantAAlternating127And1() {
+        checkSlide1DownConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
     private func checkSlide1DownFillingWithConstantA(_ value: Lane) {
         let mismatches = Mismatches("slide1DownFillingWith with a repeating \(hex(value))")
         let fillInputs = Inputs.lanes(Lane.self, seed: 0xA9BF_99D9_551D_1406)
@@ -63,6 +223,117 @@ extension SIMDInt8ConstantTests {
 
     @Test func slide1DownFillingWithConstantSplatMinus128() {
         checkSlide1DownFillingWithConstantA(-128)
+    }
+
+    @inline(__always)
+    private func checkSlide1DownFillingWithConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "slide1DownFillingWith with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let fillInputs = Inputs.lanes(Lane.self, seed: 0x8926_F525_C1AD_327D)
+        mismatches.check(
+            H.repeatingBlock(
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd
+            ),
+            H(
+                raw: HighwayReference.repeatingBlockI8(
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd
+                )
+            ),
+            "repeatingBlock"
+        )
+        for fill in fillInputs {
+            mismatches.check(
+                H.slide1Down(
+                    H.repeatingBlock(
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd
+                    ),
+                    fillingWith: fill
+                ),
+                H(
+                    raw: HighwayReference.slide1DownFillingWithI8(
+                        fill,
+                        H.repeatingBlock(
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd
+                        ).raw
+                    )
+                ),
+                "fill: \(hex(fill))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func slide1DownFillingWithConstantAAlternating1And26() {
+        checkSlide1DownFillingWithConstantAAlternating(1, 26)
+    }
+
+    @Test func slide1DownFillingWithConstantAAlternating26And127() {
+        checkSlide1DownFillingWithConstantAAlternating(26, 127)
+    }
+
+    @Test func slide1DownFillingWithConstantAAlternating127And1() {
+        checkSlide1DownFillingWithConstantAAlternating(127, 1)
     }
 
     @inline(__always)

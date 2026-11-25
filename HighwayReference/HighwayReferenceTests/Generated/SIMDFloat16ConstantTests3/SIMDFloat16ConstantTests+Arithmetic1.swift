@@ -325,6 +325,108 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
+    private func checkAddingConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("adding with a alternating \(hex(even)), \(hex(odd))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x2A81_96EB_0BB3_7A98)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(
+                raw: HighwayReference.repeatingBlockF16(
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern
+                )
+            ),
+            "repeatingBlock"
+        )
+        for b in bInputs
+        where !hasUnorderedNaNs(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).simd,
+            b.simd
+        ) {
+            mismatches.check(
+                H.adding(H.repeatingBlock(even, odd, even, odd, even, odd, even, odd), b),
+                H(
+                    raw: HighwayReference.addingF16(
+                        H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func addingConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkAddingConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func addingConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkAddingConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func addingConstantAAlternatingHalfAndOne() {
+        checkAddingConstantAAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkAddingConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("adding with b alternating \(hex(even)), \(hex(odd))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x3D4A_B8D3_86D1_E7A8)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(
+                raw: HighwayReference.repeatingBlockF16(
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern
+                )
+            ),
+            "repeatingBlock"
+        )
+        for a in aInputs
+        where !hasUnorderedNaNs(
+            a.simd,
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).simd
+        ) {
+            mismatches.check(
+                H.adding(a, H.repeatingBlock(even, odd, even, odd, even, odd, even, odd)),
+                H(
+                    raw: HighwayReference.addingF16(
+                        a.raw,
+                        H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func addingConstantBAlternatingOneAndMinusTwoPointFive() {
+        checkAddingConstantBAlternating(1.0, -2.5)
+    }
+
+    @Test func addingConstantBAlternatingMinusTwoPointFiveAndHalf() {
+        checkAddingConstantBAlternating(-2.5, 0.5)
+    }
+
+    @Test func addingConstantBAlternatingHalfAndOne() {
+        checkAddingConstantBAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
     private func checkSubtractingConstantA(_ value: Lane) {
         let mismatches = Mismatches("subtracting with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0xB776_9B41_09D7_15CA)
@@ -494,6 +596,100 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
+    private func checkSubtractingConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("subtracting with a alternating \(hex(even)), \(hex(odd))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x9A10_D023_6F80_0D03)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(
+                raw: HighwayReference.repeatingBlockF16(
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern
+                )
+            ),
+            "repeatingBlock"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.subtracting(H.repeatingBlock(even, odd, even, odd, even, odd, even, odd), b),
+                H(
+                    raw: HighwayReference.subtractingF16(
+                        H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func subtractingConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkSubtractingConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func subtractingConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkSubtractingConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func subtractingConstantAAlternatingHalfAndOne() {
+        checkSubtractingConstantAAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkSubtractingConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("subtracting with b alternating \(hex(even)), \(hex(odd))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x7EBD_3D9D_0780_1B53)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(
+                raw: HighwayReference.repeatingBlockF16(
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern
+                )
+            ),
+            "repeatingBlock"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.subtracting(a, H.repeatingBlock(even, odd, even, odd, even, odd, even, odd)),
+                H(
+                    raw: HighwayReference.subtractingF16(
+                        a.raw,
+                        H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func subtractingConstantBAlternatingOneAndMinusTwoPointFive() {
+        checkSubtractingConstantBAlternating(1.0, -2.5)
+    }
+
+    @Test func subtractingConstantBAlternatingMinusTwoPointFiveAndHalf() {
+        checkSubtractingConstantBAlternating(-2.5, 0.5)
+    }
+
+    @Test func subtractingConstantBAlternatingHalfAndOne() {
+        checkSubtractingConstantBAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
     private func checkDividingConstantA(_ value: Lane) {
         let mismatches = Mismatches("dividing with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0xFA48_B040_7C80_8BF6)
@@ -660,6 +856,100 @@ extension SIMDFloat16ConstantTests {
     @Test func dividingConstantSplatGreatest() {
         checkDividingConstantA(.greatestFiniteMagnitude)
         checkDividingConstantB(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkDividingConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("dividing with a alternating \(hex(even)), \(hex(odd))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x0FB7_5CF3_4519_E3FF)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(
+                raw: HighwayReference.repeatingBlockF16(
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern
+                )
+            ),
+            "repeatingBlock"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.dividing(H.repeatingBlock(even, odd, even, odd, even, odd, even, odd), b),
+                H(
+                    raw: HighwayReference.dividingF16(
+                        H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func dividingConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkDividingConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func dividingConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkDividingConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func dividingConstantAAlternatingHalfAndOne() {
+        checkDividingConstantAAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkDividingConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("dividing with b alternating \(hex(even)), \(hex(odd))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xD896_A857_D1F5_129F)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(
+                raw: HighwayReference.repeatingBlockF16(
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern,
+                    even.bitPattern,
+                    odd.bitPattern
+                )
+            ),
+            "repeatingBlock"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.dividing(a, H.repeatingBlock(even, odd, even, odd, even, odd, even, odd)),
+                H(
+                    raw: HighwayReference.dividingF16(
+                        a.raw,
+                        H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func dividingConstantBAlternatingOneAndMinusTwoPointFive() {
+        checkDividingConstantBAlternating(1.0, -2.5)
+    }
+
+    @Test func dividingConstantBAlternatingMinusTwoPointFiveAndHalf() {
+        checkDividingConstantBAlternating(-2.5, 0.5)
+    }
+
+    @Test func dividingConstantBAlternatingHalfAndOne() {
+        checkDividingConstantBAlternating(0.5, 1.0)
     }
 
     @inline(__always)
@@ -885,141 +1175,6 @@ extension SIMDFloat16ConstantTests {
     @Test func absoluteDifferenceConstantSplatGreatest() {
         checkAbsoluteDifferenceConstantA(.greatestFiniteMagnitude)
         checkAbsoluteDifferenceConstantB(.greatestFiniteMagnitude)
-    }
-
-    @inline(__always)
-    private func checkAddingSubtractingConstantA(_ value: Lane) {
-        let mismatches = Mismatches("addingSubtracting with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.self, seed: 0x083C_95D6_E99C_3BF7)
-        mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
-            "repeating"
-        )
-        for b in bInputs
-        where !hasUnorderedNaNs(alternatingNegation: H.repeating(value).simd, b.simd) {
-            mismatches.check(
-                H.addingSubtracting(H.repeating(value), b),
-                H(raw: HighwayReference.addingSubtractingF16(H.repeating(value).raw, b.raw)),
-                "b: \(describe(b))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @inline(__always)
-    private func checkAddingSubtractingConstantB(_ value: Lane) {
-        let mismatches = Mismatches("addingSubtracting with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.self, seed: 0x10D1_ABD6_EE72_E5F9)
-        mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
-            "repeating"
-        )
-        for a in aInputs
-        where !hasUnorderedNaNs(alternatingNegation: a.simd, H.repeating(value).simd) {
-            mismatches.check(
-                H.addingSubtracting(a, H.repeating(value)),
-                H(raw: HighwayReference.addingSubtractingF16(a.raw, H.repeating(value).raw)),
-                "a: \(describe(a))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func addingSubtractingConstantSplatZero() {
-        checkAddingSubtractingConstantA(0.0)
-        checkAddingSubtractingConstantB(0.0)
-    }
-
-    @Test func addingSubtractingConstantSplatNegativeZero() {
-        checkAddingSubtractingConstantA(-0.0)
-        checkAddingSubtractingConstantB(-0.0)
-    }
-
-    @Test func addingSubtractingConstantSplatOne() {
-        checkAddingSubtractingConstantA(1.0)
-        checkAddingSubtractingConstantB(1.0)
-    }
-
-    @Test func addingSubtractingConstantSplatMinusOne() {
-        checkAddingSubtractingConstantA(-1.0)
-        checkAddingSubtractingConstantB(-1.0)
-    }
-
-    @Test func addingSubtractingConstantSplatTwo() {
-        checkAddingSubtractingConstantA(2.0)
-        checkAddingSubtractingConstantB(2.0)
-    }
-
-    @Test func addingSubtractingConstantSplatHalf() {
-        checkAddingSubtractingConstantA(0.5)
-        checkAddingSubtractingConstantB(0.5)
-    }
-
-    @Test func addingSubtractingConstantSplatFour() {
-        checkAddingSubtractingConstantA(4.0)
-        checkAddingSubtractingConstantB(4.0)
-    }
-
-    @Test func addingSubtractingConstantSplatQuarter() {
-        checkAddingSubtractingConstantA(0.25)
-        checkAddingSubtractingConstantB(0.25)
-    }
-
-    @Test func addingSubtractingConstantSplatOnePointFive() {
-        checkAddingSubtractingConstantA(1.5)
-        checkAddingSubtractingConstantB(1.5)
-    }
-
-    @Test func addingSubtractingConstantSplatMinusTwoPointFive() {
-        checkAddingSubtractingConstantA(-2.5)
-        checkAddingSubtractingConstantB(-2.5)
-    }
-
-    @Test func addingSubtractingConstantSplatInfinity() {
-        checkAddingSubtractingConstantA(.infinity)
-        checkAddingSubtractingConstantB(.infinity)
-    }
-
-    @Test func addingSubtractingConstantSplatMinusInfinity() {
-        checkAddingSubtractingConstantA(-.infinity)
-        checkAddingSubtractingConstantB(-.infinity)
-    }
-
-    @Test func addingSubtractingConstantSplatNaN() {
-        checkAddingSubtractingConstantA(.nan)
-        checkAddingSubtractingConstantB(.nan)
-    }
-
-    @Test func addingSubtractingConstantSplatMinusNaN() {
-        checkAddingSubtractingConstantA(-.nan)
-        checkAddingSubtractingConstantB(-.nan)
-    }
-
-    @Test func addingSubtractingConstantSplatPayloadNaN() {
-        checkAddingSubtractingConstantA(Lane(nan: 1, signaling: false))
-        checkAddingSubtractingConstantB(Lane(nan: 1, signaling: false))
-    }
-
-    @Test func addingSubtractingConstantSplatSignalingNaN() {
-        checkAddingSubtractingConstantA(.signalingNaN)
-        checkAddingSubtractingConstantB(.signalingNaN)
-    }
-
-    @Test func addingSubtractingConstantSplatMinusSignalingNaN() {
-        checkAddingSubtractingConstantA(-.signalingNaN)
-        checkAddingSubtractingConstantB(-.signalingNaN)
-    }
-
-    @Test func addingSubtractingConstantSplatLeastNonzero() {
-        checkAddingSubtractingConstantA(.leastNonzeroMagnitude)
-        checkAddingSubtractingConstantB(.leastNonzeroMagnitude)
-    }
-
-    @Test func addingSubtractingConstantSplatGreatest() {
-        checkAddingSubtractingConstantA(.greatestFiniteMagnitude)
-        checkAddingSubtractingConstantB(.greatestFiniteMagnitude)
     }
 }
 #endif

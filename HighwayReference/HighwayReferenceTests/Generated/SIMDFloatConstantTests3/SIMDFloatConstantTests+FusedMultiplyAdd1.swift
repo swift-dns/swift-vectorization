@@ -962,4 +962,94 @@ extension SIMDFloatConstantTests {
         checkMultiplyAddingSubtractingConstantB(.greatestFiniteMagnitude)
         checkMultiplyAddingSubtractingConstantC(.greatestFiniteMagnitude)
     }
+
+    @inline(__always)
+    private func checkMultiplyAddingSubtractingConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "multiplyAddingSubtracting with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let bInputs = Inputs.vectors(H.self, seed: 0xB346_18AC_2CE1_BE22)
+        let cInputs = Inputs.vectors(H.self, seed: 0xB346_17AC_2CE1_BC6F)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockF32(even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for (b, c) in everyPair(bInputs, cInputs)
+        where !hasUnorderedNaNs(
+            multiplying: H.repeatingBlock(even, odd, even, odd).simd,
+            b.simd,
+            adding: c.simd
+        ) {
+            mismatches.check(
+                H.multiplyAddingSubtracting(H.repeatingBlock(even, odd, even, odd), b, c),
+                H(
+                    raw: HighwayReference.multiplyAddingSubtractingF32(
+                        H.repeatingBlock(even, odd, even, odd).raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
+                "b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyAddingSubtractingConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkMultiplyAddingSubtractingConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func multiplyAddingSubtractingConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkMultiplyAddingSubtractingConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func multiplyAddingSubtractingConstantAAlternatingHalfAndOne() {
+        checkMultiplyAddingSubtractingConstantAAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkMultiplyAddingSubtractingConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "multiplyAddingSubtracting with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x1DA7_788F_D0FA_7556)
+        let cInputs = Inputs.vectors(H.self, seed: 0x1DA7_768F_D0FA_71F0)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockF32(even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for (a, c) in everyPair(aInputs, cInputs)
+        where !hasUnorderedNaNs(
+            multiplying: a.simd,
+            H.repeatingBlock(even, odd, even, odd).simd,
+            adding: c.simd
+        ) {
+            mismatches.check(
+                H.multiplyAddingSubtracting(a, H.repeatingBlock(even, odd, even, odd), c),
+                H(
+                    raw: HighwayReference.multiplyAddingSubtractingF32(
+                        a.raw,
+                        H.repeatingBlock(even, odd, even, odd).raw,
+                        c.raw
+                    )
+                ),
+                "a: \(describe(a)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyAddingSubtractingConstantBAlternatingOneAndMinusTwoPointFive() {
+        checkMultiplyAddingSubtractingConstantBAlternating(1.0, -2.5)
+    }
+
+    @Test func multiplyAddingSubtractingConstantBAlternatingMinusTwoPointFiveAndHalf() {
+        checkMultiplyAddingSubtractingConstantBAlternating(-2.5, 0.5)
+    }
+
+    @Test func multiplyAddingSubtractingConstantBAlternatingHalfAndOne() {
+        checkMultiplyAddingSubtractingConstantBAlternating(0.5, 1.0)
+    }
 }

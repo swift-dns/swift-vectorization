@@ -99,6 +99,34 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
+    private func checkSmallestConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("smallest with a alternating \(hex(even)), \(hex(odd))")
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockI64(even, odd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.smallest(H.repeatingBlock(even, odd)),
+            HighwayReference.smallestI64(H.repeatingBlock(even, odd).raw),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func smallestConstantAAlternating1And26() {
+        checkSmallestConstantAAlternating(1, 26)
+    }
+
+    @Test func smallestConstantAAlternating26And127() {
+        checkSmallestConstantAAlternating(26, 127)
+    }
+
+    @Test func smallestConstantAAlternating127And1() {
+        checkSmallestConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
     private func checkLargestConstantA(_ value: Lane) {
         let mismatches = Mismatches("largest with a repeating \(hex(value))")
         mismatches.check(
@@ -188,5 +216,33 @@ extension SIMDInt64ConstantTests {
 
     @Test func largestConstantSplatMin() {
         checkLargestConstantA(Lane.min)
+    }
+
+    @inline(__always)
+    private func checkLargestConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("largest with a alternating \(hex(even)), \(hex(odd))")
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockI64(even, odd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.largest(H.repeatingBlock(even, odd)),
+            HighwayReference.largestI64(H.repeatingBlock(even, odd).raw),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func largestConstantAAlternating1And26() {
+        checkLargestConstantAAlternating(1, 26)
+    }
+
+    @Test func largestConstantAAlternating26And127() {
+        checkLargestConstantAAlternating(26, 127)
+    }
+
+    @Test func largestConstantAAlternating127And1() {
+        checkLargestConstantAAlternating(127, 1)
     }
 }

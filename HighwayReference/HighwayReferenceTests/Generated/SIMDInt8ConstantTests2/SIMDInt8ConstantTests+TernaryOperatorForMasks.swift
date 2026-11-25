@@ -430,4 +430,232 @@ extension SIMDInt8ConstantTests {
         checkSelectingByVectorConstantB(-128)
         checkSelectingByVectorConstantC(-128)
     }
+
+    @inline(__always)
+    private func checkSelectingByVectorConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "selectingByVector with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x7467_9591_F62F_0BAB)
+        let cInputs = Inputs.vectors(H.self, seed: 0x7467_9791_F62F_0F11)
+        mismatches.check(
+            H.repeatingBlock(
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd
+            ),
+            H(
+                raw: HighwayReference.repeatingBlockI8(
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd
+                )
+            ),
+            "repeatingBlock"
+        )
+        for (a, c) in everyPair(aInputs, cInputs) {
+            mismatches.check(
+                H.selecting(
+                    a,
+                    H.repeatingBlock(
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd
+                    ),
+                    c
+                ),
+                H(
+                    raw: HighwayReference.selectingByVectorI8(
+                        a.raw,
+                        H.repeatingBlock(
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd
+                        ).raw,
+                        c.raw
+                    )
+                ),
+                "a: \(describe(a)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func selectingByVectorConstantBAlternating1And26() {
+        checkSelectingByVectorConstantBAlternating(1, 26)
+    }
+
+    @Test func selectingByVectorConstantBAlternating26And127() {
+        checkSelectingByVectorConstantBAlternating(26, 127)
+    }
+
+    @Test func selectingByVectorConstantBAlternating127And1() {
+        checkSelectingByVectorConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkSelectingByVectorConstantCAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "selectingByVector with c alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x9D98_CF4E_35F3_A522)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9D98_D04E_35F3_A6D5)
+        mismatches.check(
+            H.repeatingBlock(
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd
+            ),
+            H(
+                raw: HighwayReference.repeatingBlockI8(
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd
+                )
+            ),
+            "repeatingBlock"
+        )
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.selecting(
+                    a,
+                    b,
+                    H.repeatingBlock(
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd
+                    )
+                ),
+                H(
+                    raw: HighwayReference.selectingByVectorI8(
+                        a.raw,
+                        b.raw,
+                        H.repeatingBlock(
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd
+                        ).raw
+                    )
+                ),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func selectingByVectorConstantCAlternating1And26() {
+        checkSelectingByVectorConstantCAlternating(1, 26)
+    }
+
+    @Test func selectingByVectorConstantCAlternating26And127() {
+        checkSelectingByVectorConstantCAlternating(26, 127)
+    }
+
+    @Test func selectingByVectorConstantCAlternating127And1() {
+        checkSelectingByVectorConstantCAlternating(127, 1)
+    }
 }

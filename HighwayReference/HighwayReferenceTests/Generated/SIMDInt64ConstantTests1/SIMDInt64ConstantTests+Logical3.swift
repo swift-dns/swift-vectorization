@@ -7,6 +7,374 @@ import Vectorization
 
 extension SIMDInt64ConstantTests {
     @inline(__always)
+    private func checkAllBitsSetConstantA(_ value: Lane) {
+        let mismatches = Mismatches("allBitsSet with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI64(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.allBitsSet(H.repeating(value)),
+            HighwayReference.allBitsSetI64(H.repeating(value).raw),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func allBitsSetConstantSplat0() {
+        checkAllBitsSetConstantA(0)
+    }
+
+    @Test func allBitsSetConstantSplat1() {
+        checkAllBitsSetConstantA(1)
+    }
+
+    @Test func allBitsSetConstantSplat15() {
+        checkAllBitsSetConstantA(15)
+    }
+
+    @Test func allBitsSetConstantSplat16() {
+        checkAllBitsSetConstantA(16)
+    }
+
+    @Test func allBitsSetConstantSplat26() {
+        checkAllBitsSetConstantA(26)
+    }
+
+    @Test func allBitsSetConstantSplat127() {
+        checkAllBitsSetConstantA(127)
+    }
+
+    @Test func allBitsSetConstantSplat128() {
+        checkAllBitsSetConstantA(128)
+    }
+
+    @Test func allBitsSetConstantSplat255() {
+        checkAllBitsSetConstantA(255)
+    }
+
+    @Test func allBitsSetConstantSplat256() {
+        checkAllBitsSetConstantA(256)
+    }
+
+    @Test func allBitsSetConstantSplat257() {
+        checkAllBitsSetConstantA(257)
+    }
+
+    @Test func allBitsSetConstantSplat65280() {
+        checkAllBitsSetConstantA(65280)
+    }
+
+    @Test func allBitsSetConstantSplat65281() {
+        checkAllBitsSetConstantA(65281)
+    }
+
+    @Test func allBitsSetConstantSplatMinus1() {
+        checkAllBitsSetConstantA(-1)
+    }
+
+    @Test func allBitsSetConstantSplatMinus16() {
+        checkAllBitsSetConstantA(-16)
+    }
+
+    @Test func allBitsSetConstantSplatMinus17() {
+        checkAllBitsSetConstantA(-17)
+    }
+
+    @Test func allBitsSetConstantSplatMinus128() {
+        checkAllBitsSetConstantA(-128)
+    }
+
+    @Test func allBitsSetConstantSplatMinus129() {
+        checkAllBitsSetConstantA(-129)
+    }
+
+    @Test func allBitsSetConstantSplatMax() {
+        checkAllBitsSetConstantA(Lane.max)
+    }
+
+    @Test func allBitsSetConstantSplatMin() {
+        checkAllBitsSetConstantA(Lane.min)
+    }
+
+    @inline(__always)
+    private func checkAllBitsClearConstantA(_ value: Lane) {
+        let mismatches = Mismatches("allBitsClear with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI64(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.allBitsClear(H.repeating(value)),
+            HighwayReference.allBitsClearI64(H.repeating(value).raw),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func allBitsClearConstantSplat0() {
+        checkAllBitsClearConstantA(0)
+    }
+
+    @Test func allBitsClearConstantSplat1() {
+        checkAllBitsClearConstantA(1)
+    }
+
+    @Test func allBitsClearConstantSplat15() {
+        checkAllBitsClearConstantA(15)
+    }
+
+    @Test func allBitsClearConstantSplat16() {
+        checkAllBitsClearConstantA(16)
+    }
+
+    @Test func allBitsClearConstantSplat26() {
+        checkAllBitsClearConstantA(26)
+    }
+
+    @Test func allBitsClearConstantSplat127() {
+        checkAllBitsClearConstantA(127)
+    }
+
+    @Test func allBitsClearConstantSplat128() {
+        checkAllBitsClearConstantA(128)
+    }
+
+    @Test func allBitsClearConstantSplat255() {
+        checkAllBitsClearConstantA(255)
+    }
+
+    @Test func allBitsClearConstantSplat256() {
+        checkAllBitsClearConstantA(256)
+    }
+
+    @Test func allBitsClearConstantSplat257() {
+        checkAllBitsClearConstantA(257)
+    }
+
+    @Test func allBitsClearConstantSplat65280() {
+        checkAllBitsClearConstantA(65280)
+    }
+
+    @Test func allBitsClearConstantSplat65281() {
+        checkAllBitsClearConstantA(65281)
+    }
+
+    @Test func allBitsClearConstantSplatMinus1() {
+        checkAllBitsClearConstantA(-1)
+    }
+
+    @Test func allBitsClearConstantSplatMinus16() {
+        checkAllBitsClearConstantA(-16)
+    }
+
+    @Test func allBitsClearConstantSplatMinus17() {
+        checkAllBitsClearConstantA(-17)
+    }
+
+    @Test func allBitsClearConstantSplatMinus128() {
+        checkAllBitsClearConstantA(-128)
+    }
+
+    @Test func allBitsClearConstantSplatMinus129() {
+        checkAllBitsClearConstantA(-129)
+    }
+
+    @Test func allBitsClearConstantSplatMax() {
+        checkAllBitsClearConstantA(Lane.max)
+    }
+
+    @Test func allBitsClearConstantSplatMin() {
+        checkAllBitsClearConstantA(Lane.min)
+    }
+
+    @inline(__always)
+    private func checkLeadingZeroBitCountConstantA(_ value: Lane) {
+        let mismatches = Mismatches("leadingZeroBitCount with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI64(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.leadingZeroBitCount(H.repeating(value)),
+            H(raw: HighwayReference.leadingZeroBitCountI64(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func leadingZeroBitCountConstantSplat0() {
+        checkLeadingZeroBitCountConstantA(0)
+    }
+
+    @Test func leadingZeroBitCountConstantSplat1() {
+        checkLeadingZeroBitCountConstantA(1)
+    }
+
+    @Test func leadingZeroBitCountConstantSplat15() {
+        checkLeadingZeroBitCountConstantA(15)
+    }
+
+    @Test func leadingZeroBitCountConstantSplat16() {
+        checkLeadingZeroBitCountConstantA(16)
+    }
+
+    @Test func leadingZeroBitCountConstantSplat26() {
+        checkLeadingZeroBitCountConstantA(26)
+    }
+
+    @Test func leadingZeroBitCountConstantSplat127() {
+        checkLeadingZeroBitCountConstantA(127)
+    }
+
+    @Test func leadingZeroBitCountConstantSplat128() {
+        checkLeadingZeroBitCountConstantA(128)
+    }
+
+    @Test func leadingZeroBitCountConstantSplat255() {
+        checkLeadingZeroBitCountConstantA(255)
+    }
+
+    @Test func leadingZeroBitCountConstantSplat256() {
+        checkLeadingZeroBitCountConstantA(256)
+    }
+
+    @Test func leadingZeroBitCountConstantSplat257() {
+        checkLeadingZeroBitCountConstantA(257)
+    }
+
+    @Test func leadingZeroBitCountConstantSplat65280() {
+        checkLeadingZeroBitCountConstantA(65280)
+    }
+
+    @Test func leadingZeroBitCountConstantSplat65281() {
+        checkLeadingZeroBitCountConstantA(65281)
+    }
+
+    @Test func leadingZeroBitCountConstantSplatMinus1() {
+        checkLeadingZeroBitCountConstantA(-1)
+    }
+
+    @Test func leadingZeroBitCountConstantSplatMinus16() {
+        checkLeadingZeroBitCountConstantA(-16)
+    }
+
+    @Test func leadingZeroBitCountConstantSplatMinus17() {
+        checkLeadingZeroBitCountConstantA(-17)
+    }
+
+    @Test func leadingZeroBitCountConstantSplatMinus128() {
+        checkLeadingZeroBitCountConstantA(-128)
+    }
+
+    @Test func leadingZeroBitCountConstantSplatMinus129() {
+        checkLeadingZeroBitCountConstantA(-129)
+    }
+
+    @Test func leadingZeroBitCountConstantSplatMax() {
+        checkLeadingZeroBitCountConstantA(Lane.max)
+    }
+
+    @Test func leadingZeroBitCountConstantSplatMin() {
+        checkLeadingZeroBitCountConstantA(Lane.min)
+    }
+
+    @inline(__always)
+    private func checkTrailingZeroBitCountConstantA(_ value: Lane) {
+        let mismatches = Mismatches("trailingZeroBitCount with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI64(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.trailingZeroBitCount(H.repeating(value)),
+            H(raw: HighwayReference.trailingZeroBitCountI64(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func trailingZeroBitCountConstantSplat0() {
+        checkTrailingZeroBitCountConstantA(0)
+    }
+
+    @Test func trailingZeroBitCountConstantSplat1() {
+        checkTrailingZeroBitCountConstantA(1)
+    }
+
+    @Test func trailingZeroBitCountConstantSplat15() {
+        checkTrailingZeroBitCountConstantA(15)
+    }
+
+    @Test func trailingZeroBitCountConstantSplat16() {
+        checkTrailingZeroBitCountConstantA(16)
+    }
+
+    @Test func trailingZeroBitCountConstantSplat26() {
+        checkTrailingZeroBitCountConstantA(26)
+    }
+
+    @Test func trailingZeroBitCountConstantSplat127() {
+        checkTrailingZeroBitCountConstantA(127)
+    }
+
+    @Test func trailingZeroBitCountConstantSplat128() {
+        checkTrailingZeroBitCountConstantA(128)
+    }
+
+    @Test func trailingZeroBitCountConstantSplat255() {
+        checkTrailingZeroBitCountConstantA(255)
+    }
+
+    @Test func trailingZeroBitCountConstantSplat256() {
+        checkTrailingZeroBitCountConstantA(256)
+    }
+
+    @Test func trailingZeroBitCountConstantSplat257() {
+        checkTrailingZeroBitCountConstantA(257)
+    }
+
+    @Test func trailingZeroBitCountConstantSplat65280() {
+        checkTrailingZeroBitCountConstantA(65280)
+    }
+
+    @Test func trailingZeroBitCountConstantSplat65281() {
+        checkTrailingZeroBitCountConstantA(65281)
+    }
+
+    @Test func trailingZeroBitCountConstantSplatMinus1() {
+        checkTrailingZeroBitCountConstantA(-1)
+    }
+
+    @Test func trailingZeroBitCountConstantSplatMinus16() {
+        checkTrailingZeroBitCountConstantA(-16)
+    }
+
+    @Test func trailingZeroBitCountConstantSplatMinus17() {
+        checkTrailingZeroBitCountConstantA(-17)
+    }
+
+    @Test func trailingZeroBitCountConstantSplatMinus128() {
+        checkTrailingZeroBitCountConstantA(-128)
+    }
+
+    @Test func trailingZeroBitCountConstantSplatMinus129() {
+        checkTrailingZeroBitCountConstantA(-129)
+    }
+
+    @Test func trailingZeroBitCountConstantSplatMax() {
+        checkTrailingZeroBitCountConstantA(Lane.max)
+    }
+
+    @Test func trailingZeroBitCountConstantSplatMin() {
+        checkTrailingZeroBitCountConstantA(Lane.min)
+    }
+
+    @inline(__always)
     private func checkHighestSetBitIndexConstantA(_ value: Lane) {
         let mismatches = Mismatches("highestSetBitIndex with a repeating \(hex(value))")
         mismatches.check(
@@ -329,5 +697,43 @@ extension SIMDInt64ConstantTests {
     @Test func negatingIfNegativeConstantSplatMin() {
         checkNegatingIfNegativeConstantA(Lane.min)
         checkNegatingIfNegativeConstantB(Lane.min)
+    }
+
+    @inline(__always)
+    private func checkNegatingIfNegativeConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "negatingIfNegative with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let bInputs = Inputs.vectors(H.self, seed: 0xEC66_DA70_DF90_4BAC)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockI64(even, odd)),
+            "repeatingBlock"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.negatingIfNegative(H.repeatingBlock(even, odd), b),
+                H(
+                    raw: HighwayReference.negatingIfNegativeI64(
+                        H.repeatingBlock(even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func negatingIfNegativeConstantAAlternating1And26() {
+        checkNegatingIfNegativeConstantAAlternating(1, 26)
+    }
+
+    @Test func negatingIfNegativeConstantAAlternating26And127() {
+        checkNegatingIfNegativeConstantAAlternating(26, 127)
+    }
+
+    @Test func negatingIfNegativeConstantAAlternating127And1() {
+        checkNegatingIfNegativeConstantAAlternating(127, 1)
     }
 }

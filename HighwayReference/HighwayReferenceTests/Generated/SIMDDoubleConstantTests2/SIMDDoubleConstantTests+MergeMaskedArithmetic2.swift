@@ -7,6 +7,335 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
+    private func checkMultiplyingWhereOtherwiseConstantOtherwise(_ value: Lane) {
+        let mismatches = Mismatches(
+            "multiplyingWhereOtherwise with otherwise repeating \(hex(value))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x55D2_BB4B_77AF_D62F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x55D2_BC4B_77AF_D7E2)
+        let bInputs = Inputs.vectors(H.self, seed: 0x55D2_BD4B_77AF_D995)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x2389_9918_175B_9D50)
+        where !hasUnorderedNaNs(a.simd, b.simd) {
+            mismatches.check(
+                H.multiplying(a, b, where: mask, otherwise: H.repeating(value)),
+                H(
+                    raw: HighwayReference.multiplyingWhereOtherwiseF64(
+                        H.repeating(value).raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkMultiplyingWhereOtherwiseConstantA(_ value: Lane) {
+        let mismatches = Mismatches("multiplyingWhereOtherwise with a repeating \(hex(value))")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xC7DF_C223_94A6_1C05)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC7DF_C123_94A6_1A52)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC7DF_BF23_94A6_16EC)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        for (otherwise, mask, b) in mixedTriples(
+            otherwiseInputs,
+            maskInputs,
+            bInputs,
+            seed: 0x5AD4_DB1B_8C48_05F7
+        ) where !hasUnorderedNaNs(H.repeating(value).simd, b.simd) {
+            mismatches.check(
+                H.multiplying(H.repeating(value), b, where: mask, otherwise: otherwise),
+                H(
+                    raw: HighwayReference.multiplyingWhereOtherwiseF64(
+                        otherwise.raw,
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw
+                    )
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkMultiplyingWhereOtherwiseConstantB(_ value: Lane) {
+        let mismatches = Mismatches("multiplyingWhereOtherwise with b repeating \(hex(value))")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xBEDE_0B23_8F73_4190)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xBEDE_0C23_8F73_4343)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBEDE_0D23_8F73_44F6)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        for (otherwise, mask, a) in mixedTriples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            seed: 0x3D11_27C4_115B_A5CC
+        ) where !hasUnorderedNaNs(a.simd, H.repeating(value).simd) {
+            mismatches.check(
+                H.multiplying(a, H.repeating(value), where: mask, otherwise: otherwise),
+                H(
+                    raw: HighwayReference.multiplyingWhereOtherwiseF64(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw
+                    )
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantSplatZero() {
+        checkMultiplyingWhereOtherwiseConstantOtherwise(0.0)
+        checkMultiplyingWhereOtherwiseConstantA(0.0)
+        checkMultiplyingWhereOtherwiseConstantB(0.0)
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantSplatNegativeZero() {
+        checkMultiplyingWhereOtherwiseConstantOtherwise(-0.0)
+        checkMultiplyingWhereOtherwiseConstantA(-0.0)
+        checkMultiplyingWhereOtherwiseConstantB(-0.0)
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantSplatOne() {
+        checkMultiplyingWhereOtherwiseConstantOtherwise(1.0)
+        checkMultiplyingWhereOtherwiseConstantA(1.0)
+        checkMultiplyingWhereOtherwiseConstantB(1.0)
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantSplatMinusOne() {
+        checkMultiplyingWhereOtherwiseConstantOtherwise(-1.0)
+        checkMultiplyingWhereOtherwiseConstantA(-1.0)
+        checkMultiplyingWhereOtherwiseConstantB(-1.0)
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantSplatTwo() {
+        checkMultiplyingWhereOtherwiseConstantOtherwise(2.0)
+        checkMultiplyingWhereOtherwiseConstantA(2.0)
+        checkMultiplyingWhereOtherwiseConstantB(2.0)
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantSplatHalf() {
+        checkMultiplyingWhereOtherwiseConstantOtherwise(0.5)
+        checkMultiplyingWhereOtherwiseConstantA(0.5)
+        checkMultiplyingWhereOtherwiseConstantB(0.5)
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantSplatFour() {
+        checkMultiplyingWhereOtherwiseConstantOtherwise(4.0)
+        checkMultiplyingWhereOtherwiseConstantA(4.0)
+        checkMultiplyingWhereOtherwiseConstantB(4.0)
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantSplatQuarter() {
+        checkMultiplyingWhereOtherwiseConstantOtherwise(0.25)
+        checkMultiplyingWhereOtherwiseConstantA(0.25)
+        checkMultiplyingWhereOtherwiseConstantB(0.25)
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantSplatOnePointFive() {
+        checkMultiplyingWhereOtherwiseConstantOtherwise(1.5)
+        checkMultiplyingWhereOtherwiseConstantA(1.5)
+        checkMultiplyingWhereOtherwiseConstantB(1.5)
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantSplatMinusTwoPointFive() {
+        checkMultiplyingWhereOtherwiseConstantOtherwise(-2.5)
+        checkMultiplyingWhereOtherwiseConstantA(-2.5)
+        checkMultiplyingWhereOtherwiseConstantB(-2.5)
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantSplatInfinity() {
+        checkMultiplyingWhereOtherwiseConstantOtherwise(.infinity)
+        checkMultiplyingWhereOtherwiseConstantA(.infinity)
+        checkMultiplyingWhereOtherwiseConstantB(.infinity)
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantSplatMinusInfinity() {
+        checkMultiplyingWhereOtherwiseConstantOtherwise(-.infinity)
+        checkMultiplyingWhereOtherwiseConstantA(-.infinity)
+        checkMultiplyingWhereOtherwiseConstantB(-.infinity)
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantSplatNaN() {
+        checkMultiplyingWhereOtherwiseConstantOtherwise(.nan)
+        checkMultiplyingWhereOtherwiseConstantA(.nan)
+        checkMultiplyingWhereOtherwiseConstantB(.nan)
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantSplatMinusNaN() {
+        checkMultiplyingWhereOtherwiseConstantOtherwise(-.nan)
+        checkMultiplyingWhereOtherwiseConstantA(-.nan)
+        checkMultiplyingWhereOtherwiseConstantB(-.nan)
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantSplatPayloadNaN() {
+        checkMultiplyingWhereOtherwiseConstantOtherwise(Lane(nan: 1, signaling: false))
+        checkMultiplyingWhereOtherwiseConstantA(Lane(nan: 1, signaling: false))
+        checkMultiplyingWhereOtherwiseConstantB(Lane(nan: 1, signaling: false))
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantSplatSignalingNaN() {
+        checkMultiplyingWhereOtherwiseConstantOtherwise(.signalingNaN)
+        checkMultiplyingWhereOtherwiseConstantA(.signalingNaN)
+        checkMultiplyingWhereOtherwiseConstantB(.signalingNaN)
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantSplatMinusSignalingNaN() {
+        checkMultiplyingWhereOtherwiseConstantOtherwise(-.signalingNaN)
+        checkMultiplyingWhereOtherwiseConstantA(-.signalingNaN)
+        checkMultiplyingWhereOtherwiseConstantB(-.signalingNaN)
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantSplatLeastNonzero() {
+        checkMultiplyingWhereOtherwiseConstantOtherwise(.leastNonzeroMagnitude)
+        checkMultiplyingWhereOtherwiseConstantA(.leastNonzeroMagnitude)
+        checkMultiplyingWhereOtherwiseConstantB(.leastNonzeroMagnitude)
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantSplatGreatest() {
+        checkMultiplyingWhereOtherwiseConstantOtherwise(.greatestFiniteMagnitude)
+        checkMultiplyingWhereOtherwiseConstantA(.greatestFiniteMagnitude)
+        checkMultiplyingWhereOtherwiseConstantB(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkMultiplyingWhereOtherwiseConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "multiplyingWhereOtherwise with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x8092_8E09_2202_F428)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8092_8F09_2202_F5DB)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8092_9109_2202_F941)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for (otherwise, mask, b) in mixedTriples(
+            otherwiseInputs,
+            maskInputs,
+            bInputs,
+            seed: 0x173C_6B3C_A625_9EA4
+        ) where !hasUnorderedNaNs(H.repeatingBlock(even, odd).simd, b.simd) {
+            mismatches.check(
+                H.multiplying(H.repeatingBlock(even, odd), b, where: mask, otherwise: otherwise),
+                H(
+                    raw: HighwayReference.multiplyingWhereOtherwiseF64(
+                        otherwise.raw,
+                        mask.raw,
+                        H.repeatingBlock(even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantAAlternatingOneAndMinusTwoPointFive() {
+        withKnownIssue(
+            "In release builds on EMU128 Highway multiplies and divides lane by lane, so the compiler folds the lanes where a constant operand is one and returns a signaling NaN of the other operand as it is, which the port's vector operation quiets"
+        ) {
+            checkMultiplyingWhereOtherwiseConstantAAlternating(1.0, -2.5)
+        } when: {
+            SIMDTarget.targetName == "EMU128" && !assertionsAreEnabled
+        }
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkMultiplyingWhereOtherwiseConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantAAlternatingHalfAndOne() {
+        withKnownIssue(
+            "In release builds on EMU128 Highway multiplies and divides lane by lane, so the compiler folds the lanes where a constant operand is one and returns a signaling NaN of the other operand as it is, which the port's vector operation quiets"
+        ) {
+            checkMultiplyingWhereOtherwiseConstantAAlternating(0.5, 1.0)
+        } when: {
+            SIMDTarget.targetName == "EMU128" && !assertionsAreEnabled
+        }
+    }
+
+    @inline(__always)
+    private func checkMultiplyingWhereOtherwiseConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "multiplyingWhereOtherwise with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x6DC9_6D20_A6E4_88CB)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6DC9_6C20_A6E4_8718)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6DC9_6F20_A6E4_8C31)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for (otherwise, mask, a) in mixedTriples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            seed: 0x8ADE_79B2_2C6D_B72D
+        ) where !hasUnorderedNaNs(a.simd, H.repeatingBlock(even, odd).simd) {
+            mismatches.check(
+                H.multiplying(a, H.repeatingBlock(even, odd), where: mask, otherwise: otherwise),
+                H(
+                    raw: HighwayReference.multiplyingWhereOtherwiseF64(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        H.repeatingBlock(even, odd).raw
+                    )
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantBAlternatingOneAndMinusTwoPointFive() {
+        withKnownIssue(
+            "In release builds on EMU128 Highway multiplies and divides lane by lane, so the compiler folds the lanes where a constant operand is one and returns a signaling NaN of the other operand as it is, which the port's vector operation quiets"
+        ) {
+            checkMultiplyingWhereOtherwiseConstantBAlternating(1.0, -2.5)
+        } when: {
+            SIMDTarget.targetName == "EMU128" && !assertionsAreEnabled
+        }
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantBAlternatingMinusTwoPointFiveAndHalf() {
+        checkMultiplyingWhereOtherwiseConstantBAlternating(-2.5, 0.5)
+    }
+
+    @Test func multiplyingWhereOtherwiseConstantBAlternatingHalfAndOne() {
+        withKnownIssue(
+            "In release builds on EMU128 Highway multiplies and divides lane by lane, so the compiler folds the lanes where a constant operand is one and returns a signaling NaN of the other operand as it is, which the port's vector operation quiets"
+        ) {
+            checkMultiplyingWhereOtherwiseConstantBAlternating(0.5, 1.0)
+        } when: {
+            SIMDTarget.targetName == "EMU128" && !assertionsAreEnabled
+        }
+    }
+
+    @inline(__always)
     private func checkDividingWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches("dividingWhereOtherwise with otherwise repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x67D0_8E95_6AAE_AA85)
@@ -213,6 +542,100 @@ extension SIMDDoubleConstantTests {
         checkDividingWhereOtherwiseConstantOtherwise(.greatestFiniteMagnitude)
         checkDividingWhereOtherwiseConstantA(.greatestFiniteMagnitude)
         checkDividingWhereOtherwiseConstantB(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkDividingWhereOtherwiseConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "dividingWhereOtherwise with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x2E1E_9584_A38F_7672)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x2E1E_9684_A38F_7825)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2E1E_9484_A38F_74BF)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for (otherwise, mask, b) in mixedTriples(
+            otherwiseInputs,
+            maskInputs,
+            bInputs,
+            seed: 0x7D2D_584F_EB37_3DB6
+        ) {
+            mismatches.check(
+                H.dividing(H.repeatingBlock(even, odd), b, where: mask, otherwise: otherwise),
+                H(
+                    raw: HighwayReference.dividingWhereOtherwiseF64(
+                        otherwise.raw,
+                        mask.raw,
+                        H.repeatingBlock(even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func dividingWhereOtherwiseConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkDividingWhereOtherwiseConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func dividingWhereOtherwiseConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkDividingWhereOtherwiseConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func dividingWhereOtherwiseConstantAAlternatingHalfAndOne() {
+        checkDividingWhereOtherwiseConstantAAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkDividingWhereOtherwiseConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "dividingWhereOtherwise with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x70B5_4ADE_E0C6_A331)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x70B5_49DE_E0C6_A17E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x70B5_48DE_E0C6_9FCB)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for (otherwise, mask, a) in mixedTriples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            seed: 0x4315_006B_D96A_F66B
+        ) {
+            mismatches.check(
+                H.dividing(a, H.repeatingBlock(even, odd), where: mask, otherwise: otherwise),
+                H(
+                    raw: HighwayReference.dividingWhereOtherwiseF64(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        H.repeatingBlock(even, odd).raw
+                    )
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func dividingWhereOtherwiseConstantBAlternatingOneAndMinusTwoPointFive() {
+        checkDividingWhereOtherwiseConstantBAlternating(1.0, -2.5)
+    }
+
+    @Test func dividingWhereOtherwiseConstantBAlternatingMinusTwoPointFiveAndHalf() {
+        checkDividingWhereOtherwiseConstantBAlternating(-2.5, 0.5)
+    }
+
+    @Test func dividingWhereOtherwiseConstantBAlternatingHalfAndOne() {
+        checkDividingWhereOtherwiseConstantBAlternating(0.5, 1.0)
     }
 
     @inline(__always)
@@ -1080,310 +1503,5 @@ extension SIMDDoubleConstantTests {
         checkNegatedMultiplyAddingWhereOtherwiseConstantA(.greatestFiniteMagnitude)
         checkNegatedMultiplyAddingWhereOtherwiseConstantB(.greatestFiniteMagnitude)
         checkNegatedMultiplyAddingWhereOtherwiseConstantC(.greatestFiniteMagnitude)
-    }
-
-    @inline(__always)
-    private func checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(_ value: Lane) {
-        let mismatches = Mismatches(
-            "negatedMultiplySubtractingWhereOtherwise with otherwise repeating \(hex(value))"
-        )
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x4412_3453_A67C_64E5)
-        let aInputs = Inputs.vectors(H.self, seed: 0x4412_3153_A67C_5FCC)
-        let bInputs = Inputs.vectors(H.self, seed: 0x4412_3253_A67C_617F)
-        let cInputs = Inputs.vectors(H.self, seed: 0x4412_2F53_A67C_5C66)
-        mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingF64(value)),
-            "repeating"
-        )
-        for (mask, a, b, c) in mixedQuadruples(
-            maskInputs,
-            aInputs,
-            bInputs,
-            cInputs,
-            seed: 0x57EB_639B_2DF8_0CF6
-        ) where !hasUnorderedNaNs(negating: a.simd, b.simd, adding: c.simd) {
-            mismatches.check(
-                H.negatedMultiplySubtracting(a, b, c, where: mask, otherwise: H.repeating(value)),
-                H(
-                    raw: HighwayReference.negatedMultiplySubtractingWhereOtherwiseF64(
-                        H.repeating(value).raw,
-                        mask.raw,
-                        a.raw,
-                        b.raw,
-                        c.raw
-                    )
-                ),
-                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @inline(__always)
-    private func checkNegatedMultiplySubtractingWhereOtherwiseConstantA(_ value: Lane) {
-        let mismatches = Mismatches(
-            "negatedMultiplySubtractingWhereOtherwise with a repeating \(hex(value))"
-        )
-        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x2A91_39C7_CAE2_1BAB)
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x2A91_38C7_CAE2_19F8)
-        let bInputs = Inputs.vectors(H.self, seed: 0x2A91_3AC7_CAE2_1D5E)
-        let cInputs = Inputs.vectors(H.self, seed: 0x2A91_3DC7_CAE2_2277)
-        mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingF64(value)),
-            "repeating"
-        )
-        for (otherwise, mask, b, c) in mixedQuadruples(
-            otherwiseInputs,
-            maskInputs,
-            bInputs,
-            cInputs,
-            seed: 0x2203_283D_2D55_828D
-        ) where !hasUnorderedNaNs(negating: H.repeating(value).simd, b.simd, adding: c.simd) {
-            mismatches.check(
-                H.negatedMultiplySubtracting(
-                    H.repeating(value),
-                    b,
-                    c,
-                    where: mask,
-                    otherwise: otherwise
-                ),
-                H(
-                    raw: HighwayReference.negatedMultiplySubtractingWhereOtherwiseF64(
-                        otherwise.raw,
-                        mask.raw,
-                        H.repeating(value).raw,
-                        b.raw,
-                        c.raw
-                    )
-                ),
-                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @inline(__always)
-    private func checkNegatedMultiplySubtractingWhereOtherwiseConstantB(_ value: Lane) {
-        let mismatches = Mismatches(
-            "negatedMultiplySubtractingWhereOtherwise with b repeating \(hex(value))"
-        )
-        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x4596_BEC7_DA7B_4E2A)
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x4596_BFC7_DA7B_4FDD)
-        let aInputs = Inputs.vectors(H.self, seed: 0x4596_BCC7_DA7B_4AC4)
-        let cInputs = Inputs.vectors(H.self, seed: 0x4596_BAC7_DA7B_475E)
-        mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingF64(value)),
-            "repeating"
-        )
-        for (otherwise, mask, a, c) in mixedQuadruples(
-            otherwiseInputs,
-            maskInputs,
-            aInputs,
-            cInputs,
-            seed: 0x3021_696F_0543_60EE
-        ) where !hasUnorderedNaNs(negating: a.simd, H.repeating(value).simd, adding: c.simd) {
-            mismatches.check(
-                H.negatedMultiplySubtracting(
-                    a,
-                    H.repeating(value),
-                    c,
-                    where: mask,
-                    otherwise: otherwise
-                ),
-                H(
-                    raw: HighwayReference.negatedMultiplySubtractingWhereOtherwiseF64(
-                        otherwise.raw,
-                        mask.raw,
-                        a.raw,
-                        H.repeating(value).raw,
-                        c.raw
-                    )
-                ),
-                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @inline(__always)
-    private func checkNegatedMultiplySubtractingWhereOtherwiseConstantC(_ value: Lane) {
-        let mismatches = Mismatches(
-            "negatedMultiplySubtractingWhereOtherwise with c repeating \(hex(value))"
-        )
-        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x3D01_87C7_D5A4_6C15)
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3D01_86C7_D5A4_6A62)
-        let aInputs = Inputs.vectors(H.self, seed: 0x3D01_85C7_D5A4_68AF)
-        let bInputs = Inputs.vectors(H.self, seed: 0x3D01_84C7_D5A4_66FC)
-        mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingF64(value)),
-            "repeating"
-        )
-        for (otherwise, mask, a, b) in mixedQuadruples(
-            otherwiseInputs,
-            maskInputs,
-            aInputs,
-            bInputs,
-            seed: 0x923F_0599_0138_FCC7
-        ) where !hasUnorderedNaNs(negating: a.simd, b.simd, adding: H.repeating(value).simd) {
-            mismatches.check(
-                H.negatedMultiplySubtracting(
-                    a,
-                    b,
-                    H.repeating(value),
-                    where: mask,
-                    otherwise: otherwise
-                ),
-                H(
-                    raw: HighwayReference.negatedMultiplySubtractingWhereOtherwiseF64(
-                        otherwise.raw,
-                        mask.raw,
-                        a.raw,
-                        b.raw,
-                        H.repeating(value).raw
-                    )
-                ),
-                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatZero() {
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(0.0)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantA(0.0)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantB(0.0)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantC(0.0)
-    }
-
-    @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatNegativeZero() {
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(-0.0)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantA(-0.0)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantB(-0.0)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantC(-0.0)
-    }
-
-    @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatOne() {
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(1.0)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantA(1.0)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantB(1.0)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantC(1.0)
-    }
-
-    @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatMinusOne() {
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(-1.0)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantA(-1.0)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantB(-1.0)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantC(-1.0)
-    }
-
-    @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatTwo() {
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(2.0)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantA(2.0)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantB(2.0)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantC(2.0)
-    }
-
-    @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatHalf() {
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(0.5)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantA(0.5)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantB(0.5)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantC(0.5)
-    }
-
-    @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatFour() {
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(4.0)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantA(4.0)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantB(4.0)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantC(4.0)
-    }
-
-    @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatQuarter() {
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(0.25)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantA(0.25)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantB(0.25)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantC(0.25)
-    }
-
-    @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatOnePointFive() {
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(1.5)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantA(1.5)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantB(1.5)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantC(1.5)
-    }
-
-    @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatMinusTwoPointFive() {
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(-2.5)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantA(-2.5)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantB(-2.5)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantC(-2.5)
-    }
-
-    @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatInfinity() {
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(.infinity)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantA(.infinity)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantB(.infinity)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantC(.infinity)
-    }
-
-    @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatMinusInfinity() {
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(-.infinity)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantA(-.infinity)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantB(-.infinity)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantC(-.infinity)
-    }
-
-    @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatNaN() {
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(.nan)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantA(.nan)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantB(.nan)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantC(.nan)
-    }
-
-    @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatMinusNaN() {
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(-.nan)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantA(-.nan)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantB(-.nan)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantC(-.nan)
-    }
-
-    @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatPayloadNaN() {
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(
-            Lane(nan: 1, signaling: false)
-        )
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantA(Lane(nan: 1, signaling: false))
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantB(Lane(nan: 1, signaling: false))
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantC(Lane(nan: 1, signaling: false))
-    }
-
-    @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatSignalingNaN() {
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(.signalingNaN)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantA(.signalingNaN)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantB(.signalingNaN)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantC(.signalingNaN)
-    }
-
-    @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatMinusSignalingNaN() {
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(-.signalingNaN)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantA(-.signalingNaN)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantB(-.signalingNaN)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantC(-.signalingNaN)
-    }
-
-    @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatLeastNonzero() {
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(.leastNonzeroMagnitude)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantA(.leastNonzeroMagnitude)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantB(.leastNonzeroMagnitude)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantC(.leastNonzeroMagnitude)
-    }
-
-    @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatGreatest() {
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(.greatestFiniteMagnitude)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantA(.greatestFiniteMagnitude)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantB(.greatestFiniteMagnitude)
-        checkNegatedMultiplySubtractingWhereOtherwiseConstantC(.greatestFiniteMagnitude)
     }
 }

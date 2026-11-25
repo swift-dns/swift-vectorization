@@ -99,6 +99,34 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
+    private func checkComplexConjugateConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("complexConjugate with a alternating \(hex(even)), \(hex(odd))")
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.complexConjugate(H.repeatingBlock(even, odd)),
+            H(raw: HighwayReference.complexConjugateF64(H.repeatingBlock(even, odd).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func complexConjugateConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkComplexConjugateConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func complexConjugateConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkComplexConjugateConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func complexConjugateConstantAAlternatingHalfAndOne() {
+        checkComplexConjugateConstantAAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
     private func checkMultiplyingComplexConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyingComplex with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0xC598_8ED7_BEBC_2DA3)

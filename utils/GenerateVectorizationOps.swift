@@ -52666,10 +52666,12 @@ struct ConstantValue {
 
 let constantMaskReaders: Set<String> = ["selecting", "selectingOrZero", "zeroingSelected"]
 
+let sveConstantMarker = "cvectorization_ops_sve_constant_"
+
 let constantMarkers = [
     "__builtin_constant_p(",
     "cvectorization_ops_sve_splat_",
-    "cvectorization_ops_sve_constant_",
+    sveConstantMarker,
     "cvectorization_ops_constant_nan_",
     "cvectorization_ops_constant_lane_",
 ]
@@ -52715,9 +52717,9 @@ func parenthesizedArgument(in text: Substring) -> (argument: Substring, rest: Su
     return nil
 }
 
-func constantIdentifiers(in source: String) -> Set<String> {
+func constantIdentifiers(in source: String, markers: [String] = constantMarkers) -> Set<String> {
     var identifiers: Set<String> = []
-    for marker in constantMarkers {
+    for marker in markers {
         var remainder = source[...]
         while let range = remainder.range(of: marker) {
             remainder = remainder[range.upperBound...]
@@ -52763,6 +52765,24 @@ func constantParameters(of op: Op, for element: Element) -> [Int] {
             || (!pair.1.isTag
                 && (identifiers.contains(pair.0.swiftName)
                     || identifiers.contains(rawName(pair.0.swiftName))))
+            ? index : nil
+    }
+}
+
+func sveConstantParameters(of op: Op, for element: Element) -> [Int] {
+    let functions =
+        [cFunctionName(of: op, for: element)]
+        + (op.template == nil ? [] : [templatedHelperName(of: op, for: element)])
+    let identifiers = constantIdentifiers(
+        in: functions.map(constantSource(ofFunctionNamed:)).joined(),
+        markers: [sveConstantMarker]
+    )
+    return zip(bindings(of: op, for: element), op.parameters).enumerated().compactMap {
+        index,
+        pair in
+        isConstantVector(pair.1) && !pair.1.isPointerIndices
+            && (identifiers.contains(pair.0.swiftName)
+                || identifiers.contains(rawName(pair.0.swiftName)))
             ? index : nil
     }
 }
@@ -53010,6 +53030,15 @@ let multiplySubtractingAddingConstantSplatTests = [
     "multiplySubtractingAddingConstantSplatZero",
 ]
 
+let multiplySubtractingAddingConstantAlternatingTests = [
+    "multiplySubtractingAddingConstantAAlternatingHalfAndOne",
+    "multiplySubtractingAddingConstantAAlternatingMinusTwoPointFiveAndHalf",
+    "multiplySubtractingAddingConstantAAlternatingOneAndMinusTwoPointFive",
+    "multiplySubtractingAddingConstantBAlternatingHalfAndOne",
+    "multiplySubtractingAddingConstantBAlternatingMinusTwoPointFiveAndHalf",
+    "multiplySubtractingAddingConstantBAlternatingOneAndMinusTwoPointFive",
+]
+
 let approximateReciprocalSquareRootConstantSplatNaNTests = [
     "approximateReciprocalSquareRootConstantSplatMinusNaN",
     "approximateReciprocalSquareRootConstantSplatMinusSignalingNaN",
@@ -53020,8 +53049,10 @@ let approximateReciprocalSquareRootConstantSplatNaNTests = [
 
 let intermittentNaNSignTests: [String: [String]] = [
     "SIMDDoubleConstant": approximateReciprocalSquareRootConstantSplatNaNTests
-        + multiplySubtractingAddingConstantSplatTests,
-    "SIMDFloatConstant": multiplySubtractingAddingConstantSplatTests,
+        + multiplySubtractingAddingConstantSplatTests
+        + multiplySubtractingAddingConstantAlternatingTests,
+    "SIMDFloatConstant": multiplySubtractingAddingConstantSplatTests
+        + multiplySubtractingAddingConstantAlternatingTests,
 ]
 
 let linuxAvx512MaskedZeroSign = KnownIssue(
@@ -53183,6 +53214,23 @@ let emu128FoldedConstantTests: [String: [String]] = [
     ]
 ]
 
+let emu128FoldedOneLanes = KnownIssue(
+    comment:
+        "In release builds on EMU128 Highway multiplies and divides lane by lane, so the compiler folds the lanes where a constant operand is one and returns a signaling NaN of the other operand as it is, which the port's vector operation quiets",
+    condition: "SIMDTarget.targetName == \"EMU128\" && !assertionsAreEnabled"
+)
+
+let emu128FoldedOneLaneAlternatingTests = [
+    "dividingConstantB", "dividingWhereConstantB", "multiplyingConstantA", "multiplyingConstantB",
+    "multiplyingWhereConstantA", "multiplyingWhereConstantB", "multiplyingWhereOtherwiseConstantA",
+    "multiplyingWhereOtherwiseConstantB",
+].flatMap { test in ["HalfAndOne", "OneAndMinusTwoPointFive"].map { "\(test)Alternating\($0)" } }
+
+let emu128FoldedOneLaneTests: [String: [String]] = [
+    "SIMDDoubleConstant": emu128FoldedOneLaneAlternatingTests,
+    "SIMDFloatConstant": emu128FoldedOneLaneAlternatingTests,
+]
+
 func sveFirstTrueSettingIssue(_ result: String) -> KnownIssue {
     KnownIssue(
         comment:
@@ -53278,6 +53326,7 @@ let knownGaps: [(issue: KnownIssue, tests: [String: [String]])] =
         (emu128Arm64Float16NaNSign, emu128Arm64Float16NaNSignTests),
         (linuxAvx3SprFloat16OrderedComparison, float16OrderedComparisonTests),
         (darwinEmu128Folding, emu128FoldedConstantTests),
+        (emu128FoldedOneLanes, emu128FoldedOneLaneTests),
         (sveWideNaNOperandOrder, sveWideNaNOperandOrderTests),
         (sveAt512NaNOperandOrder, sveAt512NaNOperandOrderTests),
     ] + sveFirstTrueSettingGaps
@@ -53316,9 +53365,28 @@ let alternatingFloatConstants = [
     AlternatingConstant(name: "MinusInfinityInfinity", even: "-.infinity", odd: ".infinity"),
 ]
 
-func alternatingConstants(of op: Op, for element: Element) -> [AlternatingConstant] {
-    element.category == .float && adjacentLaneArithmeticOps[op.identifier] != nil
+func alternatingConstants(
+    of op: Op,
+    for element: Element,
+    parameter index: Int
+) -> [AlternatingConstant] {
+    let adjacent =
+        element.category == .float && adjacentLaneArithmeticOps[op.identifier] != nil
         ? alternatingFloatConstants : []
+    guard sveConstantParameters(of: op, for: element).contains(index) else { return adjacent }
+    let operand = operandElement(of: op.parameters[index], for: element, source: op.source)
+    let lane = constantLane(of: operand, for: element)
+    let values = jointConstantVectors(for: operand)
+    return adjacent
+        + values.indices.map { rotation in
+            let even = values[rotation]
+            let odd = values[(rotation + 1) % values.count]
+            return AlternatingConstant(
+                name: "\(even.name)And\(odd.name)",
+                even: even.literal.replacingOccurrences(of: "Lane", with: lane),
+                odd: odd.literal.replacingOccurrences(of: "Lane", with: lane)
+            )
+        }
 }
 
 func constantHelperName(
@@ -53492,7 +53560,11 @@ func constantHelper(
         op.parameters[index].isPointerIndices
         ? portCall("repeating", [value], on: operand.vectorType)
         : alternating
-            ? portCall(repeatingBlockName, blockLanes)
+            ? portCall(
+                repeatingBlockName,
+                blockLanes,
+                on: constantNamespace(of: operand, for: element)
+            )
             : portCall("repeating", [value], on: constantNamespace(of: operand, for: element))
     let inputs = referenceInputs(
         of: op,
@@ -53854,6 +53926,16 @@ func isOutOfContractSplat(_ value: ConstantValue, of op: Op, for element: Elemen
     return !(0..<element.bits).contains(count)
 }
 
+func isOutOfContractAlternating(
+    _ value: AlternatingConstant,
+    of op: Op,
+    for element: Element
+) -> Bool {
+    [value.even, value.odd].contains {
+        isOutOfContractSplat(ConstantValue(name: value.name, literal: $0), of: op, for: element)
+    }
+}
+
 func immediateCondition(
     _ immediate: ImmediateArgument,
     value: String,
@@ -54043,11 +54125,11 @@ func constantTests(of op: Op, for element: Element) -> [String] {
         }
     }
     for index in splats {
-        let alternating = alternatingConstants(of: op, for: element)
-        guard !alternating.isEmpty else { break }
+        let alternating = alternatingConstants(of: op, for: element, parameter: index)
+        guard !alternating.isEmpty else { continue }
         let binding = parameterBindings[index]
         let helper = constantHelperName(of: op, parameter: binding, guarded: false) + "Alternating"
-        let test = "\(op.identifier)Constant\(uppercasedFirst(binding.swiftName))Alternating"
+        let test = "\(op.testIdentifier)Constant\(uppercasedFirst(binding.swiftName))Alternating"
         members.append(
             constantHelper(
                 of: op,
@@ -54061,6 +54143,9 @@ func constantTests(of op: Op, for element: Element) -> [String] {
             members.append(
                 constantTest(
                     "\(test)\(value.name)",
+                    disabling: laneCapabilityDisabling(of: op, for: element)
+                        + (isOutOfContractAlternating(value, of: op, for: element)
+                            ? outOfContractDisabling(of: op) : []),
                     calls: ["\(helper)(\(value.even), \(value.odd))"]
                 )
             )

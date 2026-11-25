@@ -556,4 +556,84 @@ extension SIMDInt64ConstantTests {
         checkSelectingByVectorConstantB(Lane.min)
         checkSelectingByVectorConstantC(Lane.min)
     }
+
+    @inline(__always)
+    private func checkSelectingByVectorConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "selectingByVector with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x3CC5_3A20_8482_A8C9)
+        let cInputs = Inputs.vectors(H.self, seed: 0x3CC5_3820_8482_A563)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockI64(even, odd)),
+            "repeatingBlock"
+        )
+        for (a, c) in everyPair(aInputs, cInputs) {
+            mismatches.check(
+                H.selecting(a, H.repeatingBlock(even, odd), c),
+                H(
+                    raw: HighwayReference.selectingByVectorI64(
+                        a.raw,
+                        H.repeatingBlock(even, odd).raw,
+                        c.raw
+                    )
+                ),
+                "a: \(describe(a)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func selectingByVectorConstantBAlternating1And26() {
+        checkSelectingByVectorConstantBAlternating(1, 26)
+    }
+
+    @Test func selectingByVectorConstantBAlternating26And127() {
+        checkSelectingByVectorConstantBAlternating(26, 127)
+    }
+
+    @Test func selectingByVectorConstantBAlternating127And1() {
+        checkSelectingByVectorConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkSelectingByVectorConstantCAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "selectingByVector with c alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x304C_1753_904E_6150)
+        let bInputs = Inputs.vectors(H.self, seed: 0x304C_1853_904E_6303)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockI64(even, odd)),
+            "repeatingBlock"
+        )
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.selecting(a, b, H.repeatingBlock(even, odd)),
+                H(
+                    raw: HighwayReference.selectingByVectorI64(
+                        a.raw,
+                        b.raw,
+                        H.repeatingBlock(even, odd).raw
+                    )
+                ),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func selectingByVectorConstantCAlternating1And26() {
+        checkSelectingByVectorConstantCAlternating(1, 26)
+    }
+
+    @Test func selectingByVectorConstantCAlternating26And127() {
+        checkSelectingByVectorConstantCAlternating(26, 127)
+    }
+
+    @Test func selectingByVectorConstantCAlternating127And1() {
+        checkSelectingByVectorConstantCAlternating(127, 1)
+    }
 }
