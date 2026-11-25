@@ -437,6 +437,21 @@ enum Parameter: Equatable {
         }
     }
 
+    var isVectorValued: Bool {
+        switch self {
+        case .vector, .indices, .laneIndices, .lookupIndices, .indexVector, .mask, .tuple,
+            .shiftCounts, .fillVector, .whereMask, .otherwiseVector, .pointerIndices,
+            .pointerOffsets, .sourceVector, .signedSourceVector, .sourceMask, .narrowVector,
+            .sourceNarrowVector, .narrowMask, .sourceNarrowMask:
+            return true
+        case .tag, .lane, .insertedLane, .fillLane, .laneIndex, .tupleIndex, .constLanePointer,
+            .lanePointer, .constBytePointer, .bytePointer, .count, .shiftAmount, .laneAmount,
+            .flag, .maskBits, .outVector, .roundConstant, .immediate, .constBitsPointer,
+            .constIndexPointer, .narrowLanePointer, .sourceTag, .narrowTag, .sourceNarrowTag:
+            return false
+        }
+    }
+
     var shape: Shape {
         switch self {
         case .narrowTag(let shape), .narrowVector(let shape), .sourceNarrowTag(let shape),
@@ -510,6 +525,15 @@ enum ReturnType: Equatable {
     case tuple(Int)
     case narrowVector(Shape)
     case narrowMask(Shape)
+
+    var isVectorValued: Bool {
+        switch self {
+        case .vector, .laneIndices, .mask, .indices, .tuple, .narrowVector, .narrowMask:
+            return true
+        case .lane, .count, .index, .bits, .boolean, .void:
+            return false
+        }
+    }
 }
 
 // How much of a span the span form of a pointer op reads or writes, from the span's start.
@@ -50416,12 +50440,27 @@ func codegenKey(_ referenceName: String, constantParameter: String? = nil) -> St
     "\(uppercasedFirst(referenceName))\(codegenConstantSuffix(constantParameter))"
 }
 
+enum CodegenForm {
+    case byValue
+    case inVectorCode
+
+    var suffix: String {
+        switch self {
+        case .byValue: return ""
+        case .inVectorCode: return "InVectorCode"
+        }
+    }
+}
+
+let codegenInVectorCodeCondition = "CODEGEN_IN_VECTOR_CODE"
+
 func codegenFunctionName(
     _ side: String,
     _ referenceName: String,
-    constantParameter: String? = nil
+    constantParameter: String? = nil,
+    form: CodegenForm = .byValue
 ) -> String {
-    "\(side)\(codegenKey(referenceName, constantParameter: constantParameter))"
+    "\(side)\(codegenKey(referenceName, constantParameter: constantParameter))\(form.suffix)"
 }
 
 func codegenFunction(
@@ -50438,6 +50477,77 @@ func codegenFunction(
     """
 }
 
+func codegenStoredResult(of body: String) -> String {
+    var lines = body.split(separator: "\n", omittingEmptySubsequences: false)
+    guard let last = lines.last, last.hasPrefix("return ") else {
+        fatalError("\(body) does not end with the result it returns")
+    }
+    let value = last.dropFirst("return ".count)
+    let stored = value.hasPrefix("unsafe ") ? value.dropFirst("unsafe ".count) : value
+    lines[lines.count - 1] = "unsafe result.pointee = \(stored)"
+    return lines.joined(separator: "\n")
+}
+
+func codegenLoadedParameters(
+    of parameters: [CodegenParameter],
+    variant: Int?
+) -> [CodegenParameter] {
+    let constantIndices = codegenConstantIndices(of: parameters, variant: variant)
+    return parameters.indices
+        .filter { !constantIndices.contains($0) && parameters[$0].kind.isVectorValued }
+        .map { parameters[$0] }
+}
+
+func codegenIsRunTime(_ variant: CodegenVariant, of parameters: [CodegenParameter]) -> Bool {
+    variant.alternative == nil
+        && variant.constant.map { parameters[$0].kind == .immediate } ?? true
+}
+
+func codegenInVectorCodeCall(
+    _ name: String,
+    arguments: [String],
+    loading loaded: [String],
+    returning returnType: String,
+    storing storesResult: Bool
+) -> String {
+    let copies = loaded.map { "var \($0) = \($0)" }
+    let leading = storesResult ? ["result.baseAddress.unsafelyUnwrapped"] : []
+    let call = "unsafe \(name)(\((leading + arguments).joined(separator: ", ")))"
+    let body: String
+    if storesResult {
+        body = """
+            return withUnsafeTemporaryAllocation(of: \(returnType).self, capacity: 1) { result in
+            \(call)
+            return unsafe result.baseAddress.unsafelyUnwrapped.move()
+            }
+            """
+    } else {
+        body = returnType == "Void" ? call : "return \(call)"
+    }
+    return "{ () -> \(returnType) in\n\((copies + [body]).joined(separator: "\n"))\n}()"
+}
+
+func codegenInVectorCodeFunction(
+    _ name: String,
+    parameters: [String],
+    loading loaded: [String],
+    storing storedType: String?,
+    returnClause: String,
+    body: String
+) -> String {
+    let declarations =
+        (storedType.map { ["_ result: UnsafeMutablePointer<\($0)>"] } ?? []) + parameters
+    let statements =
+        loaded.map { "let \($0) = unsafe \($0).pointee" }
+        + [storedType == nil ? body : codegenStoredResult(of: body)]
+    return """
+        @inline(never)
+        public func \(name)(\(declarations.joined(separator: ", ")))\(storedType == nil ? returnClause : "") {
+            \(statements.joined(separator: "\n"))
+        }
+        """
+}
+
 func codegenFunctions(
     _ swiftName: String,
     referenceName: String,
@@ -50447,35 +50557,69 @@ func codegenFunctions(
     constantParameter: String? = nil,
     calling highwayName: String? = nil,
     port: (parameters: [String], arguments: [String]),
-    reference: (parameters: [String], arguments: [String])
+    reference: (parameters: [String], arguments: [String]),
+    form: CodegenForm = .byValue,
+    loading loaded: [String] = []
 ) -> String {
+    let storesResult = form == .inVectorCode && returns.isVectorValued
+    guard form == .byValue || storesResult || !loaded.isEmpty else { return "" }
     let portKeyword = isUnsafe.port ? "unsafe " : ""
     let referenceKeyword = isUnsafe.reference ? "unsafe " : ""
     let hasReturn = returns != .void
     let portReturn = swiftReturnType(returns, scope: element.swiftType)
     let referenceReturn = importedReturnType(returns, element)
+    let portExpression = portKeyword + portCall(swiftName, port.arguments, on: element.vectorType)
+    let referenceExpression =
+        referenceKeyword
+        + referenceResult(
+            referenceCall(
+                highwayName ?? referenceName,
+                reference.arguments,
+                in: referenceNothrowNamespace
+            ),
+            returning: returns,
+            for: element,
+            on: element.vectorType
+        )
+    func function(
+        _ side: String,
+        parameters: [String],
+        returnType: String,
+        call: String
+    ) -> String {
+        let name = codegenFunctionName(
+            side,
+            referenceName,
+            constantParameter: constantParameter,
+            form: form
+        )
+        let returnClause = hasReturn ? " -> \(returnType)" : ""
+        switch form {
+        case .byValue:
+            return codegenFunction(
+                name,
+                parameters: parameters,
+                returnClause: returnClause,
+                call: call
+            )
+        case .inVectorCode:
+            return codegenInVectorCodeFunction(
+                name,
+                parameters: parameters,
+                loading: loaded,
+                storing: storesResult ? returnType : nil,
+                returnClause: returnClause,
+                body: hasReturn ? "return \(call)" : call
+            )
+        }
+    }
     let functions = [
-        codegenFunction(
-            codegenFunctionName("port", referenceName, constantParameter: constantParameter),
-            parameters: port.parameters,
-            returnClause: hasReturn ? " -> \(portReturn)" : "",
-            call: portKeyword + portCall(swiftName, port.arguments, on: element.vectorType)
-        ),
-        codegenFunction(
-            codegenFunctionName("highway", referenceName, constantParameter: constantParameter),
+        function("port", parameters: port.parameters, returnType: portReturn, call: portExpression),
+        function(
+            "highway",
             parameters: reference.parameters,
-            returnClause: hasReturn ? " -> \(referenceReturn)" : "",
-            call: referenceKeyword
-                + referenceResult(
-                    referenceCall(
-                        highwayName ?? referenceName,
-                        reference.arguments,
-                        in: referenceNothrowNamespace
-                    ),
-                    returning: returns,
-                    for: element,
-                    on: element.vectorType
-                )
+            returnType: referenceReturn,
+            call: referenceExpression
         ),
     ]
     return functions.joined(separator: "\n\n")
@@ -50691,7 +50835,8 @@ func codegenFunctions(
     isUnsafe: (port: Bool, reference: Bool),
     parameters: [CodegenParameter],
     templateName: String? = nil,
-    highwayOrdered: ([String]) -> [String] = { $0 }
+    highwayOrdered: ([String]) -> [String] = { $0 },
+    form: CodegenForm = .byValue
 ) -> String {
     var functions: [String] = []
 
@@ -50700,6 +50845,10 @@ func codegenFunctions(
         var referenceParameters: [String] = []
         var portArguments: [String] = []
         var referenceArguments: [String] = []
+        let loaded =
+            form == .inVectorCode
+            ? codegenLoadedParameters(of: parameters, variant: variant.constant)
+                .map(\.binding.swiftName) : []
 
         let constantIndices = codegenConstantIndices(of: parameters, variant: variant.constant)
         for (index, parameter) in parameters.enumerated() {
@@ -50720,8 +50869,21 @@ func codegenFunctions(
                 continue
             }
             let isShiftAmount = parameter.kind == .shiftAmount
-            portParameters.append(swiftDeclaration(binding, as: isShiftAmount ? "Int32" : nil))
-            referenceParameters.append(swiftDeclaration(binding, as: parameter.referenceType))
+            let isLoaded = loaded.contains(binding.swiftName)
+            portParameters.append(
+                swiftDeclaration(
+                    binding,
+                    as: isShiftAmount
+                        ? "Int32" : isLoaded ? "UnsafePointer<\(binding.swiftType)>" : nil
+                )
+            )
+            referenceParameters.append(
+                swiftDeclaration(
+                    binding,
+                    as: isLoaded
+                        ? "UnsafePointer<\(parameter.referenceType)>" : parameter.referenceType
+                )
+            )
             portArguments.append(
                 swiftCallArgument(
                     binding,
@@ -50749,12 +50911,14 @@ func codegenFunctions(
                     parameters[$0].kind == .shiftAmount ? templateName : nil
                 },
                 port: (portParameters, portArguments),
-                reference: (referenceParameters, highwayOrdered(referenceArguments))
+                reference: (referenceParameters, highwayOrdered(referenceArguments)),
+                form: form,
+                loading: loaded
             )
         )
     }
 
-    return functions.joined(separator: "\n\n")
+    return functions.filter { !$0.isEmpty }.joined(separator: "\n\n")
 }
 
 func codegenKeys(
@@ -50805,7 +50969,7 @@ func codegenParameters(of op: Op, for element: Element) -> [CodegenParameter] {
     return op.swiftOrdered(parameters)
 }
 
-func codegenFunctions(of op: Op, for element: Element) -> String {
+func codegenFunctions(of op: Op, for element: Element, form: CodegenForm = .byValue) -> String {
     codegenFunctions(
         op.swiftName,
         referenceName: referenceFunctionName(of: op, for: element),
@@ -50814,7 +50978,8 @@ func codegenFunctions(of op: Op, for element: Element) -> String {
         isUnsafe: (port: isUnsafe(op) || hasCheckedForms(op), reference: isUnsafe(op)),
         parameters: codegenParameters(of: op, for: element),
         templateName: op.template == nil ? nil : templateReferenceName(of: op, for: element),
-        highwayOrdered: op.highwayOrdered
+        highwayOrdered: op.highwayOrdered,
+        form: form
     )
 }
 
@@ -50848,14 +51013,20 @@ func codegenParameters(of op: WideningOp, from narrow: Element) -> [CodegenParam
     return parameters
 }
 
-func codegenFunctions(_ op: WideningOp, from narrow: Element, to wide: Element) -> String {
+func codegenFunctions(
+    _ op: WideningOp,
+    from narrow: Element,
+    to wide: Element,
+    form: CodegenForm = .byValue
+) -> String {
     codegenFunctions(
         op.swiftName,
         referenceName: wideningFunctionName(op, from: narrow, to: wide),
         for: wide,
         returns: .vector,
         isUnsafe: (port: true, reference: true),
-        parameters: codegenParameters(of: op, from: narrow)
+        parameters: codegenParameters(of: op, from: narrow),
+        form: form
     )
 }
 
@@ -50878,14 +51049,20 @@ func codegenParameters(of op: RebindingOp, from source: Element) -> [CodegenPara
     ]
 }
 
-func codegenFunctions(_ op: RebindingOp, from source: Element, to target: Element) -> String {
+func codegenFunctions(
+    _ op: RebindingOp,
+    from source: Element,
+    to target: Element,
+    form: CodegenForm = .byValue
+) -> String {
     codegenFunctions(
         op.swiftName,
         referenceName: rebindingFunctionName(op, from: source, to: target),
         for: target,
         returns: .mask,
         isUnsafe: (port: false, reference: false),
-        parameters: codegenParameters(of: op, from: source)
+        parameters: codegenParameters(of: op, from: source),
+        form: form
     )
 }
 
@@ -50897,7 +51074,7 @@ func codegenKeys(of op: RebindingOp, from source: Element, to target: Element) -
     )
 }
 
-func repeatingBlockCodegenFunctions(for element: Element) -> String {
+func repeatingBlockCodegenFunctions(for element: Element, form: CodegenForm = .byValue) -> String {
     let lanes = repeatingBlockLanes(of: element)
     return codegenFunctions(
         repeatingBlockName,
@@ -50909,7 +51086,8 @@ func repeatingBlockCodegenFunctions(for element: Element) -> String {
         reference: (
             lanes.map { "_ \($0): \(element.swiftType)" },
             lanes.map(element.swiftScalarArgument)
-        )
+        ),
+        form: form
     )
 }
 
@@ -51018,9 +51196,9 @@ struct KernelParameter {
     let name: String
     let kind: Kind
 
-    func type(on side: CodegenSide) -> String {
+    func type(on side: CodegenSide, form: CodegenForm = .byValue) -> String {
         switch kind {
-        case .vector: return side.vector
+        case .vector: return form == .inVectorCode ? "UnsafePointer<\(side.vector)>" : side.vector
         case .lane: return side.lane
         case .pointer: return side.pointer
         case .count: return "Int"
@@ -51031,9 +51209,9 @@ struct KernelParameter {
         }
     }
 
-    func declaration(on side: CodegenSide) -> String {
+    func declaration(on side: CodegenSide, form: CodegenForm = .byValue) -> String {
         let naming = label == name ? name : "\(label) \(name)"
-        return "\(naming): \(type(on: side))"
+        return "\(naming): \(type(on: side, form: form))"
     }
 
     func argument(passing expression: String) -> String {
@@ -51777,16 +51955,39 @@ func nativeStepCall(
     return scopes.reversed().reduce("unsafe \(call)") { inner, scope in "\(scope)\n\(inner)\n}" }
 }
 
-func codegenKernelFunctions(_ kernel: CodegenKernel, for element: Element) -> String {
+func codegenKernelFunctions(
+    _ kernel: CodegenKernel,
+    for element: Element,
+    form: CodegenForm = .byValue
+) -> String {
+    let loaded = kernel.parameters.filter { $0.kind == .vector }.map(\.name)
+    let storesResult = kernel.returns.isVectorValued
+    guard form == .byValue || storesResult || !loaded.isEmpty else { return "" }
     let referenceName = referenceFunctionName(kernel.name, element)
     let functions = [CodegenSide.Kind.port, .highway].map { kind in
         let side = CodegenSide(kind: kind, element: element)
-        let function = codegenFunction(
-            codegenFunctionName(kind.rawValue, referenceName),
-            parameters: kernel.parameters.map { $0.declaration(on: side) },
-            returnClause: " -> \(side.returnType(kernel.returns))",
-            call: kernel.body(side)
-        )
+        let name = codegenFunctionName(kind.rawValue, referenceName, form: form)
+        let parameters = kernel.parameters.map { $0.declaration(on: side, form: form) }
+        let returnType = side.returnType(kernel.returns)
+        let function =
+            switch form {
+            case .byValue:
+                codegenFunction(
+                    name,
+                    parameters: parameters,
+                    returnClause: " -> \(returnType)",
+                    call: kernel.body(side)
+                )
+            case .inVectorCode:
+                codegenInVectorCodeFunction(
+                    name,
+                    parameters: parameters,
+                    loading: loaded,
+                    storing: storesResult ? returnType : nil,
+                    returnClause: " -> \(returnType)",
+                    body: kernel.body(side)
+                )
+            }
         return kernel.usesSpans ? "\(spanAvailability)\n\(function)" : function
     }
     return functions.joined(separator: "\n\n")
@@ -51830,11 +52031,16 @@ func codegenCalls(
     pointer: String,
     referencePointer: String? = nil,
     destination: String? = nil,
-    highwayCount: String? = nil
+    highwayCount: String? = nil,
+    returning returns: ReturnType = .void,
+    form: CodegenForm = .byValue
 ) -> (port: String, reference: String) {
     var portArguments: [String] = []
     var referenceArguments: [String] = []
     var outVectorIndex = 0
+    let loaded =
+        form == .inVectorCode
+        ? codegenLoadedParameters(of: parameters, variant: constant).map(\.binding.swiftName) : []
 
     let constantIndices = codegenConstantIndices(of: parameters, variant: constant)
     for (index, parameter) in parameters.enumerated() where !constantIndices.contains(index) {
@@ -51847,8 +52053,9 @@ func codegenCalls(
             .laneAmount, .roundConstant, .immediate, .flag, .maskBits, .laneIndex, .tuple,
             .tupleIndex, .pointerIndices, .pointerOffsets, .sourceVector, .signedSourceVector,
             .sourceMask, .narrowVector, .sourceNarrowVector, .narrowMask, .sourceNarrowMask:
-            portArguments.append(swiftCallArgument(binding))
-            referenceArguments.append(swiftCallArgument(binding))
+            let operand = loaded.contains(binding.swiftName) ? "&\(binding.swiftName)" : nil
+            portArguments.append(swiftCallArgument(binding, passing: operand))
+            referenceArguments.append(swiftCallArgument(binding, passing: operand))
         case .count:
             portArguments.append(swiftCallArgument(binding))
             referenceArguments.append(swiftCallArgument(binding, passing: highwayCount))
@@ -51879,8 +52086,24 @@ func codegenCalls(
         alternative: alternative
     )
     func call(_ side: String, _ arguments: [String]) -> String {
-        let name = codegenFunctionName(side, referenceName, constantParameter: constantName)
-        return "\(keyword)\(name)(\(arguments.joined(separator: ", ")))"
+        let name = codegenFunctionName(
+            side,
+            referenceName,
+            constantParameter: constantName,
+            form: form
+        )
+        switch form {
+        case .byValue:
+            return "\(keyword)\(name)(\(arguments.joined(separator: ", ")))"
+        case .inVectorCode:
+            return codegenInVectorCodeCall(
+                name,
+                arguments: arguments,
+                loading: loaded,
+                returning: swiftReturnType(returns, scope: element.swiftType),
+                storing: returns.isVectorValued
+            )
+        }
     }
     return (call("port", portArguments), call("highway", referenceArguments))
 }
@@ -52020,7 +52243,8 @@ func codegenTest(
     constant: Int?,
     alternative: CodegenAlternative? = nil,
     guarded: Bool = false,
-    misaligned: Bool = false
+    misaligned: Bool = false,
+    form: CodegenForm = .byValue
 ) -> String {
     let parameters = codegenParameters(of: op, for: element)
     let constantName = codegenConstantName(
@@ -52032,7 +52256,12 @@ func codegenTest(
     let test =
         guarded ? "\(name)BeforeGuardPage" : misaligned ? "\(name)\(misalignedTestSuffix)" : name
     let referenceName = referenceFunctionName(of: op, for: element)
-    let function = codegenFunctionName("port", referenceName, constantParameter: constantName)
+    let function = codegenFunctionName(
+        "port",
+        referenceName,
+        constantParameter: constantName,
+        form: form
+    )
     let constants = codegenConstantIndices(of: parameters, variant: constant)
     let constantNames = constants.map { parameters[$0].binding.swiftName }
     let inputs = referenceInputs(
@@ -52053,7 +52282,9 @@ func codegenTest(
         keyword: isUnsafe(op) ? "unsafe " : "",
         pointer: referencePointer(of: op, guarded: guarded, misaligned: misaligned),
         referencePointer: paddedPointer(of: op, misaligned: misaligned),
-        destination: referenceDestination(of: op, guarded: guarded, misaligned: misaligned)
+        destination: referenceDestination(of: op, guarded: guarded, misaligned: misaligned),
+        returning: op.returns,
+        form: form
     )
     let (declarations, statements) = referenceStatements(
         of: op,
@@ -52098,7 +52329,8 @@ func codegenWideningTest(
     constant: Int?,
     alternative: CodegenAlternative? = nil,
     guarded: Bool = false,
-    misaligned: Bool = false
+    misaligned: Bool = false,
+    form: CodegenForm = .byValue
 ) -> String {
     let parameters = codegenParameters(of: op, from: narrow)
     let constantName = codegenConstantName(
@@ -52110,7 +52342,12 @@ func codegenWideningTest(
     let test =
         guarded ? "\(name)BeforeGuardPage" : misaligned ? "\(name)\(misalignedTestSuffix)" : name
     let referenceName = wideningFunctionName(op, from: narrow, to: wide)
-    let function = codegenFunctionName("port", referenceName, constantParameter: constantName)
+    let function = codegenFunctionName(
+        "port",
+        referenceName,
+        constantParameter: constantName,
+        form: form
+    )
     let seed = "seed: \(referenceTestSeed(wide, test, "0"))"
     var inputs = [
         ReferenceInput(
@@ -52137,7 +52374,9 @@ func codegenWideningTest(
         alternative: alternative,
         keyword: "unsafe ",
         pointer: pointerExpression("source", aligned: guarded || misaligned),
-        highwayCount: guarded ? "min(count, H.laneCount)" : nil
+        highwayCount: guarded ? "min(count, H.laneCount)" : nil,
+        returning: .vector,
+        form: form
     )
     let count = codegenGuardedCount(
         of: parameters,
@@ -52170,11 +52409,12 @@ func codegenWideningTest(
 func codegenRebindingTest(
     _ op: RebindingOp,
     from source: Element,
-    to target: Element
+    to target: Element,
+    form: CodegenForm = .byValue
 ) -> String {
     let test = "\(op.swiftName)\(uppercasedFirst(op.label))From\(source.swiftType)"
     let referenceName = rebindingFunctionName(op, from: source, to: target)
-    let function = codegenFunctionName("port", referenceName)
+    let function = codegenFunctionName("port", referenceName, form: form)
     let seed = "seed: \(referenceTestSeed(target, test, "0"))"
     let inputs = [
         ReferenceInput(
@@ -52189,7 +52429,9 @@ func codegenRebindingTest(
         referenceName: referenceName,
         constant: nil,
         keyword: "",
-        pointer: ""
+        pointer: "",
+        returning: .mask,
+        form: form
     )
     return referenceTestFunction(
         test,
@@ -52201,7 +52443,7 @@ func codegenRebindingTest(
     )
 }
 
-func codegenRepeatingBlockTest(for element: Element) -> String {
+func codegenRepeatingBlockTest(for element: Element, form: CodegenForm = .byValue) -> String {
     let seed = "seed: \(referenceTestSeed(element, repeatingBlockName, "0"))"
     let vectors = ReferenceInput(
         parameter: .vector,
@@ -52212,9 +52454,23 @@ func codegenRepeatingBlockTest(for element: Element) -> String {
         .map { element.swiftLane(fromSimd: "\(simdVector("vector"))[\($0)]") }
         .joined(separator: ", ")
     let referenceName = referenceFunctionName(repeatingBlockName, element)
-    let function = codegenFunctionName("port", referenceName)
-    let port = "\(function)(\(lanes))"
-    let reference = "\(codegenFunctionName("highway", referenceName))(\(lanes))"
+    let function = codegenFunctionName("port", referenceName, form: form)
+    let calls = ["port", "highway"].map { side in
+        let name = codegenFunctionName(side, referenceName, form: form)
+        switch form {
+        case .byValue:
+            return "\(name)(\(lanes))"
+        case .inVectorCode:
+            return codegenInVectorCodeCall(
+                name,
+                arguments: [lanes],
+                loading: [],
+                returning: swiftReturnType(.vector, scope: element.swiftType),
+                storing: true
+            )
+        }
+    }
+    let (port, reference) = (calls[0], calls[1])
     let description = "\"lanes: \\(describe(vector))\""
     return referenceTestFunction(
         repeatingBlockName,
@@ -52282,18 +52538,22 @@ func codegenKernelInputs(
 func codegenKernelTest(
     _ kernel: CodegenKernel,
     for element: Element,
-    guarded: Bool = false
+    guarded: Bool = false,
+    form: CodegenForm = .byValue
 ) -> String {
     let name = lowercasedFirstWord(kernel.name)
     let test = guarded ? "\(name)BeforeGuardPage" : name
     let referenceName = referenceFunctionName(kernel.name, element)
-    let function = codegenFunctionName("port", referenceName)
+    let function = codegenFunctionName("port", referenceName, form: form)
     let inputs = codegenKernelInputs(of: kernel, for: element, test: test)
     let description = referenceDescription(of: inputs)
     let spans = kernel.parameters.filter { $0.kind == .span || $0.kind == .byteSpan }
     let pointer = kernel.parameters.first { $0.kind == .pointer }
+    let loaded = form == .inVectorCode ? kernel.parameters.filter { $0.kind == .vector } : []
     let arguments = kernel.parameters.map { parameter in
         switch parameter.kind {
+        case .vector where form == .inVectorCode:
+            return parameter.argument(passing: "&\(parameter.name)")
         case .vector, .lane, .count: return parameter.argument(passing: parameter.name)
         case .pointer:
             return parameter.argument(passing: pointerExpression("source", aligned: guarded))
@@ -52303,8 +52563,20 @@ func codegenKernelTest(
         }
     }
     let keyword = pointer == nil ? "" : "unsafe "
-    let calls = ["port", "highway"].map {
-        "\(keyword)\(codegenFunctionName($0, referenceName))(\(arguments.joined(separator: ", ")))"
+    let calls = ["port", "highway"].map { side in
+        let name = codegenFunctionName(side, referenceName, form: form)
+        switch form {
+        case .byValue:
+            return "\(keyword)\(name)(\(arguments.joined(separator: ", ")))"
+        case .inVectorCode:
+            return codegenInVectorCodeCall(
+                name,
+                arguments: arguments,
+                loading: loaded.map(\.name),
+                returning: swiftReturnType(kernel.returns, scope: element.swiftType),
+                storing: kernel.returns.isVectorValued
+            )
+        }
     }
 
     var statements = spans.map {
@@ -52356,16 +52628,24 @@ func codegenKernelTest(
     )
 }
 
-func codegenTests(of op: Op, for element: Element) -> [String] {
+func codegenTests(of op: Op, for element: Element, form: CodegenForm = .byValue) -> [String] {
     var tests: [String] = []
     let parameters = codegenParameters(of: op, for: element)
     for variant in codegenVariants(of: parameters, for: element) {
+        let loaded = codegenLoadedParameters(of: parameters, variant: variant.constant)
+        if form == .inVectorCode
+            && (!codegenIsRunTime(variant, of: parameters)
+                || loaded.isEmpty && !op.returns.isVectorValued)
+        {
+            continue
+        }
         tests.append(
             codegenTest(
                 of: op,
                 for: element,
                 constant: variant.constant,
-                alternative: variant.alternative
+                alternative: variant.alternative,
+                form: form
             )
         )
         if op.span != nil {
@@ -52375,7 +52655,8 @@ func codegenTests(of op: Op, for element: Element) -> [String] {
                     for: element,
                     constant: variant.constant,
                     alternative: variant.alternative,
-                    guarded: true
+                    guarded: true,
+                    form: form
                 )
             )
         }
@@ -52386,7 +52667,8 @@ func codegenTests(of op: Op, for element: Element) -> [String] {
                     for: element,
                     constant: variant.constant,
                     alternative: variant.alternative,
-                    misaligned: true
+                    misaligned: true,
+                    form: form
                 )
             )
         }
@@ -52394,10 +52676,16 @@ func codegenTests(of op: Op, for element: Element) -> [String] {
     return tests
 }
 
-func codegenWideningTests(_ op: WideningOp, from narrow: Element, to wide: Element) -> [String] {
+func codegenWideningTests(
+    _ op: WideningOp,
+    from narrow: Element,
+    to wide: Element,
+    form: CodegenForm = .byValue
+) -> [String] {
     var tests: [String] = []
     let parameters = codegenParameters(of: op, from: narrow)
     for variant in codegenVariants(of: parameters, for: wide) {
+        if form == .inVectorCode && !codegenIsRunTime(variant, of: parameters) { continue }
         for (guarded, misaligned) in [(false, false), (true, false), (false, true)] {
             tests.append(
                 codegenWideningTest(
@@ -52407,7 +52695,8 @@ func codegenWideningTests(_ op: WideningOp, from narrow: Element, to wide: Eleme
                     constant: variant.constant,
                     alternative: variant.alternative,
                     guarded: guarded,
-                    misaligned: misaligned
+                    misaligned: misaligned,
+                    form: form
                 )
             )
         }
@@ -52415,34 +52704,52 @@ func codegenWideningTests(_ op: WideningOp, from narrow: Element, to wide: Eleme
     return tests
 }
 
-func codegenKernelTests(_ kernel: CodegenKernel, for element: Element) -> [String] {
-    var tests = [codegenKernelTest(kernel, for: element)]
+func codegenKernelTests(
+    _ kernel: CodegenKernel,
+    for element: Element,
+    form: CodegenForm = .byValue
+) -> [String] {
+    if form == .inVectorCode && !kernel.returns.isVectorValued
+        && !kernel.parameters.contains(where: { $0.kind == .vector })
+    {
+        return []
+    }
+    var tests = [codegenKernelTest(kernel, for: element, form: form)]
     if kernel.parameters.contains(where: { $0.kind == .pointer }) {
-        tests.append(codegenKernelTest(kernel, for: element, guarded: true))
+        tests.append(codegenKernelTest(kernel, for: element, guarded: true, form: form))
     }
     return tests
 }
 
-func generateCodegenTestMembers(_ element: Element, by keys: Set<String>?) -> [SectionMember] {
+func generateCodegenTestMembers(
+    _ element: Element,
+    by keys: Set<String>?,
+    form: CodegenForm = .byValue
+) -> [SectionMember] {
     var members = testedOps(for: element, by: keys).map {
         SectionMember(
             section: $0.section,
             inside: markingKnownGaps(
-                guarded(codegenTests(of: $0, for: element), op: $0, in: element, testing: true),
+                guarded(
+                    codegenTests(of: $0, for: element, form: form),
+                    op: $0,
+                    in: element,
+                    testing: true
+                ),
                 suite: "\(element.namespace)Codegen"
             )
         )
     }
     members += wideningOps.map { op in
         let tests = testedWideningSources(of: op, for: element, by: keys).flatMap {
-            codegenWideningTests(op, from: $0, to: element)
+            codegenWideningTests(op, from: $0, to: element, form: form)
         }
         return SectionMember(section: op.section, inside: tests)
     }
     members += rebindingOps.map { op in
         let tests = testedRebindingSources(of: op, for: element, by: keys).map {
             guarded(
-                codegenRebindingTest(op, from: $0, to: element),
+                codegenRebindingTest(op, from: $0, to: element, form: form),
                 rebinding: $0,
                 to: element,
                 testing: true
@@ -52454,12 +52761,12 @@ func generateCodegenTestMembers(_ element: Element, by keys: Set<String>?) -> [S
         members.append(
             SectionMember(
                 section: .initialization,
-                inside: [codegenRepeatingBlockTest(for: element)]
+                inside: [codegenRepeatingBlockTest(for: element, form: form)]
             )
         )
     }
     members += testedKernels(for: element, by: keys).map {
-        SectionMember(section: .kernels, inside: codegenKernelTests($0, for: element))
+        SectionMember(section: .kernels, inside: codegenKernelTests($0, for: element, form: form))
     }
     return members
 }
@@ -52472,19 +52779,24 @@ let codegenTestImports = """
     import Vectorization
     """
 
-func generateCodegenTests(_ element: Element) -> String {
-    """
-    \(generationNotice)
+func generateCodegenTests(_ element: Element, form: CodegenForm = .byValue) -> String {
+    let title =
+        switch form {
+        case .byValue: "codegen"
+        case .inVectorCode: "codegen in vector code"
+        }
+    return """
+        \(generationNotice)
 
-    \(codegenTestImports)
+        \(codegenTestImports)
 
-    @Suite("\(element.namespace) codegen against Highway")
-    struct \(element.namespace)CodegenTests {
-        typealias H = \(element.vectorType)
-        typealias Lane = \(element.swiftType)
-    }
+        @Suite("\(element.namespace) \(title) against Highway")
+        struct \(element.namespace)Codegen\(form.suffix)Tests {
+            typealias H = \(element.vectorType)
+            typealias Lane = \(element.swiftType)
+        }
 
-    """
+        """
 }
 
 struct ConstantValue {
@@ -53994,18 +54306,22 @@ func generateConstantTests(_ element: Element) -> String {
     """
 }
 
-func generateCodegenMembers(_ element: Element) -> [SectionMember] {
+func generateCodegenMembers(
+    _ element: Element,
+    form: CodegenForm = .byValue
+) -> [SectionMember] {
     var members = ops.filter { $0.applies.matches(element) }.map {
         SectionMember(
             section: $0.section,
-            inside: guarded(
-                referenceSpanMembers(of: $0, for: element),
-                op: $0,
-                in: element,
-                testing: false
-            ),
+            inside: form == .byValue
+                ? guarded(
+                    referenceSpanMembers(of: $0, for: element),
+                    op: $0,
+                    in: element,
+                    testing: false
+                ) : [],
             outside: guarded(
-                [codegenFunctions(of: $0, for: element)],
+                [codegenFunctions(of: $0, for: element, form: form)],
                 op: $0,
                 in: element,
                 testing: false
@@ -54016,10 +54332,11 @@ func generateCodegenMembers(_ element: Element) -> [SectionMember] {
         let narrows = wideningSources(of: element)
         return SectionMember(
             section: op.section,
-            inside: narrows.map {
-                spanMembers(referenceSpanForms(of: op, from: $0, to: element))
-            },
-            outside: narrows.map { codegenFunctions(op, from: $0, to: element) }
+            inside: form == .byValue
+                ? narrows.map {
+                    spanMembers(referenceSpanForms(of: op, from: $0, to: element))
+                } : [],
+            outside: narrows.map { codegenFunctions(op, from: $0, to: element, form: form) }
         )
     }
     members += rebindingOps.map { op in
@@ -54027,7 +54344,7 @@ func generateCodegenMembers(_ element: Element) -> [SectionMember] {
             section: op.section,
             outside: rebindingSources(of: element).map {
                 guarded(
-                    codegenFunctions(op, from: $0, to: element),
+                    codegenFunctions(op, from: $0, to: element, form: form),
                     rebinding: $0,
                     to: element,
                     testing: false
@@ -54038,11 +54355,14 @@ func generateCodegenMembers(_ element: Element) -> [SectionMember] {
     members.append(
         SectionMember(
             section: .initialization,
-            outside: [repeatingBlockCodegenFunctions(for: element)]
+            outside: [repeatingBlockCodegenFunctions(for: element, form: form)]
         )
     )
     members += codegenKernels.filter { $0.applies.matches(element) }.map {
-        SectionMember(section: .kernels, outside: [codegenKernelFunctions($0, for: element)])
+        SectionMember(
+            section: .kernels,
+            outside: [codegenKernelFunctions($0, for: element, form: form)]
+        )
     }
     return members
 }
@@ -54145,8 +54465,13 @@ func conditioned(_ source: String, on condition: String?) -> String {
     return "\(notice)#if \(condition)\n\(source.dropFirst(notice.count))#endif\n"
 }
 
-func conditioned(_ source: String, for element: Element?) -> String {
-    conditioned(source, on: element?.compilationCondition)
+func conditioned(
+    _ source: String,
+    for element: Element?,
+    under condition: String? = nil
+) -> String {
+    let conditions = [condition, element?.compilationCondition].compactMap { $0 }
+    return conditioned(source, on: conditions.isEmpty ? nil : conditions.joined(separator: " && "))
 }
 
 func entirelyGuardedCondition(of members: [SectionMember]) -> String? {
@@ -54170,7 +54495,8 @@ func sectionFile(
     imports: String,
     extending type: String,
     for element: Element? = nil,
-    testing: Bool = false
+    testing: Bool = false,
+    under condition: String? = nil
 ) -> String {
     var output = "\(generationNotice)\n\n\(imports)\n"
     let attribute = testing ? nil : element?.swiftAvailability
@@ -54200,10 +54526,10 @@ func sectionFile(
     if !usesCVectorizationOps(output) {
         output = output.replacingOccurrences(of: "\(elementImports)\n", with: "")
     }
-    return conditioned(
-        output,
-        on: element?.compilationCondition ?? entirelyGuardedCondition(of: members)
-    )
+    let conditions = [
+        condition, element?.compilationCondition ?? entirelyGuardedCondition(of: members),
+    ].compactMap { $0 }
+    return conditioned(output, on: conditions.isEmpty ? nil : conditions.joined(separator: " && "))
 }
 
 func writeSections(
@@ -54215,7 +54541,8 @@ func writeSections(
     for element: Element? = nil,
     testing: Bool = false,
     balancing: Bool = false,
-    inParts partCount: Int = 1
+    inParts partCount: Int = 1,
+    under condition: String? = nil
 ) throws {
     func populated(_ section: Section) -> [SectionMember] {
         members.filter {
@@ -54232,7 +54559,8 @@ func writeSections(
                     imports: imports,
                     extending: type,
                     for: element,
-                    testing: testing
+                    testing: testing,
+                    under: condition
                 ),
                 to: "\(directory)/\(name)+Members\(index + 1).swift"
             )
@@ -54253,7 +54581,8 @@ func writeSections(
                     imports: imports,
                     extending: type,
                     for: element,
-                    testing: testing
+                    testing: testing,
+                    under: condition
                 ),
                 to: "\(partDirectory)/\(name)+\(section.rawValue)\(number).swift"
             )
@@ -54497,6 +54826,26 @@ for element in elements {
         for: element,
         testing: true
     )
+    let inVectorCodeTestsName = "\(element.namespace)CodegenInVectorCodeTests"
+    try write(
+        conditioned(
+            generateCodegenTests(element, form: .inVectorCode),
+            for: element,
+            under: codegenInVectorCodeCondition
+        ),
+        to: "\(codegenTestsDirectory)/\(inVectorCodeTestsName).swift"
+    )
+    try writeSections(
+        generateCodegenTestMembers(element, by: testedKeys, form: .inVectorCode),
+        named: inVectorCodeTestsName,
+        in: codegenTestsDirectory,
+        imports: codegenTestImports,
+        extending: inVectorCodeTestsName,
+        for: element,
+        testing: true,
+        balancing: true,
+        under: codegenInVectorCodeCondition
+    )
     let constantTestsName = "\(element.namespace)ConstantTests"
     let constantTestsDirectory = "\(generatedReferenceTestsRoot)/\(constantTestsName)"
     for part in 1...constantTestParts {
@@ -54545,6 +54894,16 @@ for element in elements {
         imports: codegenImports,
         extending: referenceNamespace(of: element),
         for: element
+    )
+    try writeSections(
+        generateCodegenMembers(element, form: .inVectorCode),
+        named: "\(codegenName)InVectorCode",
+        in: codegenDirectory,
+        imports: codegenImports,
+        extending: referenceNamespace(of: element),
+        for: element,
+        balancing: true,
+        under: codegenInVectorCodeCondition
     )
 }
 try format(generatedSwiftRoot)

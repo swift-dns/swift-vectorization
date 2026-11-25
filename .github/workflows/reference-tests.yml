@@ -69,7 +69,8 @@ jobs:
             expected-vector-bytes: 32
             runner: ubuntu-24.04-arm
             flags: "-Xcc -march=armv8.4-a+sve+bf16+i8mm -Xcc -msve-vector-bits=256 -Xcc -DHWY_BROKEN_SVE=0 -Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-min=256 -Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-max=256"
-            compare-codegen: false
+            compare-codegen: true
+            compare-in-vector-code: true
             debug-tests: false
             release-tests: true
             sde-cpu: ""
@@ -79,7 +80,8 @@ jobs:
             expected-vector-bytes: 64
             runner: ubuntu-24.04-arm
             flags: "-Xcc -march=armv8.2-a+sve -Xcc -msve-vector-bits=512 -Xcc -DHWY_BROKEN_SVE=0 -Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-min=512 -Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-max=512"
-            compare-codegen: false
+            compare-codegen: true
+            compare-in-vector-code: true
             debug-tests: false
             release-tests: true
             sde-cpu: ""
@@ -89,7 +91,8 @@ jobs:
             expected-vector-bytes: 64
             runner: ubuntu-24.04-arm
             flags: "-Xcc -march=armv9-a+bf16+i8mm -Xcc -msve-vector-bits=512 -Xcc -DHWY_BROKEN_SVE=0 -Xcc -DHWY_BROKEN_SVE2=0 -Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-min=512 -Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-max=512"
-            compare-codegen: false
+            compare-codegen: true
+            compare-in-vector-code: true
             debug-tests: false
             release-tests: true
             sde-cpu: ""
@@ -391,9 +394,14 @@ jobs:
         if: ${{ matrix.mode == 'codegen' && matrix.target.compare-codegen }}
         env:
           FLAGS: ${{ matrix.target.flags }}
+          IN_VECTOR_CODE: ${{ matrix.target.compare-in-vector-code }}
         run: |
           read -r -a flags <<< "${FLAGS}"
-          scripts/compare-codegen.sh -- "${flags[@]}"
+          options=()
+          if [[ "${IN_VECTOR_CODE}" == 'true' ]]; then
+            options+=( --in-vector-code )
+          fi
+          scripts/compare-codegen.sh "${options[@]}" -- "${flags[@]}"
 
   sanitizer-reference-tests:
     name: reference-tests (${{ matrix.target.name }}, sanitizers)
