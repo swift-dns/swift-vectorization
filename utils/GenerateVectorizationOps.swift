@@ -2519,28 +2519,36 @@ func sveTwoTablesLookupLanesByHalves(for element: Element) -> String {
         """
 }
 
+func sveSelectedComparison(_ comparison: String, for element: Element) -> String {
+    let unsigned = unsignedElement(of: element)
+    let lanes = sveBuiltin(
+        "dup_n",
+        [comparison, "(\(unsigned.cUnsignedLane))-1"],
+        for: unsigned,
+        predication: "z"
+    )
+    return "(\(element.cMask))(\(sveVector(unsigned.cSuffix)))\(lanes)"
+}
+
 func sveComparisonSplat(_ name: String, mirrored: String, for element: Element) -> String? {
     guard isInteger64(element) else { return nil }
-    let unsigned = unsignedElement(of: element)
-    func selected(_ comparison: String) -> String {
-        let lanes = sveBuiltin(
-            "dup_n",
-            [comparison, "(\(unsigned.cUnsignedLane))-1"],
-            for: unsigned,
-            predication: "z"
-        )
-        return maskResult(
-            "(\(element.cMask))(\(sveVector(unsigned.cSuffix)))\(lanes)",
-            for: element
-        )
-    }
     let all = sveAllLanes(of: element)
     return [
         sveSplatBranch("b", .comparison, for: element) {
-            selected(sveBuiltin(name, [all, sveOperand("a", for: element), $0], for: element))
+            let comparison = sveBuiltin(
+                name,
+                [all, sveOperand("a", for: element), $0],
+                for: element
+            )
+            return maskResult(sveSelectedComparison(comparison, for: element), for: element)
         },
         sveSplatBranch("a", .comparison, for: element) {
-            selected(sveBuiltin(mirrored, [all, sveOperand("b", for: element), $0], for: element))
+            let comparison = sveBuiltin(
+                mirrored,
+                [all, sveOperand("b", for: element), $0],
+                for: element
+            )
+            return maskResult(sveSelectedComparison(comparison, for: element), for: element)
         },
     ].joined(separator: "\n")
 }
@@ -2970,14 +2978,24 @@ func sveMagnitudeExtremum(
 ) -> String {
     let all = sveAllLanes(of: element)
     let (first, second) = name == "minimum" ? operands : (operands.second, operands.first)
+    let compares = element.category == .signedInteger ? unsignedElement(of: element) : element
     func magnitude(_ operand: String) -> String {
-        sveBuiltin("abs", [all, sveOperand(operand, for: element)], for: element, predication: "x")
+        guard element.category == .signedInteger else {
+            return sveBuiltin(
+                "abs",
+                [all, sveOperand(operand, for: element)],
+                for: element,
+                predication: "x"
+            )
+        }
+        let absolute = operationCall("magnitude", [operand], for: element)
+        return sveOperand("(\(compares.cVector))\(absolute)", for: compares)
     }
     func compared(_ name: String) -> String {
         sveBuiltin(
             name,
             [all, magnitude(operands.first), magnitude(operands.second)],
-            for: element
+            for: compares
         )
     }
     func selected(_ predicate: String, _ yes: String, _ no: String) -> String {
@@ -3002,6 +3020,20 @@ func sveMagnitudeExtremum(
 }
 
 func sveWideMagnitudeExtremum(_ name: String, for element: Element) -> String? {
+    if isSignedInteger64(element) {
+        let portable = magnitudeExtremum(name, for: element)
+        return sveFoldingConstants(
+            jointly: [["a", "b"]],
+            portable,
+            otherwise: sveFoldingConstants(
+                of: ["a", "b"],
+                sveMagnitudeExtremum(name, of: ("a", "b"), for: element),
+                otherwise: portable,
+                for: element
+            ),
+            for: element
+        )
+    }
     guard let folded = sveConstantMagnitudeExtremum(name, for: element) else { return nil }
     let wide = sveConstantBarrier(blocking: .both([.notANumber]), for: element) {
         sveMagnitudeExtremum(name, of: ($0, $1), for: element)
@@ -13535,19 +13567,19 @@ func sveDuplicatedLanes(_ operand: String, odd: Bool, for element: Element) -> S
     return sveResult(sveBuiltin(odd ? "trn2" : "trn1", [lanes, lanes], for: element), for: element)
 }
 
-func complexDuplicates(using select: AlternatingSelect = .shuffle, for element: Element) -> String {
+func complexDuplicates(for element: Element) -> String {
     let vector = element.cVector
-    func lanes(_ operand: String, odd: Bool) -> String {
-        select == .shuffle
-            ? complexLanes(operand, odd: odd, for: element)
-            : sveDuplicatedLanes(operand, odd: odd, for: element)
-    }
     return """
-        const \(vector) u = \(lanes("a", odd: false));
-        const \(vector) v = \(lanes("a", odd: true));
-        const \(vector) x = \(lanes("b", odd: false));
-        const \(vector) y = \(lanes("b", odd: true));
+        const \(vector) u = \(complexLanes("a", odd: false, for: element));
+        const \(vector) v = \(complexLanes("a", odd: true, for: element));
+        const \(vector) x = \(complexLanes("b", odd: false, for: element));
+        const \(vector) y = \(complexLanes("b", odd: true, for: element));
         """
+}
+
+func complexSwappedLanes(_ operand: String, for element: Element) -> String {
+    let indices = (0..<element.laneCount).map { $0 ^ 1 }
+    return "__builtin_shufflevector(\(operand), \(operand), \(laneIndices(indices)))"
 }
 
 func twoProductComplexMultiplyingBody(
@@ -13556,7 +13588,6 @@ func twoProductComplexMultiplyingBody(
     for element: Element
 ) -> String {
     let vector = element.cVector
-    let swappedIndices = (0..<element.laneCount).map { $0 ^ 1 }
     let (first, second) =
         conjugating
         ? (alternatingLanes("b", negatedLanes("b", for: element), for: element), "swapped")
@@ -13570,7 +13601,7 @@ func twoProductComplexMultiplyingBody(
     return """
         const \(vector) u = \(complexLanes("a", odd: false, for: element));
         const \(vector) v = \(complexLanes("a", odd: true, for: element));
-        const \(vector) swapped = __builtin_shufflevector(b, b, \(laneIndices(swappedIndices)));
+        const \(vector) swapped = \(complexSwappedLanes("b", for: element));
         const \(vector) first = \(first);
         const \(vector) second = \(second);
         \(vectorResult(adding ? arithmetic("+", sum, "c", for: element) : sum, for: element))
@@ -13583,7 +13614,6 @@ func complexMultiplyingBody(
     fused: Bool,
     selectingByMask: Bool = false,
     highwayOrder: Bool = false,
-    using select: AlternatingSelect = .shuffle,
     finishing: ((String) -> String)? = nil,
     for element: Element
 ) -> String {
@@ -13617,9 +13647,9 @@ func complexMultiplyingBody(
     let alternated =
         selectingByMask
         ? wordwiseEvenLanes("evens", "odds", for: element)
-        : alternatingLanes("evens", "odds", using: select, for: element)
+        : alternatingLanes("evens", "odds", for: element)
     let lanes =
-        ([complexDuplicates(using: select, for: element)] + accumulations + [
+        ([complexDuplicates(for: element)] + accumulations + [
             "const \(vector) odds = \(odds);",
             "const \(vector) evens = \(evens);",
             "const \(vector) multiplied = \(alternated);",
@@ -13677,6 +13707,76 @@ func sveComplexMultiplying(conjugating: Bool, adding: Bool, for element: Element
     return vectorResult(sveResult(rotated, for: element), for: element)
 }
 
+func sveTwoProductComplexMultiplying(
+    conjugating: Bool,
+    adding: Bool,
+    foldingConstantB: Bool,
+    for element: Element
+) -> String {
+    let vector = element.cVector
+    func permuted(_ name: String, _ first: String, _ second: String) -> String {
+        let operands = [first, second].map { sveOperand("(\($0))", for: element) }
+        return sveResult(sveBuiltin(name, operands, for: element), for: element)
+    }
+    func added(_ sum: String) -> String {
+        adding ? arithmetic("+", "c", sum, for: element) : sum
+    }
+    let swapped = complexSwappedLanes("b", for: element)
+    let permutations: [(name: String, portable: String, built: String)] =
+        conjugating
+        ? [
+            (
+                "first", alternatingLanes("b", negatedLanes("b", for: element), for: element),
+                permuted("trn1", "b", permuted("trn2", "negated", "b"))
+            ),
+            ("second", swapped, permuted("trn1", permuted("trn2", "b", "b"), "b")),
+        ]
+        : [
+            (
+                "crossed",
+                alternatingLanes(negatedLanes(swapped, for: element), swapped, for: element),
+                permuted("trn1", permuted("trn2", "negated", "b"), "b")
+            )
+        ]
+    let constant = "\(cFunctionName("sveConstant", element))(b)"
+    let (first, second) = conjugating ? ("first", "second") : ("b", "crossed")
+    let scaled = multipliedLanes(
+        "a",
+        "(\(arithmetic("+", first, second, for: element)))",
+        for: element
+    )
+    let byB = multipliedLanes(
+        conjugating ? "imaginary" : "real",
+        conjugating ? second : first,
+        for: element
+    )
+    let byA = arithmetic(
+        "*",
+        conjugating ? "real" : "imaginary",
+        conjugating ? first : second,
+        for: element
+    )
+    let terms = conjugating ? [byA, byB] : [byB, byA]
+    let statements =
+        ["const \(vector) negated = \(negatedLanes("b", for: element));"]
+        + permutations.map {
+            foldingConstantB
+                ? "const \(vector) \($0.name) = \(constant) ? \($0.portable) : \($0.built);"
+                : "const \(vector) \($0.name) = \($0.built);"
+        }
+        + [
+            """
+            if (\(sveSplatCondition("a", nil, for: element))) {
+              \(vectorResult(added(scaled), for: element))
+            }
+            """,
+            "const \(vector) real = \(permuted("trn1", "a", "a"));",
+            "const \(vector) imaginary = \(permuted("trn2", "a", "a"));",
+            vectorResult(arithmetic("+", added(terms[0]), terms[1], for: element), for: element),
+        ]
+    return statements.joined(separator: "\n")
+}
+
 func isSelectedByMask(_ element: Element) -> Bool {
     element.category != .float && element.bits == 16
 }
@@ -13714,17 +13814,16 @@ func complexMultiplyingTargets(conjugating: Bool, adding: Bool) -> TargetBodies<
             let singles = foldedOperands(of: element, select)
             return sveFoldingConstants(
                 of: singles,
-                jointly: singles.isEmpty && select == .sve ? [["a", "b"]] : [],
+                jointly: singles.isEmpty ? [["a", "b"]] : [],
                 twoProductComplexMultiplyingBody(
                     conjugating: conjugating,
                     adding: adding,
                     for: element
                 ),
-                otherwise: complexMultiplyingBody(
+                otherwise: sveTwoProductComplexMultiplying(
                     conjugating: conjugating,
                     adding: adding,
-                    fused: false,
-                    using: select,
+                    foldingConstantB: !singles.contains("b"),
                     for: element
                 ),
                 for: element
@@ -16736,7 +16835,11 @@ let basicOps: [Op] = [
             sve2_128: { element in sveTrueCount(for: element) },
             sve: { element in
                 element.laneCount > 32
-                    ? sveTrueCount(for: element)
+                    ? sveFolding(
+                        when: "\(cFunctionName("sveSplat", element))((\(element.cVector))mask)",
+                        portableTrueCount(for: element),
+                        otherwise: sveTrueCount(for: element)
+                    )
                     : sveFoldingConstantMask(
                         portableTrueCount(for: element),
                         otherwise: sveTrueCount(for: element),
@@ -17373,6 +17476,29 @@ func sveMaskedComparison(of family: MaskedFamily, for element: Element) -> Strin
     return sveMaskVector(predicate, for: element)
 }
 
+func maskedMaskResult(of family: MaskedFamily, for element: Element) -> String {
+    maskResult("mask & \(maskedExpression(of: family, for: element))", for: element)
+}
+
+func sveMaskedConstantMaskComparison(of family: MaskedFamily, for element: Element) -> String? {
+    guard isInteger64(element), let comparison = family.sveComparison,
+        ["cmplt", "cmple"].contains(comparison.name)
+    else { return nil }
+    let constant = cFunctionName("sveConstant", element)
+    let compared = comparison.swapped ? ["b", "a"] : ["a", "b"]
+    let operands = compared.map { sveOperand($0, for: element) }
+    let selected = sveSelectedComparison(
+        sveBuiltin(comparison.name, [sveAllLanes(of: element)] + operands, for: element),
+        for: element
+    )
+    return sveFolding(
+        when:
+            "\(constant)((\(element.cVector))mask) && !(\(constant)(a) && \(constant)(b))",
+        maskResult("mask & \(selected)", for: element),
+        otherwise: maskedMaskResult(of: family, for: element)
+    )
+}
+
 func sveMergingSelecting(_ operation: String, for element: Element) -> String {
     let active = svePredicate(of: "mask", for: element)
     let selected = sveBuiltin(
@@ -17654,6 +17780,7 @@ func maskedFamilyTargets(_ family: MaskedFamily, merging: Bool) -> TargetBodies<
     if let comparison = family.comparison {
         return TargetBodies(
             sve2_128: { element in sveMaskedComparison(of: family, for: element) },
+            sve: { element in sveMaskedConstantMaskComparison(of: family, for: element) },
             avx3: { element in x86Avx3MaskedComparison(comparison, for: element) }
         )
     }
@@ -17772,7 +17899,7 @@ func maskedOp(
         outOfLineOnSVE: family.outOfLineOnSVE
     ) { element in
         if family.returns == .mask {
-            return maskResult("mask & \(operation(element))", for: element)
+            return maskedMaskResult(of: family, for: element)
         }
         if merging && family.divides {
             let isolated = maskedExpression(of: family, for: element, isolatingDivisor: true)
@@ -25478,7 +25605,18 @@ let compressOps: [Op] = [
                 default: neonPartitionedBytes(for: $0)
                 }
             },
-            sve: { partitioned(isPartition: $0.bits == 64 && $0.width == 32, for: $0) },
+            sve: { element in
+                let body = partitioned(
+                    isPartition: element.bits == 64 && element.width == 32,
+                    for: element
+                )
+                guard element.bits <= 16 else { return body }
+                return sveFolding(
+                    when: "\(cFunctionName("sveSplat", element))((\(element.cVector))mask)",
+                    vectorResult("a", for: element),
+                    otherwise: body
+                )
+            },
             avx3dl: { partitioned(isPartition: $0.bits == 64, for: $0) },
             avx3: { x86Avx3Partitioned(for: $0) },
             avx2: { partitioned(isPartition: $0.bits != 8, for: $0) },
@@ -33604,17 +33742,18 @@ func mulBitsByteIndexedOps(
     }
 }
 
-func mulBitsMultiRotatedRightFoldingConstants(for element: Element) -> String {
+func mulBitsMultiRotatedRightFoldingConstants(sve2: Bool, for element: Element) -> String {
     let bytes = unsignedElement(bits: 8)
-    let constants = [
-        "\(cFunctionName("sveConstant", element))(a)",
-        "\(cFunctionName("sveConstant", bytes))((\(bytes.cVector))b)",
+    let marker = sve2 ? "sveConstant" : "sveSplat"
+    let operands = [
+        "\(cFunctionName(marker, element))(a)",
+        "\(cFunctionName(marker, bytes))((\(bytes.cVector))b)",
     ]
     return sveFolding(
-        when: constants.joined(separator: " || "),
-        mulBitsMultiRotatedRightLookup(.wideSve(sve2: true), for: element),
+        when: operands.joined(separator: sve2 ? " || " : " && "),
+        mulBitsMultiRotatedRightLookup(.wideSve(sve2: sve2), for: element),
         otherwise: mulBitsMultiRotatedRightLookup(
-            .wideSve(sve2: true),
+            .wideSve(sve2: sve2),
             sveShuffles: true,
             for: element
         )
@@ -33628,10 +33767,8 @@ let mulBitsMultiRotatedRightOps = mulBitsByteIndexedOps(
     targets: TargetBodies(
         neon: { element in mulBitsMultiRotatedRightLookup(.neon, for: element) },
         sve2_128: { element in mulBitsMultiRotatedRightLookup(.sve, for: element) },
-        sve: { element in
-            mulBitsMultiRotatedRightLookup(.wideSve(sve2: false), sveShuffles: true, for: element)
-        },
-        sve2: { element in mulBitsMultiRotatedRightFoldingConstants(for: element) },
+        sve: { element in mulBitsMultiRotatedRightFoldingConstants(sve2: false, for: element) },
+        sve2: { element in mulBitsMultiRotatedRightFoldingConstants(sve2: true, for: element) },
         avx3dl: { element in mulBitsMultiRotatedRightX86Multishift(for: element) },
         avx3: { element in mulBitsMultiRotatedRightLookup(.x86, for: element) },
         avx2: { element in mulBitsMultiRotatedRightLookup(.x86, for: element) },

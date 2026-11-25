@@ -81,44 +81,73 @@ extension SIMDInt8ConstantTests {
         mismatches.record()
     }
 
+    @inline(__always)
+    private func checkMultiplyingComplexConstantB(_ value: Lane) {
+        let mismatches = Mismatches("multiplyingComplex with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xEB8E_5499_FADE_6304)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI8(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.multiplyingComplex(a, H.repeating(value)),
+                H(raw: HighwayReference.multiplyingComplexI8(a.raw, H.repeating(value).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func multiplyingComplexConstantSplat0() {
         checkMultiplyingComplexConstantA(0)
+        checkMultiplyingComplexConstantB(0)
     }
 
     @Test func multiplyingComplexConstantSplat1() {
         checkMultiplyingComplexConstantA(1)
+        checkMultiplyingComplexConstantB(1)
     }
 
     @Test func multiplyingComplexConstantSplat15() {
         checkMultiplyingComplexConstantA(15)
+        checkMultiplyingComplexConstantB(15)
     }
 
     @Test func multiplyingComplexConstantSplat16() {
         checkMultiplyingComplexConstantA(16)
+        checkMultiplyingComplexConstantB(16)
     }
 
     @Test func multiplyingComplexConstantSplat26() {
         checkMultiplyingComplexConstantA(26)
+        checkMultiplyingComplexConstantB(26)
     }
 
     @Test func multiplyingComplexConstantSplat127() {
         checkMultiplyingComplexConstantA(127)
+        checkMultiplyingComplexConstantB(127)
     }
 
     @Test func multiplyingComplexConstantSplatMinus1() {
         checkMultiplyingComplexConstantA(-1)
+        checkMultiplyingComplexConstantB(-1)
     }
 
     @Test func multiplyingComplexConstantSplatMinus16() {
         checkMultiplyingComplexConstantA(-16)
+        checkMultiplyingComplexConstantB(-16)
     }
 
     @Test func multiplyingComplexConstantSplatMinus17() {
         checkMultiplyingComplexConstantA(-17)
+        checkMultiplyingComplexConstantB(-17)
     }
 
     @Test func multiplyingComplexConstantSplatMinus128() {
         checkMultiplyingComplexConstantA(-128)
+        checkMultiplyingComplexConstantB(-128)
     }
 
     @inline(__always)
@@ -473,44 +502,80 @@ extension SIMDInt8ConstantTests {
         mismatches.record()
     }
 
+    @inline(__always)
+    private func checkMultiplyAddingComplexConstantB(_ value: Lane) {
+        let mismatches = Mismatches("multiplyAddingComplex with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x71C1_7FD4_99E0_D82F)
+        let cInputs = Inputs.vectors(H.self, seed: 0x71C1_81D4_99E0_DB95)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI8(value)),
+            "repeating"
+        )
+        for (a, c) in everyPair(aInputs, cInputs) {
+            mismatches.check(
+                H.multiplyAddingComplex(a, H.repeating(value), c),
+                H(
+                    raw: HighwayReference.multiplyAddingComplexI8(
+                        a.raw,
+                        H.repeating(value).raw,
+                        c.raw
+                    )
+                ),
+                "a: \(describe(a)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func multiplyAddingComplexConstantSplat0() {
         checkMultiplyAddingComplexConstantA(0)
+        checkMultiplyAddingComplexConstantB(0)
     }
 
     @Test func multiplyAddingComplexConstantSplat1() {
         checkMultiplyAddingComplexConstantA(1)
+        checkMultiplyAddingComplexConstantB(1)
     }
 
     @Test func multiplyAddingComplexConstantSplat15() {
         checkMultiplyAddingComplexConstantA(15)
+        checkMultiplyAddingComplexConstantB(15)
     }
 
     @Test func multiplyAddingComplexConstantSplat16() {
         checkMultiplyAddingComplexConstantA(16)
+        checkMultiplyAddingComplexConstantB(16)
     }
 
     @Test func multiplyAddingComplexConstantSplat26() {
         checkMultiplyAddingComplexConstantA(26)
+        checkMultiplyAddingComplexConstantB(26)
     }
 
     @Test func multiplyAddingComplexConstantSplat127() {
         checkMultiplyAddingComplexConstantA(127)
+        checkMultiplyAddingComplexConstantB(127)
     }
 
     @Test func multiplyAddingComplexConstantSplatMinus1() {
         checkMultiplyAddingComplexConstantA(-1)
+        checkMultiplyAddingComplexConstantB(-1)
     }
 
     @Test func multiplyAddingComplexConstantSplatMinus16() {
         checkMultiplyAddingComplexConstantA(-16)
+        checkMultiplyAddingComplexConstantB(-16)
     }
 
     @Test func multiplyAddingComplexConstantSplatMinus17() {
         checkMultiplyAddingComplexConstantA(-17)
+        checkMultiplyAddingComplexConstantB(-17)
     }
 
     @Test func multiplyAddingComplexConstantSplatMinus128() {
         checkMultiplyAddingComplexConstantA(-128)
+        checkMultiplyAddingComplexConstantB(-128)
     }
 
     @inline(__always)

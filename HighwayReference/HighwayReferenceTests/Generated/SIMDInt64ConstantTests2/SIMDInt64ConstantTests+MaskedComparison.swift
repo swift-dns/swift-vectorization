@@ -293,6 +293,69 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
+    private func checkLessThanWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("lessThanWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xDD7A_7FE6_2563_D03A)
+        let bInputs = Inputs.vectors(H.self, seed: 0xDD7A_7EE6_2563_CE87)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.lessThan(a, b, where: mask),
+                H.Mask(raw: HighwayReference.lessThanWhereI64(mask.raw, a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func lessThanWhereConstantMaskAllFalse() {
+        checkLessThanWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func lessThanWhereConstantMaskAllTrue() {
+        checkLessThanWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func lessThanWhereConstantMaskOnlyFirst() {
+        checkLessThanWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func lessThanWhereConstantMaskOnlyLast() {
+        checkLessThanWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func lessThanWhereConstantMaskAllButFirst() {
+        checkLessThanWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func lessThanWhereConstantMaskAllButLast() {
+        checkLessThanWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
     private func checkLessThanWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("lessThanWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x78AA_4E4F_3FEE_CCA6)
@@ -429,6 +492,69 @@ extension SIMDInt64ConstantTests {
     @Test func lessThanWhereConstantSplatMin() {
         checkLessThanWhereConstantA(Lane.min)
         checkLessThanWhereConstantB(Lane.min)
+    }
+
+    @inline(__always)
+    private func checkGreaterThanWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("greaterThanWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x43D0_E1BE_EBB6_EF11)
+        let bInputs = Inputs.vectors(H.self, seed: 0x43D0_DEBE_EBB6_E9F8)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.greaterThan(a, b, where: mask),
+                H.Mask(raw: HighwayReference.greaterThanWhereI64(mask.raw, a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func greaterThanWhereConstantMaskAllFalse() {
+        checkGreaterThanWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func greaterThanWhereConstantMaskAllTrue() {
+        checkGreaterThanWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func greaterThanWhereConstantMaskOnlyFirst() {
+        checkGreaterThanWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func greaterThanWhereConstantMaskOnlyLast() {
+        checkGreaterThanWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func greaterThanWhereConstantMaskAllButFirst() {
+        checkGreaterThanWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func greaterThanWhereConstantMaskAllButLast() {
+        checkGreaterThanWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
     }
 
     @inline(__always)
@@ -579,6 +705,69 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
+    private func checkLessThanOrEqualToWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("lessThanOrEqualToWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x7086_9FA6_E855_D602)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7086_9EA6_E855_D44F)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.lessThanOrEqualTo(a, b, where: mask),
+                H.Mask(raw: HighwayReference.lessThanOrEqualToWhereI64(mask.raw, a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func lessThanOrEqualToWhereConstantMaskAllFalse() {
+        checkLessThanOrEqualToWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func lessThanOrEqualToWhereConstantMaskAllTrue() {
+        checkLessThanOrEqualToWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func lessThanOrEqualToWhereConstantMaskOnlyFirst() {
+        checkLessThanOrEqualToWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func lessThanOrEqualToWhereConstantMaskOnlyLast() {
+        checkLessThanOrEqualToWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func lessThanOrEqualToWhereConstantMaskAllButFirst() {
+        checkLessThanOrEqualToWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func lessThanOrEqualToWhereConstantMaskAllButLast() {
+        checkLessThanOrEqualToWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
     private func checkLessThanOrEqualToWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("lessThanOrEqualToWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA624_C4F5_942D_879E)
@@ -723,6 +912,69 @@ extension SIMDInt64ConstantTests {
     @Test func lessThanOrEqualToWhereConstantSplatMin() {
         checkLessThanOrEqualToWhereConstantA(Lane.min)
         checkLessThanOrEqualToWhereConstantB(Lane.min)
+    }
+
+    @inline(__always)
+    private func checkGreaterThanOrEqualToWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("greaterThanOrEqualToWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x6EEB_71A8_128A_C827)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6EEB_72A8_128A_C9DA)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.greaterThanOrEqualTo(a, b, where: mask),
+                H.Mask(raw: HighwayReference.greaterThanOrEqualToWhereI64(mask.raw, a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func greaterThanOrEqualToWhereConstantMaskAllFalse() {
+        checkGreaterThanOrEqualToWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func greaterThanOrEqualToWhereConstantMaskAllTrue() {
+        checkGreaterThanOrEqualToWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func greaterThanOrEqualToWhereConstantMaskOnlyFirst() {
+        checkGreaterThanOrEqualToWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func greaterThanOrEqualToWhereConstantMaskOnlyLast() {
+        checkGreaterThanOrEqualToWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func greaterThanOrEqualToWhereConstantMaskAllButFirst() {
+        checkGreaterThanOrEqualToWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func greaterThanOrEqualToWhereConstantMaskAllButLast() {
+        checkGreaterThanOrEqualToWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
     }
 
     @inline(__always)

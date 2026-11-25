@@ -25,56 +25,88 @@ extension SIMDUInt16ConstantTests {
         mismatches.record()
     }
 
+    @inline(__always)
+    private func checkMultiplyingComplexConstantB(_ value: Lane) {
+        let mismatches = Mismatches("multiplyingComplex with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xB784_D3B0_04D8_D4F9)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU16(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.multiplyingComplex(a, H.repeating(value)),
+                H(raw: HighwayReference.multiplyingComplexU16(a.raw, H.repeating(value).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func multiplyingComplexConstantSplat0() {
         checkMultiplyingComplexConstantA(0)
+        checkMultiplyingComplexConstantB(0)
     }
 
     @Test func multiplyingComplexConstantSplat1() {
         checkMultiplyingComplexConstantA(1)
+        checkMultiplyingComplexConstantB(1)
     }
 
     @Test func multiplyingComplexConstantSplat15() {
         checkMultiplyingComplexConstantA(15)
+        checkMultiplyingComplexConstantB(15)
     }
 
     @Test func multiplyingComplexConstantSplat16() {
         checkMultiplyingComplexConstantA(16)
+        checkMultiplyingComplexConstantB(16)
     }
 
     @Test func multiplyingComplexConstantSplat26() {
         checkMultiplyingComplexConstantA(26)
+        checkMultiplyingComplexConstantB(26)
     }
 
     @Test func multiplyingComplexConstantSplat127() {
         checkMultiplyingComplexConstantA(127)
+        checkMultiplyingComplexConstantB(127)
     }
 
     @Test func multiplyingComplexConstantSplat128() {
         checkMultiplyingComplexConstantA(128)
+        checkMultiplyingComplexConstantB(128)
     }
 
     @Test func multiplyingComplexConstantSplat255() {
         checkMultiplyingComplexConstantA(255)
+        checkMultiplyingComplexConstantB(255)
     }
 
     @Test func multiplyingComplexConstantSplat256() {
         checkMultiplyingComplexConstantA(256)
+        checkMultiplyingComplexConstantB(256)
     }
 
     @Test func multiplyingComplexConstantSplat257() {
         checkMultiplyingComplexConstantA(257)
+        checkMultiplyingComplexConstantB(257)
     }
 
     @Test func multiplyingComplexConstantSplat65280() {
         checkMultiplyingComplexConstantA(65280)
+        checkMultiplyingComplexConstantB(65280)
     }
 
     @Test func multiplyingComplexConstantSplat65281() {
         checkMultiplyingComplexConstantA(65281)
+        checkMultiplyingComplexConstantB(65281)
     }
 
     @Test func multiplyingComplexConstantSplatMax() {
         checkMultiplyingComplexConstantA(Lane.max)
+        checkMultiplyingComplexConstantB(Lane.max)
     }
 
     @inline(__always)
@@ -326,56 +358,95 @@ extension SIMDUInt16ConstantTests {
         mismatches.record()
     }
 
+    @inline(__always)
+    private func checkMultiplyAddingComplexConstantB(_ value: Lane) {
+        let mismatches = Mismatches("multiplyAddingComplex with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x4A78_4423_D805_0354)
+        let cInputs = Inputs.vectors(H.self, seed: 0x4A78_4623_D805_06BA)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU16(value)),
+            "repeating"
+        )
+        for (a, c) in everyPair(aInputs, cInputs) {
+            mismatches.check(
+                H.multiplyAddingComplex(a, H.repeating(value), c),
+                H(
+                    raw: HighwayReference.multiplyAddingComplexU16(
+                        a.raw,
+                        H.repeating(value).raw,
+                        c.raw
+                    )
+                ),
+                "a: \(describe(a)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func multiplyAddingComplexConstantSplat0() {
         checkMultiplyAddingComplexConstantA(0)
+        checkMultiplyAddingComplexConstantB(0)
     }
 
     @Test func multiplyAddingComplexConstantSplat1() {
         checkMultiplyAddingComplexConstantA(1)
+        checkMultiplyAddingComplexConstantB(1)
     }
 
     @Test func multiplyAddingComplexConstantSplat15() {
         checkMultiplyAddingComplexConstantA(15)
+        checkMultiplyAddingComplexConstantB(15)
     }
 
     @Test func multiplyAddingComplexConstantSplat16() {
         checkMultiplyAddingComplexConstantA(16)
+        checkMultiplyAddingComplexConstantB(16)
     }
 
     @Test func multiplyAddingComplexConstantSplat26() {
         checkMultiplyAddingComplexConstantA(26)
+        checkMultiplyAddingComplexConstantB(26)
     }
 
     @Test func multiplyAddingComplexConstantSplat127() {
         checkMultiplyAddingComplexConstantA(127)
+        checkMultiplyAddingComplexConstantB(127)
     }
 
     @Test func multiplyAddingComplexConstantSplat128() {
         checkMultiplyAddingComplexConstantA(128)
+        checkMultiplyAddingComplexConstantB(128)
     }
 
     @Test func multiplyAddingComplexConstantSplat255() {
         checkMultiplyAddingComplexConstantA(255)
+        checkMultiplyAddingComplexConstantB(255)
     }
 
     @Test func multiplyAddingComplexConstantSplat256() {
         checkMultiplyAddingComplexConstantA(256)
+        checkMultiplyAddingComplexConstantB(256)
     }
 
     @Test func multiplyAddingComplexConstantSplat257() {
         checkMultiplyAddingComplexConstantA(257)
+        checkMultiplyAddingComplexConstantB(257)
     }
 
     @Test func multiplyAddingComplexConstantSplat65280() {
         checkMultiplyAddingComplexConstantA(65280)
+        checkMultiplyAddingComplexConstantB(65280)
     }
 
     @Test func multiplyAddingComplexConstantSplat65281() {
         checkMultiplyAddingComplexConstantA(65281)
+        checkMultiplyAddingComplexConstantB(65281)
     }
 
     @Test func multiplyAddingComplexConstantSplatMax() {
         checkMultiplyAddingComplexConstantA(Lane.max)
+        checkMultiplyAddingComplexConstantB(Lane.max)
     }
 
     @inline(__always)
