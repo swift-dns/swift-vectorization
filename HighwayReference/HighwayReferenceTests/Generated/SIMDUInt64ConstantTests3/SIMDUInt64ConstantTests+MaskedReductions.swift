@@ -7,6 +7,139 @@ import Vectorization
 
 extension SIMDUInt64ConstantTests {
     @inline(__always)
+    private func checkSumWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("sumWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x5AC2_00B6_6865_DD83)
+        for a in aInputs {
+            mismatches.check(
+                H.sum(a, where: mask),
+                HighwayReference.sumWhereU64(mask.raw, a.raw),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func sumWhereConstantMaskAllFalse() {
+        checkSumWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func sumWhereConstantMaskAllTrue() {
+        checkSumWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func sumWhereConstantMaskOnlyFirst() {
+        checkSumWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func sumWhereConstantMaskOnlyLast() {
+        checkSumWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func sumWhereConstantMaskAllButFirst() {
+        checkSumWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func sumWhereConstantMaskAllButLast() {
+        checkSumWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
+    private func checkSumWhereConstantA(_ value: Lane) {
+        let mismatches = Mismatches("sumWhere with a repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x0FB2_556A_AEAF_D2B9)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for mask in maskInputs {
+            mismatches.check(
+                H.sum(H.repeating(value), where: mask),
+                HighwayReference.sumWhereU64(mask.raw, H.repeating(value).raw),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func sumWhereConstantSplat0() {
+        checkSumWhereConstantA(0)
+    }
+
+    @Test func sumWhereConstantSplat1() {
+        checkSumWhereConstantA(1)
+    }
+
+    @Test func sumWhereConstantSplat15() {
+        checkSumWhereConstantA(15)
+    }
+
+    @Test func sumWhereConstantSplat16() {
+        checkSumWhereConstantA(16)
+    }
+
+    @Test func sumWhereConstantSplat26() {
+        checkSumWhereConstantA(26)
+    }
+
+    @Test func sumWhereConstantSplat127() {
+        checkSumWhereConstantA(127)
+    }
+
+    @Test func sumWhereConstantSplat128() {
+        checkSumWhereConstantA(128)
+    }
+
+    @Test func sumWhereConstantSplat255() {
+        checkSumWhereConstantA(255)
+    }
+
+    @Test func sumWhereConstantSplat256() {
+        checkSumWhereConstantA(256)
+    }
+
+    @Test func sumWhereConstantSplat257() {
+        checkSumWhereConstantA(257)
+    }
+
+    @Test func sumWhereConstantSplat65280() {
+        checkSumWhereConstantA(65280)
+    }
+
+    @Test func sumWhereConstantSplat65281() {
+        checkSumWhereConstantA(65281)
+    }
+
+    @Test func sumWhereConstantSplatMax() {
+        checkSumWhereConstantA(Lane.max)
+    }
+
+    @inline(__always)
     private func checkSmallestWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("smallestWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7743_4743_73AE_5DED)

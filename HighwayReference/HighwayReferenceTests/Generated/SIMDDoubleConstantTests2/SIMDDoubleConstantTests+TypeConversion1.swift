@@ -899,6 +899,68 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
+    private func checkVectorConvertingWhereFromUInt64ConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("vectorConvertingWhereFromUInt64 with mask \(describe(mask))")
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0x4FC1_BB6A_E16E_9D6B)
+        for a in aInputs {
+            mismatches.check(
+                H.vector(converting: a, where: mask),
+                H(raw: HighwayReference.vectorConvertingWhereU64ToF64(mask.raw, a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func vectorConvertingWhereFromUInt64ConstantMaskAllFalse() {
+        checkVectorConvertingWhereFromUInt64ConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func vectorConvertingWhereFromUInt64ConstantMaskAllTrue() {
+        checkVectorConvertingWhereFromUInt64ConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func vectorConvertingWhereFromUInt64ConstantMaskOnlyFirst() {
+        checkVectorConvertingWhereFromUInt64ConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func vectorConvertingWhereFromUInt64ConstantMaskOnlyLast() {
+        checkVectorConvertingWhereFromUInt64ConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func vectorConvertingWhereFromUInt64ConstantMaskAllButFirst() {
+        checkVectorConvertingWhereFromUInt64ConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func vectorConvertingWhereFromUInt64ConstantMaskAllButLast() {
+        checkVectorConvertingWhereFromUInt64ConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
     private func checkVectorConvertingWhereFromUInt64ConstantA(_ value: UInt64) {
         let mismatches = Mismatches(
             "vectorConvertingWhereFromUInt64 with a repeating \(hex(value))"
@@ -977,21 +1039,26 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorConvertingWhereFromInt64ConstantA(_ value: Int64) {
-        let mismatches = Mismatches("vectorConvertingWhereFromInt64 with a repeating \(hex(value))")
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF723_A432_F823_AFA8)
+    private func checkVectorConvertingWhereFromUInt64ConstantAAlternating(
+        _ even: UInt64,
+        _ odd: UInt64
+    ) {
+        let mismatches = Mismatches(
+            "vectorConvertingWhereFromUInt64 with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x9DCB_E908_9D4C_0E44)
         mismatches.check(
-            SIMD<Int64>.repeating(value),
-            SIMD<Int64>(raw: HighwayReference.repeatingI64(value)),
-            "repeating"
+            SIMD<UInt64>.repeatingBlock(even, odd),
+            SIMD<UInt64>(raw: HighwayReference.repeatingBlockU64(even, odd)),
+            "repeatingBlock"
         )
         for mask in maskInputs {
             mismatches.check(
-                H.vector(converting: SIMD<Int64>.repeating(value), where: mask),
+                H.vector(converting: SIMD<UInt64>.repeatingBlock(even, odd), where: mask),
                 H(
-                    raw: HighwayReference.vectorConvertingWhereI64ToF64(
+                    raw: HighwayReference.vectorConvertingWhereU64ToF64(
                         mask.raw,
-                        SIMD<Int64>.repeating(value).raw
+                        SIMD<UInt64>.repeatingBlock(even, odd).raw
                     )
                 ),
                 "mask: \(describe(mask))"
@@ -1000,79 +1067,15 @@ extension SIMDDoubleConstantTests {
         mismatches.record()
     }
 
-    @Test func vectorConvertingWhereFromInt64ConstantSplat0() {
-        checkVectorConvertingWhereFromInt64ConstantA(0)
+    @Test func vectorConvertingWhereFromUInt64ConstantAAlternating1And26() {
+        checkVectorConvertingWhereFromUInt64ConstantAAlternating(1, 26)
     }
 
-    @Test func vectorConvertingWhereFromInt64ConstantSplat1() {
-        checkVectorConvertingWhereFromInt64ConstantA(1)
+    @Test func vectorConvertingWhereFromUInt64ConstantAAlternating26And127() {
+        checkVectorConvertingWhereFromUInt64ConstantAAlternating(26, 127)
     }
 
-    @Test func vectorConvertingWhereFromInt64ConstantSplat15() {
-        checkVectorConvertingWhereFromInt64ConstantA(15)
-    }
-
-    @Test func vectorConvertingWhereFromInt64ConstantSplat16() {
-        checkVectorConvertingWhereFromInt64ConstantA(16)
-    }
-
-    @Test func vectorConvertingWhereFromInt64ConstantSplat26() {
-        checkVectorConvertingWhereFromInt64ConstantA(26)
-    }
-
-    @Test func vectorConvertingWhereFromInt64ConstantSplat127() {
-        checkVectorConvertingWhereFromInt64ConstantA(127)
-    }
-
-    @Test func vectorConvertingWhereFromInt64ConstantSplat128() {
-        checkVectorConvertingWhereFromInt64ConstantA(128)
-    }
-
-    @Test func vectorConvertingWhereFromInt64ConstantSplat255() {
-        checkVectorConvertingWhereFromInt64ConstantA(255)
-    }
-
-    @Test func vectorConvertingWhereFromInt64ConstantSplat256() {
-        checkVectorConvertingWhereFromInt64ConstantA(256)
-    }
-
-    @Test func vectorConvertingWhereFromInt64ConstantSplat257() {
-        checkVectorConvertingWhereFromInt64ConstantA(257)
-    }
-
-    @Test func vectorConvertingWhereFromInt64ConstantSplat65280() {
-        checkVectorConvertingWhereFromInt64ConstantA(65280)
-    }
-
-    @Test func vectorConvertingWhereFromInt64ConstantSplat65281() {
-        checkVectorConvertingWhereFromInt64ConstantA(65281)
-    }
-
-    @Test func vectorConvertingWhereFromInt64ConstantSplatMinus1() {
-        checkVectorConvertingWhereFromInt64ConstantA(-1)
-    }
-
-    @Test func vectorConvertingWhereFromInt64ConstantSplatMinus16() {
-        checkVectorConvertingWhereFromInt64ConstantA(-16)
-    }
-
-    @Test func vectorConvertingWhereFromInt64ConstantSplatMinus17() {
-        checkVectorConvertingWhereFromInt64ConstantA(-17)
-    }
-
-    @Test func vectorConvertingWhereFromInt64ConstantSplatMinus128() {
-        checkVectorConvertingWhereFromInt64ConstantA(-128)
-    }
-
-    @Test func vectorConvertingWhereFromInt64ConstantSplatMinus129() {
-        checkVectorConvertingWhereFromInt64ConstantA(-129)
-    }
-
-    @Test func vectorConvertingWhereFromInt64ConstantSplatMax() {
-        checkVectorConvertingWhereFromInt64ConstantA(Int64.max)
-    }
-
-    @Test func vectorConvertingWhereFromInt64ConstantSplatMin() {
-        checkVectorConvertingWhereFromInt64ConstantA(Int64.min)
+    @Test func vectorConvertingWhereFromUInt64ConstantAAlternating127And1() {
+        checkVectorConvertingWhereFromUInt64ConstantAAlternating(127, 1)
     }
 }

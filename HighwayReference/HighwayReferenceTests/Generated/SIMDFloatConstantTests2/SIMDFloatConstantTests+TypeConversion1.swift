@@ -899,162 +899,186 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorResizingFromUInt64ConstantA(_ value: UInt64) {
-        let mismatches = Mismatches("vectorResizingFromUInt64 with a repeating \(hex(value))")
-        mismatches.check(
-            SIMD<UInt64>.repeating(value),
-            SIMD<UInt64>(raw: HighwayReference.repeatingU64(value)),
-            "repeating"
-        )
-        let port = H.vector(resizing: SIMD<UInt64>.repeating(value))
-        let reference = H(
-            raw: HighwayReference.vectorResizingU64ToF32(SIMD<UInt64>.repeating(value).raw)
-        )
-        let definedBytes = SIMD<UInt64>.laneCount * MemoryLayout<UInt64>.stride
-        let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
-        let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
-        mismatches.check(
-            Array(bytes(of: port).prefix(definedBytes)),
-            Array(bytes(of: reference).prefix(definedBytes)),
-            ""
-        )
-        mismatches.check(
-            Array(registerBytes(of: port).dropFirst(definedBytes).prefix(newBytes)),
-            Array(registerBytes(of: reference).dropFirst(definedBytes).prefix(newBytes)),
-            ""
-        )
+    private func checkVectorConvertingWhereFromUInt32ConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("vectorConvertingWhereFromUInt32 with mask \(describe(mask))")
+        let aInputs = Inputs.conversions(SIMD<UInt32>.self, seed: 0x9396_2548_F2B1_E221)
+        for a in aInputs {
+            mismatches.check(
+                H.vector(converting: a, where: mask),
+                H(raw: HighwayReference.vectorConvertingWhereU32ToF32(mask.raw, a.raw)),
+                "a: \(describe(a))"
+            )
+        }
         mismatches.record()
     }
 
-    @Test func vectorResizingFromUInt64ConstantSplat0() {
-        checkVectorResizingFromUInt64ConstantA(0)
+    @Test func vectorConvertingWhereFromUInt32ConstantMaskAllFalse() {
+        checkVectorConvertingWhereFromUInt32ConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
     }
 
-    @Test func vectorResizingFromUInt64ConstantSplat1() {
-        checkVectorResizingFromUInt64ConstantA(1)
+    @Test func vectorConvertingWhereFromUInt32ConstantMaskAllTrue() {
+        checkVectorConvertingWhereFromUInt32ConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
     }
 
-    @Test func vectorResizingFromUInt64ConstantSplat15() {
-        checkVectorResizingFromUInt64ConstantA(15)
+    @Test func vectorConvertingWhereFromUInt32ConstantMaskOnlyFirst() {
+        checkVectorConvertingWhereFromUInt32ConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
     }
 
-    @Test func vectorResizingFromUInt64ConstantSplat16() {
-        checkVectorResizingFromUInt64ConstantA(16)
+    @Test func vectorConvertingWhereFromUInt32ConstantMaskOnlyLast() {
+        checkVectorConvertingWhereFromUInt32ConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
     }
 
-    @Test func vectorResizingFromUInt64ConstantSplat26() {
-        checkVectorResizingFromUInt64ConstantA(26)
+    @Test func vectorConvertingWhereFromUInt32ConstantMaskAllButFirst() {
+        checkVectorConvertingWhereFromUInt32ConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
     }
 
-    @Test func vectorResizingFromUInt64ConstantSplat127() {
-        checkVectorResizingFromUInt64ConstantA(127)
-    }
-
-    @Test func vectorResizingFromUInt64ConstantSplat128() {
-        checkVectorResizingFromUInt64ConstantA(128)
-    }
-
-    @Test func vectorResizingFromUInt64ConstantSplat255() {
-        checkVectorResizingFromUInt64ConstantA(255)
-    }
-
-    @Test func vectorResizingFromUInt64ConstantSplat256() {
-        checkVectorResizingFromUInt64ConstantA(256)
-    }
-
-    @Test func vectorResizingFromUInt64ConstantSplat257() {
-        checkVectorResizingFromUInt64ConstantA(257)
-    }
-
-    @Test func vectorResizingFromUInt64ConstantSplat65280() {
-        checkVectorResizingFromUInt64ConstantA(65280)
-    }
-
-    @Test func vectorResizingFromUInt64ConstantSplat65281() {
-        checkVectorResizingFromUInt64ConstantA(65281)
-    }
-
-    @Test func vectorResizingFromUInt64ConstantSplatMax() {
-        checkVectorResizingFromUInt64ConstantA(UInt64.max)
+    @Test func vectorConvertingWhereFromUInt32ConstantMaskAllButLast() {
+        checkVectorConvertingWhereFromUInt32ConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
     }
 
     @inline(__always)
-    private func checkHalfVectorResizingFromUInt64ConstantA(_ value: UInt64) {
-        let mismatches = Mismatches("halfVectorResizingFromUInt64 with a repeating \(hex(value))")
+    private func checkVectorConvertingWhereFromUInt32ConstantA(_ value: UInt32) {
+        let mismatches = Mismatches(
+            "vectorConvertingWhereFromUInt32 with a repeating \(hex(value))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7662_F893_2FF7_EE63)
         mismatches.check(
-            SIMD<UInt64>.repeating(value),
-            SIMD<UInt64>(raw: HighwayReference.repeatingU64(value)),
+            SIMD<UInt32>.repeating(value),
+            SIMD<UInt32>(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
-        let port = H.halfVector(resizing: SIMD<UInt64>.repeating(value))
-        let reference = H.HalfVector(
-            raw: HighwayReference.halfVectorResizingU64ToF32(SIMD<UInt64>.repeating(value).raw)
-        )
-        let definedBytes = SIMD<UInt64>.laneCount * MemoryLayout<UInt64>.stride
-        let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
-        let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
-        mismatches.check(
-            Array(bytes(of: port).prefix(definedBytes)),
-            Array(bytes(of: reference).prefix(definedBytes)),
-            ""
-        )
-        mismatches.check(
-            Array(registerBytes(of: port).dropFirst(definedBytes).prefix(newBytes)),
-            Array(registerBytes(of: reference).dropFirst(definedBytes).prefix(newBytes)),
-            ""
-        )
+        for mask in maskInputs {
+            mismatches.check(
+                H.vector(converting: SIMD<UInt32>.repeating(value), where: mask),
+                H(
+                    raw: HighwayReference.vectorConvertingWhereU32ToF32(
+                        mask.raw,
+                        SIMD<UInt32>.repeating(value).raw
+                    )
+                ),
+                "mask: \(describe(mask))"
+            )
+        }
         mismatches.record()
     }
 
-    @Test func halfVectorResizingFromUInt64ConstantSplat0() {
-        checkHalfVectorResizingFromUInt64ConstantA(0)
+    @Test func vectorConvertingWhereFromUInt32ConstantSplat0() {
+        checkVectorConvertingWhereFromUInt32ConstantA(0)
     }
 
-    @Test func halfVectorResizingFromUInt64ConstantSplat1() {
-        checkHalfVectorResizingFromUInt64ConstantA(1)
+    @Test func vectorConvertingWhereFromUInt32ConstantSplat1() {
+        checkVectorConvertingWhereFromUInt32ConstantA(1)
     }
 
-    @Test func halfVectorResizingFromUInt64ConstantSplat15() {
-        checkHalfVectorResizingFromUInt64ConstantA(15)
+    @Test func vectorConvertingWhereFromUInt32ConstantSplat15() {
+        checkVectorConvertingWhereFromUInt32ConstantA(15)
     }
 
-    @Test func halfVectorResizingFromUInt64ConstantSplat16() {
-        checkHalfVectorResizingFromUInt64ConstantA(16)
+    @Test func vectorConvertingWhereFromUInt32ConstantSplat16() {
+        checkVectorConvertingWhereFromUInt32ConstantA(16)
     }
 
-    @Test func halfVectorResizingFromUInt64ConstantSplat26() {
-        checkHalfVectorResizingFromUInt64ConstantA(26)
+    @Test func vectorConvertingWhereFromUInt32ConstantSplat26() {
+        checkVectorConvertingWhereFromUInt32ConstantA(26)
     }
 
-    @Test func halfVectorResizingFromUInt64ConstantSplat127() {
-        checkHalfVectorResizingFromUInt64ConstantA(127)
+    @Test func vectorConvertingWhereFromUInt32ConstantSplat127() {
+        checkVectorConvertingWhereFromUInt32ConstantA(127)
     }
 
-    @Test func halfVectorResizingFromUInt64ConstantSplat128() {
-        checkHalfVectorResizingFromUInt64ConstantA(128)
+    @Test func vectorConvertingWhereFromUInt32ConstantSplat128() {
+        checkVectorConvertingWhereFromUInt32ConstantA(128)
     }
 
-    @Test func halfVectorResizingFromUInt64ConstantSplat255() {
-        checkHalfVectorResizingFromUInt64ConstantA(255)
+    @Test func vectorConvertingWhereFromUInt32ConstantSplat255() {
+        checkVectorConvertingWhereFromUInt32ConstantA(255)
     }
 
-    @Test func halfVectorResizingFromUInt64ConstantSplat256() {
-        checkHalfVectorResizingFromUInt64ConstantA(256)
+    @Test func vectorConvertingWhereFromUInt32ConstantSplat256() {
+        checkVectorConvertingWhereFromUInt32ConstantA(256)
     }
 
-    @Test func halfVectorResizingFromUInt64ConstantSplat257() {
-        checkHalfVectorResizingFromUInt64ConstantA(257)
+    @Test func vectorConvertingWhereFromUInt32ConstantSplat257() {
+        checkVectorConvertingWhereFromUInt32ConstantA(257)
     }
 
-    @Test func halfVectorResizingFromUInt64ConstantSplat65280() {
-        checkHalfVectorResizingFromUInt64ConstantA(65280)
+    @Test func vectorConvertingWhereFromUInt32ConstantSplat65280() {
+        checkVectorConvertingWhereFromUInt32ConstantA(65280)
     }
 
-    @Test func halfVectorResizingFromUInt64ConstantSplat65281() {
-        checkHalfVectorResizingFromUInt64ConstantA(65281)
+    @Test func vectorConvertingWhereFromUInt32ConstantSplat65281() {
+        checkVectorConvertingWhereFromUInt32ConstantA(65281)
     }
 
-    @Test func halfVectorResizingFromUInt64ConstantSplatMax() {
-        checkHalfVectorResizingFromUInt64ConstantA(UInt64.max)
+    @Test func vectorConvertingWhereFromUInt32ConstantSplatMax() {
+        checkVectorConvertingWhereFromUInt32ConstantA(UInt32.max)
+    }
+
+    @inline(__always)
+    private func checkVectorConvertingWhereFromUInt32ConstantAAlternating(
+        _ even: UInt32,
+        _ odd: UInt32
+    ) {
+        let mismatches = Mismatches(
+            "vectorConvertingWhereFromUInt32 with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xEE5C_E3D7_5EAA_E67A)
+        mismatches.check(
+            SIMD<UInt32>.repeatingBlock(even, odd, even, odd),
+            SIMD<UInt32>(raw: HighwayReference.repeatingBlockU32(even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for mask in maskInputs {
+            mismatches.check(
+                H.vector(
+                    converting: SIMD<UInt32>.repeatingBlock(even, odd, even, odd),
+                    where: mask
+                ),
+                H(
+                    raw: HighwayReference.vectorConvertingWhereU32ToF32(
+                        mask.raw,
+                        SIMD<UInt32>.repeatingBlock(even, odd, even, odd).raw
+                    )
+                ),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func vectorConvertingWhereFromUInt32ConstantAAlternating1And26() {
+        checkVectorConvertingWhereFromUInt32ConstantAAlternating(1, 26)
+    }
+
+    @Test func vectorConvertingWhereFromUInt32ConstantAAlternating26And127() {
+        checkVectorConvertingWhereFromUInt32ConstantAAlternating(26, 127)
+    }
+
+    @Test func vectorConvertingWhereFromUInt32ConstantAAlternating127And1() {
+        checkVectorConvertingWhereFromUInt32ConstantAAlternating(127, 1)
     }
 }

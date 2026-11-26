@@ -7,6 +7,342 @@ import Vectorization
 
 extension SIMDUInt32ConstantTests {
     @inline(__always)
+    private func checkDividingWhereOtherwiseConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("dividingWhereOtherwise with mask \(describe(mask))")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xDF74_DCB5_C19D_AFE8)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDF74_DEB5_C19D_B34E)
+        let bInputs =
+            Inputs.vectors(H.self, seed: 0xDF74_DFB5_C19D_B501)
+            + Inputs.vectors(H.self, seed: 0xC492_3324_2DE9_DABA).enumerated().map {
+                index,
+                vector in H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))
+            }
+        for (otherwise, a, b) in mixedTriples(
+            otherwiseInputs,
+            aInputs,
+            bInputs,
+            seed: 0x27F9_D707_E3B9_0AE4
+        ) {
+            mismatches.check(
+                H.dividing(a, b, where: mask, otherwise: otherwise),
+                H(
+                    raw: HighwayReference.dividingWhereOtherwiseU32(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
+                "otherwise: \(describe(otherwise)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func dividingWhereOtherwiseConstantMaskAllFalse() {
+        checkDividingWhereOtherwiseConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func dividingWhereOtherwiseConstantMaskAllTrue() {
+        checkDividingWhereOtherwiseConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func dividingWhereOtherwiseConstantMaskOnlyFirst() {
+        checkDividingWhereOtherwiseConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func dividingWhereOtherwiseConstantMaskOnlyLast() {
+        checkDividingWhereOtherwiseConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func dividingWhereOtherwiseConstantMaskAllButFirst() {
+        checkDividingWhereOtherwiseConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func dividingWhereOtherwiseConstantMaskAllButLast() {
+        checkDividingWhereOtherwiseConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
+    private func checkDividingWhereOtherwiseConstantOtherwise(_ value: Lane) {
+        let mismatches = Mismatches("dividingWhereOtherwise with otherwise repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x0B8D_6CD1_FBD6_9BE3)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0B8D_6DD1_FBD6_9D96)
+        let bInputs =
+            Inputs.vectors(H.self, seed: 0x0B8D_6ED1_FBD6_9F49)
+            + Inputs.vectors(H.self, seed: 0x7E5E_1C5F_9D06_D4E2).enumerated().map {
+                index,
+                vector in H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))
+            }
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU32(value)),
+            "repeating"
+        )
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x029C_4D61_6173_82EC)
+        {
+            mismatches.check(
+                H.dividing(a, b, where: mask, otherwise: H.repeating(value)),
+                H(
+                    raw: HighwayReference.dividingWhereOtherwiseU32(
+                        H.repeating(value).raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat0() {
+        checkDividingWhereOtherwiseConstantOtherwise(0)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat1() {
+        checkDividingWhereOtherwiseConstantOtherwise(1)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat15() {
+        checkDividingWhereOtherwiseConstantOtherwise(15)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat16() {
+        checkDividingWhereOtherwiseConstantOtherwise(16)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat26() {
+        checkDividingWhereOtherwiseConstantOtherwise(26)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat127() {
+        checkDividingWhereOtherwiseConstantOtherwise(127)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat128() {
+        checkDividingWhereOtherwiseConstantOtherwise(128)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat255() {
+        checkDividingWhereOtherwiseConstantOtherwise(255)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat256() {
+        checkDividingWhereOtherwiseConstantOtherwise(256)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat257() {
+        checkDividingWhereOtherwiseConstantOtherwise(257)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat65280() {
+        checkDividingWhereOtherwiseConstantOtherwise(65280)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat65281() {
+        checkDividingWhereOtherwiseConstantOtherwise(65281)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplatMax() {
+        checkDividingWhereOtherwiseConstantOtherwise(Lane.max)
+    }
+
+    @inline(__always)
+    private func checkRemainderWhereOtherwiseConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("remainderWhereOtherwise with mask \(describe(mask))")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x6EE3_36BC_6F30_CC69)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6EE3_34BC_6F30_C903)
+        let bInputs =
+            Inputs.vectors(H.self, seed: 0x6EE3_33BC_6F30_C750)
+            + Inputs.vectors(H.self, seed: 0x187C_204D_5EDC_0D7F).enumerated().map {
+                index,
+                vector in H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))
+            }
+        for (otherwise, a, b) in mixedTriples(
+            otherwiseInputs,
+            aInputs,
+            bInputs,
+            seed: 0x3E64_DCB0_1706_AC23
+        ) {
+            mismatches.check(
+                H.remainder(a, b, where: mask, otherwise: otherwise),
+                H(
+                    raw: HighwayReference.remainderWhereOtherwiseU32(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
+                "otherwise: \(describe(otherwise)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func remainderWhereOtherwiseConstantMaskAllFalse() {
+        checkRemainderWhereOtherwiseConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func remainderWhereOtherwiseConstantMaskAllTrue() {
+        checkRemainderWhereOtherwiseConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func remainderWhereOtherwiseConstantMaskOnlyFirst() {
+        checkRemainderWhereOtherwiseConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func remainderWhereOtherwiseConstantMaskOnlyLast() {
+        checkRemainderWhereOtherwiseConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func remainderWhereOtherwiseConstantMaskAllButFirst() {
+        checkRemainderWhereOtherwiseConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func remainderWhereOtherwiseConstantMaskAllButLast() {
+        checkRemainderWhereOtherwiseConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
+    private func checkRemainderWhereOtherwiseConstantOtherwise(_ value: Lane) {
+        let mismatches = Mismatches(
+            "remainderWhereOtherwise with otherwise repeating \(hex(value))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x760B_F818_2031_0308)
+        let aInputs = Inputs.vectors(H.self, seed: 0x760B_FB18_2031_0821)
+        let bInputs =
+            Inputs.vectors(H.self, seed: 0x760B_FA18_2031_066E)
+            + Inputs.vectors(H.self, seed: 0x365C_4693_B8CC_C455).enumerated().map {
+                index,
+                vector in H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))
+            }
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU32(value)),
+            "repeating"
+        )
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x01B7_FAE1_9BD9_435D)
+        {
+            mismatches.check(
+                H.remainder(a, b, where: mask, otherwise: H.repeating(value)),
+                H(
+                    raw: HighwayReference.remainderWhereOtherwiseU32(
+                        H.repeating(value).raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat0() {
+        checkRemainderWhereOtherwiseConstantOtherwise(0)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat1() {
+        checkRemainderWhereOtherwiseConstantOtherwise(1)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat15() {
+        checkRemainderWhereOtherwiseConstantOtherwise(15)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat16() {
+        checkRemainderWhereOtherwiseConstantOtherwise(16)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat26() {
+        checkRemainderWhereOtherwiseConstantOtherwise(26)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat127() {
+        checkRemainderWhereOtherwiseConstantOtherwise(127)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat128() {
+        checkRemainderWhereOtherwiseConstantOtherwise(128)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat255() {
+        checkRemainderWhereOtherwiseConstantOtherwise(255)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat256() {
+        checkRemainderWhereOtherwiseConstantOtherwise(256)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat257() {
+        checkRemainderWhereOtherwiseConstantOtherwise(257)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat65280() {
+        checkRemainderWhereOtherwiseConstantOtherwise(65280)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat65281() {
+        checkRemainderWhereOtherwiseConstantOtherwise(65281)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplatMax() {
+        checkRemainderWhereOtherwiseConstantOtherwise(Lane.max)
+    }
+
+    @inline(__always)
     private func checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "negatedMultiplySubtractingWhereOtherwise with otherwise repeating \(hex(value))"

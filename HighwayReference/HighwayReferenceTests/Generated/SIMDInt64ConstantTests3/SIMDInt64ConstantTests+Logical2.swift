@@ -887,323 +887,288 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseAndWhereOtherwiseConstantOtherwise(_ value: Lane) {
-        let mismatches = Mismatches(
-            "bitwiseAndWhereOtherwise with otherwise repeating \(hex(value))"
-        )
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xEBCB_EF0C_A07C_1AB8)
-        let aInputs = Inputs.vectors(H.self, seed: 0xEBCB_F20C_A07C_1FD1)
-        let bInputs = Inputs.vectors(H.self, seed: 0xEBCB_F10C_A07C_1E1E)
-        mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingI64(value)),
-            "repeating"
-        )
-        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x6ECD_4DEE_D640_11CD)
-        {
+    private func checkBitwiseAndWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("bitwiseAndWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xE63B_8EF1_FFC2_494C)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE63B_91F1_FFC2_4E65)
+        for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
-                H.bitwiseAnd(a, b, where: mask, otherwise: H.repeating(value)),
-                H(
-                    raw: HighwayReference.bitwiseAndWhereOtherwiseI64(
-                        H.repeating(value).raw,
-                        mask.raw,
-                        a.raw,
-                        b.raw
-                    )
-                ),
-                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+                H.bitwiseAnd(a, b, where: mask),
+                H(raw: HighwayReference.bitwiseAndWhereI64(mask.raw, a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
             )
         }
         mismatches.record()
     }
 
-    @Test func bitwiseAndWhereOtherwiseConstantSplat0() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(0)
+    @Test func bitwiseAndWhereConstantMaskAllFalse() {
+        checkBitwiseAndWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
     }
 
-    @Test func bitwiseAndWhereOtherwiseConstantSplat1() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(1)
+    @Test func bitwiseAndWhereConstantMaskAllTrue() {
+        checkBitwiseAndWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
     }
 
-    @Test func bitwiseAndWhereOtherwiseConstantSplat15() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(15)
+    @Test func bitwiseAndWhereConstantMaskOnlyFirst() {
+        checkBitwiseAndWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
     }
 
-    @Test func bitwiseAndWhereOtherwiseConstantSplat16() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(16)
+    @Test func bitwiseAndWhereConstantMaskOnlyLast() {
+        checkBitwiseAndWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
     }
 
-    @Test func bitwiseAndWhereOtherwiseConstantSplat26() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(26)
+    @Test func bitwiseAndWhereConstantMaskAllButFirst() {
+        checkBitwiseAndWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
     }
 
-    @Test func bitwiseAndWhereOtherwiseConstantSplat127() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(127)
-    }
-
-    @Test func bitwiseAndWhereOtherwiseConstantSplat128() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(128)
-    }
-
-    @Test func bitwiseAndWhereOtherwiseConstantSplat255() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(255)
-    }
-
-    @Test func bitwiseAndWhereOtherwiseConstantSplat256() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(256)
-    }
-
-    @Test func bitwiseAndWhereOtherwiseConstantSplat257() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(257)
-    }
-
-    @Test func bitwiseAndWhereOtherwiseConstantSplat65280() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(65280)
-    }
-
-    @Test func bitwiseAndWhereOtherwiseConstantSplat65281() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(65281)
-    }
-
-    @Test func bitwiseAndWhereOtherwiseConstantSplatMinus1() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(-1)
-    }
-
-    @Test func bitwiseAndWhereOtherwiseConstantSplatMinus16() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(-16)
-    }
-
-    @Test func bitwiseAndWhereOtherwiseConstantSplatMinus17() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(-17)
-    }
-
-    @Test func bitwiseAndWhereOtherwiseConstantSplatMinus128() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(-128)
-    }
-
-    @Test func bitwiseAndWhereOtherwiseConstantSplatMinus129() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(-129)
-    }
-
-    @Test func bitwiseAndWhereOtherwiseConstantSplatMax() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(Lane.max)
-    }
-
-    @Test func bitwiseAndWhereOtherwiseConstantSplatMin() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(Lane.min)
+    @Test func bitwiseAndWhereConstantMaskAllButLast() {
+        checkBitwiseAndWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
     }
 
     @inline(__always)
-    private func checkBitwiseOrWhereOtherwiseConstantOtherwise(_ value: Lane) {
-        let mismatches = Mismatches(
-            "bitwiseOrWhereOtherwise with otherwise repeating \(hex(value))"
-        )
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1171_36FE_2D95_1E4C)
-        let aInputs = Inputs.vectors(H.self, seed: 0x1171_39FE_2D95_2365)
-        let bInputs = Inputs.vectors(H.self, seed: 0x1171_38FE_2D95_21B2)
+    private func checkBitwiseAndWhereConstantA(_ value: Lane) {
+        let mismatches = Mismatches("bitwiseAndWhere with a repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC712_4D39_6576_BDCC)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC712_4F39_6576_C132)
         mismatches.check(
             H.repeating(value),
             H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
-        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xF36E_ECCB_B223_9819)
-        {
+        for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
-                H.bitwiseOr(a, b, where: mask, otherwise: H.repeating(value)),
+                H.bitwiseAnd(H.repeating(value), b, where: mask),
                 H(
-                    raw: HighwayReference.bitwiseOrWhereOtherwiseI64(
-                        H.repeating(value).raw,
+                    raw: HighwayReference.bitwiseAndWhereI64(
                         mask.raw,
-                        a.raw,
+                        H.repeating(value).raw,
                         b.raw
                     )
                 ),
-                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+                "mask: \(describe(mask)), b: \(describe(b))"
             )
         }
         mismatches.record()
-    }
-
-    @Test func bitwiseOrWhereOtherwiseConstantSplat0() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(0)
-    }
-
-    @Test func bitwiseOrWhereOtherwiseConstantSplat1() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(1)
-    }
-
-    @Test func bitwiseOrWhereOtherwiseConstantSplat15() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(15)
-    }
-
-    @Test func bitwiseOrWhereOtherwiseConstantSplat16() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(16)
-    }
-
-    @Test func bitwiseOrWhereOtherwiseConstantSplat26() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(26)
-    }
-
-    @Test func bitwiseOrWhereOtherwiseConstantSplat127() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(127)
-    }
-
-    @Test func bitwiseOrWhereOtherwiseConstantSplat128() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(128)
-    }
-
-    @Test func bitwiseOrWhereOtherwiseConstantSplat255() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(255)
-    }
-
-    @Test func bitwiseOrWhereOtherwiseConstantSplat256() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(256)
-    }
-
-    @Test func bitwiseOrWhereOtherwiseConstantSplat257() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(257)
-    }
-
-    @Test func bitwiseOrWhereOtherwiseConstantSplat65280() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(65280)
-    }
-
-    @Test func bitwiseOrWhereOtherwiseConstantSplat65281() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(65281)
-    }
-
-    @Test func bitwiseOrWhereOtherwiseConstantSplatMinus1() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(-1)
-    }
-
-    @Test func bitwiseOrWhereOtherwiseConstantSplatMinus16() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(-16)
-    }
-
-    @Test func bitwiseOrWhereOtherwiseConstantSplatMinus17() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(-17)
-    }
-
-    @Test func bitwiseOrWhereOtherwiseConstantSplatMinus128() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(-128)
-    }
-
-    @Test func bitwiseOrWhereOtherwiseConstantSplatMinus129() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(-129)
-    }
-
-    @Test func bitwiseOrWhereOtherwiseConstantSplatMax() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(Lane.max)
-    }
-
-    @Test func bitwiseOrWhereOtherwiseConstantSplatMin() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(Lane.min)
     }
 
     @inline(__always)
-    private func checkBitwiseXorWhereOtherwiseConstantOtherwise(_ value: Lane) {
-        let mismatches = Mismatches(
-            "bitwiseXorWhereOtherwise with otherwise repeating \(hex(value))"
-        )
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x867A_CA48_ADAB_B404)
-        let aInputs = Inputs.vectors(H.self, seed: 0x867A_CD48_ADAB_B91D)
-        let bInputs = Inputs.vectors(H.self, seed: 0x867A_CC48_ADAB_B76A)
+    private func checkBitwiseAndWhereConstantB(_ value: Lane) {
+        let mismatches = Mismatches("bitwiseAndWhere with b repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xCFA7_8439_6A4D_9FE1)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCFA7_8339_6A4D_9E2E)
         mismatches.check(
             H.repeating(value),
             H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
-        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x4E12_0D13_81EE_48B1)
-        {
+        for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
-                H.bitwiseXor(a, b, where: mask, otherwise: H.repeating(value)),
+                H.bitwiseAnd(a, H.repeating(value), where: mask),
                 H(
-                    raw: HighwayReference.bitwiseXorWhereOtherwiseI64(
-                        H.repeating(value).raw,
+                    raw: HighwayReference.bitwiseAndWhereI64(
                         mask.raw,
                         a.raw,
-                        b.raw
+                        H.repeating(value).raw
                     )
                 ),
-                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+                "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
         mismatches.record()
     }
 
-    @Test func bitwiseXorWhereOtherwiseConstantSplat0() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(0)
+    @Test func bitwiseAndWhereConstantSplat0() {
+        checkBitwiseAndWhereConstantA(0)
+        checkBitwiseAndWhereConstantB(0)
     }
 
-    @Test func bitwiseXorWhereOtherwiseConstantSplat1() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(1)
+    @Test func bitwiseAndWhereConstantSplat1() {
+        checkBitwiseAndWhereConstantA(1)
+        checkBitwiseAndWhereConstantB(1)
     }
 
-    @Test func bitwiseXorWhereOtherwiseConstantSplat15() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(15)
+    @Test func bitwiseAndWhereConstantSplat15() {
+        checkBitwiseAndWhereConstantA(15)
+        checkBitwiseAndWhereConstantB(15)
     }
 
-    @Test func bitwiseXorWhereOtherwiseConstantSplat16() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(16)
+    @Test func bitwiseAndWhereConstantSplat16() {
+        checkBitwiseAndWhereConstantA(16)
+        checkBitwiseAndWhereConstantB(16)
     }
 
-    @Test func bitwiseXorWhereOtherwiseConstantSplat26() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(26)
+    @Test func bitwiseAndWhereConstantSplat26() {
+        checkBitwiseAndWhereConstantA(26)
+        checkBitwiseAndWhereConstantB(26)
     }
 
-    @Test func bitwiseXorWhereOtherwiseConstantSplat127() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(127)
+    @Test func bitwiseAndWhereConstantSplat127() {
+        checkBitwiseAndWhereConstantA(127)
+        checkBitwiseAndWhereConstantB(127)
     }
 
-    @Test func bitwiseXorWhereOtherwiseConstantSplat128() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(128)
+    @Test func bitwiseAndWhereConstantSplat128() {
+        checkBitwiseAndWhereConstantA(128)
+        checkBitwiseAndWhereConstantB(128)
     }
 
-    @Test func bitwiseXorWhereOtherwiseConstantSplat255() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(255)
+    @Test func bitwiseAndWhereConstantSplat255() {
+        checkBitwiseAndWhereConstantA(255)
+        checkBitwiseAndWhereConstantB(255)
     }
 
-    @Test func bitwiseXorWhereOtherwiseConstantSplat256() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(256)
+    @Test func bitwiseAndWhereConstantSplat256() {
+        checkBitwiseAndWhereConstantA(256)
+        checkBitwiseAndWhereConstantB(256)
     }
 
-    @Test func bitwiseXorWhereOtherwiseConstantSplat257() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(257)
+    @Test func bitwiseAndWhereConstantSplat257() {
+        checkBitwiseAndWhereConstantA(257)
+        checkBitwiseAndWhereConstantB(257)
     }
 
-    @Test func bitwiseXorWhereOtherwiseConstantSplat65280() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(65280)
+    @Test func bitwiseAndWhereConstantSplat65280() {
+        checkBitwiseAndWhereConstantA(65280)
+        checkBitwiseAndWhereConstantB(65280)
     }
 
-    @Test func bitwiseXorWhereOtherwiseConstantSplat65281() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(65281)
+    @Test func bitwiseAndWhereConstantSplat65281() {
+        checkBitwiseAndWhereConstantA(65281)
+        checkBitwiseAndWhereConstantB(65281)
     }
 
-    @Test func bitwiseXorWhereOtherwiseConstantSplatMinus1() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(-1)
+    @Test func bitwiseAndWhereConstantSplatMinus1() {
+        checkBitwiseAndWhereConstantA(-1)
+        checkBitwiseAndWhereConstantB(-1)
     }
 
-    @Test func bitwiseXorWhereOtherwiseConstantSplatMinus16() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(-16)
+    @Test func bitwiseAndWhereConstantSplatMinus16() {
+        checkBitwiseAndWhereConstantA(-16)
+        checkBitwiseAndWhereConstantB(-16)
     }
 
-    @Test func bitwiseXorWhereOtherwiseConstantSplatMinus17() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(-17)
+    @Test func bitwiseAndWhereConstantSplatMinus17() {
+        checkBitwiseAndWhereConstantA(-17)
+        checkBitwiseAndWhereConstantB(-17)
     }
 
-    @Test func bitwiseXorWhereOtherwiseConstantSplatMinus128() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(-128)
+    @Test func bitwiseAndWhereConstantSplatMinus128() {
+        checkBitwiseAndWhereConstantA(-128)
+        checkBitwiseAndWhereConstantB(-128)
     }
 
-    @Test func bitwiseXorWhereOtherwiseConstantSplatMinus129() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(-129)
+    @Test func bitwiseAndWhereConstantSplatMinus129() {
+        checkBitwiseAndWhereConstantA(-129)
+        checkBitwiseAndWhereConstantB(-129)
     }
 
-    @Test func bitwiseXorWhereOtherwiseConstantSplatMax() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(Lane.max)
+    @Test func bitwiseAndWhereConstantSplatMax() {
+        checkBitwiseAndWhereConstantA(Lane.max)
+        checkBitwiseAndWhereConstantB(Lane.max)
     }
 
-    @Test func bitwiseXorWhereOtherwiseConstantSplatMin() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(Lane.min)
+    @Test func bitwiseAndWhereConstantSplatMin() {
+        checkBitwiseAndWhereConstantA(Lane.min)
+        checkBitwiseAndWhereConstantB(Lane.min)
+    }
+
+    @inline(__always)
+    private func checkBitwiseAndWhereConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("bitwiseAndWhere with a alternating \(hex(even)), \(hex(odd))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE751_D8D7_2133_C6A7)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE751_DAD7_2133_CA0D)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockI64(even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, b) in everyPair(maskInputs, bInputs) {
+            mismatches.check(
+                H.bitwiseAnd(H.repeatingBlock(even, odd), b, where: mask),
+                H(
+                    raw: HighwayReference.bitwiseAndWhereI64(
+                        mask.raw,
+                        H.repeatingBlock(even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func bitwiseAndWhereConstantAAlternating1And26() {
+        checkBitwiseAndWhereConstantAAlternating(1, 26)
+    }
+
+    @Test func bitwiseAndWhereConstantAAlternating26And127() {
+        checkBitwiseAndWhereConstantAAlternating(26, 127)
+    }
+
+    @Test func bitwiseAndWhereConstantAAlternating127And1() {
+        checkBitwiseAndWhereConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkBitwiseAndWhereConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("bitwiseAndWhere with b alternating \(hex(even)), \(hex(odd))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8CA7_4F04_907F_6894)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8CA7_5004_907F_6A47)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockI64(even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.bitwiseAnd(a, H.repeatingBlock(even, odd), where: mask),
+                H(
+                    raw: HighwayReference.bitwiseAndWhereI64(
+                        mask.raw,
+                        a.raw,
+                        H.repeatingBlock(even, odd).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func bitwiseAndWhereConstantBAlternating1And26() {
+        checkBitwiseAndWhereConstantBAlternating(1, 26)
+    }
+
+    @Test func bitwiseAndWhereConstantBAlternating26And127() {
+        checkBitwiseAndWhereConstantBAlternating(26, 127)
+    }
+
+    @Test func bitwiseAndWhereConstantBAlternating127And1() {
+        checkBitwiseAndWhereConstantBAlternating(127, 1)
     }
 }

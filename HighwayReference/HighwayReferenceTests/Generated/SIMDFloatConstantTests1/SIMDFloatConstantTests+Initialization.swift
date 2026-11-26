@@ -7,6 +7,312 @@ import Vectorization
 
 extension SIMDFloatConstantTests {
     @inline(__always)
+    private func checkRepeatingWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("repeatingWhere with mask \(describe(mask))")
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xFE24_5B13_A6CA_CA13)
+        for value in valueInputs {
+            mismatches.check(
+                H.repeating(value, where: mask),
+                H(raw: HighwayReference.repeatingWhereF32(mask.raw, value)),
+                "value: \(hex(value))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func repeatingWhereConstantMaskAllFalse() {
+        checkRepeatingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func repeatingWhereConstantMaskAllTrue() {
+        checkRepeatingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func repeatingWhereConstantMaskOnlyFirst() {
+        checkRepeatingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func repeatingWhereConstantMaskOnlyLast() {
+        checkRepeatingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func repeatingWhereConstantMaskAllButFirst() {
+        checkRepeatingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func repeatingWhereConstantMaskAllButLast() {
+        checkRepeatingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
+    private func checkRepeatingWhereConstantValue(_ value: Lane) {
+        let mismatches = Mismatches("repeatingWhere with value \(value)")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC378_928D_1AB7_676F)
+        for mask in maskInputs {
+            mismatches.check(
+                H.repeating(value, where: mask),
+                H(raw: HighwayReference.repeatingWhereF32(mask.raw, value)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func repeatingWhereConstantValueZero() {
+        checkRepeatingWhereConstantValue(0.0)
+    }
+
+    @Test func repeatingWhereConstantValueNegativeZero() {
+        checkRepeatingWhereConstantValue(-0.0)
+    }
+
+    @Test func repeatingWhereConstantValueOne() {
+        checkRepeatingWhereConstantValue(1.0)
+    }
+
+    @Test func repeatingWhereConstantValueMinusOne() {
+        checkRepeatingWhereConstantValue(-1.0)
+    }
+
+    @Test func repeatingWhereConstantValueTwo() {
+        checkRepeatingWhereConstantValue(2.0)
+    }
+
+    @Test func repeatingWhereConstantValueHalf() {
+        checkRepeatingWhereConstantValue(0.5)
+    }
+
+    @Test func repeatingWhereConstantValueFour() {
+        checkRepeatingWhereConstantValue(4.0)
+    }
+
+    @Test func repeatingWhereConstantValueQuarter() {
+        checkRepeatingWhereConstantValue(0.25)
+    }
+
+    @Test func repeatingWhereConstantValueOnePointFive() {
+        checkRepeatingWhereConstantValue(1.5)
+    }
+
+    @Test func repeatingWhereConstantValueMinusTwoPointFive() {
+        checkRepeatingWhereConstantValue(-2.5)
+    }
+
+    @Test func repeatingWhereConstantValueInfinity() {
+        checkRepeatingWhereConstantValue(.infinity)
+    }
+
+    @Test func repeatingWhereConstantValueMinusInfinity() {
+        checkRepeatingWhereConstantValue(-.infinity)
+    }
+
+    @Test func repeatingWhereConstantValueNaN() {
+        checkRepeatingWhereConstantValue(.nan)
+    }
+
+    @Test func repeatingWhereConstantValueMinusNaN() {
+        checkRepeatingWhereConstantValue(-.nan)
+    }
+
+    @Test func repeatingWhereConstantValuePayloadNaN() {
+        checkRepeatingWhereConstantValue(Lane(nan: 1, signaling: false))
+    }
+
+    @Test func repeatingWhereConstantValueSignalingNaN() {
+        checkRepeatingWhereConstantValue(.signalingNaN)
+    }
+
+    @Test func repeatingWhereConstantValueMinusSignalingNaN() {
+        checkRepeatingWhereConstantValue(-.signalingNaN)
+    }
+
+    @Test func repeatingWhereConstantValueLeastNonzero() {
+        checkRepeatingWhereConstantValue(.leastNonzeroMagnitude)
+    }
+
+    @Test func repeatingWhereConstantValueGreatest() {
+        checkRepeatingWhereConstantValue(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkRepeatingWhereOtherwiseConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("repeatingWhereOtherwise with mask \(describe(mask))")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x7557_915A_9143_1944)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x7557_935A_9143_1CAA)
+        for (otherwise, value) in everyPair(otherwiseInputs, valueInputs) {
+            mismatches.check(
+                H.repeating(value, where: mask, otherwise: otherwise),
+                H(raw: HighwayReference.repeatingWhereOtherwiseF32(otherwise.raw, mask.raw, value)),
+                "otherwise: \(describe(otherwise)), value: \(hex(value))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func repeatingWhereOtherwiseConstantMaskAllFalse() {
+        checkRepeatingWhereOtherwiseConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func repeatingWhereOtherwiseConstantMaskAllTrue() {
+        checkRepeatingWhereOtherwiseConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func repeatingWhereOtherwiseConstantMaskOnlyFirst() {
+        checkRepeatingWhereOtherwiseConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func repeatingWhereOtherwiseConstantMaskOnlyLast() {
+        checkRepeatingWhereOtherwiseConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func repeatingWhereOtherwiseConstantMaskAllButFirst() {
+        checkRepeatingWhereOtherwiseConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func repeatingWhereOtherwiseConstantMaskAllButLast() {
+        checkRepeatingWhereOtherwiseConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
+    private func checkRepeatingWhereOtherwiseConstantValue(_ value: Lane) {
+        let mismatches = Mismatches("repeatingWhereOtherwise with value \(value)")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x0612_481E_3182_EC03)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x0612_471E_3182_EA50)
+        for (otherwise, mask) in everyPair(otherwiseInputs, maskInputs) {
+            mismatches.check(
+                H.repeating(value, where: mask, otherwise: otherwise),
+                H(raw: HighwayReference.repeatingWhereOtherwiseF32(otherwise.raw, mask.raw, value)),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func repeatingWhereOtherwiseConstantValueZero() {
+        checkRepeatingWhereOtherwiseConstantValue(0.0)
+    }
+
+    @Test func repeatingWhereOtherwiseConstantValueNegativeZero() {
+        checkRepeatingWhereOtherwiseConstantValue(-0.0)
+    }
+
+    @Test func repeatingWhereOtherwiseConstantValueOne() {
+        checkRepeatingWhereOtherwiseConstantValue(1.0)
+    }
+
+    @Test func repeatingWhereOtherwiseConstantValueMinusOne() {
+        checkRepeatingWhereOtherwiseConstantValue(-1.0)
+    }
+
+    @Test func repeatingWhereOtherwiseConstantValueTwo() {
+        checkRepeatingWhereOtherwiseConstantValue(2.0)
+    }
+
+    @Test func repeatingWhereOtherwiseConstantValueHalf() {
+        checkRepeatingWhereOtherwiseConstantValue(0.5)
+    }
+
+    @Test func repeatingWhereOtherwiseConstantValueFour() {
+        checkRepeatingWhereOtherwiseConstantValue(4.0)
+    }
+
+    @Test func repeatingWhereOtherwiseConstantValueQuarter() {
+        checkRepeatingWhereOtherwiseConstantValue(0.25)
+    }
+
+    @Test func repeatingWhereOtherwiseConstantValueOnePointFive() {
+        checkRepeatingWhereOtherwiseConstantValue(1.5)
+    }
+
+    @Test func repeatingWhereOtherwiseConstantValueMinusTwoPointFive() {
+        checkRepeatingWhereOtherwiseConstantValue(-2.5)
+    }
+
+    @Test func repeatingWhereOtherwiseConstantValueInfinity() {
+        checkRepeatingWhereOtherwiseConstantValue(.infinity)
+    }
+
+    @Test func repeatingWhereOtherwiseConstantValueMinusInfinity() {
+        checkRepeatingWhereOtherwiseConstantValue(-.infinity)
+    }
+
+    @Test func repeatingWhereOtherwiseConstantValueNaN() {
+        checkRepeatingWhereOtherwiseConstantValue(.nan)
+    }
+
+    @Test func repeatingWhereOtherwiseConstantValueMinusNaN() {
+        checkRepeatingWhereOtherwiseConstantValue(-.nan)
+    }
+
+    @Test func repeatingWhereOtherwiseConstantValuePayloadNaN() {
+        checkRepeatingWhereOtherwiseConstantValue(Lane(nan: 1, signaling: false))
+    }
+
+    @Test func repeatingWhereOtherwiseConstantValueSignalingNaN() {
+        checkRepeatingWhereOtherwiseConstantValue(.signalingNaN)
+    }
+
+    @Test func repeatingWhereOtherwiseConstantValueMinusSignalingNaN() {
+        checkRepeatingWhereOtherwiseConstantValue(-.signalingNaN)
+    }
+
+    @Test func repeatingWhereOtherwiseConstantValueLeastNonzero() {
+        checkRepeatingWhereOtherwiseConstantValue(.leastNonzeroMagnitude)
+    }
+
+    @Test func repeatingWhereOtherwiseConstantValueGreatest() {
+        checkRepeatingWhereOtherwiseConstantValue(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
     private func checkRepeatingWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "repeatingWhereOtherwise with otherwise repeating \(hex(value))"
@@ -108,5 +414,46 @@ extension SIMDFloatConstantTests {
 
     @Test func repeatingWhereOtherwiseConstantSplatGreatest() {
         checkRepeatingWhereOtherwiseConstantOtherwise(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkRepeatingWhereOtherwiseConstantOtherwiseAlternating(_ even: Lane, _ odd: Lane)
+    {
+        let mismatches = Mismatches(
+            "repeatingWhereOtherwise with otherwise alternating \(hex(even)), \(hex(odd))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC076_7811_3473_9B8C)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xC076_7B11_3473_A0A5)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockF32(even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, value) in everyPair(maskInputs, valueInputs) {
+            mismatches.check(
+                H.repeating(value, where: mask, otherwise: H.repeatingBlock(even, odd, even, odd)),
+                H(
+                    raw: HighwayReference.repeatingWhereOtherwiseF32(
+                        H.repeatingBlock(even, odd, even, odd).raw,
+                        mask.raw,
+                        value
+                    )
+                ),
+                "mask: \(describe(mask)), value: \(hex(value))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func repeatingWhereOtherwiseConstantOtherwiseAlternatingOneAndMinusTwoPointFive() {
+        checkRepeatingWhereOtherwiseConstantOtherwiseAlternating(1.0, -2.5)
+    }
+
+    @Test func repeatingWhereOtherwiseConstantOtherwiseAlternatingMinusTwoPointFiveAndHalf() {
+        checkRepeatingWhereOtherwiseConstantOtherwiseAlternating(-2.5, 0.5)
+    }
+
+    @Test func repeatingWhereOtherwiseConstantOtherwiseAlternatingHalfAndOne() {
+        checkRepeatingWhereOtherwiseConstantOtherwiseAlternating(0.5, 1.0)
     }
 }

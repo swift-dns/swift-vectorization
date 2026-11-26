@@ -7,6 +7,932 @@ import Vectorization
 
 extension SIMDInt8ConstantTests {
     @inline(__always)
+    private func checkShiftedLeftByWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("shiftedLeftByWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x677F_7F59_AED0_11BF)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x677F_8059_AED0_1372, inContract: true)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.shiftedLeft(a, by: b, where: mask),
+                H(raw: HighwayReference.shiftedLeftByWhereI8(mask.raw, a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func shiftedLeftByWhereConstantMaskAllFalse() {
+        checkShiftedLeftByWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func shiftedLeftByWhereConstantMaskAllTrue() {
+        checkShiftedLeftByWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func shiftedLeftByWhereConstantMaskOnlyFirst() {
+        checkShiftedLeftByWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func shiftedLeftByWhereConstantMaskOnlyLast() {
+        checkShiftedLeftByWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func shiftedLeftByWhereConstantMaskAllButFirst() {
+        checkShiftedLeftByWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func shiftedLeftByWhereConstantMaskAllButLast() {
+        checkShiftedLeftByWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
+    private func checkShiftedLeftByWhereConstantA(_ value: Lane) {
+        let mismatches = Mismatches("shiftedLeftByWhere with a repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6E1E_E1A1_CC9D_0B45)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x6E1E_DFA1_CC9D_07DF, inContract: true)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI8(value)),
+            "repeating"
+        )
+        for (mask, b) in everyPair(maskInputs, bInputs) {
+            mismatches.check(
+                H.shiftedLeft(H.repeating(value), by: b, where: mask),
+                H(
+                    raw: HighwayReference.shiftedLeftByWhereI8(
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkShiftedLeftByWhereConstantB(_ value: Lane) {
+        let mismatches = Mismatches("shiftedLeftByWhere with b repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x651D_2AA1_C76A_30D0)
+        let aInputs = Inputs.vectors(H.self, seed: 0x651D_2BA1_C76A_3283)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI8(value)),
+            "repeating"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.shiftedLeft(a, by: H.repeating(value), where: mask),
+                H(
+                    raw: HighwayReference.shiftedLeftByWhereI8(
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func shiftedLeftByWhereConstantSplat0() {
+        checkShiftedLeftByWhereConstantA(0)
+        checkShiftedLeftByWhereConstantB(0)
+    }
+
+    @Test func shiftedLeftByWhereConstantSplat1() {
+        checkShiftedLeftByWhereConstantA(1)
+        checkShiftedLeftByWhereConstantB(1)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedLeftByWhereConstantSplat15() {
+        checkShiftedLeftByWhereConstantA(15)
+        checkShiftedLeftByWhereConstantB(15)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedLeftByWhereConstantSplat16() {
+        checkShiftedLeftByWhereConstantA(16)
+        checkShiftedLeftByWhereConstantB(16)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedLeftByWhereConstantSplat26() {
+        checkShiftedLeftByWhereConstantA(26)
+        checkShiftedLeftByWhereConstantB(26)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedLeftByWhereConstantSplat127() {
+        checkShiftedLeftByWhereConstantA(127)
+        checkShiftedLeftByWhereConstantB(127)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedLeftByWhereConstantSplatMinus1() {
+        checkShiftedLeftByWhereConstantA(-1)
+        checkShiftedLeftByWhereConstantB(-1)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedLeftByWhereConstantSplatMinus16() {
+        checkShiftedLeftByWhereConstantA(-16)
+        checkShiftedLeftByWhereConstantB(-16)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedLeftByWhereConstantSplatMinus17() {
+        checkShiftedLeftByWhereConstantA(-17)
+        checkShiftedLeftByWhereConstantB(-17)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedLeftByWhereConstantSplatMinus128() {
+        checkShiftedLeftByWhereConstantA(-128)
+        checkShiftedLeftByWhereConstantB(-128)
+    }
+
+    @inline(__always)
+    private func checkShiftedLeftByWhereConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "shiftedLeftByWhere with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x0C8B_4629_934E_B068)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x0C8B_4829_934E_B3CE, inContract: true)
+        mismatches.check(
+            H.repeatingBlock(
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd
+            ),
+            H(
+                raw: HighwayReference.repeatingBlockI8(
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd
+                )
+            ),
+            "repeatingBlock"
+        )
+        for (mask, b) in everyPair(maskInputs, bInputs) {
+            mismatches.check(
+                H.shiftedLeft(
+                    H.repeatingBlock(
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd
+                    ),
+                    by: b,
+                    where: mask
+                ),
+                H(
+                    raw: HighwayReference.shiftedLeftByWhereI8(
+                        mask.raw,
+                        H.repeatingBlock(
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd
+                        ).raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedLeftByWhereConstantAAlternating1And26() {
+        checkShiftedLeftByWhereConstantAAlternating(1, 26)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedLeftByWhereConstantAAlternating26And127() {
+        checkShiftedLeftByWhereConstantAAlternating(26, 127)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedLeftByWhereConstantAAlternating127And1() {
+        checkShiftedLeftByWhereConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkShiftedLeftByWhereConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "shiftedLeftByWhere with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x69A0_05DB_E00A_6D0B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x69A0_04DB_E00A_6B58)
+        mismatches.check(
+            H.repeatingBlock(
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd
+            ),
+            H(
+                raw: HighwayReference.repeatingBlockI8(
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd
+                )
+            ),
+            "repeatingBlock"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.shiftedLeft(
+                    a,
+                    by: H.repeatingBlock(
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd
+                    ),
+                    where: mask
+                ),
+                H(
+                    raw: HighwayReference.shiftedLeftByWhereI8(
+                        mask.raw,
+                        a.raw,
+                        H.repeatingBlock(
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd
+                        ).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedLeftByWhereConstantBAlternating1And26() {
+        checkShiftedLeftByWhereConstantBAlternating(1, 26)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedLeftByWhereConstantBAlternating26And127() {
+        checkShiftedLeftByWhereConstantBAlternating(26, 127)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedLeftByWhereConstantBAlternating127And1() {
+        checkShiftedLeftByWhereConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkShiftedRightByWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("shiftedRightByWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x5FAC_9714_54DA_2F02)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x5FAC_9614_54DA_2D4F, inContract: true)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.shiftedRight(a, by: b, where: mask),
+                H(raw: HighwayReference.shiftedRightByWhereI8(mask.raw, a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func shiftedRightByWhereConstantMaskAllFalse() {
+        checkShiftedRightByWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func shiftedRightByWhereConstantMaskAllTrue() {
+        checkShiftedRightByWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func shiftedRightByWhereConstantMaskOnlyFirst() {
+        checkShiftedRightByWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func shiftedRightByWhereConstantMaskOnlyLast() {
+        checkShiftedRightByWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func shiftedRightByWhereConstantMaskAllButFirst() {
+        checkShiftedRightByWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func shiftedRightByWhereConstantMaskAllButLast() {
+        checkShiftedRightByWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
+    private func checkShiftedRightByWhereConstantA(_ value: Lane) {
+        let mismatches = Mismatches("shiftedRightByWhere with a repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x175B_24AA_D5E6_929E)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x175B_22AA_D5E6_8F38, inContract: true)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI8(value)),
+            "repeating"
+        )
+        for (mask, b) in everyPair(maskInputs, bInputs) {
+            mismatches.check(
+                H.shiftedRight(H.repeating(value), by: b, where: mask),
+                H(
+                    raw: HighwayReference.shiftedRightByWhereI8(
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkShiftedRightByWhereConstantB(_ value: Lane) {
+        let mismatches = Mismatches("shiftedRightByWhere with b repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xFC55_9FAA_C64D_601F)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFC55_9EAA_C64D_5E6C)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI8(value)),
+            "repeating"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.shiftedRight(a, by: H.repeating(value), where: mask),
+                H(
+                    raw: HighwayReference.shiftedRightByWhereI8(
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func shiftedRightByWhereConstantSplat0() {
+        checkShiftedRightByWhereConstantA(0)
+        checkShiftedRightByWhereConstantB(0)
+    }
+
+    @Test func shiftedRightByWhereConstantSplat1() {
+        checkShiftedRightByWhereConstantA(1)
+        checkShiftedRightByWhereConstantB(1)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedRightByWhereConstantSplat15() {
+        checkShiftedRightByWhereConstantA(15)
+        checkShiftedRightByWhereConstantB(15)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedRightByWhereConstantSplat16() {
+        checkShiftedRightByWhereConstantA(16)
+        checkShiftedRightByWhereConstantB(16)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedRightByWhereConstantSplat26() {
+        checkShiftedRightByWhereConstantA(26)
+        checkShiftedRightByWhereConstantB(26)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedRightByWhereConstantSplat127() {
+        checkShiftedRightByWhereConstantA(127)
+        checkShiftedRightByWhereConstantB(127)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedRightByWhereConstantSplatMinus1() {
+        checkShiftedRightByWhereConstantA(-1)
+        checkShiftedRightByWhereConstantB(-1)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedRightByWhereConstantSplatMinus16() {
+        checkShiftedRightByWhereConstantA(-16)
+        checkShiftedRightByWhereConstantB(-16)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedRightByWhereConstantSplatMinus17() {
+        checkShiftedRightByWhereConstantA(-17)
+        checkShiftedRightByWhereConstantB(-17)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedRightByWhereConstantSplatMinus128() {
+        checkShiftedRightByWhereConstantA(-128)
+        checkShiftedRightByWhereConstantB(-128)
+    }
+
+    @inline(__always)
+    private func checkShiftedRightByWhereConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "shiftedRightByWhere with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x5625_38CF_8E42_9425)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x5625_36CF_8E42_90BF, inContract: true)
+        mismatches.check(
+            H.repeatingBlock(
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd
+            ),
+            H(
+                raw: HighwayReference.repeatingBlockI8(
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd
+                )
+            ),
+            "repeatingBlock"
+        )
+        for (mask, b) in everyPair(maskInputs, bInputs) {
+            mismatches.check(
+                H.shiftedRight(
+                    H.repeatingBlock(
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd
+                    ),
+                    by: b,
+                    where: mask
+                ),
+                H(
+                    raw: HighwayReference.shiftedRightByWhereI8(
+                        mask.raw,
+                        H.repeatingBlock(
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd
+                        ).raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedRightByWhereConstantAAlternating1And26() {
+        checkShiftedRightByWhereConstantAAlternating(1, 26)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedRightByWhereConstantAAlternating26And127() {
+        checkShiftedRightByWhereConstantAAlternating(26, 127)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedRightByWhereConstantAAlternating127And1() {
+        checkShiftedRightByWhereConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkShiftedRightByWhereConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "shiftedRightByWhere with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE43C_2A37_123E_27A6)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE43C_2B37_123E_2959)
+        mismatches.check(
+            H.repeatingBlock(
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd
+            ),
+            H(
+                raw: HighwayReference.repeatingBlockI8(
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd
+                )
+            ),
+            "repeatingBlock"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.shiftedRight(
+                    a,
+                    by: H.repeatingBlock(
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd
+                    ),
+                    where: mask
+                ),
+                H(
+                    raw: HighwayReference.shiftedRightByWhereI8(
+                        mask.raw,
+                        a.raw,
+                        H.repeatingBlock(
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd
+                        ).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedRightByWhereConstantBAlternating1And26() {
+        checkShiftedRightByWhereConstantBAlternating(1, 26)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedRightByWhereConstantBAlternating26And127() {
+        checkShiftedRightByWhereConstantBAlternating(26, 127)
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 has no defined result for these shift counts"
+        )
+    ) func shiftedRightByWhereConstantBAlternating127And1() {
+        checkShiftedRightByWhereConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
     private func checkShiftedLeftWhereConstantBits(_ bits: Int) {
         let mismatches = Mismatches("shiftedLeftWhere with bits \(bits)")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xCADE_C8A2_3907_6637)

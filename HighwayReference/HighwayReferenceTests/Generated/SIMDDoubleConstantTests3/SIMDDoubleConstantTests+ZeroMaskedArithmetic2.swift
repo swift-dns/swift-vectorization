@@ -7,6 +7,292 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
+    private func checkDividingWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("dividingWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x8E12_62C4_1F42_C4E1)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8E12_5FC4_1F42_BFC8)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.dividing(a, b, where: mask),
+                H(raw: HighwayReference.dividingWhereF64(mask.raw, a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func dividingWhereConstantMaskAllFalse() {
+        checkDividingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func dividingWhereConstantMaskAllTrue() {
+        checkDividingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func dividingWhereConstantMaskOnlyFirst() {
+        checkDividingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func dividingWhereConstantMaskOnlyLast() {
+        checkDividingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func dividingWhereConstantMaskAllButFirst() {
+        checkDividingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func dividingWhereConstantMaskAllButLast() {
+        checkDividingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
+    private func checkDividingWhereConstantA(_ value: Lane) {
+        let mismatches = Mismatches("dividingWhere with a repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x535F_AB49_97BE_0423)
+        let bInputs = Inputs.vectors(H.self, seed: 0x535F_AD49_97BE_0789)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        for (mask, b) in everyPair(maskInputs, bInputs) {
+            mismatches.check(
+                H.dividing(H.repeating(value), b, where: mask),
+                H(raw: HighwayReference.dividingWhereF64(mask.raw, H.repeating(value).raw, b.raw)),
+                "mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkDividingWhereConstantB(_ value: Lane) {
+        let mismatches = Mismatches("dividingWhere with b repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6DF8_B049_A6FB_3E42)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6DF8_B149_A6FB_3FF5)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.dividing(a, H.repeating(value), where: mask),
+                H(raw: HighwayReference.dividingWhereF64(mask.raw, a.raw, H.repeating(value).raw)),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func dividingWhereConstantSplatZero() {
+        checkDividingWhereConstantA(0.0)
+        checkDividingWhereConstantB(0.0)
+    }
+
+    @Test func dividingWhereConstantSplatNegativeZero() {
+        checkDividingWhereConstantA(-0.0)
+        checkDividingWhereConstantB(-0.0)
+    }
+
+    @Test func dividingWhereConstantSplatOne() {
+        checkDividingWhereConstantA(1.0)
+        checkDividingWhereConstantB(1.0)
+    }
+
+    @Test func dividingWhereConstantSplatMinusOne() {
+        checkDividingWhereConstantA(-1.0)
+        checkDividingWhereConstantB(-1.0)
+    }
+
+    @Test func dividingWhereConstantSplatTwo() {
+        checkDividingWhereConstantA(2.0)
+        checkDividingWhereConstantB(2.0)
+    }
+
+    @Test func dividingWhereConstantSplatHalf() {
+        checkDividingWhereConstantA(0.5)
+        checkDividingWhereConstantB(0.5)
+    }
+
+    @Test func dividingWhereConstantSplatFour() {
+        checkDividingWhereConstantA(4.0)
+        checkDividingWhereConstantB(4.0)
+    }
+
+    @Test func dividingWhereConstantSplatQuarter() {
+        checkDividingWhereConstantA(0.25)
+        checkDividingWhereConstantB(0.25)
+    }
+
+    @Test func dividingWhereConstantSplatOnePointFive() {
+        checkDividingWhereConstantA(1.5)
+        checkDividingWhereConstantB(1.5)
+    }
+
+    @Test func dividingWhereConstantSplatMinusTwoPointFive() {
+        checkDividingWhereConstantA(-2.5)
+        checkDividingWhereConstantB(-2.5)
+    }
+
+    @Test func dividingWhereConstantSplatInfinity() {
+        checkDividingWhereConstantA(.infinity)
+        checkDividingWhereConstantB(.infinity)
+    }
+
+    @Test func dividingWhereConstantSplatMinusInfinity() {
+        checkDividingWhereConstantA(-.infinity)
+        checkDividingWhereConstantB(-.infinity)
+    }
+
+    @Test func dividingWhereConstantSplatNaN() {
+        checkDividingWhereConstantA(.nan)
+        checkDividingWhereConstantB(.nan)
+    }
+
+    @Test func dividingWhereConstantSplatMinusNaN() {
+        checkDividingWhereConstantA(-.nan)
+        checkDividingWhereConstantB(-.nan)
+    }
+
+    @Test func dividingWhereConstantSplatPayloadNaN() {
+        checkDividingWhereConstantA(Lane(nan: 1, signaling: false))
+        checkDividingWhereConstantB(Lane(nan: 1, signaling: false))
+    }
+
+    @Test func dividingWhereConstantSplatSignalingNaN() {
+        checkDividingWhereConstantA(.signalingNaN)
+        checkDividingWhereConstantB(.signalingNaN)
+    }
+
+    @Test func dividingWhereConstantSplatMinusSignalingNaN() {
+        checkDividingWhereConstantA(-.signalingNaN)
+        checkDividingWhereConstantB(-.signalingNaN)
+    }
+
+    @Test func dividingWhereConstantSplatLeastNonzero() {
+        checkDividingWhereConstantA(.leastNonzeroMagnitude)
+        checkDividingWhereConstantB(.leastNonzeroMagnitude)
+    }
+
+    @Test func dividingWhereConstantSplatGreatest() {
+        checkDividingWhereConstantA(.greatestFiniteMagnitude)
+        checkDividingWhereConstantB(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkDividingWhereConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("dividingWhere with a alternating \(hex(even)), \(hex(odd))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x2A4F_17BD_0EC8_463A)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2A4F_15BD_0EC8_42D4)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, b) in everyPair(maskInputs, bInputs) {
+            mismatches.check(
+                H.dividing(H.repeatingBlock(even, odd), b, where: mask),
+                H(
+                    raw: HighwayReference.dividingWhereF64(
+                        mask.raw,
+                        H.repeatingBlock(even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func dividingWhereConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkDividingWhereConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func dividingWhereConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkDividingWhereConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func dividingWhereConstantAAlternatingHalfAndOne() {
+        checkDividingWhereConstantAAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkDividingWhereConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("dividingWhere with b alternating \(hex(even)), \(hex(odd))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA2EF_323A_EA2B_4619)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA2EF_313A_EA2B_4466)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.dividing(a, H.repeatingBlock(even, odd), where: mask),
+                H(
+                    raw: HighwayReference.dividingWhereF64(
+                        mask.raw,
+                        a.raw,
+                        H.repeatingBlock(even, odd).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func dividingWhereConstantBAlternatingOneAndMinusTwoPointFive() {
+        withKnownIssue(
+            "In release builds on EMU128 Highway multiplies and divides lane by lane, so the compiler folds the lanes where a constant operand is one and returns a signaling NaN of the other operand as it is, which the port's vector operation quiets"
+        ) {
+            checkDividingWhereConstantBAlternating(1.0, -2.5)
+        } when: {
+            SIMDTarget.targetName == "EMU128" && !assertionsAreEnabled
+        }
+    }
+
+    @Test func dividingWhereConstantBAlternatingMinusTwoPointFiveAndHalf() {
+        checkDividingWhereConstantBAlternating(-2.5, 0.5)
+    }
+
+    @Test func dividingWhereConstantBAlternatingHalfAndOne() {
+        withKnownIssue(
+            "In release builds on EMU128 Highway multiplies and divides lane by lane, so the compiler folds the lanes where a constant operand is one and returns a signaling NaN of the other operand as it is, which the port's vector operation quiets"
+        ) {
+            checkDividingWhereConstantBAlternating(0.5, 1.0)
+        } when: {
+            SIMDTarget.targetName == "EMU128" && !assertionsAreEnabled
+        }
+    }
+
+    @inline(__always)
     private func checkMultiplyAddingWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyAddingWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xAA25_6DE5_59F2_8CAC)
@@ -947,207 +1233,5 @@ extension SIMDDoubleConstantTests {
         } when: {
             isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
         }
-    }
-
-    @inline(__always)
-    private func checkApproximateReciprocalWhereConstantA(_ value: Lane) {
-        let mismatches = Mismatches("approximateReciprocalWhere with a repeating \(hex(value))")
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x10AC_00F8_131B_111B)
-        mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingF64(value)),
-            "repeating"
-        )
-        for mask in maskInputs {
-            mismatches.check(
-                H.approximateReciprocal(H.repeating(value), where: mask),
-                H(
-                    raw: HighwayReference.approximateReciprocalWhereF64(
-                        mask.raw,
-                        H.repeating(value).raw
-                    )
-                ),
-                "mask: \(describe(mask))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatZero() {
-        checkApproximateReciprocalWhereConstantA(0.0)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatNegativeZero() {
-        checkApproximateReciprocalWhereConstantA(-0.0)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatOne() {
-        checkApproximateReciprocalWhereConstantA(1.0)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatMinusOne() {
-        checkApproximateReciprocalWhereConstantA(-1.0)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatTwo() {
-        checkApproximateReciprocalWhereConstantA(2.0)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatHalf() {
-        checkApproximateReciprocalWhereConstantA(0.5)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatFour() {
-        checkApproximateReciprocalWhereConstantA(4.0)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatQuarter() {
-        checkApproximateReciprocalWhereConstantA(0.25)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatOnePointFive() {
-        checkApproximateReciprocalWhereConstantA(1.5)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatMinusTwoPointFive() {
-        checkApproximateReciprocalWhereConstantA(-2.5)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatInfinity() {
-        checkApproximateReciprocalWhereConstantA(.infinity)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatMinusInfinity() {
-        checkApproximateReciprocalWhereConstantA(-.infinity)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatNaN() {
-        checkApproximateReciprocalWhereConstantA(.nan)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatMinusNaN() {
-        checkApproximateReciprocalWhereConstantA(-.nan)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatPayloadNaN() {
-        checkApproximateReciprocalWhereConstantA(Lane(nan: 1, signaling: false))
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatSignalingNaN() {
-        checkApproximateReciprocalWhereConstantA(.signalingNaN)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatMinusSignalingNaN() {
-        checkApproximateReciprocalWhereConstantA(-.signalingNaN)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatLeastNonzero() {
-        checkApproximateReciprocalWhereConstantA(.leastNonzeroMagnitude)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatGreatest() {
-        checkApproximateReciprocalWhereConstantA(.greatestFiniteMagnitude)
-    }
-
-    @inline(__always)
-    private func checkApproximateReciprocalSquareRootWhereConstantA(_ value: Lane) {
-        let mismatches = Mismatches(
-            "approximateReciprocalSquareRootWhere with a repeating \(hex(value))"
-        )
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xFF7E_16AB_F127_0370)
-        mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingF64(value)),
-            "repeating"
-        )
-        for mask in maskInputs {
-            mismatches.check(
-                H.approximateReciprocalSquareRoot(H.repeating(value), where: mask),
-                H(
-                    raw: HighwayReference.approximateReciprocalSquareRootWhereF64(
-                        mask.raw,
-                        H.repeating(value).raw
-                    )
-                ),
-                "mask: \(describe(mask))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatZero() {
-        checkApproximateReciprocalSquareRootWhereConstantA(0.0)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatNegativeZero() {
-        checkApproximateReciprocalSquareRootWhereConstantA(-0.0)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatOne() {
-        checkApproximateReciprocalSquareRootWhereConstantA(1.0)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatMinusOne() {
-        checkApproximateReciprocalSquareRootWhereConstantA(-1.0)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatTwo() {
-        checkApproximateReciprocalSquareRootWhereConstantA(2.0)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatHalf() {
-        checkApproximateReciprocalSquareRootWhereConstantA(0.5)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatFour() {
-        checkApproximateReciprocalSquareRootWhereConstantA(4.0)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatQuarter() {
-        checkApproximateReciprocalSquareRootWhereConstantA(0.25)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatOnePointFive() {
-        checkApproximateReciprocalSquareRootWhereConstantA(1.5)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatMinusTwoPointFive() {
-        checkApproximateReciprocalSquareRootWhereConstantA(-2.5)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatInfinity() {
-        checkApproximateReciprocalSquareRootWhereConstantA(.infinity)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatMinusInfinity() {
-        checkApproximateReciprocalSquareRootWhereConstantA(-.infinity)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatNaN() {
-        checkApproximateReciprocalSquareRootWhereConstantA(.nan)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatMinusNaN() {
-        checkApproximateReciprocalSquareRootWhereConstantA(-.nan)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatPayloadNaN() {
-        checkApproximateReciprocalSquareRootWhereConstantA(Lane(nan: 1, signaling: false))
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatSignalingNaN() {
-        checkApproximateReciprocalSquareRootWhereConstantA(.signalingNaN)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatMinusSignalingNaN() {
-        checkApproximateReciprocalSquareRootWhereConstantA(-.signalingNaN)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatLeastNonzero() {
-        checkApproximateReciprocalSquareRootWhereConstantA(.leastNonzeroMagnitude)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatGreatest() {
-        checkApproximateReciprocalSquareRootWhereConstantA(.greatestFiniteMagnitude)
     }
 }

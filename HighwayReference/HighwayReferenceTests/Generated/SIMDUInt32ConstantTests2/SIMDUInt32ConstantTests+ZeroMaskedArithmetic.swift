@@ -7,6 +7,1314 @@ import Vectorization
 
 extension SIMDUInt32ConstantTests {
     @inline(__always)
+    private func checkMaximumWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("maximumWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xF6D1_6151_61F8_C4AB)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF6D1_6251_61F8_C65E)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.maximum(a, b, where: mask),
+                H(raw: HighwayReference.maximumWhereU32(mask.raw, a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func maximumWhereConstantMaskAllFalse() {
+        checkMaximumWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func maximumWhereConstantMaskAllTrue() {
+        checkMaximumWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func maximumWhereConstantMaskOnlyFirst() {
+        checkMaximumWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func maximumWhereConstantMaskOnlyLast() {
+        checkMaximumWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func maximumWhereConstantMaskAllButFirst() {
+        checkMaximumWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func maximumWhereConstantMaskAllButLast() {
+        checkMaximumWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
+    private func checkMaximumWhereConstantA(_ value: Lane) {
+        let mismatches = Mismatches("maximumWhere with a repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC079_0934_C009_0F91)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC079_0734_C009_0C2B)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU32(value)),
+            "repeating"
+        )
+        for (mask, b) in everyPair(maskInputs, bInputs) {
+            mismatches.check(
+                H.maximum(H.repeating(value), b, where: mask),
+                H(raw: HighwayReference.maximumWhereU32(mask.raw, H.repeating(value).raw, b.raw)),
+                "mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkMaximumWhereConstantB(_ value: Lane) {
+        let mismatches = Mismatches("maximumWhere with b repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB70A_5234_BA79_633C)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB70A_5334_BA79_64EF)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU32(value)),
+            "repeating"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.maximum(a, H.repeating(value), where: mask),
+                H(raw: HighwayReference.maximumWhereU32(mask.raw, a.raw, H.repeating(value).raw)),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func maximumWhereConstantSplat0() {
+        checkMaximumWhereConstantA(0)
+        checkMaximumWhereConstantB(0)
+    }
+
+    @Test func maximumWhereConstantSplat1() {
+        checkMaximumWhereConstantA(1)
+        checkMaximumWhereConstantB(1)
+    }
+
+    @Test func maximumWhereConstantSplat15() {
+        checkMaximumWhereConstantA(15)
+        checkMaximumWhereConstantB(15)
+    }
+
+    @Test func maximumWhereConstantSplat16() {
+        checkMaximumWhereConstantA(16)
+        checkMaximumWhereConstantB(16)
+    }
+
+    @Test func maximumWhereConstantSplat26() {
+        checkMaximumWhereConstantA(26)
+        checkMaximumWhereConstantB(26)
+    }
+
+    @Test func maximumWhereConstantSplat127() {
+        checkMaximumWhereConstantA(127)
+        checkMaximumWhereConstantB(127)
+    }
+
+    @Test func maximumWhereConstantSplat128() {
+        checkMaximumWhereConstantA(128)
+        checkMaximumWhereConstantB(128)
+    }
+
+    @Test func maximumWhereConstantSplat255() {
+        checkMaximumWhereConstantA(255)
+        checkMaximumWhereConstantB(255)
+    }
+
+    @Test func maximumWhereConstantSplat256() {
+        checkMaximumWhereConstantA(256)
+        checkMaximumWhereConstantB(256)
+    }
+
+    @Test func maximumWhereConstantSplat257() {
+        checkMaximumWhereConstantA(257)
+        checkMaximumWhereConstantB(257)
+    }
+
+    @Test func maximumWhereConstantSplat65280() {
+        checkMaximumWhereConstantA(65280)
+        checkMaximumWhereConstantB(65280)
+    }
+
+    @Test func maximumWhereConstantSplat65281() {
+        checkMaximumWhereConstantA(65281)
+        checkMaximumWhereConstantB(65281)
+    }
+
+    @Test func maximumWhereConstantSplatMax() {
+        checkMaximumWhereConstantA(Lane.max)
+        checkMaximumWhereConstantB(Lane.max)
+    }
+
+    @inline(__always)
+    private func checkMaximumWhereConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("maximumWhere with b alternating \(hex(even)), \(hex(odd))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x48BF_3A06_9CE2_9F17)
+        let aInputs = Inputs.vectors(H.self, seed: 0x48BF_3906_9CE2_9D64)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockU32(even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.maximum(a, H.repeatingBlock(even, odd, even, odd), where: mask),
+                H(
+                    raw: HighwayReference.maximumWhereU32(
+                        mask.raw,
+                        a.raw,
+                        H.repeatingBlock(even, odd, even, odd).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func maximumWhereConstantBAlternating1And26() {
+        checkMaximumWhereConstantBAlternating(1, 26)
+    }
+
+    @Test func maximumWhereConstantBAlternating26And127() {
+        checkMaximumWhereConstantBAlternating(26, 127)
+    }
+
+    @Test func maximumWhereConstantBAlternating127And1() {
+        checkMaximumWhereConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkAddingWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("addingWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x4518_95AA_1BF6_B396)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4518_94AA_1BF6_B1E3)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.adding(a, b, where: mask),
+                H(raw: HighwayReference.addingWhereU32(mask.raw, a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func addingWhereConstantMaskAllFalse() {
+        checkAddingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func addingWhereConstantMaskAllTrue() {
+        checkAddingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func addingWhereConstantMaskOnlyFirst() {
+        checkAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func addingWhereConstantMaskOnlyLast() {
+        checkAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func addingWhereConstantMaskAllButFirst() {
+        checkAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func addingWhereConstantMaskAllButLast() {
+        checkAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
+    private func checkAddingWhereConstantA(_ value: Lane) {
+        let mismatches = Mismatches("addingWhere with a repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x21A0_E23D_451C_7E52)
+        let bInputs = Inputs.vectors(H.self, seed: 0x21A0_E03D_451C_7AEC)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU32(value)),
+            "repeating"
+        )
+        for (mask, b) in everyPair(maskInputs, bInputs) {
+            mismatches.check(
+                H.adding(H.repeating(value), b, where: mask),
+                H(raw: HighwayReference.addingWhereU32(mask.raw, H.repeating(value).raw, b.raw)),
+                "mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkAddingWhereConstantB(_ value: Lane) {
+        let mismatches = Mismatches("addingWhere with b repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x07E1_5D3D_3698_0E73)
+        let aInputs = Inputs.vectors(H.self, seed: 0x07E1_5C3D_3698_0CC0)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU32(value)),
+            "repeating"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.adding(a, H.repeating(value), where: mask),
+                H(raw: HighwayReference.addingWhereU32(mask.raw, a.raw, H.repeating(value).raw)),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func addingWhereConstantSplat0() {
+        checkAddingWhereConstantA(0)
+        checkAddingWhereConstantB(0)
+    }
+
+    @Test func addingWhereConstantSplat1() {
+        checkAddingWhereConstantA(1)
+        checkAddingWhereConstantB(1)
+    }
+
+    @Test func addingWhereConstantSplat15() {
+        checkAddingWhereConstantA(15)
+        checkAddingWhereConstantB(15)
+    }
+
+    @Test func addingWhereConstantSplat16() {
+        checkAddingWhereConstantA(16)
+        checkAddingWhereConstantB(16)
+    }
+
+    @Test func addingWhereConstantSplat26() {
+        checkAddingWhereConstantA(26)
+        checkAddingWhereConstantB(26)
+    }
+
+    @Test func addingWhereConstantSplat127() {
+        checkAddingWhereConstantA(127)
+        checkAddingWhereConstantB(127)
+    }
+
+    @Test func addingWhereConstantSplat128() {
+        checkAddingWhereConstantA(128)
+        checkAddingWhereConstantB(128)
+    }
+
+    @Test func addingWhereConstantSplat255() {
+        checkAddingWhereConstantA(255)
+        checkAddingWhereConstantB(255)
+    }
+
+    @Test func addingWhereConstantSplat256() {
+        checkAddingWhereConstantA(256)
+        checkAddingWhereConstantB(256)
+    }
+
+    @Test func addingWhereConstantSplat257() {
+        checkAddingWhereConstantA(257)
+        checkAddingWhereConstantB(257)
+    }
+
+    @Test func addingWhereConstantSplat65280() {
+        checkAddingWhereConstantA(65280)
+        checkAddingWhereConstantB(65280)
+    }
+
+    @Test func addingWhereConstantSplat65281() {
+        checkAddingWhereConstantA(65281)
+        checkAddingWhereConstantB(65281)
+    }
+
+    @Test func addingWhereConstantSplatMax() {
+        checkAddingWhereConstantA(Lane.max)
+        checkAddingWhereConstantB(Lane.max)
+    }
+
+    @inline(__always)
+    private func checkAddingWhereConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("addingWhere with b alternating \(hex(even)), \(hex(odd))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xFB55_133F_3222_D64A)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFB55_143F_3222_D7FD)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockU32(even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.adding(a, H.repeatingBlock(even, odd, even, odd), where: mask),
+                H(
+                    raw: HighwayReference.addingWhereU32(
+                        mask.raw,
+                        a.raw,
+                        H.repeatingBlock(even, odd, even, odd).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func addingWhereConstantBAlternating1And26() {
+        checkAddingWhereConstantBAlternating(1, 26)
+    }
+
+    @Test func addingWhereConstantBAlternating26And127() {
+        checkAddingWhereConstantBAlternating(26, 127)
+    }
+
+    @Test func addingWhereConstantBAlternating127And1() {
+        checkAddingWhereConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkSubtractingWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("subtractingWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x12DC_6846_BB9B_E295)
+        let bInputs = Inputs.vectors(H.self, seed: 0x12DC_6546_BB9B_DD7C)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.subtracting(a, b, where: mask),
+                H(raw: HighwayReference.subtractingWhereU32(mask.raw, a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func subtractingWhereConstantMaskAllFalse() {
+        checkSubtractingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func subtractingWhereConstantMaskAllTrue() {
+        checkSubtractingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func subtractingWhereConstantMaskOnlyFirst() {
+        checkSubtractingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func subtractingWhereConstantMaskOnlyLast() {
+        checkSubtractingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func subtractingWhereConstantMaskAllButFirst() {
+        checkSubtractingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func subtractingWhereConstantMaskAllButLast() {
+        checkSubtractingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
+    private func checkSubtractingWhereConstantA(_ value: Lane) {
+        let mismatches = Mismatches("subtractingWhere with a repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE9FA_FD9D_9EE7_8F87)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE9FA_FF9D_9EE7_92ED)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU32(value)),
+            "repeating"
+        )
+        for (mask, b) in everyPair(maskInputs, bInputs) {
+            mismatches.check(
+                H.subtracting(H.repeating(value), b, where: mask),
+                H(
+                    raw: HighwayReference.subtractingWhereU32(
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkSubtractingWhereConstantB(_ value: Lane) {
+        let mismatches = Mismatches("subtractingWhere with b repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x0493_E29D_AE24_9346)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0493_E39D_AE24_94F9)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU32(value)),
+            "repeating"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.subtracting(a, H.repeating(value), where: mask),
+                H(
+                    raw: HighwayReference.subtractingWhereU32(
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func subtractingWhereConstantSplat0() {
+        checkSubtractingWhereConstantA(0)
+        checkSubtractingWhereConstantB(0)
+    }
+
+    @Test func subtractingWhereConstantSplat1() {
+        checkSubtractingWhereConstantA(1)
+        checkSubtractingWhereConstantB(1)
+    }
+
+    @Test func subtractingWhereConstantSplat15() {
+        checkSubtractingWhereConstantA(15)
+        checkSubtractingWhereConstantB(15)
+    }
+
+    @Test func subtractingWhereConstantSplat16() {
+        checkSubtractingWhereConstantA(16)
+        checkSubtractingWhereConstantB(16)
+    }
+
+    @Test func subtractingWhereConstantSplat26() {
+        checkSubtractingWhereConstantA(26)
+        checkSubtractingWhereConstantB(26)
+    }
+
+    @Test func subtractingWhereConstantSplat127() {
+        checkSubtractingWhereConstantA(127)
+        checkSubtractingWhereConstantB(127)
+    }
+
+    @Test func subtractingWhereConstantSplat128() {
+        checkSubtractingWhereConstantA(128)
+        checkSubtractingWhereConstantB(128)
+    }
+
+    @Test func subtractingWhereConstantSplat255() {
+        checkSubtractingWhereConstantA(255)
+        checkSubtractingWhereConstantB(255)
+    }
+
+    @Test func subtractingWhereConstantSplat256() {
+        checkSubtractingWhereConstantA(256)
+        checkSubtractingWhereConstantB(256)
+    }
+
+    @Test func subtractingWhereConstantSplat257() {
+        checkSubtractingWhereConstantA(257)
+        checkSubtractingWhereConstantB(257)
+    }
+
+    @Test func subtractingWhereConstantSplat65280() {
+        checkSubtractingWhereConstantA(65280)
+        checkSubtractingWhereConstantB(65280)
+    }
+
+    @Test func subtractingWhereConstantSplat65281() {
+        checkSubtractingWhereConstantA(65281)
+        checkSubtractingWhereConstantB(65281)
+    }
+
+    @Test func subtractingWhereConstantSplatMax() {
+        checkSubtractingWhereConstantA(Lane.max)
+        checkSubtractingWhereConstantB(Lane.max)
+    }
+
+    @inline(__always)
+    private func checkSubtractingWhereConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("subtractingWhere with b alternating \(hex(even)), \(hex(odd))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x4861_9A01_45F4_B6BD)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4861_9901_45F4_B50A)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockU32(even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.subtracting(a, H.repeatingBlock(even, odd, even, odd), where: mask),
+                H(
+                    raw: HighwayReference.subtractingWhereU32(
+                        mask.raw,
+                        a.raw,
+                        H.repeatingBlock(even, odd, even, odd).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func subtractingWhereConstantBAlternating1And26() {
+        checkSubtractingWhereConstantBAlternating(1, 26)
+    }
+
+    @Test func subtractingWhereConstantBAlternating26And127() {
+        checkSubtractingWhereConstantBAlternating(26, 127)
+    }
+
+    @Test func subtractingWhereConstantBAlternating127And1() {
+        checkSubtractingWhereConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkMultiplyingWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("multiplyingWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xBEE2_1482_0D88_2E01)
+        let bInputs = Inputs.vectors(H.self, seed: 0xBEE2_1182_0D88_28E8)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.multiplying(a, b, where: mask),
+                H(raw: HighwayReference.multiplyingWhereU32(mask.raw, a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingWhereConstantMaskAllFalse() {
+        checkMultiplyingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func multiplyingWhereConstantMaskAllTrue() {
+        checkMultiplyingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func multiplyingWhereConstantMaskOnlyFirst() {
+        checkMultiplyingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func multiplyingWhereConstantMaskOnlyLast() {
+        checkMultiplyingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func multiplyingWhereConstantMaskAllButFirst() {
+        checkMultiplyingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func multiplyingWhereConstantMaskAllButLast() {
+        checkMultiplyingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
+    private func checkMultiplyingWhereConstantA(_ value: Lane) {
+        let mismatches = Mismatches("multiplyingWhere with a repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x68D3_8A32_0079_4643)
+        let bInputs = Inputs.vectors(H.self, seed: 0x68D3_8C32_0079_49A9)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU32(value)),
+            "repeating"
+        )
+        for (mask, b) in everyPair(maskInputs, bInputs) {
+            mismatches.check(
+                H.multiplying(H.repeating(value), b, where: mask),
+                H(
+                    raw: HighwayReference.multiplyingWhereU32(
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkMultiplyingWhereConstantB(_ value: Lane) {
+        let mismatches = Mismatches("multiplyingWhere with b repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x81B9_0F32_0E44_1262)
+        let aInputs = Inputs.vectors(H.self, seed: 0x81B9_1032_0E44_1415)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU32(value)),
+            "repeating"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.multiplying(a, H.repeating(value), where: mask),
+                H(
+                    raw: HighwayReference.multiplyingWhereU32(
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingWhereConstantSplat0() {
+        checkMultiplyingWhereConstantA(0)
+        checkMultiplyingWhereConstantB(0)
+    }
+
+    @Test func multiplyingWhereConstantSplat1() {
+        checkMultiplyingWhereConstantA(1)
+        checkMultiplyingWhereConstantB(1)
+    }
+
+    @Test func multiplyingWhereConstantSplat15() {
+        checkMultiplyingWhereConstantA(15)
+        checkMultiplyingWhereConstantB(15)
+    }
+
+    @Test func multiplyingWhereConstantSplat16() {
+        checkMultiplyingWhereConstantA(16)
+        checkMultiplyingWhereConstantB(16)
+    }
+
+    @Test func multiplyingWhereConstantSplat26() {
+        checkMultiplyingWhereConstantA(26)
+        checkMultiplyingWhereConstantB(26)
+    }
+
+    @Test func multiplyingWhereConstantSplat127() {
+        checkMultiplyingWhereConstantA(127)
+        checkMultiplyingWhereConstantB(127)
+    }
+
+    @Test func multiplyingWhereConstantSplat128() {
+        checkMultiplyingWhereConstantA(128)
+        checkMultiplyingWhereConstantB(128)
+    }
+
+    @Test func multiplyingWhereConstantSplat255() {
+        checkMultiplyingWhereConstantA(255)
+        checkMultiplyingWhereConstantB(255)
+    }
+
+    @Test func multiplyingWhereConstantSplat256() {
+        checkMultiplyingWhereConstantA(256)
+        checkMultiplyingWhereConstantB(256)
+    }
+
+    @Test func multiplyingWhereConstantSplat257() {
+        checkMultiplyingWhereConstantA(257)
+        checkMultiplyingWhereConstantB(257)
+    }
+
+    @Test func multiplyingWhereConstantSplat65280() {
+        checkMultiplyingWhereConstantA(65280)
+        checkMultiplyingWhereConstantB(65280)
+    }
+
+    @Test func multiplyingWhereConstantSplat65281() {
+        checkMultiplyingWhereConstantA(65281)
+        checkMultiplyingWhereConstantB(65281)
+    }
+
+    @Test func multiplyingWhereConstantSplatMax() {
+        checkMultiplyingWhereConstantA(Lane.max)
+        checkMultiplyingWhereConstantB(Lane.max)
+    }
+
+    @inline(__always)
+    private func checkMultiplyingWhereConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("multiplyingWhere with a alternating \(hex(even)), \(hex(odd))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x495A_5435_03C6_5F1A)
+        let bInputs = Inputs.vectors(H.self, seed: 0x495A_5235_03C6_5BB4)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockU32(even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, b) in everyPair(maskInputs, bInputs) {
+            mismatches.check(
+                H.multiplying(H.repeatingBlock(even, odd, even, odd), b, where: mask),
+                H(
+                    raw: HighwayReference.multiplyingWhereU32(
+                        mask.raw,
+                        H.repeatingBlock(even, odd, even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingWhereConstantAAlternating1And26() {
+        checkMultiplyingWhereConstantAAlternating(1, 26)
+    }
+
+    @Test func multiplyingWhereConstantAAlternating26And127() {
+        checkMultiplyingWhereConstantAAlternating(26, 127)
+    }
+
+    @Test func multiplyingWhereConstantAAlternating127And1() {
+        checkMultiplyingWhereConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkMultiplyingWhereConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("multiplyingWhere with b alternating \(hex(even)), \(hex(odd))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x93B4_A3CB_34D1_BD79)
+        let aInputs = Inputs.vectors(H.self, seed: 0x93B4_A2CB_34D1_BBC6)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockU32(even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.multiplying(a, H.repeatingBlock(even, odd, even, odd), where: mask),
+                H(
+                    raw: HighwayReference.multiplyingWhereU32(
+                        mask.raw,
+                        a.raw,
+                        H.repeatingBlock(even, odd, even, odd).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingWhereConstantBAlternating1And26() {
+        checkMultiplyingWhereConstantBAlternating(1, 26)
+    }
+
+    @Test func multiplyingWhereConstantBAlternating26And127() {
+        checkMultiplyingWhereConstantBAlternating(26, 127)
+    }
+
+    @Test func multiplyingWhereConstantBAlternating127And1() {
+        checkMultiplyingWhereConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkDividingWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("dividingWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xA770_0E16_B680_9007)
+        let bInputs =
+            Inputs.vectors(H.self, seed: 0xA770_0F16_B680_91BA)
+            + Inputs.vectors(H.self, seed: 0x16F3_7204_2901_6741).enumerated().map {
+                index,
+                vector in H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))
+            }
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.dividing(a, b, where: mask),
+                H(raw: HighwayReference.dividingWhereU32(mask.raw, a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func dividingWhereConstantMaskAllFalse() {
+        checkDividingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func dividingWhereConstantMaskAllTrue() {
+        checkDividingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func dividingWhereConstantMaskOnlyFirst() {
+        checkDividingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func dividingWhereConstantMaskOnlyLast() {
+        checkDividingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func dividingWhereConstantMaskAllButFirst() {
+        checkDividingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func dividingWhereConstantMaskAllButLast() {
+        checkDividingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
+    private func checkDividingWhereConstantA(_ value: Lane) {
+        let mismatches = Mismatches("dividingWhere with a repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7F75_AFE2_D4C0_66DD)
+        let bInputs =
+            Inputs.vectors(H.self, seed: 0x7F75_ADE2_D4C0_6377)
+            + Inputs.vectors(H.self, seed: 0xDF9D_A575_C585_2688).enumerated().map {
+                index,
+                vector in H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))
+            }
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU32(value)),
+            "repeating"
+        )
+        for (mask, b) in everyPair(maskInputs, bInputs) {
+            mismatches.check(
+                H.dividing(H.repeating(value), b, where: mask),
+                H(raw: HighwayReference.dividingWhereU32(mask.raw, H.repeating(value).raw, b.raw)),
+                "mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkDividingWhereConstantB(_ value: Lane) {
+        let mismatches = Mismatches("dividingWhere with b repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x76E0_78E2_CFE9_84C8)
+        let aInputs = Inputs.vectors(H.self, seed: 0x76E0_79E2_CFE9_867B)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU32(value)),
+            "repeating"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.dividing(a, H.repeating(value), where: mask),
+                H(raw: HighwayReference.dividingWhereU32(mask.raw, a.raw, H.repeating(value).raw)),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func dividingWhereConstantSplat0() {
+        checkDividingWhereConstantA(0)
+        checkDividingWhereConstantB(0)
+    }
+
+    @Test func dividingWhereConstantSplat1() {
+        checkDividingWhereConstantA(1)
+        checkDividingWhereConstantB(1)
+    }
+
+    @Test func dividingWhereConstantSplat15() {
+        checkDividingWhereConstantA(15)
+        checkDividingWhereConstantB(15)
+    }
+
+    @Test func dividingWhereConstantSplat16() {
+        checkDividingWhereConstantA(16)
+        checkDividingWhereConstantB(16)
+    }
+
+    @Test func dividingWhereConstantSplat26() {
+        checkDividingWhereConstantA(26)
+        checkDividingWhereConstantB(26)
+    }
+
+    @Test func dividingWhereConstantSplat127() {
+        checkDividingWhereConstantA(127)
+        checkDividingWhereConstantB(127)
+    }
+
+    @Test func dividingWhereConstantSplat128() {
+        checkDividingWhereConstantA(128)
+        checkDividingWhereConstantB(128)
+    }
+
+    @Test func dividingWhereConstantSplat255() {
+        checkDividingWhereConstantA(255)
+        checkDividingWhereConstantB(255)
+    }
+
+    @Test func dividingWhereConstantSplat256() {
+        checkDividingWhereConstantA(256)
+        checkDividingWhereConstantB(256)
+    }
+
+    @Test func dividingWhereConstantSplat257() {
+        checkDividingWhereConstantA(257)
+        checkDividingWhereConstantB(257)
+    }
+
+    @Test func dividingWhereConstantSplat65280() {
+        checkDividingWhereConstantA(65280)
+        checkDividingWhereConstantB(65280)
+    }
+
+    @Test func dividingWhereConstantSplat65281() {
+        checkDividingWhereConstantA(65281)
+        checkDividingWhereConstantB(65281)
+    }
+
+    @Test func dividingWhereConstantSplatMax() {
+        checkDividingWhereConstantA(Lane.max)
+        checkDividingWhereConstantB(Lane.max)
+    }
+
+    @inline(__always)
+    private func checkDividingWhereConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("dividingWhere with b alternating \(hex(even)), \(hex(odd))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xCE74_2AFF_4CAA_F473)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCE74_29FF_4CAA_F2C0)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockU32(even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.dividing(a, H.repeatingBlock(even, odd, even, odd), where: mask),
+                H(
+                    raw: HighwayReference.dividingWhereU32(
+                        mask.raw,
+                        a.raw,
+                        H.repeatingBlock(even, odd, even, odd).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func dividingWhereConstantBAlternating1And26() {
+        checkDividingWhereConstantBAlternating(1, 26)
+    }
+
+    @Test func dividingWhereConstantBAlternating26And127() {
+        checkDividingWhereConstantBAlternating(26, 127)
+    }
+
+    @Test func dividingWhereConstantBAlternating127And1() {
+        checkDividingWhereConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkMultiplyAddingWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("multiplyAddingWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x3BF3_42B7_8BDE_EF56)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3BF3_41B7_8BDE_EDA3)
+        let cInputs = Inputs.vectors(H.self, seed: 0x3BF3_40B7_8BDE_EBF0)
+        for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x8B4E_5237_4605_CD43) {
+            mismatches.check(
+                H.multiplyAdding(a, b, c, where: mask),
+                H(raw: HighwayReference.multiplyAddingWhereU32(mask.raw, a.raw, b.raw, c.raw)),
+                "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyAddingWhereConstantMaskAllFalse() {
+        checkMultiplyAddingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func multiplyAddingWhereConstantMaskAllTrue() {
+        checkMultiplyAddingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func multiplyAddingWhereConstantMaskOnlyFirst() {
+        checkMultiplyAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func multiplyAddingWhereConstantMaskOnlyLast() {
+        checkMultiplyAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func multiplyAddingWhereConstantMaskAllButFirst() {
+        checkMultiplyAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func multiplyAddingWhereConstantMaskAllButLast() {
+        checkMultiplyAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
+    private func checkNegatedMultiplyAddingWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("negatedMultiplyAddingWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x8F7C_BFE0_E818_5370)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8F7C_C2E0_E818_5889)
+        let cInputs = Inputs.vectors(H.self, seed: 0x8F7C_C1E0_E818_56D6)
+        for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xC485_632F_DC20_1C25) {
+            mismatches.check(
+                H.negatedMultiplyAdding(a, b, c, where: mask),
+                H(
+                    raw: HighwayReference.negatedMultiplyAddingWhereU32(
+                        mask.raw,
+                        a.raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
+                "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func negatedMultiplyAddingWhereConstantMaskAllFalse() {
+        checkNegatedMultiplyAddingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func negatedMultiplyAddingWhereConstantMaskAllTrue() {
+        checkNegatedMultiplyAddingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func negatedMultiplyAddingWhereConstantMaskOnlyFirst() {
+        checkNegatedMultiplyAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func negatedMultiplyAddingWhereConstantMaskOnlyLast() {
+        checkNegatedMultiplyAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func negatedMultiplyAddingWhereConstantMaskAllButFirst() {
+        checkNegatedMultiplyAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func negatedMultiplyAddingWhereConstantMaskAllButLast() {
+        checkNegatedMultiplyAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
+    private func checkNegatedMultiplySubtractingWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("negatedMultiplySubtractingWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xB990_764D_9A0B_87F3)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB990_774D_9A0B_89A6)
+        let cInputs = Inputs.vectors(H.self, seed: 0xB990_784D_9A0B_8B59)
+        for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x478C_3B6D_C30A_863C) {
+            mismatches.check(
+                H.negatedMultiplySubtracting(a, b, c, where: mask),
+                H(
+                    raw: HighwayReference.negatedMultiplySubtractingWhereU32(
+                        mask.raw,
+                        a.raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
+                "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantMaskAllFalse() {
+        checkNegatedMultiplySubtractingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantMaskAllTrue() {
+        checkNegatedMultiplySubtractingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantMaskOnlyFirst() {
+        checkNegatedMultiplySubtractingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantMaskOnlyLast() {
+        checkNegatedMultiplySubtractingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantMaskAllButFirst() {
+        checkNegatedMultiplySubtractingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantMaskAllButLast() {
+        checkNegatedMultiplySubtractingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
     private func checkMultiplyPairwiseAddingWhereFromUInt16ConstantA(_ value: UInt16) {
         let mismatches = Mismatches(
             "multiplyPairwiseAddingWhereFromUInt16 with a repeating \(hex(value))"

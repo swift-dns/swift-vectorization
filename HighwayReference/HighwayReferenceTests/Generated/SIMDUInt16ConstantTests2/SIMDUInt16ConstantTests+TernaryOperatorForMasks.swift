@@ -194,6 +194,77 @@ extension SIMDUInt16ConstantTests {
     }
 
     @inline(__always)
+    private func checkZeroingSelectedConstantA(_ value: Lane) {
+        let mismatches = Mismatches("zeroingSelected with a repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x60C0_55D9_82E7_ABB9)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingU16(value)),
+            "repeating"
+        )
+        for mask in maskInputs {
+            mismatches.check(
+                H.zeroingSelected(mask, H.repeating(value)),
+                H(raw: HighwayReference.zeroingSelectedU16(mask.raw, H.repeating(value).raw)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func zeroingSelectedConstantSplat0() {
+        checkZeroingSelectedConstantA(0)
+    }
+
+    @Test func zeroingSelectedConstantSplat1() {
+        checkZeroingSelectedConstantA(1)
+    }
+
+    @Test func zeroingSelectedConstantSplat15() {
+        checkZeroingSelectedConstantA(15)
+    }
+
+    @Test func zeroingSelectedConstantSplat16() {
+        checkZeroingSelectedConstantA(16)
+    }
+
+    @Test func zeroingSelectedConstantSplat26() {
+        checkZeroingSelectedConstantA(26)
+    }
+
+    @Test func zeroingSelectedConstantSplat127() {
+        checkZeroingSelectedConstantA(127)
+    }
+
+    @Test func zeroingSelectedConstantSplat128() {
+        checkZeroingSelectedConstantA(128)
+    }
+
+    @Test func zeroingSelectedConstantSplat255() {
+        checkZeroingSelectedConstantA(255)
+    }
+
+    @Test func zeroingSelectedConstantSplat256() {
+        checkZeroingSelectedConstantA(256)
+    }
+
+    @Test func zeroingSelectedConstantSplat257() {
+        checkZeroingSelectedConstantA(257)
+    }
+
+    @Test func zeroingSelectedConstantSplat65280() {
+        checkZeroingSelectedConstantA(65280)
+    }
+
+    @Test func zeroingSelectedConstantSplat65281() {
+        checkZeroingSelectedConstantA(65281)
+    }
+
+    @Test func zeroingSelectedConstantSplatMax() {
+        checkZeroingSelectedConstantA(Lane.max)
+    }
+
+    @inline(__always)
     private func checkSelectingByVectorConstantA(_ value: Lane) {
         let mismatches = Mismatches("selectingByVector with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.self, seed: 0xD726_9DE4_3D0D_5D49)

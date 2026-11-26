@@ -7,6 +7,209 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
+    private func checkVectorConvertingWhereFromInt64ConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("vectorConvertingWhereFromInt64 with mask \(describe(mask))")
+        let aInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0xBFF8_4EA5_181C_9AE8)
+        for a in aInputs {
+            mismatches.check(
+                H.vector(converting: a, where: mask),
+                H(raw: HighwayReference.vectorConvertingWhereI64ToF64(mask.raw, a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantMaskAllFalse() {
+        checkVectorConvertingWhereFromInt64ConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantMaskAllTrue() {
+        checkVectorConvertingWhereFromInt64ConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantMaskOnlyFirst() {
+        checkVectorConvertingWhereFromInt64ConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantMaskOnlyLast() {
+        checkVectorConvertingWhereFromInt64ConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantMaskAllButFirst() {
+        checkVectorConvertingWhereFromInt64ConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantMaskAllButLast() {
+        checkVectorConvertingWhereFromInt64ConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
+    private func checkVectorConvertingWhereFromInt64ConstantA(_ value: Int64) {
+        let mismatches = Mismatches("vectorConvertingWhereFromInt64 with a repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF723_A432_F823_AFA8)
+        mismatches.check(
+            SIMD<Int64>.repeating(value),
+            SIMD<Int64>(raw: HighwayReference.repeatingI64(value)),
+            "repeating"
+        )
+        for mask in maskInputs {
+            mismatches.check(
+                H.vector(converting: SIMD<Int64>.repeating(value), where: mask),
+                H(
+                    raw: HighwayReference.vectorConvertingWhereI64ToF64(
+                        mask.raw,
+                        SIMD<Int64>.repeating(value).raw
+                    )
+                ),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantSplat0() {
+        checkVectorConvertingWhereFromInt64ConstantA(0)
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantSplat1() {
+        checkVectorConvertingWhereFromInt64ConstantA(1)
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantSplat15() {
+        checkVectorConvertingWhereFromInt64ConstantA(15)
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantSplat16() {
+        checkVectorConvertingWhereFromInt64ConstantA(16)
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantSplat26() {
+        checkVectorConvertingWhereFromInt64ConstantA(26)
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantSplat127() {
+        checkVectorConvertingWhereFromInt64ConstantA(127)
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantSplat128() {
+        checkVectorConvertingWhereFromInt64ConstantA(128)
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantSplat255() {
+        checkVectorConvertingWhereFromInt64ConstantA(255)
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantSplat256() {
+        checkVectorConvertingWhereFromInt64ConstantA(256)
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantSplat257() {
+        checkVectorConvertingWhereFromInt64ConstantA(257)
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantSplat65280() {
+        checkVectorConvertingWhereFromInt64ConstantA(65280)
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantSplat65281() {
+        checkVectorConvertingWhereFromInt64ConstantA(65281)
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantSplatMinus1() {
+        checkVectorConvertingWhereFromInt64ConstantA(-1)
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantSplatMinus16() {
+        checkVectorConvertingWhereFromInt64ConstantA(-16)
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantSplatMinus17() {
+        checkVectorConvertingWhereFromInt64ConstantA(-17)
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantSplatMinus128() {
+        checkVectorConvertingWhereFromInt64ConstantA(-128)
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantSplatMinus129() {
+        checkVectorConvertingWhereFromInt64ConstantA(-129)
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantSplatMax() {
+        checkVectorConvertingWhereFromInt64ConstantA(Int64.max)
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantSplatMin() {
+        checkVectorConvertingWhereFromInt64ConstantA(Int64.min)
+    }
+
+    @inline(__always)
+    private func checkVectorConvertingWhereFromInt64ConstantAAlternating(
+        _ even: Int64,
+        _ odd: Int64
+    ) {
+        let mismatches = Mismatches(
+            "vectorConvertingWhereFromInt64 with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x5DAA_308F_4826_1613)
+        mismatches.check(
+            SIMD<Int64>.repeatingBlock(even, odd),
+            SIMD<Int64>(raw: HighwayReference.repeatingBlockI64(even, odd)),
+            "repeatingBlock"
+        )
+        for mask in maskInputs {
+            mismatches.check(
+                H.vector(converting: SIMD<Int64>.repeatingBlock(even, odd), where: mask),
+                H(
+                    raw: HighwayReference.vectorConvertingWhereI64ToF64(
+                        mask.raw,
+                        SIMD<Int64>.repeatingBlock(even, odd).raw
+                    )
+                ),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantAAlternating1And26() {
+        checkVectorConvertingWhereFromInt64ConstantAAlternating(1, 26)
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantAAlternating26And127() {
+        checkVectorConvertingWhereFromInt64ConstantAAlternating(26, 127)
+    }
+
+    @Test func vectorConvertingWhereFromInt64ConstantAAlternating127And1() {
+        checkVectorConvertingWhereFromInt64ConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
     private func checkVectorResizingFromUInt64ConstantA(_ value: UInt64) {
         let mismatches = Mismatches("vectorResizingFromUInt64 with a repeating \(hex(value))")
         mismatches.check(
@@ -973,108 +1176,4 @@ extension SIMDDoubleConstantTests {
         checkHalfVectorResizingFromFloat16ConstantA(.greatestFiniteMagnitude)
     }
     #endif
-
-    @inline(__always)
-    private func checkVectorResizingFromBFloat16ConstantA(_ value: BFloat16) {
-        let mismatches = Mismatches("vectorResizingFromBFloat16 with a repeating \(hex(value))")
-        mismatches.check(
-            SIMD<BFloat16>.repeating(value),
-            SIMD<BFloat16>(raw: HighwayReference.repeatingBF16(value.bitPattern)),
-            "repeating"
-        )
-        let port = H.vector(resizing: SIMD<BFloat16>.repeating(value))
-        let reference = H(
-            raw: HighwayReference.vectorResizingBF16ToF64(SIMD<BFloat16>.repeating(value).raw)
-        )
-        let definedBytes = SIMD<BFloat16>.laneCount * MemoryLayout<BFloat16>.stride
-        let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
-        let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
-        mismatches.check(
-            Array(bytes(of: port).prefix(definedBytes)),
-            Array(bytes(of: reference).prefix(definedBytes)),
-            ""
-        )
-        mismatches.check(
-            Array(registerBytes(of: port).dropFirst(definedBytes).prefix(newBytes)),
-            Array(registerBytes(of: reference).dropFirst(definedBytes).prefix(newBytes)),
-            ""
-        )
-        mismatches.record()
-    }
-
-    @Test func vectorResizingFromBFloat16ConstantSplatZero() {
-        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x0000))
-    }
-
-    @Test func vectorResizingFromBFloat16ConstantSplatNegativeZero() {
-        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x8000))
-    }
-
-    @Test func vectorResizingFromBFloat16ConstantSplatOne() {
-        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F80))
-    }
-
-    @Test func vectorResizingFromBFloat16ConstantSplatMinusOne() {
-        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0xBF80))
-    }
-
-    @Test func vectorResizingFromBFloat16ConstantSplatTwo() {
-        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x4000))
-    }
-
-    @Test func vectorResizingFromBFloat16ConstantSplatHalf() {
-        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F00))
-    }
-
-    @Test func vectorResizingFromBFloat16ConstantSplatFour() {
-        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x4080))
-    }
-
-    @Test func vectorResizingFromBFloat16ConstantSplatQuarter() {
-        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x3E80))
-    }
-
-    @Test func vectorResizingFromBFloat16ConstantSplatOnePointFive() {
-        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x3FC0))
-    }
-
-    @Test func vectorResizingFromBFloat16ConstantSplatMinusTwoPointFive() {
-        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0xC020))
-    }
-
-    @Test func vectorResizingFromBFloat16ConstantSplatInfinity() {
-        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F80))
-    }
-
-    @Test func vectorResizingFromBFloat16ConstantSplatMinusInfinity() {
-        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF80))
-    }
-
-    @Test func vectorResizingFromBFloat16ConstantSplatNaN() {
-        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC0))
-    }
-
-    @Test func vectorResizingFromBFloat16ConstantSplatMinusNaN() {
-        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0xFFC0))
-    }
-
-    @Test func vectorResizingFromBFloat16ConstantSplatPayloadNaN() {
-        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC1))
-    }
-
-    @Test func vectorResizingFromBFloat16ConstantSplatSignalingNaN() {
-        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F81))
-    }
-
-    @Test func vectorResizingFromBFloat16ConstantSplatMinusSignalingNaN() {
-        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF81))
-    }
-
-    @Test func vectorResizingFromBFloat16ConstantSplatLeastNonzero() {
-        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x0001))
-    }
-
-    @Test func vectorResizingFromBFloat16ConstantSplatGreatest() {
-        checkVectorResizingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F7F))
-    }
 }

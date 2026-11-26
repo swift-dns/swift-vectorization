@@ -7,6 +7,68 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
+    private func checkSquareRootWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("squareRootWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x4D06_E6A1_F24F_3A66)
+        for a in aInputs {
+            mismatches.check(
+                H.squareRoot(a, where: mask),
+                H(raw: HighwayReference.squareRootWhereF64(mask.raw, a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func squareRootWhereConstantMaskAllFalse() {
+        checkSquareRootWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func squareRootWhereConstantMaskAllTrue() {
+        checkSquareRootWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func squareRootWhereConstantMaskOnlyFirst() {
+        checkSquareRootWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func squareRootWhereConstantMaskOnlyLast() {
+        checkSquareRootWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func squareRootWhereConstantMaskAllButFirst() {
+        checkSquareRootWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func squareRootWhereConstantMaskAllButLast() {
+        checkSquareRootWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
     private func checkSquareRootWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("squareRootWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB79E_80DA_9A84_1C62)
@@ -317,6 +379,69 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
+    private func checkAddingWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("addingWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xBCA5_8E0F_B806_83F4)
+        let bInputs = Inputs.vectors(H.self, seed: 0xBCA5_910F_B806_890D)
+        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a.simd, b.simd) {
+            mismatches.check(
+                H.adding(a, b, where: mask),
+                H(raw: HighwayReference.addingWhereF64(mask.raw, a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func addingWhereConstantMaskAllFalse() {
+        checkAddingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func addingWhereConstantMaskAllTrue() {
+        checkAddingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func addingWhereConstantMaskOnlyFirst() {
+        checkAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func addingWhereConstantMaskOnlyLast() {
+        checkAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func addingWhereConstantMaskAllButFirst() {
+        checkAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func addingWhereConstantMaskAllButLast() {
+        checkAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
     private func checkAddingWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("addingWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7D08_A108_653D_7C24)
@@ -529,6 +654,69 @@ extension SIMDDoubleConstantTests {
 
     @Test func addingWhereConstantBAlternatingHalfAndOne() {
         checkAddingWhereConstantBAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkSubtractingWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("subtractingWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x48D3_F107_E7CE_2EF7)
+        let bInputs = Inputs.vectors(H.self, seed: 0x48D3_F207_E7CE_30AA)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.subtracting(a, b, where: mask),
+                H(raw: HighwayReference.subtractingWhereF64(mask.raw, a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func subtractingWhereConstantMaskAllFalse() {
+        checkSubtractingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func subtractingWhereConstantMaskAllTrue() {
+        checkSubtractingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func subtractingWhereConstantMaskOnlyFirst() {
+        checkSubtractingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func subtractingWhereConstantMaskOnlyLast() {
+        checkSubtractingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func subtractingWhereConstantMaskAllButFirst() {
+        checkSubtractingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func subtractingWhereConstantMaskAllButLast() {
+        checkSubtractingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
     }
 
     @inline(__always)
@@ -752,6 +940,69 @@ extension SIMDDoubleConstantTests {
 
     @Test func subtractingWhereConstantBAlternatingHalfAndOne() {
         checkSubtractingWhereConstantBAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkMultiplyingWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("multiplyingWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x8A12_67C2_ED41_501B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8A12_68C2_ED41_51CE)
+        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a.simd, b.simd) {
+            mismatches.check(
+                H.multiplying(a, b, where: mask),
+                H(raw: HighwayReference.multiplyingWhereF64(mask.raw, a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingWhereConstantMaskAllFalse() {
+        checkMultiplyingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func multiplyingWhereConstantMaskAllTrue() {
+        checkMultiplyingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func multiplyingWhereConstantMaskOnlyFirst() {
+        checkMultiplyingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func multiplyingWhereConstantMaskOnlyLast() {
+        checkMultiplyingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func multiplyingWhereConstantMaskAllButFirst() {
+        checkMultiplyingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func multiplyingWhereConstantMaskAllButLast() {
+        checkMultiplyingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
     }
 
     @inline(__always)
@@ -1000,229 +1251,6 @@ extension SIMDDoubleConstantTests {
             "In release builds on EMU128 Highway multiplies and divides lane by lane, so the compiler folds the lanes where a constant operand is one and returns a signaling NaN of the other operand as it is, which the port's vector operation quiets"
         ) {
             checkMultiplyingWhereConstantBAlternating(0.5, 1.0)
-        } when: {
-            SIMDTarget.targetName == "EMU128" && !assertionsAreEnabled
-        }
-    }
-
-    @inline(__always)
-    private func checkDividingWhereConstantA(_ value: Lane) {
-        let mismatches = Mismatches("dividingWhere with a repeating \(hex(value))")
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x535F_AB49_97BE_0423)
-        let bInputs = Inputs.vectors(H.self, seed: 0x535F_AD49_97BE_0789)
-        mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingF64(value)),
-            "repeating"
-        )
-        for (mask, b) in everyPair(maskInputs, bInputs) {
-            mismatches.check(
-                H.dividing(H.repeating(value), b, where: mask),
-                H(raw: HighwayReference.dividingWhereF64(mask.raw, H.repeating(value).raw, b.raw)),
-                "mask: \(describe(mask)), b: \(describe(b))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @inline(__always)
-    private func checkDividingWhereConstantB(_ value: Lane) {
-        let mismatches = Mismatches("dividingWhere with b repeating \(hex(value))")
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6DF8_B049_A6FB_3E42)
-        let aInputs = Inputs.vectors(H.self, seed: 0x6DF8_B149_A6FB_3FF5)
-        mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingF64(value)),
-            "repeating"
-        )
-        for (mask, a) in everyPair(maskInputs, aInputs) {
-            mismatches.check(
-                H.dividing(a, H.repeating(value), where: mask),
-                H(raw: HighwayReference.dividingWhereF64(mask.raw, a.raw, H.repeating(value).raw)),
-                "mask: \(describe(mask)), a: \(describe(a))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func dividingWhereConstantSplatZero() {
-        checkDividingWhereConstantA(0.0)
-        checkDividingWhereConstantB(0.0)
-    }
-
-    @Test func dividingWhereConstantSplatNegativeZero() {
-        checkDividingWhereConstantA(-0.0)
-        checkDividingWhereConstantB(-0.0)
-    }
-
-    @Test func dividingWhereConstantSplatOne() {
-        checkDividingWhereConstantA(1.0)
-        checkDividingWhereConstantB(1.0)
-    }
-
-    @Test func dividingWhereConstantSplatMinusOne() {
-        checkDividingWhereConstantA(-1.0)
-        checkDividingWhereConstantB(-1.0)
-    }
-
-    @Test func dividingWhereConstantSplatTwo() {
-        checkDividingWhereConstantA(2.0)
-        checkDividingWhereConstantB(2.0)
-    }
-
-    @Test func dividingWhereConstantSplatHalf() {
-        checkDividingWhereConstantA(0.5)
-        checkDividingWhereConstantB(0.5)
-    }
-
-    @Test func dividingWhereConstantSplatFour() {
-        checkDividingWhereConstantA(4.0)
-        checkDividingWhereConstantB(4.0)
-    }
-
-    @Test func dividingWhereConstantSplatQuarter() {
-        checkDividingWhereConstantA(0.25)
-        checkDividingWhereConstantB(0.25)
-    }
-
-    @Test func dividingWhereConstantSplatOnePointFive() {
-        checkDividingWhereConstantA(1.5)
-        checkDividingWhereConstantB(1.5)
-    }
-
-    @Test func dividingWhereConstantSplatMinusTwoPointFive() {
-        checkDividingWhereConstantA(-2.5)
-        checkDividingWhereConstantB(-2.5)
-    }
-
-    @Test func dividingWhereConstantSplatInfinity() {
-        checkDividingWhereConstantA(.infinity)
-        checkDividingWhereConstantB(.infinity)
-    }
-
-    @Test func dividingWhereConstantSplatMinusInfinity() {
-        checkDividingWhereConstantA(-.infinity)
-        checkDividingWhereConstantB(-.infinity)
-    }
-
-    @Test func dividingWhereConstantSplatNaN() {
-        checkDividingWhereConstantA(.nan)
-        checkDividingWhereConstantB(.nan)
-    }
-
-    @Test func dividingWhereConstantSplatMinusNaN() {
-        checkDividingWhereConstantA(-.nan)
-        checkDividingWhereConstantB(-.nan)
-    }
-
-    @Test func dividingWhereConstantSplatPayloadNaN() {
-        checkDividingWhereConstantA(Lane(nan: 1, signaling: false))
-        checkDividingWhereConstantB(Lane(nan: 1, signaling: false))
-    }
-
-    @Test func dividingWhereConstantSplatSignalingNaN() {
-        checkDividingWhereConstantA(.signalingNaN)
-        checkDividingWhereConstantB(.signalingNaN)
-    }
-
-    @Test func dividingWhereConstantSplatMinusSignalingNaN() {
-        checkDividingWhereConstantA(-.signalingNaN)
-        checkDividingWhereConstantB(-.signalingNaN)
-    }
-
-    @Test func dividingWhereConstantSplatLeastNonzero() {
-        checkDividingWhereConstantA(.leastNonzeroMagnitude)
-        checkDividingWhereConstantB(.leastNonzeroMagnitude)
-    }
-
-    @Test func dividingWhereConstantSplatGreatest() {
-        checkDividingWhereConstantA(.greatestFiniteMagnitude)
-        checkDividingWhereConstantB(.greatestFiniteMagnitude)
-    }
-
-    @inline(__always)
-    private func checkDividingWhereConstantAAlternating(_ even: Lane, _ odd: Lane) {
-        let mismatches = Mismatches("dividingWhere with a alternating \(hex(even)), \(hex(odd))")
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x2A4F_17BD_0EC8_463A)
-        let bInputs = Inputs.vectors(H.self, seed: 0x2A4F_15BD_0EC8_42D4)
-        mismatches.check(
-            H.repeatingBlock(even, odd),
-            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
-            "repeatingBlock"
-        )
-        for (mask, b) in everyPair(maskInputs, bInputs) {
-            mismatches.check(
-                H.dividing(H.repeatingBlock(even, odd), b, where: mask),
-                H(
-                    raw: HighwayReference.dividingWhereF64(
-                        mask.raw,
-                        H.repeatingBlock(even, odd).raw,
-                        b.raw
-                    )
-                ),
-                "mask: \(describe(mask)), b: \(describe(b))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func dividingWhereConstantAAlternatingOneAndMinusTwoPointFive() {
-        checkDividingWhereConstantAAlternating(1.0, -2.5)
-    }
-
-    @Test func dividingWhereConstantAAlternatingMinusTwoPointFiveAndHalf() {
-        checkDividingWhereConstantAAlternating(-2.5, 0.5)
-    }
-
-    @Test func dividingWhereConstantAAlternatingHalfAndOne() {
-        checkDividingWhereConstantAAlternating(0.5, 1.0)
-    }
-
-    @inline(__always)
-    private func checkDividingWhereConstantBAlternating(_ even: Lane, _ odd: Lane) {
-        let mismatches = Mismatches("dividingWhere with b alternating \(hex(even)), \(hex(odd))")
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA2EF_323A_EA2B_4619)
-        let aInputs = Inputs.vectors(H.self, seed: 0xA2EF_313A_EA2B_4466)
-        mismatches.check(
-            H.repeatingBlock(even, odd),
-            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
-            "repeatingBlock"
-        )
-        for (mask, a) in everyPair(maskInputs, aInputs) {
-            mismatches.check(
-                H.dividing(a, H.repeatingBlock(even, odd), where: mask),
-                H(
-                    raw: HighwayReference.dividingWhereF64(
-                        mask.raw,
-                        a.raw,
-                        H.repeatingBlock(even, odd).raw
-                    )
-                ),
-                "mask: \(describe(mask)), a: \(describe(a))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func dividingWhereConstantBAlternatingOneAndMinusTwoPointFive() {
-        withKnownIssue(
-            "In release builds on EMU128 Highway multiplies and divides lane by lane, so the compiler folds the lanes where a constant operand is one and returns a signaling NaN of the other operand as it is, which the port's vector operation quiets"
-        ) {
-            checkDividingWhereConstantBAlternating(1.0, -2.5)
-        } when: {
-            SIMDTarget.targetName == "EMU128" && !assertionsAreEnabled
-        }
-    }
-
-    @Test func dividingWhereConstantBAlternatingMinusTwoPointFiveAndHalf() {
-        checkDividingWhereConstantBAlternating(-2.5, 0.5)
-    }
-
-    @Test func dividingWhereConstantBAlternatingHalfAndOne() {
-        withKnownIssue(
-            "In release builds on EMU128 Highway multiplies and divides lane by lane, so the compiler folds the lanes where a constant operand is one and returns a signaling NaN of the other operand as it is, which the port's vector operation quiets"
-        ) {
-            checkDividingWhereConstantBAlternating(0.5, 1.0)
         } when: {
             SIMDTarget.targetName == "EMU128" && !assertionsAreEnabled
         }

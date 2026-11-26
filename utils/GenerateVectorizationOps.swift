@@ -8264,13 +8264,95 @@ func x86Avx3AndXor(for element: Element) -> String {
 func maskedBitwiseTargets(
     _ symbol: String,
     operation: String,
+    sveBuiltin builtin: String,
+    portable: @escaping (Element) -> String,
     neon: ((Element) -> String?)? = nil
 ) -> TargetBodies<Element> {
     TargetBodies(
         neon: neon,
         sve2_128: { element in sveMaskedBitwise(operation, for: element) },
+        sve: { element in
+            sveWideMaskedZeroed(
+                SveZeroed(builtin: builtin, operands: ["a", "b"], splatting: ["a", "b"]),
+                portable: portable(element),
+                for: element
+            )
+        },
         avx3: { element in x86Avx3MaskedBitwise(symbol, for: element) }
     )
+}
+
+func sveWideMaskedZeroed(
+    _ zeroed: SveZeroed,
+    portable: String,
+    for element: Element
+) -> String? {
+    guard zeroed.applies.matches(element) else { return nil }
+    let canonical = sveCanonicalMaskCondition(rawName("mask"), for: element)
+    func constant(_ operand: String) -> String { sveConstantCondition(operand, for: element) }
+    func zeroing(splatting splat: String?) -> String {
+        let operands = zeroed.operands.map { operand in
+            let viewed = zeroed.unsignedOperands.contains(operand)
+            let target = viewed ? unsignedElement(of: element) : element
+            let lanes =
+                operand == splat
+                ? sveBuiltin("dup_n", [sveFirstLane(operand, for: element)], for: element)
+                : sveOperand(operand, for: element)
+            return sveReinterpreted(lanes, from: element, to: target)
+        }
+        let builtin =
+            element.category == .signedInteger
+            ? zeroed.signedBuiltin ?? zeroed.builtin : zeroed.builtin
+        var combined: String
+        if zeroed.negated {
+            let fused = sveBuiltin(
+                builtin,
+                [sveAllLanes(of: element)] + operands,
+                for: element,
+                predication: "x"
+            )
+            let signed = signedElement(of: element).at(width: element.width)
+            let negated = sveBuiltin(
+                "neg",
+                ["active", sveReinterpreted(fused, from: element, to: signed)],
+                for: signed,
+                predication: "z"
+            )
+            combined = sveReinterpreted(negated, from: signed, to: element)
+        } else {
+            combined = sveBuiltin(builtin, ["active"] + operands, for: element, predication: "z")
+        }
+        if zeroed.returnsUnsigned && element.category == .signedInteger {
+            combined = sveReinterpreted(combined, from: unsignedElement(of: element), to: element)
+        }
+        return """
+            const __SVBool_t active = \(svePredicate(of: "mask", for: element));
+            \(vectorResult(sveResult(combined, for: element), for: element))
+            """
+    }
+    let folded =
+        [canonical]
+        + (zeroed.foldingConstants
+            ? ["(\(zeroed.operands.map(constant).joined(separator: " && ")))"] : [])
+        + zeroed.foldingOperands.map(constant)
+    let runtime = sveFolding(
+        when: folded.joined(separator: " || "),
+        portable,
+        otherwise: zeroing(splatting: nil)
+    )
+    guard !zeroed.splatting.isEmpty else { return runtime }
+    let arms = zeroed.splatting.map { splat in
+        let conditions =
+            [sveSplatCondition(splat, nil, for: element)]
+            + zeroed.operands.filter { $0 != splat }.map { "!\(constant($0))" }
+            + ["!\(canonical)"]
+        return """
+            if (\(conditions.joined(separator: " && "))) {
+            \(indented(zeroing(splatting: splat)))
+            }
+            """
+    }
+    return (arms + [zeroed.gatingRuntime ? runtime : portable]).joined(separator: "\n")
 }
 
 func maskedBitwiseOtherwiseTargets(_ symbol: String, operation: String) -> TargetBodies<Element> {
@@ -16522,6 +16604,7 @@ let basicOps: [Op] = [
                     for: element
                 )
             },
+            sve: { element in sveWideZeroingSelected(for: element) },
             sveSplat: { element in sveSplatSelecting(zeroing: true, for: element) },
             avx3: { element in
                 vectorResult(
@@ -16531,9 +16614,7 @@ let basicOps: [Op] = [
             }
         )
     ) { element in
-        let mask = "(\(element.cUnsignedVector))mask"
-        let kept = fromUnsignedBits("~\(mask) & \(unsignedBits("a", of: element))", of: element)
-        return vectorResult(kept, for: element)
+        portableZeroingSelected(for: element)
     },
     Op(
         "bitwiseAnd",
@@ -16542,7 +16623,12 @@ let basicOps: [Op] = [
         .vector,
         .all,
         section: .logical,
-        targets: maskedBitwiseTargets("&", operation: "bitwiseAnd")
+        targets: maskedBitwiseTargets(
+            "&",
+            operation: "bitwiseAnd",
+            sveBuiltin: "and",
+            portable: { element in maskedBitwise("&", for: element) }
+        )
     ) { element in
         maskedBitwise("&", for: element)
     },
@@ -16556,6 +16642,8 @@ let basicOps: [Op] = [
         targets: maskedBitwiseTargets(
             "|",
             operation: "bitwiseOr",
+            sveBuiltin: "orr",
+            portable: { element in commutedMaskedBitwise("|", for: element) },
             neon: { element in maskedBitwise("|", for: element) }
         )
     ) { element in
@@ -16571,6 +16659,8 @@ let basicOps: [Op] = [
         targets: maskedBitwiseTargets(
             "^",
             operation: "bitwiseXor",
+            sveBuiltin: "eor",
+            portable: { element in commutedMaskedBitwise("^", for: element) },
             neon: { element in maskedBitwise("^", for: element) }
         )
     ) { element in
@@ -17423,6 +17513,20 @@ func negativeLanes(of operand: String = "a", for element: Element) -> String {
     return "(\(element.cUnsignedVector))((\(signed.cVector))\(operand) >> \(element.bits - 1))"
 }
 
+struct SveZeroed {
+    let builtin: String
+    let operands: [String]
+    var applies = Applies.integer
+    var splatting: [String] = []
+    var returnsUnsigned = false
+    var signedBuiltin: String?
+    var unsignedOperands: [String] = []
+    var foldingConstants = false
+    var negated = false
+    var gatingRuntime = false
+    var foldingOperands: [String] = []
+}
+
 struct MaskedFamily {
     let swiftName: String
     let operation: String
@@ -17444,7 +17548,10 @@ struct MaskedFamily {
     var followsHighwayOrderOnSSE2 = false
     var sveArithmetic: SveMaskedArithmetic?
     var sveZeroedBuiltin: (neon: String, sve: String)?
+    var sveZeroedInteger: SveZeroed?
+    var sveZeroedFloat: SveZeroed?
     var selectsByPredicateOnSVE: Applies?
+    var selectsByPredicateFoldingConstantMaskOnSVE: Applies?
     var selectsByBytesOnNEON = false
 }
 
@@ -17818,6 +17925,16 @@ func maskedFamilyTargets(_ family: MaskedFamily, merging: Bool) -> TargetBodies<
     )
     if let name = family.svePredicatedUnary {
         targets.sve2_128 = { element in sveMaskedUnary(name, merging: merging, for: element) }
+        targets.sve = { element in
+            let constants = (merging ? ["otherwise"] : [])
+                .map { sveConstantCondition($0, for: element) }
+            return sveFolding(
+                when: (constants + [sveCanonicalMaskCondition(rawName("mask"), for: element)])
+                    .joined(separator: " || "),
+                portableMasked(family, merging: merging, for: element),
+                otherwise: sveMaskedUnary(name, merging: merging, for: element)
+            )
+        }
     }
     if family.selectsByBytesOnNEON && !merging {
         targets.neon = { element in
@@ -17848,6 +17965,20 @@ func maskedFamilyTargets(_ family: MaskedFamily, merging: Bool) -> TargetBodies<
             }
         }
     }
+    if !merging, family.sveZeroedInteger != nil || family.sveZeroedFloat != nil {
+        let inherited = targets.sve
+        targets.sve = { element in
+            let body = inherited?(element)
+            let zeroed =
+                element.category == .float ? family.sveZeroedFloat : family.sveZeroedInteger
+            guard let zeroed else { return body }
+            return sveWideMaskedZeroed(
+                zeroed,
+                portable: body ?? portableMasked(family, merging: false, for: element),
+                for: element
+            ) ?? body
+        }
+    }
     guard merging else { return targets }
     if let selected = family.selectsByPredicateOnSVE {
         func selecting(
@@ -17860,6 +17991,20 @@ func maskedFamilyTargets(_ family: MaskedFamily, merging: Bool) -> TargetBodies<
         }
         targets.sve2_128 = selecting(targets.sve2_128)
         targets.sve = selecting(targets.sve)
+    }
+    if let selected = family.selectsByPredicateFoldingConstantMaskOnSVE {
+        let inherited = targets.sve
+        targets.sve = { element in
+            guard selected.matches(element) else { return inherited?(element) }
+            return sveFoldingConstantMask(
+                portableMasked(family, merging: true, for: element),
+                otherwise: sveMergingSelecting(
+                    maskedExpression(of: family, for: element),
+                    for: element
+                ),
+                for: element
+            )
+        }
     }
     if family.divides {
         let plain = { (element: Element) -> String? in
@@ -17897,6 +18042,21 @@ func maskedFamilyHelpers(_ family: MaskedFamily, merging: Bool) -> TargetBodies<
     return TargetBodies(emu128: { element in emu128MaskedDividingHelpers(for: element) })
 }
 
+func portableMasked(_ family: MaskedFamily, merging: Bool, for element: Element) -> String {
+    if family.returns == .mask {
+        return maskedMaskResult(of: family, for: element)
+    }
+    if merging && family.divides {
+        let isolated = maskedExpression(of: family, for: element, isolatingDivisor: true)
+        return maskedSelecting(isolated, merging: true, for: element)
+    }
+    return maskedSelecting(
+        maskedExpression(of: family, for: element),
+        merging: merging,
+        for: element
+    )
+}
+
 func maskedOp(
     _ family: MaskedFamily,
     _ highwayName: String,
@@ -17906,7 +18066,6 @@ func maskedOp(
 ) -> Op {
     let parameters: [Parameter] =
         (merging ? [.otherwiseVector, .whereMask] : [.whereMask]) + family.operands
-    let operation = { (element: Element) in maskedExpression(of: family, for: element) }
     return Op(
         family.swiftName,
         highwayName,
@@ -17922,14 +18081,7 @@ func maskedOp(
         helpers: maskedFamilyHelpers(family, merging: merging),
         outOfLineOnSVE: family.outOfLineOnSVE
     ) { element in
-        if family.returns == .mask {
-            return maskedMaskResult(of: family, for: element)
-        }
-        if merging && family.divides {
-            let isolated = maskedExpression(of: family, for: element, isolatingDivisor: true)
-            return maskedSelecting(isolated, merging: true, for: element)
-        }
-        return maskedSelecting(operation(element), merging: merging, for: element)
+        portableMasked(family, merging: merging, for: element)
     }
 }
 
@@ -17979,6 +18131,13 @@ func maskedRepeatingOp(merging: Bool) -> Op {
     let operation = { (element: Element) in repeatingVector("value", of: element) }
     var targets = maskedTargets(operation, merging: merging)
     targets.sve2_128 = { element in sveMaskedRepeating(merging: merging, for: element) }
+    targets.sve = { element in
+        sveWideMaskedRepeating(
+            maskedSelecting(operation(element), merging: merging, for: element),
+            merging: merging,
+            for: element
+        )
+    }
     return Op(
         "repeating",
         merging ? "MaskedSetOr" : "MaskedSet",
@@ -18025,6 +18184,22 @@ func sveMaskedSum(for element: Element) -> String? {
     return "return __builtin_bit_cast(uint16_t, \(reduced));"
 }
 
+func sveWideMaskedSum(for element: Element) -> String? {
+    guard element.category == .unsignedInteger || element.category == .signedInteger else {
+        return sveMaskedSum(for: element)
+    }
+    let reduced = sveBuiltin(
+        "addv",
+        [svePredicate(of: "mask", for: element), sveOperand("a", for: element, splat: true)],
+        for: element
+    )
+    return sveFoldingConstantMask(
+        maskedReduction("sum", identity: nil, for: element),
+        otherwise: "return (\(element.cType))\(reduced);",
+        for: element
+    )
+}
+
 func sveMaskedRepeating(merging: Bool, for element: Element) -> String? {
     guard element.category == .float || isInteger64(element) else { return nil }
     let active = svePredicate(of: "mask", for: element)
@@ -18033,6 +18208,29 @@ func sveMaskedRepeating(merging: Bool, for element: Element) -> String? {
         ? [sveOperand("otherwise", for: element, splat: true), active, "value"] : [active, "value"]
     let repeated = sveBuiltin("dup_n", arguments, for: element, predication: merging ? "m" : "z")
     return vectorResult(sveResult(repeated, for: element), for: element)
+}
+
+func sveWideMaskedRepeating(
+    _ portable: String,
+    merging: Bool,
+    for element: Element
+) -> String {
+    let active = svePredicate(of: "mask", for: element)
+    let arguments =
+        merging
+        ? [sveOperand("otherwise", for: element, splat: true), active, "value"] : [active, "value"]
+    let repeated = sveBuiltin("dup_n", arguments, for: element, predication: merging ? "m" : "z")
+    let floatConditions =
+        (merging ? [sveConstantCondition("otherwise", for: element)] : [])
+        + ["__builtin_constant_p(value)"]
+    let conditions =
+        [sveCanonicalMaskCondition(rawName("mask"), for: element)]
+        + (element.category == .float ? floatConditions : [])
+    return sveFolding(
+        when: conditions.joined(separator: " || "),
+        portable,
+        otherwise: vectorResult(sveResult(repeated, for: element), for: element)
+    )
 }
 
 func sveMaskedReduction(_ name: String, for element: Element) -> String {
@@ -18051,6 +18249,7 @@ func maskedReductionOp(
     _ highwayName: String,
     identity: ((Element) -> String)?,
     sve: @escaping (Element) -> String?,
+    wideSve: ((Element) -> String?)? = nil,
     unorderedNaNs: UnorderedNaNs? = nil,
     filtersUnorderedNaNs: Bool = false
 ) -> Op {
@@ -18063,7 +18262,7 @@ func maskedReductionOp(
         section: .maskedReductions,
         unorderedNaNs: unorderedNaNs,
         filtersUnorderedNaNs: filtersUnorderedNaNs,
-        targets: TargetBodies(sve2_128: sve, sve: sve)
+        targets: TargetBodies(sve2_128: sve, sve: wideSve ?? sve)
     ) { element in
         maskedReduction(swiftName, identity: identity?(element), for: element)
     }
@@ -18102,6 +18301,7 @@ let maskedFamilies: [MaskedFamily] = [
         filtersUnorderedNaNs: true,
         outOfLineOnSVE: .float,
         sveZeroedBuiltin: (neon: "vmaxq_v", sve: "max"),
+        sveZeroedInteger: SveZeroed(builtin: "max", operands: ["a", "b"], splatting: ["a"]),
         selectsByPredicateOnSVE: .integer(bits: [64])
     ),
     MaskedFamily(
@@ -18117,6 +18317,13 @@ let maskedFamilies: [MaskedFamily] = [
             symbol: "+",
             merged: .adding,
             zeroed: SveBlockedLanes.adding.blockingFirst([.notANumber])
+        ),
+        sveZeroedInteger: SveZeroed(builtin: "add", operands: ["a", "b"], splatting: ["a"]),
+        sveZeroedFloat: SveZeroed(
+            builtin: "add",
+            operands: ["a", "b"],
+            applies: .float,
+            splatting: ["a"]
         )
     ),
     MaskedFamily(
@@ -18130,6 +18337,13 @@ let maskedFamilies: [MaskedFamily] = [
             symbol: "-",
             merged: .subtracting,
             zeroed: .subtracting
+        ),
+        sveZeroedInteger: SveZeroed(builtin: "sub", operands: ["a", "b"], splatting: ["a"]),
+        sveZeroedFloat: SveZeroed(
+            builtin: "sub",
+            operands: ["a", "b"],
+            applies: .float,
+            splatting: ["a"]
         )
     ),
     MaskedFamily(
@@ -18145,6 +18359,19 @@ let maskedFamilies: [MaskedFamily] = [
             symbol: "*",
             merged: .multiplying,
             zeroed: SveBlockedLanes.multiplying.blockingFirst([.notANumber])
+        ),
+        sveZeroedInteger: SveZeroed(
+            builtin: "mul",
+            operands: ["a", "b"],
+            splatting: ["a"],
+            gatingRuntime: true,
+            foldingOperands: ["a", "b"]
+        ),
+        sveZeroedFloat: SveZeroed(
+            builtin: "mul",
+            operands: ["a", "b"],
+            applies: .float,
+            splatting: ["a"]
         )
     ),
     MaskedFamily(
@@ -18160,7 +18387,20 @@ let maskedFamilies: [MaskedFamily] = [
             merged: .dividing,
             zeroed: .dividing
         ),
-        selectsByPredicateOnSVE: .integer(bits: [64])
+        sveZeroedInteger: SveZeroed(
+            builtin: "div",
+            operands: ["a", "b"],
+            applies: .integer(bits: [32, 64]),
+            splatting: ["a"]
+        ),
+        sveZeroedFloat: SveZeroed(
+            builtin: "div",
+            operands: ["a", "b"],
+            applies: .float,
+            splatting: ["a"]
+        ),
+        selectsByPredicateOnSVE: .integer(bits: [64]),
+        selectsByPredicateFoldingConstantMaskOnSVE: .integer(bits: [8, 16, 32])
     ),
     MaskedFamily(
         swiftName: "remainder",
@@ -18169,7 +18409,8 @@ let maskedFamilies: [MaskedFamily] = [
         applies: .integer,
         merged: "MaskedModOr",
         divides: true,
-        selectsByPredicateOnSVE: .integer(bits: [64])
+        selectsByPredicateOnSVE: .integer(bits: [64]),
+        selectsByPredicateFoldingConstantMaskOnSVE: .integer(bits: [8, 16, 32])
     ),
     MaskedFamily(
         swiftName: "saturatingAdding",
@@ -18210,7 +18451,14 @@ let maskedFamilies: [MaskedFamily] = [
         zeroed: "MaskedMulAdd",
         merged: "MaskedMulAddOr",
         unorderedNaNs: .multiplyAdd,
-        filtersUnorderedNaNs: true
+        filtersUnorderedNaNs: true,
+        sveZeroedInteger: SveZeroed(builtin: "mad", operands: ["b", "a", "c"]),
+        sveZeroedFloat: SveZeroed(
+            builtin: "mad",
+            operands: ["b", "a", "c"],
+            applies: .all(bits: [32]),
+            foldingOperands: ["c"]
+        )
     ),
     MaskedFamily(
         swiftName: "multiplySubtracting",
@@ -18221,6 +18469,12 @@ let maskedFamilies: [MaskedFamily] = [
         merged: "MaskedMulSubOr",
         unorderedNaNs: .negatedAddend,
         filtersUnorderedNaNs: true,
+        sveZeroedFloat: SveZeroed(
+            builtin: "nmsb",
+            operands: ["b", "a", "c"],
+            applies: .all(bits: [32]),
+            foldingOperands: ["c"]
+        ),
         selectsByPredicateOnSVE: .integer(bits: [64])
     ),
     MaskedFamily(
@@ -18231,7 +18485,14 @@ let maskedFamilies: [MaskedFamily] = [
         zeroed: "MaskedNegMulAdd",
         merged: "MaskedNegMulAddOr",
         unorderedNaNs: .negatedMultiplicand,
-        filtersUnorderedNaNs: true
+        filtersUnorderedNaNs: true,
+        sveZeroedInteger: SveZeroed(builtin: "msb", operands: ["b", "a", "c"]),
+        sveZeroedFloat: SveZeroed(
+            builtin: "msb",
+            operands: ["b", "a", "c"],
+            applies: .all(bits: [32]),
+            foldingOperands: ["c"]
+        )
     ),
     MaskedFamily(
         swiftName: "negatedMultiplySubtracting",
@@ -18242,6 +18503,17 @@ let maskedFamilies: [MaskedFamily] = [
         merged: "MaskedNegMulSubOr",
         unorderedNaNs: .negatedMultiplicand,
         filtersUnorderedNaNs: true,
+        sveZeroedInteger: SveZeroed(
+            builtin: "mad",
+            operands: ["b", "a", "c"],
+            negated: true
+        ),
+        sveZeroedFloat: SveZeroed(
+            builtin: "nmad",
+            operands: ["b", "a", "c"],
+            applies: .all(bits: [32]),
+            foldingOperands: ["c"]
+        ),
         selectsByPredicateOnSVE: .integer
     ),
     MaskedFamily(
@@ -18299,6 +18571,12 @@ let maskedFamilies: [MaskedFamily] = [
         merged: "MaskedShlOr",
         zeroedSection: .maskedShifts,
         mergedSection: .maskedShifts,
+        sveZeroedInteger: SveZeroed(
+            builtin: "lsl",
+            operands: ["a", "b"],
+            unsignedOperands: ["b"],
+            foldingConstants: true
+        ),
         selectsByPredicateOnSVE: .integer(bits: [64])
     ),
     MaskedFamily(
@@ -18310,6 +18588,13 @@ let maskedFamilies: [MaskedFamily] = [
         merged: "MaskedShrOr",
         zeroedSection: .maskedShifts,
         mergedSection: .maskedShifts,
+        sveZeroedInteger: SveZeroed(
+            builtin: "lsr",
+            operands: ["a", "b"],
+            signedBuiltin: "asr",
+            unsignedOperands: ["b"],
+            foldingConstants: true
+        ),
         selectsByPredicateOnSVE: .integer(bits: [64])
     ),
     MaskedFamily(
@@ -18328,7 +18613,8 @@ let maskedFamilies: [MaskedFamily] = [
         operands: [.vector],
         applies: .integer,
         zeroed: "MaskedLeadingZeroCount",
-        zeroedSection: .logical
+        zeroedSection: .logical,
+        sveZeroedInteger: SveZeroed(builtin: "clz", operands: ["a"], returnsUnsigned: true)
     ),
     MaskedFamily(
         swiftName: "equalTo",
@@ -18413,6 +18699,7 @@ let maskedOps: [Op] =
             "MaskedReduceSum",
             identity: nil,
             sve: { element in sveMaskedSum(for: element) },
+            wideSve: { element in sveWideMaskedSum(for: element) },
             unorderedNaNs: .acrossLanes,
             filtersUnorderedNaNs: true
         ),
@@ -21039,8 +21326,32 @@ func sveCanonicalMaskCondition(_ name: String, for element: Element) -> String {
     "__builtin_constant_p(__builtin_reduce_and(\(name) == (\(name) >> \(element.bits - 1))))"
 }
 
+func portableZeroingSelected(for element: Element) -> String {
+    let mask = "(\(element.cUnsignedVector))mask"
+    let kept = fromUnsignedBits("~\(mask) & \(unsignedBits("a", of: element))", of: element)
+    return vectorResult(kept, for: element)
+}
+
+func sveWideZeroingSelected(for element: Element) -> String {
+    let selected = sveBuiltin(
+        "sel",
+        [
+            svePredicate(of: "mask", for: element), sveZeros(for: element),
+            sveOperand("a", for: element),
+        ],
+        for: element
+    )
+    return sveFolding(
+        when: sveCanonicalMaskCondition(rawName("mask"), for: element),
+        portableZeroingSelected(for: element),
+        otherwise: vectorResult(sveResult(selected, for: element), for: element)
+    )
+}
+
 func sveSplatSelecting(zeroing: Bool, for element: Element) -> String? {
-    guard element.bits == 8 || element.bits == 64 else { return nil }
+    guard zeroing || element.bits == 8 || element.bits == 64 || element.category == .float else {
+        return nil
+    }
     let predicate = svePredicate(of: "mask", for: element)
     let lane = sveFirstLane("a", for: element)
     let duplicated = sveBuiltin("dup_n", [lane], for: element)
@@ -29481,6 +29792,18 @@ let intToFloatMaskedConvertOps = sourcedOps(accepting: intToFloatConvertible) { 
     var targets = maskedTargets({ intToFloatConverted(for: $0) }, merging: false)
     targets.sve2_128 = sourced(source) { source, result in
         sveMaskedConverted(from: source, to: result)
+    }
+    targets.sve = sourced(source) { source, result in
+        sveMaskedConverted(from: source, to: result).map { converted in
+            sveFolding(
+                when: [
+                    sveConstantCondition("a", for: source),
+                    sveCanonicalMaskCondition(rawName("mask"), for: result),
+                ].joined(separator: " || "),
+                maskedSelecting(intToFloatConverted(for: result), merging: false, for: result),
+                otherwise: converted
+            )
+        }
     }
     targets.avx2 = intToFloatEmulatedBody(from: source, masked: true)
     targets.sse4 = intToFloatEmulatedBody(from: source, masked: true)
@@ -53039,6 +53362,36 @@ let multiplySubtractingAddingConstantAlternatingTests = [
     "multiplySubtractingAddingConstantBAlternatingOneAndMinusTwoPointFive",
 ]
 
+let negatedMultiplySubtractingWhereOtherwiseConstantSplatTests = [
+    "negatedMultiplySubtractingWhereOtherwiseConstantSplatFour",
+    "negatedMultiplySubtractingWhereOtherwiseConstantSplatGreatest",
+    "negatedMultiplySubtractingWhereOtherwiseConstantSplatHalf",
+    "negatedMultiplySubtractingWhereOtherwiseConstantSplatInfinity",
+    "negatedMultiplySubtractingWhereOtherwiseConstantSplatLeastNonzero",
+    "negatedMultiplySubtractingWhereOtherwiseConstantSplatMinusInfinity",
+    "negatedMultiplySubtractingWhereOtherwiseConstantSplatMinusNaN",
+    "negatedMultiplySubtractingWhereOtherwiseConstantSplatMinusOne",
+    "negatedMultiplySubtractingWhereOtherwiseConstantSplatMinusSignalingNaN",
+    "negatedMultiplySubtractingWhereOtherwiseConstantSplatMinusTwoPointFive",
+    "negatedMultiplySubtractingWhereOtherwiseConstantSplatNaN",
+    "negatedMultiplySubtractingWhereOtherwiseConstantSplatNegativeZero",
+    "negatedMultiplySubtractingWhereOtherwiseConstantSplatOne",
+    "negatedMultiplySubtractingWhereOtherwiseConstantSplatOnePointFive",
+    "negatedMultiplySubtractingWhereOtherwiseConstantSplatPayloadNaN",
+    "negatedMultiplySubtractingWhereOtherwiseConstantSplatQuarter",
+    "negatedMultiplySubtractingWhereOtherwiseConstantSplatSignalingNaN",
+    "negatedMultiplySubtractingWhereOtherwiseConstantSplatTwo",
+    "negatedMultiplySubtractingWhereOtherwiseConstantSplatZero",
+]
+
+let negatedMultiplySubtractingWhereConstantMaskTests = [
+    "negatedMultiplySubtractingWhereConstantMaskAllButFirst",
+    "negatedMultiplySubtractingWhereConstantMaskAllButLast",
+    "negatedMultiplySubtractingWhereConstantMaskAllTrue",
+    "negatedMultiplySubtractingWhereConstantMaskOnlyFirst",
+    "negatedMultiplySubtractingWhereConstantMaskOnlyLast",
+]
+
 let approximateReciprocalSquareRootConstantSplatNaNTests = [
     "approximateReciprocalSquareRootConstantSplatMinusNaN",
     "approximateReciprocalSquareRootConstantSplatMinusSignalingNaN",
@@ -53050,9 +53403,12 @@ let approximateReciprocalSquareRootConstantSplatNaNTests = [
 let intermittentNaNSignTests: [String: [String]] = [
     "SIMDDoubleConstant": approximateReciprocalSquareRootConstantSplatNaNTests
         + multiplySubtractingAddingConstantSplatTests
-        + multiplySubtractingAddingConstantAlternatingTests,
+        + multiplySubtractingAddingConstantAlternatingTests
+        + negatedMultiplySubtractingWhereOtherwiseConstantSplatTests,
     "SIMDFloatConstant": multiplySubtractingAddingConstantSplatTests
-        + multiplySubtractingAddingConstantAlternatingTests,
+        + multiplySubtractingAddingConstantAlternatingTests
+        + negatedMultiplySubtractingWhereOtherwiseConstantSplatTests
+        + negatedMultiplySubtractingWhereConstantMaskTests,
 ]
 
 let linuxAvx512MaskedZeroSign = KnownIssue(
@@ -53089,7 +53445,11 @@ let maskedZeroSignTests: [String: [String]] = [
     "SIMDDoubleConstant": negatedMultiplySubtractingWhereConstantSplatTests,
     "SIMDDoubleReference": ["negatedMultiplySubtractingWhere"],
     "SIMDFloatCodegen": ["negatedMultiplySubtractingWhereConstantC"],
-    "SIMDFloatConstant": negatedMultiplySubtractingWhereConstantSplatTests,
+    "SIMDFloatConstant": negatedMultiplySubtractingWhereConstantSplatTests + [
+        "negatedMultiplySubtractingWhereConstantCAlternatingHalfAndOne",
+        "negatedMultiplySubtractingWhereConstantCAlternatingMinusTwoPointFiveAndHalf",
+        "negatedMultiplySubtractingWhereConstantCAlternatingOneAndMinusTwoPointFive",
+    ],
     "SIMDFloatReference": ["negatedMultiplySubtractingWhere"],
 ]
 
@@ -53438,6 +53798,7 @@ func constantType(
     case .roundConstant: return "UInt8"
     case _ where parameter.isPointerIndices: return signedElement(of: element).swiftType
     case _ where isConstantVector(parameter) || isConstantIndices(parameter): return lane
+    case .lane: return lane
     default: return "Int"
     }
 }
@@ -54048,6 +54409,8 @@ func constantTests(of op: Op, for element: Element) -> [String] {
             ]
         case .mask, .whereMask:
             values = constantMasks
+        case .lane:
+            values = constantSplats(for: element)
         default:
             fatalError("\(op.identifier) branches on \(binding.swiftName), which nothing covers")
         }

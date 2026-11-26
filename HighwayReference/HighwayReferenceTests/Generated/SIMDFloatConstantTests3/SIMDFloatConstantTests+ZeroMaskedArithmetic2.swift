@@ -7,6 +7,357 @@ import Vectorization
 
 extension SIMDFloatConstantTests {
     @inline(__always)
+    private func checkDividingWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("dividingWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x4CDA_7EAC_9207_7350)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4CDA_81AC_9207_7869)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.dividing(a, b, where: mask),
+                H(raw: HighwayReference.dividingWhereF32(mask.raw, a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func dividingWhereConstantMaskAllFalse() {
+        checkDividingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func dividingWhereConstantMaskAllTrue() {
+        checkDividingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func dividingWhereConstantMaskOnlyFirst() {
+        checkDividingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func dividingWhereConstantMaskOnlyLast() {
+        checkDividingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func dividingWhereConstantMaskAllButFirst() {
+        checkDividingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func dividingWhereConstantMaskAllButLast() {
+        checkDividingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
+    private func checkDividingWhereConstantA(_ value: Lane) {
+        let mismatches = Mismatches("dividingWhere with a repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB5D7_5B8A_00FD_A3C0)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB5D7_5D8A_00FD_A726)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        for (mask, b) in everyPair(maskInputs, bInputs) {
+            mismatches.check(
+                H.dividing(H.repeating(value), b, where: mask),
+                H(raw: HighwayReference.dividingWhereF32(mask.raw, H.repeating(value).raw, b.raw)),
+                "mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkDividingWhereConstantB(_ value: Lane) {
+        let mismatches = Mismatches("dividingWhere with b repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xBED9_928A_0631_57B5)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBED9_918A_0631_5602)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.dividing(a, H.repeating(value), where: mask),
+                H(raw: HighwayReference.dividingWhereF32(mask.raw, a.raw, H.repeating(value).raw)),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func dividingWhereConstantSplatZero() {
+        checkDividingWhereConstantA(0.0)
+        checkDividingWhereConstantB(0.0)
+    }
+
+    @Test func dividingWhereConstantSplatNegativeZero() {
+        checkDividingWhereConstantA(-0.0)
+        checkDividingWhereConstantB(-0.0)
+    }
+
+    @Test func dividingWhereConstantSplatOne() {
+        checkDividingWhereConstantA(1.0)
+        checkDividingWhereConstantB(1.0)
+    }
+
+    @Test func dividingWhereConstantSplatMinusOne() {
+        checkDividingWhereConstantA(-1.0)
+        checkDividingWhereConstantB(-1.0)
+    }
+
+    @Test func dividingWhereConstantSplatTwo() {
+        checkDividingWhereConstantA(2.0)
+        checkDividingWhereConstantB(2.0)
+    }
+
+    @Test func dividingWhereConstantSplatHalf() {
+        checkDividingWhereConstantA(0.5)
+        checkDividingWhereConstantB(0.5)
+    }
+
+    @Test func dividingWhereConstantSplatFour() {
+        checkDividingWhereConstantA(4.0)
+        checkDividingWhereConstantB(4.0)
+    }
+
+    @Test func dividingWhereConstantSplatQuarter() {
+        checkDividingWhereConstantA(0.25)
+        checkDividingWhereConstantB(0.25)
+    }
+
+    @Test func dividingWhereConstantSplatOnePointFive() {
+        checkDividingWhereConstantA(1.5)
+        checkDividingWhereConstantB(1.5)
+    }
+
+    @Test func dividingWhereConstantSplatMinusTwoPointFive() {
+        checkDividingWhereConstantA(-2.5)
+        checkDividingWhereConstantB(-2.5)
+    }
+
+    @Test func dividingWhereConstantSplatInfinity() {
+        checkDividingWhereConstantA(.infinity)
+        checkDividingWhereConstantB(.infinity)
+    }
+
+    @Test func dividingWhereConstantSplatMinusInfinity() {
+        checkDividingWhereConstantA(-.infinity)
+        checkDividingWhereConstantB(-.infinity)
+    }
+
+    @Test func dividingWhereConstantSplatNaN() {
+        checkDividingWhereConstantA(.nan)
+        checkDividingWhereConstantB(.nan)
+    }
+
+    @Test func dividingWhereConstantSplatMinusNaN() {
+        checkDividingWhereConstantA(-.nan)
+        checkDividingWhereConstantB(-.nan)
+    }
+
+    @Test func dividingWhereConstantSplatPayloadNaN() {
+        checkDividingWhereConstantA(Lane(nan: 1, signaling: false))
+        checkDividingWhereConstantB(Lane(nan: 1, signaling: false))
+    }
+
+    @Test func dividingWhereConstantSplatSignalingNaN() {
+        checkDividingWhereConstantA(.signalingNaN)
+        checkDividingWhereConstantB(.signalingNaN)
+    }
+
+    @Test func dividingWhereConstantSplatMinusSignalingNaN() {
+        checkDividingWhereConstantA(-.signalingNaN)
+        checkDividingWhereConstantB(-.signalingNaN)
+    }
+
+    @Test func dividingWhereConstantSplatLeastNonzero() {
+        checkDividingWhereConstantA(.leastNonzeroMagnitude)
+        checkDividingWhereConstantB(.leastNonzeroMagnitude)
+    }
+
+    @Test func dividingWhereConstantSplatGreatest() {
+        checkDividingWhereConstantA(.greatestFiniteMagnitude)
+        checkDividingWhereConstantB(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkDividingWhereConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("dividingWhere with a alternating \(hex(even)), \(hex(odd))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x376A_3579_4E2E_D47B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x376A_3779_4E2E_D7E1)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockF32(even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, b) in everyPair(maskInputs, bInputs) {
+            mismatches.check(
+                H.dividing(H.repeatingBlock(even, odd, even, odd), b, where: mask),
+                H(
+                    raw: HighwayReference.dividingWhereF32(
+                        mask.raw,
+                        H.repeatingBlock(even, odd, even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func dividingWhereConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkDividingWhereConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func dividingWhereConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkDividingWhereConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func dividingWhereConstantAAlternatingHalfAndOne() {
+        checkDividingWhereConstantAAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkDividingWhereConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("dividingWhere with b alternating \(hex(even)), \(hex(odd))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x43FE_AF63_3CF0_7698)
+        let aInputs = Inputs.vectors(H.self, seed: 0x43FE_B063_3CF0_784B)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockF32(even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.dividing(a, H.repeatingBlock(even, odd, even, odd), where: mask),
+                H(
+                    raw: HighwayReference.dividingWhereF32(
+                        mask.raw,
+                        a.raw,
+                        H.repeatingBlock(even, odd, even, odd).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func dividingWhereConstantBAlternatingOneAndMinusTwoPointFive() {
+        withKnownIssue(
+            "In release builds on EMU128 Highway multiplies and divides lane by lane, so the compiler folds the lanes where a constant operand is one and returns a signaling NaN of the other operand as it is, which the port's vector operation quiets"
+        ) {
+            checkDividingWhereConstantBAlternating(1.0, -2.5)
+        } when: {
+            SIMDTarget.targetName == "EMU128" && !assertionsAreEnabled
+        }
+    }
+
+    @Test func dividingWhereConstantBAlternatingMinusTwoPointFiveAndHalf() {
+        checkDividingWhereConstantBAlternating(-2.5, 0.5)
+    }
+
+    @Test func dividingWhereConstantBAlternatingHalfAndOne() {
+        withKnownIssue(
+            "In release builds on EMU128 Highway multiplies and divides lane by lane, so the compiler folds the lanes where a constant operand is one and returns a signaling NaN of the other operand as it is, which the port's vector operation quiets"
+        ) {
+            checkDividingWhereConstantBAlternating(0.5, 1.0)
+        } when: {
+            SIMDTarget.targetName == "EMU128" && !assertionsAreEnabled
+        }
+    }
+
+    @inline(__always)
+    private func checkMultiplyAddingWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("multiplyAddingWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x8AC7_9913_D5A8_3CD5)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8AC7_9613_D5A8_37BC)
+        let cInputs = Inputs.vectors(H.self, seed: 0x8AC7_9713_D5A8_396F)
+        for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x7FAF_9432_4EF3_B666)
+        where !hasUnorderedNaNs(multiplying: a.simd, b.simd, adding: c.simd) {
+            mismatches.check(
+                H.multiplyAdding(a, b, c, where: mask),
+                H(raw: HighwayReference.multiplyAddingWhereF32(mask.raw, a.raw, b.raw, c.raw)),
+                "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyAddingWhereConstantMaskAllFalse() {
+        checkMultiplyAddingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func multiplyAddingWhereConstantMaskAllTrue() {
+        checkMultiplyAddingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func multiplyAddingWhereConstantMaskOnlyFirst() {
+        checkMultiplyAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func multiplyAddingWhereConstantMaskOnlyLast() {
+        checkMultiplyAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func multiplyAddingWhereConstantMaskAllButFirst() {
+        checkMultiplyAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func multiplyAddingWhereConstantMaskAllButLast() {
+        checkMultiplyAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
     private func checkMultiplyAddingWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyAddingWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x518D_E8FD_51D6_E3C7)
@@ -205,6 +556,118 @@ extension SIMDFloatConstantTests {
         checkMultiplyAddingWhereConstantA(.greatestFiniteMagnitude)
         checkMultiplyAddingWhereConstantB(.greatestFiniteMagnitude)
         checkMultiplyAddingWhereConstantC(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkMultiplyAddingWhereConstantCAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "multiplyAddingWhere with c alternating \(hex(even)), \(hex(odd))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xDF95_0B8E_E834_4FC4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDF95_0C8E_E834_5177)
+        let bInputs = Inputs.vectors(H.self, seed: 0xDF95_0D8E_E834_532A)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockF32(even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xB85F_1C68_7569_89F8)
+        where !hasUnorderedNaNs(
+            multiplying: a.simd,
+            b.simd,
+            adding: H.repeatingBlock(even, odd, even, odd).simd
+        ) {
+            mismatches.check(
+                H.multiplyAdding(a, b, H.repeatingBlock(even, odd, even, odd), where: mask),
+                H(
+                    raw: HighwayReference.multiplyAddingWhereF32(
+                        mask.raw,
+                        a.raw,
+                        b.raw,
+                        H.repeatingBlock(even, odd, even, odd).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyAddingWhereConstantCAlternatingOneAndMinusTwoPointFive() {
+        checkMultiplyAddingWhereConstantCAlternating(1.0, -2.5)
+    }
+
+    @Test func multiplyAddingWhereConstantCAlternatingMinusTwoPointFiveAndHalf() {
+        checkMultiplyAddingWhereConstantCAlternating(-2.5, 0.5)
+    }
+
+    @Test func multiplyAddingWhereConstantCAlternatingHalfAndOne() {
+        checkMultiplyAddingWhereConstantCAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkMultiplySubtractingWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("multiplySubtractingWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xDDF9_B016_A6B4_7C44)
+        let bInputs = Inputs.vectors(H.self, seed: 0xDDF9_B316_A6B4_815D)
+        let cInputs = Inputs.vectors(H.self, seed: 0xDDF9_B216_A6B4_7FAA)
+        for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x6C63_D24F_F6DA_DA71)
+        where !hasUnorderedNaNs(multiplying: a.simd, b.simd, adding: c.simd) {
+            mismatches.check(
+                H.multiplySubtracting(a, b, c, where: mask),
+                H(raw: HighwayReference.multiplySubtractingWhereF32(mask.raw, a.raw, b.raw, c.raw)),
+                "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplySubtractingWhereConstantMaskAllFalse() {
+        checkMultiplySubtractingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func multiplySubtractingWhereConstantMaskAllTrue() {
+        checkMultiplySubtractingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func multiplySubtractingWhereConstantMaskOnlyFirst() {
+        checkMultiplySubtractingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func multiplySubtractingWhereConstantMaskOnlyLast() {
+        checkMultiplySubtractingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func multiplySubtractingWhereConstantMaskAllButFirst() {
+        checkMultiplySubtractingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func multiplySubtractingWhereConstantMaskAllButLast() {
+        checkMultiplySubtractingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
     }
 
     @inline(__always)
@@ -409,6 +872,125 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
+    private func checkMultiplySubtractingWhereConstantCAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "multiplySubtractingWhere with c alternating \(hex(even)), \(hex(odd))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x31C0_F3C0_B5E1_7B25)
+        let aInputs = Inputs.vectors(H.self, seed: 0x31C0_F2C0_B5E1_7972)
+        let bInputs = Inputs.vectors(H.self, seed: 0x31C0_F1C0_B5E1_77BF)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockF32(even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x0416_D5E1_E453_7797)
+        where !hasUnorderedNaNs(
+            multiplying: a.simd,
+            b.simd,
+            adding: H.repeatingBlock(even, odd, even, odd).simd
+        ) {
+            mismatches.check(
+                H.multiplySubtracting(a, b, H.repeatingBlock(even, odd, even, odd), where: mask),
+                H(
+                    raw: HighwayReference.multiplySubtractingWhereF32(
+                        mask.raw,
+                        a.raw,
+                        b.raw,
+                        H.repeatingBlock(even, odd, even, odd).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplySubtractingWhereConstantCAlternatingOneAndMinusTwoPointFive() {
+        checkMultiplySubtractingWhereConstantCAlternating(1.0, -2.5)
+    }
+
+    @Test func multiplySubtractingWhereConstantCAlternatingMinusTwoPointFiveAndHalf() {
+        checkMultiplySubtractingWhereConstantCAlternating(-2.5, 0.5)
+    }
+
+    @Test func multiplySubtractingWhereConstantCAlternatingHalfAndOne() {
+        checkMultiplySubtractingWhereConstantCAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
+    private func checkNegatedMultiplyAddingWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("negatedMultiplyAddingWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xA11C_C47F_2204_3189)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA11C_C17F_2204_2C70)
+        let cInputs = Inputs.vectors(H.self, seed: 0xA11C_C27F_2204_2E23)
+        for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x7F1A_BA67_A98F_5452)
+        where !hasUnorderedNaNs(negating: a.simd, b.simd, adding: c.simd) {
+            mismatches.check(
+                H.negatedMultiplyAdding(a, b, c, where: mask),
+                H(
+                    raw: HighwayReference.negatedMultiplyAddingWhereF32(
+                        mask.raw,
+                        a.raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
+                "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func negatedMultiplyAddingWhereConstantMaskAllFalse() {
+        checkNegatedMultiplyAddingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func negatedMultiplyAddingWhereConstantMaskAllTrue() {
+        checkNegatedMultiplyAddingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func negatedMultiplyAddingWhereConstantMaskOnlyFirst() {
+        checkNegatedMultiplyAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func negatedMultiplyAddingWhereConstantMaskOnlyLast() {
+        checkNegatedMultiplyAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func negatedMultiplyAddingWhereConstantMaskAllButFirst() {
+        checkNegatedMultiplyAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func negatedMultiplyAddingWhereConstantMaskAllButLast() {
+        checkNegatedMultiplyAddingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
     private func checkNegatedMultiplyAddingWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("negatedMultiplyAddingWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xEEDE_4C0C_E4BA_C35B)
@@ -610,90 +1192,32 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkNegatedMultiplySubtractingWhereConstantA(_ value: Lane) {
+    private func checkNegatedMultiplyAddingWhereConstantCAlternating(_ even: Lane, _ odd: Lane) {
         let mismatches = Mismatches(
-            "negatedMultiplySubtractingWhere with a repeating \(hex(value))"
+            "negatedMultiplyAddingWhere with c alternating \(hex(even)), \(hex(odd))"
         )
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1697_6ED8_FDA1_BDD8)
-        let bInputs = Inputs.vectors(H.self, seed: 0x1697_70D8_FDA1_C13E)
-        let cInputs = Inputs.vectors(H.self, seed: 0x1697_71D8_FDA1_C2F1)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8E87_BF1C_C009_E8A8)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8E87_C01C_C009_EA5B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8E87_C11C_C009_EC0E)
         mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingF32(value)),
-            "repeating"
+            H.repeatingBlock(even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockF32(even, odd, even, odd)),
+            "repeatingBlock"
         )
-        for (mask, b, c) in mixedTriples(maskInputs, bInputs, cInputs, seed: 0x6C7D_898D_25E1_9694)
-        where !hasUnorderedNaNs(negating: H.repeating(value).simd, b.simd, adding: c.simd) {
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xE5E4_C47A_D87B_2024)
+        where !hasUnorderedNaNs(
+            negating: a.simd,
+            b.simd,
+            adding: H.repeatingBlock(even, odd, even, odd).simd
+        ) {
             mismatches.check(
-                H.negatedMultiplySubtracting(H.repeating(value), b, c, where: mask),
+                H.negatedMultiplyAdding(a, b, H.repeatingBlock(even, odd, even, odd), where: mask),
                 H(
-                    raw: HighwayReference.negatedMultiplySubtractingWhereF32(
-                        mask.raw,
-                        H.repeating(value).raw,
-                        b.raw,
-                        c.raw
-                    )
-                ),
-                "mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @inline(__always)
-    private func checkNegatedMultiplySubtractingWhereConstantB(_ value: Lane) {
-        let mismatches = Mismatches(
-            "negatedMultiplySubtractingWhere with b repeating \(hex(value))"
-        )
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1E53_25D9_01BF_D5AD)
-        let aInputs = Inputs.vectors(H.self, seed: 0x1E53_24D9_01BF_D3FA)
-        let cInputs = Inputs.vectors(H.self, seed: 0x1E53_22D9_01BF_D094)
-        mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingF32(value)),
-            "repeating"
-        )
-        for (mask, a, c) in mixedTriples(maskInputs, aInputs, cInputs, seed: 0x49B7_8416_97F1_E37F)
-        where !hasUnorderedNaNs(negating: a.simd, H.repeating(value).simd, adding: c.simd) {
-            mismatches.check(
-                H.negatedMultiplySubtracting(a, H.repeating(value), c, where: mask),
-                H(
-                    raw: HighwayReference.negatedMultiplySubtractingWhereF32(
-                        mask.raw,
-                        a.raw,
-                        H.repeating(value).raw,
-                        c.raw
-                    )
-                ),
-                "mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @inline(__always)
-    private func checkNegatedMultiplySubtractingWhereConstantC(_ value: Lane) {
-        let mismatches = Mismatches(
-            "negatedMultiplySubtractingWhere with c repeating \(hex(value))"
-        )
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x26E8_3CD9_0696_8162)
-        let aInputs = Inputs.vectors(H.self, seed: 0x26E8_3DD9_0696_8315)
-        let bInputs = Inputs.vectors(H.self, seed: 0x26E8_3AD9_0696_7DFC)
-        mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingF32(value)),
-            "repeating"
-        )
-        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x5B45_32E5_47C5_D726)
-        where !hasUnorderedNaNs(negating: a.simd, b.simd, adding: H.repeating(value).simd) {
-            mismatches.check(
-                H.negatedMultiplySubtracting(a, b, H.repeating(value), where: mask),
-                H(
-                    raw: HighwayReference.negatedMultiplySubtractingWhereF32(
+                    raw: HighwayReference.negatedMultiplyAddingWhereF32(
                         mask.raw,
                         a.raw,
                         b.raw,
-                        H.repeating(value).raw
+                        H.repeatingBlock(even, odd, even, odd).raw
                     )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
@@ -702,452 +1226,15 @@ extension SIMDFloatConstantTests {
         mismatches.record()
     }
 
-    @Test func negatedMultiplySubtractingWhereConstantSplatZero() {
-        withKnownIssue(
-            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
-            isIntermittent: true
-        ) {
-            checkNegatedMultiplySubtractingWhereConstantA(0.0)
-            checkNegatedMultiplySubtractingWhereConstantB(0.0)
-            checkNegatedMultiplySubtractingWhereConstantC(0.0)
-        } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
-        }
+    @Test func negatedMultiplyAddingWhereConstantCAlternatingOneAndMinusTwoPointFive() {
+        checkNegatedMultiplyAddingWhereConstantCAlternating(1.0, -2.5)
     }
 
-    @Test func negatedMultiplySubtractingWhereConstantSplatNegativeZero() {
-        withKnownIssue(
-            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
-            isIntermittent: true
-        ) {
-            checkNegatedMultiplySubtractingWhereConstantA(-0.0)
-            checkNegatedMultiplySubtractingWhereConstantB(-0.0)
-            checkNegatedMultiplySubtractingWhereConstantC(-0.0)
-        } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
-        }
+    @Test func negatedMultiplyAddingWhereConstantCAlternatingMinusTwoPointFiveAndHalf() {
+        checkNegatedMultiplyAddingWhereConstantCAlternating(-2.5, 0.5)
     }
 
-    @Test func negatedMultiplySubtractingWhereConstantSplatOne() {
-        withKnownIssue(
-            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
-            isIntermittent: true
-        ) {
-            checkNegatedMultiplySubtractingWhereConstantA(1.0)
-            checkNegatedMultiplySubtractingWhereConstantB(1.0)
-            checkNegatedMultiplySubtractingWhereConstantC(1.0)
-        } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
-        }
-    }
-
-    @Test func negatedMultiplySubtractingWhereConstantSplatMinusOne() {
-        withKnownIssue(
-            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
-            isIntermittent: true
-        ) {
-            checkNegatedMultiplySubtractingWhereConstantA(-1.0)
-            checkNegatedMultiplySubtractingWhereConstantB(-1.0)
-            checkNegatedMultiplySubtractingWhereConstantC(-1.0)
-        } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
-        }
-    }
-
-    @Test func negatedMultiplySubtractingWhereConstantSplatTwo() {
-        withKnownIssue(
-            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
-            isIntermittent: true
-        ) {
-            checkNegatedMultiplySubtractingWhereConstantA(2.0)
-            checkNegatedMultiplySubtractingWhereConstantB(2.0)
-            checkNegatedMultiplySubtractingWhereConstantC(2.0)
-        } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
-        }
-    }
-
-    @Test func negatedMultiplySubtractingWhereConstantSplatHalf() {
-        withKnownIssue(
-            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
-            isIntermittent: true
-        ) {
-            checkNegatedMultiplySubtractingWhereConstantA(0.5)
-            checkNegatedMultiplySubtractingWhereConstantB(0.5)
-            checkNegatedMultiplySubtractingWhereConstantC(0.5)
-        } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
-        }
-    }
-
-    @Test func negatedMultiplySubtractingWhereConstantSplatFour() {
-        withKnownIssue(
-            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
-            isIntermittent: true
-        ) {
-            checkNegatedMultiplySubtractingWhereConstantA(4.0)
-            checkNegatedMultiplySubtractingWhereConstantB(4.0)
-            checkNegatedMultiplySubtractingWhereConstantC(4.0)
-        } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
-        }
-    }
-
-    @Test func negatedMultiplySubtractingWhereConstantSplatQuarter() {
-        withKnownIssue(
-            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
-            isIntermittent: true
-        ) {
-            checkNegatedMultiplySubtractingWhereConstantA(0.25)
-            checkNegatedMultiplySubtractingWhereConstantB(0.25)
-            checkNegatedMultiplySubtractingWhereConstantC(0.25)
-        } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
-        }
-    }
-
-    @Test func negatedMultiplySubtractingWhereConstantSplatOnePointFive() {
-        withKnownIssue(
-            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
-            isIntermittent: true
-        ) {
-            checkNegatedMultiplySubtractingWhereConstantA(1.5)
-            checkNegatedMultiplySubtractingWhereConstantB(1.5)
-            checkNegatedMultiplySubtractingWhereConstantC(1.5)
-        } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
-        }
-    }
-
-    @Test func negatedMultiplySubtractingWhereConstantSplatMinusTwoPointFive() {
-        withKnownIssue(
-            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
-            isIntermittent: true
-        ) {
-            checkNegatedMultiplySubtractingWhereConstantA(-2.5)
-            checkNegatedMultiplySubtractingWhereConstantB(-2.5)
-            checkNegatedMultiplySubtractingWhereConstantC(-2.5)
-        } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
-        }
-    }
-
-    @Test func negatedMultiplySubtractingWhereConstantSplatInfinity() {
-        withKnownIssue(
-            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
-            isIntermittent: true
-        ) {
-            checkNegatedMultiplySubtractingWhereConstantA(.infinity)
-            checkNegatedMultiplySubtractingWhereConstantB(.infinity)
-            checkNegatedMultiplySubtractingWhereConstantC(.infinity)
-        } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
-        }
-    }
-
-    @Test func negatedMultiplySubtractingWhereConstantSplatMinusInfinity() {
-        withKnownIssue(
-            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
-            isIntermittent: true
-        ) {
-            checkNegatedMultiplySubtractingWhereConstantA(-.infinity)
-            checkNegatedMultiplySubtractingWhereConstantB(-.infinity)
-            checkNegatedMultiplySubtractingWhereConstantC(-.infinity)
-        } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
-        }
-    }
-
-    @Test func negatedMultiplySubtractingWhereConstantSplatNaN() {
-        withKnownIssue(
-            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
-            isIntermittent: true
-        ) {
-            checkNegatedMultiplySubtractingWhereConstantA(.nan)
-            checkNegatedMultiplySubtractingWhereConstantB(.nan)
-            checkNegatedMultiplySubtractingWhereConstantC(.nan)
-        } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
-        }
-    }
-
-    @Test func negatedMultiplySubtractingWhereConstantSplatMinusNaN() {
-        withKnownIssue(
-            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
-            isIntermittent: true
-        ) {
-            checkNegatedMultiplySubtractingWhereConstantA(-.nan)
-            checkNegatedMultiplySubtractingWhereConstantB(-.nan)
-            checkNegatedMultiplySubtractingWhereConstantC(-.nan)
-        } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
-        }
-    }
-
-    @Test func negatedMultiplySubtractingWhereConstantSplatPayloadNaN() {
-        withKnownIssue(
-            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
-            isIntermittent: true
-        ) {
-            checkNegatedMultiplySubtractingWhereConstantA(Lane(nan: 1, signaling: false))
-            checkNegatedMultiplySubtractingWhereConstantB(Lane(nan: 1, signaling: false))
-            checkNegatedMultiplySubtractingWhereConstantC(Lane(nan: 1, signaling: false))
-        } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
-        }
-    }
-
-    @Test func negatedMultiplySubtractingWhereConstantSplatSignalingNaN() {
-        withKnownIssue(
-            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
-            isIntermittent: true
-        ) {
-            checkNegatedMultiplySubtractingWhereConstantA(.signalingNaN)
-            checkNegatedMultiplySubtractingWhereConstantB(.signalingNaN)
-            checkNegatedMultiplySubtractingWhereConstantC(.signalingNaN)
-        } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
-        }
-    }
-
-    @Test func negatedMultiplySubtractingWhereConstantSplatMinusSignalingNaN() {
-        withKnownIssue(
-            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
-            isIntermittent: true
-        ) {
-            checkNegatedMultiplySubtractingWhereConstantA(-.signalingNaN)
-            checkNegatedMultiplySubtractingWhereConstantB(-.signalingNaN)
-            checkNegatedMultiplySubtractingWhereConstantC(-.signalingNaN)
-        } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
-        }
-    }
-
-    @Test func negatedMultiplySubtractingWhereConstantSplatLeastNonzero() {
-        withKnownIssue(
-            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
-            isIntermittent: true
-        ) {
-            checkNegatedMultiplySubtractingWhereConstantA(.leastNonzeroMagnitude)
-            checkNegatedMultiplySubtractingWhereConstantB(.leastNonzeroMagnitude)
-            checkNegatedMultiplySubtractingWhereConstantC(.leastNonzeroMagnitude)
-        } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
-        }
-    }
-
-    @Test func negatedMultiplySubtractingWhereConstantSplatGreatest() {
-        withKnownIssue(
-            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
-            isIntermittent: true
-        ) {
-            checkNegatedMultiplySubtractingWhereConstantA(.greatestFiniteMagnitude)
-            checkNegatedMultiplySubtractingWhereConstantB(.greatestFiniteMagnitude)
-            checkNegatedMultiplySubtractingWhereConstantC(.greatestFiniteMagnitude)
-        } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
-        }
-    }
-
-    @inline(__always)
-    private func checkApproximateReciprocalWhereConstantA(_ value: Lane) {
-        let mismatches = Mismatches("approximateReciprocalWhere with a repeating \(hex(value))")
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB998_633A_B6E2_BBF2)
-        mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingF32(value)),
-            "repeating"
-        )
-        for mask in maskInputs {
-            mismatches.check(
-                H.approximateReciprocal(H.repeating(value), where: mask),
-                H(
-                    raw: HighwayReference.approximateReciprocalWhereF32(
-                        mask.raw,
-                        H.repeating(value).raw
-                    )
-                ),
-                "mask: \(describe(mask))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatZero() {
-        checkApproximateReciprocalWhereConstantA(0.0)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatNegativeZero() {
-        checkApproximateReciprocalWhereConstantA(-0.0)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatOne() {
-        checkApproximateReciprocalWhereConstantA(1.0)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatMinusOne() {
-        checkApproximateReciprocalWhereConstantA(-1.0)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatTwo() {
-        checkApproximateReciprocalWhereConstantA(2.0)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatHalf() {
-        checkApproximateReciprocalWhereConstantA(0.5)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatFour() {
-        checkApproximateReciprocalWhereConstantA(4.0)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatQuarter() {
-        checkApproximateReciprocalWhereConstantA(0.25)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatOnePointFive() {
-        checkApproximateReciprocalWhereConstantA(1.5)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatMinusTwoPointFive() {
-        checkApproximateReciprocalWhereConstantA(-2.5)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatInfinity() {
-        checkApproximateReciprocalWhereConstantA(.infinity)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatMinusInfinity() {
-        checkApproximateReciprocalWhereConstantA(-.infinity)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatNaN() {
-        checkApproximateReciprocalWhereConstantA(.nan)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatMinusNaN() {
-        checkApproximateReciprocalWhereConstantA(-.nan)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatPayloadNaN() {
-        checkApproximateReciprocalWhereConstantA(Lane(nan: 1, signaling: false))
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatSignalingNaN() {
-        checkApproximateReciprocalWhereConstantA(.signalingNaN)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatMinusSignalingNaN() {
-        checkApproximateReciprocalWhereConstantA(-.signalingNaN)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatLeastNonzero() {
-        checkApproximateReciprocalWhereConstantA(.leastNonzeroMagnitude)
-    }
-
-    @Test func approximateReciprocalWhereConstantSplatGreatest() {
-        checkApproximateReciprocalWhereConstantA(.greatestFiniteMagnitude)
-    }
-
-    @inline(__always)
-    private func checkApproximateReciprocalSquareRootWhereConstantA(_ value: Lane) {
-        let mismatches = Mismatches(
-            "approximateReciprocalSquareRootWhere with a repeating \(hex(value))"
-        )
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA94B_8A08_39AA_108D)
-        mismatches.check(
-            H.repeating(value),
-            H(raw: HighwayReference.repeatingF32(value)),
-            "repeating"
-        )
-        for mask in maskInputs {
-            mismatches.check(
-                H.approximateReciprocalSquareRoot(H.repeating(value), where: mask),
-                H(
-                    raw: HighwayReference.approximateReciprocalSquareRootWhereF32(
-                        mask.raw,
-                        H.repeating(value).raw
-                    )
-                ),
-                "mask: \(describe(mask))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatZero() {
-        checkApproximateReciprocalSquareRootWhereConstantA(0.0)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatNegativeZero() {
-        checkApproximateReciprocalSquareRootWhereConstantA(-0.0)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatOne() {
-        checkApproximateReciprocalSquareRootWhereConstantA(1.0)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatMinusOne() {
-        checkApproximateReciprocalSquareRootWhereConstantA(-1.0)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatTwo() {
-        checkApproximateReciprocalSquareRootWhereConstantA(2.0)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatHalf() {
-        checkApproximateReciprocalSquareRootWhereConstantA(0.5)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatFour() {
-        checkApproximateReciprocalSquareRootWhereConstantA(4.0)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatQuarter() {
-        checkApproximateReciprocalSquareRootWhereConstantA(0.25)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatOnePointFive() {
-        checkApproximateReciprocalSquareRootWhereConstantA(1.5)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatMinusTwoPointFive() {
-        checkApproximateReciprocalSquareRootWhereConstantA(-2.5)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatInfinity() {
-        checkApproximateReciprocalSquareRootWhereConstantA(.infinity)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatMinusInfinity() {
-        checkApproximateReciprocalSquareRootWhereConstantA(-.infinity)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatNaN() {
-        checkApproximateReciprocalSquareRootWhereConstantA(.nan)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatMinusNaN() {
-        checkApproximateReciprocalSquareRootWhereConstantA(-.nan)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatPayloadNaN() {
-        checkApproximateReciprocalSquareRootWhereConstantA(Lane(nan: 1, signaling: false))
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatSignalingNaN() {
-        checkApproximateReciprocalSquareRootWhereConstantA(.signalingNaN)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatMinusSignalingNaN() {
-        checkApproximateReciprocalSquareRootWhereConstantA(-.signalingNaN)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatLeastNonzero() {
-        checkApproximateReciprocalSquareRootWhereConstantA(.leastNonzeroMagnitude)
-    }
-
-    @Test func approximateReciprocalSquareRootWhereConstantSplatGreatest() {
-        checkApproximateReciprocalSquareRootWhereConstantA(.greatestFiniteMagnitude)
+    @Test func negatedMultiplyAddingWhereConstantCAlternatingHalfAndOne() {
+        checkNegatedMultiplyAddingWhereConstantCAlternating(0.5, 1.0)
     }
 }

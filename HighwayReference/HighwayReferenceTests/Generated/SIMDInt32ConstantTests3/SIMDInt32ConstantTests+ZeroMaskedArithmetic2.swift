@@ -7,6 +7,77 @@ import Vectorization
 
 extension SIMDInt32ConstantTests {
     @inline(__always)
+    private func checkNegatedMultiplySubtractingWhereConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("negatedMultiplySubtractingWhere with mask \(describe(mask))")
+        let aInputs = Inputs.vectors(H.self, seed: 0xAC84_87C6_6195_324F)
+        let bInputs = Inputs.vectors(H.self, seed: 0xAC84_88C6_6195_3402)
+        let cInputs = Inputs.vectors(H.self, seed: 0xAC84_89C6_6195_35B5)
+        for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x5D55_B057_FF4E_AD70) {
+            mismatches.check(
+                H.negatedMultiplySubtracting(a, b, c, where: mask),
+                H(
+                    raw: HighwayReference.negatedMultiplySubtractingWhereI32(
+                        mask.raw,
+                        a.raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
+                "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantMaskAllFalse() {
+        checkNegatedMultiplySubtractingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantMaskAllTrue() {
+        checkNegatedMultiplySubtractingWhereConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantMaskOnlyFirst() {
+        checkNegatedMultiplySubtractingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantMaskOnlyLast() {
+        checkNegatedMultiplySubtractingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantMaskAllButFirst() {
+        checkNegatedMultiplySubtractingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantMaskAllButLast() {
+        checkNegatedMultiplySubtractingWhereConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
     private func checkMultiplyPairwiseAddingWhereFromInt16ConstantA(_ value: Int16) {
         let mismatches = Mismatches(
             "multiplyPairwiseAddingWhereFromInt16 with a repeating \(hex(value))"

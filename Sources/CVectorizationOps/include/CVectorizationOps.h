@@ -4623,12 +4623,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ze
   if (cvectorization_ops_sve_splat_u8(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
     return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svsel_u8(__builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0), __builtin_sve_svdup_n_u8(0), __builtin_sve_svdup_n_u8(a[0])));
   }
-  return (cvectorization_ops_raw_vector_u8)(~(cvectorization_ops_vector_u8)mask & a);
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return (cvectorization_ops_raw_vector_u8)(~(cvectorization_ops_vector_u8)mask & a);
+  }
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svsel_u8(__builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0), __builtin_sve_svdup_n_u8(0), (cvectorization_ops_sve_u8)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   if (cvectorization_ops_sve_splat_u8(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
     return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svsel_u8(__builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0), __builtin_sve_svdup_n_u8(0), __builtin_sve_svdup_n_u8(a[0])));
   }
-  return (cvectorization_ops_raw_vector_u8)(~(cvectorization_ops_vector_u8)mask & a);
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return (cvectorization_ops_raw_vector_u8)(~(cvectorization_ops_vector_u8)mask & a);
+  }
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svsel_u8(__builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0), __builtin_sve_svdup_n_u8(0), (cvectorization_ops_sve_u8)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}, (cvectorization_ops_x86_i8)a));
 #else
@@ -4639,7 +4645,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_bi
   const cvectorization_ops_mask_u8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u8, cvectorization_ops_read_mask_u8, rawMask);
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
   const cvectorization_ops_vector_u8 b = (cvectorization_ops_vector_u8)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u8(a) && !cvectorization_ops_sve_constant_u8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svand_u8_z(active, __builtin_sve_svdup_n_u8(a[0]), (cvectorization_ops_sve_u8)b));
+  }
+  if (cvectorization_ops_sve_splat_u8(b) && !cvectorization_ops_sve_constant_u8(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svand_u8_z(active, (cvectorization_ops_sve_u8)a, __builtin_sve_svdup_n_u8(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u8)((a & b) & (cvectorization_ops_vector_u8)mask);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u8(a) && !cvectorization_ops_sve_constant_u8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svand_u8_z(active, __builtin_sve_svdup_n_u8(a[0]), (cvectorization_ops_sve_u8)b));
+  }
+  if (cvectorization_ops_sve_splat_u8(b) && !cvectorization_ops_sve_constant_u8(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svand_u8_z(active, (cvectorization_ops_sve_u8)a, __builtin_sve_svdup_n_u8(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u8)((a & b) & (cvectorization_ops_vector_u8)mask);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8)((cvectorization_ops_x86_i8)a & (cvectorization_ops_x86_i8)b), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return (cvectorization_ops_raw_vector_u8)((a & b) & (cvectorization_ops_vector_u8)mask);
@@ -4649,7 +4675,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_bi
   const cvectorization_ops_mask_u8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u8, cvectorization_ops_read_mask_u8, rawMask);
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
   const cvectorization_ops_vector_u8 b = (cvectorization_ops_vector_u8)rawB;
-#if CVECTORIZATION_OPS_NEON
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u8(a) && !cvectorization_ops_sve_constant_u8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svorr_u8_z(active, __builtin_sve_svdup_n_u8(a[0]), (cvectorization_ops_sve_u8)b));
+  }
+  if (cvectorization_ops_sve_splat_u8(b) && !cvectorization_ops_sve_constant_u8(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svorr_u8_z(active, (cvectorization_ops_sve_u8)a, __builtin_sve_svdup_n_u8(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)mask & (a | b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u8(a) && !cvectorization_ops_sve_constant_u8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svorr_u8_z(active, __builtin_sve_svdup_n_u8(a[0]), (cvectorization_ops_sve_u8)b));
+  }
+  if (cvectorization_ops_sve_splat_u8(b) && !cvectorization_ops_sve_constant_u8(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svorr_u8_z(active, (cvectorization_ops_sve_u8)a, __builtin_sve_svdup_n_u8(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)mask & (a | b));
+#elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u8)((a | b) & (cvectorization_ops_vector_u8)mask);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8)((cvectorization_ops_x86_i8)a | (cvectorization_ops_x86_i8)b), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
@@ -4661,7 +4707,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_bi
   const cvectorization_ops_mask_u8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u8, cvectorization_ops_read_mask_u8, rawMask);
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
   const cvectorization_ops_vector_u8 b = (cvectorization_ops_vector_u8)rawB;
-#if CVECTORIZATION_OPS_NEON
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u8(a) && !cvectorization_ops_sve_constant_u8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_sveor_u8_z(active, __builtin_sve_svdup_n_u8(a[0]), (cvectorization_ops_sve_u8)b));
+  }
+  if (cvectorization_ops_sve_splat_u8(b) && !cvectorization_ops_sve_constant_u8(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_sveor_u8_z(active, (cvectorization_ops_sve_u8)a, __builtin_sve_svdup_n_u8(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)mask & (a ^ b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u8(a) && !cvectorization_ops_sve_constant_u8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_sveor_u8_z(active, __builtin_sve_svdup_n_u8(a[0]), (cvectorization_ops_sve_u8)b));
+  }
+  if (cvectorization_ops_sve_splat_u8(b) && !cvectorization_ops_sve_constant_u8(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_sveor_u8_z(active, (cvectorization_ops_sve_u8)a, __builtin_sve_svdup_n_u8(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)mask & (a ^ b));
+#elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u8)((a ^ b) & (cvectorization_ops_vector_u8)mask);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8)((cvectorization_ops_x86_i8)a ^ (cvectorization_ops_x86_i8)b), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
@@ -14794,7 +14860,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ma
   const cvectorization_ops_mask_u8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u8, cvectorization_ops_read_mask_u8, rawMask);
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
   const cvectorization_ops_vector_u8 b = (cvectorization_ops_vector_u8)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u8(a) && !cvectorization_ops_sve_constant_u8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svmax_u8_z(active, __builtin_sve_svdup_n_u8(a[0]), (cvectorization_ops_sve_u8)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_maximum_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u8(a) && !cvectorization_ops_sve_constant_u8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svmax_u8_z(active, __builtin_sve_svdup_n_u8(a[0]), (cvectorization_ops_sve_u8)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_maximum_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_u8)cvectorization_ops_maximum_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_maximum_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b));
@@ -14811,7 +14889,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ad
   const cvectorization_ops_mask_u8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u8, cvectorization_ops_read_mask_u8, rawMask);
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
   const cvectorization_ops_vector_u8 b = (cvectorization_ops_vector_u8)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u8(a) && !cvectorization_ops_sve_constant_u8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svadd_u8_z(active, __builtin_sve_svdup_n_u8(a[0]), (cvectorization_ops_sve_u8)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_adding_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u8(a) && !cvectorization_ops_sve_constant_u8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svadd_u8_z(active, __builtin_sve_svdup_n_u8(a[0]), (cvectorization_ops_sve_u8)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_adding_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_u8)cvectorization_ops_adding_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_adding_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b));
@@ -14828,7 +14918,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_su
   const cvectorization_ops_mask_u8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u8, cvectorization_ops_read_mask_u8, rawMask);
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
   const cvectorization_ops_vector_u8 b = (cvectorization_ops_vector_u8)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u8(a) && !cvectorization_ops_sve_constant_u8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svsub_u8_z(active, __builtin_sve_svdup_n_u8(a[0]), (cvectorization_ops_sve_u8)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_subtracting_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u8(a) && !cvectorization_ops_sve_constant_u8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svsub_u8_z(active, __builtin_sve_svdup_n_u8(a[0]), (cvectorization_ops_sve_u8)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_subtracting_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_u8)cvectorization_ops_subtracting_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_subtracting_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b));
@@ -14845,7 +14947,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_mu
   const cvectorization_ops_mask_u8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u8, cvectorization_ops_read_mask_u8, rawMask);
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
   const cvectorization_ops_vector_u8 b = (cvectorization_ops_vector_u8)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u8(a) && !cvectorization_ops_sve_constant_u8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svmul_u8_z(active, __builtin_sve_svdup_n_u8(a[0]), (cvectorization_ops_sve_u8)b));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7))) || cvectorization_ops_sve_constant_u8(a) || cvectorization_ops_sve_constant_u8(b)) {
+    return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_multiplying_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svmul_u8_z(active, (cvectorization_ops_sve_u8)a, (cvectorization_ops_sve_u8)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u8(a) && !cvectorization_ops_sve_constant_u8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svmul_u8_z(active, __builtin_sve_svdup_n_u8(a[0]), (cvectorization_ops_sve_u8)b));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7))) || cvectorization_ops_sve_constant_u8(a) || cvectorization_ops_sve_constant_u8(b)) {
+    return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_multiplying_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svmul_u8_z(active, (cvectorization_ops_sve_u8)a, (cvectorization_ops_sve_u8)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_u8)cvectorization_ops_multiplying_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_multiplying_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b));
@@ -14875,6 +14997,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_di
   const cvectorization_ops_vector_u8 b = (cvectorization_ops_vector_u8)rawB;
 #if CVECTORIZATION_OPS_NEON == 2
   return cvectorization_ops_selecting_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_dividing_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b), (cvectorization_ops_raw_vector_u8)otherwise);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_u8((cvectorization_ops_vector_u8)mask)) {
+    return cvectorization_ops_selecting_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_dividing_u8((cvectorization_ops_raw_vector_u8)a, cvectorization_ops_selecting_u8(rawMask, (cvectorization_ops_raw_vector_u8)b, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_repeating_u8(1))), (cvectorization_ops_raw_vector_u8)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svsel_u8(active, (cvectorization_ops_sve_u8)(cvectorization_ops_vector_u8)cvectorization_ops_dividing_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b), (cvectorization_ops_sve_splat_u8(otherwise) ? __builtin_sve_svdup_n_u8(otherwise[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)otherwise)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_u8((cvectorization_ops_vector_u8)mask)) {
+    return cvectorization_ops_selecting_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_dividing_u8((cvectorization_ops_raw_vector_u8)a, cvectorization_ops_selecting_u8(rawMask, (cvectorization_ops_raw_vector_u8)b, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_repeating_u8(1))), (cvectorization_ops_raw_vector_u8)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svsel_u8(active, (cvectorization_ops_sve_u8)(cvectorization_ops_vector_u8)cvectorization_ops_dividing_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b), (cvectorization_ops_sve_splat_u8(otherwise) ? __builtin_sve_svdup_n_u8(otherwise[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)otherwise)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return cvectorization_ops_selecting_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_dividing_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b), (cvectorization_ops_raw_vector_u8)otherwise);
 #else
@@ -14888,6 +15022,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_re
   const cvectorization_ops_vector_u8 b = (cvectorization_ops_vector_u8)rawB;
 #if CVECTORIZATION_OPS_NEON == 2
   return cvectorization_ops_selecting_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_remainder_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b), (cvectorization_ops_raw_vector_u8)otherwise);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_u8((cvectorization_ops_vector_u8)mask)) {
+    return cvectorization_ops_selecting_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_remainder_u8((cvectorization_ops_raw_vector_u8)a, cvectorization_ops_selecting_u8(rawMask, (cvectorization_ops_raw_vector_u8)b, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_repeating_u8(1))), (cvectorization_ops_raw_vector_u8)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svsel_u8(active, (cvectorization_ops_sve_u8)(cvectorization_ops_vector_u8)cvectorization_ops_remainder_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b), (cvectorization_ops_sve_splat_u8(otherwise) ? __builtin_sve_svdup_n_u8(otherwise[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)otherwise)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_u8((cvectorization_ops_vector_u8)mask)) {
+    return cvectorization_ops_selecting_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_remainder_u8((cvectorization_ops_raw_vector_u8)a, cvectorization_ops_selecting_u8(rawMask, (cvectorization_ops_raw_vector_u8)b, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_repeating_u8(1))), (cvectorization_ops_raw_vector_u8)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svsel_u8(active, (cvectorization_ops_sve_u8)(cvectorization_ops_vector_u8)cvectorization_ops_remainder_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b), (cvectorization_ops_sve_splat_u8(otherwise) ? __builtin_sve_svdup_n_u8(otherwise[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)otherwise)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return cvectorization_ops_selecting_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_remainder_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b), (cvectorization_ops_raw_vector_u8)otherwise);
 #else
@@ -14933,7 +15079,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_mu
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
   const cvectorization_ops_vector_u8 b = (cvectorization_ops_vector_u8)rawB;
   const cvectorization_ops_vector_u8 c = (cvectorization_ops_vector_u8)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_multiply_adding_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b, (cvectorization_ops_raw_vector_u8)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svmad_u8_z(active, (cvectorization_ops_sve_u8)b, (cvectorization_ops_sve_u8)a, (cvectorization_ops_sve_u8)c));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_multiply_adding_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b, (cvectorization_ops_raw_vector_u8)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svmad_u8_z(active, (cvectorization_ops_sve_u8)b, (cvectorization_ops_sve_u8)a, (cvectorization_ops_sve_u8)c));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_u8)cvectorization_ops_multiply_adding_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b, (cvectorization_ops_raw_vector_u8)c), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_multiply_adding_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b, (cvectorization_ops_raw_vector_u8)c));
@@ -14971,7 +15129,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ne
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
   const cvectorization_ops_vector_u8 b = (cvectorization_ops_vector_u8)rawB;
   const cvectorization_ops_vector_u8 c = (cvectorization_ops_vector_u8)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_negated_multiply_adding_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b, (cvectorization_ops_raw_vector_u8)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svmsb_u8_z(active, (cvectorization_ops_sve_u8)b, (cvectorization_ops_sve_u8)a, (cvectorization_ops_sve_u8)c));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_negated_multiply_adding_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b, (cvectorization_ops_raw_vector_u8)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svmsb_u8_z(active, (cvectorization_ops_sve_u8)b, (cvectorization_ops_sve_u8)a, (cvectorization_ops_sve_u8)c));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_u8)cvectorization_ops_negated_multiply_adding_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b, (cvectorization_ops_raw_vector_u8)c), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_negated_multiply_adding_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b, (cvectorization_ops_raw_vector_u8)c));
@@ -14990,7 +15160,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ne
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
   const cvectorization_ops_vector_u8 b = (cvectorization_ops_vector_u8)rawB;
   const cvectorization_ops_vector_u8 c = (cvectorization_ops_vector_u8)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_negated_multiply_subtracting_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b, (cvectorization_ops_raw_vector_u8)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_reinterpret_u8_s8(__builtin_sve_svneg_s8_z(active, __builtin_sve_reinterpret_s8_u8(__builtin_sve_svmad_u8_x(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)b, (cvectorization_ops_sve_u8)a, (cvectorization_ops_sve_u8)c)))));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_negated_multiply_subtracting_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b, (cvectorization_ops_raw_vector_u8)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_reinterpret_u8_s8(__builtin_sve_svneg_s8_z(active, __builtin_sve_reinterpret_s8_u8(__builtin_sve_svmad_u8_x(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)b, (cvectorization_ops_sve_u8)a, (cvectorization_ops_sve_u8)c)))));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_u8)cvectorization_ops_negated_multiply_subtracting_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b, (cvectorization_ops_raw_vector_u8)c), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_negated_multiply_subtracting_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b, (cvectorization_ops_raw_vector_u8)c));
@@ -15047,7 +15229,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_sh
   const cvectorization_ops_mask_u8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u8, cvectorization_ops_read_mask_u8, rawMask);
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
   const cvectorization_ops_vector_u8 b = (cvectorization_ops_vector_u8)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7))) || (cvectorization_ops_sve_constant_u8(a) && cvectorization_ops_sve_constant_u8(b))) {
+    return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_shifted_left_by_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svlsl_u8_z(active, (cvectorization_ops_sve_u8)a, (cvectorization_ops_sve_u8)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7))) || (cvectorization_ops_sve_constant_u8(a) && cvectorization_ops_sve_constant_u8(b))) {
+    return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_shifted_left_by_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svlsl_u8_z(active, (cvectorization_ops_sve_u8)a, (cvectorization_ops_sve_u8)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_u8)cvectorization_ops_shifted_left_by_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_shifted_left_by_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b));
@@ -15064,7 +15258,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_sh
   const cvectorization_ops_mask_u8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u8, cvectorization_ops_read_mask_u8, rawMask);
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
   const cvectorization_ops_vector_u8 b = (cvectorization_ops_vector_u8)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7))) || (cvectorization_ops_sve_constant_u8(a) && cvectorization_ops_sve_constant_u8(b))) {
+    return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_shifted_right_by_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svlsr_u8_z(active, (cvectorization_ops_sve_u8)a, (cvectorization_ops_sve_u8)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7))) || (cvectorization_ops_sve_constant_u8(a) && cvectorization_ops_sve_constant_u8(b))) {
+    return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_shifted_right_by_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svlsr_u8_z(active, (cvectorization_ops_sve_u8)a, (cvectorization_ops_sve_u8)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_u8)cvectorization_ops_shifted_right_by_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_shifted_right_by_u8((cvectorization_ops_raw_vector_u8)a, (cvectorization_ops_raw_vector_u8)b));
@@ -15080,7 +15286,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_sh
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_leading_zero_bit_count_where_u8(cvectorization_ops_raw_mask_u8 rawMask, cvectorization_ops_raw_vector_u8 rawA) {
   const cvectorization_ops_mask_u8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u8, cvectorization_ops_read_mask_u8, rawMask);
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_leading_zero_bit_count_u8((cvectorization_ops_raw_vector_u8)a));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svclz_u8_z(active, (cvectorization_ops_sve_u8)a));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_leading_zero_bit_count_u8((cvectorization_ops_raw_vector_u8)a));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svclz_u8_z(active, (cvectorization_ops_sve_u8)a));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_u8)cvectorization_ops_leading_zero_bit_count_u8((cvectorization_ops_raw_vector_u8)a), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_leading_zero_bit_count_u8((cvectorization_ops_raw_vector_u8)a));
@@ -15148,7 +15366,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u8 cvectorization_ops_grea
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_repeating_where_u8(cvectorization_ops_raw_mask_u8 rawMask, uint8_t value) {
   const cvectorization_ops_mask_u8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u8, cvectorization_ops_read_mask_u8, rawMask);
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_repeating_u8(value));
+  }
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svdup_n_u8_z(__builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_repeating_u8(value));
+  }
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svdup_n_u8_z(__builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_u8)cvectorization_ops_repeating_u8(value), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_repeating_u8(value));
@@ -15157,12 +15385,36 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_re
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_repeating_where_otherwise_u8(cvectorization_ops_raw_vector_u8 rawOtherwise, cvectorization_ops_raw_mask_u8 rawMask, uint8_t value) {
   const cvectorization_ops_vector_u8 otherwise = (cvectorization_ops_vector_u8)rawOtherwise;
   const cvectorization_ops_mask_u8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u8, cvectorization_ops_read_mask_u8, rawMask);
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_repeating_u8(value), (cvectorization_ops_raw_vector_u8)otherwise);
+  }
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svdup_n_u8_m((cvectorization_ops_sve_u8)otherwise, __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_repeating_u8(value), (cvectorization_ops_raw_vector_u8)otherwise);
+  }
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svdup_n_u8_m((cvectorization_ops_sve_u8)otherwise, __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0), value));
+#else
   return cvectorization_ops_selecting_u8(rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_u8)cvectorization_ops_repeating_u8(value), (cvectorization_ops_raw_vector_u8)otherwise);
+#endif
 }
 CVECTORIZATION_OPS_INLINE uint8_t cvectorization_ops_sum_where_u8(cvectorization_ops_raw_mask_u8 rawMask, cvectorization_ops_raw_vector_u8 rawA) {
   const cvectorization_ops_mask_u8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u8, cvectorization_ops_read_mask_u8, rawMask);
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_u8((cvectorization_ops_vector_u8)mask)) {
+    return cvectorization_ops_sum_u8(cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)a));
+  }
+  return (uint8_t)__builtin_sve_svaddv_u8(__builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0), (cvectorization_ops_sve_u8)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_u8((cvectorization_ops_vector_u8)mask)) {
+    return cvectorization_ops_sum_u8(cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)a));
+  }
+  return (uint8_t)__builtin_sve_svaddv_u8(__builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0), (cvectorization_ops_sve_u8)a);
+#else
   return cvectorization_ops_sum_u8(cvectorization_ops_selecting_or_zero_u8(rawMask, (cvectorization_ops_raw_vector_u8)a));
+#endif
 }
 CVECTORIZATION_OPS_INLINE uint8_t cvectorization_ops_smallest_where_u8(cvectorization_ops_raw_mask_u8 rawMask, cvectorization_ops_raw_vector_u8 rawA) {
   const cvectorization_ops_mask_u8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u8, cvectorization_ops_read_mask_u8, rawMask);
@@ -23531,7 +23783,23 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_s
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_zeroing_selected_u16(cvectorization_ops_raw_mask_u16 rawMask, cvectorization_ops_raw_vector_u16 rawA) {
   const cvectorization_ops_mask_u16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u16, cvectorization_ops_read_mask_u16, rawMask);
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u16(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svsel_u16(__builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0), __builtin_sve_svdup_n_u16(0), __builtin_sve_svdup_n_u16(a[0])));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return (cvectorization_ops_raw_vector_u16)(~(cvectorization_ops_vector_u16)mask & a);
+  }
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svsel_u16(__builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0), __builtin_sve_svdup_n_u16(0), (cvectorization_ops_sve_u16)a));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u16(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svsel_u16(__builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0), __builtin_sve_svdup_n_u16(0), __builtin_sve_svdup_n_u16(a[0])));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return (cvectorization_ops_raw_vector_u16)(~(cvectorization_ops_vector_u16)mask & a);
+  }
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svsel_u16(__builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0), __builtin_sve_svdup_n_u16(0), (cvectorization_ops_sve_u16)a));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}, (cvectorization_ops_x86_i16)a));
 #else
   return (cvectorization_ops_raw_vector_u16)(~(cvectorization_ops_vector_u16)mask & a);
@@ -23541,7 +23809,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_b
   const cvectorization_ops_mask_u16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u16, cvectorization_ops_read_mask_u16, rawMask);
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
   const cvectorization_ops_vector_u16 b = (cvectorization_ops_vector_u16)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u16(a) && !cvectorization_ops_sve_constant_u16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svand_u16_z(active, __builtin_sve_svdup_n_u16(a[0]), (cvectorization_ops_sve_u16)b));
+  }
+  if (cvectorization_ops_sve_splat_u16(b) && !cvectorization_ops_sve_constant_u16(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svand_u16_z(active, (cvectorization_ops_sve_u16)a, __builtin_sve_svdup_n_u16(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u16)((a & b) & (cvectorization_ops_vector_u16)mask);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u16(a) && !cvectorization_ops_sve_constant_u16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svand_u16_z(active, __builtin_sve_svdup_n_u16(a[0]), (cvectorization_ops_sve_u16)b));
+  }
+  if (cvectorization_ops_sve_splat_u16(b) && !cvectorization_ops_sve_constant_u16(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svand_u16_z(active, (cvectorization_ops_sve_u16)a, __builtin_sve_svdup_n_u16(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u16)((a & b) & (cvectorization_ops_vector_u16)mask);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16)((cvectorization_ops_x86_i16)a & (cvectorization_ops_x86_i16)b), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return (cvectorization_ops_raw_vector_u16)((a & b) & (cvectorization_ops_vector_u16)mask);
@@ -23551,7 +23839,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_b
   const cvectorization_ops_mask_u16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u16, cvectorization_ops_read_mask_u16, rawMask);
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
   const cvectorization_ops_vector_u16 b = (cvectorization_ops_vector_u16)rawB;
-#if CVECTORIZATION_OPS_NEON
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u16(a) && !cvectorization_ops_sve_constant_u16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svorr_u16_z(active, __builtin_sve_svdup_n_u16(a[0]), (cvectorization_ops_sve_u16)b));
+  }
+  if (cvectorization_ops_sve_splat_u16(b) && !cvectorization_ops_sve_constant_u16(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svorr_u16_z(active, (cvectorization_ops_sve_u16)a, __builtin_sve_svdup_n_u16(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)mask & (a | b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u16(a) && !cvectorization_ops_sve_constant_u16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svorr_u16_z(active, __builtin_sve_svdup_n_u16(a[0]), (cvectorization_ops_sve_u16)b));
+  }
+  if (cvectorization_ops_sve_splat_u16(b) && !cvectorization_ops_sve_constant_u16(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svorr_u16_z(active, (cvectorization_ops_sve_u16)a, __builtin_sve_svdup_n_u16(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)mask & (a | b));
+#elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u16)((a | b) & (cvectorization_ops_vector_u16)mask);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16)((cvectorization_ops_x86_i16)a | (cvectorization_ops_x86_i16)b), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
@@ -23563,7 +23871,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_b
   const cvectorization_ops_mask_u16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u16, cvectorization_ops_read_mask_u16, rawMask);
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
   const cvectorization_ops_vector_u16 b = (cvectorization_ops_vector_u16)rawB;
-#if CVECTORIZATION_OPS_NEON
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u16(a) && !cvectorization_ops_sve_constant_u16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_sveor_u16_z(active, __builtin_sve_svdup_n_u16(a[0]), (cvectorization_ops_sve_u16)b));
+  }
+  if (cvectorization_ops_sve_splat_u16(b) && !cvectorization_ops_sve_constant_u16(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_sveor_u16_z(active, (cvectorization_ops_sve_u16)a, __builtin_sve_svdup_n_u16(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)mask & (a ^ b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u16(a) && !cvectorization_ops_sve_constant_u16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_sveor_u16_z(active, __builtin_sve_svdup_n_u16(a[0]), (cvectorization_ops_sve_u16)b));
+  }
+  if (cvectorization_ops_sve_splat_u16(b) && !cvectorization_ops_sve_constant_u16(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_sveor_u16_z(active, (cvectorization_ops_sve_u16)a, __builtin_sve_svdup_n_u16(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)mask & (a ^ b));
+#elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u16)((a ^ b) & (cvectorization_ops_vector_u16)mask);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16)((cvectorization_ops_x86_i16)a ^ (cvectorization_ops_x86_i16)b), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
@@ -29122,7 +29450,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_m
   const cvectorization_ops_mask_u16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u16, cvectorization_ops_read_mask_u16, rawMask);
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
   const cvectorization_ops_vector_u16 b = (cvectorization_ops_vector_u16)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u16(a) && !cvectorization_ops_sve_constant_u16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svmax_u16_z(active, __builtin_sve_svdup_n_u16(a[0]), (cvectorization_ops_sve_u16)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_maximum_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u16(a) && !cvectorization_ops_sve_constant_u16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svmax_u16_z(active, __builtin_sve_svdup_n_u16(a[0]), (cvectorization_ops_sve_u16)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_maximum_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_u16)cvectorization_ops_maximum_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_maximum_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b));
@@ -29139,7 +29479,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_a
   const cvectorization_ops_mask_u16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u16, cvectorization_ops_read_mask_u16, rawMask);
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
   const cvectorization_ops_vector_u16 b = (cvectorization_ops_vector_u16)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u16(a) && !cvectorization_ops_sve_constant_u16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svadd_u16_z(active, __builtin_sve_svdup_n_u16(a[0]), (cvectorization_ops_sve_u16)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_adding_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u16(a) && !cvectorization_ops_sve_constant_u16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svadd_u16_z(active, __builtin_sve_svdup_n_u16(a[0]), (cvectorization_ops_sve_u16)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_adding_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_u16)cvectorization_ops_adding_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_adding_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b));
@@ -29156,7 +29508,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_s
   const cvectorization_ops_mask_u16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u16, cvectorization_ops_read_mask_u16, rawMask);
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
   const cvectorization_ops_vector_u16 b = (cvectorization_ops_vector_u16)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u16(a) && !cvectorization_ops_sve_constant_u16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svsub_u16_z(active, __builtin_sve_svdup_n_u16(a[0]), (cvectorization_ops_sve_u16)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_subtracting_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u16(a) && !cvectorization_ops_sve_constant_u16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svsub_u16_z(active, __builtin_sve_svdup_n_u16(a[0]), (cvectorization_ops_sve_u16)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_subtracting_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_u16)cvectorization_ops_subtracting_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_subtracting_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b));
@@ -29173,7 +29537,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_m
   const cvectorization_ops_mask_u16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u16, cvectorization_ops_read_mask_u16, rawMask);
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
   const cvectorization_ops_vector_u16 b = (cvectorization_ops_vector_u16)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u16(a) && !cvectorization_ops_sve_constant_u16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svmul_u16_z(active, __builtin_sve_svdup_n_u16(a[0]), (cvectorization_ops_sve_u16)b));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15))) || cvectorization_ops_sve_constant_u16(a) || cvectorization_ops_sve_constant_u16(b)) {
+    return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_multiplying_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svmul_u16_z(active, (cvectorization_ops_sve_u16)a, (cvectorization_ops_sve_u16)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u16(a) && !cvectorization_ops_sve_constant_u16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svmul_u16_z(active, __builtin_sve_svdup_n_u16(a[0]), (cvectorization_ops_sve_u16)b));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15))) || cvectorization_ops_sve_constant_u16(a) || cvectorization_ops_sve_constant_u16(b)) {
+    return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_multiplying_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svmul_u16_z(active, (cvectorization_ops_sve_u16)a, (cvectorization_ops_sve_u16)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_u16)cvectorization_ops_multiplying_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_multiplying_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b));
@@ -29203,6 +29587,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_d
   const cvectorization_ops_vector_u16 b = (cvectorization_ops_vector_u16)rawB;
 #if CVECTORIZATION_OPS_NEON == 2
   return cvectorization_ops_selecting_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_dividing_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b), (cvectorization_ops_raw_vector_u16)otherwise);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_u16((cvectorization_ops_vector_u16)mask)) {
+    return cvectorization_ops_selecting_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_dividing_u16((cvectorization_ops_raw_vector_u16)a, cvectorization_ops_selecting_u16(rawMask, (cvectorization_ops_raw_vector_u16)b, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_repeating_u16(1))), (cvectorization_ops_raw_vector_u16)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svsel_u16(active, (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_dividing_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b), (cvectorization_ops_sve_splat_u16(otherwise) ? __builtin_sve_svdup_n_u16(otherwise[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)otherwise)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_u16((cvectorization_ops_vector_u16)mask)) {
+    return cvectorization_ops_selecting_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_dividing_u16((cvectorization_ops_raw_vector_u16)a, cvectorization_ops_selecting_u16(rawMask, (cvectorization_ops_raw_vector_u16)b, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_repeating_u16(1))), (cvectorization_ops_raw_vector_u16)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svsel_u16(active, (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_dividing_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b), (cvectorization_ops_sve_splat_u16(otherwise) ? __builtin_sve_svdup_n_u16(otherwise[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)otherwise)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return cvectorization_ops_selecting_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_dividing_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b), (cvectorization_ops_raw_vector_u16)otherwise);
 #else
@@ -29216,6 +29612,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_r
   const cvectorization_ops_vector_u16 b = (cvectorization_ops_vector_u16)rawB;
 #if CVECTORIZATION_OPS_NEON == 2
   return cvectorization_ops_selecting_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_remainder_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b), (cvectorization_ops_raw_vector_u16)otherwise);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_u16((cvectorization_ops_vector_u16)mask)) {
+    return cvectorization_ops_selecting_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_remainder_u16((cvectorization_ops_raw_vector_u16)a, cvectorization_ops_selecting_u16(rawMask, (cvectorization_ops_raw_vector_u16)b, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_repeating_u16(1))), (cvectorization_ops_raw_vector_u16)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svsel_u16(active, (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_remainder_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b), (cvectorization_ops_sve_splat_u16(otherwise) ? __builtin_sve_svdup_n_u16(otherwise[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)otherwise)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_u16((cvectorization_ops_vector_u16)mask)) {
+    return cvectorization_ops_selecting_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_remainder_u16((cvectorization_ops_raw_vector_u16)a, cvectorization_ops_selecting_u16(rawMask, (cvectorization_ops_raw_vector_u16)b, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_repeating_u16(1))), (cvectorization_ops_raw_vector_u16)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svsel_u16(active, (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_remainder_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b), (cvectorization_ops_sve_splat_u16(otherwise) ? __builtin_sve_svdup_n_u16(otherwise[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)otherwise)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return cvectorization_ops_selecting_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_remainder_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b), (cvectorization_ops_raw_vector_u16)otherwise);
 #else
@@ -29261,7 +29669,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_m
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
   const cvectorization_ops_vector_u16 b = (cvectorization_ops_vector_u16)rawB;
   const cvectorization_ops_vector_u16 c = (cvectorization_ops_vector_u16)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_multiply_adding_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b, (cvectorization_ops_raw_vector_u16)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svmad_u16_z(active, (cvectorization_ops_sve_u16)b, (cvectorization_ops_sve_u16)a, (cvectorization_ops_sve_u16)c));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_multiply_adding_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b, (cvectorization_ops_raw_vector_u16)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svmad_u16_z(active, (cvectorization_ops_sve_u16)b, (cvectorization_ops_sve_u16)a, (cvectorization_ops_sve_u16)c));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_u16)cvectorization_ops_multiply_adding_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b, (cvectorization_ops_raw_vector_u16)c), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_multiply_adding_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b, (cvectorization_ops_raw_vector_u16)c));
@@ -29299,7 +29719,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_n
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
   const cvectorization_ops_vector_u16 b = (cvectorization_ops_vector_u16)rawB;
   const cvectorization_ops_vector_u16 c = (cvectorization_ops_vector_u16)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_negated_multiply_adding_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b, (cvectorization_ops_raw_vector_u16)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svmsb_u16_z(active, (cvectorization_ops_sve_u16)b, (cvectorization_ops_sve_u16)a, (cvectorization_ops_sve_u16)c));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_negated_multiply_adding_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b, (cvectorization_ops_raw_vector_u16)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svmsb_u16_z(active, (cvectorization_ops_sve_u16)b, (cvectorization_ops_sve_u16)a, (cvectorization_ops_sve_u16)c));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_u16)cvectorization_ops_negated_multiply_adding_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b, (cvectorization_ops_raw_vector_u16)c), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_negated_multiply_adding_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b, (cvectorization_ops_raw_vector_u16)c));
@@ -29318,7 +29750,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_n
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
   const cvectorization_ops_vector_u16 b = (cvectorization_ops_vector_u16)rawB;
   const cvectorization_ops_vector_u16 c = (cvectorization_ops_vector_u16)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_negated_multiply_subtracting_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b, (cvectorization_ops_raw_vector_u16)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_reinterpret_u16_s16(__builtin_sve_svneg_s16_z(active, __builtin_sve_reinterpret_s16_u16(__builtin_sve_svmad_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)b, (cvectorization_ops_sve_u16)a, (cvectorization_ops_sve_u16)c)))));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_negated_multiply_subtracting_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b, (cvectorization_ops_raw_vector_u16)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_reinterpret_u16_s16(__builtin_sve_svneg_s16_z(active, __builtin_sve_reinterpret_s16_u16(__builtin_sve_svmad_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)b, (cvectorization_ops_sve_u16)a, (cvectorization_ops_sve_u16)c)))));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_u16)cvectorization_ops_negated_multiply_subtracting_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b, (cvectorization_ops_raw_vector_u16)c), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_negated_multiply_subtracting_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b, (cvectorization_ops_raw_vector_u16)c));
@@ -29387,7 +29831,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_s
   const cvectorization_ops_mask_u16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u16, cvectorization_ops_read_mask_u16, rawMask);
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
   const cvectorization_ops_vector_u16 b = (cvectorization_ops_vector_u16)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15))) || (cvectorization_ops_sve_constant_u16(a) && cvectorization_ops_sve_constant_u16(b))) {
+    return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_left_by_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svlsl_u16_z(active, (cvectorization_ops_sve_u16)a, (cvectorization_ops_sve_u16)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15))) || (cvectorization_ops_sve_constant_u16(a) && cvectorization_ops_sve_constant_u16(b))) {
+    return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_left_by_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svlsl_u16_z(active, (cvectorization_ops_sve_u16)a, (cvectorization_ops_sve_u16)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_left_by_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_left_by_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b));
@@ -29404,7 +29860,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_s
   const cvectorization_ops_mask_u16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u16, cvectorization_ops_read_mask_u16, rawMask);
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
   const cvectorization_ops_vector_u16 b = (cvectorization_ops_vector_u16)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15))) || (cvectorization_ops_sve_constant_u16(a) && cvectorization_ops_sve_constant_u16(b))) {
+    return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_by_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svlsr_u16_z(active, (cvectorization_ops_sve_u16)a, (cvectorization_ops_sve_u16)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15))) || (cvectorization_ops_sve_constant_u16(a) && cvectorization_ops_sve_constant_u16(b))) {
+    return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_by_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svlsr_u16_z(active, (cvectorization_ops_sve_u16)a, (cvectorization_ops_sve_u16)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_by_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_by_u16((cvectorization_ops_raw_vector_u16)a, (cvectorization_ops_raw_vector_u16)b));
@@ -29420,7 +29888,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_s
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_leading_zero_bit_count_where_u16(cvectorization_ops_raw_mask_u16 rawMask, cvectorization_ops_raw_vector_u16 rawA) {
   const cvectorization_ops_mask_u16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u16, cvectorization_ops_read_mask_u16, rawMask);
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_leading_zero_bit_count_u16((cvectorization_ops_raw_vector_u16)a));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svclz_u16_z(active, (cvectorization_ops_sve_u16)a));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_leading_zero_bit_count_u16((cvectorization_ops_raw_vector_u16)a));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svclz_u16_z(active, (cvectorization_ops_sve_u16)a));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_u16)cvectorization_ops_leading_zero_bit_count_u16((cvectorization_ops_raw_vector_u16)a), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_leading_zero_bit_count_u16((cvectorization_ops_raw_vector_u16)a));
@@ -29488,7 +29968,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u16 cvectorization_ops_gre
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_repeating_where_u16(cvectorization_ops_raw_mask_u16 rawMask, uint16_t value) {
   const cvectorization_ops_mask_u16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u16, cvectorization_ops_read_mask_u16, rawMask);
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_repeating_u16(value));
+  }
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svdup_n_u16_z(__builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_repeating_u16(value));
+  }
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svdup_n_u16_z(__builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_u16)cvectorization_ops_repeating_u16(value), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_repeating_u16(value));
@@ -29497,12 +29987,36 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_r
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_repeating_where_otherwise_u16(cvectorization_ops_raw_vector_u16 rawOtherwise, cvectorization_ops_raw_mask_u16 rawMask, uint16_t value) {
   const cvectorization_ops_vector_u16 otherwise = (cvectorization_ops_vector_u16)rawOtherwise;
   const cvectorization_ops_mask_u16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u16, cvectorization_ops_read_mask_u16, rawMask);
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_repeating_u16(value), (cvectorization_ops_raw_vector_u16)otherwise);
+  }
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svdup_n_u16_m((cvectorization_ops_sve_u16)otherwise, __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_repeating_u16(value), (cvectorization_ops_raw_vector_u16)otherwise);
+  }
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svdup_n_u16_m((cvectorization_ops_sve_u16)otherwise, __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0), value));
+#else
   return cvectorization_ops_selecting_u16(rawMask, (cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)cvectorization_ops_repeating_u16(value), (cvectorization_ops_raw_vector_u16)otherwise);
+#endif
 }
 CVECTORIZATION_OPS_INLINE uint16_t cvectorization_ops_sum_where_u16(cvectorization_ops_raw_mask_u16 rawMask, cvectorization_ops_raw_vector_u16 rawA) {
   const cvectorization_ops_mask_u16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u16, cvectorization_ops_read_mask_u16, rawMask);
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_u16((cvectorization_ops_vector_u16)mask)) {
+    return cvectorization_ops_sum_u16(cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)a));
+  }
+  return (uint16_t)__builtin_sve_svaddv_u16(__builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0), (cvectorization_ops_sve_u16)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_u16((cvectorization_ops_vector_u16)mask)) {
+    return cvectorization_ops_sum_u16(cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)a));
+  }
+  return (uint16_t)__builtin_sve_svaddv_u16(__builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0), (cvectorization_ops_sve_u16)a);
+#else
   return cvectorization_ops_sum_u16(cvectorization_ops_selecting_or_zero_u16(rawMask, (cvectorization_ops_raw_vector_u16)a));
+#endif
 }
 CVECTORIZATION_OPS_INLINE uint16_t cvectorization_ops_smallest_where_u16(cvectorization_ops_raw_mask_u16 rawMask, cvectorization_ops_raw_vector_u16 rawA) {
   const cvectorization_ops_mask_u16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u16, cvectorization_ops_read_mask_u16, rawMask);
@@ -36833,7 +37347,23 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_s
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_zeroing_selected_u32(cvectorization_ops_raw_mask_u32 rawMask, cvectorization_ops_raw_vector_u32 rawA) {
   const cvectorization_ops_mask_u32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u32, cvectorization_ops_read_mask_u32, rawMask);
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u32(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svsel_u32(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), __builtin_sve_svdup_n_u32(0), __builtin_sve_svdup_n_u32(a[0])));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return (cvectorization_ops_raw_vector_u32)(~(cvectorization_ops_vector_u32)mask & a);
+  }
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svsel_u32(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), __builtin_sve_svdup_n_u32(0), (cvectorization_ops_sve_u32)a));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u32(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svsel_u32(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), __builtin_sve_svdup_n_u32(0), __builtin_sve_svdup_n_u32(a[0])));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return (cvectorization_ops_raw_vector_u32)(~(cvectorization_ops_vector_u32)mask & a);
+  }
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svsel_u32(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), __builtin_sve_svdup_n_u32(0), (cvectorization_ops_sve_u32)a));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}, (cvectorization_ops_x86_i32)a));
 #else
   return (cvectorization_ops_raw_vector_u32)(~(cvectorization_ops_vector_u32)mask & a);
@@ -36843,7 +37373,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_b
   const cvectorization_ops_mask_u32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u32, cvectorization_ops_read_mask_u32, rawMask);
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
   const cvectorization_ops_vector_u32 b = (cvectorization_ops_vector_u32)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u32(a) && !cvectorization_ops_sve_constant_u32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svand_u32_z(active, __builtin_sve_svdup_n_u32(a[0]), (cvectorization_ops_sve_u32)b));
+  }
+  if (cvectorization_ops_sve_splat_u32(b) && !cvectorization_ops_sve_constant_u32(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svand_u32_z(active, (cvectorization_ops_sve_u32)a, __builtin_sve_svdup_n_u32(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u32)((a & b) & (cvectorization_ops_vector_u32)mask);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u32(a) && !cvectorization_ops_sve_constant_u32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svand_u32_z(active, __builtin_sve_svdup_n_u32(a[0]), (cvectorization_ops_sve_u32)b));
+  }
+  if (cvectorization_ops_sve_splat_u32(b) && !cvectorization_ops_sve_constant_u32(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svand_u32_z(active, (cvectorization_ops_sve_u32)a, __builtin_sve_svdup_n_u32(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u32)((a & b) & (cvectorization_ops_vector_u32)mask);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32)((cvectorization_ops_x86_i32)a & (cvectorization_ops_x86_i32)b), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return (cvectorization_ops_raw_vector_u32)((a & b) & (cvectorization_ops_vector_u32)mask);
@@ -36853,7 +37403,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_b
   const cvectorization_ops_mask_u32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u32, cvectorization_ops_read_mask_u32, rawMask);
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
   const cvectorization_ops_vector_u32 b = (cvectorization_ops_vector_u32)rawB;
-#if CVECTORIZATION_OPS_NEON
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u32(a) && !cvectorization_ops_sve_constant_u32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svorr_u32_z(active, __builtin_sve_svdup_n_u32(a[0]), (cvectorization_ops_sve_u32)b));
+  }
+  if (cvectorization_ops_sve_splat_u32(b) && !cvectorization_ops_sve_constant_u32(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svorr_u32_z(active, (cvectorization_ops_sve_u32)a, __builtin_sve_svdup_n_u32(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)mask & (a | b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u32(a) && !cvectorization_ops_sve_constant_u32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svorr_u32_z(active, __builtin_sve_svdup_n_u32(a[0]), (cvectorization_ops_sve_u32)b));
+  }
+  if (cvectorization_ops_sve_splat_u32(b) && !cvectorization_ops_sve_constant_u32(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svorr_u32_z(active, (cvectorization_ops_sve_u32)a, __builtin_sve_svdup_n_u32(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)mask & (a | b));
+#elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u32)((a | b) & (cvectorization_ops_vector_u32)mask);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32)((cvectorization_ops_x86_i32)a | (cvectorization_ops_x86_i32)b), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
@@ -36865,7 +37435,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_b
   const cvectorization_ops_mask_u32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u32, cvectorization_ops_read_mask_u32, rawMask);
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
   const cvectorization_ops_vector_u32 b = (cvectorization_ops_vector_u32)rawB;
-#if CVECTORIZATION_OPS_NEON
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u32(a) && !cvectorization_ops_sve_constant_u32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_sveor_u32_z(active, __builtin_sve_svdup_n_u32(a[0]), (cvectorization_ops_sve_u32)b));
+  }
+  if (cvectorization_ops_sve_splat_u32(b) && !cvectorization_ops_sve_constant_u32(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_sveor_u32_z(active, (cvectorization_ops_sve_u32)a, __builtin_sve_svdup_n_u32(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)mask & (a ^ b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u32(a) && !cvectorization_ops_sve_constant_u32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_sveor_u32_z(active, __builtin_sve_svdup_n_u32(a[0]), (cvectorization_ops_sve_u32)b));
+  }
+  if (cvectorization_ops_sve_splat_u32(b) && !cvectorization_ops_sve_constant_u32(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_sveor_u32_z(active, (cvectorization_ops_sve_u32)a, __builtin_sve_svdup_n_u32(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)mask & (a ^ b));
+#elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u32)((a ^ b) & (cvectorization_ops_vector_u32)mask);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32)((cvectorization_ops_x86_i32)a ^ (cvectorization_ops_x86_i32)b), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
@@ -41344,7 +41934,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_m
   const cvectorization_ops_mask_u32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u32, cvectorization_ops_read_mask_u32, rawMask);
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
   const cvectorization_ops_vector_u32 b = (cvectorization_ops_vector_u32)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u32(a) && !cvectorization_ops_sve_constant_u32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svmax_u32_z(active, __builtin_sve_svdup_n_u32(a[0]), (cvectorization_ops_sve_u32)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_maximum_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u32(a) && !cvectorization_ops_sve_constant_u32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svmax_u32_z(active, __builtin_sve_svdup_n_u32(a[0]), (cvectorization_ops_sve_u32)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_maximum_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_u32)cvectorization_ops_maximum_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_maximum_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b));
@@ -41361,7 +41963,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_a
   const cvectorization_ops_mask_u32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u32, cvectorization_ops_read_mask_u32, rawMask);
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
   const cvectorization_ops_vector_u32 b = (cvectorization_ops_vector_u32)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u32(a) && !cvectorization_ops_sve_constant_u32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svadd_u32_z(active, __builtin_sve_svdup_n_u32(a[0]), (cvectorization_ops_sve_u32)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_adding_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u32(a) && !cvectorization_ops_sve_constant_u32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svadd_u32_z(active, __builtin_sve_svdup_n_u32(a[0]), (cvectorization_ops_sve_u32)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_adding_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_u32)cvectorization_ops_adding_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_adding_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b));
@@ -41378,7 +41992,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_s
   const cvectorization_ops_mask_u32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u32, cvectorization_ops_read_mask_u32, rawMask);
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
   const cvectorization_ops_vector_u32 b = (cvectorization_ops_vector_u32)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u32(a) && !cvectorization_ops_sve_constant_u32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svsub_u32_z(active, __builtin_sve_svdup_n_u32(a[0]), (cvectorization_ops_sve_u32)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_subtracting_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u32(a) && !cvectorization_ops_sve_constant_u32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svsub_u32_z(active, __builtin_sve_svdup_n_u32(a[0]), (cvectorization_ops_sve_u32)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_subtracting_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_u32)cvectorization_ops_subtracting_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_subtracting_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b));
@@ -41395,7 +42021,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_m
   const cvectorization_ops_mask_u32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u32, cvectorization_ops_read_mask_u32, rawMask);
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
   const cvectorization_ops_vector_u32 b = (cvectorization_ops_vector_u32)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u32(a) && !cvectorization_ops_sve_constant_u32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svmul_u32_z(active, __builtin_sve_svdup_n_u32(a[0]), (cvectorization_ops_sve_u32)b));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || cvectorization_ops_sve_constant_u32(a) || cvectorization_ops_sve_constant_u32(b)) {
+    return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_multiplying_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svmul_u32_z(active, (cvectorization_ops_sve_u32)a, (cvectorization_ops_sve_u32)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u32(a) && !cvectorization_ops_sve_constant_u32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svmul_u32_z(active, __builtin_sve_svdup_n_u32(a[0]), (cvectorization_ops_sve_u32)b));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || cvectorization_ops_sve_constant_u32(a) || cvectorization_ops_sve_constant_u32(b)) {
+    return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_multiplying_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svmul_u32_z(active, (cvectorization_ops_sve_u32)a, (cvectorization_ops_sve_u32)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_u32)cvectorization_ops_multiplying_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_multiplying_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b));
@@ -41412,7 +42058,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_d
   const cvectorization_ops_mask_u32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u32, cvectorization_ops_read_mask_u32, rawMask);
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
   const cvectorization_ops_vector_u32 b = (cvectorization_ops_vector_u32)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u32(a) && !cvectorization_ops_sve_constant_u32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svdiv_u32_z(active, __builtin_sve_svdup_n_u32(a[0]), (cvectorization_ops_sve_u32)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_dividing_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u32(a) && !cvectorization_ops_sve_constant_u32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svdiv_u32_z(active, __builtin_sve_svdup_n_u32(a[0]), (cvectorization_ops_sve_u32)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_dividing_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_u32)cvectorization_ops_dividing_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_dividing_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b));
@@ -41425,6 +42083,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_d
   const cvectorization_ops_vector_u32 b = (cvectorization_ops_vector_u32)rawB;
 #if CVECTORIZATION_OPS_NEON == 2
   return cvectorization_ops_selecting_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_dividing_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b), (cvectorization_ops_raw_vector_u32)otherwise);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_u32((cvectorization_ops_vector_u32)mask)) {
+    return cvectorization_ops_selecting_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_dividing_u32((cvectorization_ops_raw_vector_u32)a, cvectorization_ops_selecting_u32(rawMask, (cvectorization_ops_raw_vector_u32)b, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_repeating_u32(1))), (cvectorization_ops_raw_vector_u32)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svsel_u32(active, (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_dividing_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b), (cvectorization_ops_sve_splat_u32(otherwise) ? __builtin_sve_svdup_n_u32(otherwise[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)otherwise)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_u32((cvectorization_ops_vector_u32)mask)) {
+    return cvectorization_ops_selecting_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_dividing_u32((cvectorization_ops_raw_vector_u32)a, cvectorization_ops_selecting_u32(rawMask, (cvectorization_ops_raw_vector_u32)b, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_repeating_u32(1))), (cvectorization_ops_raw_vector_u32)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svsel_u32(active, (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_dividing_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b), (cvectorization_ops_sve_splat_u32(otherwise) ? __builtin_sve_svdup_n_u32(otherwise[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)otherwise)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return cvectorization_ops_selecting_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_dividing_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b), (cvectorization_ops_raw_vector_u32)otherwise);
 #else
@@ -41438,6 +42108,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_r
   const cvectorization_ops_vector_u32 b = (cvectorization_ops_vector_u32)rawB;
 #if CVECTORIZATION_OPS_NEON == 2
   return cvectorization_ops_selecting_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_remainder_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b), (cvectorization_ops_raw_vector_u32)otherwise);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_u32((cvectorization_ops_vector_u32)mask)) {
+    return cvectorization_ops_selecting_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_remainder_u32((cvectorization_ops_raw_vector_u32)a, cvectorization_ops_selecting_u32(rawMask, (cvectorization_ops_raw_vector_u32)b, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_repeating_u32(1))), (cvectorization_ops_raw_vector_u32)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svsel_u32(active, (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_remainder_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b), (cvectorization_ops_sve_splat_u32(otherwise) ? __builtin_sve_svdup_n_u32(otherwise[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)otherwise)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_u32((cvectorization_ops_vector_u32)mask)) {
+    return cvectorization_ops_selecting_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_remainder_u32((cvectorization_ops_raw_vector_u32)a, cvectorization_ops_selecting_u32(rawMask, (cvectorization_ops_raw_vector_u32)b, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_repeating_u32(1))), (cvectorization_ops_raw_vector_u32)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svsel_u32(active, (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_remainder_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b), (cvectorization_ops_sve_splat_u32(otherwise) ? __builtin_sve_svdup_n_u32(otherwise[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)otherwise)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return cvectorization_ops_selecting_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_remainder_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b), (cvectorization_ops_raw_vector_u32)otherwise);
 #else
@@ -41449,7 +42131,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_m
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
   const cvectorization_ops_vector_u32 b = (cvectorization_ops_vector_u32)rawB;
   const cvectorization_ops_vector_u32 c = (cvectorization_ops_vector_u32)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_multiply_adding_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b, (cvectorization_ops_raw_vector_u32)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svmad_u32_z(active, (cvectorization_ops_sve_u32)b, (cvectorization_ops_sve_u32)a, (cvectorization_ops_sve_u32)c));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_multiply_adding_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b, (cvectorization_ops_raw_vector_u32)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svmad_u32_z(active, (cvectorization_ops_sve_u32)b, (cvectorization_ops_sve_u32)a, (cvectorization_ops_sve_u32)c));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_u32)cvectorization_ops_multiply_adding_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b, (cvectorization_ops_raw_vector_u32)c), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_multiply_adding_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b, (cvectorization_ops_raw_vector_u32)c));
@@ -41487,7 +42181,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_n
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
   const cvectorization_ops_vector_u32 b = (cvectorization_ops_vector_u32)rawB;
   const cvectorization_ops_vector_u32 c = (cvectorization_ops_vector_u32)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_negated_multiply_adding_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b, (cvectorization_ops_raw_vector_u32)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svmsb_u32_z(active, (cvectorization_ops_sve_u32)b, (cvectorization_ops_sve_u32)a, (cvectorization_ops_sve_u32)c));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_negated_multiply_adding_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b, (cvectorization_ops_raw_vector_u32)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svmsb_u32_z(active, (cvectorization_ops_sve_u32)b, (cvectorization_ops_sve_u32)a, (cvectorization_ops_sve_u32)c));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_u32)cvectorization_ops_negated_multiply_adding_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b, (cvectorization_ops_raw_vector_u32)c), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_negated_multiply_adding_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b, (cvectorization_ops_raw_vector_u32)c));
@@ -41506,7 +42212,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_n
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
   const cvectorization_ops_vector_u32 b = (cvectorization_ops_vector_u32)rawB;
   const cvectorization_ops_vector_u32 c = (cvectorization_ops_vector_u32)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_negated_multiply_subtracting_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b, (cvectorization_ops_raw_vector_u32)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_reinterpret_u32_s32(__builtin_sve_svneg_s32_z(active, __builtin_sve_reinterpret_s32_u32(__builtin_sve_svmad_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)b, (cvectorization_ops_sve_u32)a, (cvectorization_ops_sve_u32)c)))));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_negated_multiply_subtracting_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b, (cvectorization_ops_raw_vector_u32)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_reinterpret_u32_s32(__builtin_sve_svneg_s32_z(active, __builtin_sve_reinterpret_s32_u32(__builtin_sve_svmad_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)b, (cvectorization_ops_sve_u32)a, (cvectorization_ops_sve_u32)c)))));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_u32)cvectorization_ops_negated_multiply_subtracting_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b, (cvectorization_ops_raw_vector_u32)c), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_negated_multiply_subtracting_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b, (cvectorization_ops_raw_vector_u32)c));
@@ -41563,7 +42281,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_s
   const cvectorization_ops_mask_u32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u32, cvectorization_ops_read_mask_u32, rawMask);
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
   const cvectorization_ops_vector_u32 b = (cvectorization_ops_vector_u32)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || (cvectorization_ops_sve_constant_u32(a) && cvectorization_ops_sve_constant_u32(b))) {
+    return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_left_by_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svlsl_u32_z(active, (cvectorization_ops_sve_u32)a, (cvectorization_ops_sve_u32)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || (cvectorization_ops_sve_constant_u32(a) && cvectorization_ops_sve_constant_u32(b))) {
+    return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_left_by_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svlsl_u32_z(active, (cvectorization_ops_sve_u32)a, (cvectorization_ops_sve_u32)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_left_by_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_left_by_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b));
@@ -41580,7 +42310,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_s
   const cvectorization_ops_mask_u32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u32, cvectorization_ops_read_mask_u32, rawMask);
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
   const cvectorization_ops_vector_u32 b = (cvectorization_ops_vector_u32)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || (cvectorization_ops_sve_constant_u32(a) && cvectorization_ops_sve_constant_u32(b))) {
+    return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_by_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svlsr_u32_z(active, (cvectorization_ops_sve_u32)a, (cvectorization_ops_sve_u32)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || (cvectorization_ops_sve_constant_u32(a) && cvectorization_ops_sve_constant_u32(b))) {
+    return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_by_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svlsr_u32_z(active, (cvectorization_ops_sve_u32)a, (cvectorization_ops_sve_u32)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_by_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_by_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b));
@@ -41596,7 +42338,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_s
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_leading_zero_bit_count_where_u32(cvectorization_ops_raw_mask_u32 rawMask, cvectorization_ops_raw_vector_u32 rawA) {
   const cvectorization_ops_mask_u32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u32, cvectorization_ops_read_mask_u32, rawMask);
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_leading_zero_bit_count_u32((cvectorization_ops_raw_vector_u32)a));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svclz_u32_z(active, (cvectorization_ops_sve_u32)a));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_leading_zero_bit_count_u32((cvectorization_ops_raw_vector_u32)a));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svclz_u32_z(active, (cvectorization_ops_sve_u32)a));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_u32)cvectorization_ops_leading_zero_bit_count_u32((cvectorization_ops_raw_vector_u32)a), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_leading_zero_bit_count_u32((cvectorization_ops_raw_vector_u32)a));
@@ -41664,7 +42418,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u32 cvectorization_ops_gre
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_repeating_where_u32(cvectorization_ops_raw_mask_u32 rawMask, uint32_t value) {
   const cvectorization_ops_mask_u32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u32, cvectorization_ops_read_mask_u32, rawMask);
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_repeating_u32(value));
+  }
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svdup_n_u32_z(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_repeating_u32(value));
+  }
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svdup_n_u32_z(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_u32)cvectorization_ops_repeating_u32(value), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_repeating_u32(value));
@@ -41673,12 +42437,36 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_r
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_repeating_where_otherwise_u32(cvectorization_ops_raw_vector_u32 rawOtherwise, cvectorization_ops_raw_mask_u32 rawMask, uint32_t value) {
   const cvectorization_ops_vector_u32 otherwise = (cvectorization_ops_vector_u32)rawOtherwise;
   const cvectorization_ops_mask_u32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u32, cvectorization_ops_read_mask_u32, rawMask);
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_repeating_u32(value), (cvectorization_ops_raw_vector_u32)otherwise);
+  }
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svdup_n_u32_m((cvectorization_ops_sve_u32)otherwise, __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_repeating_u32(value), (cvectorization_ops_raw_vector_u32)otherwise);
+  }
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svdup_n_u32_m((cvectorization_ops_sve_u32)otherwise, __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), value));
+#else
   return cvectorization_ops_selecting_u32(rawMask, (cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)cvectorization_ops_repeating_u32(value), (cvectorization_ops_raw_vector_u32)otherwise);
+#endif
 }
 CVECTORIZATION_OPS_INLINE uint32_t cvectorization_ops_sum_where_u32(cvectorization_ops_raw_mask_u32 rawMask, cvectorization_ops_raw_vector_u32 rawA) {
   const cvectorization_ops_mask_u32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u32, cvectorization_ops_read_mask_u32, rawMask);
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_u32((cvectorization_ops_vector_u32)mask)) {
+    return cvectorization_ops_sum_u32(cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)a));
+  }
+  return (uint32_t)__builtin_sve_svaddv_u32(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), (cvectorization_ops_sve_u32)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_u32((cvectorization_ops_vector_u32)mask)) {
+    return cvectorization_ops_sum_u32(cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)a));
+  }
+  return (uint32_t)__builtin_sve_svaddv_u32(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), (cvectorization_ops_sve_u32)a);
+#else
   return cvectorization_ops_sum_u32(cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)a));
+#endif
 }
 CVECTORIZATION_OPS_INLINE uint32_t cvectorization_ops_smallest_where_u32(cvectorization_ops_raw_mask_u32 rawMask, cvectorization_ops_raw_vector_u32 rawA) {
   const cvectorization_ops_mask_u32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u32, cvectorization_ops_read_mask_u32, rawMask);
@@ -49460,12 +50248,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_z
   if (cvectorization_ops_sve_splat_u64(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
     return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svsel_u64(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), __builtin_sve_svdup_n_u64(0), __builtin_sve_svdup_n_u64(a[0])));
   }
-  return (cvectorization_ops_raw_vector_u64)(~(cvectorization_ops_vector_u64)mask & a);
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return (cvectorization_ops_raw_vector_u64)(~(cvectorization_ops_vector_u64)mask & a);
+  }
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svsel_u64(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), __builtin_sve_svdup_n_u64(0), (cvectorization_ops_sve_u64)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   if (cvectorization_ops_sve_splat_u64(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
     return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svsel_u64(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), __builtin_sve_svdup_n_u64(0), __builtin_sve_svdup_n_u64(a[0])));
   }
-  return (cvectorization_ops_raw_vector_u64)(~(cvectorization_ops_vector_u64)mask & a);
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return (cvectorization_ops_raw_vector_u64)(~(cvectorization_ops_vector_u64)mask & a);
+  }
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svsel_u64(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), __builtin_sve_svdup_n_u64(0), (cvectorization_ops_sve_u64)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}, (cvectorization_ops_x86_i64)a));
 #else
@@ -49476,7 +50270,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_b
   const cvectorization_ops_mask_u64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u64, cvectorization_ops_read_mask_u64, rawMask);
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
   const cvectorization_ops_vector_u64 b = (cvectorization_ops_vector_u64)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u64(a) && !cvectorization_ops_sve_constant_u64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svand_u64_z(active, __builtin_sve_svdup_n_u64(a[0]), (cvectorization_ops_sve_u64)b));
+  }
+  if (cvectorization_ops_sve_splat_u64(b) && !cvectorization_ops_sve_constant_u64(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svand_u64_z(active, (cvectorization_ops_sve_u64)a, __builtin_sve_svdup_n_u64(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u64)((a & b) & (cvectorization_ops_vector_u64)mask);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u64(a) && !cvectorization_ops_sve_constant_u64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svand_u64_z(active, __builtin_sve_svdup_n_u64(a[0]), (cvectorization_ops_sve_u64)b));
+  }
+  if (cvectorization_ops_sve_splat_u64(b) && !cvectorization_ops_sve_constant_u64(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svand_u64_z(active, (cvectorization_ops_sve_u64)a, __builtin_sve_svdup_n_u64(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u64)((a & b) & (cvectorization_ops_vector_u64)mask);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64)((cvectorization_ops_x86_i64)a & (cvectorization_ops_x86_i64)b), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return (cvectorization_ops_raw_vector_u64)((a & b) & (cvectorization_ops_vector_u64)mask);
@@ -49486,7 +50300,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_b
   const cvectorization_ops_mask_u64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u64, cvectorization_ops_read_mask_u64, rawMask);
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
   const cvectorization_ops_vector_u64 b = (cvectorization_ops_vector_u64)rawB;
-#if CVECTORIZATION_OPS_NEON
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u64(a) && !cvectorization_ops_sve_constant_u64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svorr_u64_z(active, __builtin_sve_svdup_n_u64(a[0]), (cvectorization_ops_sve_u64)b));
+  }
+  if (cvectorization_ops_sve_splat_u64(b) && !cvectorization_ops_sve_constant_u64(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svorr_u64_z(active, (cvectorization_ops_sve_u64)a, __builtin_sve_svdup_n_u64(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)mask & (a | b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u64(a) && !cvectorization_ops_sve_constant_u64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svorr_u64_z(active, __builtin_sve_svdup_n_u64(a[0]), (cvectorization_ops_sve_u64)b));
+  }
+  if (cvectorization_ops_sve_splat_u64(b) && !cvectorization_ops_sve_constant_u64(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svorr_u64_z(active, (cvectorization_ops_sve_u64)a, __builtin_sve_svdup_n_u64(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)mask & (a | b));
+#elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u64)((a | b) & (cvectorization_ops_vector_u64)mask);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64)((cvectorization_ops_x86_i64)a | (cvectorization_ops_x86_i64)b), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
@@ -49498,7 +50332,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_b
   const cvectorization_ops_mask_u64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u64, cvectorization_ops_read_mask_u64, rawMask);
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
   const cvectorization_ops_vector_u64 b = (cvectorization_ops_vector_u64)rawB;
-#if CVECTORIZATION_OPS_NEON
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u64(a) && !cvectorization_ops_sve_constant_u64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_sveor_u64_z(active, __builtin_sve_svdup_n_u64(a[0]), (cvectorization_ops_sve_u64)b));
+  }
+  if (cvectorization_ops_sve_splat_u64(b) && !cvectorization_ops_sve_constant_u64(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_sveor_u64_z(active, (cvectorization_ops_sve_u64)a, __builtin_sve_svdup_n_u64(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)mask & (a ^ b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u64(a) && !cvectorization_ops_sve_constant_u64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_sveor_u64_z(active, __builtin_sve_svdup_n_u64(a[0]), (cvectorization_ops_sve_u64)b));
+  }
+  if (cvectorization_ops_sve_splat_u64(b) && !cvectorization_ops_sve_constant_u64(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_sveor_u64_z(active, (cvectorization_ops_sve_u64)a, __builtin_sve_svdup_n_u64(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)mask & (a ^ b));
+#elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u64)((a ^ b) & (cvectorization_ops_vector_u64)mask);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64)((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)b), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
@@ -54738,7 +55592,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_m
   const cvectorization_ops_mask_u64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u64, cvectorization_ops_read_mask_u64, rawMask);
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
   const cvectorization_ops_vector_u64 b = (cvectorization_ops_vector_u64)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u64(a) && !cvectorization_ops_sve_constant_u64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svmax_u64_z(active, __builtin_sve_svdup_n_u64(a[0]), (cvectorization_ops_sve_u64)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_maximum_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u64(a) && !cvectorization_ops_sve_constant_u64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svmax_u64_z(active, __builtin_sve_svdup_n_u64(a[0]), (cvectorization_ops_sve_u64)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_maximum_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_u64)cvectorization_ops_maximum_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_maximum_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b));
@@ -54766,7 +55632,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_a
   const cvectorization_ops_mask_u64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u64, cvectorization_ops_read_mask_u64, rawMask);
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
   const cvectorization_ops_vector_u64 b = (cvectorization_ops_vector_u64)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u64(a) && !cvectorization_ops_sve_constant_u64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svadd_u64_z(active, __builtin_sve_svdup_n_u64(a[0]), (cvectorization_ops_sve_u64)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_adding_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u64(a) && !cvectorization_ops_sve_constant_u64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svadd_u64_z(active, __builtin_sve_svdup_n_u64(a[0]), (cvectorization_ops_sve_u64)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_adding_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_u64)cvectorization_ops_adding_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_adding_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b));
@@ -54783,7 +55661,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_s
   const cvectorization_ops_mask_u64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u64, cvectorization_ops_read_mask_u64, rawMask);
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
   const cvectorization_ops_vector_u64 b = (cvectorization_ops_vector_u64)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u64(a) && !cvectorization_ops_sve_constant_u64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svsub_u64_z(active, __builtin_sve_svdup_n_u64(a[0]), (cvectorization_ops_sve_u64)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_subtracting_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u64(a) && !cvectorization_ops_sve_constant_u64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svsub_u64_z(active, __builtin_sve_svdup_n_u64(a[0]), (cvectorization_ops_sve_u64)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_subtracting_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_u64)cvectorization_ops_subtracting_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_subtracting_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b));
@@ -54800,7 +55690,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_m
   const cvectorization_ops_mask_u64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u64, cvectorization_ops_read_mask_u64, rawMask);
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
   const cvectorization_ops_vector_u64 b = (cvectorization_ops_vector_u64)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u64(a) && !cvectorization_ops_sve_constant_u64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svmul_u64_z(active, __builtin_sve_svdup_n_u64(a[0]), (cvectorization_ops_sve_u64)b));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63))) || cvectorization_ops_sve_constant_u64(a) || cvectorization_ops_sve_constant_u64(b)) {
+    return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_multiplying_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svmul_u64_z(active, (cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u64(a) && !cvectorization_ops_sve_constant_u64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svmul_u64_z(active, __builtin_sve_svdup_n_u64(a[0]), (cvectorization_ops_sve_u64)b));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63))) || cvectorization_ops_sve_constant_u64(a) || cvectorization_ops_sve_constant_u64(b)) {
+    return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_multiplying_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svmul_u64_z(active, (cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_u64)cvectorization_ops_multiplying_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_multiplying_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b));
@@ -54817,7 +55727,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_d
   const cvectorization_ops_mask_u64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u64, cvectorization_ops_read_mask_u64, rawMask);
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
   const cvectorization_ops_vector_u64 b = (cvectorization_ops_vector_u64)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_u64(a) && !cvectorization_ops_sve_constant_u64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svdiv_u64_z(active, __builtin_sve_svdup_n_u64(a[0]), (cvectorization_ops_sve_u64)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_dividing_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_u64(a) && !cvectorization_ops_sve_constant_u64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svdiv_u64_z(active, __builtin_sve_svdup_n_u64(a[0]), (cvectorization_ops_sve_u64)b));
+  }
+  return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_dividing_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_u64)cvectorization_ops_dividing_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_dividing_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b));
@@ -54868,7 +55790,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_m
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
   const cvectorization_ops_vector_u64 b = (cvectorization_ops_vector_u64)rawB;
   const cvectorization_ops_vector_u64 c = (cvectorization_ops_vector_u64)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_multiply_adding_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b, (cvectorization_ops_raw_vector_u64)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svmad_u64_z(active, (cvectorization_ops_sve_u64)b, (cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)c));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_multiply_adding_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b, (cvectorization_ops_raw_vector_u64)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svmad_u64_z(active, (cvectorization_ops_sve_u64)b, (cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)c));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_u64)cvectorization_ops_multiply_adding_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b, (cvectorization_ops_raw_vector_u64)c), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_multiply_adding_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b, (cvectorization_ops_raw_vector_u64)c));
@@ -54917,7 +55851,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_n
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
   const cvectorization_ops_vector_u64 b = (cvectorization_ops_vector_u64)rawB;
   const cvectorization_ops_vector_u64 c = (cvectorization_ops_vector_u64)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_negated_multiply_adding_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b, (cvectorization_ops_raw_vector_u64)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svmsb_u64_z(active, (cvectorization_ops_sve_u64)b, (cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)c));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_negated_multiply_adding_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b, (cvectorization_ops_raw_vector_u64)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svmsb_u64_z(active, (cvectorization_ops_sve_u64)b, (cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)c));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_u64)cvectorization_ops_negated_multiply_adding_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b, (cvectorization_ops_raw_vector_u64)c), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_negated_multiply_adding_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b, (cvectorization_ops_raw_vector_u64)c));
@@ -54936,7 +55882,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_n
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
   const cvectorization_ops_vector_u64 b = (cvectorization_ops_vector_u64)rawB;
   const cvectorization_ops_vector_u64 c = (cvectorization_ops_vector_u64)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_negated_multiply_subtracting_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b, (cvectorization_ops_raw_vector_u64)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_reinterpret_u64_s64(__builtin_sve_svneg_s64_z(active, __builtin_sve_reinterpret_s64_u64(__builtin_sve_svmad_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)b, (cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)c)))));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_negated_multiply_subtracting_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b, (cvectorization_ops_raw_vector_u64)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_reinterpret_u64_s64(__builtin_sve_svneg_s64_z(active, __builtin_sve_reinterpret_s64_u64(__builtin_sve_svmad_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)b, (cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)c)))));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_u64)cvectorization_ops_negated_multiply_subtracting_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b, (cvectorization_ops_raw_vector_u64)c), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_negated_multiply_subtracting_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b, (cvectorization_ops_raw_vector_u64)c));
@@ -54993,7 +55951,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_s
   const cvectorization_ops_mask_u64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u64, cvectorization_ops_read_mask_u64, rawMask);
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
   const cvectorization_ops_vector_u64 b = (cvectorization_ops_vector_u64)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63))) || (cvectorization_ops_sve_constant_u64(a) && cvectorization_ops_sve_constant_u64(b))) {
+    return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_left_by_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svlsl_u64_z(active, (cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63))) || (cvectorization_ops_sve_constant_u64(a) && cvectorization_ops_sve_constant_u64(b))) {
+    return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_left_by_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svlsl_u64_z(active, (cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_left_by_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_left_by_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b));
@@ -55021,7 +55991,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_s
   const cvectorization_ops_mask_u64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u64, cvectorization_ops_read_mask_u64, rawMask);
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
   const cvectorization_ops_vector_u64 b = (cvectorization_ops_vector_u64)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63))) || (cvectorization_ops_sve_constant_u64(a) && cvectorization_ops_sve_constant_u64(b))) {
+    return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_by_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svlsr_u64_z(active, (cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63))) || (cvectorization_ops_sve_constant_u64(a) && cvectorization_ops_sve_constant_u64(b))) {
+    return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_by_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svlsr_u64_z(active, (cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_by_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_by_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b));
@@ -55048,7 +56030,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_s
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_leading_zero_bit_count_where_u64(cvectorization_ops_raw_mask_u64 rawMask, cvectorization_ops_raw_vector_u64 rawA) {
   const cvectorization_ops_mask_u64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u64, cvectorization_ops_read_mask_u64, rawMask);
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_leading_zero_bit_count_u64((cvectorization_ops_raw_vector_u64)a));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svclz_u64_z(active, (cvectorization_ops_sve_u64)a));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_leading_zero_bit_count_u64((cvectorization_ops_raw_vector_u64)a));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svclz_u64_z(active, (cvectorization_ops_sve_u64)a));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_u64)cvectorization_ops_leading_zero_bit_count_u64((cvectorization_ops_raw_vector_u64)a), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_leading_zero_bit_count_u64((cvectorization_ops_raw_vector_u64)a));
@@ -55170,6 +56164,16 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_r
   const cvectorization_ops_mask_u64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u64, cvectorization_ops_read_mask_u64, rawMask);
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svdup_n_u64_z(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_repeating_u64(value));
+  }
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svdup_n_u64_z(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_repeating_u64(value));
+  }
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svdup_n_u64_z(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), value));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_u64)cvectorization_ops_repeating_u64(value), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
@@ -55181,6 +56185,16 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_r
   const cvectorization_ops_mask_u64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u64, cvectorization_ops_read_mask_u64, rawMask);
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svdup_n_u64_m((cvectorization_ops_sve_splat_u64(otherwise) ? __builtin_sve_svdup_n_u64(otherwise[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)otherwise), __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_repeating_u64(value), (cvectorization_ops_raw_vector_u64)otherwise);
+  }
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svdup_n_u64_m((cvectorization_ops_sve_splat_u64(otherwise) ? __builtin_sve_svdup_n_u64(otherwise[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)otherwise), __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_repeating_u64(value), (cvectorization_ops_raw_vector_u64)otherwise);
+  }
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svdup_n_u64_m((cvectorization_ops_sve_splat_u64(otherwise) ? __builtin_sve_svdup_n_u64(otherwise[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)otherwise), __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), value));
 #else
   return cvectorization_ops_selecting_u64(rawMask, (cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)cvectorization_ops_repeating_u64(value), (cvectorization_ops_raw_vector_u64)otherwise);
 #endif
@@ -55188,7 +56202,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_r
 CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_sum_where_u64(cvectorization_ops_raw_mask_u64 rawMask, cvectorization_ops_raw_vector_u64 rawA) {
   const cvectorization_ops_mask_u64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u64, cvectorization_ops_read_mask_u64, rawMask);
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_u64((cvectorization_ops_vector_u64)mask)) {
+    return cvectorization_ops_sum_u64(cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)a));
+  }
+  return (uint64_t)__builtin_sve_svaddv_u64(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_u64((cvectorization_ops_vector_u64)mask)) {
+    return cvectorization_ops_sum_u64(cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)a));
+  }
+  return (uint64_t)__builtin_sve_svaddv_u64(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a));
+#else
   return cvectorization_ops_sum_u64(cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)a));
+#endif
 }
 CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_smallest_where_u64(cvectorization_ops_raw_mask_u64 rawMask, cvectorization_ops_raw_vector_u64 rawA) {
   const cvectorization_ops_mask_u64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u64, cvectorization_ops_read_mask_u64, rawMask);
@@ -63396,12 +64422,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ze
   if (cvectorization_ops_sve_splat_i8(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
     return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svsel_s8(__builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0), __builtin_sve_svdup_n_s8(0), __builtin_sve_svdup_n_s8(a[0])));
   }
-  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(~(cvectorization_ops_vector_u8)mask & (cvectorization_ops_vector_u8)a));
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(~(cvectorization_ops_vector_u8)mask & (cvectorization_ops_vector_u8)a));
+  }
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svsel_s8(__builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0), __builtin_sve_svdup_n_s8(0), (cvectorization_ops_sve_i8)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   if (cvectorization_ops_sve_splat_i8(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
     return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svsel_s8(__builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0), __builtin_sve_svdup_n_s8(0), __builtin_sve_svdup_n_s8(a[0])));
   }
-  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(~(cvectorization_ops_vector_u8)mask & (cvectorization_ops_vector_u8)a));
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(~(cvectorization_ops_vector_u8)mask & (cvectorization_ops_vector_u8)a));
+  }
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svsel_s8(__builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0), __builtin_sve_svdup_n_s8(0), (cvectorization_ops_sve_i8)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}, (cvectorization_ops_x86_i8)a));
 #else
@@ -63412,7 +64444,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_bi
   const cvectorization_ops_mask_i8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i8, cvectorization_ops_read_mask_i8, rawMask);
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
   const cvectorization_ops_vector_i8 b = (cvectorization_ops_vector_i8)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i8(a) && !cvectorization_ops_sve_constant_i8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svand_s8_z(active, __builtin_sve_svdup_n_s8(a[0]), (cvectorization_ops_sve_i8)b));
+  }
+  if (cvectorization_ops_sve_splat_i8(b) && !cvectorization_ops_sve_constant_i8(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svand_s8_z(active, (cvectorization_ops_sve_i8)a, __builtin_sve_svdup_n_s8(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)((cvectorization_ops_vector_u8)(a & b) & (cvectorization_ops_vector_u8)mask));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i8(a) && !cvectorization_ops_sve_constant_i8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svand_s8_z(active, __builtin_sve_svdup_n_s8(a[0]), (cvectorization_ops_sve_i8)b));
+  }
+  if (cvectorization_ops_sve_splat_i8(b) && !cvectorization_ops_sve_constant_i8(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svand_s8_z(active, (cvectorization_ops_sve_i8)a, __builtin_sve_svdup_n_s8(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)((cvectorization_ops_vector_u8)(a & b) & (cvectorization_ops_vector_u8)mask));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8)((cvectorization_ops_x86_i8)a & (cvectorization_ops_x86_i8)b), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)((cvectorization_ops_vector_u8)(a & b) & (cvectorization_ops_vector_u8)mask));
@@ -63422,7 +64474,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_bi
   const cvectorization_ops_mask_i8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i8, cvectorization_ops_read_mask_i8, rawMask);
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
   const cvectorization_ops_vector_i8 b = (cvectorization_ops_vector_i8)rawB;
-#if CVECTORIZATION_OPS_NEON
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i8(a) && !cvectorization_ops_sve_constant_i8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svorr_s8_z(active, __builtin_sve_svdup_n_s8(a[0]), (cvectorization_ops_sve_i8)b));
+  }
+  if (cvectorization_ops_sve_splat_i8(b) && !cvectorization_ops_sve_constant_i8(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svorr_s8_z(active, (cvectorization_ops_sve_i8)a, __builtin_sve_svdup_n_s8(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)((cvectorization_ops_vector_u8)mask & (cvectorization_ops_vector_u8)(a | b)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i8(a) && !cvectorization_ops_sve_constant_i8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svorr_s8_z(active, __builtin_sve_svdup_n_s8(a[0]), (cvectorization_ops_sve_i8)b));
+  }
+  if (cvectorization_ops_sve_splat_i8(b) && !cvectorization_ops_sve_constant_i8(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svorr_s8_z(active, (cvectorization_ops_sve_i8)a, __builtin_sve_svdup_n_s8(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)((cvectorization_ops_vector_u8)mask & (cvectorization_ops_vector_u8)(a | b)));
+#elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)((cvectorization_ops_vector_u8)(a | b) & (cvectorization_ops_vector_u8)mask));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8)((cvectorization_ops_x86_i8)a | (cvectorization_ops_x86_i8)b), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
@@ -63434,7 +64506,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_bi
   const cvectorization_ops_mask_i8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i8, cvectorization_ops_read_mask_i8, rawMask);
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
   const cvectorization_ops_vector_i8 b = (cvectorization_ops_vector_i8)rawB;
-#if CVECTORIZATION_OPS_NEON
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i8(a) && !cvectorization_ops_sve_constant_i8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_sveor_s8_z(active, __builtin_sve_svdup_n_s8(a[0]), (cvectorization_ops_sve_i8)b));
+  }
+  if (cvectorization_ops_sve_splat_i8(b) && !cvectorization_ops_sve_constant_i8(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_sveor_s8_z(active, (cvectorization_ops_sve_i8)a, __builtin_sve_svdup_n_s8(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)((cvectorization_ops_vector_u8)mask & (cvectorization_ops_vector_u8)(a ^ b)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i8(a) && !cvectorization_ops_sve_constant_i8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_sveor_s8_z(active, __builtin_sve_svdup_n_s8(a[0]), (cvectorization_ops_sve_i8)b));
+  }
+  if (cvectorization_ops_sve_splat_i8(b) && !cvectorization_ops_sve_constant_i8(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_sveor_s8_z(active, (cvectorization_ops_sve_i8)a, __builtin_sve_svdup_n_s8(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)((cvectorization_ops_vector_u8)mask & (cvectorization_ops_vector_u8)(a ^ b)));
+#elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)((cvectorization_ops_vector_u8)(a ^ b) & (cvectorization_ops_vector_u8)mask));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8)((cvectorization_ops_x86_i8)a ^ (cvectorization_ops_x86_i8)b), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
@@ -70788,7 +71880,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ma
   const cvectorization_ops_mask_i8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i8, cvectorization_ops_read_mask_i8, rawMask);
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
   const cvectorization_ops_vector_i8 b = (cvectorization_ops_vector_i8)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i8(a) && !cvectorization_ops_sve_constant_i8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svmax_s8_z(active, __builtin_sve_svdup_n_s8(a[0]), (cvectorization_ops_sve_i8)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_maximum_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i8(a) && !cvectorization_ops_sve_constant_i8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svmax_s8_z(active, __builtin_sve_svdup_n_s8(a[0]), (cvectorization_ops_sve_i8)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_maximum_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_i8)cvectorization_ops_maximum_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_maximum_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b));
@@ -70805,7 +71909,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ad
   const cvectorization_ops_mask_i8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i8, cvectorization_ops_read_mask_i8, rawMask);
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
   const cvectorization_ops_vector_i8 b = (cvectorization_ops_vector_i8)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i8(a) && !cvectorization_ops_sve_constant_i8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svadd_s8_z(active, __builtin_sve_svdup_n_s8(a[0]), (cvectorization_ops_sve_i8)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_adding_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i8(a) && !cvectorization_ops_sve_constant_i8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svadd_s8_z(active, __builtin_sve_svdup_n_s8(a[0]), (cvectorization_ops_sve_i8)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_adding_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_i8)cvectorization_ops_adding_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_adding_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b));
@@ -70822,7 +71938,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_su
   const cvectorization_ops_mask_i8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i8, cvectorization_ops_read_mask_i8, rawMask);
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
   const cvectorization_ops_vector_i8 b = (cvectorization_ops_vector_i8)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i8(a) && !cvectorization_ops_sve_constant_i8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svsub_s8_z(active, __builtin_sve_svdup_n_s8(a[0]), (cvectorization_ops_sve_i8)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_subtracting_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i8(a) && !cvectorization_ops_sve_constant_i8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svsub_s8_z(active, __builtin_sve_svdup_n_s8(a[0]), (cvectorization_ops_sve_i8)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_subtracting_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_i8)cvectorization_ops_subtracting_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_subtracting_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b));
@@ -70839,7 +71967,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_mu
   const cvectorization_ops_mask_i8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i8, cvectorization_ops_read_mask_i8, rawMask);
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
   const cvectorization_ops_vector_i8 b = (cvectorization_ops_vector_i8)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i8(a) && !cvectorization_ops_sve_constant_i8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svmul_s8_z(active, __builtin_sve_svdup_n_s8(a[0]), (cvectorization_ops_sve_i8)b));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7))) || cvectorization_ops_sve_constant_i8(a) || cvectorization_ops_sve_constant_i8(b)) {
+    return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_multiplying_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svmul_s8_z(active, (cvectorization_ops_sve_i8)a, (cvectorization_ops_sve_i8)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i8(a) && !cvectorization_ops_sve_constant_i8(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svmul_s8_z(active, __builtin_sve_svdup_n_s8(a[0]), (cvectorization_ops_sve_i8)b));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7))) || cvectorization_ops_sve_constant_i8(a) || cvectorization_ops_sve_constant_i8(b)) {
+    return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_multiplying_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svmul_s8_z(active, (cvectorization_ops_sve_i8)a, (cvectorization_ops_sve_i8)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_i8)cvectorization_ops_multiplying_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_multiplying_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b));
@@ -70869,6 +72017,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_di
   const cvectorization_ops_vector_i8 b = (cvectorization_ops_vector_i8)rawB;
 #if CVECTORIZATION_OPS_NEON == 2
   return cvectorization_ops_selecting_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_dividing_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b), (cvectorization_ops_raw_vector_i8)otherwise);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_i8((cvectorization_ops_vector_i8)mask)) {
+    return cvectorization_ops_selecting_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_dividing_i8((cvectorization_ops_raw_vector_i8)a, cvectorization_ops_selecting_i8(rawMask, (cvectorization_ops_raw_vector_i8)b, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_repeating_i8(1))), (cvectorization_ops_raw_vector_i8)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svsel_s8(active, (cvectorization_ops_sve_i8)(cvectorization_ops_vector_i8)cvectorization_ops_dividing_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b), (cvectorization_ops_sve_splat_i8(otherwise) ? __builtin_sve_svdup_n_s8(otherwise[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)otherwise)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_i8((cvectorization_ops_vector_i8)mask)) {
+    return cvectorization_ops_selecting_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_dividing_i8((cvectorization_ops_raw_vector_i8)a, cvectorization_ops_selecting_i8(rawMask, (cvectorization_ops_raw_vector_i8)b, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_repeating_i8(1))), (cvectorization_ops_raw_vector_i8)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svsel_s8(active, (cvectorization_ops_sve_i8)(cvectorization_ops_vector_i8)cvectorization_ops_dividing_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b), (cvectorization_ops_sve_splat_i8(otherwise) ? __builtin_sve_svdup_n_s8(otherwise[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)otherwise)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return cvectorization_ops_selecting_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_dividing_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b), (cvectorization_ops_raw_vector_i8)otherwise);
 #else
@@ -70882,6 +72042,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_re
   const cvectorization_ops_vector_i8 b = (cvectorization_ops_vector_i8)rawB;
 #if CVECTORIZATION_OPS_NEON == 2
   return cvectorization_ops_selecting_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_remainder_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b), (cvectorization_ops_raw_vector_i8)otherwise);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_i8((cvectorization_ops_vector_i8)mask)) {
+    return cvectorization_ops_selecting_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_remainder_i8((cvectorization_ops_raw_vector_i8)a, cvectorization_ops_selecting_i8(rawMask, (cvectorization_ops_raw_vector_i8)b, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_repeating_i8(1))), (cvectorization_ops_raw_vector_i8)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svsel_s8(active, (cvectorization_ops_sve_i8)(cvectorization_ops_vector_i8)cvectorization_ops_remainder_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b), (cvectorization_ops_sve_splat_i8(otherwise) ? __builtin_sve_svdup_n_s8(otherwise[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)otherwise)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_i8((cvectorization_ops_vector_i8)mask)) {
+    return cvectorization_ops_selecting_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_remainder_i8((cvectorization_ops_raw_vector_i8)a, cvectorization_ops_selecting_i8(rawMask, (cvectorization_ops_raw_vector_i8)b, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_repeating_i8(1))), (cvectorization_ops_raw_vector_i8)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svsel_s8(active, (cvectorization_ops_sve_i8)(cvectorization_ops_vector_i8)cvectorization_ops_remainder_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b), (cvectorization_ops_sve_splat_i8(otherwise) ? __builtin_sve_svdup_n_s8(otherwise[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)otherwise)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return cvectorization_ops_selecting_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_remainder_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b), (cvectorization_ops_raw_vector_i8)otherwise);
 #else
@@ -70942,7 +72114,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_mu
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
   const cvectorization_ops_vector_i8 b = (cvectorization_ops_vector_i8)rawB;
   const cvectorization_ops_vector_i8 c = (cvectorization_ops_vector_i8)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_multiply_adding_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b, (cvectorization_ops_raw_vector_i8)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svmad_s8_z(active, (cvectorization_ops_sve_i8)b, (cvectorization_ops_sve_i8)a, (cvectorization_ops_sve_i8)c));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_multiply_adding_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b, (cvectorization_ops_raw_vector_i8)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svmad_s8_z(active, (cvectorization_ops_sve_i8)b, (cvectorization_ops_sve_i8)a, (cvectorization_ops_sve_i8)c));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_i8)cvectorization_ops_multiply_adding_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b, (cvectorization_ops_raw_vector_i8)c), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_multiply_adding_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b, (cvectorization_ops_raw_vector_i8)c));
@@ -70980,7 +72164,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ne
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
   const cvectorization_ops_vector_i8 b = (cvectorization_ops_vector_i8)rawB;
   const cvectorization_ops_vector_i8 c = (cvectorization_ops_vector_i8)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_negated_multiply_adding_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b, (cvectorization_ops_raw_vector_i8)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svmsb_s8_z(active, (cvectorization_ops_sve_i8)b, (cvectorization_ops_sve_i8)a, (cvectorization_ops_sve_i8)c));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_negated_multiply_adding_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b, (cvectorization_ops_raw_vector_i8)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svmsb_s8_z(active, (cvectorization_ops_sve_i8)b, (cvectorization_ops_sve_i8)a, (cvectorization_ops_sve_i8)c));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_i8)cvectorization_ops_negated_multiply_adding_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b, (cvectorization_ops_raw_vector_i8)c), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_negated_multiply_adding_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b, (cvectorization_ops_raw_vector_i8)c));
@@ -70999,7 +72195,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ne
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
   const cvectorization_ops_vector_i8 b = (cvectorization_ops_vector_i8)rawB;
   const cvectorization_ops_vector_i8 c = (cvectorization_ops_vector_i8)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_negated_multiply_subtracting_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b, (cvectorization_ops_raw_vector_i8)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svneg_s8_z(active, __builtin_sve_svmad_s8_x(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_i8)b, (cvectorization_ops_sve_i8)a, (cvectorization_ops_sve_i8)c)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_negated_multiply_subtracting_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b, (cvectorization_ops_raw_vector_i8)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svneg_s8_z(active, __builtin_sve_svmad_s8_x(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_i8)b, (cvectorization_ops_sve_i8)a, (cvectorization_ops_sve_i8)c)));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_i8)cvectorization_ops_negated_multiply_subtracting_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b, (cvectorization_ops_raw_vector_i8)c), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_negated_multiply_subtracting_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b, (cvectorization_ops_raw_vector_i8)c));
@@ -71056,7 +72264,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_sh
   const cvectorization_ops_mask_i8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i8, cvectorization_ops_read_mask_i8, rawMask);
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
   const cvectorization_ops_vector_i8 b = (cvectorization_ops_vector_i8)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7))) || (cvectorization_ops_sve_constant_i8(a) && cvectorization_ops_sve_constant_i8(b))) {
+    return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_shifted_left_by_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svlsl_s8_z(active, (cvectorization_ops_sve_i8)a, __builtin_sve_reinterpret_u8_s8((cvectorization_ops_sve_i8)b)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7))) || (cvectorization_ops_sve_constant_i8(a) && cvectorization_ops_sve_constant_i8(b))) {
+    return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_shifted_left_by_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svlsl_s8_z(active, (cvectorization_ops_sve_i8)a, __builtin_sve_reinterpret_u8_s8((cvectorization_ops_sve_i8)b)));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_i8)cvectorization_ops_shifted_left_by_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_shifted_left_by_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b));
@@ -71073,7 +72293,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_sh
   const cvectorization_ops_mask_i8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i8, cvectorization_ops_read_mask_i8, rawMask);
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
   const cvectorization_ops_vector_i8 b = (cvectorization_ops_vector_i8)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7))) || (cvectorization_ops_sve_constant_i8(a) && cvectorization_ops_sve_constant_i8(b))) {
+    return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_shifted_right_by_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svasr_s8_z(active, (cvectorization_ops_sve_i8)a, __builtin_sve_reinterpret_u8_s8((cvectorization_ops_sve_i8)b)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7))) || (cvectorization_ops_sve_constant_i8(a) && cvectorization_ops_sve_constant_i8(b))) {
+    return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_shifted_right_by_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svasr_s8_z(active, (cvectorization_ops_sve_i8)a, __builtin_sve_reinterpret_u8_s8((cvectorization_ops_sve_i8)b)));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_i8)cvectorization_ops_shifted_right_by_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_shifted_right_by_i8((cvectorization_ops_raw_vector_i8)a, (cvectorization_ops_raw_vector_i8)b));
@@ -71089,7 +72321,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_sh
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_leading_zero_bit_count_where_i8(cvectorization_ops_raw_mask_i8 rawMask, cvectorization_ops_raw_vector_i8 rawA) {
   const cvectorization_ops_mask_i8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i8, cvectorization_ops_read_mask_i8, rawMask);
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_leading_zero_bit_count_i8((cvectorization_ops_raw_vector_i8)a));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_reinterpret_s8_u8(__builtin_sve_svclz_s8_z(active, (cvectorization_ops_sve_i8)a)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_leading_zero_bit_count_i8((cvectorization_ops_raw_vector_i8)a));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_reinterpret_s8_u8(__builtin_sve_svclz_s8_z(active, (cvectorization_ops_sve_i8)a)));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_i8)cvectorization_ops_leading_zero_bit_count_i8((cvectorization_ops_raw_vector_i8)a), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_leading_zero_bit_count_i8((cvectorization_ops_raw_vector_i8)a));
@@ -71157,7 +72401,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i8 cvectorization_ops_grea
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_repeating_where_i8(cvectorization_ops_raw_mask_i8 rawMask, int8_t value) {
   const cvectorization_ops_mask_i8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i8, cvectorization_ops_read_mask_i8, rawMask);
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_repeating_i8(value));
+  }
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svdup_n_s8_z(__builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_repeating_i8(value));
+  }
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svdup_n_s8_z(__builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_selectb_512((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_i8)cvectorization_ops_repeating_i8(value), (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_repeating_i8(value));
@@ -71166,12 +72420,36 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_re
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_repeating_where_otherwise_i8(cvectorization_ops_raw_vector_i8 rawOtherwise, cvectorization_ops_raw_mask_i8 rawMask, int8_t value) {
   const cvectorization_ops_vector_i8 otherwise = (cvectorization_ops_vector_i8)rawOtherwise;
   const cvectorization_ops_mask_i8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i8, cvectorization_ops_read_mask_i8, rawMask);
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_repeating_i8(value), (cvectorization_ops_raw_vector_i8)otherwise);
+  }
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svdup_n_s8_m((cvectorization_ops_sve_i8)otherwise, __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 7)))) {
+    return cvectorization_ops_selecting_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_repeating_i8(value), (cvectorization_ops_raw_vector_i8)otherwise);
+  }
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svdup_n_s8_m((cvectorization_ops_sve_i8)otherwise, __builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0), value));
+#else
   return cvectorization_ops_selecting_i8(rawMask, (cvectorization_ops_raw_vector_i8)(cvectorization_ops_vector_i8)cvectorization_ops_repeating_i8(value), (cvectorization_ops_raw_vector_i8)otherwise);
+#endif
 }
 CVECTORIZATION_OPS_INLINE int8_t cvectorization_ops_sum_where_i8(cvectorization_ops_raw_mask_i8 rawMask, cvectorization_ops_raw_vector_i8 rawA) {
   const cvectorization_ops_mask_i8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i8, cvectorization_ops_read_mask_i8, rawMask);
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_i8((cvectorization_ops_vector_i8)mask)) {
+    return cvectorization_ops_sum_i8(cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)a));
+  }
+  return (int8_t)__builtin_sve_svaddv_s8(__builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0), (cvectorization_ops_sve_i8)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_i8((cvectorization_ops_vector_i8)mask)) {
+    return cvectorization_ops_sum_i8(cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)a));
+  }
+  return (int8_t)__builtin_sve_svaddv_s8(__builtin_sve_svcmpne_n_u8(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)rawMask, 0), (cvectorization_ops_sve_i8)a);
+#else
   return cvectorization_ops_sum_i8(cvectorization_ops_selecting_or_zero_i8(rawMask, (cvectorization_ops_raw_vector_i8)a));
+#endif
 }
 CVECTORIZATION_OPS_INLINE int8_t cvectorization_ops_smallest_where_i8(cvectorization_ops_raw_mask_i8 rawMask, cvectorization_ops_raw_vector_i8 rawA) {
   const cvectorization_ops_mask_i8 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i8, cvectorization_ops_read_mask_i8, rawMask);
@@ -79692,7 +80970,23 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_s
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_zeroing_selected_i16(cvectorization_ops_raw_mask_i16 rawMask, cvectorization_ops_raw_vector_i16 rawA) {
   const cvectorization_ops_mask_i16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i16, cvectorization_ops_read_mask_i16, rawMask);
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i16(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svsel_s16(__builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0), __builtin_sve_svdup_n_s16(0), __builtin_sve_svdup_n_s16(a[0])));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(~(cvectorization_ops_vector_u16)mask & (cvectorization_ops_vector_u16)a));
+  }
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svsel_s16(__builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0), __builtin_sve_svdup_n_s16(0), (cvectorization_ops_sve_i16)a));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i16(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svsel_s16(__builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0), __builtin_sve_svdup_n_s16(0), __builtin_sve_svdup_n_s16(a[0])));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(~(cvectorization_ops_vector_u16)mask & (cvectorization_ops_vector_u16)a));
+  }
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svsel_s16(__builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0), __builtin_sve_svdup_n_s16(0), (cvectorization_ops_sve_i16)a));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}, (cvectorization_ops_x86_i16)a));
 #else
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(~(cvectorization_ops_vector_u16)mask & (cvectorization_ops_vector_u16)a));
@@ -79702,7 +80996,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_b
   const cvectorization_ops_mask_i16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i16, cvectorization_ops_read_mask_i16, rawMask);
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
   const cvectorization_ops_vector_i16 b = (cvectorization_ops_vector_i16)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i16(a) && !cvectorization_ops_sve_constant_i16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svand_s16_z(active, __builtin_sve_svdup_n_s16(a[0]), (cvectorization_ops_sve_i16)b));
+  }
+  if (cvectorization_ops_sve_splat_i16(b) && !cvectorization_ops_sve_constant_i16(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svand_s16_z(active, (cvectorization_ops_sve_i16)a, __builtin_sve_svdup_n_s16(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)((cvectorization_ops_vector_u16)(a & b) & (cvectorization_ops_vector_u16)mask));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i16(a) && !cvectorization_ops_sve_constant_i16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svand_s16_z(active, __builtin_sve_svdup_n_s16(a[0]), (cvectorization_ops_sve_i16)b));
+  }
+  if (cvectorization_ops_sve_splat_i16(b) && !cvectorization_ops_sve_constant_i16(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svand_s16_z(active, (cvectorization_ops_sve_i16)a, __builtin_sve_svdup_n_s16(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)((cvectorization_ops_vector_u16)(a & b) & (cvectorization_ops_vector_u16)mask));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16)((cvectorization_ops_x86_i16)a & (cvectorization_ops_x86_i16)b), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)((cvectorization_ops_vector_u16)(a & b) & (cvectorization_ops_vector_u16)mask));
@@ -79712,7 +81026,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_b
   const cvectorization_ops_mask_i16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i16, cvectorization_ops_read_mask_i16, rawMask);
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
   const cvectorization_ops_vector_i16 b = (cvectorization_ops_vector_i16)rawB;
-#if CVECTORIZATION_OPS_NEON
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i16(a) && !cvectorization_ops_sve_constant_i16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svorr_s16_z(active, __builtin_sve_svdup_n_s16(a[0]), (cvectorization_ops_sve_i16)b));
+  }
+  if (cvectorization_ops_sve_splat_i16(b) && !cvectorization_ops_sve_constant_i16(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svorr_s16_z(active, (cvectorization_ops_sve_i16)a, __builtin_sve_svdup_n_s16(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)((cvectorization_ops_vector_u16)mask & (cvectorization_ops_vector_u16)(a | b)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i16(a) && !cvectorization_ops_sve_constant_i16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svorr_s16_z(active, __builtin_sve_svdup_n_s16(a[0]), (cvectorization_ops_sve_i16)b));
+  }
+  if (cvectorization_ops_sve_splat_i16(b) && !cvectorization_ops_sve_constant_i16(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svorr_s16_z(active, (cvectorization_ops_sve_i16)a, __builtin_sve_svdup_n_s16(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)((cvectorization_ops_vector_u16)mask & (cvectorization_ops_vector_u16)(a | b)));
+#elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)((cvectorization_ops_vector_u16)(a | b) & (cvectorization_ops_vector_u16)mask));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16)((cvectorization_ops_x86_i16)a | (cvectorization_ops_x86_i16)b), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
@@ -79724,7 +81058,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_b
   const cvectorization_ops_mask_i16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i16, cvectorization_ops_read_mask_i16, rawMask);
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
   const cvectorization_ops_vector_i16 b = (cvectorization_ops_vector_i16)rawB;
-#if CVECTORIZATION_OPS_NEON
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i16(a) && !cvectorization_ops_sve_constant_i16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_sveor_s16_z(active, __builtin_sve_svdup_n_s16(a[0]), (cvectorization_ops_sve_i16)b));
+  }
+  if (cvectorization_ops_sve_splat_i16(b) && !cvectorization_ops_sve_constant_i16(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_sveor_s16_z(active, (cvectorization_ops_sve_i16)a, __builtin_sve_svdup_n_s16(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)((cvectorization_ops_vector_u16)mask & (cvectorization_ops_vector_u16)(a ^ b)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i16(a) && !cvectorization_ops_sve_constant_i16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_sveor_s16_z(active, __builtin_sve_svdup_n_s16(a[0]), (cvectorization_ops_sve_i16)b));
+  }
+  if (cvectorization_ops_sve_splat_i16(b) && !cvectorization_ops_sve_constant_i16(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_sveor_s16_z(active, (cvectorization_ops_sve_i16)a, __builtin_sve_svdup_n_s16(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)((cvectorization_ops_vector_u16)mask & (cvectorization_ops_vector_u16)(a ^ b)));
+#elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)((cvectorization_ops_vector_u16)(a ^ b) & (cvectorization_ops_vector_u16)mask));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16)((cvectorization_ops_x86_i16)a ^ (cvectorization_ops_x86_i16)b), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
@@ -85330,7 +86684,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_m
   const cvectorization_ops_mask_i16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i16, cvectorization_ops_read_mask_i16, rawMask);
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
   const cvectorization_ops_vector_i16 b = (cvectorization_ops_vector_i16)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i16(a) && !cvectorization_ops_sve_constant_i16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svmax_s16_z(active, __builtin_sve_svdup_n_s16(a[0]), (cvectorization_ops_sve_i16)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_maximum_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i16(a) && !cvectorization_ops_sve_constant_i16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svmax_s16_z(active, __builtin_sve_svdup_n_s16(a[0]), (cvectorization_ops_sve_i16)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_maximum_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_i16)cvectorization_ops_maximum_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_maximum_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b));
@@ -85347,7 +86713,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_a
   const cvectorization_ops_mask_i16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i16, cvectorization_ops_read_mask_i16, rawMask);
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
   const cvectorization_ops_vector_i16 b = (cvectorization_ops_vector_i16)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i16(a) && !cvectorization_ops_sve_constant_i16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svadd_s16_z(active, __builtin_sve_svdup_n_s16(a[0]), (cvectorization_ops_sve_i16)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_adding_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i16(a) && !cvectorization_ops_sve_constant_i16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svadd_s16_z(active, __builtin_sve_svdup_n_s16(a[0]), (cvectorization_ops_sve_i16)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_adding_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_i16)cvectorization_ops_adding_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_adding_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b));
@@ -85364,7 +86742,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_s
   const cvectorization_ops_mask_i16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i16, cvectorization_ops_read_mask_i16, rawMask);
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
   const cvectorization_ops_vector_i16 b = (cvectorization_ops_vector_i16)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i16(a) && !cvectorization_ops_sve_constant_i16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svsub_s16_z(active, __builtin_sve_svdup_n_s16(a[0]), (cvectorization_ops_sve_i16)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_subtracting_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i16(a) && !cvectorization_ops_sve_constant_i16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svsub_s16_z(active, __builtin_sve_svdup_n_s16(a[0]), (cvectorization_ops_sve_i16)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_subtracting_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_i16)cvectorization_ops_subtracting_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_subtracting_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b));
@@ -85381,7 +86771,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_m
   const cvectorization_ops_mask_i16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i16, cvectorization_ops_read_mask_i16, rawMask);
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
   const cvectorization_ops_vector_i16 b = (cvectorization_ops_vector_i16)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i16(a) && !cvectorization_ops_sve_constant_i16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svmul_s16_z(active, __builtin_sve_svdup_n_s16(a[0]), (cvectorization_ops_sve_i16)b));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15))) || cvectorization_ops_sve_constant_i16(a) || cvectorization_ops_sve_constant_i16(b)) {
+    return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_multiplying_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svmul_s16_z(active, (cvectorization_ops_sve_i16)a, (cvectorization_ops_sve_i16)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i16(a) && !cvectorization_ops_sve_constant_i16(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svmul_s16_z(active, __builtin_sve_svdup_n_s16(a[0]), (cvectorization_ops_sve_i16)b));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15))) || cvectorization_ops_sve_constant_i16(a) || cvectorization_ops_sve_constant_i16(b)) {
+    return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_multiplying_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svmul_s16_z(active, (cvectorization_ops_sve_i16)a, (cvectorization_ops_sve_i16)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_i16)cvectorization_ops_multiplying_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_multiplying_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b));
@@ -85411,6 +86821,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_d
   const cvectorization_ops_vector_i16 b = (cvectorization_ops_vector_i16)rawB;
 #if CVECTORIZATION_OPS_NEON == 2
   return cvectorization_ops_selecting_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_dividing_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b), (cvectorization_ops_raw_vector_i16)otherwise);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_i16((cvectorization_ops_vector_i16)mask)) {
+    return cvectorization_ops_selecting_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_dividing_i16((cvectorization_ops_raw_vector_i16)a, cvectorization_ops_selecting_i16(rawMask, (cvectorization_ops_raw_vector_i16)b, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_repeating_i16(1))), (cvectorization_ops_raw_vector_i16)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svsel_s16(active, (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_dividing_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b), (cvectorization_ops_sve_splat_i16(otherwise) ? __builtin_sve_svdup_n_s16(otherwise[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)otherwise)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_i16((cvectorization_ops_vector_i16)mask)) {
+    return cvectorization_ops_selecting_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_dividing_i16((cvectorization_ops_raw_vector_i16)a, cvectorization_ops_selecting_i16(rawMask, (cvectorization_ops_raw_vector_i16)b, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_repeating_i16(1))), (cvectorization_ops_raw_vector_i16)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svsel_s16(active, (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_dividing_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b), (cvectorization_ops_sve_splat_i16(otherwise) ? __builtin_sve_svdup_n_s16(otherwise[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)otherwise)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return cvectorization_ops_selecting_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_dividing_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b), (cvectorization_ops_raw_vector_i16)otherwise);
 #else
@@ -85424,6 +86846,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_r
   const cvectorization_ops_vector_i16 b = (cvectorization_ops_vector_i16)rawB;
 #if CVECTORIZATION_OPS_NEON == 2
   return cvectorization_ops_selecting_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_remainder_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b), (cvectorization_ops_raw_vector_i16)otherwise);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_i16((cvectorization_ops_vector_i16)mask)) {
+    return cvectorization_ops_selecting_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_remainder_i16((cvectorization_ops_raw_vector_i16)a, cvectorization_ops_selecting_i16(rawMask, (cvectorization_ops_raw_vector_i16)b, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_repeating_i16(1))), (cvectorization_ops_raw_vector_i16)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svsel_s16(active, (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_remainder_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b), (cvectorization_ops_sve_splat_i16(otherwise) ? __builtin_sve_svdup_n_s16(otherwise[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)otherwise)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_i16((cvectorization_ops_vector_i16)mask)) {
+    return cvectorization_ops_selecting_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_remainder_i16((cvectorization_ops_raw_vector_i16)a, cvectorization_ops_selecting_i16(rawMask, (cvectorization_ops_raw_vector_i16)b, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_repeating_i16(1))), (cvectorization_ops_raw_vector_i16)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svsel_s16(active, (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_remainder_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b), (cvectorization_ops_sve_splat_i16(otherwise) ? __builtin_sve_svdup_n_s16(otherwise[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)otherwise)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return cvectorization_ops_selecting_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_remainder_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b), (cvectorization_ops_raw_vector_i16)otherwise);
 #else
@@ -85494,7 +86928,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_m
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
   const cvectorization_ops_vector_i16 b = (cvectorization_ops_vector_i16)rawB;
   const cvectorization_ops_vector_i16 c = (cvectorization_ops_vector_i16)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_multiply_adding_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b, (cvectorization_ops_raw_vector_i16)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svmad_s16_z(active, (cvectorization_ops_sve_i16)b, (cvectorization_ops_sve_i16)a, (cvectorization_ops_sve_i16)c));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_multiply_adding_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b, (cvectorization_ops_raw_vector_i16)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svmad_s16_z(active, (cvectorization_ops_sve_i16)b, (cvectorization_ops_sve_i16)a, (cvectorization_ops_sve_i16)c));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_i16)cvectorization_ops_multiply_adding_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b, (cvectorization_ops_raw_vector_i16)c), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_multiply_adding_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b, (cvectorization_ops_raw_vector_i16)c));
@@ -85532,7 +86978,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_n
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
   const cvectorization_ops_vector_i16 b = (cvectorization_ops_vector_i16)rawB;
   const cvectorization_ops_vector_i16 c = (cvectorization_ops_vector_i16)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_negated_multiply_adding_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b, (cvectorization_ops_raw_vector_i16)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svmsb_s16_z(active, (cvectorization_ops_sve_i16)b, (cvectorization_ops_sve_i16)a, (cvectorization_ops_sve_i16)c));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_negated_multiply_adding_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b, (cvectorization_ops_raw_vector_i16)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svmsb_s16_z(active, (cvectorization_ops_sve_i16)b, (cvectorization_ops_sve_i16)a, (cvectorization_ops_sve_i16)c));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_i16)cvectorization_ops_negated_multiply_adding_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b, (cvectorization_ops_raw_vector_i16)c), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_negated_multiply_adding_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b, (cvectorization_ops_raw_vector_i16)c));
@@ -85551,7 +87009,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_n
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
   const cvectorization_ops_vector_i16 b = (cvectorization_ops_vector_i16)rawB;
   const cvectorization_ops_vector_i16 c = (cvectorization_ops_vector_i16)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_negated_multiply_subtracting_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b, (cvectorization_ops_raw_vector_i16)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svneg_s16_z(active, __builtin_sve_svmad_s16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_i16)b, (cvectorization_ops_sve_i16)a, (cvectorization_ops_sve_i16)c)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_negated_multiply_subtracting_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b, (cvectorization_ops_raw_vector_i16)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svneg_s16_z(active, __builtin_sve_svmad_s16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_i16)b, (cvectorization_ops_sve_i16)a, (cvectorization_ops_sve_i16)c)));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_i16)cvectorization_ops_negated_multiply_subtracting_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b, (cvectorization_ops_raw_vector_i16)c), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_negated_multiply_subtracting_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b, (cvectorization_ops_raw_vector_i16)c));
@@ -85620,7 +87090,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_s
   const cvectorization_ops_mask_i16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i16, cvectorization_ops_read_mask_i16, rawMask);
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
   const cvectorization_ops_vector_i16 b = (cvectorization_ops_vector_i16)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15))) || (cvectorization_ops_sve_constant_i16(a) && cvectorization_ops_sve_constant_i16(b))) {
+    return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_left_by_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svlsl_s16_z(active, (cvectorization_ops_sve_i16)a, __builtin_sve_reinterpret_u16_s16((cvectorization_ops_sve_i16)b)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15))) || (cvectorization_ops_sve_constant_i16(a) && cvectorization_ops_sve_constant_i16(b))) {
+    return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_left_by_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svlsl_s16_z(active, (cvectorization_ops_sve_i16)a, __builtin_sve_reinterpret_u16_s16((cvectorization_ops_sve_i16)b)));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_left_by_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_left_by_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b));
@@ -85637,7 +87119,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_s
   const cvectorization_ops_mask_i16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i16, cvectorization_ops_read_mask_i16, rawMask);
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
   const cvectorization_ops_vector_i16 b = (cvectorization_ops_vector_i16)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15))) || (cvectorization_ops_sve_constant_i16(a) && cvectorization_ops_sve_constant_i16(b))) {
+    return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_by_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svasr_s16_z(active, (cvectorization_ops_sve_i16)a, __builtin_sve_reinterpret_u16_s16((cvectorization_ops_sve_i16)b)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15))) || (cvectorization_ops_sve_constant_i16(a) && cvectorization_ops_sve_constant_i16(b))) {
+    return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_by_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svasr_s16_z(active, (cvectorization_ops_sve_i16)a, __builtin_sve_reinterpret_u16_s16((cvectorization_ops_sve_i16)b)));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_by_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_by_i16((cvectorization_ops_raw_vector_i16)a, (cvectorization_ops_raw_vector_i16)b));
@@ -85653,7 +87147,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_s
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_leading_zero_bit_count_where_i16(cvectorization_ops_raw_mask_i16 rawMask, cvectorization_ops_raw_vector_i16 rawA) {
   const cvectorization_ops_mask_i16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i16, cvectorization_ops_read_mask_i16, rawMask);
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_leading_zero_bit_count_i16((cvectorization_ops_raw_vector_i16)a));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_reinterpret_s16_u16(__builtin_sve_svclz_s16_z(active, (cvectorization_ops_sve_i16)a)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_leading_zero_bit_count_i16((cvectorization_ops_raw_vector_i16)a));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_reinterpret_s16_u16(__builtin_sve_svclz_s16_z(active, (cvectorization_ops_sve_i16)a)));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_i16)cvectorization_ops_leading_zero_bit_count_i16((cvectorization_ops_raw_vector_i16)a), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_leading_zero_bit_count_i16((cvectorization_ops_raw_vector_i16)a));
@@ -85721,7 +87227,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i16 cvectorization_ops_gre
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_repeating_where_i16(cvectorization_ops_raw_mask_i16 rawMask, int16_t value) {
   const cvectorization_ops_mask_i16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i16, cvectorization_ops_read_mask_i16, rawMask);
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_repeating_i16(value));
+  }
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svdup_n_s16_z(__builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_repeating_i16(value));
+  }
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svdup_n_s16_z(__builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_ia32_selectw_512((unsigned int)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_i16)cvectorization_ops_repeating_i16(value), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_repeating_i16(value));
@@ -85730,12 +87246,36 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_r
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_repeating_where_otherwise_i16(cvectorization_ops_raw_vector_i16 rawOtherwise, cvectorization_ops_raw_mask_i16 rawMask, int16_t value) {
   const cvectorization_ops_vector_i16 otherwise = (cvectorization_ops_vector_i16)rawOtherwise;
   const cvectorization_ops_mask_i16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i16, cvectorization_ops_read_mask_i16, rawMask);
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_repeating_i16(value), (cvectorization_ops_raw_vector_i16)otherwise);
+  }
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svdup_n_s16_m((cvectorization_ops_sve_i16)otherwise, __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 15)))) {
+    return cvectorization_ops_selecting_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_repeating_i16(value), (cvectorization_ops_raw_vector_i16)otherwise);
+  }
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svdup_n_s16_m((cvectorization_ops_sve_i16)otherwise, __builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0), value));
+#else
   return cvectorization_ops_selecting_i16(rawMask, (cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)cvectorization_ops_repeating_i16(value), (cvectorization_ops_raw_vector_i16)otherwise);
+#endif
 }
 CVECTORIZATION_OPS_INLINE int16_t cvectorization_ops_sum_where_i16(cvectorization_ops_raw_mask_i16 rawMask, cvectorization_ops_raw_vector_i16 rawA) {
   const cvectorization_ops_mask_i16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i16, cvectorization_ops_read_mask_i16, rawMask);
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_i16((cvectorization_ops_vector_i16)mask)) {
+    return cvectorization_ops_sum_i16(cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)a));
+  }
+  return (int16_t)__builtin_sve_svaddv_s16(__builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0), (cvectorization_ops_sve_i16)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_i16((cvectorization_ops_vector_i16)mask)) {
+    return cvectorization_ops_sum_i16(cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)a));
+  }
+  return (int16_t)__builtin_sve_svaddv_s16(__builtin_sve_svcmpne_n_u16(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)rawMask, 0), (cvectorization_ops_sve_i16)a);
+#else
   return cvectorization_ops_sum_i16(cvectorization_ops_selecting_or_zero_i16(rawMask, (cvectorization_ops_raw_vector_i16)a));
+#endif
 }
 CVECTORIZATION_OPS_INLINE int16_t cvectorization_ops_smallest_where_i16(cvectorization_ops_raw_mask_i16 rawMask, cvectorization_ops_raw_vector_i16 rawA) {
   const cvectorization_ops_mask_i16 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i16, cvectorization_ops_read_mask_i16, rawMask);
@@ -93308,7 +94848,23 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_s
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_zeroing_selected_i32(cvectorization_ops_raw_mask_i32 rawMask, cvectorization_ops_raw_vector_i32 rawA) {
   const cvectorization_ops_mask_i32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i32, cvectorization_ops_read_mask_i32, rawMask);
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i32(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svsel_s32(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), __builtin_sve_svdup_n_s32(0), __builtin_sve_svdup_n_s32(a[0])));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(~(cvectorization_ops_vector_u32)mask & (cvectorization_ops_vector_u32)a));
+  }
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svsel_s32(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), __builtin_sve_svdup_n_s32(0), (cvectorization_ops_sve_i32)a));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i32(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svsel_s32(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), __builtin_sve_svdup_n_s32(0), __builtin_sve_svdup_n_s32(a[0])));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(~(cvectorization_ops_vector_u32)mask & (cvectorization_ops_vector_u32)a));
+  }
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svsel_s32(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), __builtin_sve_svdup_n_s32(0), (cvectorization_ops_sve_i32)a));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}, (cvectorization_ops_x86_i32)a));
 #else
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(~(cvectorization_ops_vector_u32)mask & (cvectorization_ops_vector_u32)a));
@@ -93318,7 +94874,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_b
   const cvectorization_ops_mask_i32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i32, cvectorization_ops_read_mask_i32, rawMask);
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
   const cvectorization_ops_vector_i32 b = (cvectorization_ops_vector_i32)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i32(a) && !cvectorization_ops_sve_constant_i32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svand_s32_z(active, __builtin_sve_svdup_n_s32(a[0]), (cvectorization_ops_sve_i32)b));
+  }
+  if (cvectorization_ops_sve_splat_i32(b) && !cvectorization_ops_sve_constant_i32(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svand_s32_z(active, (cvectorization_ops_sve_i32)a, __builtin_sve_svdup_n_s32(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)((cvectorization_ops_vector_u32)(a & b) & (cvectorization_ops_vector_u32)mask));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i32(a) && !cvectorization_ops_sve_constant_i32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svand_s32_z(active, __builtin_sve_svdup_n_s32(a[0]), (cvectorization_ops_sve_i32)b));
+  }
+  if (cvectorization_ops_sve_splat_i32(b) && !cvectorization_ops_sve_constant_i32(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svand_s32_z(active, (cvectorization_ops_sve_i32)a, __builtin_sve_svdup_n_s32(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)((cvectorization_ops_vector_u32)(a & b) & (cvectorization_ops_vector_u32)mask));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32)((cvectorization_ops_x86_i32)a & (cvectorization_ops_x86_i32)b), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)((cvectorization_ops_vector_u32)(a & b) & (cvectorization_ops_vector_u32)mask));
@@ -93328,7 +94904,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_b
   const cvectorization_ops_mask_i32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i32, cvectorization_ops_read_mask_i32, rawMask);
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
   const cvectorization_ops_vector_i32 b = (cvectorization_ops_vector_i32)rawB;
-#if CVECTORIZATION_OPS_NEON
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i32(a) && !cvectorization_ops_sve_constant_i32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svorr_s32_z(active, __builtin_sve_svdup_n_s32(a[0]), (cvectorization_ops_sve_i32)b));
+  }
+  if (cvectorization_ops_sve_splat_i32(b) && !cvectorization_ops_sve_constant_i32(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svorr_s32_z(active, (cvectorization_ops_sve_i32)a, __builtin_sve_svdup_n_s32(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)((cvectorization_ops_vector_u32)mask & (cvectorization_ops_vector_u32)(a | b)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i32(a) && !cvectorization_ops_sve_constant_i32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svorr_s32_z(active, __builtin_sve_svdup_n_s32(a[0]), (cvectorization_ops_sve_i32)b));
+  }
+  if (cvectorization_ops_sve_splat_i32(b) && !cvectorization_ops_sve_constant_i32(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svorr_s32_z(active, (cvectorization_ops_sve_i32)a, __builtin_sve_svdup_n_s32(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)((cvectorization_ops_vector_u32)mask & (cvectorization_ops_vector_u32)(a | b)));
+#elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)((cvectorization_ops_vector_u32)(a | b) & (cvectorization_ops_vector_u32)mask));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32)((cvectorization_ops_x86_i32)a | (cvectorization_ops_x86_i32)b), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
@@ -93340,7 +94936,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_b
   const cvectorization_ops_mask_i32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i32, cvectorization_ops_read_mask_i32, rawMask);
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
   const cvectorization_ops_vector_i32 b = (cvectorization_ops_vector_i32)rawB;
-#if CVECTORIZATION_OPS_NEON
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i32(a) && !cvectorization_ops_sve_constant_i32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_sveor_s32_z(active, __builtin_sve_svdup_n_s32(a[0]), (cvectorization_ops_sve_i32)b));
+  }
+  if (cvectorization_ops_sve_splat_i32(b) && !cvectorization_ops_sve_constant_i32(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_sveor_s32_z(active, (cvectorization_ops_sve_i32)a, __builtin_sve_svdup_n_s32(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)((cvectorization_ops_vector_u32)mask & (cvectorization_ops_vector_u32)(a ^ b)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i32(a) && !cvectorization_ops_sve_constant_i32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_sveor_s32_z(active, __builtin_sve_svdup_n_s32(a[0]), (cvectorization_ops_sve_i32)b));
+  }
+  if (cvectorization_ops_sve_splat_i32(b) && !cvectorization_ops_sve_constant_i32(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_sveor_s32_z(active, (cvectorization_ops_sve_i32)a, __builtin_sve_svdup_n_s32(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)((cvectorization_ops_vector_u32)mask & (cvectorization_ops_vector_u32)(a ^ b)));
+#elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)((cvectorization_ops_vector_u32)(a ^ b) & (cvectorization_ops_vector_u32)mask));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32)((cvectorization_ops_x86_i32)a ^ (cvectorization_ops_x86_i32)b), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
@@ -97887,7 +99503,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_m
   const cvectorization_ops_mask_i32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i32, cvectorization_ops_read_mask_i32, rawMask);
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
   const cvectorization_ops_vector_i32 b = (cvectorization_ops_vector_i32)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i32(a) && !cvectorization_ops_sve_constant_i32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svmax_s32_z(active, __builtin_sve_svdup_n_s32(a[0]), (cvectorization_ops_sve_i32)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_maximum_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i32(a) && !cvectorization_ops_sve_constant_i32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svmax_s32_z(active, __builtin_sve_svdup_n_s32(a[0]), (cvectorization_ops_sve_i32)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_maximum_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_i32)cvectorization_ops_maximum_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_maximum_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b));
@@ -97904,7 +99532,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_a
   const cvectorization_ops_mask_i32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i32, cvectorization_ops_read_mask_i32, rawMask);
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
   const cvectorization_ops_vector_i32 b = (cvectorization_ops_vector_i32)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i32(a) && !cvectorization_ops_sve_constant_i32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svadd_s32_z(active, __builtin_sve_svdup_n_s32(a[0]), (cvectorization_ops_sve_i32)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_adding_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i32(a) && !cvectorization_ops_sve_constant_i32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svadd_s32_z(active, __builtin_sve_svdup_n_s32(a[0]), (cvectorization_ops_sve_i32)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_adding_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_i32)cvectorization_ops_adding_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_adding_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b));
@@ -97921,7 +99561,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_s
   const cvectorization_ops_mask_i32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i32, cvectorization_ops_read_mask_i32, rawMask);
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
   const cvectorization_ops_vector_i32 b = (cvectorization_ops_vector_i32)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i32(a) && !cvectorization_ops_sve_constant_i32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svsub_s32_z(active, __builtin_sve_svdup_n_s32(a[0]), (cvectorization_ops_sve_i32)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_subtracting_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i32(a) && !cvectorization_ops_sve_constant_i32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svsub_s32_z(active, __builtin_sve_svdup_n_s32(a[0]), (cvectorization_ops_sve_i32)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_subtracting_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_i32)cvectorization_ops_subtracting_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_subtracting_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b));
@@ -97938,7 +99590,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_m
   const cvectorization_ops_mask_i32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i32, cvectorization_ops_read_mask_i32, rawMask);
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
   const cvectorization_ops_vector_i32 b = (cvectorization_ops_vector_i32)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i32(a) && !cvectorization_ops_sve_constant_i32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svmul_s32_z(active, __builtin_sve_svdup_n_s32(a[0]), (cvectorization_ops_sve_i32)b));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || cvectorization_ops_sve_constant_i32(a) || cvectorization_ops_sve_constant_i32(b)) {
+    return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_multiplying_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svmul_s32_z(active, (cvectorization_ops_sve_i32)a, (cvectorization_ops_sve_i32)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i32(a) && !cvectorization_ops_sve_constant_i32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svmul_s32_z(active, __builtin_sve_svdup_n_s32(a[0]), (cvectorization_ops_sve_i32)b));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || cvectorization_ops_sve_constant_i32(a) || cvectorization_ops_sve_constant_i32(b)) {
+    return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_multiplying_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svmul_s32_z(active, (cvectorization_ops_sve_i32)a, (cvectorization_ops_sve_i32)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_i32)cvectorization_ops_multiplying_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_multiplying_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b));
@@ -97955,7 +99627,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_d
   const cvectorization_ops_mask_i32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i32, cvectorization_ops_read_mask_i32, rawMask);
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
   const cvectorization_ops_vector_i32 b = (cvectorization_ops_vector_i32)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i32(a) && !cvectorization_ops_sve_constant_i32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svdiv_s32_z(active, __builtin_sve_svdup_n_s32(a[0]), (cvectorization_ops_sve_i32)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_dividing_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i32(a) && !cvectorization_ops_sve_constant_i32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svdiv_s32_z(active, __builtin_sve_svdup_n_s32(a[0]), (cvectorization_ops_sve_i32)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_dividing_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_i32)cvectorization_ops_dividing_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_dividing_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b));
@@ -97968,6 +99652,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_d
   const cvectorization_ops_vector_i32 b = (cvectorization_ops_vector_i32)rawB;
 #if CVECTORIZATION_OPS_NEON == 2
   return cvectorization_ops_selecting_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_dividing_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b), (cvectorization_ops_raw_vector_i32)otherwise);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_i32((cvectorization_ops_vector_i32)mask)) {
+    return cvectorization_ops_selecting_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_dividing_i32((cvectorization_ops_raw_vector_i32)a, cvectorization_ops_selecting_i32(rawMask, (cvectorization_ops_raw_vector_i32)b, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_repeating_i32(1))), (cvectorization_ops_raw_vector_i32)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svsel_s32(active, (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_dividing_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b), (cvectorization_ops_sve_splat_i32(otherwise) ? __builtin_sve_svdup_n_s32(otherwise[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)otherwise)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_i32((cvectorization_ops_vector_i32)mask)) {
+    return cvectorization_ops_selecting_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_dividing_i32((cvectorization_ops_raw_vector_i32)a, cvectorization_ops_selecting_i32(rawMask, (cvectorization_ops_raw_vector_i32)b, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_repeating_i32(1))), (cvectorization_ops_raw_vector_i32)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svsel_s32(active, (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_dividing_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b), (cvectorization_ops_sve_splat_i32(otherwise) ? __builtin_sve_svdup_n_s32(otherwise[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)otherwise)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return cvectorization_ops_selecting_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_dividing_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b), (cvectorization_ops_raw_vector_i32)otherwise);
 #else
@@ -97981,6 +99677,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_r
   const cvectorization_ops_vector_i32 b = (cvectorization_ops_vector_i32)rawB;
 #if CVECTORIZATION_OPS_NEON == 2
   return cvectorization_ops_selecting_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_remainder_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b), (cvectorization_ops_raw_vector_i32)otherwise);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_i32((cvectorization_ops_vector_i32)mask)) {
+    return cvectorization_ops_selecting_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_remainder_i32((cvectorization_ops_raw_vector_i32)a, cvectorization_ops_selecting_i32(rawMask, (cvectorization_ops_raw_vector_i32)b, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_repeating_i32(1))), (cvectorization_ops_raw_vector_i32)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svsel_s32(active, (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_remainder_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b), (cvectorization_ops_sve_splat_i32(otherwise) ? __builtin_sve_svdup_n_s32(otherwise[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)otherwise)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_i32((cvectorization_ops_vector_i32)mask)) {
+    return cvectorization_ops_selecting_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_remainder_i32((cvectorization_ops_raw_vector_i32)a, cvectorization_ops_selecting_i32(rawMask, (cvectorization_ops_raw_vector_i32)b, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_repeating_i32(1))), (cvectorization_ops_raw_vector_i32)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svsel_s32(active, (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_remainder_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b), (cvectorization_ops_sve_splat_i32(otherwise) ? __builtin_sve_svdup_n_s32(otherwise[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)otherwise)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return cvectorization_ops_selecting_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_remainder_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b), (cvectorization_ops_raw_vector_i32)otherwise);
 #else
@@ -98007,7 +99715,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_m
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
   const cvectorization_ops_vector_i32 b = (cvectorization_ops_vector_i32)rawB;
   const cvectorization_ops_vector_i32 c = (cvectorization_ops_vector_i32)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_multiply_adding_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b, (cvectorization_ops_raw_vector_i32)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svmad_s32_z(active, (cvectorization_ops_sve_i32)b, (cvectorization_ops_sve_i32)a, (cvectorization_ops_sve_i32)c));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_multiply_adding_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b, (cvectorization_ops_raw_vector_i32)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svmad_s32_z(active, (cvectorization_ops_sve_i32)b, (cvectorization_ops_sve_i32)a, (cvectorization_ops_sve_i32)c));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_i32)cvectorization_ops_multiply_adding_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b, (cvectorization_ops_raw_vector_i32)c), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_multiply_adding_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b, (cvectorization_ops_raw_vector_i32)c));
@@ -98045,7 +99765,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_n
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
   const cvectorization_ops_vector_i32 b = (cvectorization_ops_vector_i32)rawB;
   const cvectorization_ops_vector_i32 c = (cvectorization_ops_vector_i32)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_negated_multiply_adding_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b, (cvectorization_ops_raw_vector_i32)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svmsb_s32_z(active, (cvectorization_ops_sve_i32)b, (cvectorization_ops_sve_i32)a, (cvectorization_ops_sve_i32)c));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_negated_multiply_adding_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b, (cvectorization_ops_raw_vector_i32)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svmsb_s32_z(active, (cvectorization_ops_sve_i32)b, (cvectorization_ops_sve_i32)a, (cvectorization_ops_sve_i32)c));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_i32)cvectorization_ops_negated_multiply_adding_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b, (cvectorization_ops_raw_vector_i32)c), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_negated_multiply_adding_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b, (cvectorization_ops_raw_vector_i32)c));
@@ -98064,7 +99796,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_n
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
   const cvectorization_ops_vector_i32 b = (cvectorization_ops_vector_i32)rawB;
   const cvectorization_ops_vector_i32 c = (cvectorization_ops_vector_i32)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_negated_multiply_subtracting_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b, (cvectorization_ops_raw_vector_i32)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svneg_s32_z(active, __builtin_sve_svmad_s32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_i32)b, (cvectorization_ops_sve_i32)a, (cvectorization_ops_sve_i32)c)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_negated_multiply_subtracting_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b, (cvectorization_ops_raw_vector_i32)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svneg_s32_z(active, __builtin_sve_svmad_s32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_i32)b, (cvectorization_ops_sve_i32)a, (cvectorization_ops_sve_i32)c)));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_i32)cvectorization_ops_negated_multiply_subtracting_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b, (cvectorization_ops_raw_vector_i32)c), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_negated_multiply_subtracting_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b, (cvectorization_ops_raw_vector_i32)c));
@@ -98121,7 +99865,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_s
   const cvectorization_ops_mask_i32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i32, cvectorization_ops_read_mask_i32, rawMask);
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
   const cvectorization_ops_vector_i32 b = (cvectorization_ops_vector_i32)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || (cvectorization_ops_sve_constant_i32(a) && cvectorization_ops_sve_constant_i32(b))) {
+    return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_left_by_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svlsl_s32_z(active, (cvectorization_ops_sve_i32)a, __builtin_sve_reinterpret_u32_s32((cvectorization_ops_sve_i32)b)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || (cvectorization_ops_sve_constant_i32(a) && cvectorization_ops_sve_constant_i32(b))) {
+    return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_left_by_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svlsl_s32_z(active, (cvectorization_ops_sve_i32)a, __builtin_sve_reinterpret_u32_s32((cvectorization_ops_sve_i32)b)));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_left_by_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_left_by_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b));
@@ -98138,7 +99894,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_s
   const cvectorization_ops_mask_i32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i32, cvectorization_ops_read_mask_i32, rawMask);
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
   const cvectorization_ops_vector_i32 b = (cvectorization_ops_vector_i32)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || (cvectorization_ops_sve_constant_i32(a) && cvectorization_ops_sve_constant_i32(b))) {
+    return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_by_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svasr_s32_z(active, (cvectorization_ops_sve_i32)a, __builtin_sve_reinterpret_u32_s32((cvectorization_ops_sve_i32)b)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || (cvectorization_ops_sve_constant_i32(a) && cvectorization_ops_sve_constant_i32(b))) {
+    return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_by_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svasr_s32_z(active, (cvectorization_ops_sve_i32)a, __builtin_sve_reinterpret_u32_s32((cvectorization_ops_sve_i32)b)));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_by_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_by_i32((cvectorization_ops_raw_vector_i32)a, (cvectorization_ops_raw_vector_i32)b));
@@ -98154,7 +99922,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_s
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_leading_zero_bit_count_where_i32(cvectorization_ops_raw_mask_i32 rawMask, cvectorization_ops_raw_vector_i32 rawA) {
   const cvectorization_ops_mask_i32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i32, cvectorization_ops_read_mask_i32, rawMask);
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_leading_zero_bit_count_i32((cvectorization_ops_raw_vector_i32)a));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_reinterpret_s32_u32(__builtin_sve_svclz_s32_z(active, (cvectorization_ops_sve_i32)a)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_leading_zero_bit_count_i32((cvectorization_ops_raw_vector_i32)a));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_reinterpret_s32_u32(__builtin_sve_svclz_s32_z(active, (cvectorization_ops_sve_i32)a)));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_i32)cvectorization_ops_leading_zero_bit_count_i32((cvectorization_ops_raw_vector_i32)a), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_leading_zero_bit_count_i32((cvectorization_ops_raw_vector_i32)a));
@@ -98222,7 +100002,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i32 cvectorization_ops_gre
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_repeating_where_i32(cvectorization_ops_raw_mask_i32 rawMask, int32_t value) {
   const cvectorization_ops_mask_i32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i32, cvectorization_ops_read_mask_i32, rawMask);
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_repeating_i32(value));
+  }
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svdup_n_s32_z(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_repeating_i32(value));
+  }
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svdup_n_s32_z(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_i32)cvectorization_ops_repeating_i32(value), (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_repeating_i32(value));
@@ -98231,12 +100021,36 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_r
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_repeating_where_otherwise_i32(cvectorization_ops_raw_vector_i32 rawOtherwise, cvectorization_ops_raw_mask_i32 rawMask, int32_t value) {
   const cvectorization_ops_vector_i32 otherwise = (cvectorization_ops_vector_i32)rawOtherwise;
   const cvectorization_ops_mask_i32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i32, cvectorization_ops_read_mask_i32, rawMask);
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_repeating_i32(value), (cvectorization_ops_raw_vector_i32)otherwise);
+  }
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svdup_n_s32_m((cvectorization_ops_sve_i32)otherwise, __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_repeating_i32(value), (cvectorization_ops_raw_vector_i32)otherwise);
+  }
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svdup_n_s32_m((cvectorization_ops_sve_i32)otherwise, __builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), value));
+#else
   return cvectorization_ops_selecting_i32(rawMask, (cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)cvectorization_ops_repeating_i32(value), (cvectorization_ops_raw_vector_i32)otherwise);
+#endif
 }
 CVECTORIZATION_OPS_INLINE int32_t cvectorization_ops_sum_where_i32(cvectorization_ops_raw_mask_i32 rawMask, cvectorization_ops_raw_vector_i32 rawA) {
   const cvectorization_ops_mask_i32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i32, cvectorization_ops_read_mask_i32, rawMask);
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_i32((cvectorization_ops_vector_i32)mask)) {
+    return cvectorization_ops_sum_i32(cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)a));
+  }
+  return (int32_t)__builtin_sve_svaddv_s32(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), (cvectorization_ops_sve_i32)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_i32((cvectorization_ops_vector_i32)mask)) {
+    return cvectorization_ops_sum_i32(cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)a));
+  }
+  return (int32_t)__builtin_sve_svaddv_s32(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), (cvectorization_ops_sve_i32)a);
+#else
   return cvectorization_ops_sum_i32(cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)a));
+#endif
 }
 CVECTORIZATION_OPS_INLINE int32_t cvectorization_ops_smallest_where_i32(cvectorization_ops_raw_mask_i32 rawMask, cvectorization_ops_raw_vector_i32 rawA) {
   const cvectorization_ops_mask_i32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i32, cvectorization_ops_read_mask_i32, rawMask);
@@ -106483,12 +108297,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_z
   if (cvectorization_ops_sve_splat_i64(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
     return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svsel_s64(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), __builtin_sve_svdup_n_s64(0), __builtin_sve_svdup_n_s64(a[0])));
   }
-  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(~(cvectorization_ops_vector_u64)mask & (cvectorization_ops_vector_u64)a));
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(~(cvectorization_ops_vector_u64)mask & (cvectorization_ops_vector_u64)a));
+  }
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svsel_s64(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), __builtin_sve_svdup_n_s64(0), (cvectorization_ops_sve_i64)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   if (cvectorization_ops_sve_splat_i64(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
     return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svsel_s64(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), __builtin_sve_svdup_n_s64(0), __builtin_sve_svdup_n_s64(a[0])));
   }
-  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(~(cvectorization_ops_vector_u64)mask & (cvectorization_ops_vector_u64)a));
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(~(cvectorization_ops_vector_u64)mask & (cvectorization_ops_vector_u64)a));
+  }
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svsel_s64(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), __builtin_sve_svdup_n_s64(0), (cvectorization_ops_sve_i64)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}, (cvectorization_ops_x86_i64)a));
 #else
@@ -106499,7 +108319,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_b
   const cvectorization_ops_mask_i64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i64, cvectorization_ops_read_mask_i64, rawMask);
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
   const cvectorization_ops_vector_i64 b = (cvectorization_ops_vector_i64)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i64(a) && !cvectorization_ops_sve_constant_i64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svand_s64_z(active, __builtin_sve_svdup_n_s64(a[0]), (cvectorization_ops_sve_i64)b));
+  }
+  if (cvectorization_ops_sve_splat_i64(b) && !cvectorization_ops_sve_constant_i64(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svand_s64_z(active, (cvectorization_ops_sve_i64)a, __builtin_sve_svdup_n_s64(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)((cvectorization_ops_vector_u64)(a & b) & (cvectorization_ops_vector_u64)mask));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i64(a) && !cvectorization_ops_sve_constant_i64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svand_s64_z(active, __builtin_sve_svdup_n_s64(a[0]), (cvectorization_ops_sve_i64)b));
+  }
+  if (cvectorization_ops_sve_splat_i64(b) && !cvectorization_ops_sve_constant_i64(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svand_s64_z(active, (cvectorization_ops_sve_i64)a, __builtin_sve_svdup_n_s64(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)((cvectorization_ops_vector_u64)(a & b) & (cvectorization_ops_vector_u64)mask));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64)((cvectorization_ops_x86_i64)a & (cvectorization_ops_x86_i64)b), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)((cvectorization_ops_vector_u64)(a & b) & (cvectorization_ops_vector_u64)mask));
@@ -106509,7 +108349,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_b
   const cvectorization_ops_mask_i64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i64, cvectorization_ops_read_mask_i64, rawMask);
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
   const cvectorization_ops_vector_i64 b = (cvectorization_ops_vector_i64)rawB;
-#if CVECTORIZATION_OPS_NEON
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i64(a) && !cvectorization_ops_sve_constant_i64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svorr_s64_z(active, __builtin_sve_svdup_n_s64(a[0]), (cvectorization_ops_sve_i64)b));
+  }
+  if (cvectorization_ops_sve_splat_i64(b) && !cvectorization_ops_sve_constant_i64(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svorr_s64_z(active, (cvectorization_ops_sve_i64)a, __builtin_sve_svdup_n_s64(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)((cvectorization_ops_vector_u64)mask & (cvectorization_ops_vector_u64)(a | b)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i64(a) && !cvectorization_ops_sve_constant_i64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svorr_s64_z(active, __builtin_sve_svdup_n_s64(a[0]), (cvectorization_ops_sve_i64)b));
+  }
+  if (cvectorization_ops_sve_splat_i64(b) && !cvectorization_ops_sve_constant_i64(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svorr_s64_z(active, (cvectorization_ops_sve_i64)a, __builtin_sve_svdup_n_s64(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)((cvectorization_ops_vector_u64)mask & (cvectorization_ops_vector_u64)(a | b)));
+#elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)((cvectorization_ops_vector_u64)(a | b) & (cvectorization_ops_vector_u64)mask));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64)((cvectorization_ops_x86_i64)a | (cvectorization_ops_x86_i64)b), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
@@ -106521,7 +108381,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_b
   const cvectorization_ops_mask_i64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i64, cvectorization_ops_read_mask_i64, rawMask);
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
   const cvectorization_ops_vector_i64 b = (cvectorization_ops_vector_i64)rawB;
-#if CVECTORIZATION_OPS_NEON
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i64(a) && !cvectorization_ops_sve_constant_i64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_sveor_s64_z(active, __builtin_sve_svdup_n_s64(a[0]), (cvectorization_ops_sve_i64)b));
+  }
+  if (cvectorization_ops_sve_splat_i64(b) && !cvectorization_ops_sve_constant_i64(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_sveor_s64_z(active, (cvectorization_ops_sve_i64)a, __builtin_sve_svdup_n_s64(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)((cvectorization_ops_vector_u64)mask & (cvectorization_ops_vector_u64)(a ^ b)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i64(a) && !cvectorization_ops_sve_constant_i64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_sveor_s64_z(active, __builtin_sve_svdup_n_s64(a[0]), (cvectorization_ops_sve_i64)b));
+  }
+  if (cvectorization_ops_sve_splat_i64(b) && !cvectorization_ops_sve_constant_i64(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_sveor_s64_z(active, (cvectorization_ops_sve_i64)a, __builtin_sve_svdup_n_s64(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)((cvectorization_ops_vector_u64)mask & (cvectorization_ops_vector_u64)(a ^ b)));
+#elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)((cvectorization_ops_vector_u64)(a ^ b) & (cvectorization_ops_vector_u64)mask));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64)((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)b), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
@@ -110853,7 +112733,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_m
   const cvectorization_ops_mask_i64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i64, cvectorization_ops_read_mask_i64, rawMask);
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
   const cvectorization_ops_vector_i64 b = (cvectorization_ops_vector_i64)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i64(a) && !cvectorization_ops_sve_constant_i64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svmax_s64_z(active, __builtin_sve_svdup_n_s64(a[0]), (cvectorization_ops_sve_i64)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_maximum_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i64(a) && !cvectorization_ops_sve_constant_i64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svmax_s64_z(active, __builtin_sve_svdup_n_s64(a[0]), (cvectorization_ops_sve_i64)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_maximum_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64)cvectorization_ops_maximum_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_maximum_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b));
@@ -110881,7 +112773,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_a
   const cvectorization_ops_mask_i64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i64, cvectorization_ops_read_mask_i64, rawMask);
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
   const cvectorization_ops_vector_i64 b = (cvectorization_ops_vector_i64)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i64(a) && !cvectorization_ops_sve_constant_i64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svadd_s64_z(active, __builtin_sve_svdup_n_s64(a[0]), (cvectorization_ops_sve_i64)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_adding_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i64(a) && !cvectorization_ops_sve_constant_i64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svadd_s64_z(active, __builtin_sve_svdup_n_s64(a[0]), (cvectorization_ops_sve_i64)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_adding_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64)cvectorization_ops_adding_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_adding_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b));
@@ -110898,7 +112802,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_s
   const cvectorization_ops_mask_i64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i64, cvectorization_ops_read_mask_i64, rawMask);
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
   const cvectorization_ops_vector_i64 b = (cvectorization_ops_vector_i64)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i64(a) && !cvectorization_ops_sve_constant_i64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svsub_s64_z(active, __builtin_sve_svdup_n_s64(a[0]), (cvectorization_ops_sve_i64)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_subtracting_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i64(a) && !cvectorization_ops_sve_constant_i64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svsub_s64_z(active, __builtin_sve_svdup_n_s64(a[0]), (cvectorization_ops_sve_i64)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_subtracting_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64)cvectorization_ops_subtracting_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_subtracting_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b));
@@ -110915,7 +112831,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_m
   const cvectorization_ops_mask_i64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i64, cvectorization_ops_read_mask_i64, rawMask);
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
   const cvectorization_ops_vector_i64 b = (cvectorization_ops_vector_i64)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i64(a) && !cvectorization_ops_sve_constant_i64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svmul_s64_z(active, __builtin_sve_svdup_n_s64(a[0]), (cvectorization_ops_sve_i64)b));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63))) || cvectorization_ops_sve_constant_i64(a) || cvectorization_ops_sve_constant_i64(b)) {
+    return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_multiplying_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svmul_s64_z(active, (cvectorization_ops_sve_i64)a, (cvectorization_ops_sve_i64)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i64(a) && !cvectorization_ops_sve_constant_i64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svmul_s64_z(active, __builtin_sve_svdup_n_s64(a[0]), (cvectorization_ops_sve_i64)b));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63))) || cvectorization_ops_sve_constant_i64(a) || cvectorization_ops_sve_constant_i64(b)) {
+    return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_multiplying_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svmul_s64_z(active, (cvectorization_ops_sve_i64)a, (cvectorization_ops_sve_i64)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64)cvectorization_ops_multiplying_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_multiplying_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b));
@@ -110932,7 +112868,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_d
   const cvectorization_ops_mask_i64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i64, cvectorization_ops_read_mask_i64, rawMask);
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
   const cvectorization_ops_vector_i64 b = (cvectorization_ops_vector_i64)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_i64(a) && !cvectorization_ops_sve_constant_i64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svdiv_s64_z(active, __builtin_sve_svdup_n_s64(a[0]), (cvectorization_ops_sve_i64)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_dividing_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_i64(a) && !cvectorization_ops_sve_constant_i64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svdiv_s64_z(active, __builtin_sve_svdup_n_s64(a[0]), (cvectorization_ops_sve_i64)b));
+  }
+  return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_dividing_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64)cvectorization_ops_dividing_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_dividing_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b));
@@ -110998,7 +112946,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_m
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
   const cvectorization_ops_vector_i64 b = (cvectorization_ops_vector_i64)rawB;
   const cvectorization_ops_vector_i64 c = (cvectorization_ops_vector_i64)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_multiply_adding_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b, (cvectorization_ops_raw_vector_i64)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svmad_s64_z(active, (cvectorization_ops_sve_i64)b, (cvectorization_ops_sve_i64)a, (cvectorization_ops_sve_i64)c));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_multiply_adding_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b, (cvectorization_ops_raw_vector_i64)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svmad_s64_z(active, (cvectorization_ops_sve_i64)b, (cvectorization_ops_sve_i64)a, (cvectorization_ops_sve_i64)c));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64)cvectorization_ops_multiply_adding_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b, (cvectorization_ops_raw_vector_i64)c), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_multiply_adding_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b, (cvectorization_ops_raw_vector_i64)c));
@@ -111047,7 +113007,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_n
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
   const cvectorization_ops_vector_i64 b = (cvectorization_ops_vector_i64)rawB;
   const cvectorization_ops_vector_i64 c = (cvectorization_ops_vector_i64)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_negated_multiply_adding_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b, (cvectorization_ops_raw_vector_i64)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svmsb_s64_z(active, (cvectorization_ops_sve_i64)b, (cvectorization_ops_sve_i64)a, (cvectorization_ops_sve_i64)c));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_negated_multiply_adding_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b, (cvectorization_ops_raw_vector_i64)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svmsb_s64_z(active, (cvectorization_ops_sve_i64)b, (cvectorization_ops_sve_i64)a, (cvectorization_ops_sve_i64)c));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64)cvectorization_ops_negated_multiply_adding_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b, (cvectorization_ops_raw_vector_i64)c), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_negated_multiply_adding_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b, (cvectorization_ops_raw_vector_i64)c));
@@ -111066,7 +113038,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_n
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
   const cvectorization_ops_vector_i64 b = (cvectorization_ops_vector_i64)rawB;
   const cvectorization_ops_vector_i64 c = (cvectorization_ops_vector_i64)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_negated_multiply_subtracting_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b, (cvectorization_ops_raw_vector_i64)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svneg_s64_z(active, __builtin_sve_svmad_s64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_i64)b, (cvectorization_ops_sve_i64)a, (cvectorization_ops_sve_i64)c)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_negated_multiply_subtracting_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b, (cvectorization_ops_raw_vector_i64)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svneg_s64_z(active, __builtin_sve_svmad_s64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_i64)b, (cvectorization_ops_sve_i64)a, (cvectorization_ops_sve_i64)c)));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64)cvectorization_ops_negated_multiply_subtracting_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b, (cvectorization_ops_raw_vector_i64)c), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_negated_multiply_subtracting_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b, (cvectorization_ops_raw_vector_i64)c));
@@ -111123,7 +113107,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_s
   const cvectorization_ops_mask_i64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i64, cvectorization_ops_read_mask_i64, rawMask);
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
   const cvectorization_ops_vector_i64 b = (cvectorization_ops_vector_i64)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63))) || (cvectorization_ops_sve_constant_i64(a) && cvectorization_ops_sve_constant_i64(b))) {
+    return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_left_by_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svlsl_s64_z(active, (cvectorization_ops_sve_i64)a, __builtin_sve_reinterpret_u64_s64((cvectorization_ops_sve_i64)b)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63))) || (cvectorization_ops_sve_constant_i64(a) && cvectorization_ops_sve_constant_i64(b))) {
+    return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_left_by_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svlsl_s64_z(active, (cvectorization_ops_sve_i64)a, __builtin_sve_reinterpret_u64_s64((cvectorization_ops_sve_i64)b)));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_left_by_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_left_by_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b));
@@ -111151,7 +113147,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_s
   const cvectorization_ops_mask_i64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i64, cvectorization_ops_read_mask_i64, rawMask);
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
   const cvectorization_ops_vector_i64 b = (cvectorization_ops_vector_i64)rawB;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63))) || (cvectorization_ops_sve_constant_i64(a) && cvectorization_ops_sve_constant_i64(b))) {
+    return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_by_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svasr_s64_z(active, (cvectorization_ops_sve_i64)a, __builtin_sve_reinterpret_u64_s64((cvectorization_ops_sve_i64)b)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63))) || (cvectorization_ops_sve_constant_i64(a) && cvectorization_ops_sve_constant_i64(b))) {
+    return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_by_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svasr_s64_z(active, (cvectorization_ops_sve_i64)a, __builtin_sve_reinterpret_u64_s64((cvectorization_ops_sve_i64)b)));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_by_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_by_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b));
@@ -111178,7 +113186,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_s
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_leading_zero_bit_count_where_i64(cvectorization_ops_raw_mask_i64 rawMask, cvectorization_ops_raw_vector_i64 rawA) {
   const cvectorization_ops_mask_i64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i64, cvectorization_ops_read_mask_i64, rawMask);
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_leading_zero_bit_count_i64((cvectorization_ops_raw_vector_i64)a));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_reinterpret_s64_u64(__builtin_sve_svclz_s64_z(active, (cvectorization_ops_sve_i64)a)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_leading_zero_bit_count_i64((cvectorization_ops_raw_vector_i64)a));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_reinterpret_s64_u64(__builtin_sve_svclz_s64_z(active, (cvectorization_ops_sve_i64)a)));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64)cvectorization_ops_leading_zero_bit_count_i64((cvectorization_ops_raw_vector_i64)a), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
   return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_leading_zero_bit_count_i64((cvectorization_ops_raw_vector_i64)a));
@@ -111300,6 +113320,16 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_r
   const cvectorization_ops_mask_i64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i64, cvectorization_ops_read_mask_i64, rawMask);
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svdup_n_s64_z(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_repeating_i64(value));
+  }
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svdup_n_s64_z(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_repeating_i64(value));
+  }
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svdup_n_s64_z(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), value));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64)cvectorization_ops_repeating_i64(value), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}));
 #else
@@ -111311,6 +113341,16 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_r
   const cvectorization_ops_mask_i64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i64, cvectorization_ops_read_mask_i64, rawMask);
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svdup_n_s64_m((cvectorization_ops_sve_splat_i64(otherwise) ? __builtin_sve_svdup_n_s64(otherwise[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)otherwise), __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_repeating_i64(value), (cvectorization_ops_raw_vector_i64)otherwise);
+  }
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svdup_n_s64_m((cvectorization_ops_sve_splat_i64(otherwise) ? __builtin_sve_svdup_n_s64(otherwise[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)otherwise), __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_repeating_i64(value), (cvectorization_ops_raw_vector_i64)otherwise);
+  }
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svdup_n_s64_m((cvectorization_ops_sve_splat_i64(otherwise) ? __builtin_sve_svdup_n_s64(otherwise[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)otherwise), __builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), value));
 #else
   return cvectorization_ops_selecting_i64(rawMask, (cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)cvectorization_ops_repeating_i64(value), (cvectorization_ops_raw_vector_i64)otherwise);
 #endif
@@ -111318,7 +113358,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_r
 CVECTORIZATION_OPS_INLINE int64_t cvectorization_ops_sum_where_i64(cvectorization_ops_raw_mask_i64 rawMask, cvectorization_ops_raw_vector_i64 rawA) {
   const cvectorization_ops_mask_i64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i64, cvectorization_ops_read_mask_i64, rawMask);
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_i64((cvectorization_ops_vector_i64)mask)) {
+    return cvectorization_ops_sum_i64(cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)a));
+  }
+  return (int64_t)__builtin_sve_svaddv_s64(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), (cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_i64((cvectorization_ops_vector_i64)mask)) {
+    return cvectorization_ops_sum_i64(cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)a));
+  }
+  return (int64_t)__builtin_sve_svaddv_s64(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), (cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a));
+#else
   return cvectorization_ops_sum_i64(cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)a));
+#endif
 }
 CVECTORIZATION_OPS_INLINE int64_t cvectorization_ops_smallest_where_i64(cvectorization_ops_raw_mask_i64 rawMask, cvectorization_ops_raw_vector_i64 rawA) {
   const cvectorization_ops_mask_i64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i64, cvectorization_ops_read_mask_i64, rawMask);
@@ -118900,7 +120952,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_m
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_selecting_or_zero_f32(cvectorization_ops_raw_mask_f32 rawMask, cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_mask_f32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_f32, cvectorization_ops_read_mask_f32, rawMask);
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_f32(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svsel_f32(__builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0), __builtin_sve_svdup_n_f32(a[0]), __builtin_sve_svdup_n_f32(0)));
+  }
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)((cvectorization_ops_vector_u32)mask & (cvectorization_ops_vector_u32)a));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_f32(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svsel_f32(__builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0), __builtin_sve_svdup_n_f32(a[0]), __builtin_sve_svdup_n_f32(0)));
+  }
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)((cvectorization_ops_vector_u32)mask & (cvectorization_ops_vector_u32)a));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)__builtin_ia32_selectps_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_f32)a, (cvectorization_ops_x86_f32)(cvectorization_ops_x86_f32){0}));
 #else
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)((cvectorization_ops_vector_u32)mask & (cvectorization_ops_vector_u32)a));
@@ -118909,7 +120971,23 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_s
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_zeroing_selected_f32(cvectorization_ops_raw_mask_f32 rawMask, cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_mask_f32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_f32, cvectorization_ops_read_mask_f32, rawMask);
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_f32(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svsel_f32(__builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0), __builtin_sve_svdup_n_f32(0), __builtin_sve_svdup_n_f32(a[0])));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(~(cvectorization_ops_vector_u32)mask & (cvectorization_ops_vector_u32)a));
+  }
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svsel_f32(__builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0), __builtin_sve_svdup_n_f32(0), (cvectorization_ops_sve_f32)a));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_f32(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svsel_f32(__builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0), __builtin_sve_svdup_n_f32(0), __builtin_sve_svdup_n_f32(a[0])));
+  }
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(~(cvectorization_ops_vector_u32)mask & (cvectorization_ops_vector_u32)a));
+  }
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svsel_f32(__builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0), __builtin_sve_svdup_n_f32(0), (cvectorization_ops_sve_f32)a));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)__builtin_ia32_selectps_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_f32)(cvectorization_ops_x86_f32){0}, (cvectorization_ops_x86_f32)a));
 #else
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(~(cvectorization_ops_vector_u32)mask & (cvectorization_ops_vector_u32)a));
@@ -123108,6 +125186,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_s
 #if CVECTORIZATION_OPS_NEON == 2
   const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svsqrt_f32_z(active, (cvectorization_ops_sve_f32)a));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_square_root_f32((cvectorization_ops_raw_vector_f32)a));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svsqrt_f32_z(active, (cvectorization_ops_sve_f32)a));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_square_root_f32((cvectorization_ops_raw_vector_f32)a));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svsqrt_f32_z(active, (cvectorization_ops_sve_f32)a));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_f32)cvectorization_ops_selecting_or_zero_u8((cvectorization_ops_raw_mask_u8)rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_f32)cvectorization_ops_square_root_f32((cvectorization_ops_raw_vector_f32)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -123121,6 +125211,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_s
   const cvectorization_ops_mask_f32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_f32, cvectorization_ops_read_mask_f32, rawMask);
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svsel_f32(active, __builtin_sve_svsqrt_f32_z(active, (cvectorization_ops_sve_f32)a), (cvectorization_ops_sve_f32)otherwise));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_f32(otherwise) || __builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_f32(rawMask, (cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_square_root_f32((cvectorization_ops_raw_vector_f32)a), (cvectorization_ops_raw_vector_f32)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svsel_f32(active, __builtin_sve_svsqrt_f32_z(active, (cvectorization_ops_sve_f32)a), (cvectorization_ops_sve_f32)otherwise));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_f32(otherwise) || __builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_f32(rawMask, (cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_square_root_f32((cvectorization_ops_raw_vector_f32)a), (cvectorization_ops_raw_vector_f32)otherwise);
+  }
   const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svsel_f32(active, __builtin_sve_svsqrt_f32_z(active, (cvectorization_ops_sve_f32)a), (cvectorization_ops_sve_f32)otherwise));
 #else
@@ -123196,6 +125298,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_a
   }
   return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(a + b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_f32(a) && !cvectorization_ops_sve_constant_f32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svadd_f32_z(active, __builtin_sve_svdup_n_f32(a[0]), (cvectorization_ops_sve_f32)b));
+  }
   if (!cvectorization_ops_sve_constant_numbers_f32(a, b) && (cvectorization_ops_constant_lane_f32(a, -0.0f) || cvectorization_ops_constant_nan_f32(a) || cvectorization_ops_constant_lane_f32(b, -0.0f))) {
     __SVFloat32_t hiddenFirst = (cvectorization_ops_sve_f32)a;
     __SVFloat32_t hiddenSecond = (cvectorization_ops_sve_f32)b;
@@ -123206,6 +125312,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_a
   }
   return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(a + b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_f32(a) && !cvectorization_ops_sve_constant_f32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svadd_f32_z(active, __builtin_sve_svdup_n_f32(a[0]), (cvectorization_ops_sve_f32)b));
+  }
   if (!cvectorization_ops_sve_constant_numbers_f32(a, b) && (cvectorization_ops_constant_lane_f32(a, -0.0f) || cvectorization_ops_constant_nan_f32(a) || cvectorization_ops_constant_lane_f32(b, -0.0f))) {
     __SVFloat32_t hiddenFirst = (cvectorization_ops_sve_f32)a;
     __SVFloat32_t hiddenSecond = (cvectorization_ops_sve_f32)b;
@@ -123271,6 +125381,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_s
   }
   return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(a - b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_f32(a) && !cvectorization_ops_sve_constant_f32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svsub_f32_z(active, __builtin_sve_svdup_n_f32(a[0]), (cvectorization_ops_sve_f32)b));
+  }
   if (!cvectorization_ops_sve_constant_numbers_f32(a, b) && (cvectorization_ops_constant_lane_f32(a, -0.0f) || cvectorization_ops_constant_nan_f32(a) || cvectorization_ops_constant_lane_f32(b, 0.0f) || cvectorization_ops_constant_nan_f32(b))) {
     __SVFloat32_t hiddenFirst = (cvectorization_ops_sve_f32)a;
     __SVFloat32_t hiddenSecond = (cvectorization_ops_sve_f32)b;
@@ -123281,6 +125395,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_s
   }
   return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(a - b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_f32(a) && !cvectorization_ops_sve_constant_f32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svsub_f32_z(active, __builtin_sve_svdup_n_f32(a[0]), (cvectorization_ops_sve_f32)b));
+  }
   if (!cvectorization_ops_sve_constant_numbers_f32(a, b) && (cvectorization_ops_constant_lane_f32(a, -0.0f) || cvectorization_ops_constant_nan_f32(a) || cvectorization_ops_constant_lane_f32(b, 0.0f) || cvectorization_ops_constant_nan_f32(b))) {
     __SVFloat32_t hiddenFirst = (cvectorization_ops_sve_f32)a;
     __SVFloat32_t hiddenSecond = (cvectorization_ops_sve_f32)b;
@@ -123346,6 +125464,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_m
   }
   return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(a * b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_f32(a) && !cvectorization_ops_sve_constant_f32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svmul_f32_z(active, __builtin_sve_svdup_n_f32(a[0]), (cvectorization_ops_sve_f32)b));
+  }
   if (!cvectorization_ops_sve_constant_numbers_f32(a, b) && (cvectorization_ops_constant_lane_f32(a, 1.0f) || cvectorization_ops_constant_lane_f32(a, -1.0f) || cvectorization_ops_constant_nan_f32(a) || cvectorization_ops_constant_lane_f32(b, 1.0f) || cvectorization_ops_constant_lane_f32(b, -1.0f))) {
     __SVFloat32_t hiddenFirst = (cvectorization_ops_sve_f32)a;
     __SVFloat32_t hiddenSecond = (cvectorization_ops_sve_f32)b;
@@ -123356,6 +125478,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_m
   }
   return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(a * b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_f32(a) && !cvectorization_ops_sve_constant_f32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svmul_f32_z(active, __builtin_sve_svdup_n_f32(a[0]), (cvectorization_ops_sve_f32)b));
+  }
   if (!cvectorization_ops_sve_constant_numbers_f32(a, b) && (cvectorization_ops_constant_lane_f32(a, 1.0f) || cvectorization_ops_constant_lane_f32(a, -1.0f) || cvectorization_ops_constant_nan_f32(a) || cvectorization_ops_constant_lane_f32(b, 1.0f) || cvectorization_ops_constant_lane_f32(b, -1.0f))) {
     __SVFloat32_t hiddenFirst = (cvectorization_ops_sve_f32)a;
     __SVFloat32_t hiddenSecond = (cvectorization_ops_sve_f32)b;
@@ -123421,6 +125547,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_d
   }
   return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(a / b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_f32(a) && !cvectorization_ops_sve_constant_f32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svdiv_f32_z(active, __builtin_sve_svdup_n_f32(a[0]), (cvectorization_ops_sve_f32)b));
+  }
   if (!cvectorization_ops_sve_constant_numbers_f32(a, b) && (cvectorization_ops_constant_nan_f32(a) || cvectorization_ops_constant_nan_f32(b) || cvectorization_ops_constant_lane_f32(b, 1.0f) || cvectorization_ops_constant_lane_f32(b, -1.0f))) {
     __SVFloat32_t hiddenFirst = (cvectorization_ops_sve_f32)a;
     __SVFloat32_t hiddenSecond = (cvectorization_ops_sve_f32)b;
@@ -123431,6 +125561,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_d
   }
   return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(a / b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_f32(a) && !cvectorization_ops_sve_constant_f32(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+    return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svdiv_f32_z(active, __builtin_sve_svdup_n_f32(a[0]), (cvectorization_ops_sve_f32)b));
+  }
   if (!cvectorization_ops_sve_constant_numbers_f32(a, b) && (cvectorization_ops_constant_nan_f32(a) || cvectorization_ops_constant_nan_f32(b) || cvectorization_ops_constant_lane_f32(b, 1.0f) || cvectorization_ops_constant_lane_f32(b, -1.0f))) {
     __SVFloat32_t hiddenFirst = (cvectorization_ops_sve_f32)a;
     __SVFloat32_t hiddenSecond = (cvectorization_ops_sve_f32)b;
@@ -123621,7 +125755,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_m
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
   const cvectorization_ops_vector_f32 b = (cvectorization_ops_vector_f32)rawB;
   const cvectorization_ops_vector_f32 c = (cvectorization_ops_vector_f32)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || cvectorization_ops_sve_constant_f32(c)) {
+    return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_multiply_adding_f32((cvectorization_ops_raw_vector_f32)a, (cvectorization_ops_raw_vector_f32)b, (cvectorization_ops_raw_vector_f32)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svmad_f32_z(active, (cvectorization_ops_sve_f32)b, (cvectorization_ops_sve_f32)a, (cvectorization_ops_sve_f32)c));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || cvectorization_ops_sve_constant_f32(c)) {
+    return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_multiply_adding_f32((cvectorization_ops_raw_vector_f32)a, (cvectorization_ops_raw_vector_f32)b, (cvectorization_ops_raw_vector_f32)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svmad_f32_z(active, (cvectorization_ops_sve_f32)b, (cvectorization_ops_sve_f32)a, (cvectorization_ops_sve_f32)c));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)__builtin_ia32_selectps_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_f32)(cvectorization_ops_vector_f32)cvectorization_ops_multiply_adding_f32((cvectorization_ops_raw_vector_f32)a, (cvectorization_ops_raw_vector_f32)b, (cvectorization_ops_raw_vector_f32)c), (cvectorization_ops_x86_f32)(cvectorization_ops_x86_f32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_multiply_adding_f32((cvectorization_ops_raw_vector_f32)a, (cvectorization_ops_raw_vector_f32)b, (cvectorization_ops_raw_vector_f32)c));
@@ -123640,7 +125786,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_m
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
   const cvectorization_ops_vector_f32 b = (cvectorization_ops_vector_f32)rawB;
   const cvectorization_ops_vector_f32 c = (cvectorization_ops_vector_f32)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || cvectorization_ops_sve_constant_f32(c)) {
+    return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_multiply_subtracting_f32((cvectorization_ops_raw_vector_f32)a, (cvectorization_ops_raw_vector_f32)b, (cvectorization_ops_raw_vector_f32)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svnmsb_f32_z(active, (cvectorization_ops_sve_f32)b, (cvectorization_ops_sve_f32)a, (cvectorization_ops_sve_f32)c));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || cvectorization_ops_sve_constant_f32(c)) {
+    return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_multiply_subtracting_f32((cvectorization_ops_raw_vector_f32)a, (cvectorization_ops_raw_vector_f32)b, (cvectorization_ops_raw_vector_f32)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svnmsb_f32_z(active, (cvectorization_ops_sve_f32)b, (cvectorization_ops_sve_f32)a, (cvectorization_ops_sve_f32)c));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)__builtin_ia32_selectps_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_f32)(cvectorization_ops_vector_f32)cvectorization_ops_multiply_subtracting_f32((cvectorization_ops_raw_vector_f32)a, (cvectorization_ops_raw_vector_f32)b, (cvectorization_ops_raw_vector_f32)c), (cvectorization_ops_x86_f32)(cvectorization_ops_x86_f32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_multiply_subtracting_f32((cvectorization_ops_raw_vector_f32)a, (cvectorization_ops_raw_vector_f32)b, (cvectorization_ops_raw_vector_f32)c));
@@ -123659,7 +125817,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_n
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
   const cvectorization_ops_vector_f32 b = (cvectorization_ops_vector_f32)rawB;
   const cvectorization_ops_vector_f32 c = (cvectorization_ops_vector_f32)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || cvectorization_ops_sve_constant_f32(c)) {
+    return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_negated_multiply_adding_f32((cvectorization_ops_raw_vector_f32)a, (cvectorization_ops_raw_vector_f32)b, (cvectorization_ops_raw_vector_f32)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svmsb_f32_z(active, (cvectorization_ops_sve_f32)b, (cvectorization_ops_sve_f32)a, (cvectorization_ops_sve_f32)c));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || cvectorization_ops_sve_constant_f32(c)) {
+    return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_negated_multiply_adding_f32((cvectorization_ops_raw_vector_f32)a, (cvectorization_ops_raw_vector_f32)b, (cvectorization_ops_raw_vector_f32)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svmsb_f32_z(active, (cvectorization_ops_sve_f32)b, (cvectorization_ops_sve_f32)a, (cvectorization_ops_sve_f32)c));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)__builtin_ia32_selectps_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_f32)(cvectorization_ops_vector_f32)cvectorization_ops_negated_multiply_adding_f32((cvectorization_ops_raw_vector_f32)a, (cvectorization_ops_raw_vector_f32)b, (cvectorization_ops_raw_vector_f32)c), (cvectorization_ops_x86_f32)(cvectorization_ops_x86_f32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_negated_multiply_adding_f32((cvectorization_ops_raw_vector_f32)a, (cvectorization_ops_raw_vector_f32)b, (cvectorization_ops_raw_vector_f32)c));
@@ -123678,7 +125848,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_n
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
   const cvectorization_ops_vector_f32 b = (cvectorization_ops_vector_f32)rawB;
   const cvectorization_ops_vector_f32 c = (cvectorization_ops_vector_f32)rawC;
-#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || cvectorization_ops_sve_constant_f32(c)) {
+    return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_negated_multiply_subtracting_f32((cvectorization_ops_raw_vector_f32)a, (cvectorization_ops_raw_vector_f32)b, (cvectorization_ops_raw_vector_f32)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svnmad_f32_z(active, (cvectorization_ops_sve_f32)b, (cvectorization_ops_sve_f32)a, (cvectorization_ops_sve_f32)c));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || cvectorization_ops_sve_constant_f32(c)) {
+    return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_negated_multiply_subtracting_f32((cvectorization_ops_raw_vector_f32)a, (cvectorization_ops_raw_vector_f32)b, (cvectorization_ops_raw_vector_f32)c));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svnmad_f32_z(active, (cvectorization_ops_sve_f32)b, (cvectorization_ops_sve_f32)a, (cvectorization_ops_sve_f32)c));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)__builtin_ia32_selectps_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_f32)(cvectorization_ops_vector_f32)cvectorization_ops_negated_multiply_subtracting_f32((cvectorization_ops_raw_vector_f32)a, (cvectorization_ops_raw_vector_f32)b, (cvectorization_ops_raw_vector_f32)c), (cvectorization_ops_x86_f32)(cvectorization_ops_x86_f32){0}));
 #else
   return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_negated_multiply_subtracting_f32((cvectorization_ops_raw_vector_f32)a, (cvectorization_ops_raw_vector_f32)b, (cvectorization_ops_raw_vector_f32)c));
@@ -123834,6 +126016,16 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_r
   const cvectorization_ops_mask_f32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_f32, cvectorization_ops_read_mask_f32, rawMask);
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svdup_n_f32_z(__builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || __builtin_constant_p(value)) {
+    return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_repeating_f32(value));
+  }
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svdup_n_f32_z(__builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || __builtin_constant_p(value)) {
+    return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_repeating_f32(value));
+  }
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svdup_n_f32_z(__builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0), value));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)__builtin_ia32_selectps_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_f32)(cvectorization_ops_vector_f32)cvectorization_ops_repeating_f32(value), (cvectorization_ops_x86_f32)(cvectorization_ops_x86_f32){0}));
 #else
@@ -123844,6 +126036,16 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_r
   const cvectorization_ops_vector_f32 otherwise = (cvectorization_ops_vector_f32)rawOtherwise;
   const cvectorization_ops_mask_f32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_f32, cvectorization_ops_read_mask_f32, rawMask);
 #if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svdup_n_f32_m((cvectorization_ops_sve_f32)otherwise, __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || cvectorization_ops_sve_constant_f32(otherwise) || __builtin_constant_p(value)) {
+    return cvectorization_ops_selecting_f32(rawMask, (cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_repeating_f32(value), (cvectorization_ops_raw_vector_f32)otherwise);
+  }
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svdup_n_f32_m((cvectorization_ops_sve_f32)otherwise, __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31))) || cvectorization_ops_sve_constant_f32(otherwise) || __builtin_constant_p(value)) {
+    return cvectorization_ops_selecting_f32(rawMask, (cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_repeating_f32(value), (cvectorization_ops_raw_vector_f32)otherwise);
+  }
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svdup_n_f32_m((cvectorization_ops_sve_f32)otherwise, __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0), value));
 #else
   return cvectorization_ops_selecting_f32(rawMask, (cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_repeating_f32(value), (cvectorization_ops_raw_vector_f32)otherwise);
@@ -130941,12 +133143,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_z
   if (cvectorization_ops_sve_splat_f64(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
     return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svsel_f64(__builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0), __builtin_sve_svdup_n_f64(0), __builtin_sve_svdup_n_f64(a[0])));
   }
-  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(~(cvectorization_ops_vector_u64)mask & (cvectorization_ops_vector_u64)a));
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(~(cvectorization_ops_vector_u64)mask & (cvectorization_ops_vector_u64)a));
+  }
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svsel_f64(__builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0), __builtin_sve_svdup_n_f64(0), (cvectorization_ops_sve_f64)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   if (cvectorization_ops_sve_splat_f64(a) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
     return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svsel_f64(__builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0), __builtin_sve_svdup_n_f64(0), __builtin_sve_svdup_n_f64(a[0])));
   }
-  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(~(cvectorization_ops_vector_u64)mask & (cvectorization_ops_vector_u64)a));
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(~(cvectorization_ops_vector_u64)mask & (cvectorization_ops_vector_u64)a));
+  }
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svsel_f64(__builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0), __builtin_sve_svdup_n_f64(0), (cvectorization_ops_sve_f64)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)__builtin_ia32_selectpd_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_f64)(cvectorization_ops_x86_f64){0}, (cvectorization_ops_x86_f64)a));
 #else
@@ -134757,6 +136965,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_s
 #if CVECTORIZATION_OPS_NEON == 2
   const __SVBool_t active = __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0);
   return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svsqrt_f64_z(active, (cvectorization_ops_sve_f64)a));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_f64(rawMask, (cvectorization_ops_raw_vector_f64)(cvectorization_ops_vector_f64)cvectorization_ops_square_root_f64((cvectorization_ops_raw_vector_f64)a));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svsqrt_f64_z(active, (cvectorization_ops_sve_f64)a));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_f64(rawMask, (cvectorization_ops_raw_vector_f64)(cvectorization_ops_vector_f64)cvectorization_ops_square_root_f64((cvectorization_ops_raw_vector_f64)a));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svsqrt_f64_z(active, (cvectorization_ops_sve_f64)a));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_f64)cvectorization_ops_selecting_or_zero_u8((cvectorization_ops_raw_mask_u8)rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_f64)cvectorization_ops_square_root_f64((cvectorization_ops_raw_vector_f64)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -134770,6 +136990,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_s
   const cvectorization_ops_mask_f64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_f64, cvectorization_ops_read_mask_f64, rawMask);
   const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svsel_f64(active, __builtin_sve_svsqrt_f64_z(active, (cvectorization_ops_sve_f64)a), (cvectorization_ops_sve_f64)otherwise));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_f64(otherwise) || __builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_f64(rawMask, (cvectorization_ops_raw_vector_f64)(cvectorization_ops_vector_f64)cvectorization_ops_square_root_f64((cvectorization_ops_raw_vector_f64)a), (cvectorization_ops_raw_vector_f64)otherwise);
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svsel_f64(active, __builtin_sve_svsqrt_f64_z(active, (cvectorization_ops_sve_f64)a), (cvectorization_ops_sve_f64)otherwise));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_f64(otherwise) || __builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_f64(rawMask, (cvectorization_ops_raw_vector_f64)(cvectorization_ops_vector_f64)cvectorization_ops_square_root_f64((cvectorization_ops_raw_vector_f64)a), (cvectorization_ops_raw_vector_f64)otherwise);
+  }
   const __SVBool_t active = __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0);
   return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svsel_f64(active, __builtin_sve_svsqrt_f64_z(active, (cvectorization_ops_sve_f64)a), (cvectorization_ops_sve_f64)otherwise));
 #else
@@ -134845,6 +137077,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_a
   }
   return cvectorization_ops_selecting_or_zero_f64(rawMask, (cvectorization_ops_raw_vector_f64)(a + b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_f64(a) && !cvectorization_ops_sve_constant_f64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svadd_f64_z(active, __builtin_sve_svdup_n_f64(a[0]), (cvectorization_ops_sve_f64)b));
+  }
   if (!cvectorization_ops_sve_constant_numbers_f64(a, b) && (cvectorization_ops_constant_lane_f64(a, -0.0) || cvectorization_ops_constant_nan_f64(a) || cvectorization_ops_constant_lane_f64(b, -0.0))) {
     __SVFloat64_t hiddenFirst = (cvectorization_ops_sve_f64)a;
     __SVFloat64_t hiddenSecond = (cvectorization_ops_sve_f64)b;
@@ -134855,6 +137091,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_a
   }
   return cvectorization_ops_selecting_or_zero_f64(rawMask, (cvectorization_ops_raw_vector_f64)(a + b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_f64(a) && !cvectorization_ops_sve_constant_f64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svadd_f64_z(active, __builtin_sve_svdup_n_f64(a[0]), (cvectorization_ops_sve_f64)b));
+  }
   if (!cvectorization_ops_sve_constant_numbers_f64(a, b) && (cvectorization_ops_constant_lane_f64(a, -0.0) || cvectorization_ops_constant_nan_f64(a) || cvectorization_ops_constant_lane_f64(b, -0.0))) {
     __SVFloat64_t hiddenFirst = (cvectorization_ops_sve_f64)a;
     __SVFloat64_t hiddenSecond = (cvectorization_ops_sve_f64)b;
@@ -134920,6 +137160,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_s
   }
   return cvectorization_ops_selecting_or_zero_f64(rawMask, (cvectorization_ops_raw_vector_f64)(a - b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_f64(a) && !cvectorization_ops_sve_constant_f64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svsub_f64_z(active, __builtin_sve_svdup_n_f64(a[0]), (cvectorization_ops_sve_f64)b));
+  }
   if (!cvectorization_ops_sve_constant_numbers_f64(a, b) && (cvectorization_ops_constant_lane_f64(a, -0.0) || cvectorization_ops_constant_nan_f64(a) || cvectorization_ops_constant_lane_f64(b, 0.0) || cvectorization_ops_constant_nan_f64(b))) {
     __SVFloat64_t hiddenFirst = (cvectorization_ops_sve_f64)a;
     __SVFloat64_t hiddenSecond = (cvectorization_ops_sve_f64)b;
@@ -134930,6 +137174,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_s
   }
   return cvectorization_ops_selecting_or_zero_f64(rawMask, (cvectorization_ops_raw_vector_f64)(a - b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_f64(a) && !cvectorization_ops_sve_constant_f64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svsub_f64_z(active, __builtin_sve_svdup_n_f64(a[0]), (cvectorization_ops_sve_f64)b));
+  }
   if (!cvectorization_ops_sve_constant_numbers_f64(a, b) && (cvectorization_ops_constant_lane_f64(a, -0.0) || cvectorization_ops_constant_nan_f64(a) || cvectorization_ops_constant_lane_f64(b, 0.0) || cvectorization_ops_constant_nan_f64(b))) {
     __SVFloat64_t hiddenFirst = (cvectorization_ops_sve_f64)a;
     __SVFloat64_t hiddenSecond = (cvectorization_ops_sve_f64)b;
@@ -134995,6 +137243,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_m
   }
   return cvectorization_ops_selecting_or_zero_f64(rawMask, (cvectorization_ops_raw_vector_f64)(a * b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_f64(a) && !cvectorization_ops_sve_constant_f64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svmul_f64_z(active, __builtin_sve_svdup_n_f64(a[0]), (cvectorization_ops_sve_f64)b));
+  }
   if (!cvectorization_ops_sve_constant_numbers_f64(a, b) && (cvectorization_ops_constant_lane_f64(a, 1.0) || cvectorization_ops_constant_lane_f64(a, -1.0) || cvectorization_ops_constant_nan_f64(a) || cvectorization_ops_constant_lane_f64(b, 1.0) || cvectorization_ops_constant_lane_f64(b, -1.0))) {
     __SVFloat64_t hiddenFirst = (cvectorization_ops_sve_f64)a;
     __SVFloat64_t hiddenSecond = (cvectorization_ops_sve_f64)b;
@@ -135005,6 +137257,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_m
   }
   return cvectorization_ops_selecting_or_zero_f64(rawMask, (cvectorization_ops_raw_vector_f64)(a * b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_f64(a) && !cvectorization_ops_sve_constant_f64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svmul_f64_z(active, __builtin_sve_svdup_n_f64(a[0]), (cvectorization_ops_sve_f64)b));
+  }
   if (!cvectorization_ops_sve_constant_numbers_f64(a, b) && (cvectorization_ops_constant_lane_f64(a, 1.0) || cvectorization_ops_constant_lane_f64(a, -1.0) || cvectorization_ops_constant_nan_f64(a) || cvectorization_ops_constant_lane_f64(b, 1.0) || cvectorization_ops_constant_lane_f64(b, -1.0))) {
     __SVFloat64_t hiddenFirst = (cvectorization_ops_sve_f64)a;
     __SVFloat64_t hiddenSecond = (cvectorization_ops_sve_f64)b;
@@ -135070,6 +137326,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_d
   }
   return cvectorization_ops_selecting_or_zero_f64(rawMask, (cvectorization_ops_raw_vector_f64)(a / b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_splat_f64(a) && !cvectorization_ops_sve_constant_f64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svdiv_f64_z(active, __builtin_sve_svdup_n_f64(a[0]), (cvectorization_ops_sve_f64)b));
+  }
   if (!cvectorization_ops_sve_constant_numbers_f64(a, b) && (cvectorization_ops_constant_nan_f64(a) || cvectorization_ops_constant_nan_f64(b) || cvectorization_ops_constant_lane_f64(b, 1.0) || cvectorization_ops_constant_lane_f64(b, -1.0))) {
     __SVFloat64_t hiddenFirst = (cvectorization_ops_sve_f64)a;
     __SVFloat64_t hiddenSecond = (cvectorization_ops_sve_f64)b;
@@ -135080,6 +137340,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_d
   }
   return cvectorization_ops_selecting_or_zero_f64(rawMask, (cvectorization_ops_raw_vector_f64)(a / b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_splat_f64(a) && !cvectorization_ops_sve_constant_f64(b) && !__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    const __SVBool_t active = __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0);
+    return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svdiv_f64_z(active, __builtin_sve_svdup_n_f64(a[0]), (cvectorization_ops_sve_f64)b));
+  }
   if (!cvectorization_ops_sve_constant_numbers_f64(a, b) && (cvectorization_ops_constant_nan_f64(a) || cvectorization_ops_constant_nan_f64(b) || cvectorization_ops_constant_lane_f64(b, 1.0) || cvectorization_ops_constant_lane_f64(b, -1.0))) {
     __SVFloat64_t hiddenFirst = (cvectorization_ops_sve_f64)a;
     __SVFloat64_t hiddenSecond = (cvectorization_ops_sve_f64)b;
@@ -135483,6 +137747,16 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_r
   const cvectorization_ops_mask_f64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_f64, cvectorization_ops_read_mask_f64, rawMask);
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svdup_n_f64_z(__builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63))) || __builtin_constant_p(value)) {
+    return cvectorization_ops_selecting_or_zero_f64(rawMask, (cvectorization_ops_raw_vector_f64)(cvectorization_ops_vector_f64)cvectorization_ops_repeating_f64(value));
+  }
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svdup_n_f64_z(__builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63))) || __builtin_constant_p(value)) {
+    return cvectorization_ops_selecting_or_zero_f64(rawMask, (cvectorization_ops_raw_vector_f64)(cvectorization_ops_vector_f64)cvectorization_ops_repeating_f64(value));
+  }
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svdup_n_f64_z(__builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0), value));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)__builtin_ia32_selectpd_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_f64)(cvectorization_ops_vector_f64)cvectorization_ops_repeating_f64(value), (cvectorization_ops_x86_f64)(cvectorization_ops_x86_f64){0}));
 #else
@@ -135493,6 +137767,16 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_r
   const cvectorization_ops_vector_f64 otherwise = (cvectorization_ops_vector_f64)rawOtherwise;
   const cvectorization_ops_mask_f64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_f64, cvectorization_ops_read_mask_f64, rawMask);
 #if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svdup_n_f64_m((cvectorization_ops_sve_f64)otherwise, __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63))) || cvectorization_ops_sve_constant_f64(otherwise) || __builtin_constant_p(value)) {
+    return cvectorization_ops_selecting_f64(rawMask, (cvectorization_ops_raw_vector_f64)(cvectorization_ops_vector_f64)cvectorization_ops_repeating_f64(value), (cvectorization_ops_raw_vector_f64)otherwise);
+  }
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svdup_n_f64_m((cvectorization_ops_sve_f64)otherwise, __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0), value));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (__builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63))) || cvectorization_ops_sve_constant_f64(otherwise) || __builtin_constant_p(value)) {
+    return cvectorization_ops_selecting_f64(rawMask, (cvectorization_ops_raw_vector_f64)(cvectorization_ops_vector_f64)cvectorization_ops_repeating_f64(value), (cvectorization_ops_raw_vector_f64)otherwise);
+  }
   return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svdup_n_f64_m((cvectorization_ops_sve_f64)otherwise, __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0), value));
 #else
   return cvectorization_ops_selecting_f64(rawMask, (cvectorization_ops_raw_vector_f64)(cvectorization_ops_vector_f64)cvectorization_ops_repeating_f64(value), (cvectorization_ops_raw_vector_f64)otherwise);
@@ -143152,6 +145436,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svcvt_f32_u32_z(active, (cvectorization_ops_sve_u32)a));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_u32(a) || __builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)__builtin_convertvector(a, cvectorization_ops_vector_f32));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svcvt_f32_u32_z(active, (cvectorization_ops_sve_u32)a));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_u32(a) || __builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)__builtin_convertvector(a, cvectorization_ops_vector_f32));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svcvt_f32_u32_z(active, (cvectorization_ops_sve_u32)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)__builtin_ia32_selectps_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_f32)__builtin_convertvector(a, cvectorization_ops_vector_f32), (cvectorization_ops_x86_f32)(cvectorization_ops_x86_f32){0}));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -143173,6 +145469,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_v
   const cvectorization_ops_mask_f64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_f64, cvectorization_ops_read_mask_f64, rawMask);
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_u64_z(active, (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_u64(a) || __builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_f64(rawMask, (cvectorization_ops_raw_vector_f64)__builtin_convertvector(a, cvectorization_ops_vector_f64));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_u64_z(active, (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_u64(a) || __builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_f64(rawMask, (cvectorization_ops_raw_vector_f64)__builtin_convertvector(a, cvectorization_ops_vector_f64));
+  }
   const __SVBool_t active = __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0);
   return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_u64_z(active, (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -143197,6 +145505,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svcvt_f32_s32_z(active, (cvectorization_ops_sve_i32)a));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_i32(a) || __builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)__builtin_convertvector(a, cvectorization_ops_vector_f32));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svcvt_f32_s32_z(active, (cvectorization_ops_sve_i32)a));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_i32(a) || __builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 31)))) {
+    return cvectorization_ops_selecting_or_zero_f32(rawMask, (cvectorization_ops_raw_vector_f32)__builtin_convertvector(a, cvectorization_ops_vector_f32));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svcvt_f32_s32_z(active, (cvectorization_ops_sve_i32)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)__builtin_ia32_selectps_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_f32)__builtin_convertvector(a, cvectorization_ops_vector_f32), (cvectorization_ops_x86_f32)(cvectorization_ops_x86_f32){0}));
 #else
@@ -143207,6 +145527,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_v
   const cvectorization_ops_mask_f64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_f64, cvectorization_ops_read_mask_f64, rawMask);
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_s64_z(active, (cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  if (cvectorization_ops_sve_constant_i64(a) || __builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_f64(rawMask, (cvectorization_ops_raw_vector_f64)__builtin_convertvector(a, cvectorization_ops_vector_f64));
+  }
+  const __SVBool_t active = __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_s64_z(active, (cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  if (cvectorization_ops_sve_constant_i64(a) || __builtin_constant_p(__builtin_reduce_and(rawMask == (rawMask >> 63)))) {
+    return cvectorization_ops_selecting_or_zero_f64(rawMask, (cvectorization_ops_raw_vector_f64)__builtin_convertvector(a, cvectorization_ops_vector_f64));
+  }
   const __SVBool_t active = __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0);
   return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_s64_z(active, (cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6

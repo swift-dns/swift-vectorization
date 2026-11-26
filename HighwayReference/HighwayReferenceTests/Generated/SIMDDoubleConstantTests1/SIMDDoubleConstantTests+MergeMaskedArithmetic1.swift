@@ -7,6 +7,75 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
+    private func checkSquareRootWhereOtherwiseConstantMask(_ mask: H.Mask) {
+        let mismatches = Mismatches("squareRootWhereOtherwise with mask \(describe(mask))")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xBC80_2899_3793_F4FF)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBC80_2A99_3793_F865)
+        for (otherwise, a) in everyPair(otherwiseInputs, aInputs) {
+            mismatches.check(
+                H.squareRoot(a, where: mask, otherwise: otherwise),
+                H(
+                    raw: HighwayReference.squareRootWhereOtherwiseF64(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw
+                    )
+                ),
+                "otherwise: \(describe(otherwise)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func squareRootWhereOtherwiseConstantMaskAllFalse() {
+        checkSquareRootWhereOtherwiseConstantMask(H.Mask(H.Mask.SIMDType(repeating: false)))
+    }
+
+    @Test func squareRootWhereOtherwiseConstantMaskAllTrue() {
+        checkSquareRootWhereOtherwiseConstantMask(H.Mask(H.Mask.SIMDType(repeating: true)))
+    }
+
+    @Test func squareRootWhereOtherwiseConstantMaskOnlyFirst() {
+        checkSquareRootWhereOtherwiseConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[0] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func squareRootWhereOtherwiseConstantMaskOnlyLast() {
+        checkSquareRootWhereOtherwiseConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: false)
+                simd[H.laneCount - 1] = true
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func squareRootWhereOtherwiseConstantMaskAllButFirst() {
+        checkSquareRootWhereOtherwiseConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[0] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @Test func squareRootWhereOtherwiseConstantMaskAllButLast() {
+        checkSquareRootWhereOtherwiseConstantMask(
+            {
+                var simd = H.Mask.SIMDType(repeating: true)
+                simd[H.laneCount - 1] = false
+                return H.Mask(simd)
+            }()
+        )
+    }
+
+    @inline(__always)
     private func checkSquareRootWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "squareRootWhereOtherwise with otherwise repeating \(hex(value))"
@@ -153,6 +222,49 @@ extension SIMDDoubleConstantTests {
     @Test func squareRootWhereOtherwiseConstantSplatGreatest() {
         checkSquareRootWhereOtherwiseConstantOtherwise(.greatestFiniteMagnitude)
         checkSquareRootWhereOtherwiseConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkSquareRootWhereOtherwiseConstantOtherwiseAlternating(
+        _ even: Lane,
+        _ odd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "squareRootWhereOtherwise with otherwise alternating \(hex(even)), \(hex(odd))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC3E0_F0C7_BDF5_69CB)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC3E0_F1C7_BDF5_6B7E)
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.squareRoot(a, where: mask, otherwise: H.repeatingBlock(even, odd)),
+                H(
+                    raw: HighwayReference.squareRootWhereOtherwiseF64(
+                        H.repeatingBlock(even, odd).raw,
+                        mask.raw,
+                        a.raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func squareRootWhereOtherwiseConstantOtherwiseAlternatingOneAndMinusTwoPointFive() {
+        checkSquareRootWhereOtherwiseConstantOtherwiseAlternating(1.0, -2.5)
+    }
+
+    @Test func squareRootWhereOtherwiseConstantOtherwiseAlternatingMinusTwoPointFiveAndHalf() {
+        checkSquareRootWhereOtherwiseConstantOtherwiseAlternating(-2.5, 0.5)
+    }
+
+    @Test func squareRootWhereOtherwiseConstantOtherwiseAlternatingHalfAndOne() {
+        checkSquareRootWhereOtherwiseConstantOtherwiseAlternating(0.5, 1.0)
     }
 
     @inline(__always)
