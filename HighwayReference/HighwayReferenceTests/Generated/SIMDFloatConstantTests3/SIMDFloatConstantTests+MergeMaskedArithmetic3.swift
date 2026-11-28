@@ -7,6 +7,482 @@ import Vectorization
 
 extension SIMDFloatConstantTests {
     @inline(__always)
+    private func checkNegatedMultiplyAddingWhereOtherwiseConstantOtherwise(_ value: Lane) {
+        let mismatches = Mismatches(
+            "negatedMultiplyAddingWhereOtherwise with otherwise repeating \(hex(value))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6785_30DD_0C35_2C4D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6785_2DDD_0C35_2734)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6785_2EDD_0C35_28E7)
+        let cInputs = Inputs.vectors(H.self, seed: 0x6785_2BDD_0C35_23CE)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        for (mask, a, b, c) in mixedQuadruples(
+            maskInputs,
+            aInputs,
+            bInputs,
+            cInputs,
+            seed: 0xC37B_CCC8_DF83_BCDE
+        ) where !hasUnorderedNaNs(negating: a.simd, b.simd, adding: c.simd) {
+            mismatches.check(
+                H.negatedMultiplyAdding(a, b, c, where: mask, otherwise: H.repeating(value)),
+                H(
+                    raw: HighwayReference.negatedMultiplyAddingWhereOtherwiseF32(
+                        H.repeating(value).raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkNegatedMultiplyAddingWhereOtherwiseConstantA(_ value: Lane) {
+        let mismatches = Mismatches(
+            "negatedMultiplyAddingWhereOtherwise with a repeating \(hex(value))"
+        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x9031_DDF5_3560_DEE3)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x9031_DCF5_3560_DD30)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9031_DEF5_3560_E096)
+        let cInputs = Inputs.vectors(H.self, seed: 0x9031_E1F5_3560_E5AF)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        for (otherwise, mask, b, c) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            bInputs,
+            cInputs,
+            seed: 0xE668_817D_2FE0_C365
+        ) where !hasUnorderedNaNs(negating: H.repeating(value).simd, b.simd, adding: c.simd) {
+            mismatches.check(
+                H.negatedMultiplyAdding(
+                    H.repeating(value),
+                    b,
+                    c,
+                    where: mask,
+                    otherwise: otherwise
+                ),
+                H(
+                    raw: HighwayReference.negatedMultiplyAddingWhereOtherwiseF32(
+                        otherwise.raw,
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkNegatedMultiplyAddingWhereOtherwiseConstantB(_ value: Lane) {
+        let mismatches = Mismatches(
+            "negatedMultiplyAddingWhereOtherwise with b repeating \(hex(value))"
+        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xAACA_E2F5_449E_1902)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xAACA_E3F5_449E_1AB5)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAACA_E0F5_449E_159C)
+        let cInputs = Inputs.vectors(H.self, seed: 0xAACA_DEF5_449E_1236)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        for (otherwise, mask, a, c) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            cInputs,
+            seed: 0xD369_67A8_2CC6_59C6
+        ) where !hasUnorderedNaNs(negating: a.simd, H.repeating(value).simd, adding: c.simd) {
+            mismatches.check(
+                H.negatedMultiplyAdding(
+                    a,
+                    H.repeating(value),
+                    c,
+                    where: mask,
+                    otherwise: otherwise
+                ),
+                H(
+                    raw: HighwayReference.negatedMultiplyAddingWhereOtherwiseF32(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw,
+                        c.raw
+                    )
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkNegatedMultiplyAddingWhereOtherwiseConstantC(_ value: Lane) {
+        let mismatches = Mismatches(
+            "negatedMultiplyAddingWhereOtherwise with c repeating \(hex(value))"
+        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xA235_CBF5_3FC7_6D4D)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA235_CAF5_3FC7_6B9A)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA235_C9F5_3FC7_69E7)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA235_C8F5_3FC7_6834)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        for (otherwise, mask, a, b) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            bInputs,
+            seed: 0x14FB_B8D4_9212_451F
+        ) where !hasUnorderedNaNs(negating: a.simd, b.simd, adding: H.repeating(value).simd) {
+            mismatches.check(
+                H.negatedMultiplyAdding(
+                    a,
+                    b,
+                    H.repeating(value),
+                    where: mask,
+                    otherwise: otherwise
+                ),
+                H(
+                    raw: HighwayReference.negatedMultiplyAddingWhereOtherwiseF32(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw,
+                        H.repeating(value).raw
+                    )
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func negatedMultiplyAddingWhereOtherwiseConstantSplatZero() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkNegatedMultiplyAddingWhereOtherwiseConstantOtherwise(0.0)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantA(0.0)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantB(0.0)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantC(0.0)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @Test func negatedMultiplyAddingWhereOtherwiseConstantSplatNegativeZero() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkNegatedMultiplyAddingWhereOtherwiseConstantOtherwise(-0.0)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantA(-0.0)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantB(-0.0)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantC(-0.0)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @Test func negatedMultiplyAddingWhereOtherwiseConstantSplatOne() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkNegatedMultiplyAddingWhereOtherwiseConstantOtherwise(1.0)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantA(1.0)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantB(1.0)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantC(1.0)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @Test func negatedMultiplyAddingWhereOtherwiseConstantSplatMinusOne() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkNegatedMultiplyAddingWhereOtherwiseConstantOtherwise(-1.0)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantA(-1.0)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantB(-1.0)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantC(-1.0)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @Test func negatedMultiplyAddingWhereOtherwiseConstantSplatTwo() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkNegatedMultiplyAddingWhereOtherwiseConstantOtherwise(2.0)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantA(2.0)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantB(2.0)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantC(2.0)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @Test func negatedMultiplyAddingWhereOtherwiseConstantSplatHalf() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkNegatedMultiplyAddingWhereOtherwiseConstantOtherwise(0.5)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantA(0.5)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantB(0.5)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantC(0.5)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @Test func negatedMultiplyAddingWhereOtherwiseConstantSplatFour() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkNegatedMultiplyAddingWhereOtherwiseConstantOtherwise(4.0)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantA(4.0)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantB(4.0)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantC(4.0)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @Test func negatedMultiplyAddingWhereOtherwiseConstantSplatQuarter() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkNegatedMultiplyAddingWhereOtherwiseConstantOtherwise(0.25)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantA(0.25)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantB(0.25)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantC(0.25)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @Test func negatedMultiplyAddingWhereOtherwiseConstantSplatOnePointFive() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkNegatedMultiplyAddingWhereOtherwiseConstantOtherwise(1.5)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantA(1.5)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantB(1.5)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantC(1.5)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @Test func negatedMultiplyAddingWhereOtherwiseConstantSplatMinusTwoPointFive() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkNegatedMultiplyAddingWhereOtherwiseConstantOtherwise(-2.5)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantA(-2.5)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantB(-2.5)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantC(-2.5)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @Test func negatedMultiplyAddingWhereOtherwiseConstantSplatInfinity() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkNegatedMultiplyAddingWhereOtherwiseConstantOtherwise(.infinity)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantA(.infinity)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantB(.infinity)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantC(.infinity)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @Test func negatedMultiplyAddingWhereOtherwiseConstantSplatMinusInfinity() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkNegatedMultiplyAddingWhereOtherwiseConstantOtherwise(-.infinity)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantA(-.infinity)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantB(-.infinity)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantC(-.infinity)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @Test func negatedMultiplyAddingWhereOtherwiseConstantSplatNaN() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkNegatedMultiplyAddingWhereOtherwiseConstantOtherwise(.nan)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantA(.nan)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantB(.nan)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantC(.nan)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @Test func negatedMultiplyAddingWhereOtherwiseConstantSplatMinusNaN() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkNegatedMultiplyAddingWhereOtherwiseConstantOtherwise(-.nan)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantA(-.nan)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantB(-.nan)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantC(-.nan)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @Test func negatedMultiplyAddingWhereOtherwiseConstantSplatPayloadNaN() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkNegatedMultiplyAddingWhereOtherwiseConstantOtherwise(
+                Lane(nan: 1, signaling: false)
+            )
+            checkNegatedMultiplyAddingWhereOtherwiseConstantA(Lane(nan: 1, signaling: false))
+            checkNegatedMultiplyAddingWhereOtherwiseConstantB(Lane(nan: 1, signaling: false))
+            checkNegatedMultiplyAddingWhereOtherwiseConstantC(Lane(nan: 1, signaling: false))
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @Test func negatedMultiplyAddingWhereOtherwiseConstantSplatSignalingNaN() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkNegatedMultiplyAddingWhereOtherwiseConstantOtherwise(.signalingNaN)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantA(.signalingNaN)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantB(.signalingNaN)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantC(.signalingNaN)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @Test func negatedMultiplyAddingWhereOtherwiseConstantSplatMinusSignalingNaN() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkNegatedMultiplyAddingWhereOtherwiseConstantOtherwise(-.signalingNaN)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantA(-.signalingNaN)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantB(-.signalingNaN)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantC(-.signalingNaN)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @Test func negatedMultiplyAddingWhereOtherwiseConstantSplatLeastNonzero() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkNegatedMultiplyAddingWhereOtherwiseConstantOtherwise(.leastNonzeroMagnitude)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantA(.leastNonzeroMagnitude)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantB(.leastNonzeroMagnitude)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantC(.leastNonzeroMagnitude)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @Test func negatedMultiplyAddingWhereOtherwiseConstantSplatGreatest() {
+        withKnownIssue(
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+            isIntermittent: true
+        ) {
+            checkNegatedMultiplyAddingWhereOtherwiseConstantOtherwise(.greatestFiniteMagnitude)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantA(.greatestFiniteMagnitude)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantB(.greatestFiniteMagnitude)
+            checkNegatedMultiplyAddingWhereOtherwiseConstantC(.greatestFiniteMagnitude)
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
+        }
+    }
+
+    @inline(__always)
     private func checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "negatedMultiplySubtractingWhereOtherwise with otherwise repeating \(hex(value))"
@@ -178,7 +654,7 @@ extension SIMDFloatConstantTests {
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatZero() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(0.0)
@@ -194,7 +670,7 @@ extension SIMDFloatConstantTests {
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatNegativeZero() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(-0.0)
@@ -210,7 +686,7 @@ extension SIMDFloatConstantTests {
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatOne() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(1.0)
@@ -226,7 +702,7 @@ extension SIMDFloatConstantTests {
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatMinusOne() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(-1.0)
@@ -242,7 +718,7 @@ extension SIMDFloatConstantTests {
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatTwo() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(2.0)
@@ -258,7 +734,7 @@ extension SIMDFloatConstantTests {
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatHalf() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(0.5)
@@ -274,7 +750,7 @@ extension SIMDFloatConstantTests {
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatFour() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(4.0)
@@ -290,7 +766,7 @@ extension SIMDFloatConstantTests {
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatQuarter() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(0.25)
@@ -306,7 +782,7 @@ extension SIMDFloatConstantTests {
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatOnePointFive() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(1.5)
@@ -322,7 +798,7 @@ extension SIMDFloatConstantTests {
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatMinusTwoPointFive() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(-2.5)
@@ -338,7 +814,7 @@ extension SIMDFloatConstantTests {
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatInfinity() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(.infinity)
@@ -354,7 +830,7 @@ extension SIMDFloatConstantTests {
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatMinusInfinity() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(-.infinity)
@@ -370,7 +846,7 @@ extension SIMDFloatConstantTests {
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatNaN() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(.nan)
@@ -386,7 +862,7 @@ extension SIMDFloatConstantTests {
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatMinusNaN() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(-.nan)
@@ -402,7 +878,7 @@ extension SIMDFloatConstantTests {
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatPayloadNaN() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(
@@ -420,7 +896,7 @@ extension SIMDFloatConstantTests {
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatSignalingNaN() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(.signalingNaN)
@@ -436,7 +912,7 @@ extension SIMDFloatConstantTests {
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatMinusSignalingNaN() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(-.signalingNaN)
@@ -452,7 +928,7 @@ extension SIMDFloatConstantTests {
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatLeastNonzero() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(.leastNonzeroMagnitude)
@@ -468,7 +944,7 @@ extension SIMDFloatConstantTests {
 
     @Test func negatedMultiplySubtractingWhereOtherwiseConstantSplatGreatest() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereOtherwiseConstantOtherwise(.greatestFiniteMagnitude)

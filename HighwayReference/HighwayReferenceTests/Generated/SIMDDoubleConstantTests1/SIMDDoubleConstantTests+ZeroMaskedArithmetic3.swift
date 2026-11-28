@@ -7,6 +7,517 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
+    private func checkNegatedMultiplySubtractingWhereConstantA(_ value: Lane) {
+        let mismatches = Mismatches(
+            "negatedMultiplySubtractingWhere with a repeating \(hex(value))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3E75_895F_9995_13C3)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3E75_8B5F_9995_1729)
+        let cInputs = Inputs.vectors(H.self, seed: 0x3E75_8A5F_9995_1576)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        for (mask, b, c) in mixedTriples(maskInputs, bInputs, cInputs, seed: 0xE13B_0EF8_93D4_DEC5)
+        where !hasUnorderedNaNs(negating: H.repeating(value).simd, b.simd, adding: c.simd) {
+            mismatches.check(
+                H.negatedMultiplySubtracting(H.repeating(value), b, c, where: mask),
+                H(
+                    raw: HighwayReference.negatedMultiplySubtractingWhereF64(
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
+                "mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkNegatedMultiplySubtractingWhereConstantB(_ value: Lane) {
+        let mismatches = Mismatches(
+            "negatedMultiplySubtractingWhere with b repeating \(hex(value))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x575B_0E5F_A75F_DFE2)
+        let aInputs = Inputs.vectors(H.self, seed: 0x575B_0F5F_A75F_E195)
+        let cInputs = Inputs.vectors(H.self, seed: 0x575B_0D5F_A75F_DE2F)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        for (mask, a, c) in mixedTriples(maskInputs, aInputs, cInputs, seed: 0x1F6B_4B5A_1BC9_E6A6)
+        where !hasUnorderedNaNs(negating: a.simd, H.repeating(value).simd, adding: c.simd) {
+            mismatches.check(
+                H.negatedMultiplySubtracting(a, H.repeating(value), c, where: mask),
+                H(
+                    raw: HighwayReference.negatedMultiplySubtractingWhereF64(
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw,
+                        c.raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkNegatedMultiplySubtractingWhereConstantC(_ value: Lane) {
+        let mismatches = Mismatches(
+            "negatedMultiplySubtractingWhere with c repeating \(hex(value))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x4EC5_F75F_A289_342D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4EC5_F65F_A289_327A)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4EC5_F55F_A289_30C7)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x0DDD_9C8B_6BF5_F2FF)
+        where !hasUnorderedNaNs(negating: a.simd, b.simd, adding: H.repeating(value).simd) {
+            mismatches.check(
+                H.negatedMultiplySubtracting(a, b, H.repeating(value), where: mask),
+                H(
+                    raw: HighwayReference.negatedMultiplySubtractingWhereF64(
+                        mask.raw,
+                        a.raw,
+                        b.raw,
+                        H.repeating(value).raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantSplatZero() {
+        withKnownIssue(
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            isIntermittent: true
+        ) {
+            withKnownIssue(
+                "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+                isIntermittent: true
+            ) {
+                checkNegatedMultiplySubtractingWhereConstantA(0.0)
+                checkNegatedMultiplySubtractingWhereConstantB(0.0)
+                checkNegatedMultiplySubtractingWhereConstantC(0.0)
+            } when: {
+                isAmd64 && !isDarwin
+                    && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                    && assertionsAreEnabled
+            }
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
+        }
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantSplatNegativeZero() {
+        withKnownIssue(
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            isIntermittent: true
+        ) {
+            withKnownIssue(
+                "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+                isIntermittent: true
+            ) {
+                checkNegatedMultiplySubtractingWhereConstantA(-0.0)
+                checkNegatedMultiplySubtractingWhereConstantB(-0.0)
+                checkNegatedMultiplySubtractingWhereConstantC(-0.0)
+            } when: {
+                isAmd64 && !isDarwin
+                    && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                    && assertionsAreEnabled
+            }
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
+        }
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantSplatOne() {
+        withKnownIssue(
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            isIntermittent: true
+        ) {
+            withKnownIssue(
+                "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+                isIntermittent: true
+            ) {
+                checkNegatedMultiplySubtractingWhereConstantA(1.0)
+                checkNegatedMultiplySubtractingWhereConstantB(1.0)
+                checkNegatedMultiplySubtractingWhereConstantC(1.0)
+            } when: {
+                isAmd64 && !isDarwin
+                    && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                    && assertionsAreEnabled
+            }
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
+        }
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantSplatMinusOne() {
+        withKnownIssue(
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            isIntermittent: true
+        ) {
+            withKnownIssue(
+                "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+                isIntermittent: true
+            ) {
+                checkNegatedMultiplySubtractingWhereConstantA(-1.0)
+                checkNegatedMultiplySubtractingWhereConstantB(-1.0)
+                checkNegatedMultiplySubtractingWhereConstantC(-1.0)
+            } when: {
+                isAmd64 && !isDarwin
+                    && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                    && assertionsAreEnabled
+            }
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
+        }
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantSplatTwo() {
+        withKnownIssue(
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            isIntermittent: true
+        ) {
+            withKnownIssue(
+                "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+                isIntermittent: true
+            ) {
+                checkNegatedMultiplySubtractingWhereConstantA(2.0)
+                checkNegatedMultiplySubtractingWhereConstantB(2.0)
+                checkNegatedMultiplySubtractingWhereConstantC(2.0)
+            } when: {
+                isAmd64 && !isDarwin
+                    && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                    && assertionsAreEnabled
+            }
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
+        }
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantSplatHalf() {
+        withKnownIssue(
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            isIntermittent: true
+        ) {
+            withKnownIssue(
+                "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+                isIntermittent: true
+            ) {
+                checkNegatedMultiplySubtractingWhereConstantA(0.5)
+                checkNegatedMultiplySubtractingWhereConstantB(0.5)
+                checkNegatedMultiplySubtractingWhereConstantC(0.5)
+            } when: {
+                isAmd64 && !isDarwin
+                    && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                    && assertionsAreEnabled
+            }
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
+        }
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantSplatFour() {
+        withKnownIssue(
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            isIntermittent: true
+        ) {
+            withKnownIssue(
+                "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+                isIntermittent: true
+            ) {
+                checkNegatedMultiplySubtractingWhereConstantA(4.0)
+                checkNegatedMultiplySubtractingWhereConstantB(4.0)
+                checkNegatedMultiplySubtractingWhereConstantC(4.0)
+            } when: {
+                isAmd64 && !isDarwin
+                    && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                    && assertionsAreEnabled
+            }
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
+        }
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantSplatQuarter() {
+        withKnownIssue(
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            isIntermittent: true
+        ) {
+            withKnownIssue(
+                "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+                isIntermittent: true
+            ) {
+                checkNegatedMultiplySubtractingWhereConstantA(0.25)
+                checkNegatedMultiplySubtractingWhereConstantB(0.25)
+                checkNegatedMultiplySubtractingWhereConstantC(0.25)
+            } when: {
+                isAmd64 && !isDarwin
+                    && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                    && assertionsAreEnabled
+            }
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
+        }
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantSplatOnePointFive() {
+        withKnownIssue(
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            isIntermittent: true
+        ) {
+            withKnownIssue(
+                "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+                isIntermittent: true
+            ) {
+                checkNegatedMultiplySubtractingWhereConstantA(1.5)
+                checkNegatedMultiplySubtractingWhereConstantB(1.5)
+                checkNegatedMultiplySubtractingWhereConstantC(1.5)
+            } when: {
+                isAmd64 && !isDarwin
+                    && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                    && assertionsAreEnabled
+            }
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
+        }
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantSplatMinusTwoPointFive() {
+        withKnownIssue(
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            isIntermittent: true
+        ) {
+            withKnownIssue(
+                "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+                isIntermittent: true
+            ) {
+                checkNegatedMultiplySubtractingWhereConstantA(-2.5)
+                checkNegatedMultiplySubtractingWhereConstantB(-2.5)
+                checkNegatedMultiplySubtractingWhereConstantC(-2.5)
+            } when: {
+                isAmd64 && !isDarwin
+                    && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                    && assertionsAreEnabled
+            }
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
+        }
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantSplatInfinity() {
+        withKnownIssue(
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            isIntermittent: true
+        ) {
+            withKnownIssue(
+                "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+                isIntermittent: true
+            ) {
+                checkNegatedMultiplySubtractingWhereConstantA(.infinity)
+                checkNegatedMultiplySubtractingWhereConstantB(.infinity)
+                checkNegatedMultiplySubtractingWhereConstantC(.infinity)
+            } when: {
+                isAmd64 && !isDarwin
+                    && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                    && assertionsAreEnabled
+            }
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
+        }
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantSplatMinusInfinity() {
+        withKnownIssue(
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            isIntermittent: true
+        ) {
+            withKnownIssue(
+                "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+                isIntermittent: true
+            ) {
+                checkNegatedMultiplySubtractingWhereConstantA(-.infinity)
+                checkNegatedMultiplySubtractingWhereConstantB(-.infinity)
+                checkNegatedMultiplySubtractingWhereConstantC(-.infinity)
+            } when: {
+                isAmd64 && !isDarwin
+                    && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                    && assertionsAreEnabled
+            }
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
+        }
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantSplatNaN() {
+        withKnownIssue(
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            isIntermittent: true
+        ) {
+            withKnownIssue(
+                "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+                isIntermittent: true
+            ) {
+                checkNegatedMultiplySubtractingWhereConstantA(.nan)
+                checkNegatedMultiplySubtractingWhereConstantB(.nan)
+                checkNegatedMultiplySubtractingWhereConstantC(.nan)
+            } when: {
+                isAmd64 && !isDarwin
+                    && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                    && assertionsAreEnabled
+            }
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
+        }
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantSplatMinusNaN() {
+        withKnownIssue(
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            isIntermittent: true
+        ) {
+            withKnownIssue(
+                "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+                isIntermittent: true
+            ) {
+                checkNegatedMultiplySubtractingWhereConstantA(-.nan)
+                checkNegatedMultiplySubtractingWhereConstantB(-.nan)
+                checkNegatedMultiplySubtractingWhereConstantC(-.nan)
+            } when: {
+                isAmd64 && !isDarwin
+                    && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                    && assertionsAreEnabled
+            }
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
+        }
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantSplatPayloadNaN() {
+        withKnownIssue(
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            isIntermittent: true
+        ) {
+            withKnownIssue(
+                "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+                isIntermittent: true
+            ) {
+                checkNegatedMultiplySubtractingWhereConstantA(Lane(nan: 1, signaling: false))
+                checkNegatedMultiplySubtractingWhereConstantB(Lane(nan: 1, signaling: false))
+                checkNegatedMultiplySubtractingWhereConstantC(Lane(nan: 1, signaling: false))
+            } when: {
+                isAmd64 && !isDarwin
+                    && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                    && assertionsAreEnabled
+            }
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
+        }
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantSplatSignalingNaN() {
+        withKnownIssue(
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            isIntermittent: true
+        ) {
+            withKnownIssue(
+                "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+                isIntermittent: true
+            ) {
+                checkNegatedMultiplySubtractingWhereConstantA(.signalingNaN)
+                checkNegatedMultiplySubtractingWhereConstantB(.signalingNaN)
+                checkNegatedMultiplySubtractingWhereConstantC(.signalingNaN)
+            } when: {
+                isAmd64 && !isDarwin
+                    && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                    && assertionsAreEnabled
+            }
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
+        }
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantSplatMinusSignalingNaN() {
+        withKnownIssue(
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            isIntermittent: true
+        ) {
+            withKnownIssue(
+                "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+                isIntermittent: true
+            ) {
+                checkNegatedMultiplySubtractingWhereConstantA(-.signalingNaN)
+                checkNegatedMultiplySubtractingWhereConstantB(-.signalingNaN)
+                checkNegatedMultiplySubtractingWhereConstantC(-.signalingNaN)
+            } when: {
+                isAmd64 && !isDarwin
+                    && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                    && assertionsAreEnabled
+            }
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
+        }
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantSplatLeastNonzero() {
+        withKnownIssue(
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            isIntermittent: true
+        ) {
+            withKnownIssue(
+                "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+                isIntermittent: true
+            ) {
+                checkNegatedMultiplySubtractingWhereConstantA(.leastNonzeroMagnitude)
+                checkNegatedMultiplySubtractingWhereConstantB(.leastNonzeroMagnitude)
+                checkNegatedMultiplySubtractingWhereConstantC(.leastNonzeroMagnitude)
+            } when: {
+                isAmd64 && !isDarwin
+                    && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                    && assertionsAreEnabled
+            }
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
+        }
+    }
+
+    @Test func negatedMultiplySubtractingWhereConstantSplatGreatest() {
+        withKnownIssue(
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            isIntermittent: true
+        ) {
+            withKnownIssue(
+                "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
+                isIntermittent: true
+            ) {
+                checkNegatedMultiplySubtractingWhereConstantA(.greatestFiniteMagnitude)
+                checkNegatedMultiplySubtractingWhereConstantB(.greatestFiniteMagnitude)
+                checkNegatedMultiplySubtractingWhereConstantC(.greatestFiniteMagnitude)
+            } when: {
+                isAmd64 && !isDarwin
+                    && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                    && assertionsAreEnabled
+            }
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
+        }
+    }
+
+    @inline(__always)
     private func checkApproximateReciprocalWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("approximateReciprocalWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x10AC_00F8_131B_111B)

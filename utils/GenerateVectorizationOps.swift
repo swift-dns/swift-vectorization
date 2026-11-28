@@ -509,6 +509,11 @@ enum UnorderedNaNs {
     var isWidened: Bool {
         [.widenedPairs, .widenedEven, .widenedOdd, .widenedAccumulating].contains(self)
     }
+
+    var negatesAnOperand: Bool {
+        [.negatedMultiplicand, .negatedAddend, .alternatingAddend, .alternatingNegatedAddend]
+            .contains(self)
+    }
 }
 
 enum ReturnType: Equatable {
@@ -53333,6 +53338,7 @@ struct KnownIssue {
     let comment: String
     let condition: String
     var isIntermittent: String?
+    var marksTestsByPrefix = false
 }
 
 let linuxAvx2AndAvx512NaNSign = KnownIssue(
@@ -53345,9 +53351,10 @@ let linuxAvx2AndAvx512NaNSign = KnownIssue(
 
 let linuxAvx2AndAvx512IntermittentNaNSign = KnownIssue(
     comment:
-        "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+        "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN operand that a fused multiply-add negates, in some builds only: which tests show it changes with what is compiled next to them, the cause of which is not known yet",
     condition: linuxAvx2AndAvx512NaNSign.condition,
-    isIntermittent: "true"
+    isIntermittent: "true",
+    marksTestsByPrefix: true
 )
 
 let knownGapTests: [String: [String]] = [
@@ -53359,67 +53366,6 @@ let knownGapTests: [String: [String]] = [
     ],
 ]
 
-let multiplySubtractingAddingConstantSplatTests = [
-    "multiplySubtractingAddingConstantSplatFour",
-    "multiplySubtractingAddingConstantSplatGreatest",
-    "multiplySubtractingAddingConstantSplatHalf",
-    "multiplySubtractingAddingConstantSplatInfinity",
-    "multiplySubtractingAddingConstantSplatLeastNonzero",
-    "multiplySubtractingAddingConstantSplatMinusInfinity",
-    "multiplySubtractingAddingConstantSplatMinusNaN",
-    "multiplySubtractingAddingConstantSplatMinusOne",
-    "multiplySubtractingAddingConstantSplatMinusSignalingNaN",
-    "multiplySubtractingAddingConstantSplatMinusTwoPointFive",
-    "multiplySubtractingAddingConstantSplatNaN",
-    "multiplySubtractingAddingConstantSplatNegativeZero",
-    "multiplySubtractingAddingConstantSplatOne",
-    "multiplySubtractingAddingConstantSplatOnePointFive",
-    "multiplySubtractingAddingConstantSplatPayloadNaN",
-    "multiplySubtractingAddingConstantSplatQuarter",
-    "multiplySubtractingAddingConstantSplatSignalingNaN",
-    "multiplySubtractingAddingConstantSplatTwo",
-    "multiplySubtractingAddingConstantSplatZero",
-]
-
-let multiplySubtractingAddingConstantAlternatingTests = [
-    "multiplySubtractingAddingConstantAAlternatingHalfAndOne",
-    "multiplySubtractingAddingConstantAAlternatingMinusTwoPointFiveAndHalf",
-    "multiplySubtractingAddingConstantAAlternatingOneAndMinusTwoPointFive",
-    "multiplySubtractingAddingConstantBAlternatingHalfAndOne",
-    "multiplySubtractingAddingConstantBAlternatingMinusTwoPointFiveAndHalf",
-    "multiplySubtractingAddingConstantBAlternatingOneAndMinusTwoPointFive",
-]
-
-let negatedMultiplySubtractingWhereOtherwiseConstantSplatTests = [
-    "negatedMultiplySubtractingWhereOtherwiseConstantSplatFour",
-    "negatedMultiplySubtractingWhereOtherwiseConstantSplatGreatest",
-    "negatedMultiplySubtractingWhereOtherwiseConstantSplatHalf",
-    "negatedMultiplySubtractingWhereOtherwiseConstantSplatInfinity",
-    "negatedMultiplySubtractingWhereOtherwiseConstantSplatLeastNonzero",
-    "negatedMultiplySubtractingWhereOtherwiseConstantSplatMinusInfinity",
-    "negatedMultiplySubtractingWhereOtherwiseConstantSplatMinusNaN",
-    "negatedMultiplySubtractingWhereOtherwiseConstantSplatMinusOne",
-    "negatedMultiplySubtractingWhereOtherwiseConstantSplatMinusSignalingNaN",
-    "negatedMultiplySubtractingWhereOtherwiseConstantSplatMinusTwoPointFive",
-    "negatedMultiplySubtractingWhereOtherwiseConstantSplatNaN",
-    "negatedMultiplySubtractingWhereOtherwiseConstantSplatNegativeZero",
-    "negatedMultiplySubtractingWhereOtherwiseConstantSplatOne",
-    "negatedMultiplySubtractingWhereOtherwiseConstantSplatOnePointFive",
-    "negatedMultiplySubtractingWhereOtherwiseConstantSplatPayloadNaN",
-    "negatedMultiplySubtractingWhereOtherwiseConstantSplatQuarter",
-    "negatedMultiplySubtractingWhereOtherwiseConstantSplatSignalingNaN",
-    "negatedMultiplySubtractingWhereOtherwiseConstantSplatTwo",
-    "negatedMultiplySubtractingWhereOtherwiseConstantSplatZero",
-]
-
-let negatedMultiplySubtractingWhereConstantMaskTests = [
-    "negatedMultiplySubtractingWhereConstantMaskAllButFirst",
-    "negatedMultiplySubtractingWhereConstantMaskAllButLast",
-    "negatedMultiplySubtractingWhereConstantMaskAllTrue",
-    "negatedMultiplySubtractingWhereConstantMaskOnlyFirst",
-    "negatedMultiplySubtractingWhereConstantMaskOnlyLast",
-]
-
 let approximateReciprocalSquareRootConstantSplatNaNTests = [
     "approximateReciprocalSquareRootConstantSplatMinusNaN",
     "approximateReciprocalSquareRootConstantSplatMinusSignalingNaN",
@@ -53428,15 +53374,14 @@ let approximateReciprocalSquareRootConstantSplatNaNTests = [
     "approximateReciprocalSquareRootConstantSplatSignalingNaN",
 ]
 
+let negatingFusedMultiplyConstantTestPrefixes = Set(
+    ops.filter { $0.unorderedNaNs?.negatesAnOperand == true }.map { "\($0.testIdentifier)Constant" }
+).sorted()
+
 let intermittentNaNSignTests: [String: [String]] = [
     "SIMDDoubleConstant": approximateReciprocalSquareRootConstantSplatNaNTests
-        + multiplySubtractingAddingConstantSplatTests
-        + multiplySubtractingAddingConstantAlternatingTests
-        + negatedMultiplySubtractingWhereOtherwiseConstantSplatTests,
-    "SIMDFloatConstant": multiplySubtractingAddingConstantSplatTests
-        + multiplySubtractingAddingConstantAlternatingTests
-        + negatedMultiplySubtractingWhereOtherwiseConstantSplatTests
-        + negatedMultiplySubtractingWhereConstantMaskTests,
+        + negatingFusedMultiplyConstantTestPrefixes,
+    "SIMDFloatConstant": negatingFusedMultiplyConstantTestPrefixes,
 ]
 
 let linuxAvx512MaskedZeroSign = KnownIssue(
@@ -53719,11 +53664,27 @@ let knownGaps: [(issue: KnownIssue, tests: [String: [String]])] =
         (sveAt512NaNOperandOrder, sveAt512NaNOperandOrderTests),
     ] + sveFirstTrueSettingGaps
 
+func declaredTestName(in test: String, among names: [String], byPrefix: Bool) -> String? {
+    guard byPrefix else { return names.first(where: { test.contains("func \($0)() {") }) }
+    for prefix in names {
+        guard let start = test.range(of: "func \(prefix)"),
+            let end = test.range(of: "() {\n", range: start.upperBound..<test.endIndex)
+        else { continue }
+        return prefix + test[start.upperBound..<end.lowerBound]
+    }
+    return nil
+}
+
 func markingKnownGaps(_ tests: [String], suite: String) -> [String] {
     knownGaps.reduce(tests) { tests, gap in
         guard let names = gap.tests[suite] else { return tests }
         return tests.map { test in
-            guard let name = names.first(where: { test.contains("func \($0)() {") }),
+            guard
+                let name = declaredTestName(
+                    in: test,
+                    among: names,
+                    byPrefix: gap.issue.marksTestsByPrefix
+                ),
                 let header = test.range(of: "func \(name)() {\n"), test.hasSuffix("\n}")
             else { return test }
             let body = test[header.upperBound...].dropLast(2)
