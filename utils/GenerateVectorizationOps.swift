@@ -22386,6 +22386,7 @@ struct FixedPermutation {
     let section: Section
     var targets = TargetBodies<Element>()
     var helpers = TargetBodies<Element>()
+    var sveShuffle: ((Element) -> String?)?
     var sse2Only: ((Element) -> String?)?
     var lowerFirst = false
     var laneCapability: LaneCapability?
@@ -22890,6 +22891,94 @@ func sveSplatSelectedLower(for element: Element) -> String {
         """
 }
 
+func sveLowerHalf(for element: Element) -> String {
+    let pattern = svePattern(lanes: element.laneCount / 2)
+    return "__builtin_sve_svptrue_pat_b\(element.bits)(\(pattern))"
+}
+
+func sveEvenBlocks(for element: Element) -> String {
+    switch element.width {
+    case 32:
+        return "const __SVBool_t evens = \(sveLowerHalf(for: element));"
+    case 64:
+        let all = sveAllLanes(of: unsignedElement(bits: 8))
+        return """
+            const __SVBool_t halves = __builtin_sve_svtrn1_b64(\(all), __builtin_sve_svwhilelt_b8_u64(0, 0));
+            const __SVBool_t evens = __builtin_sve_svzip1_b64(halves, halves);
+            """
+    default:
+        fatalError("There is no wide SVE target of \(element.width) bytes")
+    }
+}
+
+func sveSelectedLower(for element: Element) -> String {
+    let operands = [sveLowerHalf(for: element)] + ["b", "a"].map { sveOperand($0, for: element) }
+    let selected = sveBuiltin("sel", operands, for: element)
+    return vectorResult(sveResult(selected, for: element), for: element)
+}
+
+func sveExtendedHalves(for element: Element) -> String {
+    let operands = ["b", "a"].map { sveOperand($0, for: element) } + ["\(element.laneCount / 2)"]
+    let extended = sveBuiltin("ext", operands, for: element)
+    return vectorResult(sveResult(extended, for: element), for: element)
+}
+
+func sveOddEvenBlocks(for element: Element) -> String {
+    guard element.width == 64 else { return sveSelectedLower(for: element) }
+    let operands = ["evens"] + ["b", "a"].map { sveOperand($0, for: element) }
+    let selected = sveBuiltin("sel", operands, for: element)
+    return """
+        \(sveEvenBlocks(for: element))
+        \(vectorResult(sveResult(selected, for: element), for: element))
+        """
+}
+
+func sveInterleavedEvenBlocks(for element: Element) -> String {
+    let (first, second) = (sveOperand("a", for: element), sveOperand("b", for: element))
+    guard element.width == 64 else {
+        let lower = sveLowerHalf(for: element)
+        let spliced = sveBuiltin("splice", [lower, first, second], for: element)
+        return vectorResult(sveResult(spliced, for: element), for: element)
+    }
+    let amount = "\(element.laneCount - element.blockLaneCount)"
+    let slid = sveBuiltin("ext", [second, second, amount], for: element)
+    let selected = sveBuiltin("sel", ["evens", first, slid], for: element)
+    return """
+        \(sveEvenBlocks(for: element))
+        \(vectorResult(sveResult(selected, for: element), for: element))
+        """
+}
+
+func sveInterleavedOddBlocks(for element: Element) -> String {
+    let (first, second) = (sveOperand("a", for: element), sveOperand("b", for: element))
+    let slid = sveBuiltin("ext", [first, first, "\(element.blockLaneCount)"], for: element)
+    let selected = sveBuiltin("sel", ["evens", slid, second], for: element)
+    return """
+        \(sveEvenBlocks(for: element))
+        \(vectorResult(sveResult(selected, for: element), for: element))
+        """
+}
+
+func sveInterleavedBlocks(upper: Bool, for element: Element) -> String {
+    guard element.width == 64 else {
+        return upper
+            ? sveInterleavedOddBlocks(for: element) : sveInterleavedEvenBlocks(for: element)
+    }
+    let pairs = unsignedElement(bits: 64)
+    let operands = ["a", "b"].map { sveViewedOperand($0, from: element, as: pairs) }
+    let evens = sveBuiltin("trn1", operands, for: pairs)
+    let odds = sveBuiltin("trn2", operands, for: pairs)
+    let zipped = sveBuiltin(upper ? "zip2" : "zip1", [evens, odds], for: pairs)
+    return sveViewedResult(zipped, viewing: pairs, for: element)
+}
+
+func sveSwappedBlocks(for element: Element) -> String? {
+    guard element.width == 32 else { return nil }
+    let operand = sveOperand("a", for: element)
+    let swapped = sveBuiltin("ext", [operand, operand, "\(element.laneCount / 2)"], for: element)
+    return vectorResult(sveResult(swapped, for: element), for: element)
+}
+
 func sveSplatMember(_ name: String, for element: Element) -> String {
     let duplicated = sveResult(sveBuiltin("dup_n", ["\(name)[0]"], for: element), for: element)
     let condition = sveSplatCondition(name, nil, for: element)
@@ -23366,6 +23455,20 @@ func fixedPermutationOp(_ permutation: FixedPermutation) -> Op {
         return shuffled(operands.0, operands.1, permutation.indices(element), for: element)
     }
     var targets = permutation.targets
+    if let sveShuffle = permutation.sveShuffle {
+        targets.sve = { element in
+            sveShuffle(element).map { body in
+                sveFoldingConstants(
+                    of: isBinary ? [] : ["a"],
+                    jointly: isBinary ? [["a", "b"]] : [],
+                    portable(element),
+                    otherwise: body,
+                    for: element
+                )
+            }
+        }
+        targets.sve2 = portable
+    }
     if let sse2 = permutation.sse2Only {
         targets.sse2 = sse2
         targets.ssse3 = { element in sse2(element) == nil ? nil : portable(element) }
@@ -23971,6 +24074,7 @@ let fixedPermutations: [FixedPermutation] = [
             sve2_128Splat: { element in sveSplatExtended(for: element) },
             sveSplat: { element in sveSplatExtended(for: element) }
         ),
+        sveShuffle: { element in sveExtendedHalves(for: element) },
         sse2Only: { element in x86ConcatenatedLowerUpper(for: element) },
         lowerFirst: true,
         indices: { element in
@@ -23990,10 +24094,12 @@ let fixedPermutations: [FixedPermutation] = [
             ssse3: { element in x86ConcatenatedUpperLower(level: .ssse3, for: element) },
             sse2: { element in x86ConcatenatedUpperLower(level: .sse2, for: element) }
         ),
-        lowerFirst: true
-    ) { element in
-        concatenatedLanes(lowFromUpper: false, highFromUpper: true, for: element)
-    },
+        sveShuffle: { element in sveSelectedLower(for: element) },
+        lowerFirst: true,
+        indices: { element in
+            concatenatedLanes(lowFromUpper: false, highFromUpper: true, for: element)
+        }
+    ),
     FixedPermutation(
         swiftName: "concatenatingOdd",
         highwayName: "ConcatOdd",
@@ -24092,11 +24198,13 @@ let fixedPermutations: [FixedPermutation] = [
         parameters: [.tag, .vector],
         applies: .all,
         section: .reverse,
-        referenceCall: bfloat16ViaIntegers("ReverseBlocks", when: "HWY_TARGET == HWY_SVE_256")
-    ) { element in
-        let blocks = element.width / 16
-        return blockIndices((0..<blocks).reversed().map { ($0, false) }, for: element)
-    },
+        sveShuffle: { element in sveSwappedBlocks(for: element) },
+        referenceCall: bfloat16ViaIntegers("ReverseBlocks", when: "HWY_TARGET == HWY_SVE_256"),
+        indices: { element in
+            let blocks = element.width / 16
+            return blockIndices((0..<blocks).reversed().map { ($0, false) }, for: element)
+        }
+    ),
     FixedPermutation(
         swiftName: "reversed2",
         highwayName: "Reverse2",
@@ -24147,31 +24255,39 @@ let fixedPermutations: [FixedPermutation] = [
         highwayName: "OddEvenBlocks",
         parameters: [.vector, .vector],
         applies: .all,
-        section: .otherFixedPatternAcrossBlocks
-    ) { element in
-        let blocks = element.width / 16
-        return blockIndices((0..<blocks).map { ($0, $0 % 2 == 0) }, for: element)
-    },
+        section: .otherFixedPatternAcrossBlocks,
+        sveShuffle: { element in sveOddEvenBlocks(for: element) },
+        indices: { element in
+            let blocks = element.width / 16
+            return blockIndices((0..<blocks).map { ($0, $0 % 2 == 0) }, for: element)
+        }
+    ),
     FixedPermutation(
         swiftName: "swappingAdjacentBlocks",
         highwayName: "SwapAdjacentBlocks",
         parameters: [.vector],
         applies: .all,
         section: .otherFixedPatternAcrossBlocks,
+        sveShuffle: { element in sveSwappedBlocks(for: element) },
         referenceCall: bfloat16ViaIntegers(
             "SwapAdjacentBlocks",
             when: "HWY_TARGET == HWY_SVE_256"
-        )
-    ) { element in
-        let blocks = element.width / 16
-        return blockIndices((0..<blocks).map { (blocks > 1 ? $0 ^ 1 : $0, false) }, for: element)
-    },
+        ),
+        indices: { element in
+            let blocks = element.width / 16
+            return blockIndices(
+                (0..<blocks).map { (blocks > 1 ? $0 ^ 1 : $0, false) },
+                for: element
+            )
+        }
+    ),
     FixedPermutation(
         swiftName: "interleavingEvenBlocks",
         highwayName: "InterleaveEvenBlocks",
         parameters: [.tag, .vector, .vector],
         applies: .all,
         section: .otherFixedPatternAcrossBlocks,
+        sveShuffle: { element in sveInterleavedEvenBlocks(for: element) },
         indices: interleavedBlocks { pair, _ in 2 * pair }
     ),
     FixedPermutation(
@@ -24180,6 +24296,7 @@ let fixedPermutations: [FixedPermutation] = [
         parameters: [.tag, .vector, .vector],
         applies: .all,
         section: .otherFixedPatternAcrossBlocks,
+        sveShuffle: { element in sveInterleavedOddBlocks(for: element) },
         indices: interleavedBlocks { pair, blocks in blocks > 1 ? 2 * pair + 1 : 0 }
     ),
     FixedPermutation(
@@ -24188,6 +24305,7 @@ let fixedPermutations: [FixedPermutation] = [
         parameters: [.tag, .vector, .vector],
         applies: .all,
         section: .otherFixedPatternAcrossBlocks,
+        sveShuffle: { element in sveInterleavedBlocks(upper: false, for: element) },
         indices: interleavedBlocks { pair, _ in pair }
     ),
     FixedPermutation(
@@ -24196,6 +24314,7 @@ let fixedPermutations: [FixedPermutation] = [
         parameters: [.tag, .vector, .vector],
         applies: .all,
         section: .otherFixedPatternAcrossBlocks,
+        sveShuffle: { element in sveInterleavedBlocks(upper: true, for: element) },
         indices: interleavedBlocks { pair, blocks in blocks / 2 + pair }
     ),
 ]
@@ -26205,8 +26324,28 @@ func sveTupleMasks(for element: Element) -> String {
         """
 }
 
+func sveTupleSelection(for element: Element) -> String {
+    let source = sveOperand("a", for: element)
+    let members = (0..<2).map { sveOperand("tuple.v\($0)", for: element) }
+    let results = [
+        sveBuiltin("sel", ["first", source, members[0]], for: element),
+        sveBuiltin("sel", ["first", members[1], source], for: element),
+    ].map { "(\(element.cRawVector))\(sveResult($0, for: element))" }
+    return """
+        const __SVBool_t first = __builtin_sve_svwhilelt_b8_u64(0, -(uint64_t)(index == 0));
+        return (\(element.cTuple(2))){\(results.joined(separator: ", "))};
+        """
+}
+
 func sveTupleReplacement(_ count: Int, for element: Element) -> String? {
-    guard count == 2, element.width == 32 else { return nil }
+    guard count == 2 else { return nil }
+    guard element.width == 32 else {
+        return sveFolding(
+            when: "__builtin_constant_p(index)",
+            tupleReplacement(count, x86: false, for: element),
+            otherwise: sveTupleSelection(for: element)
+        )
+    }
     let blocks = 0..<element.width / 16
     let type = "__typeof__(\(sveTupleBlock("tuple.v0", 0, for: element)))"
     let declarations = (0..<count).flatMap { member in
@@ -38110,10 +38249,10 @@ func insertedBlockCases(for element: Element) -> [(amount: Int, body: String)] {
     }
 }
 
-func portableInsertedBlock(for element: Element) -> String {
+func insertedBlock(_ switches: [String], for element: Element) -> String {
     let lanes = element.blockLaneCount
     return """
-        \(constantSwitch(on: "index", insertedBlockCases(for: element)))
+        \(switches.joined(separator: "\n"))
         \(element.cVector) result = a;
         #pragma clang loop unroll(full)
         for (size_t i = 0; i < \(lanes); ++i) {
@@ -38121,6 +38260,52 @@ func portableInsertedBlock(for element: Element) -> String {
         }
         \(vectorResult("result", for: element))
         """
+}
+
+func portableInsertedBlock(for element: Element) -> String {
+    insertedBlock([constantSwitch(on: "index", insertedBlockCases(for: element))], for: element)
+}
+
+func sveInsertedBlockCases(for element: Element) -> [(amount: Int, body: String)] {
+    let blocks = element.width / 16
+    let pairs = unsignedElement(bits: 64)
+    let padding = Array(repeating: -1, count: element.laneCount - element.blockLaneCount)
+    let widened =
+        "__builtin_shufflevector(b, b, \(laneIndices(Array(0..<element.blockLaneCount) + padding)))"
+    let block = "(\(sveVector(pairs.cSuffix)))\(widened)"
+    let source = sveOperand("a", for: pairs)
+    func prefix(_ blocks: Int) -> String {
+        "__builtin_sve_svptrue_pat_b64(\(svePattern(lanes: 2 * blocks)))"
+    }
+    return (0..<blocks).map { index in
+        let inserted: String
+        if index == 0 {
+            inserted = sveBuiltin("sel", [prefix(1), block, source], for: pairs)
+        } else {
+            let spliced = sveBuiltin("splice", [prefix(index), source, block], for: pairs)
+            inserted =
+                index == blocks - 1
+                ? spliced : sveBuiltin("sel", [prefix(index + 1), spliced, source], for: pairs)
+        }
+        return (amount: index, body: sveViewedResult(inserted, viewing: pairs, for: element))
+    }
+}
+
+func sveInsertedBlock(for element: Element) -> String {
+    let bits = element.hasOpaqueVector ? "b" : "(\(unsignedElement(of: element).cBlock))b"
+    let folded = constantSwitch(
+        on: "index",
+        knowing: ["index"],
+        alongside: [
+            sveConstantCondition("a", for: element),
+            "__builtin_constant_p(__builtin_reduce_or(\(bits)))",
+        ],
+        insertedBlockCases(for: element)
+    )
+    return insertedBlock(
+        [folded, constantSwitch(on: "index", sveInsertedBlockCases(for: element))],
+        for: element
+    )
 }
 
 let blockOps: [Op] = [
@@ -38144,7 +38329,11 @@ let blockOps: [Op] = [
         .all,
         section: .gettingSettingBlocks,
         immediates: [blockIndex],
-        vectorLabels: ["_", "with"]
+        vectorLabels: ["_", "with"],
+        targets: TargetBodies(
+            sve: { element in sveInsertedBlock(for: element) },
+            sve2: { element in portableInsertedBlock(for: element) }
+        )
     ) { element in
         portableInsertedBlock(for: element)
     },
@@ -43732,12 +43921,38 @@ func halfPrecisionRepeatingBlock(for element: Element) -> String {
     let unsigned = unsignedElement(bits: element.bits).at(width: element.width)
     let call =
         "\(cFunctionName(repeatingBlockName, unsigned))(\(repeatingBlockLanes(of: element).joined(separator: ", ")))"
-    return "return (\(element.cRawVector))\(call);"
+    let calling = "return (\(element.cRawVector))\(call);"
+    guard element.category == .float16 else { return calling }
+    return cBody(
+        TargetBodies(
+            sve: { element in
+                let words = unsigned.at(width: element.width)
+                let literal = repeatingBlockLiteral(of: words)
+                return "return (\(element.cRawVector))(\(words.cRawVector))\(literal);"
+            }
+        ),
+        for: element,
+        portable: { _ in calling }
+    )
+}
+
+func repeatingBlockLiteral(of element: Element) -> String {
+    let blocks = Array(repeating: repeatingBlockLanes(of: element), count: element.width / 16)
+    return compoundLiteral(element.cVector, blocks.flatMap { $0 })
 }
 
 func repeatingBlockBody(of element: Element) -> String {
-    let blocks = Array(repeating: repeatingBlockLanes(of: element), count: element.width / 16)
-    return vectorResult(compoundLiteral(element.cVector, blocks.flatMap { $0 }), for: element)
+    vectorResult(repeatingBlockLiteral(of: element), for: element)
+}
+
+func sveRepeatingBlock(for element: Element) -> String {
+    let lanes = repeatingBlockLanes(of: element)
+    let duplicated = sveBuiltin("dupq_n", lanes, for: element)
+    return sveFolding(
+        when: lanes.map { "__builtin_constant_p(\($0))" }.joined(separator: " && "),
+        repeatingBlockBody(of: element),
+        otherwise: vectorResult(sveResult(duplicated, for: element), for: element)
+    )
 }
 
 typealias TargetBranch = (condition: String, body: String)
@@ -46096,7 +46311,11 @@ func generateHeader() -> String {
             parameters: repeatingBlockLanes(of: element).map { "\(element.cScalar) \($0)" },
             body: element.isHalfPrecision
                 ? halfPrecisionRepeatingBlock(for: element)
-                : cBody(TargetBodies(), for: element, portable: repeatingBlockBody),
+                : cBody(
+                    TargetBodies(sve: { element in sveRepeatingBlock(for: element) }),
+                    for: element,
+                    portable: repeatingBlockBody
+                ),
             for: element
         )
         output += "\n"
@@ -50255,6 +50474,43 @@ func repeatingBlockReferenceTest(for element: Element) -> String {
     )
 }
 
+func repeatingBlockConstantTests(for element: Element) -> [String] {
+    let lanes = repeatingBlockLanes(of: element)
+    let name = "check\(uppercasedFirst(repeatingBlockName))ConstantLanes"
+    let reference = referenceResult(
+        referenceCall(
+            referenceFunctionName(repeatingBlockName, element),
+            lanes.map(element.swiftScalarArgument)
+        ),
+        returning: .vector,
+        for: element
+    )
+    let port = portCall(repeatingBlockName, lanes)
+    let helper = referenceTestFunction(
+        name,
+        label: "\(repeatingBlockName) with constant lanes",
+        for: element,
+        inputs: [],
+        signature: constantHelperSignature(name, lanes, "Lane"),
+        statements: "mismatches.check(\(port), \(reference), \"lanes\")"
+    )
+    let values = jointConstantVectors(for: element)
+    let rotations = values.indices.map { rotation in
+        let literals = lanes.indices.map { values[($0 + rotation) % values.count].literal }
+        return ("Lanes\(rotation)", literals)
+    }
+    let splats = values.map { value in
+        ("Splat\(value.name)", lanes.map { _ in value.literal })
+    }
+    return [helper]
+        + (rotations + splats).map { suffix, literals in
+            constantTest(
+                "\(repeatingBlockName)Constant\(suffix)",
+                calls: ["\(name)(\(literals.joined(separator: ", ")))"]
+            )
+        }
+}
+
 func laneCapabilityReferenceTest(_ capability: LaneCapability, for element: Element) -> String {
     let name = capability.name
     let call = referenceCall(referenceFunctionName(name, element), [])
@@ -53783,6 +54039,7 @@ func constantType(
     switch parameter {
     case .flag: return "Bool"
     case .mask, .whereMask: return "H.Mask"
+    case .narrowVector(.block): return "H.BlockVector"
     case .constBytePointer: return "UInt64"
     case .roundConstant: return "UInt8"
     case _ where parameter.isPointerIndices: return signedElement(of: element).swiftType
@@ -53793,6 +54050,21 @@ func constantType(
 }
 
 let indexSplats = integerConstants([0, 1])
+
+func constantBlocks(for operand: Element) -> [ConstantValue] {
+    constantSplats(for: operand).map {
+        ConstantValue(name: $0.name, literal: "H.block(H.repeating(\($0.literal)), at: 0)")
+    }
+}
+
+func jointConstantBlocks(for operand: Element) -> [ConstantValue] {
+    let names = Set(jointConstantVectors(for: operand).map(\.name))
+    return constantBlocks(for: operand).filter { names.contains($0.name) }
+}
+
+func describesConstant(_ parameter: Parameter) -> Bool {
+    [.mask, .whereMask, .narrowVector(.block)].contains(parameter)
+}
 
 func constantIndexSplats(
     of op: Op,
@@ -53986,7 +54258,7 @@ func constantHelper(
         ? "alternating \\(hex(even)), \\(hex(odd))"
         : isSplat
             ? "repeating \\(hex(value))"
-            : [.mask, .whereMask].contains(op.parameters[index])
+            : describesConstant(op.parameters[index])
                 ? "\\(describe(\(value)))" : "\\(\(value))"
     let suffix = guarded ? " before a guard page" : ""
     let knownIssue =
@@ -54116,6 +54388,8 @@ func jointConstantTests(
         switch op.parameters[index] {
         case _ where isVector(index): dimension = rotations
         case .mask, .whereMask: dimension = constantMasks.map { [index: $0] }
+        case .narrowVector(.block):
+            dimension = jointConstantBlocks(for: element).map { [index: $0] }
         case .laneAmount: dimension = jointConstantAmounts.map { [index: $0] }
         case .immediate:
             let widest = element.at(width: X86Level.avx3.width)
@@ -54176,7 +54450,7 @@ func jointConstantTests(
             isVector(index)
             ? (alternating ? "alternating " : "repeating ")
                 + values.map { "\\(hex(\($0)))" }.joined(separator: ", ")
-            : [.mask, .whereMask].contains(op.parameters[index])
+            : describesConstant(op.parameters[index])
                 ? "\\(describe(\(values[0])))" : "\\(\(values[0]))"
         return "\(parameterBindings[index].swiftName) \(described)"
     }
@@ -54398,6 +54672,8 @@ func constantTests(of op: Op, for element: Element) -> [String] {
             ]
         case .mask, .whereMask:
             values = constantMasks
+        case .narrowVector(.block):
+            values = constantBlocks(for: element)
         case .lane:
             values = constantSplats(for: element)
         default:
@@ -54577,6 +54853,14 @@ func generateConstantTestMembers(_ element: Element, by keys: Set<String>?) -> [
             wideningConstantTests(op, from: $0, to: element)
         }
         return SectionMember(section: op.section, inside: tests)
+    }
+    if isTested(repeatingBlockCodegenKeys(for: element), by: keys) {
+        members.append(
+            SectionMember(
+                section: .initialization,
+                inside: repeatingBlockConstantTests(for: element)
+            )
+        )
     }
     return members
 }

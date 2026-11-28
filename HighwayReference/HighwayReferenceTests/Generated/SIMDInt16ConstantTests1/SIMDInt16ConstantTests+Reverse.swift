@@ -123,6 +123,122 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
+    private func checkReversedBlocksConstantA(_ value: Lane) {
+        let mismatches = Mismatches("reversedBlocks with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI16(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.reversedBlocks(H.repeating(value)),
+            H(raw: HighwayReference.reversedBlocksI16(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func reversedBlocksConstantSplat0() {
+        checkReversedBlocksConstantA(0)
+    }
+
+    @Test func reversedBlocksConstantSplat1() {
+        checkReversedBlocksConstantA(1)
+    }
+
+    @Test func reversedBlocksConstantSplat15() {
+        checkReversedBlocksConstantA(15)
+    }
+
+    @Test func reversedBlocksConstantSplat16() {
+        checkReversedBlocksConstantA(16)
+    }
+
+    @Test func reversedBlocksConstantSplat26() {
+        checkReversedBlocksConstantA(26)
+    }
+
+    @Test func reversedBlocksConstantSplat127() {
+        checkReversedBlocksConstantA(127)
+    }
+
+    @Test func reversedBlocksConstantSplat128() {
+        checkReversedBlocksConstantA(128)
+    }
+
+    @Test func reversedBlocksConstantSplat255() {
+        checkReversedBlocksConstantA(255)
+    }
+
+    @Test func reversedBlocksConstantSplat256() {
+        checkReversedBlocksConstantA(256)
+    }
+
+    @Test func reversedBlocksConstantSplat257() {
+        checkReversedBlocksConstantA(257)
+    }
+
+    @Test func reversedBlocksConstantSplatMinus1() {
+        checkReversedBlocksConstantA(-1)
+    }
+
+    @Test func reversedBlocksConstantSplatMinus16() {
+        checkReversedBlocksConstantA(-16)
+    }
+
+    @Test func reversedBlocksConstantSplatMinus17() {
+        checkReversedBlocksConstantA(-17)
+    }
+
+    @Test func reversedBlocksConstantSplatMinus128() {
+        checkReversedBlocksConstantA(-128)
+    }
+
+    @Test func reversedBlocksConstantSplatMinus129() {
+        checkReversedBlocksConstantA(-129)
+    }
+
+    @Test func reversedBlocksConstantSplatMax() {
+        checkReversedBlocksConstantA(Lane.max)
+    }
+
+    @Test func reversedBlocksConstantSplatMin() {
+        checkReversedBlocksConstantA(Lane.min)
+    }
+
+    @inline(__always)
+    private func checkReversedBlocksConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("reversedBlocks with a alternating \(hex(even)), \(hex(odd))")
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockI16(even, odd, even, odd, even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.reversedBlocks(H.repeatingBlock(even, odd, even, odd, even, odd, even, odd)),
+            H(
+                raw: HighwayReference.reversedBlocksI16(
+                    H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func reversedBlocksConstantAAlternating1And26() {
+        checkReversedBlocksConstantAAlternating(1, 26)
+    }
+
+    @Test func reversedBlocksConstantAAlternating26And127() {
+        checkReversedBlocksConstantAAlternating(26, 127)
+    }
+
+    @Test func reversedBlocksConstantAAlternating127And1() {
+        checkReversedBlocksConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
     private func checkReversed4ConstantA(_ value: Lane) {
         let mismatches = Mismatches("reversed4 with a repeating \(hex(value))")
         mismatches.check(

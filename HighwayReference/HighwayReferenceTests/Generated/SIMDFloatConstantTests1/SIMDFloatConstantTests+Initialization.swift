@@ -456,4 +456,39 @@ extension SIMDFloatConstantTests {
     @Test func repeatingWhereOtherwiseConstantOtherwiseAlternatingHalfAndOne() {
         checkRepeatingWhereOtherwiseConstantOtherwiseAlternating(0.5, 1.0)
     }
+
+    @inline(__always)
+    private func checkRepeatingBlockConstantLanes(_ v0: Lane, _ v1: Lane, _ v2: Lane, _ v3: Lane) {
+        let mismatches = Mismatches("repeatingBlock with constant lanes")
+        mismatches.check(
+            H.repeatingBlock(v0, v1, v2, v3),
+            H(raw: HighwayReference.repeatingBlockF32(v0, v1, v2, v3)),
+            "lanes"
+        )
+        mismatches.record()
+    }
+
+    @Test func repeatingBlockConstantLanes0() {
+        checkRepeatingBlockConstantLanes(1.0, -2.5, 0.5, 1.0)
+    }
+
+    @Test func repeatingBlockConstantLanes1() {
+        checkRepeatingBlockConstantLanes(-2.5, 0.5, 1.0, -2.5)
+    }
+
+    @Test func repeatingBlockConstantLanes2() {
+        checkRepeatingBlockConstantLanes(0.5, 1.0, -2.5, 0.5)
+    }
+
+    @Test func repeatingBlockConstantSplatOne() {
+        checkRepeatingBlockConstantLanes(1.0, 1.0, 1.0, 1.0)
+    }
+
+    @Test func repeatingBlockConstantSplatMinusTwoPointFive() {
+        checkRepeatingBlockConstantLanes(-2.5, -2.5, -2.5, -2.5)
+    }
+
+    @Test func repeatingBlockConstantSplatHalf() {
+        checkRepeatingBlockConstantLanes(0.5, 0.5, 0.5, 0.5)
+    }
 }

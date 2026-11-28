@@ -283,6 +283,34 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
+    private func checkReversedBlocksConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("reversedBlocks with a alternating \(hex(even)), \(hex(odd))")
+        mismatches.check(
+            H.repeatingBlock(even, odd),
+            H(raw: HighwayReference.repeatingBlockF64(even, odd)),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.reversedBlocks(H.repeatingBlock(even, odd)),
+            H(raw: HighwayReference.reversedBlocksF64(H.repeatingBlock(even, odd).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func reversedBlocksConstantAAlternatingOneAndMinusTwoPointFive() {
+        checkReversedBlocksConstantAAlternating(1.0, -2.5)
+    }
+
+    @Test func reversedBlocksConstantAAlternatingMinusTwoPointFiveAndHalf() {
+        checkReversedBlocksConstantAAlternating(-2.5, 0.5)
+    }
+
+    @Test func reversedBlocksConstantAAlternatingHalfAndOne() {
+        checkReversedBlocksConstantAAlternating(0.5, 1.0)
+    }
+
+    @inline(__always)
     private func checkReversed2ConstantA(_ value: Lane) {
         let mismatches = Mismatches("reversed2 with a repeating \(hex(value))")
         mismatches.check(

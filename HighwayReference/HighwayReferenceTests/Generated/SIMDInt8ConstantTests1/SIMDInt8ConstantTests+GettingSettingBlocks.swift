@@ -71,6 +71,143 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
+    private func checkReplacingBlockConstantB(_ b: H.BlockVector) {
+        let mismatches = Mismatches("replacingBlock with b \(describe(b))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x9435_C145_350E_95F0)
+        let indexInputs = Array(0...H.laneCount / 16 - 1)
+        for (a, index) in everyPair(aInputs, indexInputs) {
+            mismatches.check(
+                H.replacingBlock(a, at: index, with: b),
+                H(
+                    raw: HighwayReference.replacingBlockI8(
+                        a.raw,
+                        Int32(truncatingIfNeeded: index),
+                        b.raw
+                    )
+                ),
+                "a: \(describe(a)), index: \(index)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func replacingBlockConstantB0() {
+        checkReplacingBlockConstantB(H.block(H.repeating(0), at: 0))
+    }
+
+    @Test func replacingBlockConstantB1() {
+        checkReplacingBlockConstantB(H.block(H.repeating(1), at: 0))
+    }
+
+    @Test func replacingBlockConstantB15() {
+        checkReplacingBlockConstantB(H.block(H.repeating(15), at: 0))
+    }
+
+    @Test func replacingBlockConstantB16() {
+        checkReplacingBlockConstantB(H.block(H.repeating(16), at: 0))
+    }
+
+    @Test func replacingBlockConstantB26() {
+        checkReplacingBlockConstantB(H.block(H.repeating(26), at: 0))
+    }
+
+    @Test func replacingBlockConstantB127() {
+        checkReplacingBlockConstantB(H.block(H.repeating(127), at: 0))
+    }
+
+    @Test func replacingBlockConstantBMinus1() {
+        checkReplacingBlockConstantB(H.block(H.repeating(-1), at: 0))
+    }
+
+    @Test func replacingBlockConstantBMinus16() {
+        checkReplacingBlockConstantB(H.block(H.repeating(-16), at: 0))
+    }
+
+    @Test func replacingBlockConstantBMinus17() {
+        checkReplacingBlockConstantB(H.block(H.repeating(-17), at: 0))
+    }
+
+    @Test func replacingBlockConstantBMinus128() {
+        checkReplacingBlockConstantB(H.block(H.repeating(-128), at: 0))
+    }
+
+    @inline(__always)
+    private func checkReplacingBlockConstantAIndexB(
+        _ aValue: Lane,
+        _ index: Int,
+        _ b: H.BlockVector
+    ) {
+        let mismatches = Mismatches(
+            "replacingBlock with a repeating \(hex(aValue)), index \(index), b \(describe(b))"
+        )
+        mismatches.check(
+            H.repeating(aValue),
+            H(raw: HighwayReference.repeatingI8(aValue)),
+            "repeating"
+        )
+        mismatches.check(
+            H.replacingBlock(H.repeating(aValue), at: index, with: b),
+            H(
+                raw: HighwayReference.replacingBlockI8(
+                    H.repeating(aValue).raw,
+                    Int32(truncatingIfNeeded: index),
+                    b.raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test(.enabled(if: 0 <= H.laneCount / 16 - 1)) func replacingBlockConstantA1Index0B1() {
+        checkReplacingBlockConstantAIndexB(1, 0, H.block(H.repeating(1), at: 0))
+    }
+
+    @Test(.enabled(if: 0 <= H.laneCount / 16 - 1)) func replacingBlockConstantA1Index0B26() {
+        checkReplacingBlockConstantAIndexB(1, 0, H.block(H.repeating(26), at: 0))
+    }
+
+    @Test(.enabled(if: 0 <= H.laneCount / 16 - 1)) func replacingBlockConstantA1Index0B127() {
+        checkReplacingBlockConstantAIndexB(1, 0, H.block(H.repeating(127), at: 0))
+    }
+
+    @Test(.enabled(if: 1 <= H.laneCount / 16 - 1)) func replacingBlockConstantA1Index1B1() {
+        checkReplacingBlockConstantAIndexB(1, 1, H.block(H.repeating(1), at: 0))
+    }
+
+    @Test(.enabled(if: 1 <= H.laneCount / 16 - 1)) func replacingBlockConstantA1Index1B26() {
+        checkReplacingBlockConstantAIndexB(1, 1, H.block(H.repeating(26), at: 0))
+    }
+
+    @Test(.enabled(if: 1 <= H.laneCount / 16 - 1)) func replacingBlockConstantA1Index1B127() {
+        checkReplacingBlockConstantAIndexB(1, 1, H.block(H.repeating(127), at: 0))
+    }
+
+    @Test(.enabled(if: 2 <= H.laneCount / 16 - 1)) func replacingBlockConstantA1Index2B1() {
+        checkReplacingBlockConstantAIndexB(1, 2, H.block(H.repeating(1), at: 0))
+    }
+
+    @Test(.enabled(if: 2 <= H.laneCount / 16 - 1)) func replacingBlockConstantA1Index2B26() {
+        checkReplacingBlockConstantAIndexB(1, 2, H.block(H.repeating(26), at: 0))
+    }
+
+    @Test(.enabled(if: 2 <= H.laneCount / 16 - 1)) func replacingBlockConstantA1Index2B127() {
+        checkReplacingBlockConstantAIndexB(1, 2, H.block(H.repeating(127), at: 0))
+    }
+
+    @Test(.enabled(if: 3 <= H.laneCount / 16 - 1)) func replacingBlockConstantA1Index3B1() {
+        checkReplacingBlockConstantAIndexB(1, 3, H.block(H.repeating(1), at: 0))
+    }
+
+    @Test(.enabled(if: 3 <= H.laneCount / 16 - 1)) func replacingBlockConstantA1Index3B26() {
+        checkReplacingBlockConstantAIndexB(1, 3, H.block(H.repeating(26), at: 0))
+    }
+
+    @Test(.enabled(if: 3 <= H.laneCount / 16 - 1)) func replacingBlockConstantA1Index3B127() {
+        checkReplacingBlockConstantAIndexB(1, 3, H.block(H.repeating(127), at: 0))
+    }
+
+    @inline(__always)
     private func checkReplacingBlockConstantIndex(_ index: Int) {
         let mismatches = Mismatches("replacingBlock with index \(index)")
         let aInputs = Inputs.vectors(H.self, seed: 0xF40E_01DB_171C_77B2)
@@ -146,5 +283,187 @@ extension SIMDInt8ConstantTests {
 
     @Test(.enabled(if: 3 <= H.laneCount / 16 - 1)) func replacingBlockUncheckedConstantIndex3() {
         checkReplacingBlockUncheckedConstantIndex(3)
+    }
+
+    @inline(__always)
+    private func checkReplacingBlockConstantA(_ value: Lane) {
+        let mismatches = Mismatches("replacingBlock with a repeating \(hex(value))")
+        let indexInputs = Array(0...H.laneCount / 16 - 1)
+        let bInputs = Inputs.vectors(H.BlockVector.self, seed: 0x9D37_7645_3A41_6CFF).map(
+            poisoningUpperBytes
+        )
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI8(value)),
+            "repeating"
+        )
+        for (index, b) in everyPair(indexInputs, bInputs) {
+            mismatches.check(
+                H.replacingBlock(H.repeating(value), at: index, with: b),
+                H(
+                    raw: HighwayReference.replacingBlockI8(
+                        H.repeating(value).raw,
+                        Int32(truncatingIfNeeded: index),
+                        b.raw
+                    )
+                ),
+                "index: \(index), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func replacingBlockConstantSplat0() {
+        checkReplacingBlockConstantA(0)
+    }
+
+    @Test func replacingBlockConstantSplat1() {
+        checkReplacingBlockConstantA(1)
+    }
+
+    @Test func replacingBlockConstantSplat15() {
+        checkReplacingBlockConstantA(15)
+    }
+
+    @Test func replacingBlockConstantSplat16() {
+        checkReplacingBlockConstantA(16)
+    }
+
+    @Test func replacingBlockConstantSplat26() {
+        checkReplacingBlockConstantA(26)
+    }
+
+    @Test func replacingBlockConstantSplat127() {
+        checkReplacingBlockConstantA(127)
+    }
+
+    @Test func replacingBlockConstantSplatMinus1() {
+        checkReplacingBlockConstantA(-1)
+    }
+
+    @Test func replacingBlockConstantSplatMinus16() {
+        checkReplacingBlockConstantA(-16)
+    }
+
+    @Test func replacingBlockConstantSplatMinus17() {
+        checkReplacingBlockConstantA(-17)
+    }
+
+    @Test func replacingBlockConstantSplatMinus128() {
+        checkReplacingBlockConstantA(-128)
+    }
+
+    @inline(__always)
+    private func checkReplacingBlockConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches("replacingBlock with a alternating \(hex(even)), \(hex(odd))")
+        let indexInputs = Array(0...H.laneCount / 16 - 1)
+        let bInputs = Inputs.vectors(H.BlockVector.self, seed: 0xDC30_86FE_5136_30AE).map(
+            poisoningUpperBytes
+        )
+        mismatches.check(
+            H.repeatingBlock(
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd,
+                even,
+                odd
+            ),
+            H(
+                raw: HighwayReference.repeatingBlockI8(
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd,
+                    even,
+                    odd
+                )
+            ),
+            "repeatingBlock"
+        )
+        for (index, b) in everyPair(indexInputs, bInputs) {
+            mismatches.check(
+                H.replacingBlock(
+                    H.repeatingBlock(
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd,
+                        even,
+                        odd
+                    ),
+                    at: index,
+                    with: b
+                ),
+                H(
+                    raw: HighwayReference.replacingBlockI8(
+                        H.repeatingBlock(
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd,
+                            even,
+                            odd
+                        ).raw,
+                        Int32(truncatingIfNeeded: index),
+                        b.raw
+                    )
+                ),
+                "index: \(index), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func replacingBlockConstantAAlternating1And26() {
+        checkReplacingBlockConstantAAlternating(1, 26)
+    }
+
+    @Test func replacingBlockConstantAAlternating26And127() {
+        checkReplacingBlockConstantAAlternating(26, 127)
+    }
+
+    @Test func replacingBlockConstantAAlternating127And1() {
+        checkReplacingBlockConstantAAlternating(127, 1)
     }
 }

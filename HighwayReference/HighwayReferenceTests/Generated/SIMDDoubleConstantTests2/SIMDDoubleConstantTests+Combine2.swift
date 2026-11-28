@@ -7,6 +7,139 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
+    private func checkInterleavingWholeUpperConstantA(_ value: Lane) {
+        let mismatches = Mismatches("interleavingWholeUpper with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.self, seed: 0x1C56_6C8E_9E94_4A2E)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.interleavingWholeUpper(H.repeating(value), b),
+                H(raw: HighwayReference.interleavingWholeUpperF64(H.repeating(value).raw, b.raw)),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkInterleavingWholeUpperConstantB(_ value: Lane) {
+        let mismatches = Mismatches("interleavingWholeUpper with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x13C1_368E_99BD_69CC)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.interleavingWholeUpper(a, H.repeating(value)),
+                H(raw: HighwayReference.interleavingWholeUpperF64(a.raw, H.repeating(value).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func interleavingWholeUpperConstantSplatZero() {
+        checkInterleavingWholeUpperConstantA(0.0)
+        checkInterleavingWholeUpperConstantB(0.0)
+    }
+
+    @Test func interleavingWholeUpperConstantSplatNegativeZero() {
+        checkInterleavingWholeUpperConstantA(-0.0)
+        checkInterleavingWholeUpperConstantB(-0.0)
+    }
+
+    @Test func interleavingWholeUpperConstantSplatOne() {
+        checkInterleavingWholeUpperConstantA(1.0)
+        checkInterleavingWholeUpperConstantB(1.0)
+    }
+
+    @Test func interleavingWholeUpperConstantSplatMinusOne() {
+        checkInterleavingWholeUpperConstantA(-1.0)
+        checkInterleavingWholeUpperConstantB(-1.0)
+    }
+
+    @Test func interleavingWholeUpperConstantSplatTwo() {
+        checkInterleavingWholeUpperConstantA(2.0)
+        checkInterleavingWholeUpperConstantB(2.0)
+    }
+
+    @Test func interleavingWholeUpperConstantSplatHalf() {
+        checkInterleavingWholeUpperConstantA(0.5)
+        checkInterleavingWholeUpperConstantB(0.5)
+    }
+
+    @Test func interleavingWholeUpperConstantSplatFour() {
+        checkInterleavingWholeUpperConstantA(4.0)
+        checkInterleavingWholeUpperConstantB(4.0)
+    }
+
+    @Test func interleavingWholeUpperConstantSplatQuarter() {
+        checkInterleavingWholeUpperConstantA(0.25)
+        checkInterleavingWholeUpperConstantB(0.25)
+    }
+
+    @Test func interleavingWholeUpperConstantSplatOnePointFive() {
+        checkInterleavingWholeUpperConstantA(1.5)
+        checkInterleavingWholeUpperConstantB(1.5)
+    }
+
+    @Test func interleavingWholeUpperConstantSplatMinusTwoPointFive() {
+        checkInterleavingWholeUpperConstantA(-2.5)
+        checkInterleavingWholeUpperConstantB(-2.5)
+    }
+
+    @Test func interleavingWholeUpperConstantSplatInfinity() {
+        checkInterleavingWholeUpperConstantA(.infinity)
+        checkInterleavingWholeUpperConstantB(.infinity)
+    }
+
+    @Test func interleavingWholeUpperConstantSplatMinusInfinity() {
+        checkInterleavingWholeUpperConstantA(-.infinity)
+        checkInterleavingWholeUpperConstantB(-.infinity)
+    }
+
+    @Test func interleavingWholeUpperConstantSplatNaN() {
+        checkInterleavingWholeUpperConstantA(.nan)
+        checkInterleavingWholeUpperConstantB(.nan)
+    }
+
+    @Test func interleavingWholeUpperConstantSplatMinusNaN() {
+        checkInterleavingWholeUpperConstantA(-.nan)
+        checkInterleavingWholeUpperConstantB(-.nan)
+    }
+
+    @Test func interleavingWholeUpperConstantSplatPayloadNaN() {
+        checkInterleavingWholeUpperConstantA(Lane(nan: 1, signaling: false))
+        checkInterleavingWholeUpperConstantB(Lane(nan: 1, signaling: false))
+    }
+
+    @Test func interleavingWholeUpperConstantSplatSignalingNaN() {
+        checkInterleavingWholeUpperConstantA(.signalingNaN)
+        checkInterleavingWholeUpperConstantB(.signalingNaN)
+    }
+
+    @Test func interleavingWholeUpperConstantSplatMinusSignalingNaN() {
+        checkInterleavingWholeUpperConstantA(-.signalingNaN)
+        checkInterleavingWholeUpperConstantB(-.signalingNaN)
+    }
+
+    @Test func interleavingWholeUpperConstantSplatLeastNonzero() {
+        checkInterleavingWholeUpperConstantA(.leastNonzeroMagnitude)
+        checkInterleavingWholeUpperConstantB(.leastNonzeroMagnitude)
+    }
+
+    @Test func interleavingWholeUpperConstantSplatGreatest() {
+        checkInterleavingWholeUpperConstantA(.greatestFiniteMagnitude)
+        checkInterleavingWholeUpperConstantB(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
     private func checkLowerHalfConstantA(_ value: Lane) {
         let mismatches = Mismatches("lowerHalf with a repeating \(hex(value))")
         mismatches.check(

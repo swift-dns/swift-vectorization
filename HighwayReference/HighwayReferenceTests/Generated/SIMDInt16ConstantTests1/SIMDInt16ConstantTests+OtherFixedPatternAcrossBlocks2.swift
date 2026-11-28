@@ -7,6 +7,321 @@ import Vectorization
 
 extension SIMDInt16ConstantTests {
     @inline(__always)
+    private func checkInterleavingUpperBlocksConstantAB(_ aValue: Lane, _ bValue: Lane) {
+        let mismatches = Mismatches(
+            "interleavingUpperBlocks with a repeating \(hex(aValue)), b repeating \(hex(bValue))"
+        )
+        mismatches.check(
+            H.repeating(aValue),
+            H(raw: HighwayReference.repeatingI16(aValue)),
+            "repeating"
+        )
+        mismatches.check(
+            H.repeating(bValue),
+            H(raw: HighwayReference.repeatingI16(bValue)),
+            "repeating"
+        )
+        mismatches.check(
+            H.interleavingUpperBlocks(H.repeating(aValue), H.repeating(bValue)),
+            H(
+                raw: HighwayReference.interleavingUpperBlocksI16(
+                    H.repeating(aValue).raw,
+                    H.repeating(bValue).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func interleavingUpperBlocksConstantA1B26() {
+        checkInterleavingUpperBlocksConstantAB(1, 26)
+    }
+
+    @Test func interleavingUpperBlocksConstantA26B127() {
+        checkInterleavingUpperBlocksConstantAB(26, 127)
+    }
+
+    @Test func interleavingUpperBlocksConstantA127B1() {
+        checkInterleavingUpperBlocksConstantAB(127, 1)
+    }
+
+    @inline(__always)
+    private func checkInterleavingUpperBlocksConstantABAlternating(
+        _ aEven: Lane,
+        _ aOdd: Lane,
+        _ bEven: Lane,
+        _ bOdd: Lane
+    ) {
+        let mismatches = Mismatches(
+            "interleavingUpperBlocks with a alternating \(hex(aEven)), \(hex(aOdd)), b alternating \(hex(bEven)), \(hex(bOdd))"
+        )
+        mismatches.check(
+            H.repeatingBlock(aEven, aOdd, aEven, aOdd, aEven, aOdd, aEven, aOdd),
+            H(
+                raw: HighwayReference.repeatingBlockI16(
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd,
+                    aEven,
+                    aOdd
+                )
+            ),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.repeatingBlock(bEven, bOdd, bEven, bOdd, bEven, bOdd, bEven, bOdd),
+            H(
+                raw: HighwayReference.repeatingBlockI16(
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd,
+                    bEven,
+                    bOdd
+                )
+            ),
+            "repeatingBlock"
+        )
+        mismatches.check(
+            H.interleavingUpperBlocks(
+                H.repeatingBlock(aEven, aOdd, aEven, aOdd, aEven, aOdd, aEven, aOdd),
+                H.repeatingBlock(bEven, bOdd, bEven, bOdd, bEven, bOdd, bEven, bOdd)
+            ),
+            H(
+                raw: HighwayReference.interleavingUpperBlocksI16(
+                    H.repeatingBlock(aEven, aOdd, aEven, aOdd, aEven, aOdd, aEven, aOdd).raw,
+                    H.repeatingBlock(bEven, bOdd, bEven, bOdd, bEven, bOdd, bEven, bOdd).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func interleavingUpperBlocksConstantA1And26B26And127() {
+        checkInterleavingUpperBlocksConstantABAlternating(1, 26, 26, 127)
+    }
+
+    @Test func interleavingUpperBlocksConstantA26And127B127And1() {
+        checkInterleavingUpperBlocksConstantABAlternating(26, 127, 127, 1)
+    }
+
+    @Test func interleavingUpperBlocksConstantA127And1B1And26() {
+        checkInterleavingUpperBlocksConstantABAlternating(127, 1, 1, 26)
+    }
+
+    @inline(__always)
+    private func checkInterleavingUpperBlocksConstantA(_ value: Lane) {
+        let mismatches = Mismatches("interleavingUpperBlocks with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.self, seed: 0xF949_0DDD_E89F_E8AF)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI16(value)),
+            "repeating"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.interleavingUpperBlocks(H.repeating(value), b),
+                H(raw: HighwayReference.interleavingUpperBlocksI16(H.repeating(value).raw, b.raw)),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkInterleavingUpperBlocksConstantB(_ value: Lane) {
+        let mismatches = Mismatches("interleavingUpperBlocks with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.self, seed: 0x02B7_C3DD_EE2F_9351)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI16(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.interleavingUpperBlocks(a, H.repeating(value)),
+                H(raw: HighwayReference.interleavingUpperBlocksI16(a.raw, H.repeating(value).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func interleavingUpperBlocksConstantSplat0() {
+        checkInterleavingUpperBlocksConstantA(0)
+        checkInterleavingUpperBlocksConstantB(0)
+    }
+
+    @Test func interleavingUpperBlocksConstantSplat1() {
+        checkInterleavingUpperBlocksConstantA(1)
+        checkInterleavingUpperBlocksConstantB(1)
+    }
+
+    @Test func interleavingUpperBlocksConstantSplat15() {
+        checkInterleavingUpperBlocksConstantA(15)
+        checkInterleavingUpperBlocksConstantB(15)
+    }
+
+    @Test func interleavingUpperBlocksConstantSplat16() {
+        checkInterleavingUpperBlocksConstantA(16)
+        checkInterleavingUpperBlocksConstantB(16)
+    }
+
+    @Test func interleavingUpperBlocksConstantSplat26() {
+        checkInterleavingUpperBlocksConstantA(26)
+        checkInterleavingUpperBlocksConstantB(26)
+    }
+
+    @Test func interleavingUpperBlocksConstantSplat127() {
+        checkInterleavingUpperBlocksConstantA(127)
+        checkInterleavingUpperBlocksConstantB(127)
+    }
+
+    @Test func interleavingUpperBlocksConstantSplat128() {
+        checkInterleavingUpperBlocksConstantA(128)
+        checkInterleavingUpperBlocksConstantB(128)
+    }
+
+    @Test func interleavingUpperBlocksConstantSplat255() {
+        checkInterleavingUpperBlocksConstantA(255)
+        checkInterleavingUpperBlocksConstantB(255)
+    }
+
+    @Test func interleavingUpperBlocksConstantSplat256() {
+        checkInterleavingUpperBlocksConstantA(256)
+        checkInterleavingUpperBlocksConstantB(256)
+    }
+
+    @Test func interleavingUpperBlocksConstantSplat257() {
+        checkInterleavingUpperBlocksConstantA(257)
+        checkInterleavingUpperBlocksConstantB(257)
+    }
+
+    @Test func interleavingUpperBlocksConstantSplatMinus1() {
+        checkInterleavingUpperBlocksConstantA(-1)
+        checkInterleavingUpperBlocksConstantB(-1)
+    }
+
+    @Test func interleavingUpperBlocksConstantSplatMinus16() {
+        checkInterleavingUpperBlocksConstantA(-16)
+        checkInterleavingUpperBlocksConstantB(-16)
+    }
+
+    @Test func interleavingUpperBlocksConstantSplatMinus17() {
+        checkInterleavingUpperBlocksConstantA(-17)
+        checkInterleavingUpperBlocksConstantB(-17)
+    }
+
+    @Test func interleavingUpperBlocksConstantSplatMinus128() {
+        checkInterleavingUpperBlocksConstantA(-128)
+        checkInterleavingUpperBlocksConstantB(-128)
+    }
+
+    @Test func interleavingUpperBlocksConstantSplatMinus129() {
+        checkInterleavingUpperBlocksConstantA(-129)
+        checkInterleavingUpperBlocksConstantB(-129)
+    }
+
+    @Test func interleavingUpperBlocksConstantSplatMax() {
+        checkInterleavingUpperBlocksConstantA(Lane.max)
+        checkInterleavingUpperBlocksConstantB(Lane.max)
+    }
+
+    @Test func interleavingUpperBlocksConstantSplatMin() {
+        checkInterleavingUpperBlocksConstantA(Lane.min)
+        checkInterleavingUpperBlocksConstantB(Lane.min)
+    }
+
+    @inline(__always)
+    private func checkInterleavingUpperBlocksConstantAAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "interleavingUpperBlocks with a alternating \(hex(even)), \(hex(odd))"
+        )
+        let bInputs = Inputs.vectors(H.self, seed: 0xACDA_DFA2_FEA7_E024)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockI16(even, odd, even, odd, even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.interleavingUpperBlocks(
+                    H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+                    b
+                ),
+                H(
+                    raw: HighwayReference.interleavingUpperBlocksI16(
+                        H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw,
+                        b.raw
+                    )
+                ),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func interleavingUpperBlocksConstantAAlternating1And26() {
+        checkInterleavingUpperBlocksConstantAAlternating(1, 26)
+    }
+
+    @Test func interleavingUpperBlocksConstantAAlternating26And127() {
+        checkInterleavingUpperBlocksConstantAAlternating(26, 127)
+    }
+
+    @Test func interleavingUpperBlocksConstantAAlternating127And1() {
+        checkInterleavingUpperBlocksConstantAAlternating(127, 1)
+    }
+
+    @inline(__always)
+    private func checkInterleavingUpperBlocksConstantBAlternating(_ even: Lane, _ odd: Lane) {
+        let mismatches = Mismatches(
+            "interleavingUpperBlocks with b alternating \(hex(even)), \(hex(odd))"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x069D_F1DF_832D_1244)
+        mismatches.check(
+            H.repeatingBlock(even, odd, even, odd, even, odd, even, odd),
+            H(raw: HighwayReference.repeatingBlockI16(even, odd, even, odd, even, odd, even, odd)),
+            "repeatingBlock"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.interleavingUpperBlocks(
+                    a,
+                    H.repeatingBlock(even, odd, even, odd, even, odd, even, odd)
+                ),
+                H(
+                    raw: HighwayReference.interleavingUpperBlocksI16(
+                        a.raw,
+                        H.repeatingBlock(even, odd, even, odd, even, odd, even, odd).raw
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func interleavingUpperBlocksConstantBAlternating1And26() {
+        checkInterleavingUpperBlocksConstantBAlternating(1, 26)
+    }
+
+    @Test func interleavingUpperBlocksConstantBAlternating26And127() {
+        checkInterleavingUpperBlocksConstantBAlternating(26, 127)
+    }
+
+    @Test func interleavingUpperBlocksConstantBAlternating127And1() {
+        checkInterleavingUpperBlocksConstantBAlternating(127, 1)
+    }
+
+    @inline(__always)
     private func checkBroadcastingLaneConstantLane(_ lane: Int) {
         let mismatches = Mismatches("broadcastingLane with lane \(lane)")
         let aInputs = Inputs.vectors(H.self, seed: 0xB5A1_51DD_3773_B0BA)

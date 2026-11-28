@@ -109,4 +109,113 @@ extension SIMDBFloat16ConstantTests {
     @Test func repeatingWhereOtherwiseConstantSplatGreatest() {
         checkRepeatingWhereOtherwiseConstantOtherwise(Lane(bitPattern: 0x7F7F))
     }
+
+    @inline(__always)
+    private func checkRepeatingBlockConstantLanes(
+        _ v0: Lane,
+        _ v1: Lane,
+        _ v2: Lane,
+        _ v3: Lane,
+        _ v4: Lane,
+        _ v5: Lane,
+        _ v6: Lane,
+        _ v7: Lane
+    ) {
+        let mismatches = Mismatches("repeatingBlock with constant lanes")
+        mismatches.check(
+            H.repeatingBlock(v0, v1, v2, v3, v4, v5, v6, v7),
+            H(
+                raw: HighwayReference.repeatingBlockBF16(
+                    v0.bitPattern,
+                    v1.bitPattern,
+                    v2.bitPattern,
+                    v3.bitPattern,
+                    v4.bitPattern,
+                    v5.bitPattern,
+                    v6.bitPattern,
+                    v7.bitPattern
+                )
+            ),
+            "lanes"
+        )
+        mismatches.record()
+    }
+
+    @Test func repeatingBlockConstantLanes0() {
+        checkRepeatingBlockConstantLanes(
+            Lane(bitPattern: 0x3F80),
+            Lane(bitPattern: 0xC020),
+            Lane(bitPattern: 0x3F00),
+            Lane(bitPattern: 0x3F80),
+            Lane(bitPattern: 0xC020),
+            Lane(bitPattern: 0x3F00),
+            Lane(bitPattern: 0x3F80),
+            Lane(bitPattern: 0xC020)
+        )
+    }
+
+    @Test func repeatingBlockConstantLanes1() {
+        checkRepeatingBlockConstantLanes(
+            Lane(bitPattern: 0xC020),
+            Lane(bitPattern: 0x3F00),
+            Lane(bitPattern: 0x3F80),
+            Lane(bitPattern: 0xC020),
+            Lane(bitPattern: 0x3F00),
+            Lane(bitPattern: 0x3F80),
+            Lane(bitPattern: 0xC020),
+            Lane(bitPattern: 0x3F00)
+        )
+    }
+
+    @Test func repeatingBlockConstantLanes2() {
+        checkRepeatingBlockConstantLanes(
+            Lane(bitPattern: 0x3F00),
+            Lane(bitPattern: 0x3F80),
+            Lane(bitPattern: 0xC020),
+            Lane(bitPattern: 0x3F00),
+            Lane(bitPattern: 0x3F80),
+            Lane(bitPattern: 0xC020),
+            Lane(bitPattern: 0x3F00),
+            Lane(bitPattern: 0x3F80)
+        )
+    }
+
+    @Test func repeatingBlockConstantSplatOne() {
+        checkRepeatingBlockConstantLanes(
+            Lane(bitPattern: 0x3F80),
+            Lane(bitPattern: 0x3F80),
+            Lane(bitPattern: 0x3F80),
+            Lane(bitPattern: 0x3F80),
+            Lane(bitPattern: 0x3F80),
+            Lane(bitPattern: 0x3F80),
+            Lane(bitPattern: 0x3F80),
+            Lane(bitPattern: 0x3F80)
+        )
+    }
+
+    @Test func repeatingBlockConstantSplatMinusTwoPointFive() {
+        checkRepeatingBlockConstantLanes(
+            Lane(bitPattern: 0xC020),
+            Lane(bitPattern: 0xC020),
+            Lane(bitPattern: 0xC020),
+            Lane(bitPattern: 0xC020),
+            Lane(bitPattern: 0xC020),
+            Lane(bitPattern: 0xC020),
+            Lane(bitPattern: 0xC020),
+            Lane(bitPattern: 0xC020)
+        )
+    }
+
+    @Test func repeatingBlockConstantSplatHalf() {
+        checkRepeatingBlockConstantLanes(
+            Lane(bitPattern: 0x3F00),
+            Lane(bitPattern: 0x3F00),
+            Lane(bitPattern: 0x3F00),
+            Lane(bitPattern: 0x3F00),
+            Lane(bitPattern: 0x3F00),
+            Lane(bitPattern: 0x3F00),
+            Lane(bitPattern: 0x3F00),
+            Lane(bitPattern: 0x3F00)
+        )
+    }
 }

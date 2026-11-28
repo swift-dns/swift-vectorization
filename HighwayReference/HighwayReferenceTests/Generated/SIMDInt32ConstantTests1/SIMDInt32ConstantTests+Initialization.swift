@@ -130,4 +130,39 @@ extension SIMDInt32ConstantTests {
             }()
         )
     }
+
+    @inline(__always)
+    private func checkRepeatingBlockConstantLanes(_ v0: Lane, _ v1: Lane, _ v2: Lane, _ v3: Lane) {
+        let mismatches = Mismatches("repeatingBlock with constant lanes")
+        mismatches.check(
+            H.repeatingBlock(v0, v1, v2, v3),
+            H(raw: HighwayReference.repeatingBlockI32(v0, v1, v2, v3)),
+            "lanes"
+        )
+        mismatches.record()
+    }
+
+    @Test func repeatingBlockConstantLanes0() {
+        checkRepeatingBlockConstantLanes(1, 26, 127, 1)
+    }
+
+    @Test func repeatingBlockConstantLanes1() {
+        checkRepeatingBlockConstantLanes(26, 127, 1, 26)
+    }
+
+    @Test func repeatingBlockConstantLanes2() {
+        checkRepeatingBlockConstantLanes(127, 1, 26, 127)
+    }
+
+    @Test func repeatingBlockConstantSplat1() {
+        checkRepeatingBlockConstantLanes(1, 1, 1, 1)
+    }
+
+    @Test func repeatingBlockConstantSplat26() {
+        checkRepeatingBlockConstantLanes(26, 26, 26, 26)
+    }
+
+    @Test func repeatingBlockConstantSplat127() {
+        checkRepeatingBlockConstantLanes(127, 127, 127, 127)
+    }
 }

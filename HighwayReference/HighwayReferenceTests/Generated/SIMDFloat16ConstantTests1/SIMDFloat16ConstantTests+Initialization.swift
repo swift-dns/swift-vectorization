@@ -110,5 +110,60 @@ extension SIMDFloat16ConstantTests {
     @Test func repeatingWhereOtherwiseConstantSplatGreatest() {
         checkRepeatingWhereOtherwiseConstantOtherwise(.greatestFiniteMagnitude)
     }
+
+    @inline(__always)
+    private func checkRepeatingBlockConstantLanes(
+        _ v0: Lane,
+        _ v1: Lane,
+        _ v2: Lane,
+        _ v3: Lane,
+        _ v4: Lane,
+        _ v5: Lane,
+        _ v6: Lane,
+        _ v7: Lane
+    ) {
+        let mismatches = Mismatches("repeatingBlock with constant lanes")
+        mismatches.check(
+            H.repeatingBlock(v0, v1, v2, v3, v4, v5, v6, v7),
+            H(
+                raw: HighwayReference.repeatingBlockF16(
+                    v0.bitPattern,
+                    v1.bitPattern,
+                    v2.bitPattern,
+                    v3.bitPattern,
+                    v4.bitPattern,
+                    v5.bitPattern,
+                    v6.bitPattern,
+                    v7.bitPattern
+                )
+            ),
+            "lanes"
+        )
+        mismatches.record()
+    }
+
+    @Test func repeatingBlockConstantLanes0() {
+        checkRepeatingBlockConstantLanes(1.0, -2.5, 0.5, 1.0, -2.5, 0.5, 1.0, -2.5)
+    }
+
+    @Test func repeatingBlockConstantLanes1() {
+        checkRepeatingBlockConstantLanes(-2.5, 0.5, 1.0, -2.5, 0.5, 1.0, -2.5, 0.5)
+    }
+
+    @Test func repeatingBlockConstantLanes2() {
+        checkRepeatingBlockConstantLanes(0.5, 1.0, -2.5, 0.5, 1.0, -2.5, 0.5, 1.0)
+    }
+
+    @Test func repeatingBlockConstantSplatOne() {
+        checkRepeatingBlockConstantLanes(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+    }
+
+    @Test func repeatingBlockConstantSplatMinusTwoPointFive() {
+        checkRepeatingBlockConstantLanes(-2.5, -2.5, -2.5, -2.5, -2.5, -2.5, -2.5, -2.5)
+    }
+
+    @Test func repeatingBlockConstantSplatHalf() {
+        checkRepeatingBlockConstantLanes(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5)
+    }
 }
 #endif

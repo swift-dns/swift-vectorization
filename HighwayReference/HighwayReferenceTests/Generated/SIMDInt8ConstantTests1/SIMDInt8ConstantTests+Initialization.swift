@@ -130,4 +130,160 @@ extension SIMDInt8ConstantTests {
             }()
         )
     }
+
+    @inline(__always)
+    private func checkRepeatingBlockConstantLanes(
+        _ v0: Lane,
+        _ v1: Lane,
+        _ v2: Lane,
+        _ v3: Lane,
+        _ v4: Lane,
+        _ v5: Lane,
+        _ v6: Lane,
+        _ v7: Lane,
+        _ v8: Lane,
+        _ v9: Lane,
+        _ v10: Lane,
+        _ v11: Lane,
+        _ v12: Lane,
+        _ v13: Lane,
+        _ v14: Lane,
+        _ v15: Lane
+    ) {
+        let mismatches = Mismatches("repeatingBlock with constant lanes")
+        mismatches.check(
+            H.repeatingBlock(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15),
+            H(
+                raw: HighwayReference.repeatingBlockI8(
+                    v0,
+                    v1,
+                    v2,
+                    v3,
+                    v4,
+                    v5,
+                    v6,
+                    v7,
+                    v8,
+                    v9,
+                    v10,
+                    v11,
+                    v12,
+                    v13,
+                    v14,
+                    v15
+                )
+            ),
+            "lanes"
+        )
+        mismatches.record()
+    }
+
+    @Test func repeatingBlockConstantLanes0() {
+        checkRepeatingBlockConstantLanes(
+            1,
+            26,
+            127,
+            1,
+            26,
+            127,
+            1,
+            26,
+            127,
+            1,
+            26,
+            127,
+            1,
+            26,
+            127,
+            1
+        )
+    }
+
+    @Test func repeatingBlockConstantLanes1() {
+        checkRepeatingBlockConstantLanes(
+            26,
+            127,
+            1,
+            26,
+            127,
+            1,
+            26,
+            127,
+            1,
+            26,
+            127,
+            1,
+            26,
+            127,
+            1,
+            26
+        )
+    }
+
+    @Test func repeatingBlockConstantLanes2() {
+        checkRepeatingBlockConstantLanes(
+            127,
+            1,
+            26,
+            127,
+            1,
+            26,
+            127,
+            1,
+            26,
+            127,
+            1,
+            26,
+            127,
+            1,
+            26,
+            127
+        )
+    }
+
+    @Test func repeatingBlockConstantSplat1() {
+        checkRepeatingBlockConstantLanes(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    }
+
+    @Test func repeatingBlockConstantSplat26() {
+        checkRepeatingBlockConstantLanes(
+            26,
+            26,
+            26,
+            26,
+            26,
+            26,
+            26,
+            26,
+            26,
+            26,
+            26,
+            26,
+            26,
+            26,
+            26,
+            26
+        )
+    }
+
+    @Test func repeatingBlockConstantSplat127() {
+        checkRepeatingBlockConstantLanes(
+            127,
+            127,
+            127,
+            127,
+            127,
+            127,
+            127,
+            127,
+            127,
+            127,
+            127,
+            127,
+            127,
+            127,
+            127,
+            127
+        )
+    }
 }
