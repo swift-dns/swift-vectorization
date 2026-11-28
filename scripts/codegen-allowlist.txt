@@ -30280,12 +30280,12 @@ SVE_256 MagnitudeI64ConstantAInVectorCode the port has 3 instructions against hi
 SVE_256 MagnitudeI8ConstantA the port has 4 instructions against highway's 6; the port has add, adrp, ldp that highway lacks, and highway has abs, ext, mov x2, ptrue that the port lacks
 SVE_256 MagnitudeI8ConstantAInVectorCode the port has 3 instructions against highway's 5; the port has nothing that highway lacks, and highway has abs, ptrue that the port lacks
 SVE_256 MagnitudeWhereI16 the port and highway have 11 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
-SVE_256 MagnitudeWhereI16ConstantA the port and highway have 10 instructions each; the port has and, mov that highway lacks, and highway has abs, movi that the port lacks
-SVE_256 MagnitudeWhereI16ConstantAInVectorCode the port and highway have 8 instructions each; the port has and, mov that highway lacks, and highway has abs, movi that the port lacks
+SVE_256 MagnitudeWhereI16ConstantA the port has 8 instructions against highway's 10; the port has nothing that highway lacks, and highway has abs, movi that the port lacks
+SVE_256 MagnitudeWhereI16ConstantAInVectorCode the port has 6 instructions against highway's 8; the port has nothing that highway lacks, and highway has abs, movi that the port lacks
 SVE_256 MagnitudeWhereI16InVectorCode the port has 9 instructions against highway's 8; the port has and, mov that highway lacks, and highway has movi that the port lacks
 SVE_256 MagnitudeWhereI32 the port and highway have 11 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
-SVE_256 MagnitudeWhereI32ConstantA the port and highway have 10 instructions each; the port has and, mov that highway lacks, and highway has abs, movi that the port lacks
-SVE_256 MagnitudeWhereI32ConstantAInVectorCode the port and highway have 8 instructions each; the port has and, mov that highway lacks, and highway has abs, movi that the port lacks
+SVE_256 MagnitudeWhereI32ConstantA the port has 8 instructions against highway's 10; the port has nothing that highway lacks, and highway has abs, movi that the port lacks
+SVE_256 MagnitudeWhereI32ConstantAInVectorCode the port has 6 instructions against highway's 8; the port has nothing that highway lacks, and highway has abs, movi that the port lacks
 SVE_256 MagnitudeWhereI32InVectorCode the port has 9 instructions against highway's 8; the port has and, mov that highway lacks, and highway has movi that the port lacks
 SVE_256 MagnitudeWhereI64 the port and highway have 11 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE_256 MagnitudeWhereI64ConstantA the port has 8 instructions against highway's 10; the port has nothing that highway lacks, and highway has abs, movi that the port lacks
@@ -31127,7 +31127,7 @@ SVE_256 MultiplyAddingComplexConjugateWhereI16InVectorCode the port has 20 instr
 SVE_256 MultiplyAddingComplexConjugateWhereI32 the port has 22 instructions against highway's 24; the port has and, mad, mov x2, subr, trn2 that highway lacks, and highway has add, ext, movi, movprfx, msb, mul x2, sel that the port lacks
 SVE_256 MultiplyAddingComplexConjugateWhereI32ConstantA the port has 20 instructions against highway's 24; the port has and, mov x2, subr that highway lacks, and highway has ext, movi, movprfx, msb, mul x2, sel, trn1 that the port lacks
 SVE_256 MultiplyAddingComplexConjugateWhereI32ConstantAInVectorCode the port has 18 instructions against highway's 22; the port has and, mov x2, subr that highway lacks, and highway has ext, movi, movprfx, msb, mul x2, sel, trn1 that the port lacks
-SVE_256 MultiplyAddingComplexConjugateWhereI32ConstantB the port has 23 instructions against highway's 24; the port has adrp, and, ldr, mla, mov, splice that highway lacks, and highway has ext, movi, msb, mul x2, sel, trn1 that the port lacks
+SVE_256 MultiplyAddingComplexConjugateWhereI32ConstantB the port has 22 instructions against highway's 24; the port has adrp, and, ldr, mla, mov, splice that highway lacks, and highway has ext, movi, movprfx, msb, mul x2, sel, trn1 that the port lacks
 SVE_256 MultiplyAddingComplexConjugateWhereI32ConstantBInVectorCode the port has 17 instructions against highway's 22; the port has adrp, and, ldr, mla, mov that highway lacks, and highway has ext, movi, movprfx, msb, mul x2, sel, trn1 x2, trn2 that the port lacks
 SVE_256 MultiplyAddingComplexConjugateWhereI32ConstantC the port has 22 instructions against highway's 23; the port has and, mov x2, subr, trn2 that highway lacks, and highway has ext, movi, movprfx, msb, mul, sel that the port lacks
 SVE_256 MultiplyAddingComplexConjugateWhereI32ConstantCInVectorCode the port has 20 instructions against highway's 21; the port has and, mov x2, subr, trn2 that highway lacks, and highway has ext, movi, movprfx, msb, mul, sel that the port lacks
@@ -31159,7 +31159,7 @@ SVE_256 MultiplyAddingComplexConjugateWhereU16InVectorCode the port has 20 instr
 SVE_256 MultiplyAddingComplexConjugateWhereU32 the port has 22 instructions against highway's 24; the port has and, mad, mov x2, subr, trn2 that highway lacks, and highway has add, ext, movi, movprfx, msb, mul x2, sel that the port lacks
 SVE_256 MultiplyAddingComplexConjugateWhereU32ConstantA the port has 20 instructions against highway's 24; the port has and, mov x2, subr that highway lacks, and highway has ext, movi, movprfx, msb, mul x2, sel, trn1 that the port lacks
 SVE_256 MultiplyAddingComplexConjugateWhereU32ConstantAInVectorCode the port has 18 instructions against highway's 22; the port has and, mov x2, subr that highway lacks, and highway has ext, movi, movprfx, msb, mul x2, sel, trn1 that the port lacks
-SVE_256 MultiplyAddingComplexConjugateWhereU32ConstantB the port has 23 instructions against highway's 24; the port has adrp, and, ldr, mla, mov, splice that highway lacks, and highway has ext, movi, msb, mul x2, sel, trn1 that the port lacks
+SVE_256 MultiplyAddingComplexConjugateWhereU32ConstantB the port has 22 instructions against highway's 24; the port has adrp, and, ldr, mla, mov, splice that highway lacks, and highway has ext, movi, movprfx, msb, mul x2, sel, trn1 that the port lacks
 SVE_256 MultiplyAddingComplexConjugateWhereU32ConstantBInVectorCode the port has 17 instructions against highway's 22; the port has adrp, and, ldr, mla, mov that highway lacks, and highway has ext, movi, movprfx, msb, mul x2, sel, trn1 x2, trn2 that the port lacks
 SVE_256 MultiplyAddingComplexConjugateWhereU32ConstantC the port has 22 instructions against highway's 23; the port has and, mov x2, subr, trn2 that highway lacks, and highway has ext, movi, movprfx, msb, mul, sel that the port lacks
 SVE_256 MultiplyAddingComplexConjugateWhereU32ConstantCInVectorCode the port has 20 instructions against highway's 21; the port has and, mov x2, subr, trn2 that highway lacks, and highway has ext, movi, movprfx, msb, mul, sel that the port lacks
@@ -31523,10 +31523,10 @@ SVE_256 MultiplyPairwiseAddingWhereI16ToI32ConstantBInVectorCode the port and hi
 SVE_256 MultiplyPairwiseAddingWhereI16ToI32InVectorCode the port and highway have 17 instructions each; the port has and, mov that highway lacks, and highway has movi, sel that the port lacks
 SVE_256 MultiplyPairwiseAddingWhereU16ToU32 the port and highway have 18 instructions each; the port has and, mov that highway lacks, and highway has movi, sel that the port lacks
 SVE_256 MultiplyPairwiseAddingWhereU16ToU32ConstantA the port and highway have 18 instructions each; the port has and, mov that highway lacks, and highway has movi, sel that the port lacks
-SVE_256 MultiplyPairwiseAddingWhereU16ToU32ConstantAInVectorCode the port has 15 instructions against highway's 16; the port has and that highway lacks, and highway has movi, sel that the port lacks
+SVE_256 MultiplyPairwiseAddingWhereU16ToU32ConstantAInVectorCode the port and highway have 16 instructions each; the port has and, mov that highway lacks, and highway has movi, sel that the port lacks
 SVE_256 MultiplyPairwiseAddingWhereU16ToU32ConstantB the port and highway have 18 instructions each; the port has and, mov that highway lacks, and highway has movi, sel that the port lacks
-SVE_256 MultiplyPairwiseAddingWhereU16ToU32ConstantBInVectorCode the port has 15 instructions against highway's 16; the port has and that highway lacks, and highway has movi, sel that the port lacks
-SVE_256 MultiplyPairwiseAddingWhereU16ToU32InVectorCode the port has 15 instructions against highway's 17; the port has and, mla that highway lacks, and highway has mad, mov, movi, sel that the port lacks
+SVE_256 MultiplyPairwiseAddingWhereU16ToU32ConstantBInVectorCode the port and highway have 16 instructions each; the port has and, mov that highway lacks, and highway has movi, sel that the port lacks
+SVE_256 MultiplyPairwiseAddingWhereU16ToU32InVectorCode the port and highway have 17 instructions each; the port has and, mov that highway lacks, and highway has movi, sel that the port lacks
 SVE_256 MultiplyQuadAccumulatingI16ToI64ConstantCInVectorCode the port and highway have 6 instructions each, the same instructions with other registers, operands or constants
 SVE_256 MultiplyQuadAccumulatingI8ToI32ConstantCInVectorCode the port and highway have 6 instructions each, the same instructions with other registers, operands or constants
 SVE_256 MultiplyQuadAccumulatingU16ToU64ConstantCInVectorCode the port and highway have 6 instructions each, the same instructions with other registers, operands or constants
@@ -34293,8 +34293,8 @@ SVE_256 SelectingIfNegativeOrZeroI8ConstantB the port and highway have 8 instruc
 SVE_256 SelectingIfNegativeOrZeroI8ConstantBInVectorCode the port and highway have 6 instructions each; the port has and, asr that highway lacks, and highway has cmplt, ptrue that the port lacks
 SVE_256 SelectingIfNegativeOrZeroI8InVectorCode the port has 6 instructions against highway's 8; the port has and, asr that highway lacks, and highway has cmplt, mov, movi, ptrue that the port lacks
 SVE_256 SelectingOrZeroBF16 the port has 9 instructions against highway's 10; the port has and x2 that highway lacks, and highway has mov, movi, splice that the port lacks
-SVE_256 SelectingOrZeroBF16ConstantA the port has 10 instructions against highway's 12; the port has and that highway lacks, and highway has fmov, mov, movi that the port lacks
-SVE_256 SelectingOrZeroBF16ConstantAInVectorCode the port has 8 instructions against highway's 10; the port has and that highway lacks, and highway has fmov, mov, movi that the port lacks
+SVE_256 SelectingOrZeroBF16ConstantA the port has 8 instructions against highway's 12; the port has nothing that highway lacks, and highway has fmov, mov x2, movi that the port lacks
+SVE_256 SelectingOrZeroBF16ConstantAInVectorCode the port has 6 instructions against highway's 10; the port has nothing that highway lacks, and highway has fmov, mov x2, movi that the port lacks
 SVE_256 SelectingOrZeroBF16InVectorCode the port and highway have 8 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE_256 SelectingOrZeroF16 the port has 9 instructions against highway's 10; the port has and x2 that highway lacks, and highway has mov, movi, splice that the port lacks
 SVE_256 SelectingOrZeroF16ConstantA the port and highway have 11 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
@@ -34305,24 +34305,16 @@ SVE_256 SelectingOrZeroF32InVectorCode the port and highway have 8 instructions 
 SVE_256 SelectingOrZeroF64 the port has 9 instructions against highway's 10; the port has and x2 that highway lacks, and highway has mov, movi, splice that the port lacks
 SVE_256 SelectingOrZeroF64InVectorCode the port and highway have 8 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE_256 SelectingOrZeroI16 the port has 9 instructions against highway's 10; the port has and x2 that highway lacks, and highway has mov, movi, splice that the port lacks
-SVE_256 SelectingOrZeroI16ConstantA the port has 10 instructions against highway's 8; the port has and, mov that highway lacks, and highway has nothing that the port lacks
-SVE_256 SelectingOrZeroI16ConstantAInVectorCode the port has 8 instructions against highway's 6; the port has and, mov that highway lacks, and highway has nothing that the port lacks
 SVE_256 SelectingOrZeroI16InVectorCode the port and highway have 8 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE_256 SelectingOrZeroI32 the port has 9 instructions against highway's 10; the port has and x2 that highway lacks, and highway has mov, movi, splice that the port lacks
-SVE_256 SelectingOrZeroI32ConstantA the port has 10 instructions against highway's 8; the port has and, mov that highway lacks, and highway has nothing that the port lacks
-SVE_256 SelectingOrZeroI32ConstantAInVectorCode the port has 8 instructions against highway's 6; the port has and, mov that highway lacks, and highway has nothing that the port lacks
 SVE_256 SelectingOrZeroI32InVectorCode the port and highway have 8 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE_256 SelectingOrZeroI64 the port has 9 instructions against highway's 10; the port has and x2 that highway lacks, and highway has mov, movi, splice that the port lacks
 SVE_256 SelectingOrZeroI64InVectorCode the port and highway have 8 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE_256 SelectingOrZeroI8 the port has 9 instructions against highway's 10; the port has and x2 that highway lacks, and highway has mov, movi, splice that the port lacks
 SVE_256 SelectingOrZeroI8InVectorCode the port and highway have 8 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE_256 SelectingOrZeroU16 the port has 9 instructions against highway's 10; the port has and x2 that highway lacks, and highway has mov, movi, splice that the port lacks
-SVE_256 SelectingOrZeroU16ConstantA the port has 10 instructions against highway's 8; the port has and, mov that highway lacks, and highway has nothing that the port lacks
-SVE_256 SelectingOrZeroU16ConstantAInVectorCode the port has 8 instructions against highway's 6; the port has and, mov that highway lacks, and highway has nothing that the port lacks
 SVE_256 SelectingOrZeroU16InVectorCode the port and highway have 8 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE_256 SelectingOrZeroU32 the port has 9 instructions against highway's 10; the port has and x2 that highway lacks, and highway has mov, movi, splice that the port lacks
-SVE_256 SelectingOrZeroU32ConstantA the port has 10 instructions against highway's 8; the port has and, mov that highway lacks, and highway has nothing that the port lacks
-SVE_256 SelectingOrZeroU32ConstantAInVectorCode the port has 8 instructions against highway's 6; the port has and, mov that highway lacks, and highway has nothing that the port lacks
 SVE_256 SelectingOrZeroU32InVectorCode the port and highway have 8 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE_256 SelectingOrZeroU64 the port has 9 instructions against highway's 10; the port has and x2 that highway lacks, and highway has mov, movi, splice that the port lacks
 SVE_256 SelectingOrZeroU64InVectorCode the port and highway have 8 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
@@ -43896,12 +43888,12 @@ SVE MagnitudeI64ConstantAInVectorCode the port has 3 instructions against highwa
 SVE MagnitudeI8ConstantA the port has 5 instructions against highway's 10; the port has add, adrp, ldp x2 that highway lacks, and highway has abs, ext x3, mov x4, ptrue that the port lacks
 SVE MagnitudeI8ConstantAInVectorCode the port has 3 instructions against highway's 5; the port has nothing that highway lacks, and highway has abs, ptrue that the port lacks
 SVE MagnitudeWhereI16 the port and highway have 20 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
-SVE MagnitudeWhereI16ConstantA the port and highway have 17 instructions each; the port has and, mov that highway lacks, and highway has abs, movi that the port lacks
-SVE MagnitudeWhereI16ConstantAInVectorCode the port and highway have 8 instructions each; the port has and, mov that highway lacks, and highway has abs, movi that the port lacks
+SVE MagnitudeWhereI16ConstantA the port has 15 instructions against highway's 17; the port has nothing that highway lacks, and highway has abs, movi that the port lacks
+SVE MagnitudeWhereI16ConstantAInVectorCode the port has 6 instructions against highway's 8; the port has nothing that highway lacks, and highway has abs, movi that the port lacks
 SVE MagnitudeWhereI16InVectorCode the port has 9 instructions against highway's 8; the port has and, mov that highway lacks, and highway has movi that the port lacks
 SVE MagnitudeWhereI32 the port and highway have 20 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
-SVE MagnitudeWhereI32ConstantA the port and highway have 17 instructions each; the port has and, mov that highway lacks, and highway has abs, movi that the port lacks
-SVE MagnitudeWhereI32ConstantAInVectorCode the port and highway have 8 instructions each; the port has and, mov that highway lacks, and highway has abs, movi that the port lacks
+SVE MagnitudeWhereI32ConstantA the port has 15 instructions against highway's 17; the port has nothing that highway lacks, and highway has abs, movi that the port lacks
+SVE MagnitudeWhereI32ConstantAInVectorCode the port has 6 instructions against highway's 8; the port has nothing that highway lacks, and highway has abs, movi that the port lacks
 SVE MagnitudeWhereI32InVectorCode the port has 9 instructions against highway's 8; the port has and, mov that highway lacks, and highway has movi that the port lacks
 SVE MagnitudeWhereI64 the port and highway have 20 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE MagnitudeWhereI64ConstantA the port has 15 instructions against highway's 17; the port has nothing that highway lacks, and highway has abs, movi that the port lacks
@@ -45060,10 +45052,10 @@ SVE MultiplyPairwiseAddingWhereI16ToI32ConstantBInVectorCode the port and highwa
 SVE MultiplyPairwiseAddingWhereI16ToI32InVectorCode the port and highway have 17 instructions each; the port has and, mov that highway lacks, and highway has movi, sel that the port lacks
 SVE MultiplyPairwiseAddingWhereU16ToU32 the port and highway have 32 instructions each; the port has and, mov that highway lacks, and highway has movi, sel that the port lacks
 SVE MultiplyPairwiseAddingWhereU16ToU32ConstantA the port and highway have 28 instructions each; the port has and, mov that highway lacks, and highway has movi, sel that the port lacks
-SVE MultiplyPairwiseAddingWhereU16ToU32ConstantAInVectorCode the port has 15 instructions against highway's 16; the port has and that highway lacks, and highway has movi, sel that the port lacks
+SVE MultiplyPairwiseAddingWhereU16ToU32ConstantAInVectorCode the port and highway have 16 instructions each; the port has and, mov that highway lacks, and highway has movi, sel that the port lacks
 SVE MultiplyPairwiseAddingWhereU16ToU32ConstantB the port and highway have 28 instructions each; the port has and, mov that highway lacks, and highway has movi, sel that the port lacks
-SVE MultiplyPairwiseAddingWhereU16ToU32ConstantBInVectorCode the port has 15 instructions against highway's 16; the port has and that highway lacks, and highway has movi, sel that the port lacks
-SVE MultiplyPairwiseAddingWhereU16ToU32InVectorCode the port has 15 instructions against highway's 17; the port has and, mla that highway lacks, and highway has mad, mov, movi, sel that the port lacks
+SVE MultiplyPairwiseAddingWhereU16ToU32ConstantBInVectorCode the port and highway have 16 instructions each; the port has and, mov that highway lacks, and highway has movi, sel that the port lacks
+SVE MultiplyPairwiseAddingWhereU16ToU32InVectorCode the port and highway have 17 instructions each; the port has and, mov that highway lacks, and highway has movi, sel that the port lacks
 SVE MultiplyQuadAccumulatingI16ToI64ConstantCInVectorCode the port and highway have 6 instructions each, the same instructions with other registers, operands or constants
 SVE MultiplyQuadAccumulatingI8ToI32ConstantCInVectorCode the port and highway have 6 instructions each, the same instructions with other registers, operands or constants
 SVE MultiplyQuadAccumulatingU16ToU64ConstantCInVectorCode the port and highway have 6 instructions each, the same instructions with other registers, operands or constants
@@ -48038,8 +48030,6 @@ SVE SelectingIfNegativeOrZeroI8ConstantB the port and highway have 15 instructio
 SVE SelectingIfNegativeOrZeroI8ConstantBInVectorCode the port and highway have 6 instructions each; the port has and, asr that highway lacks, and highway has cmplt, ptrue that the port lacks
 SVE SelectingIfNegativeOrZeroI8InVectorCode the port has 6 instructions against highway's 8; the port has and, asr that highway lacks, and highway has cmplt, mov, movi, ptrue that the port lacks
 SVE SelectingOrZeroBF16 the port and highway have 19 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
-SVE SelectingOrZeroBF16ConstantA the port has 17 instructions against highway's 15; the port has and, mov that highway lacks, and highway has nothing that the port lacks
-SVE SelectingOrZeroBF16ConstantAInVectorCode the port has 8 instructions against highway's 6; the port has and, mov that highway lacks, and highway has nothing that the port lacks
 SVE SelectingOrZeroBF16InVectorCode the port and highway have 8 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE SelectingOrZeroF16 the port and highway have 19 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE SelectingOrZeroF16ConstantA the port and highway have 18 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
@@ -48050,24 +48040,16 @@ SVE SelectingOrZeroF32InVectorCode the port and highway have 8 instructions each
 SVE SelectingOrZeroF64 the port and highway have 19 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE SelectingOrZeroF64InVectorCode the port and highway have 8 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE SelectingOrZeroI16 the port and highway have 19 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
-SVE SelectingOrZeroI16ConstantA the port has 17 instructions against highway's 15; the port has and, mov that highway lacks, and highway has nothing that the port lacks
-SVE SelectingOrZeroI16ConstantAInVectorCode the port has 8 instructions against highway's 6; the port has and, mov that highway lacks, and highway has nothing that the port lacks
 SVE SelectingOrZeroI16InVectorCode the port and highway have 8 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE SelectingOrZeroI32 the port and highway have 19 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
-SVE SelectingOrZeroI32ConstantA the port has 17 instructions against highway's 15; the port has and, mov that highway lacks, and highway has nothing that the port lacks
-SVE SelectingOrZeroI32ConstantAInVectorCode the port has 8 instructions against highway's 6; the port has and, mov that highway lacks, and highway has nothing that the port lacks
 SVE SelectingOrZeroI32InVectorCode the port and highway have 8 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE SelectingOrZeroI64 the port and highway have 19 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE SelectingOrZeroI64InVectorCode the port and highway have 8 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE SelectingOrZeroI8 the port and highway have 19 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE SelectingOrZeroI8InVectorCode the port and highway have 8 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE SelectingOrZeroU16 the port and highway have 19 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
-SVE SelectingOrZeroU16ConstantA the port has 17 instructions against highway's 15; the port has and, mov that highway lacks, and highway has nothing that the port lacks
-SVE SelectingOrZeroU16ConstantAInVectorCode the port has 8 instructions against highway's 6; the port has and, mov that highway lacks, and highway has nothing that the port lacks
 SVE SelectingOrZeroU16InVectorCode the port and highway have 8 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE SelectingOrZeroU32 the port and highway have 19 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
-SVE SelectingOrZeroU32ConstantA the port has 17 instructions against highway's 15; the port has and, mov that highway lacks, and highway has nothing that the port lacks
-SVE SelectingOrZeroU32ConstantAInVectorCode the port has 8 instructions against highway's 6; the port has and, mov that highway lacks, and highway has nothing that the port lacks
 SVE SelectingOrZeroU32InVectorCode the port and highway have 8 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE SelectingOrZeroU64 the port and highway have 19 instructions each; the port has and that highway lacks, and highway has movi that the port lacks
 SVE SelectingOrZeroU64InVectorCode the port and highway have 8 instructions each; the port has and that highway lacks, and highway has movi that the port lacks

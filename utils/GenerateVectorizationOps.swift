@@ -16581,13 +16581,22 @@ let basicOps: [Op] = [
             sve2_128Splat: { element in
                 sveBitwiseSplat("and", operands: ("mask", "a"), splattingFirst: false, for: element)
             },
+            sve: { element in
+                guard sveOnlySplatSelectingLanes.matches(element) else { return nil }
+                return [
+                    sveSplatSelectingArm(zeroing: false, for: element),
+                    portableSelectingOrZero(for: element),
+                ].joined(separator: "\n")
+            },
+            sve2: { element in
+                sveOnlySplatSelectingLanes.matches(element)
+                    ? portableSelectingOrZero(for: element) : nil
+            },
             sveSplat: { element in sveSplatSelecting(zeroing: false, for: element) },
             avx3: { element in x86Avx3ZeroMasked("a", for: element) }
         )
     ) { element in
-        let mask = "(\(element.cUnsignedVector))mask"
-        let selected = fromUnsignedBits("\(mask) & \(unsignedBits("a", of: element))", of: element)
-        return vectorResult(selected, for: element)
+        portableSelectingOrZero(for: element)
     },
     Op(
         "zeroingSelected",
@@ -21326,6 +21335,12 @@ func sveCanonicalMaskCondition(_ name: String, for element: Element) -> String {
     "__builtin_constant_p(__builtin_reduce_and(\(name) == (\(name) >> \(element.bits - 1))))"
 }
 
+func portableSelectingOrZero(for element: Element) -> String {
+    let mask = "(\(element.cUnsignedVector))mask"
+    let selected = fromUnsignedBits("\(mask) & \(unsignedBits("a", of: element))", of: element)
+    return vectorResult(selected, for: element)
+}
+
 func portableZeroingSelected(for element: Element) -> String {
     let mask = "(\(element.cUnsignedVector))mask"
     let kept = fromUnsignedBits("~\(mask) & \(unsignedBits("a", of: element))", of: element)
@@ -21348,25 +21363,34 @@ func sveWideZeroingSelected(for element: Element) -> String {
     )
 }
 
+let sveOnlySplatSelectingLanes = Applies.integer(bits: [16, 32])
+
 func sveSplatSelecting(zeroing: Bool, for element: Element) -> String? {
     guard zeroing || element.bits == 8 || element.bits == 64 || element.category == .float else {
         return nil
     }
+    return sveSplatSelectingArm(zeroing: zeroing, for: element)
+}
+
+func sveSplatSelectingArm(zeroing: Bool, for element: Element) -> String {
     let predicate = svePredicate(of: "mask", for: element)
     let lane = sveFirstLane("a", for: element)
     let duplicated = sveBuiltin("dup_n", [lane], for: element)
     let selected: String
+    var conditions = [
+        sveSplatCondition("a", nil, for: element),
+        "!\(sveCanonicalMaskCondition(rawName("mask"), for: element))",
+    ]
     if zeroing {
         selected = sveBuiltin("sel", [predicate, sveZeros(for: element), duplicated], for: element)
     } else if element.category == .float {
         selected = sveBuiltin("sel", [predicate, duplicated, sveZeros(for: element)], for: element)
     } else {
         selected = sveBuiltin("dup_n", [predicate, lane], for: element, predication: "z")
+        conditions.append("!(__builtin_constant_p(\(lane)) && \(lane) == 0)")
     }
-    let condition =
-        "\(sveSplatCondition("a", nil, for: element)) && !\(sveCanonicalMaskCondition(rawName("mask"), for: element))"
     return """
-        if (\(condition)) {
+        if (\(conditions.joined(separator: " && "))) {
           \(vectorResult(sveResult(selected, for: element), for: element))
         }
         """
@@ -43785,7 +43809,8 @@ func sveBody<Input>(_ targets: TargetBodies<Input>, for input: Input) -> String?
 func sveBranches<Input: WidthScaled>(
     _ targets: TargetBodies<Input>,
     for input: Input,
-    portable: ((Input) -> String)?
+    portable: ((Input) -> String)?,
+    fallback: String?
 ) -> [TargetBranch] {
     supportedSveWidths.flatMap { width -> [TargetBranch] in
         let scaled = input.at(width: width)
@@ -43798,11 +43823,14 @@ func sveBranches<Input: WidthScaled>(
         let sve2 =
             supportedSveLevels.contains(.sve2(bytes: width))
             ? targets.sve2?(scaled).flatMap(splatting) : nil
-        let specific = sve2.flatMap { $0 == sve ? nil : $0 }.map {
-            (condition: sveWidthCondition(width, level: .sve2(bytes: width)), body: $0)
-        }
-        let general = sve.map { (condition: sveWidthCondition(width), body: $0) }
-        return [specific, general].compactMap { $0 }
+        let general = sve.flatMap { $0 == fallback ? nil : $0 }
+        let specific = sve2.flatMap { $0 == sve || ($0 == fallback && general == nil) ? nil : $0 }
+        return [
+            specific.map {
+                (condition: sveWidthCondition(width, level: .sve2(bytes: width)), body: $0)
+            },
+            general.map { (condition: sveWidthCondition(width), body: $0) },
+        ].compactMap { $0 }
     }
 }
 
@@ -43822,7 +43850,7 @@ func cBody<Input: WidthScaled>(
     let neon = neonBody.map { (condition: neonCondition, body: $0) }
     let emu128 = targets.emu128?(input).map { (condition: emu128Condition, body: $0) }
     let specific = (neon.map { [$0] } ?? []) + x86Branches(targets, for: input, portable: portable)
-    let wide = sveBranches(targets, for: input, portable: portable).filter { $0.body != fallback }
+    let wide = sveBranches(targets, for: input, portable: portable, fallback: fallback)
     let branches =
         (sve2.map { [$0] } ?? []) + wide
         + mergingIdenticalBodies(specific.filter { $0.body != fallback })
