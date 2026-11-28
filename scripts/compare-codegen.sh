@@ -26,10 +26,12 @@ readonly longer_allowlist_entry_format='<TARGET> <Function>'
 readonly longer_allowlist_entry_example='EMU128_X86_64 RemainderI64'
 readonly target_name="HighwayReferenceCodegen"
 readonly host_dependent_target="EMU128"
+readonly in_vector_code_define="CODEGEN_IN_VECTOR_CODE"
 readonly listing_limit_on_failure=50
 
 architecture=""
 verbose="false"
+in_vector_code="false"
 fingerprints_path=""
 declare -a extra_build_arguments=()
 declare -A location_of_entry=()
@@ -43,9 +45,12 @@ cleanup() {
 }
 
 usage() {
-  printf -- 'Usage: %s [--arch <arch>] [--verbose | --fingerprints <file>]\n' \
+  printf -- 'Usage: %s [--arch <arch>] [--in-vector-code] [--verbose | --fingerprints <file>]\n' \
     "$(basename -- "${BASH_SOURCE[0]}")"
   printf -- '       [-- <extra swift build arguments>]\n'
+  printf -- '  --in-vector-code      also compare the <Function>InVectorCode kernels, which load\n'
+  printf -- '                        their vectors from memory and store their result; without it\n'
+  printf -- '                        their allowlist entries are not checked\n'
   printf -- '  --fingerprints <file> write the fingerprint of every port and highway function to the\n'
   printf -- '                        file instead of comparing them, for list-new-ops.sh to read\n'
   printf -- "A function that is not the same as highway's fails unless %s\n" \
@@ -81,6 +86,9 @@ parse_arguments() {
       --verbose)
         verbose="true"
         ;;
+      --in-vector-code)
+        in_vector_code="true"
+        ;;
       --fingerprints)
         fingerprints_path="${1:?--fingerprints requires the file to write the fingerprints to}"
         shift
@@ -101,6 +109,9 @@ parse_arguments() {
 
   if [[ "${verbose}" == "true" && -n "${fingerprints_path}" ]]; then
     fatal "--verbose prints the listings of the comparison, which --fingerprints skips" "$(usage)"
+  fi
+  if [[ "${in_vector_code}" == "true" && -n "${fingerprints_path}" ]]; then
+    fatal "--in-vector-code adds kernels to the comparison, which --fingerprints skips" "$(usage)"
   fi
   return 0
 }
@@ -246,6 +257,7 @@ compare_functions() {
   local longer_allowlist_file="${5:?compare_functions requires the longer allowlist file}"
   local show_listings="${6:?compare_functions requires whether to print the listings}"
   local host_architecture_key="${7:?compare_functions requires the key of the host architecture}"
+  local compares_in_vector_code="${8:?compare_functions requires whether to compare InVectorCode kernels}"
 
   if ! awk -F '\t' \
     -v names_file="${names_file}" \
@@ -258,6 +270,7 @@ compare_functions() {
     -v show_listings="${show_listings}" \
     -v host_dependent_target="${host_dependent_target}" \
     -v host_architecture_key="${host_architecture_key}" \
+    -v compares_in_vector_code="${compares_in_vector_code}" \
     -v listing_limit="${listing_limit_on_failure}" '
     function keyed_target(target) {
       if (target == host_dependent_target) {
@@ -416,6 +429,9 @@ compare_functions() {
           continue
         }
         paired[highway_name] = 1
+        if (key ~ /InVectorCode$/) {
+          in_vector_code_total++
+        }
 
         port_length = trimmed_length(port_name)
         highway_length = trimmed_length(highway_name)
@@ -491,6 +507,10 @@ compare_functions() {
         printf "** ERROR: found no port functions to compare\n" > "/dev/stderr"
         failed = 1
       }
+      if (compares_in_vector_code == "true" && in_vector_code_total == 0) {
+        printf "** ERROR: found no InVectorCode functions to compare\n" > "/dev/stderr"
+        failed = 1
+      }
       if (highway_target == "") {
         printf "** ERROR: found no targetOfHighway to read the target from\n" > "/dev/stderr"
         failed = 1
@@ -501,6 +521,9 @@ compare_functions() {
           continue
         }
         listed_function = allowlist_function[entry]
+        if (compares_in_vector_code != "true" && listed_function ~ /InVectorCode$/) {
+          continue
+        }
         listed_as = "allowlisted"
         if (allowlist_for_reorders[entry]) {
           listed_as = "reorder-allowlisted"
@@ -1112,6 +1135,9 @@ main() {
   if [[ -n "${architecture}" ]]; then
     build_arguments+=( --arch "${architecture}" )
   fi
+  if [[ "${in_vector_code}" == "true" ]]; then
+    build_arguments+=( -Xswiftc "-D${in_vector_code_define}" )
+  fi
   build_arguments+=( "${extra_build_arguments[@]}" )
 
   local binary_directory
@@ -1150,7 +1176,8 @@ main() {
 
   log "Comparing the functions..."
   compare_functions "${names_file}" "${listing_file}" "${allowlist_path}" \
-    "${reorder_allowlist_path}" "${longer_allowlist_path}" "${verbose}" "${host_architecture_key}"
+    "${reorder_allowlist_path}" "${longer_allowlist_path}" "${verbose}" "${host_architecture_key}" \
+    "${in_vector_code}"
   return 0
 }
 

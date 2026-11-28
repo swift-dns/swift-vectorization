@@ -2,41 +2,41 @@
   "@context" : "https://spdx.org/rdf/3.0.1/spdx-context.jsonld",
   "@graph" : [
     {
-      "creationInfo" : "urn:uuid:55ee0107-0578-4b74-97e6-bfd9c1b622fc:creationInfo",
-      "from" : "urn:uuid:55ee0107-0578-4b74-97e6-bfd9c1b622fc",
+      "creationInfo" : "urn:uuid:b0868514-df8c-4b91-a9fa-0a00fc170019:creationInfo",
+      "from" : "urn:uuid:b0868514-df8c-4b91-a9fa-0a00fc170019",
       "relationshipType" : "hasDeclaredLicense",
-      "spdxId" : "urn:uuid:55ee0107-0578-4b74-97e6-bfd9c1b622fc-hasDeclaredLicense-urn:spdx:Apache-2.0",
+      "spdxId" : "urn:uuid:b0868514-df8c-4b91-a9fa-0a00fc170019-hasDeclaredLicense-urn:spdx:Apache-2.0",
       "to" : [
         "urn:spdx:Apache-2.0"
       ],
       "type" : "Relationship"
     },
     {
-      "creationInfo" : "urn:uuid:55ee0107-0578-4b74-97e6-bfd9c1b622fc:creationInfo",
+      "creationInfo" : "urn:uuid:b0868514-df8c-4b91-a9fa-0a00fc170019:creationInfo",
       "simplelicensing_licenseExpression" : "Apache-2.0",
       "spdxId" : "urn:spdx:Apache-2.0",
       "type" : "simplelicensing_LicenseExpression"
     },
     {
-      "@id" : "urn:uuid:55ee0107-0578-4b74-97e6-bfd9c1b622fc:creationInfo",
-      "created" : "2026-10-31T17:23:39Z",
+      "@id" : "urn:uuid:b0868514-df8c-4b91-a9fa-0a00fc170019:creationInfo",
+      "created" : "2026-11-21T00:18:28Z",
       "createdBy" : [
-        "urn:uuid:55ee0107-0578-4b74-97e6-bfd9c1b622fc"
+        "urn:uuid:b0868514-df8c-4b91-a9fa-0a00fc170019"
       ],
-      "specVersion" : "6.4.2",
+      "specVersion" : "6.4.3",
       "type" : "CreationInfo"
     },
     {
-      "creationInfo" : "urn:uuid:55ee0107-0578-4b74-97e6-bfd9c1b622fc:creationInfo",
+      "creationInfo" : "urn:uuid:b0868514-df8c-4b91-a9fa-0a00fc170019:creationInfo",
       "name" : "swift-package-manager",
-      "spdxId" : "urn:uuid:55ee0107-0578-4b74-97e6-bfd9c1b622fc",
+      "spdxId" : "urn:uuid:b0868514-df8c-4b91-a9fa-0a00fc170019",
       "type" : "Agent"
     },
     {
       "@id" : "_:creationInfo",
-      "created" : "2026-10-31T17:23:39Z",
+      "created" : "2026-11-21T00:18:28Z",
       "createdBy" : [
-        "urn:uuid:55ee0107-0578-4b74-97e6-bfd9c1b622fc"
+        "urn:uuid:b0868514-df8c-4b91-a9fa-0a00fc170019"
       ],
       "specVersion" : "3.0.1",
       "type" : "CreationInfo"
@@ -50,14 +50,14 @@
       "rootElement" : [
         "urn:spdx:swift-vectorization"
       ],
-      "spdxId" : "urn:uuid:13f28506-e4d0-426e-98f3-4952f6f3e805",
+      "spdxId" : "urn:uuid:cffe1d46-6421-468c-b393-1864302a0d7b",
       "type" : "software_Sbom"
     },
     {
       "creationInfo" : "_:creationInfo",
-      "from" : "urn:uuid:13f28506-e4d0-426e-98f3-4952f6f3e805",
+      "from" : "urn:uuid:cffe1d46-6421-468c-b393-1864302a0d7b",
       "relationshipType" : "describes",
-      "spdxId" : "urn:uuid:13f28506-e4d0-426e-98f3-4952f6f3e805-describes-urn:spdx:swift-vectorization",
+      "spdxId" : "urn:uuid:cffe1d46-6421-468c-b393-1864302a0d7b-describes-urn:spdx:swift-vectorization",
       "to" : [
         "urn:spdx:swift-vectorization"
       ],
@@ -70,9 +70,9 @@
         "software"
       ],
       "rootElement" : [
-        "urn:uuid:13f28506-e4d0-426e-98f3-4952f6f3e805"
+        "urn:uuid:cffe1d46-6421-468c-b393-1864302a0d7b"
       ],
-      "spdxId" : "urn:uuid:7bc54f60-b548-48a7-a4aa-e68d3205a356",
+      "spdxId" : "urn:uuid:ed42f09e-5cee-44bd-8260-388170f4d7be",
       "type" : "SpdxDocument"
     },
     {

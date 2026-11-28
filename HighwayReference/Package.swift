@@ -80,20 +80,31 @@ package.targets += [
         name: "HighwayReferenceCodegen",
         dependencies: ["CHighwayReference", "Vectorization"],
         path: "HighwayReferenceCodegen",
-        swiftSettings: settings + [.interoperabilityMode(.Cxx)]
+        swiftSettings: settings + [.interoperabilityMode(.Cxx), .unsafeFlags(["-O"])]
     ),
 ]
 
-package.targets += elementNames.map { name in
-    .testTarget(
-        name: "\(name)Tests",
-        dependencies: [
-            "CHighwayReference", "HighwayReferenceCodegen", "HighwayReferenceTestSupport",
-            "Vectorization",
-        ],
-        path: "HighwayReferenceTests/Generated/\(name)Tests",
-        swiftSettings: settings + [.interoperabilityMode(.Cxx)]
-    )
+let referenceDependencies: [Target.Dependency] = [
+    "CHighwayReference", "HighwayReferenceTestSupport", "Vectorization",
+]
+
+let testSuites: [(name: String, dependencies: [Target.Dependency])] = [
+    ("ReferenceTests", referenceDependencies),
+    ("ConstantTests1", referenceDependencies),
+    ("ConstantTests2", referenceDependencies),
+    ("ConstantTests3", referenceDependencies),
+    ("CodegenTests", referenceDependencies + ["HighwayReferenceCodegen"]),
+]
+
+package.targets += elementNames.flatMap { name in
+    testSuites.map { suite in
+        .testTarget(
+            name: "\(name)\(suite.name)",
+            dependencies: suite.dependencies,
+            path: "HighwayReferenceTests/Generated/\(name)\(suite.name)",
+            swiftSettings: settings + [.interoperabilityMode(.Cxx)]
+        )
+    }
 }
 
 package.cxxLanguageStandard = .cxx17
